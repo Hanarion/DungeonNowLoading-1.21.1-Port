@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "s": {
+      "item": "minecraft:stone_bricks"
+    }
+  },
+  "pattern": [
+    "srs",
+    "srs",
+    "srs"
+  ],
+  "result": {
+    "count": 3,
+    "item": "dungeonnowloading:redstone_lane_i"
+  },
+  "show_notification": true
+}

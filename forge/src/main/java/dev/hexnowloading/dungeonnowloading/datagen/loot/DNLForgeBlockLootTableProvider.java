@@ -46,12 +46,17 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.STONE_TILE_STAIRS.get());
         this.add(DNLBlocks.STONE_TILE_SLAB.get(), block -> createSlabItemTable(DNLBlocks.STONE_TILE_SLAB.get()));
         this.dropSelf(DNLBlocks.STONE_TILE_WALL.get());
+        this.add(DNLBlocks.MOSS.get(), block -> this.createMultifaceBlockDrops(block, HAS_SHEARS));
         this.dropSelf(DNLBlocks.SIGNALING_STONE_EMBLEM.get());
         this.dropSelf(DNLBlocks.DUELING_STONE_EMBLEM.get());
         this.dropSelf(DNLBlocks.PUZZLING_STONE_EMBLEM.get());
         this.dropSelf(DNLBlocks.POLISHED_STONE.get());
         this.dropSelf(DNLBlocks.BORDERED_STONE.get());
         this.dropSelf(DNLBlocks.STONE_NOTCH.get());
+        this.dropSelf(DNLBlocks.REDSTONE_LANE_I.get());
+        this.dropSelf(DNLBlocks.REDSTONE_LANE_L.get());
+        this.dropSelf(DNLBlocks.REDSTONE_LANE_T.get());
+        this.dropSelf(DNLBlocks.ROTATOR_PRESSURE_PLATE.get());
         this.add(DNLBlocks.COAL_STONE_NOTCH.get(), block -> notchBlock(block, Items.COAL));
         this.add(DNLBlocks.COPPER_STONE_NOTCH.get(), block -> notchBlock(block, Items.COPPER_INGOT));
         this.add(DNLBlocks.IRON_STONE_NOTCH.get(), block -> notchBlock(block, Items.IRON_INGOT));
@@ -68,7 +73,6 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.add(DNLBlocks.DIAMOND_STONE_NOTCH.get(), block -> notchBlock(block, Items.DIAMOND));
         this.add(DNLBlocks.NETHERITE_STONE_NOTCH.get(), block -> notchBlock(block, Items.NETHERITE_INGOT));
         this.dropSelf(DNLBlocks.SIGNAL_GATE.get());
-
         this.add(DNLBlocks.BOOK_PILE.get(), block -> bookPile());
         this.add(DNLBlocks.COBBLESTONE_PEBBLES.get(), block -> pileBlock(block, DNLItems.COBBLESTONE_PEBBLE.get()));
         this.add(DNLBlocks.MOSSY_COBBLESTONE_PEBBLES.get(), block -> pileBlock(block, DNLItems.MOSSY_COBBLESTONE_PEBBLE.get()));
