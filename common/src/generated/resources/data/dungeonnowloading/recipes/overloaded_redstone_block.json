@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "b": {
+      "item": "minecraft:redstone_block"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "s": {
+      "item": "dungeonnowloading:redstone_suppressor"
+    }
+  },
+  "pattern": [
+    "rsr",
+    "sbs",
+    "rsr"
+  ],
+  "result": {
+    "item": "dungeonnowloading:overloaded_redstone_block"
+  },
+  "show_notification": true
+}

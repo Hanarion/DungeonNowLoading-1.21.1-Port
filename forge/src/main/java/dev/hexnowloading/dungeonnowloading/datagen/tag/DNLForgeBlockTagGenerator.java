@@ -32,6 +32,7 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.STONE_TILE_STAIRS.get(),
                 DNLBlocks.STONE_TILE_SLAB.get(),
                 DNLBlocks.STONE_TILE_WALL.get(),
+                DNLBlocks.OVERLOADED_REDSTONE_BLOCK.get(),
                 DNLBlocks.REDSTONE_LANE_I.get(),
                 DNLBlocks.REDSTONE_LANE_T.get(),
                 DNLBlocks.REDSTONE_LANE_L.get(),

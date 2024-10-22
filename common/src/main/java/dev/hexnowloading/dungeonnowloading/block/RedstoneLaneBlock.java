@@ -121,7 +121,7 @@ public class RedstoneLaneBlock extends DirectionalBlock {
         if (blockState.getValue(REDSTONE_LANE_MODE) == RedstoneLaneMode.UNPOWERED) {
             if (level.getBlockState(neighbourBlock).is(Blocks.REDSTONE_BLOCK)) {
                 neighbourChangedRedstoneBlock(blockState, level, blockPos, block, neighbourBlock);
-            } else if (level.getBlockState(neighbourBlock).is(Blocks.MAGMA_BLOCK)) {
+            } else if (level.getBlockState(neighbourBlock).is(DNLBlocks.OVERLOADED_REDSTONE_BLOCK.get())) {
                 neighbourChangedOverpoweredBlock(blockState, level, blockPos, block, neighbourBlock);
             } else if (
                     (
@@ -153,14 +153,14 @@ public class RedstoneLaneBlock extends DirectionalBlock {
 
         boolean hasRedstoneBlock = !neighborLaneBlockPosList.stream().filter(b -> level.getBlockState(b).is(Blocks.REDSTONE_BLOCK)).toList().isEmpty();
 
-        boolean hasMagmaBlock = !neighborLaneBlockPosList.stream().filter(b -> level.getBlockState(b).is(Blocks.MAGMA_BLOCK)).toList().isEmpty();
+        boolean hasMagmaBlock = !neighborLaneBlockPosList.stream().filter(b -> level.getBlockState(b).is(DNLBlocks.OVERLOADED_REDSTONE_BLOCK.get())).toList().isEmpty();
 
 
         if (hasRedstoneBlock || level.getBlockState(blockPos.above()).is(Blocks.REDSTONE_BLOCK)) {
 
             power = 150;
 
-        } else if (hasMagmaBlock || level.getBlockState(blockPos.above()).is(Blocks.MAGMA_BLOCK)) {
+        } else if (hasMagmaBlock || level.getBlockState(blockPos.above()).is(DNLBlocks.OVERLOADED_REDSTONE_BLOCK.get())) {
 
             power = 150;
             overpowered = true;

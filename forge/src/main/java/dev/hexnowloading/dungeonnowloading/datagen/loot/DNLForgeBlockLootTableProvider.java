@@ -53,6 +53,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.POLISHED_STONE.get());
         this.dropSelf(DNLBlocks.BORDERED_STONE.get());
         this.dropSelf(DNLBlocks.STONE_NOTCH.get());
+        this.dropSelf(DNLBlocks.OVERLOADED_REDSTONE_BLOCK.get());
         this.dropSelf(DNLBlocks.REDSTONE_LANE_I.get());
         this.dropSelf(DNLBlocks.REDSTONE_LANE_L.get());
         this.dropSelf(DNLBlocks.REDSTONE_LANE_T.get());

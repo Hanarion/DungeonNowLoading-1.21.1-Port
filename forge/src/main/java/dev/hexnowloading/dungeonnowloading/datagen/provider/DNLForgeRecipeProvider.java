@@ -150,6 +150,15 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .define('s', Items.STONE_BRICKS)
                 .unlockedBy("has_stone_bricks", has(Items.STONE_BRICKS))
                 .save(consumer);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, DNLItems.OVERLOADED_REDSTONE_BLOCK.get(), 1)
+                .pattern("rsr")
+                .pattern("sbs")
+                .pattern("rsr")
+                .define('s', DNLItems.REDSTONE_SUPPRESSOR.get())
+                .define('r', Items.REDSTONE)
+                .define('b', Items.REDSTONE_BLOCK)
+                .unlockedBy("has_stone_bricks", has(Items.STONE_BRICKS))
+                .save(consumer);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, DNLItems.REDSTONE_LANE_I.get(), 3)
                 .pattern("srs")
                 .pattern("srs")

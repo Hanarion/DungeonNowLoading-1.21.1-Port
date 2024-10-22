@@ -87,6 +87,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.WISE_FAIRKEEPER_CHEST.get());
                 output.accept(DNLItems.FIERCE_FAIRKEEPER_CHEST.get());
                 output.accept(DNLItems.FAIRKEEPER_SPAWNER.get());
+                output.accept(DNLItems.OVERLOADED_REDSTONE_BLOCK.get());
                 output.accept(DNLItems.REDSTONE_LANE_I.get());
                 output.accept(DNLItems.REDSTONE_LANE_L.get());
                 output.accept(DNLItems.REDSTONE_LANE_T.get());

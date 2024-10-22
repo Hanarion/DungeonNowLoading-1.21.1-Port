@@ -51,6 +51,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.ECHO_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.DIAMOND_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
+        simpleBlockWithItem(DNLBlocks.OVERLOADED_REDSTONE_BLOCK.get());
 
 
         stairsBlockWithItem((StairBlock) DNLBlocks.STONE_TILE_STAIRS.get(), DNLBlocks.STONE_TILES.get());

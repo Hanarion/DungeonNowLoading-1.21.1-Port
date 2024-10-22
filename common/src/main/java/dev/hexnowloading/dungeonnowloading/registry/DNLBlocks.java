@@ -17,10 +17,10 @@ import java.util.function.Supplier;
 
 public class DNLBlocks {
 
+
+    /* Initialization must be done later to avoid conflict with Sodium. */
+
     // DESIGN BLOCKS
-    //public static final Supplier<Block> SKYLIGHT_STONE = registerBlock("skylight_stone", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE)));
-    //public static final Supplier<Block> SKYLIGHT_GRASS_BLOCK = registerBlock("skylight_grass_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRASS_BLOCK)));
-    //public static final Supplier<Block> RUINED_STONE_BRICKS = registerBlock("ruined_stone_bricks", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
     public static Supplier<Block> COILING_STONE_PILLAR;
     public static Supplier<Block> COILING_STONE_PILLAR_CAPITAL;
     public static Supplier<Block> COILING_STONE_PILLAR_STAIRS;
@@ -89,6 +89,7 @@ public class DNLBlocks {
     public static Supplier<Block> NETHERITE_STONE_NOTCH;
     public static Supplier<Block> SIGNAL_GATE;
     public static Supplier<Block> SCUTTLE_STATUE;
+    public static Supplier<Block> OVERLOADED_REDSTONE_BLOCK;
     public static Supplier<Block> STONE_PILLAR;
     public static Supplier<Block> SHIELDING_STONE_PILLAR;
 
@@ -167,6 +168,7 @@ public class DNLBlocks {
         NETHERITE_STONE_NOTCH = registerBlock("netherite_stone_notch", () -> new StoneNotchBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F), StoneNotchBlock.StoneNotchMaterialSignalStrength.NETHERITE));
         SIGNAL_GATE = registerBlock("signal_gate", () -> new SignalGateBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).isRedstoneConductor(DNLBlocks::never).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         SCUTTLE_STATUE = registerBlock("scuttle_statue", () -> new ScuttleStatueBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.METAL)));
+        OVERLOADED_REDSTONE_BLOCK = registerBlock("overloaded_redstone_block", () -> new OverloadedRedstoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).requiresCorrectToolForDrops().strength(5.0f, 6.0f).sound(SoundType.METAL).isRedstoneConductor(DNLBlocks::never).lightLevel((lightLevel) -> 15)));
         STONE_PILLAR = registerBlock("stone_pillar", () -> new StonePillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE)));
         SHIELDING_STONE_PILLAR = registerBlock("shielding_stone_pillar", () -> new ShieldingStonePillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE)));
 
