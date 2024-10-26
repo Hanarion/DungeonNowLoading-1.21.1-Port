@@ -46,7 +46,7 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         super.tick();
-        this.level().addParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
+        this.level().addAlwaysVisibleParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), true, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
         if (this.tickCount > 60) {
             this.remove(RemovalReason.DISCARDED);
         }
@@ -56,7 +56,7 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
     public void handleEntityEvent(byte b) {
         if (b == EntityEvent.DEATH) {
             for (int i = 0; i < 8; ++i) {
-                this.level().addParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), this.getX(), this.getY(), this.getZ(), ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D);
+                this.level().addAlwaysVisibleParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), true, this.getX(), this.getY(), this.getZ(), ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D);
             }
         }
     }
