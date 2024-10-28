@@ -13,6 +13,8 @@ public class DNLParticleTypes {
 
     public static final Supplier<SimpleParticleType> LARGE_FLAME_PARTICLE = register("large_flame", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<ParticleType<AxisParticleType.AxisParticleData>> FAIRKEEPER_BOUNDARY_PARTICLE = register("fairkeeper_boundary", () -> new AxisParticleType(false));
+    public static final Supplier<SimpleParticleType> REDSTONE_SHOCKWAVE_PARTICLE = register("redstone_shockwave", () -> new SimpleParticleTypeOverride(false));
+
 
     private static <T extends ParticleType<?>> Supplier<T> register(String name, Supplier<T> particleTypeSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.PARTICLE_TYPE, name, particleTypeSupplier);

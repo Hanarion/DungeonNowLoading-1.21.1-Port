@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "dungeonnowloading:overloaded_redstone_block"
+          "name": "dungeonnowloading:overcharged_redstone_block"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "dungeonnowloading:blocks/overloaded_redstone_block"
+  "random_sequence": "dungeonnowloading:blocks/overcharged_redstone_block"
 }

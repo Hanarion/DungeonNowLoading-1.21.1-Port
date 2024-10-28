@@ -1,0 +1,14 @@
+{
+  "values": [
+    "minecraft:dispenser",
+    "minecraft:dropper",
+    "minecraft:piston",
+    "minecraft:sticky_piston",
+    "minecraft:redstone_lamp",
+    "minecraft:note_block",
+    "minecraft:activator_rail",
+    "minecraft:powered_rail",
+    "minecraft:observer",
+    "dungeonnowloading:signal_gate"
+  ]
+}

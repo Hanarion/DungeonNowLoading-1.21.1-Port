@@ -3,11 +3,9 @@ package dev.hexnowloading.dungeonnowloading.registry;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 
 public class DNLTags {
@@ -16,6 +14,7 @@ public class DNLTags {
     public static final TagKey<DamageType> FAIRKEEPER_HURTABLE = registerDamageTypeTag("fairkeeper_hurtable");
     public static final TagKey<Item> STONE_NOTCH_MATERIAL = registerItemTag("stone_notch_material");
     public static final TagKey<Block> FAIRKEEPER_CHEST_IGNORE = registerBlockTag("fairkeeper_chest_ignore");
+    public static final TagKey<Block> OVERCHARGED_REDSTONE_BLOCK_NEIGHBOUR_EXPLOSIVE = registerBlockTag("ovecharged_redstone_block_neighbour_explosive");
 
 
     private static TagKey<Block> registerBlockTag(String string) {

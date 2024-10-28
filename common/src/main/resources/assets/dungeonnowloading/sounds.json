@@ -1,4 +1,25 @@
 {
+  "overcharged_redstone_block_component_detonation": {
+    "subtitle": "sounds.dungeonnowloading.overcharged_redstone_block_component_detonation",
+    "sounds": [
+      "dungeonnowloading:block/overcharged_redstone_block/overcharged_redstone_block_component_detonation_0",
+      "dungeonnowloading:block/overcharged_redstone_block/overcharged_redstone_block_component_detonation_1"
+    ]
+  },
+  "overcharged_redstone_block_dust_combustion": {
+    "subtitle": "sounds.dungeonnowloading.overcharged_redstone_block_dust_combustion",
+    "sounds": [
+      "dungeonnowloading:block/overcharged_redstone_block/overcharged_redstone_block_dust_combustion_0",
+      "dungeonnowloading:block/overcharged_redstone_block/overcharged_redstone_block_dust_combustion_1"
+    ]
+  },
+  "overcharged_redstone_block_tnt_explosion": {
+    "subtitle": "sounds.dungeonnowloading.overcharged_redstone_block_tnt_explosion",
+    "sounds": [
+      "dungeonnowloading:block/overcharged_redstone_block/overcharged_redstone_block_tnt_explosion_0",
+      "dungeonnowloading:block/overcharged_redstone_block/overcharged_redstone_block_tnt_explosion_1"
+    ]
+  },
   "chaos_spawner_laughter": {
     "subtitle": "sounds.dungeonnowloading.chaos_spawner_laughter",
     "sounds": [

@@ -2,7 +2,6 @@ package dev.hexnowloading.dungeonnowloading.datagen.tag;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.tags.BlockTags;
@@ -32,7 +31,7 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.STONE_TILE_STAIRS.get(),
                 DNLBlocks.STONE_TILE_SLAB.get(),
                 DNLBlocks.STONE_TILE_WALL.get(),
-                DNLBlocks.OVERLOADED_REDSTONE_BLOCK.get(),
+                DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get(),
                 DNLBlocks.REDSTONE_LANE_I.get(),
                 DNLBlocks.REDSTONE_LANE_T.get(),
                 DNLBlocks.REDSTONE_LANE_L.get(),

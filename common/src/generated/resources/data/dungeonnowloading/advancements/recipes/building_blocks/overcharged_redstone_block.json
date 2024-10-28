@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "dungeonnowloading:overloaded_redstone_block"
+        "recipe": "dungeonnowloading:overcharged_redstone_block"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "dungeonnowloading:overloaded_redstone_block"
+      "dungeonnowloading:overcharged_redstone_block"
     ]
   },
   "sends_telemetry_event": false

@@ -3,7 +3,6 @@ package dev.hexnowloading.dungeonnowloading.datagen.loot;
 import dev.hexnowloading.dungeonnowloading.block.FairkeeperChestBlock;
 import dev.hexnowloading.dungeonnowloading.block.PileBlock;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
-import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
@@ -23,7 +22,6 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePrope
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.Set;
@@ -53,7 +51,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.POLISHED_STONE.get());
         this.dropSelf(DNLBlocks.BORDERED_STONE.get());
         this.dropSelf(DNLBlocks.STONE_NOTCH.get());
-        this.dropSelf(DNLBlocks.OVERLOADED_REDSTONE_BLOCK.get());
+        this.dropSelf(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
         this.dropSelf(DNLBlocks.REDSTONE_LANE_I.get());
         this.dropSelf(DNLBlocks.REDSTONE_LANE_L.get());
         this.dropSelf(DNLBlocks.REDSTONE_LANE_T.get());
