@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.GreatExperienceBottleEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.SpawnerCarrierEntity;
@@ -34,6 +35,8 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<HollowEntity>> HOLLOW = register("hollow", () -> EntityType.Builder.of(HollowEntity::new, MobCategory.MONSTER).sized(0.95F, 0.95F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "hollow").toString()));
     public static final Supplier<EntityType<SpawnerCarrierEntity>> SPAWNER_CARRIER = register("spawner_carrier", () -> EntityType.Builder.of(SpawnerCarrierEntity::new, MobCategory.MONSTER).sized(1.95F, 1.95F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "spawner_carrier").toString()));
     public static final Supplier<EntityType<ScuttleEntity>> SCUTTLE = register("scuttle", () -> EntityType.Builder.of(ScuttleEntity::new, MobCategory.MONSTER).sized(0.97F, 1.95F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "scuttle").toString()));
+    public static final Supplier<EntityType<BallistaGolemEntity>> BALLISTA_GOLEM = register("ballista_golem", () -> EntityType.Builder.of(BallistaGolemEntity::new, MobCategory.MONSTER).sized(2.97F, 4.0F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "ballista_golem").toString()));
+
 
     // Passive
     public static final Supplier<EntityType<SealedChaosEntity>> SEALED_CHAOS = register("sealed_chaos", () -> EntityType.Builder.of(SealedChaosEntity::new, MobCategory.CREATURE).sized(1F, 1F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "sealed_chaos").toString()));
@@ -45,6 +48,7 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<StonePillarProjectileEntity>> STONE_PILLAR_PROJECTILE = register("stone_pillar_projectile", () -> EntityType.Builder.<StonePillarProjectileEntity>of(StonePillarProjectileEntity::new, MobCategory.MISC).sized(0.75F, 2.0F).clientTrackingRange(4).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "stone_pillar_projectile").toString()));
     public static final Supplier<EntityType<ShieldingStonePillarProjectileEntity>> SHIELDING_STONE_PILLAR_PROJECTILE = register("shielding_stone_pillar_projectile", () -> EntityType.Builder.<ShieldingStonePillarProjectileEntity>of(ShieldingStonePillarProjectileEntity::new, MobCategory.MISC).sized(0.75F, 2.0F).clientTrackingRange(4).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "shielding_stone_pillar_projectile").toString()));
     public static final Supplier<EntityType<VertexArrowEntity>> VERTEX_ARROW_PROJECTILE = register("vertex_arrow_projectile", () -> EntityType.Builder.<VertexArrowEntity>of(VertexArrowEntity::new, MobCategory.MISC).sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "vertex_arrow_projectile").toString()));
+    public static final Supplier<EntityType<BallistaArrowEntity>> BALLISTA_ARROW = register("ballista_arrow", () -> EntityType.Builder.<BallistaArrowEntity>of(BallistaArrowEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "ballista_arrow").toString()));
 
     // Misc
     public static final Supplier<EntityType<SpecialItemEntity>> SPECIAL_ITEM_ENTITY = register("special_item_entity", () -> EntityType.Builder.<SpecialItemEntity>of(SpecialItemEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "special_item_entity").toString()));
@@ -57,11 +61,17 @@ public class DNLEntityTypes {
     public static Map<EntityType<? extends LivingEntity>, AttributeSupplier> getAllAttributes() {
         Map<EntityType<? extends LivingEntity>, AttributeSupplier> map = new HashMap<>();
 
+        // Boss
         map.put(CHAOS_SPAWNER.get(), ChaosSpawnerEntity.createAttributes().build());
         map.put(FAIRKEEPER.get(), FairkeeperEntity.createAttributes().build());
+
+        // Monster
         map.put(HOLLOW.get(), HollowEntity.createAttributes().build());
         map.put(SPAWNER_CARRIER.get(), SpawnerCarrierEntity.createAttributes().build());
         map.put(SCUTTLE.get(), ScuttleEntity.createAttributes().build());
+        map.put(BALLISTA_GOLEM.get(), BallistaGolemEntity.createAttributes().build());
+
+        // Passive
         map.put(SEALED_CHAOS.get(), SealedChaosEntity.createAttributes().build());
         map.put(WHIMPER.get(), WhimperEntity.createAttributes().build());
 

@@ -35,6 +35,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.REDSTONE_CATALYST.get());
         spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
+        spawnEggItem(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.65f, 0.9f, 1.5f);
     }
 
