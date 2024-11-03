@@ -43,4 +43,12 @@ public class DNLMath {
                 + (-v*x + u*y)*Math.sin(theta);
         return new BlockPos((int) Math.round(xPrime), (int) Math.round(yPrime), (int) Math.round(zPrime));
     }
+
+    public static float lerpf(float start, float end, float t) {
+        return start + t * (end - start);
+    }
+
+    public static float randomRange(float min, float max) {
+        return min + (float) Math.random() * (max - min);
+    }
 }
