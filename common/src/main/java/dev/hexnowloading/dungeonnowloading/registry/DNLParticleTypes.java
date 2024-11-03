@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.particle.type.AxisParticleType;
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.particle.type.SimpleParticleTypeOverride;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.particles.ParticleType;
@@ -15,6 +16,7 @@ public class DNLParticleTypes {
     public static final Supplier<ParticleType<AxisParticleType.AxisParticleData>> FAIRKEEPER_BOUNDARY_PARTICLE = register("fairkeeper_boundary", () -> new AxisParticleType(false));
     public static final Supplier<SimpleParticleType> REDSTONE_SHOCKWAVE_PARTICLE = register("redstone_shockwave", () -> new SimpleParticleTypeOverride(false));
 
+    public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> VERTEX_SPARK_PARTICLE = register("vertex_spark", () -> new ScalableParticleType(false));
 
     private static <T extends ParticleType<?>> Supplier<T> register(String name, Supplier<T> particleTypeSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.PARTICLE_TYPE, name, particleTypeSupplier);

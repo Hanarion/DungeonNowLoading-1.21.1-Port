@@ -11,6 +11,7 @@ import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import dev.hexnowloading.dungeonnowloading.particle.FairkeeperBoundaryParticle;
 import dev.hexnowloading.dungeonnowloading.particle.LargeFlameParticle;
 import dev.hexnowloading.dungeonnowloading.particle.RedstoneShockwaveParticle;
+import dev.hexnowloading.dungeonnowloading.particle.VertexSparkParticle;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -82,6 +83,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.CHAOS_SPAWNER_PROJECTILE.get(), ChaosSpawnerProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FLAME_PROJECTILE.get(), ThrownItemRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.STONE_PILLAR_PROJECTILE.get(), StonePillarProjectileRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), VertexArrowProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), ShieldingStonePillarProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BALLISTA_ARROW.get(), BallistaArrowRenderer::new);
 
@@ -99,7 +101,7 @@ public class DNLFabricClient implements ClientModInitializer {
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
             if (entity == null) return 0.0F;
             else
-                return entity.getUseItem() != stack ? 0.0F : (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F;
+                return entity.getUseItem() != stack ? 0.0F : (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 30.0F;
         });
 
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pulling"), (stack, level, entity, idk) ->
@@ -125,6 +127,7 @@ public class DNLFabricClient implements ClientModInitializer {
         //Projectiles
         EntityModelLayerRegistry.registerModelLayer(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(StonePillarProjectileModel.LAYER_LOCATION, StonePillarProjectileModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(VertexArrowProjectileModel.LAYER_LOCATION, VertexArrowProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ShieldingStonePillarProjectileModel.LAYER_LOCATION, ShieldingStonePillarProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BallistaArrowModel.LAYER_LOCATION, BallistaArrowModel::createBodyLayer);
 
@@ -136,6 +139,7 @@ public class DNLFabricClient implements ClientModInitializer {
     private static void registerParticleFactories() {
         ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
         registry.register(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), LargeFlameParticle.Factory::new);
+        registry.register(DNLParticleTypes.VERTEX_SPARK_PARTICLE.get(), VertexSparkParticle.Factory::new);
         registry.register(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), FairkeeperBoundaryParticle.Factory::new);
         registry.register(DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(), RedstoneShockwaveParticle.Factory::new);
     }
