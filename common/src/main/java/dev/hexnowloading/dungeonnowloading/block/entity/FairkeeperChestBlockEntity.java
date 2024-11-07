@@ -468,7 +468,7 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
 
         Map<BlockPos, BlockEntity> filtered = map.entrySet()
                 .stream()
-                .filter(e -> (e.getValue() instanceof FairkeeperSpawnerBlockEntity fairkeeperSpawnerBlockEntity && !fairkeeperSpawnerBlockEntity.getBlockState().getValue(DNLProperties.FAIRKEEPER_ALERT)) || (e.getValue() instanceof ScuttleStatueBlockEntity scuttleStatueBlockEntity && scuttleStatueBlockEntity.getBlockState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER))
+                .filter(e -> (e.getValue() instanceof FairkeeperSpawnerBlockEntity fairkeeperSpawnerBlockEntity && !fairkeeperSpawnerBlockEntity.getBlockState().getValue(DNLProperties.FAIRKEEPER_ALERT)) || (e.getValue() instanceof ScuttleStatueBlockEntity scuttleStatueBlockEntity && scuttleStatueBlockEntity.getBlockState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER) || (e.getValue() instanceof BallistaGolemStatueBlockEntity))
                 .filter(e -> e.getKey().getX() < blockEntity.actualRegion1X && e.getKey().getX() >= blockEntity.actualRegion2X && e.getKey().getY() < blockEntity.actualRegion1Y && e.getKey().getY() >= blockEntity.actualRegion2Y && e.getKey().getZ() < blockEntity.actualRegion1Z && e.getKey().getZ() >= blockEntity.actualRegion2Z)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         //filtered.forEach(((blockPosEntry, blockEntityEntry) -> ((FairkeeperSpawnerBlockEntity) blockEntityEntry).alert(nearbyPlayers.size() == 0 ? 1 : nearbyPlayers.size(), blockPosEntry, (FairkeeperSpawnerBlockEntity) blockEntityEntry)));
@@ -588,6 +588,9 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
         }
         if (alertBlockEntity instanceof ScuttleStatueBlockEntity scuttleStatueBlockEntity) {
             scuttleStatueBlockEntity.alert(spawnerBlockPos, scuttleStatueBlockEntity);
+        }
+        if (alertBlockEntity instanceof BallistaGolemStatueBlockEntity ballistaGolemStatueBlockEntity) {
+            ballistaGolemStatueBlockEntity.alert(spawnerBlockPos, ballistaGolemStatueBlockEntity);
         }
         redstoneBeam(level, pos, spawnerBlockPos);
         blockEntity.blockEntityLocationList.remove(0);

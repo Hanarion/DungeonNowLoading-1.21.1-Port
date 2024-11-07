@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
+import dev.hexnowloading.dungeonnowloading.block.BallistaGolemStatueBlock;
 import dev.hexnowloading.dungeonnowloading.block.entity.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -12,6 +13,7 @@ public class DNLBlockEntityTypes {
     public static final Supplier<BlockEntityType<FairkeeperChestBlockEntity>> FAIRKEEPER_CHEST = register("fairkeeper_chest", () -> BlockEntityType.Builder.of(FairkeeperChestBlockEntity::new, DNLBlocks.FAIRKEEPER_CHEST.get()).build(null));
     public static final Supplier<BlockEntityType<FairkeeperSpawnerBlockEntity>> FAIRKEEPER_SPAWNER = register("fairkeeper_spawner", () -> BlockEntityType.Builder.of(FairkeeperSpawnerBlockEntity::new, DNLBlocks.FAIRKEEEPER_SPAWNER.get()).build(null));
     public static final Supplier<BlockEntityType<ScuttleStatueBlockEntity>> SCUTTLE_STATUE = register("scuttle_statue", () -> BlockEntityType.Builder.of(ScuttleStatueBlockEntity::new, DNLBlocks.SCUTTLE_STATUE.get()).build(null));
+    public static final Supplier<BlockEntityType<BallistaGolemStatueBlockEntity>> BALLISTA_GOLEM_STATUE = register("ballista_golem_statue", () -> BlockEntityType.Builder.of(BallistaGolemStatueBlockEntity::new, DNLBlocks.BALLISTA_GOLEM_STATUE.get()).build(null));
     public static final Supplier<BlockEntityType<ShieldingStonePillarBlockEntity>> SHIELDING_STONE_PILLAR = register("shielding_stone_pillar", () -> BlockEntityType.Builder.of(ShieldingStonePillarBlockEntity::new, DNLBlocks.SHIELDING_STONE_PILLAR.get()).build(null));
     public static final Supplier<BlockEntityType<DisabledFairkeeperChestBlockEntity>> DISABLED_FAIRKEEPER_CHEST = register("disabled_fairkeeper_chest", () -> BlockEntityType.Builder.of(DisabledFairkeeperChestBlockEntity::new, DNLBlocks.WISE_FAIRKEEPER_CHEST.get(), DNLBlocks.FIERCE_FAIRKEEPER_CHEST.get()).build(null));
 

@@ -89,6 +89,8 @@ public class DNLBlocks {
     public static Supplier<Block> NETHERITE_STONE_NOTCH;
     public static Supplier<Block> SIGNAL_GATE;
     public static Supplier<Block> SCUTTLE_STATUE;
+    public static Supplier<Block> BALLISTA_GOLEM_STATUE;
+    public static Supplier<Block> BALLISTA_GOLEM_STATUE_PART;
     public static Supplier<Block> OVERCHARGED_REDSTONE_BLOCK;
     public static Supplier<Block> STONE_PILLAR;
     public static Supplier<Block> SHIELDING_STONE_PILLAR;
@@ -101,7 +103,7 @@ public class DNLBlocks {
 
     public static void init() {
         // DESIGN BLOCKS
-        MOSS = registerBlock("moss", () -> new MossMultifaceBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GREEN).strength(0.1F).noOcclusion().noCollission().sound(SoundType.MOSS_CARPET).pushReaction(PushReaction.DESTROY)));
+        MOSS = registerBlock("moss", () -> new MossMultifaceBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GREEN).strength(0.1F).noOcclusion().noCollission().replaceable().sound(SoundType.MOSS_CARPET).pushReaction(PushReaction.DESTROY)));
         COILING_STONE_PILLAR = registerBlock("coiling_stone_pillar", () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F,6.0F)));
         COILING_STONE_PILLAR_CAPITAL = registerBlock("coiling_stone_pillar_capital", () -> new PillarCapBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F,6.0F)));
         COILING_STONE_PILLAR_STAIRS = registerBlock("coiling_stone_pillar_stairs", () -> new StairBlock(COILING_STONE_PILLAR.get().defaultBlockState(), BlockBehaviour.Properties.copy(COILING_STONE_PILLAR.get())));
@@ -167,10 +169,12 @@ public class DNLBlocks {
         DIAMOND_STONE_NOTCH = registerBlock("diamond_stone_notch", () -> new StoneNotchBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F), StoneNotchBlock.StoneNotchMaterialSignalStrength.DIAMOND));
         NETHERITE_STONE_NOTCH = registerBlock("netherite_stone_notch", () -> new StoneNotchBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F), StoneNotchBlock.StoneNotchMaterialSignalStrength.NETHERITE));
         SIGNAL_GATE = registerBlock("signal_gate", () -> new SignalGateBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).isRedstoneConductor(DNLBlocks::never).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
-        SCUTTLE_STATUE = registerBlock("scuttle_statue", () -> new ScuttleStatueBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.METAL)));
+        SCUTTLE_STATUE = registerBlock("scuttle_statue", () -> new ScuttleStatueBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().pushReaction(PushReaction.IGNORE).sound(SoundType.METAL)));
+        BALLISTA_GOLEM_STATUE = registerBlock("ballista_golem_statue", () -> new BallistaGolemStatueBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().pushReaction(PushReaction.IGNORE).sound(SoundType.METAL)));
+        BALLISTA_GOLEM_STATUE_PART = registerBlock("ballista_golem_statue_part", () -> new BallistaGolemStatuePartBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().pushReaction(PushReaction.IGNORE).sound(SoundType.EMPTY)));
         OVERCHARGED_REDSTONE_BLOCK = registerBlock("overcharged_redstone_block", () -> new OverchargedRedstoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).requiresCorrectToolForDrops().strength(5.0f, 6.0f).sound(SoundType.METAL).isRedstoneConductor(DNLBlocks::never).lightLevel((lightLevel) -> 15)));
-        STONE_PILLAR = registerBlock("stone_pillar", () -> new StonePillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE)));
-        SHIELDING_STONE_PILLAR = registerBlock("shielding_stone_pillar", () -> new ShieldingStonePillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE)));
+        STONE_PILLAR = registerBlock("stone_pillar", () -> new StonePillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE)));
+        SHIELDING_STONE_PILLAR = registerBlock("shielding_stone_pillar", () -> new ShieldingStonePillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE)));
 
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY).noLootTable()));

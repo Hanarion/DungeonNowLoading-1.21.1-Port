@@ -1,5 +1,7 @@
-// 1.20.1	2024-10-22T05:52:35.7267582	Loot Tables
+// 1.20.1	2024-11-06T18:34:26.8853041	Loot Tables
 8de5512c6e498fd7a4e162f42dd356b7cb01701f data/dungeonnowloading/loot_tables/blocks/amethyst_stone_notch.json
+3a4cff0ea1f46917b0ecd1ee8161664741c8d995 data/dungeonnowloading/loot_tables/blocks/ballista_golem_statue.json
+9396ac882f14f31584971bf8ef799e213b09e68a data/dungeonnowloading/loot_tables/blocks/ballista_golem_statue_part.json
 e667b0755da6d97f3bb77f8c4a7af22b8b2ecb10 data/dungeonnowloading/loot_tables/blocks/book_pile.json
 ec264f3c071cfb019cec7a36ebb7bf945af39db1 data/dungeonnowloading/loot_tables/blocks/bordered_stone.json
 1a7dd2d39b6d41bdceccf24135508f0926d0f8c1 data/dungeonnowloading/loot_tables/blocks/chiseled_coiling_stone_pillar.json
@@ -40,6 +42,7 @@ a8e4752d81a4910e1c0114b5f84494083c2941e0 data/dungeonnowloading/loot_tables/bloc
 b47365c5357c5d095804a648f827be1dbd2a876c data/dungeonnowloading/loot_tables/blocks/redstone_lane_t.json
 b27d7f0e2c85cd963cde1c2056241e3ab24201bf data/dungeonnowloading/loot_tables/blocks/redstone_stone_notch.json
 25f01827e6a4a5308f30dfbb1d1e46024f1f3a72 data/dungeonnowloading/loot_tables/blocks/rotator_pressure_plate.json
+9bc5b903bf4ee112c677c2f82c7ed1d26271c72d data/dungeonnowloading/loot_tables/blocks/scuttle_statue.json
 eb81f644920db5732e8c630779244f081b1e2792 data/dungeonnowloading/loot_tables/blocks/signaling_stone_emblem.json
 c2106f54f9b052e63b97c2ceb1a20a43f5f581d5 data/dungeonnowloading/loot_tables/blocks/signal_gate.json
 a4d72e5dd6f506f5020c6483b9d9f752b2c138bb data/dungeonnowloading/loot_tables/blocks/stone_notch.json

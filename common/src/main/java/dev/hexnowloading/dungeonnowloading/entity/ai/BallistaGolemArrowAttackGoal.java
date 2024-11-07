@@ -3,6 +3,8 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.BallistaArrowEntity;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 
@@ -13,6 +15,7 @@ public class BallistaGolemArrowAttackGoal extends Goal {
     private final BallistaGolemEntity ballistaGolemEntity;
     private int nextScanTick;
     private int attackTicks;
+    private static final float FACING_THRESHOLD = 15.0F;
 
     public BallistaGolemArrowAttackGoal(BallistaGolemEntity ballistaGolemEntity) {
         this.ballistaGolemEntity = ballistaGolemEntity;
@@ -30,9 +33,14 @@ public class BallistaGolemArrowAttackGoal extends Goal {
             return false;
         } else {
             double DETECTION_RANGE = this.ballistaGolemEntity.getFollowDistance();
-            boolean hasTargetInRange = this.ballistaGolemEntity.getTarget() != null && this.ballistaGolemEntity.getTarget().distanceTo(this.ballistaGolemEntity) < DETECTION_RANGE;
+            double MIN_DETECTION_RANGE = 10;
+            boolean hasTargetInRange = this.ballistaGolemEntity.getTarget() != null && this.ballistaGolemEntity.getTarget().distanceTo(this.ballistaGolemEntity) < DETECTION_RANGE && this.ballistaGolemEntity.getTarget().distanceTo(this.ballistaGolemEntity) > MIN_DETECTION_RANGE;
+            boolean isFacingTarget = this.ballistaGolemEntity.getTarget() != null && isFacingTarget(this.ballistaGolemEntity.getTarget());
             this.nextScanTick = this.nextStartTick();
-            return this.ballistaGolemEntity.isState(BallistaGolemEntity.BallistaGolemState.IDLE) && hasTargetInRange && this.ballistaGolemEntity.getBallistaArrowCount() > 0;
+            return this.ballistaGolemEntity.isState(BallistaGolemEntity.BallistaGolemState.IDLE)
+                    && hasTargetInRange && this.ballistaGolemEntity.getBallistaArrowCount() > 0
+                    && this.ballistaGolemEntity.getTarget().hasLineOfSight(this.ballistaGolemEntity)
+                    && isFacingTarget;
         }
     }
 
@@ -70,5 +78,21 @@ public class BallistaGolemArrowAttackGoal extends Goal {
             this.ballistaGolemEntity.level().addFreshEntity(projectile);
             this.ballistaGolemEntity.setBallistaArrowCount(this.ballistaGolemEntity.getBallistaArrowCount() - 1);
         }
+    }
+
+
+    private boolean isFacingTarget(LivingEntity target) {
+        if (target == null) return false;
+
+        // Calculate the angle between the golem's facing and the target
+        double deltaX = target.getX() - this.ballistaGolemEntity.getX();
+        double deltaZ = target.getZ() - this.ballistaGolemEntity.getZ();
+        float targetYaw = (float) (Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0);
+
+        // Calculate the difference in rotation
+        float angleDifference = Math.abs(Mth.wrapDegrees(this.ballistaGolemEntity.getYRot() - targetYaw));
+
+        // Return true if within the threshold
+        return angleDifference < FACING_THRESHOLD;
     }
 }

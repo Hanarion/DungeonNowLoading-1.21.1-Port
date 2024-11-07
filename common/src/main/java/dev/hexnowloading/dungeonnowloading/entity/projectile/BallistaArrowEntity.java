@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 public class BallistaArrowEntity extends AbstractArrow {
 
-    private final int DAMAGE = 10;
+    private final int DAMAGE = 19;
     private final float KNOCKBACK = 3.0F;
     private final float EXPLOSION_STRENGTH = 4.0F;
 
@@ -76,10 +76,15 @@ public class BallistaArrowEntity extends AbstractArrow {
                     livingEntity.push(vec3.x, 0.1, vec3.z);
                 }
 
+                if (livingEntity instanceof Player player && player.isBlocking()) {
+                    player.disableShield(true);
+                }
+
                 if (!this.level().isClientSide && owner instanceof LivingEntity) {
                     EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
                     EnchantmentHelper.doPostDamageEffects((LivingEntity)owner, livingEntity);
                 }
+
             }
 
             this.playSound(SoundEvents.ARROW_HIT, 1.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
