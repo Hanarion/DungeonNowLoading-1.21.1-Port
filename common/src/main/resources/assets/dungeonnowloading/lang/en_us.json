@@ -162,5 +162,6 @@
   "sounds.dungeonnowloading.scuttle_deflect": "Scuttle deflects",
   "sounds.dungeonnowloading.scuttle_hurt": "Scuttle hurts",
   "sounds.dungeonnowloading.scuttle_death": "Scuttle dies",
+  "effect.dungeonnowloading.vertex_transmission": "Vertex Transmission",
   "warning.dungeonnowloading.cannot_open_fairkeeper_chest": "All enemies in the room must be defeated first!"
 }
