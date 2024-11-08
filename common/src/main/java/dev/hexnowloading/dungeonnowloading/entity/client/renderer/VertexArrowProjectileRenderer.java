@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.VertexArrowProjectileModel;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexArrowProjectileEntity;
@@ -12,9 +13,11 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.util.Mth;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
-public class VertexArrowProjectileRenderer extends ArrowRenderer<VertexArrowProjectileEntity> {
+public class VertexArrowProjectileRenderer extends EntityRenderer<VertexArrowProjectileEntity> {
     private static final ResourceLocation TEXTURE_0 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_0.png");
     private static final ResourceLocation TEXTURE_1 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_1.png");
     private static final ResourceLocation TEXTURE_2 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_2.png");
@@ -29,20 +32,51 @@ public class VertexArrowProjectileRenderer extends ArrowRenderer<VertexArrowProj
     }
 
     @Override
-    public void render(VertexArrowProjectileEntity entity, float v, float v1, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
-//        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(this.renderType);
+    public void render(VertexArrowProjectileEntity vertexArrowProjectileEntity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, vertexArrowProjectileEntity.yRotO, vertexArrowProjectileEntity.getYRot()) - 90.0F));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, vertexArrowProjectileEntity.xRotO, vertexArrowProjectileEntity.getXRot())));
 
+        float shakeTime = (float) vertexArrowProjectileEntity.shakeTime - partialTicks;
+        if (shakeTime > 0.0F) {
+            float $$17 = -Mth.sin(shakeTime * 3.0F) * shakeTime;
+            poseStack.mulPose(Axis.ZP.rotationDegrees($$17));
+        }
 
+        poseStack.mulPose(Axis.XP.rotationDegrees(45.0F));
+        float poseStackScale = 0.05625F;
+//        float poseStackScale = 0.05625F;
+        poseStack.scale(poseStackScale, poseStackScale, poseStackScale);
+        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityCutout(this.getTextureLocation(vertexArrowProjectileEntity)));
+        PoseStack.Pose pose = poseStack.last();
+        Matrix4f matrix4f = pose.pose();
+        Matrix3f normalMatrix = pose.normal();
 
-        super.render(entity, v, v1, poseStack, multiBufferSource, i);
+        float uStart = 1.0F;
+        float uEnd = 0.0F;
+        float vStart = 0.0F;
+        float vEnd = 0.4375F;
 
-//        entity.foo
-//        poseStack.pushPose();
-//        poseStack.scale(1f, 1f, 1f);
-//        poseStack.translate(0.0f, -entity.getBbHeight() + 0.5f, 0.0f);
-//        this.model.renderToBuffer(poseStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
-//        poseStack.popPose();
+        for (int arrowSide = 0; arrowSide < 4; arrowSide++) {
+            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+            this.vertex(matrix4f, normalMatrix, vertexConsumer, -8, -2, 0, uStart, vStart, 0, 1, 0, packedLight);
+            this.vertex(matrix4f, normalMatrix, vertexConsumer, 8, -2, 0, uEnd, vStart, 0, 1, 0, packedLight);
+            this.vertex(matrix4f, normalMatrix, vertexConsumer, 8, 2, 0, uEnd, vEnd, 0, 1, 0, packedLight);
+            this.vertex(matrix4f, normalMatrix, vertexConsumer, -8, 2, 0, uStart, vEnd, 0, 1, 0, packedLight);
+        }
 
+        poseStack.popPose();
+        super.render(vertexArrowProjectileEntity, entityYaw, partialTicks, poseStack, multiBufferSource, packedLight);
+    }
+
+    public void vertex(Matrix4f $$0, Matrix3f $$1, VertexConsumer $$2, int $$3, int $$4, int $$5, float $$6, float $$7, int $$8, int $$9, int $$10, int $$11) {
+        $$2.vertex($$0, (float)$$3, (float)$$4, (float)$$5)
+                .color(255, 255, 255, 255)
+                .uv($$6, $$7)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2($$11)
+                .normal($$1, (float)$$8, (float)$$10, (float)$$9)
+                .endVertex();
     }
 
     @Override

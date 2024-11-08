@@ -5,15 +5,15 @@ import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.potion.VertexTransmissionEffect;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,13 +24,19 @@ public class VertexNode {
     private Entity entityRef;
     private boolean attemptedConnection = false;
 
-    private static final float MAX_RANDOM_PARTICLE_SCALE_MULTIPLIER = 3;
     private static final double BEAM_PARTICLE_SPACING = 0.1d;
+    private static final double BEAM_INITIAL_PARTICLE_SPACING = 0.8d;
+    private static final float BEAM_INITIAL_PARTICLE_SCALE_MIN = 0.2f;
+    private static final float BEAM_INITIAL_PARTICLE_SCALE_MAX = 0.4f;
+    private static final double BEAM_PLAYER_EYE_LEVEL_OFFSET = -0.5d;
+
+    private static final float BEAM_PARTICLE_SCALE = 0.05f;
+    private static final float MAX_RANDOM_PARTICLE_SCALE_MULTIPLIER = 3;
+
     private static final int MAX_CONNECTION_COUNT = 2;
     private static final double MAX_CONNECTION_RADIUS = 10.0d;
     private static final double BEAM_HITBOX_RADIUS = 0.5d;
     private static final int ENTITY_EFFECT_DURATION_TICKS = 60;
-    private static final float BEAM_PARTICLE_SCALE = 0.05f;
 
     public VertexNode(Entity entityRef) {
         this.entityRef = entityRef;
@@ -51,13 +57,18 @@ public class VertexNode {
     public void disconnect_all() {
         for (VertexNodeConnectionContext connectedNodeCtx : this.connectedNodes) {
             connectedNodeCtx.getVertexNode().disconnectNode(this);
+//            this.disconnectNode(connectedNodeCtx.getVertexNode());
         }
+//        for (int index = 0; index < this.connectedNodes.size(); index++) {
+//            this.connectedNodes.get(index).getVertexNode().disconnectNode(this);
+//        }
 
         this.connectedNodes.clear();
         this.attemptedConnection = false;
     }
 
     public void disconnectNode(VertexNode node) {
+//        connectedNode.connectedNodes.removeIf(nodeConnectionCtx -> nodeConnectionCtx.getVertexNode() == this);
         this.connectedNodes.removeIf(nodeConnectionCtx -> nodeConnectionCtx.getVertexNode() == node);
     }
 
@@ -66,12 +77,27 @@ public class VertexNode {
     }
 
     public void connectToNearbyNodes(Entity sourceEntity) {
+        this.connectToNearbyNodes(sourceEntity, false);
+    }
+
+    public void connectToNearbyNodes(Entity sourceEntity, boolean isReconnectionCase) {
         List<VertexNode> nearbyNodes = this.getNearbyNodes(sourceEntity);
 
         for (VertexNode node : nearbyNodes) {
             this.connectNode(node, true);
             node.connectNode(this, false);
+
+            // VFX stuffs
+            if (!isReconnectionCase) {
+                System.out.println("hello??");
+                this.spawnInitialParticleBeamVFX(
+                        sourceEntity.level(),
+                        this.getEyeLevelPositionAdjusted(sourceEntity),
+                        this.getEyeLevelPositionAdjusted(node.entityRef)
+                );
+            }
         }
+
         this.attemptedConnection = true;
     }
 
@@ -84,7 +110,11 @@ public class VertexNode {
 
             // VFX
             if (isBeamParent) {
-                this.spawnParticleBeamVFX(entity.level(), entity.getEyePosition(), connectedNode.entityRef.getEyePosition());
+                this.spawnParticleBeamVFX(
+                        entity.level(),
+                        this.getEyeLevelPositionAdjusted(entity),
+                        this.getEyeLevelPositionAdjusted(connectedNode.entityRef)
+                );
             }
 
             // Collision logic
@@ -102,23 +132,55 @@ public class VertexNode {
                 entitiesTouchingBeam.remove(connectedNode.entityRef);
 
                 for (LivingEntity livingEntity : entitiesTouchingBeam) {
-                    if (!livingEntity.hasEffect(DNLMobEffects.VERTEX_TRANSMISSION.get())) {
-                        livingEntity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), ENTITY_EFFECT_DURATION_TICKS, 0));
+                    int slownessDurationTicks = ENTITY_EFFECT_DURATION_TICKS;
+                    int slownessAmplifier = this.getConnectionCount();
+                    int vertexTransDurationTicks = ENTITY_EFFECT_DURATION_TICKS;
+                    int vertexTransAmplifier = 0;
+
+                    // Slowness application
+                    livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, slownessDurationTicks, slownessAmplifier));
+
+                    // Vertex Transmission application
+                    boolean entityHasEffect = livingEntity.hasEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+                    if (!entityHasEffect) {
+                        livingEntity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), vertexTransDurationTicks, vertexTransAmplifier));
+                    } else if (entity.tickCount % 10 == 0) {
+                        livingEntity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), vertexTransDurationTicks, vertexTransAmplifier));
+                        VertexTransmissionEffect vertexTransmissionEffect = (VertexTransmissionEffect) livingEntity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get()).getEffect();
+                        vertexTransmissionEffect.markAsReconnectionCase(livingEntity.getUUID());
                     }
                 }
             }
 
+            // TODO: check why disconnection logic breaks the laws of physics and logic
+
             // Auto-disconnect logic
-            boolean nodeShouldDisconnect = connectedNode.entityRef.isRemoved() || !connectedNode.entityRef.isAlive();
+            boolean nodeShouldDisconnect = (
+                    connectedNode.entityRef.isRemoved()
+                    || !connectedNode.entityRef.isAlive()
+//                    || connectedNode.entityRef.distanceToSqr(this.entityRef) > MAX_CONNECTION_RADIUS
+            );
             if (connectedNode.entityRef instanceof LivingEntity livingEntity && livingEntity.isDeadOrDying()) {
                 nodeShouldDisconnect = true;
             }
-
             if (!isClientSide && nodeShouldDisconnect) {
                 connectedNode.disconnect_all();
             }
-
         }
+    }
+
+    private Vec3 getEyeLevelPositionAdjusted(Entity entity) {
+        Vec3 finalPos = entity.getEyePosition();
+
+        if (entity instanceof Player player) {
+            finalPos = new Vec3(
+                    finalPos.x,
+                    finalPos.y + BEAM_PLAYER_EYE_LEVEL_OFFSET,
+                    finalPos.z
+            );
+        }
+
+        return finalPos;
     }
 
     private List<VertexNode> getNearbyNodes(Entity sourceEntity) {
@@ -182,13 +244,39 @@ public class VertexNode {
                 float scaleMultiplier = (float) Math.random() * MAX_RANDOM_PARTICLE_SCALE_MULTIPLIER;
 
                 ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
-                        DNLParticleTypes.VERTEX_SPARK_PARTICLE.get(),
-                        BEAM_PARTICLE_SCALE * scaleMultiplier
+                    DNLParticleTypes.VERTEX_SPARK_PARTICLE.get(),
+                    BEAM_PARTICLE_SCALE * scaleMultiplier
                 );
 
                 _level.sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1, 0.0d, 0.0d, 0.0d, 0);
-//                DustParticleOptions smallRedstoneParticle = new DustParticleOptions(new Vector3f(1.0f, 0.0f, 0.0f), 0.5f);
-//                _level.sendParticles(smallRedstoneParticle, particlePos.x, particlePos.y, particlePos.z, 1, 0.0d, 0.0d, 0.0d, 0);
+            }
+        }
+    }
+
+    private void spawnInitialParticleBeamVFX(Level level, Vec3 startPos, Vec3 endPos) {
+        Vec3 line = endPos.subtract(startPos);
+        double distance = line.length();
+
+        int numberOfParticles = (int) Math.ceil(distance / BEAM_INITIAL_PARTICLE_SPACING);
+
+        for (int i = 0; i <= numberOfParticles; i++) {
+//            int randomNumber = ThreadLocalRandom.current().nextInt(6);
+//            if (randomNumber != 0) {
+//                continue;
+//            }
+
+            double t = (double) i / numberOfParticles;
+            Vec3 particlePos = startPos.add(line.scale(t));
+
+            if (level instanceof ServerLevel _level) {
+                float particleScale = BEAM_INITIAL_PARTICLE_SCALE_MIN + (float) Math.random() * (BEAM_INITIAL_PARTICLE_SCALE_MAX - BEAM_INITIAL_PARTICLE_SCALE_MIN);
+
+                ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
+                    DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
+                    particleScale
+                );
+
+                _level.sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1, 0.0d, 0.0d, 0.0d, 0);
             }
         }
     }
@@ -242,15 +330,4 @@ public class VertexNode {
         // Get the closest point on the beam
         return start.add(beamDirection.scale(t));
     }
-
-//    private boolean isValidConnectableNode(Entity entity) {
-//        if (entity instanceof VertexArrowProjectileEntity) {
-//            return true;
-//        }
-//        if (entity instanceof LivingEntity livingEntity) {
-//            MobEffectInstance vertexTransmissionEffect = livingEntity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
-//            return vertexTransmissionEffect != null && vertexTransmissionEffect.getDuration() > 0;
-//        }
-//        return false;
-//    }
 }

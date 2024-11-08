@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
 import dev.hexnowloading.dungeonnowloading.components.VertexNode;
+import dev.hexnowloading.dungeonnowloading.potion.VertexTransmissionEffect;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.nbt.CompoundTag;
@@ -8,6 +9,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -15,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.NotNull;
-
 
 public class VertexArrowProjectileEntity extends AbstractArrow {
     private int powerLevel = 0;
@@ -80,9 +81,25 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult entityHitResult) {
         super.onHitEntity(entityHitResult);
-        if (entityHitResult.getEntity() instanceof LivingEntity) {
-            LivingEntity hitEntity = (LivingEntity) entityHitResult.getEntity();
-            hitEntity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), ENTITY_EFFECT_DURATION_TICKS, 0));
+
+        if (entityHitResult.getEntity() instanceof LivingEntity entity) {
+            int slownessDurationTicks = ENTITY_EFFECT_DURATION_TICKS;
+            int slownessAmplifier = this.vertexNode.getConnectionCount();
+            int vertexTransDurationTicks = ENTITY_EFFECT_DURATION_TICKS;
+            int vertexTransAmplifier = 0;
+
+            // Slowness application
+            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, slownessDurationTicks, slownessAmplifier));
+
+            // Vertex Transmission application
+            boolean entityHasEffect = entity.hasEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+            if (!entityHasEffect) {
+                entity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), vertexTransDurationTicks, vertexTransAmplifier));
+            } else {
+                entity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), vertexTransDurationTicks, vertexTransAmplifier));
+                VertexTransmissionEffect vertexTransmissionEffect = (VertexTransmissionEffect) entity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get()).getEffect();
+                vertexTransmissionEffect.markAsReconnectionCase(entity.getUUID());
+            }
         }
     }
 
@@ -104,7 +121,7 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
                         this.entityData.set(POWER_LEVEL, this.powerLevel);
                         this.powerIncrementTimer = 0;
                     }
-                } else if (!this.vertexNode.attemptedConnection()) {
+                } else if (!this.vertexNode.attemptedConnection() && this.life != DESPAWN_TIME_TICKS) {
                     this.vertexNode.connectToNearbyNodes(this);
                 }
             }

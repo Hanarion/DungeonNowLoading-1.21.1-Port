@@ -202,6 +202,16 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .define('t', Items.REDSTONE_TORCH)
                 .unlockedBy("has_redstone", has(Items.REDSTONE))
                 .save(consumer);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, DNLItems.VERTEX_BOW.get(), 1)
+                .pattern("cts")
+                .pattern("t r")
+                .pattern("cts")
+                .define('c', DNLItems.REDSTONE_CIRCUIT.get())
+                .define('s', Items.STRING)
+                .define('t', Items.STICK)
+                .define('r', Items.REDSTONE)
+                .unlockedBy("has_redstone_circuit", has(DNLItems.REDSTONE_CIRCUIT.get()))
+                .save(consumer);
     }
 
     private void buildStoneCutterRecipes(Consumer<FinishedRecipe> consumer) {

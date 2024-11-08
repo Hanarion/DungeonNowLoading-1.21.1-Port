@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.particle;
 
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -7,9 +8,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class RedstoneShockwaveParticle extends TextureSheetParticle {
 
+    private final float scale;
     private SpriteSet spriteSet;
 
-    protected RedstoneShockwaveParticle(ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet spriteSet) {
+    protected RedstoneShockwaveParticle(ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, float scale, SpriteSet spriteSet) {
         super(clientLevel, x, y, z, xSpeed, ySpeed, zSpeed);
         this.quadSize *= 5.9F + level.random.nextFloat() * 0.5F;
         this.xd = xSpeed;
@@ -17,7 +19,7 @@ public class RedstoneShockwaveParticle extends TextureSheetParticle {
         this.zd = zSpeed;
         this.spriteSet = spriteSet;
         this.lifetime = 8;
-
+        this.scale = scale;
     }
 
     @Override
@@ -36,6 +38,11 @@ public class RedstoneShockwaveParticle extends TextureSheetParticle {
     }
 
     @Override
+    public float getQuadSize(float f) {
+        return this.quadSize * this.scale;
+    }
+
+    @Override
     protected int getLightColor(float $$0) {
         return 240;
     }
@@ -45,7 +52,7 @@ public class RedstoneShockwaveParticle extends TextureSheetParticle {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    public static class Factory implements ParticleProvider<SimpleParticleType> {
+    public static class Factory implements ParticleProvider<ScalableParticleType.ScalableParticleData> {
 
         private final SpriteSet spriteSet;
 
@@ -55,8 +62,8 @@ public class RedstoneShockwaveParticle extends TextureSheetParticle {
 
         @Nullable
         @Override
-        public Particle createParticle(SimpleParticleType simpleParticleType, ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            RedstoneShockwaveParticle particle = new RedstoneShockwaveParticle(clientLevel, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
+        public Particle createParticle(ScalableParticleType.ScalableParticleData scalableParticleData, ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+            RedstoneShockwaveParticle particle = new RedstoneShockwaveParticle(clientLevel, x, y, z, xSpeed, ySpeed, zSpeed, scalableParticleData.getScale(), this.spriteSet);
             particle.setSprite(spriteSet.get(0, 1));
             return particle;
         }

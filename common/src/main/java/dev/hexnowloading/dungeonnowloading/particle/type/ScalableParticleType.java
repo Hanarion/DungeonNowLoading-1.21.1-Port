@@ -70,7 +70,7 @@ public class ScalableParticleType extends ParticleType<ScalableParticleType.Scal
         }
 
         public float getScale() {
-            return scale;
+            return this.scale;
         }
     }
 }

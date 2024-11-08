@@ -1,4 +1,11 @@
 {
+  "vertex_bow_pull": {
+    "subtitle": "sounds.dungeonnowloading.vertex_bow_pull",
+    "sounds": [
+      "dungeonnowloading:item/vertex_bow/vertex_bow_pull_0",
+      "dungeonnowloading:item/vertex_bow/vertex_bow_pull_1"
+    ]
+  },
   "overcharged_redstone_block_component_detonation": {
     "subtitle": "sounds.dungeonnowloading.overcharged_redstone_block_component_detonation",
     "sounds": [

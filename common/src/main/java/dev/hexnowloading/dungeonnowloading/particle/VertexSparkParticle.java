@@ -119,6 +119,7 @@ public class VertexSparkParticle extends TextureSheetParticle {
 
         private final SpriteSet sprites;
 
+
         public Factory(SpriteSet sprites) {
             this.sprites = sprites;
         }
