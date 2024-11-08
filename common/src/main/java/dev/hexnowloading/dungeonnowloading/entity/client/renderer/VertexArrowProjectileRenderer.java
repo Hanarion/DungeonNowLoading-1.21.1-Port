@@ -4,11 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.client.model.VertexArrowProjectileModel;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexArrowProjectileEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.ArrowRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -17,18 +15,16 @@ import net.minecraft.util.Mth;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
-public class VertexArrowProjectileRenderer extends EntityRenderer<VertexArrowProjectileEntity> {
+public class VertexArrowProjectileRenderer<T extends VertexArrowProjectileEntity> extends EntityRenderer<VertexArrowProjectileEntity> {
     private static final ResourceLocation TEXTURE_0 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_0.png");
     private static final ResourceLocation TEXTURE_1 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_1.png");
     private static final ResourceLocation TEXTURE_2 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_2.png");
     private static final ResourceLocation TEXTURE_3 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_3.png");
-
-    private VertexArrowProjectileModel model;
-    private RenderType renderType = RenderType.entityTranslucent(TEXTURE_0);
+    private static final ResourceLocation EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_emissive.png");
 
     public VertexArrowProjectileRenderer(EntityRendererProvider.Context context) {
         super(context);
-        model = new VertexArrowProjectileModel(context.bakeLayer(VertexArrowProjectileModel.LAYER_LOCATION));
+        //model = new VertexArrowProjectileModel(context.bakeLayer(VertexArrowProjectileModel.LAYER_LOCATION));
     }
 
     @Override
@@ -45,8 +41,8 @@ public class VertexArrowProjectileRenderer extends EntityRenderer<VertexArrowPro
 
         poseStack.mulPose(Axis.XP.rotationDegrees(45.0F));
         float poseStackScale = 0.05625F;
-//        float poseStackScale = 0.05625F;
         poseStack.scale(poseStackScale, poseStackScale, poseStackScale);
+        poseStack.translate(-4.5F, 0.0F, 0.0F);
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityCutout(this.getTextureLocation(vertexArrowProjectileEntity)));
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix4f = pose.pose();
@@ -59,10 +55,23 @@ public class VertexArrowProjectileRenderer extends EntityRenderer<VertexArrowPro
 
         for (int arrowSide = 0; arrowSide < 4; arrowSide++) {
             poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-            this.vertex(matrix4f, normalMatrix, vertexConsumer, -8, -2, 0, uStart, vStart, 0, 1, 0, packedLight);
-            this.vertex(matrix4f, normalMatrix, vertexConsumer, 8, -2, 0, uEnd, vStart, 0, 1, 0, packedLight);
-            this.vertex(matrix4f, normalMatrix, vertexConsumer, 8, 2, 0, uEnd, vEnd, 0, 1, 0, packedLight);
-            this.vertex(matrix4f, normalMatrix, vertexConsumer, -8, 2, 0, uStart, vEnd, 0, 1, 0, packedLight);
+            this.vertex(matrix4f, normalMatrix, vertexConsumer, -8, -3, 0, uStart, vStart, 0, 1, 0, packedLight);
+            this.vertex(matrix4f, normalMatrix, vertexConsumer, 8, -3, 0, uEnd, vStart, 0, 1, 0, packedLight);
+            this.vertex(matrix4f, normalMatrix, vertexConsumer, 8, 3, 0, uEnd, vEnd, 0, 1, 0, packedLight);
+            this.vertex(matrix4f, normalMatrix, vertexConsumer, -8, 3, 0, uStart, vEnd, 0, 1, 0, packedLight);
+        }
+
+        if (vertexArrowProjectileEntity.getPowerLevel() == 3) {
+            //poseStack.translate(0.0F, 0.0F, 0.001F);
+            VertexConsumer emissiveConsumer = multiBufferSource.getBuffer(RenderType.entityTranslucentCull(EMISSIVE));
+            int emissiveLight = 0xF000F0;
+            for (int arrowSide = 0; arrowSide < 4; arrowSide++) {
+                poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+                this.vertex(matrix4f, normalMatrix, emissiveConsumer, -8, -3, 0, uStart, vStart, 0, 1, 0, emissiveLight);
+                this.vertex(matrix4f, normalMatrix, emissiveConsumer, 8, -3, 0, uEnd, vStart, 0, 1, 0, emissiveLight);
+                this.vertex(matrix4f, normalMatrix, emissiveConsumer, 8, 3, 0, uEnd, vEnd, 0, 1, 0, emissiveLight);
+                this.vertex(matrix4f, normalMatrix, emissiveConsumer, -8, 3, 0, uStart, vEnd, 0, 1, 0, emissiveLight);
+            }
         }
 
         poseStack.popPose();
