@@ -134,7 +134,7 @@ public class DNLItems {
     public static final Supplier<Item> HOLLOW_SPAWNEGG = register("spawn_egg_hollow", Services.ITEM.makeSpawnEgg(DNLEntityTypes.HOLLOW::get, 0x53455a, 0xf5d5e0, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> SPAWNER_CARRIER_SPAWNEGG = register("spawn_egg_spawner_carrier", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SPAWNER_CARRIER::get, 0x6a6d68, 0x60c9f3, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> SCUTTLE_SPAWNEGG = register("spawn_egg_scuttle", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SCUTTLE::get, 0x6a6d68, 0xff8800, new Item.Properties().rarity(Rarity.COMMON)));
-    public static final Supplier<Item> BALLISTA_GOLEM_SPAWNEGG = register("spawn_egg_ballista_golem", Services.ITEM.makeSpawnEgg(DNLEntityTypes.BALLISTA_GOLEM::get, 0x53455a, 0xf5d5e0, new Item.Properties().rarity(Rarity.COMMON)));
+    public static final Supplier<Item> BALLISTA_GOLEM_SPAWNEGG = register("spawn_egg_ballista_golem", Services.ITEM.makeSpawnEgg(DNLEntityTypes.BALLISTA_GOLEM::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
 
     public static final Supplier<Item> SEALED_CHAOS_SPAWNEGG = register("spawn_egg_sealed_chaos", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SEALED_CHAOS::get, 0x5f0d80, 0xd5bcd7, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> WHIMPER_SPAWNEGG = register("spawn_egg_whimper", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WHIMPER::get, 0x60f5fa, 0xbef5fa, new Item.Properties().rarity(Rarity.COMMON)));

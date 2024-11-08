@@ -47,7 +47,7 @@ public class BallistaArrowEntity extends AbstractArrow {
         Entity target = entityHitResult.getEntity();
         Entity owner = this.getOwner();
         DamageSource damageSource;
-        int damage = DAMAGE;
+        int damage = owner instanceof LivingEntity livingEntity ? (int) livingEntity.getAttributeValue(Attributes.ATTACK_DAMAGE) : DAMAGE;
 
         if (owner == null) {
             damageSource = this.damageSources().arrow(this, this);
