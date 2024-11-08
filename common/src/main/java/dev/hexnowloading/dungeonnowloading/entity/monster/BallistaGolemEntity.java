@@ -2,12 +2,15 @@ package dev.hexnowloading.dungeonnowloading.entity.monster;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.SmoothBodyRotationControl;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -46,10 +49,10 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 75.0F)
+                .add(Attributes.MAX_HEALTH, 115.0F)
                 .add(Attributes.ATTACK_DAMAGE, 19.0F)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.3)
+                .add(Attributes.MOVEMENT_SPEED, 0.35)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0F)
                 .add(Attributes.FOLLOW_RANGE, 32.0F);
     }
@@ -58,9 +61,10 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new BallistaGolemReloadGoal(this));
         this.goalSelector.addGoal(2, new BallistaGolemArrowAttackGoal(this));
-        this.goalSelector.addGoal(3, new AllRangeMeleeAttackGoal(this, 1.0, true, 1.1F));
-        this.goalSelector.addGoal(4, new SlumberingEntityRandomStrollGoal(this, 0.5));
-        this.goalSelector.addGoal(5, new SlumberingEntityLookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(3, new BallistaGolemMeleeAttackGoal(this, 1.0, true, 1.1F));
+        this.goalSelector.addGoal(4, new AllRangeMeleeAttackGoal(this, 0.5, true, 1.1F));
+        this.goalSelector.addGoal(5, new SlumberingEntityRandomStrollGoal(this, 0.5));
+        this.goalSelector.addGoal(6, new SlumberingEntityLookAtPlayerGoal(this, Player.class, 6.0F));
         this.targetSelector.addGoal(1, new SlumberingEntityPlayerTargetGoal(this));
     }
 
@@ -86,8 +90,9 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
         this.entityData.set(ARROW_COUNT, compoundTag.getInt("ArrowCount"));
     }
 
+    @Override
     protected @NotNull BodyRotationControl createBodyControl() {
-        return new SmoothBodyRotationControl(this, 5.0F);
+        return new SmoothBodyRotationControl(this, 5.0f);
     }
 
     @Override
@@ -167,6 +172,14 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
             default:
                 super.handleEntityEvent(b);
         }
+    }
+
+    @Override
+    public boolean hurt(DamageSource damageSource, float amount) {
+        if (damageSource.is(DNLTags.BALLISTA_GOLEM_HURTABLE)) {
+            return false;
+        }
+        return super.hurt(damageSource, amount);
     }
 
     @Override

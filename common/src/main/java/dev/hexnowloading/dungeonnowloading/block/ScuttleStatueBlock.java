@@ -10,6 +10,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -27,6 +29,8 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
+
+    private boolean playerDestroyedWithSilkTouch;
 
     public ScuttleStatueBlock(Properties properties) {
         super(properties);
@@ -124,9 +128,16 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
 
     @Override
     public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
-        if (blockEntity instanceof ScuttleStatueBlockEntity scuttleStatueBlockEntity) {
-            BlockPos alertPos = blockState.getValue(HALF) == DoubleBlockHalf.UPPER ? blockPos.below() : blockPos;
-            scuttleStatueBlockEntity.alert(alertPos, scuttleStatueBlockEntity);
+        if (!level.isClientSide) {
+            boolean playerDestroyed = !player.getAbilities().instabuild;
+            if (playerDestroyed) {
+                ItemStack heldItem = player.getMainHandItem();
+                playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, heldItem) < 1;
+            }
+            if (playerDestroyed && blockEntity instanceof ScuttleStatueBlockEntity scuttleStatueBlockEntity) {
+                BlockPos alertPos = blockState.getValue(HALF) == DoubleBlockHalf.UPPER ? blockPos.below() : blockPos;
+                scuttleStatueBlockEntity.alert(alertPos, scuttleStatueBlockEntity);
+            }
         }
         super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
     }
