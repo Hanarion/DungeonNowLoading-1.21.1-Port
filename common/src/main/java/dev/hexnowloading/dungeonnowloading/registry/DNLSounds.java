@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import java.util.function.Supplier;
 
 public class DNLSounds {
+    public static final Supplier<SoundEvent> VERTEX_BOW_PULL = registerSoundEvent("vertex_bow_pull");
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION = registerSoundEvent("overcharged_redstone_block_component_detonation");
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_DUST_COMBUSTION = registerSoundEvent("overcharged_redstone_block_dust_combustion");
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION = registerSoundEvent("overcharged_redstone_block_tnt_explosion");

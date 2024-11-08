@@ -18,40 +18,47 @@ public class VertexTransmissionEffect extends MobEffect {
 
     private static final HashMap<UUID, VertexNode> entityVertexNodeMap = new HashMap<>();
     private static final HashMap<UUID, Integer> damageTickCountMap = new HashMap<>();
+    private static final HashMap<UUID, Boolean> isReconnectionCaseMap = new HashMap<>();
 
     public VertexTransmissionEffect() {
-        super(MobEffectCategory.HARMFUL, 13458603); // Set the effect type and color
+        super(MobEffectCategory.HARMFUL, 15073280);
     }
 
     public VertexNode getVertexNode(UUID uuid) {
         return entityVertexNodeMap.get(uuid);
     }
 
+    public void markAsReconnectionCase(UUID uuid) {
+        isReconnectionCaseMap.put(uuid, true);
+    }
+
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
-        // TODO: Make uses of the effect amplifier
-
         UUID uuid = entity.getUUID();
         entityVertexNodeMap.computeIfAbsent(uuid, id -> new VertexNode(entity));
-        damageTickCountMap.putIfAbsent(uuid, 0);
+        damageTickCountMap.putIfAbsent(uuid, 5);
+        isReconnectionCaseMap.putIfAbsent(uuid, false);
 
         VertexNode vertexNode = entityVertexNodeMap.get(uuid);
         int damageTickCount = damageTickCountMap.get(uuid);
 
+        // TODO: fix the damage stuff lolz
         if (damageTickCount == 0) {
-            float damageAmount = BASE_DAMAGE * (DAMAGE_MULTIPLIER_PER_CONNECTION * vertexNode.getConnectionCount() + 1);
-            entity.hurt(entity.level().damageSources().magic(), damageAmount);
+            int foo = vertexNode.getConnectionCount();
+            float damageAmount = BASE_DAMAGE * (DAMAGE_MULTIPLIER_PER_CONNECTION * foo);
+
+            if (damageAmount > 0) {
+                entity.hurt(entity.level().damageSources().magic(), damageAmount);
+            }
             damageTickCountMap.put(uuid, DAMAGE_TICK_INTERVAL);
         } else {
             damageTickCountMap.put(uuid, damageTickCount-1);
         }
 
-        entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, vertexNode.getConnectionCount()));
-
         if (!entity.isDeadOrDying()
                 && !vertexNode.connectionLimitReached()
                 && !vertexNode.attemptedConnection()) {
-            vertexNode.connectToNearbyNodes(entity);
+            vertexNode.connectToNearbyNodes(entity, isReconnectionCaseMap.get(uuid));
         }
 
         vertexNode.tick(entity);
@@ -68,6 +75,7 @@ public class VertexTransmissionEffect extends MobEffect {
 
         entityVertexNodeMap.remove(uuid);
         damageTickCountMap.remove(uuid);
+        isReconnectionCaseMap.remove(uuid);
 
         super.removeAttributeModifiers(entity, attributeMap, amplifier);
     }

@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -84,7 +85,7 @@ public class OverchargedRedstoneBlock extends Block {
             BlockPos adjacentPos = pos.relative(direction);
             BlockState adjacentState = world.getBlockState(adjacentPos);
             if (adjacentState.is(Blocks.REPEATER) || adjacentState.is(Blocks.COMPARATOR)) {
-                explodeComponents(world, adjacentPos, 0.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get());
+                explodeComponents(world, adjacentPos, 0.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get(), 1.0f);
             }
         }
 
@@ -118,13 +119,13 @@ public class OverchargedRedstoneBlock extends Block {
                     if (adjacentState.is(Blocks.REPEATER) || adjacentState.is(Blocks.COMPARATOR)) {
                         explodeRepeaterAndComparator(world, adjacentPos, adjacentState, direction);
                     } else if (adjacentState.is(Blocks.ACTIVATOR_RAIL) || adjacentState.is(Blocks.POWERED_RAIL)) {
-                        explodeComponents(world, adjacentPos, 0.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get());
+                        explodeComponents(world, adjacentPos, 0.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get(), 1.0f);
                     } else if (adjacentState.is(Blocks.DISPENSER) || adjacentState.is(Blocks.DROPPER) || adjacentState.is(Blocks.PISTON) || adjacentState.is(Blocks.STICKY_PISTON)) {
-                        explodeComponents(world, adjacentPos, 1.0f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get());
+                        explodeComponents(world, adjacentPos, 1.0f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get(), 1.0f);
                     } else if (adjacentState.is(Blocks.NOTE_BLOCK) || adjacentState.is(Blocks.REDSTONE_LAMP) || adjacentState.is(Blocks.OBSERVER) || adjacentState.is(DNLBlocks.SIGNAL_GATE.get())) {
-                        explodeComponents(world, adjacentPos, 1.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get());
+                        explodeComponents(world, adjacentPos, 1.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get(), 1.0f);
                     } else if (adjacentState.is(Blocks.TNT)) {
-                        explodeComponents(world, adjacentPos, 6.0f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION.get());
+                        explodeComponents(world, adjacentPos, 6.0f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION.get(), 3.0f);
                     }
                 }
 
@@ -151,13 +152,13 @@ public class OverchargedRedstoneBlock extends Block {
             if (adjacentState.is(Blocks.REPEATER) || adjacentState.is(Blocks.COMPARATOR)) {
                 explodeRepeaterAndComparator(world, adjacentPos, adjacentState, direction);
             } else if (adjacentState.is(Blocks.ACTIVATOR_RAIL) || adjacentState.is(Blocks.POWERED_RAIL)) {
-                explodeComponents(world, adjacentPos, 0.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get());
+                explodeComponents(world, adjacentPos, 0.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get(), 1.0f);
             } else if (adjacentState.is(Blocks.DISPENSER) || adjacentState.is(Blocks.DROPPER) || adjacentState.is(Blocks.PISTON) || adjacentState.is(Blocks.STICKY_PISTON)) {
-                explodeComponents(world, adjacentPos, 1.0f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get());
+                explodeComponents(world, adjacentPos, 1.0f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get(), 1.0f);
             } else if (adjacentState.is(Blocks.NOTE_BLOCK) || adjacentState.is(Blocks.REDSTONE_LAMP) || adjacentState.is(Blocks.OBSERVER) || adjacentState.is(DNLBlocks.SIGNAL_GATE.get())) {
-                explodeComponents(world, adjacentPos, 1.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get());
+                explodeComponents(world, adjacentPos, 1.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get(), 1.0f);
             } else if (adjacentState.is(Blocks.TNT)) {
-                explodeComponents(world, adjacentPos, 6.0f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION.get());
+                explodeComponents(world, adjacentPos, 6.0f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION.get(), 1.0f);
             }
         }
     }
@@ -165,19 +166,28 @@ public class OverchargedRedstoneBlock extends Block {
     private void explodeRepeaterAndComparator(Level world, BlockPos adjacentPos, BlockState adjacentState, Direction direction) {
         Direction repeaterDirection = adjacentState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         if (repeaterDirection == direction.getOpposite()) {
-            explodeComponents(world, adjacentPos, 0.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get());
+            explodeComponents(world, adjacentPos, 0.5f, DNLSounds.OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION.get(), 1.0f);
             if (world instanceof ServerLevel serverLevel) {
-                serverLevel.sendParticles(DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(), adjacentPos.getX() + 0.5, adjacentPos.getY() + 0.5, adjacentPos.getZ() + 0.5, 1, 0.0f, 0.0f, 0.0f, 0.0f);
+                ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
+                    DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
+                    1.0f
+                );
+
+                serverLevel.sendParticles(particleData, adjacentPos.getX() + 0.5, adjacentPos.getY() + 0.5, adjacentPos.getZ() + 0.5, 1, 0.0f, 0.0f, 0.0f, 0.0f);
             }
         }
     }
 
-    private void explodeComponents(Level level, BlockPos blockPos, float strength, SoundEvent soundEvent) {
+    private void explodeComponents(Level level, BlockPos blockPos, float strength, SoundEvent soundEvent, float particleScale) {
         level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
         level.explode(null, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, strength, true, Level.ExplosionInteraction.BLOCK);
         level.playSound(null, blockPos, soundEvent, SoundSource.BLOCKS, 1.0F, 1.0F);
         if (level instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(), blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 1, 0.0f, 0.0f, 0.0f, 0.0f);
+            ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
+                    DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
+                    particleScale
+            );
+            serverLevel.sendParticles(particleData, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 1, 0.0f, 0.0f, 0.0f, 0.0f);
         }
     }
 

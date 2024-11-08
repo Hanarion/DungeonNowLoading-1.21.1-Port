@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexArrowProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -91,7 +92,7 @@ VertexBowItem extends BowItem implements Vanishable {
                             player.getX(),
                             player.getY(),
                             player.getZ(),
-                            SoundEvents.ARROW_SHOOT,
+                            DNLSounds.VERTEX_BOW_PULL.get(),
                             SoundSource.PLAYERS,
                             1.0F,
                             1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + powerForTime * 0.5F

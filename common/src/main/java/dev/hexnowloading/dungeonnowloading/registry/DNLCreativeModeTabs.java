@@ -31,18 +31,21 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.REDSTONE_CORE.get());
                 output.accept(DNLItems.REDSTONE_CHIP.get());
                 output.accept(DNLItems.REDSTONE_CIRCUIT.get());
-                // Items - Functional
-                output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
+                // Items - Combat
                 output.accept(DNLItems.SCEPTER_OF_SEALED_CHAOS.get());
                 output.accept(DNLItems.LIFE_STEALER.get());
                 output.accept(DNLItems.SPAWNER_SWORD.get());
-                output.accept(DNLItems.SKULL_OF_CHAOS.get());
-                output.accept(DNLItems.REDSTONE_CATALYST.get());
+                output.accept(DNLItems.VERTEX_BOW.get());
                 // Items - Armors
                 output.accept(DNLItems.SPAWNER_HELMET.get());
                 output.accept(DNLItems.SPAWNER_CHESTPLATE.get());
                 output.accept(DNLItems.SPAWNER_LEGGINGS.get());
                 output.accept(DNLItems.SPAWNER_BOOTS.get());
+                // Items - Functional
+                output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
+                output.accept(DNLItems.SKULL_OF_CHAOS.get());
+                output.accept(DNLItems.REDSTONE_CATALYST.get());
+
                 // Blocks
 
                 // Blocks - Design
