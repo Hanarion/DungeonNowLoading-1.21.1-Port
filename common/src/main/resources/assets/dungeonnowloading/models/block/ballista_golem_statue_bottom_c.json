@@ -1,0 +1,23 @@
+{
+	"credit": "Made with Blockbench",
+	"render_type": "cutout",
+	"texture_size": [256, 256],
+	"textures": {
+		"4": "dungeonnowloading:block/ballista_golem_statue",
+		"particle": "dungeonnowloading:block/ballista_golem_statue_particle"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 12, 1, 13], "texture": "#4"},
+				"east": {"uv": [0, 12, 1, 13], "texture": "#4"},
+				"south": {"uv": [0, 12, 1, 13], "texture": "#4"},
+				"west": {"uv": [0, 12, 1, 13], "texture": "#4"},
+				"up": {"uv": [0, 12, 1, 13], "texture": "#4"},
+				"down": {"uv": [7, 7, 8, 8], "texture": "#4"}
+			}
+		}
+	]
+}

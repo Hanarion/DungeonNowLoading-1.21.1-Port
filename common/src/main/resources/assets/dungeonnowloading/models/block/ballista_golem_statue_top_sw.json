@@ -1,0 +1,37 @@
+{
+	"credit": "Made with Blockbench",
+	"render_type": "cutout",
+	"texture_size": [256, 256],
+	"textures": {
+		"4": "dungeonnowloading:block/ballista_golem_statue",
+		"particle": "dungeonnowloading:block/ballista_golem_statue_particle"
+	},
+	"elements": [
+		{
+			"from": [1, 0, 0],
+			"to": [16, 15, 15],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 0, 0]},
+			"faces": {
+				"north": {"uv": [0, 12, 1, 13], "texture": "#4"},
+				"east": {"uv": [0, 12, 1, 13], "texture": "#4"},
+				"south": {"uv": [6, 3, 7, 4], "texture": "#4"},
+				"west": {"uv": [8, 3, 9, 4], "texture": "#4"},
+				"up": {"uv": [0, 12, 1, 13], "texture": "#4"},
+				"down": {"uv": [0, 12, 1, 13], "texture": "#4"}
+			}
+		},
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 1], "texture": "#4"},
+				"east": {"uv": [0, 0, 1, 1], "texture": "#4"},
+				"south": {"uv": [6, 9, 7, 10], "texture": "#4"},
+				"west": {"uv": [8, 9, 9, 10], "texture": "#4"},
+				"up": {"uv": [6, 7, 5, 6], "texture": "#4"},
+				"down": {"uv": [0, 0, 1, 1], "texture": "#4"}
+			}
+		}
+	],
+	"display": {}
+}
