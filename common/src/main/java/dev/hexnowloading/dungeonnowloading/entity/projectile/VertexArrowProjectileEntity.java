@@ -29,7 +29,7 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
 
     private static final EntityDataAccessor<Integer> POWER_LEVEL = SynchedEntityData.defineId(VertexArrowProjectileEntity.class, EntityDataSerializers.INT);
     private static final int ENTITY_DIRECT_HIT_EFFECT_DURATION_TICKS = 120 ;
-    private static final int ADVANCE_POWER_LEVEL_THRESHOLD_TICKS = 4;
+    private static final int ADVANCE_POWER_LEVEL_THRESHOLD_TICKS = 8;
     private static final int MAX_POWER_LEVEL = 3;
     private static final int DESPAWN_TIME_TICKS = 400;
 
@@ -117,14 +117,7 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
                 this.powerLevel = 0;
                 this.entityData.set(POWER_LEVEL, 0);
             } else {
-                if (this.powerLevel < MAX_POWER_LEVEL) {
-                    this.powerIncrementTimer++;
-                    if (this.powerIncrementTimer >= ADVANCE_POWER_LEVEL_THRESHOLD_TICKS) {
-                        this.powerLevel++;
-                        this.entityData.set(POWER_LEVEL, this.powerLevel);
-                        this.powerIncrementTimer = 0;
-                    }
-                } else if (!this.vertexNode.attemptedConnection() && this.life != DESPAWN_TIME_TICKS) {
+                if (this.powerLevel == 0 && this.powerIncrementTimer == 0) {
                     this.level().playSound(
                             null,
                             this.getX(),
@@ -135,6 +128,16 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
                             1.0F,
                             1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
                     );
+                }
+
+                if (this.powerLevel < MAX_POWER_LEVEL) {
+                    this.powerIncrementTimer++;
+                    if (this.powerIncrementTimer >= ADVANCE_POWER_LEVEL_THRESHOLD_TICKS) {
+                        this.powerLevel++;
+                        this.entityData.set(POWER_LEVEL, this.powerLevel);
+                        this.powerIncrementTimer = 0;
+                    }
+                } else if (!this.vertexNode.attemptedConnection() && this.life != DESPAWN_TIME_TICKS) {
                     this.vertexNode.connectToNearbyNodes(this);
                 }
             }

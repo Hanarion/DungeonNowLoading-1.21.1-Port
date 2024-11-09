@@ -92,11 +92,14 @@ public class VertexBowItem extends BowItem implements Vanishable {
                             player.getX(),
                             player.getY(),
                             player.getZ(),
-                            DNLSounds.VERTEX_BOW_PULL.get(),
+                            SoundEvents.ARROW_SHOOT,
                             SoundSource.PLAYERS,
                             1.0F,
                             1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + powerForTime * 0.5F
                     );
+
+                    //                    $$1.playSound((Player)null, $$4.getX(), $$4.getY(), $$4.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / ($$1.getRandom().nextFloat() * 0.4F + 1.2F) + $$8 * 0.5F);
+
                     if (!b1 && !player.getAbilities().instabuild) {
                         projectile.shrink(1);
                         if (projectile.isEmpty()) {
@@ -133,8 +136,21 @@ public class VertexBowItem extends BowItem implements Vanishable {
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack itemStack, int remainingUseDuration) {
         if (livingEntity instanceof Player player) {
             int chargeDuration = this.getUseDuration(itemStack) - remainingUseDuration;
-            if (!level.isClientSide && chargeDuration == CHARGE_TIME) {
-//                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.REDSTONE_TORCH_BURNOUT, SoundSource.PLAYERS, 1.0F, 1.0F);
+
+            if (!level.isClientSide && chargeDuration == 0) {
+                level.playSound(
+                        null,
+                        player.getX(),
+                        player.getY(),
+                        player.getZ(),
+                        DNLSounds.VERTEX_BOW_PULL.get(),
+                        SoundSource.PLAYERS,
+                        1.0F,
+                        1.0F / (level.getRandom().nextFloat() * 0.417F + 0.833F)
+                );
+            }
+
+            if (!level.isClientSide && chargeDuration == CHARGE_TIME - 4.0f) {
                 livingEntity.level().playSound(
                         null,
                         livingEntity.getX(),
@@ -145,6 +161,10 @@ public class VertexBowItem extends BowItem implements Vanishable {
                         1.0F,
                         1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
                 );
+            }
+
+            if (!level.isClientSide && chargeDuration == CHARGE_TIME) {
+//                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.REDSTONE_TORCH_BURNOUT, SoundSource.PLAYERS, 1.0F, 1.0F);
                 ((ServerLevel) level).sendParticles(DustParticleOptions.REDSTONE, player.getX(), player.getY(), player.getZ(), 20, 0.3D, 0.9D, 0.3D, 0);
             }
 
