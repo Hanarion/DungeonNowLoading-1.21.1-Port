@@ -21,8 +21,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 
-public class
-VertexBowItem extends BowItem implements Vanishable {
+public class VertexBowItem extends BowItem implements Vanishable {
     private static final float VERTEX_USE_THRESHOLD = 30.0f;
     private static final float CHARGE_TIME = 30.0f;
 
