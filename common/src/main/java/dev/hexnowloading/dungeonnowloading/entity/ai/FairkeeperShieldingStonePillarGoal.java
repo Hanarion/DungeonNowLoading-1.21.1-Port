@@ -94,7 +94,7 @@ public class FairkeeperShieldingStonePillarGoal extends Goal {
 
     @Override
     public void tick() {
-        System.out.println(this.phase);
+//        System.out.println(this.phase);
         if (this.phase == 0) {
             ((FairkeeperFlyingMoveControl) this.fairkeeperEntity.getMoveControl()).setWantedPositionWithSpeed(this.fairkeeperEntity.getSpawnPoint().getX() + 0.5d, this.fairkeeperEntity.getSpawnPoint().getY() + this.altitude, this.fairkeeperEntity.getSpawnPoint().getZ() + 0.5d, this.strafeMaxSpeed, this.strafeMinSpeed, this.strafeStopAccuracy);
             this.phase++;

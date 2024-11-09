@@ -1,4 +1,32 @@
 {
+  "vertex_arrow_bootup": {
+    "subtitle": "sounds.dungeonnowloading.vertex_arrow_bootup",
+    "sounds": [
+      "dungeonnowloading:entity/vertex_arrow/vertex_arrow_bootup_0",
+      "dungeonnowloading:entity/vertex_arrow/vertex_arrow_bootup_1"
+    ]
+  },
+  "vertex_transmission_damage": {
+    "subtitle": "sounds.dungeonnowloading.vertex_transmission_damage",
+    "sounds": [
+      "dungeonnowloading:effect/vertex_transmission/vertex_transmission_damage_0",
+      "dungeonnowloading:effect/vertex_transmission/vertex_transmission_damage_1"
+    ]
+  },
+  "vertex_node_connect": {
+    "subtitle": "sounds.dungeonnowloading.vertex_node_connect",
+    "sounds": [
+      "dungeonnowloading:misc/vertex_node/vertex_node_connect_0",
+      "dungeonnowloading:misc/vertex_node/vertex_node_connect_1"
+    ]
+  },
+  "vertex_bow_arrow_convert": {
+    "subtitle": "sounds.dungeonnowloading.vertex_bow_arrow_convert",
+    "sounds": [
+      "dungeonnowloading:item/vertex_bow/vertex_bow_arrow_convert_0",
+      "dungeonnowloading:item/vertex_bow/vertex_bow_arrow_convert_1"
+    ]
+  },
   "vertex_bow_pull": {
     "subtitle": "sounds.dungeonnowloading.vertex_bow_pull",
     "sounds": [

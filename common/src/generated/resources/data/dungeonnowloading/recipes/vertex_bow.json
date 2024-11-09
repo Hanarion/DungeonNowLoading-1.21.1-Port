@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "c": {
+      "item": "dungeonnowloading:redstone_circuit"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "s": {
+      "item": "minecraft:string"
+    },
+    "t": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "cts",
+    "t r",
+    "cts"
+  ],
+  "result": {
+    "item": "dungeonnowloading:vertex_bow"
+  },
+  "show_notification": true
+}
