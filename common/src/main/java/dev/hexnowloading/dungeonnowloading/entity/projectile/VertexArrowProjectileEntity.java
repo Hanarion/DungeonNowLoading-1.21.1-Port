@@ -4,10 +4,13 @@ import dev.hexnowloading.dungeonnowloading.components.VertexNode;
 import dev.hexnowloading.dungeonnowloading.potion.VertexTransmissionEffect;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.DNLMath;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -25,9 +28,9 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
     private int life;
 
     private static final EntityDataAccessor<Integer> POWER_LEVEL = SynchedEntityData.defineId(VertexArrowProjectileEntity.class, EntityDataSerializers.INT);
-    private static final int MAX_POWER_LEVEL = 3;
-    private static final int ENTITY_EFFECT_DURATION_TICKS = 120 ;
+    private static final int ENTITY_DIRECT_HIT_EFFECT_DURATION_TICKS = 120 ;
     private static final int ADVANCE_POWER_LEVEL_THRESHOLD_TICKS = 4;
+    private static final int MAX_POWER_LEVEL = 3;
     private static final int DESPAWN_TIME_TICKS = 400;
 
     public VertexArrowProjectileEntity(EntityType entityType, Level level) {
@@ -83,9 +86,9 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
         super.onHitEntity(entityHitResult);
 
         if (entityHitResult.getEntity() instanceof LivingEntity entity) {
-            int slownessDurationTicks = ENTITY_EFFECT_DURATION_TICKS;
+            int slownessDurationTicks = ENTITY_DIRECT_HIT_EFFECT_DURATION_TICKS;
             int slownessAmplifier = this.vertexNode.getConnectionCount();
-            int vertexTransDurationTicks = ENTITY_EFFECT_DURATION_TICKS;
+            int vertexTransDurationTicks = ENTITY_DIRECT_HIT_EFFECT_DURATION_TICKS;
             int vertexTransAmplifier = 0;
 
             // Slowness application
@@ -122,6 +125,16 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
                         this.powerIncrementTimer = 0;
                     }
                 } else if (!this.vertexNode.attemptedConnection() && this.life != DESPAWN_TIME_TICKS) {
+                    this.level().playSound(
+                            null,
+                            this.getX(),
+                            this.getY(),
+                            this.getZ(),
+                            DNLSounds.VERTEX_ARROW_BOOTUP.get(),
+                            SoundSource.PLAYERS,
+                            1.0F,
+                            1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
+                    );
                     this.vertexNode.connectToNearbyNodes(this);
                 }
             }

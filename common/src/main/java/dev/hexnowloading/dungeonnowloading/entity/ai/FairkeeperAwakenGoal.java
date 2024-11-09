@@ -35,7 +35,7 @@ public class FairkeeperAwakenGoal extends Goal {
 
     @Override
     public void start() {
-        System.out.println(this.fairkeeperEntity.getY() + " / " + this.fairkeeperEntity.getSpawnPoint().getY());
+//        System.out.println(this.fairkeeperEntity.getY() + " / " + this.fairkeeperEntity.getSpawnPoint().getY());
         double dx = this.fairkeeperEntity.getSpawnPoint().getX() + 0.5d;
         double dy = this.fairkeeperEntity.getSpawnPoint().getY() + 20.0d;
         double dz = this.fairkeeperEntity.getSpawnPoint().getZ() + 0.5d;

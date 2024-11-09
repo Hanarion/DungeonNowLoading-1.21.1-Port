@@ -5,7 +5,10 @@ import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.potion.VertexTransmissionEffect;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.DNLMath;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -28,11 +31,9 @@ public class VertexNode {
     private static final double BEAM_INITIAL_PARTICLE_SPACING = 0.8d;
     private static final float BEAM_INITIAL_PARTICLE_SCALE_MIN = 0.2f;
     private static final float BEAM_INITIAL_PARTICLE_SCALE_MAX = 0.4f;
-    private static final double BEAM_PLAYER_EYE_LEVEL_OFFSET = -0.5d;
-
     private static final float BEAM_PARTICLE_SCALE = 0.05f;
+    private static final double BEAM_PLAYER_EYE_LEVEL_OFFSET = -0.5d;
     private static final float MAX_RANDOM_PARTICLE_SCALE_MULTIPLIER = 3;
-
     private static final int MAX_CONNECTION_COUNT = 2;
     private static final double MAX_CONNECTION_RADIUS = 10.0d;
     private static final double BEAM_HITBOX_RADIUS = 0.5d;
@@ -57,23 +58,27 @@ public class VertexNode {
     public void disconnect_all() {
         for (VertexNodeConnectionContext connectedNodeCtx : this.connectedNodes) {
             connectedNodeCtx.getVertexNode().disconnectNode(this);
-//            this.disconnectNode(connectedNodeCtx.getVertexNode());
         }
-//        for (int index = 0; index < this.connectedNodes.size(); index++) {
-//            this.connectedNodes.get(index).getVertexNode().disconnectNode(this);
-//        }
-
         this.connectedNodes.clear();
         this.attemptedConnection = false;
     }
 
     public void disconnectNode(VertexNode node) {
-//        connectedNode.connectedNodes.removeIf(nodeConnectionCtx -> nodeConnectionCtx.getVertexNode() == this);
         this.connectedNodes.removeIf(nodeConnectionCtx -> nodeConnectionCtx.getVertexNode() == node);
     }
 
     public void connectNode(VertexNode node, boolean isBeamParent) {
         this.connectedNodes.add(new VertexNodeConnectionContext(node, isBeamParent));
+        this.entityRef.level().playSound(
+                null,
+                this.entityRef.getX(),
+                this.entityRef.getY(),
+                this.entityRef.getZ(),
+                DNLSounds.VERTEX_NODE_CONNECT.get(),
+                SoundSource.NEUTRAL,
+                0.5F,
+                1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
+        );
     }
 
     public void connectToNearbyNodes(Entity sourceEntity) {
@@ -89,7 +94,6 @@ public class VertexNode {
 
             // VFX stuffs
             if (!isReconnectionCase) {
-                System.out.println("hello??");
                 this.spawnInitialParticleBeamVFX(
                         sourceEntity.level(),
                         this.getEyeLevelPositionAdjusted(sourceEntity),
@@ -152,13 +156,11 @@ public class VertexNode {
                 }
             }
 
-            // TODO: check why disconnection logic breaks the laws of physics and logic
-
             // Auto-disconnect logic
             boolean nodeShouldDisconnect = (
                     connectedNode.entityRef.isRemoved()
                     || !connectedNode.entityRef.isAlive()
-//                    || connectedNode.entityRef.distanceToSqr(this.entityRef) > MAX_CONNECTION_RADIUS
+                    || connectedNode.entityRef.distanceToSqr(this.entityRef) > (MAX_CONNECTION_RADIUS * MAX_CONNECTION_RADIUS)
             );
             if (connectedNode.entityRef instanceof LivingEntity livingEntity && livingEntity.isDeadOrDying()) {
                 nodeShouldDisconnect = true;
@@ -242,13 +244,15 @@ public class VertexNode {
 
             if (level instanceof ServerLevel _level) {
                 float scaleMultiplier = (float) Math.random() * MAX_RANDOM_PARTICLE_SCALE_MULTIPLIER;
-
+//
                 ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
                     DNLParticleTypes.VERTEX_SPARK_PARTICLE.get(),
                     BEAM_PARTICLE_SCALE * scaleMultiplier
                 );
 
                 _level.sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1, 0.0d, 0.0d, 0.0d, 0);
+//                _level.addAlwaysVisibleParticle(particleData, particlePos.x, particlePos.y, particlePos.z, 0.0, 0.0, 0.0);
+//                this.level().addAlwaysVisibleParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), this.getX() + (this.getRandom().nextFloat() - 0.5D) * spread, this.getY() + height + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getZ() + (this.getRandom().nextFloat() - 0.5D) * spread, 0.0, 0.0, 0.0);
             }
         }
     }
@@ -275,7 +279,7 @@ public class VertexNode {
                     DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
                     particleScale
                 );
-
+//                _level.addAlwaysVisibleParticle(particleData, particlePos.x, particlePos.y, particlePos.z, 0.0, 0.0, 0.0);
                 _level.sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1, 0.0d, 0.0d, 0.0d, 0);
             }
         }

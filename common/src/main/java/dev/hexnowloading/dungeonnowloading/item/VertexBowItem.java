@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexArrowProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.DNLMath;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -134,7 +135,17 @@ VertexBowItem extends BowItem implements Vanishable {
         if (livingEntity instanceof Player player) {
             int chargeDuration = this.getUseDuration(itemStack) - remainingUseDuration;
             if (!level.isClientSide && chargeDuration == CHARGE_TIME) {
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.REDSTONE_TORCH_BURNOUT, SoundSource.PLAYERS, 1.0F, 1.0F);
+//                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.REDSTONE_TORCH_BURNOUT, SoundSource.PLAYERS, 1.0F, 1.0F);
+                livingEntity.level().playSound(
+                        null,
+                        livingEntity.getX(),
+                        livingEntity.getY(),
+                        livingEntity.getZ(),
+                        DNLSounds.VERTEX_BOW_ARROW_CONVERT.get(),
+                        SoundSource.PLAYERS,
+                        1.0F,
+                        1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
+                );
                 ((ServerLevel) level).sendParticles(DustParticleOptions.REDSTONE, player.getX(), player.getY(), player.getZ(), 20, 0.3D, 0.9D, 0.3D, 0);
             }
 

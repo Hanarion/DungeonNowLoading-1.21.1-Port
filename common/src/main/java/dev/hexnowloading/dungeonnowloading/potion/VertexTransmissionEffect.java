@@ -1,6 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.potion;
 
 import dev.hexnowloading.dungeonnowloading.components.VertexNode;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.DNLMath;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -42,13 +45,22 @@ public class VertexTransmissionEffect extends MobEffect {
         VertexNode vertexNode = entityVertexNodeMap.get(uuid);
         int damageTickCount = damageTickCountMap.get(uuid);
 
-        // TODO: fix the damage stuff lolz
         if (damageTickCount == 0) {
-            int foo = vertexNode.getConnectionCount();
-            float damageAmount = BASE_DAMAGE * (DAMAGE_MULTIPLIER_PER_CONNECTION * foo);
+            float damageAmount = BASE_DAMAGE * (DAMAGE_MULTIPLIER_PER_CONNECTION * vertexNode.getConnectionCount());
 
             if (damageAmount > 0) {
                 entity.hurt(entity.level().damageSources().magic(), damageAmount);
+
+                entity.level().playSound(
+                        null,
+                        entity.getX(),
+                        entity.getY(),
+                        entity.getZ(),
+                        DNLSounds.VERTEX_TRANSMISSION_DAMAGE.get(),
+                        SoundSource.NEUTRAL,
+                        1.0F,
+                        1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
+                );
             }
             damageTickCountMap.put(uuid, DAMAGE_TICK_INTERVAL);
         } else {
