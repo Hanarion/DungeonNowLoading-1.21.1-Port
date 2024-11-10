@@ -1,6 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
-import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkeeperChestBlockRenderer;
@@ -33,6 +32,7 @@ public class DNLForgeClientEvents {
         // Passive
         event.registerLayerDefinition(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);
         event.registerLayerDefinition(WhimperModel.LAYER_LOCATION, WhimperModel::createBodyLayer);
+        event.registerLayerDefinition(CopperCreepModel.LAYER_LOCATION, CopperCreepModel::createBodyLayer);
 
         // Projectiles
         event.registerLayerDefinition(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
@@ -58,6 +58,7 @@ public class DNLForgeClientEvents {
         // Passive
         event.registerEntityRenderer(DNLEntityTypes.SEALED_CHAOS.get(), SealedChaosRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.WHIMPER.get(), WhimperRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.COPPER_CREEP.get(), CopperCreepRenderer::new);
 
         // Projectiles
         event.registerEntityRenderer(DNLEntityTypes.CHAOS_SPAWNER_PROJECTILE.get(), ChaosSpawnerProjectileRenderer::new);

@@ -41,8 +41,10 @@ public class DNLItems {
     public static final Supplier<Item> SPAWNER_LEGGINGS = register("spawner_leggings", () -> new SpawnerArmorItem(DNLArmorMaterial.SPAWNER, ArmorItem.Type.LEGGINGS));
     public static final Supplier<Item> SPAWNER_BOOTS = register("spawner_boots", () -> new SpawnerArmorItem(DNLArmorMaterial.SPAWNER, ArmorItem.Type.BOOTS));
     public static final Supplier<Item> SKULL_OF_CHAOS = register("skull_of_chaos", () -> new SkullOfChaosItem(new Item.Properties().rarity(Rarity.EPIC).durability(10)));
-    public static final Supplier<Item> REDSTONE_CATALYST = register("redstone_catalyst", () -> new RedstoneCatalystItem(new Item.Properties().rarity(Rarity.EPIC).durability(10)));
+    public static final Supplier<Item> REDSTONE_CATALYST = register("redstone_catalyst", () -> new CopperDetonatorItem(new Item.Properties().rarity(Rarity.EPIC).durability(10)));
     public static final Supplier<Item> VERTEX_BOW = register("vertex_bow", () -> new VertexBowItem(new Item.Properties().rarity(Rarity.COMMON).durability(384)));
+    public static final Supplier<Item> COPPER_DETONATOR = register("copper_detonator", () -> new CopperDetonatorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
+
     // BLOCKS
     //public static final Supplier<Item> SKYLIGHT_STONE = register("skylight_stone", () -> new BlockItem(DNLBlocks.SKYLIGHT_STONE.get(), new Item.Properties()));
     //public static final Supplier<Item> SKYLIGHT_GRASS_BLOCK = register("skylight_grass_block", () -> new BlockItem(DNLBlocks.SKYLIGHT_GRASS_BLOCK.get(), new Item.Properties()));
