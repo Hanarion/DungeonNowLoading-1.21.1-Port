@@ -9,6 +9,7 @@ import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.SpawnerCarrierEntity;
+import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.*;
@@ -41,6 +42,8 @@ public class DNLEntityTypes {
     // Passive
     public static final Supplier<EntityType<SealedChaosEntity>> SEALED_CHAOS = register("sealed_chaos", () -> EntityType.Builder.of(SealedChaosEntity::new, MobCategory.CREATURE).sized(1F, 1F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "sealed_chaos").toString()));
     public static final Supplier<EntityType<WhimperEntity>> WHIMPER = register("whimper", () -> EntityType.Builder.of(WhimperEntity::new, MobCategory.CREATURE).sized(0.75F, 0.75F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "whimper").toString()));
+    public static final Supplier<EntityType<CopperCreepEntity>> COPPER_CREEP = register("copper_creep", () -> EntityType.Builder.of(CopperCreepEntity::new, MobCategory.CREATURE).sized(0.95F, 0.95F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "copper_creep").toString()));
+
 
     // Projectiles
     public static final Supplier<EntityType<ChaosSpawnerProjectileEntity>> CHAOS_SPAWNER_PROJECTILE = register("chaos_spawner_projectile", () -> EntityType.Builder.<ChaosSpawnerProjectileEntity>of(ChaosSpawnerProjectileEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).clientTrackingRange(4).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "chaos_spawner_projectile").toString()));
@@ -74,6 +77,7 @@ public class DNLEntityTypes {
         // Passive
         map.put(SEALED_CHAOS.get(), SealedChaosEntity.createAttributes().build());
         map.put(WHIMPER.get(), WhimperEntity.createAttributes().build());
+        map.put(COPPER_CREEP.get(), CopperCreepEntity.createAttributes().build());
 
         return map;
     }

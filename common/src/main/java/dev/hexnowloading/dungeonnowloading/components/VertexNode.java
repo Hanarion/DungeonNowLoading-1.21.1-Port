@@ -153,6 +153,14 @@ public class VertexNode {
                         VertexTransmissionEffect vertexTransmissionEffect = (VertexTransmissionEffect) livingEntity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get()).getEffect();
                         vertexTransmissionEffect.markAsReconnectionCase(livingEntity.getUUID());
                     }
+
+                    // No connections damage case
+                    VertexTransmissionEffect vertexTransmissionEffect = (VertexTransmissionEffect) livingEntity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get()).getEffect();
+                    VertexNode entityInBeamVertexNode = vertexTransmissionEffect.getVertexNode(livingEntity.getUUID());
+
+                    if (entityInBeamVertexNode != null && entityInBeamVertexNode.getConnectionCount() == 0) {
+                        vertexTransmissionEffect.setNoConnectionBeamDamageCase(livingEntity.getUUID(), true);
+                    }
                 }
             }
 

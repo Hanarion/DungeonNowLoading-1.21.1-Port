@@ -28,6 +28,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         ITEM_GENERATED = getExistingFile(mcLoc("item/generated"));
 
+        simpleItem(DNLItems.COPPER_DETONATOR.get());
         simpleItem(DNLItems.REDSTONE_SUPPRESSOR.get());
         simpleItem(DNLItems.REDSTONE_CORE.get());
         simpleItem(DNLItems.REDSTONE_CHIP.get());
