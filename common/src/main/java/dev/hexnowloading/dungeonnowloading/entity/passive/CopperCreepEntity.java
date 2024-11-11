@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
@@ -30,22 +31,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterEntity {
-    public AnimationState idleAnimationState = new AnimationState();
-    public AnimationState walkingAnimationState = new AnimationState();
-    public AnimationState runningAnimationState = new AnimationState();
-    public AnimationState detonationAnimationState = new AnimationState();
-
+    private static final String DEFUSED_CUSTOM_NAME = "Defused";
+    private static final float EXPLOSION_RADIUS = 2.0f;
+    private static final float POWERED_EXPLOSION_RADIUS = 5.0f;
     private static final EntityDataAccessor<Optional<UUID>> SUMMONER_UUID = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.OPTIONAL_UUID);
-    private int swell = 0;
-    private int maxSwell = 30;
-    private boolean isIgnited = false;
-    private float explosionRadius = 2.0f;
-    private Player summoner;
-
+    private static final EntityDataAccessor<Boolean> DATA_IS_POWERED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private final byte TRIGGER_IDLE_ANIMATION_STATE = 70;
     private final byte TRIGGER_WALKING_ANIMATION_STATE = 71;
     private final byte TRIGGER_RUNNING_ANIMATION_STATE = 72;
     private final byte TRIGGER_DETONATION_ANIMATION_STATE = 73;
+
+    public AnimationState idleAnimationState = new AnimationState();
+    public AnimationState walkingAnimationState = new AnimationState();
+    public AnimationState runningAnimationState = new AnimationState();
+    public AnimationState detonationAnimationState = new AnimationState();
+    private int swell = 0;
+    private int maxSwell = 30;
+    private Player summoner;
 
     public CopperCreepEntity(EntityType<? extends CopperCreepEntity> entityType, Level level) {
         super(entityType, level);
@@ -63,7 +66,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     }
 
     public void ignite() {
-        this.isIgnited = true;
+        this.entityData.set(DATA_IS_IGNITED, true);
     }
 
     public float getSwelling(float f) {
@@ -73,14 +76,14 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         return Mth.clamp((float) this.swell / (float) this.maxSwell, 0.0F, 1.0F);
     }
 
-    // Set the Summoner's UUID
-    public void setSummonerUUID(UUID summonerUUID) {
-        this.entityData.set(SUMMONER_UUID, Optional.of(summonerUUID));
-    }
-
     // Get the Summoner's UUID, returning an Optional
     public Optional<UUID> getSummonerUUID() {
         return this.entityData.get(SUMMONER_UUID);
+    }
+
+    // Set the Summoner's UUID
+    public void setSummonerUUID(UUID summonerUUID) {
+        this.entityData.set(SUMMONER_UUID, Optional.of(summonerUUID));
     }
 
     // Define Synched Data (This is the part where we define what data to sync)
@@ -88,6 +91,8 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(SUMMONER_UUID, Optional.empty()); // Initially, no UUID is set
+        this.entityData.define(DATA_IS_POWERED, false);
+        this.entityData.define(DATA_IS_IGNITED, false);
     }
 
     // Add custom save data (write the UUID to NBT)
@@ -96,16 +101,29 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         super.addAdditionalSaveData(compoundTag);
         // Save the UUID to NBT
         this.getSummonerUUID().ifPresent(uuid -> compoundTag.putUUID("summonerUUID", uuid));
+
+        if ((Boolean) this.entityData.get(DATA_IS_POWERED)) {
+            compoundTag.putBoolean("powered", true);
+        }
+
+        compoundTag.putBoolean("ignited", this.isIgnited());
     }
 
     // Read custom save data (read the UUID from NBT)
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
+
         if (compoundTag.contains("summonerUUID")) {
             // Read the UUID and set it
             UUID summonerUUID = compoundTag.getUUID("summonerUUID");
             this.setSummonerUUID(summonerUUID);
+        }
+
+        this.entityData.set(DATA_IS_POWERED, compoundTag.getBoolean("powered"));
+
+        if (compoundTag.getBoolean("ignited") && !this.isDefused()) {
+            this.ignite();
         }
     }
 
@@ -121,7 +139,9 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             SoundEvent soundEvent = itemStack.is(Items.FIRE_CHARGE) ? SoundEvents.FIRECHARGE_USE : SoundEvents.FLINTANDSTEEL_USE;
             this.level().playSound(player, this.getX(), this.getY(), this.getZ(), soundEvent, this.getSoundSource(), 1.0F, this.random.nextFloat() * 0.4F + 0.8F);
 
-            this.ignite();
+            if (!this.isDefused()) {
+                this.ignite();
+            }
 
             if (!this.level().isClientSide) {
                 if (!itemStack.isDamageableItem()) {
@@ -149,9 +169,17 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         return this.summoner;
     }
 
+    public boolean isPowered() {
+        return (Boolean) this.entityData.get(DATA_IS_POWERED);
+    }
+
+    public boolean isIgnited() {
+        return (Boolean) this.entityData.get(DATA_IS_IGNITED);
+    }
+
     @Override
     public void tick() {
-        if (this.isIgnited) {
+        if (this.isIgnited()) {
             if (this.swell == 0) {
                 this.playSound(SoundEvents.CREEPER_PRIMED, 1.0F, 1.0F);
             }
@@ -160,11 +188,22 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                 this.swell++;
             } else if (!this.level().isClientSide) {
                 this.dead = true;
-                this.level().explode(this, this.getX(), this.getY(), this.getZ(), this.explosionRadius, Level.ExplosionInteraction.NONE);
+                float finalExplosionRadius = EXPLOSION_RADIUS;
+                if (this.isPowered()) {
+                    finalExplosionRadius = POWERED_EXPLOSION_RADIUS;
+                }
+
+                this.level().explode(this, this.getX(), this.getY(), this.getZ(), finalExplosionRadius, Level.ExplosionInteraction.NONE);
                 this.discard();
             }
         }
         super.tick();
+    }
+
+    @Override
+    public void thunderHit(ServerLevel serverLevel, LightningBolt lightningBolt) {
+        super.thunderHit(serverLevel, lightningBolt);
+        this.entityData.set(DATA_IS_POWERED, true);
     }
 
     @Override
@@ -194,16 +233,34 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         this.targetSelector.addGoal(2, new NearestNonSummonerAttackableTargetGoal<>(this, Monster.class, true));
     }
 
-    private void triggerIdleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_STATE); }
-    private void triggerWalkingAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_WALKING_ANIMATION_STATE); }
-    private void triggerRunningAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_RUNNING_ANIMATION_STATE); }
-    private void triggerDetonationAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_DETONATION_ANIMATION_STATE); }
+    public boolean isDefused() {
+        if (this.hasCustomName()) {
+            return DEFUSED_CUSTOM_NAME.equals(this.getCustomName().getString());
+        }
+        return false;
+    }
+
+    private void triggerIdleAnimation() {
+        this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_STATE);
+    }
+
+    private void triggerWalkingAnimation() {
+        this.level().broadcastEntityEvent(this, TRIGGER_WALKING_ANIMATION_STATE);
+    }
+
+    private void triggerRunningAnimation() {
+        this.level().broadcastEntityEvent(this, TRIGGER_RUNNING_ANIMATION_STATE);
+    }
+
+    private void triggerDetonationAnimation() {
+        this.level().broadcastEntityEvent(this, TRIGGER_DETONATION_ANIMATION_STATE);
+    }
 
     private class MoveDirectlyTowardsTargetGoal extends Goal {
         private static final float AT_TARGET_STOP_DISTANCE = 0.5f;
         private final PathfinderMob mob;
-        private LivingEntity target;
         private final double speedModifier;
+        private LivingEntity target;
 
         public MoveDirectlyTowardsTargetGoal(PathfinderMob mob, LivingEntity target, double speedModifier) {
             this.mob = mob;

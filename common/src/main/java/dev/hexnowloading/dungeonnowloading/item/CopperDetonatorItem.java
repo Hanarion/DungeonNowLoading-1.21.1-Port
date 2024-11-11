@@ -72,6 +72,7 @@ public class CopperDetonatorItem extends Item {
                 player.getBoundingBox().inflate(creepTriggerRadius)
         )
                 .stream()
+                .filter(entity -> !entity.isDefused())
                 .filter(entity -> player.distanceToSqr(entity) <= (creepTriggerRadius * creepTriggerRadius))
                 .toList();
     }
