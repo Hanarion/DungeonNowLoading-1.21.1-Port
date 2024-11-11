@@ -21,18 +21,24 @@ import net.minecraft.world.entity.Entity;
 public class CopperCreepModel<T extends Entity> extends HierarchicalModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "copper_creep"), "main");
-	private final ModelPart left_leg;
-	private final ModelPart right_leg;
+	private final ModelPart coppercreep;
 	private final ModelPart body;
 	private final ModelPart rod;
+	private final ModelPart bodycube;
+	private final ModelPart legs;
+	private final ModelPart left_leg;
+	private final ModelPart right_leg;
 	private final ModelPart root;
 //	private final ModelPart bb_main;
 
 	public CopperCreepModel(ModelPart root) {
-		this.left_leg = root.getChild("left_leg");
-		this.right_leg = root.getChild("right_leg");
-		this.body = root.getChild("body");
+		this.coppercreep = root.getChild("coppercreep");
+		this.body = this.coppercreep.getChild("body");
 		this.rod = this.body.getChild("rod");
+		this.bodycube = this.body.getChild("bodycube");
+		this.legs = this.coppercreep.getChild("legs");
+		this.left_leg = this.legs.getChild("left_leg");
+		this.right_leg = this.legs.getChild("right_leg");
 		this.root = root;
 //		this.bb_main = root.getChild("bb_main");
 	}
@@ -41,14 +47,20 @@ public class CopperCreepModel<T extends Entity> extends HierarchicalModel<T> {
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition left_leg = partdefinition.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(16, 18).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(2.5F, 20.0F, 0.5F));
+		PartDefinition coppercreep = partdefinition.addOrReplaceChild("coppercreep", CubeListBuilder.create(), PartPose.offset(0.0F, 16.0F, 0.0F));
 
-		PartDefinition right_leg = partdefinition.addOrReplaceChild("right_leg", CubeListBuilder.create().texOffs(0, 26).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.5F, 20.0F, 0.5F));
+		PartDefinition body = coppercreep.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(0.0F, 0.5F, 0.5F));
 
-		PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-4.5F, -4.5F, -4.5F, 9.0F, 9.0F, 9.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 15.5F, 0.5F));
+		PartDefinition rod = body.addOrReplaceChild("rod", CubeListBuilder.create().texOffs(0, 0).addBox(-1.0F, -2.0F, -0.5F, 2.0F, 7.0F, 2.0F, new CubeDeformation(0.0F))
+				.texOffs(0, 18).addBox(-2.0F, -6.0F, -1.5F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -4.5F, -0.5F));
 
-		PartDefinition rod = body.addOrReplaceChild("rod", CubeListBuilder.create().texOffs(0, 0).addBox(-1.0F, -2.0F, -0.5F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(0, 18).addBox(-2.0F, -6.0F, -1.5F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -4.5F, -0.5F));
+		PartDefinition bodycube = body.addOrReplaceChild("bodycube", CubeListBuilder.create().texOffs(0, 0).addBox(-4.5F, -13.0F, -4.0F, 9.0F, 9.0F, 9.0F, new CubeDeformation(0.15F)), PartPose.offset(0.0F, 8.5F, -0.5F));
+
+		PartDefinition legs = coppercreep.addOrReplaceChild("legs", CubeListBuilder.create(), PartPose.offset(0.0F, 8.0F, 0.0F));
+
+		PartDefinition left_leg = legs.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(16, 18).addBox(-2.0F, -3.0F, -2.0F, 4.0F, 7.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(2.5F, -4.0F, 0.5F));
+
+		PartDefinition right_leg = legs.addOrReplaceChild("right_leg", CubeListBuilder.create().texOffs(0, 26).addBox(-2.0F, -3.0F, -2.0F, 4.0F, 7.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.5F, -4.0F, 0.5F));
 
 		return LayerDefinition.create(meshdefinition, 64, 64);
 	}
@@ -61,6 +73,7 @@ public class CopperCreepModel<T extends Entity> extends HierarchicalModel<T> {
 		this.animate(copperCreepEntity.idleAnimationState, CopperCreepAnimation.IDLE, ageInTicks);
 		this.animate(copperCreepEntity.walkingAnimationState, CopperCreepAnimation.WALKING, ageInTicks);
 //		this.animate(copperCreepEntity.runningAnimationState, CopperCreepAnimation.RUNNING, ageInTicks);
+		this.animate(copperCreepEntity.summonAnimationState, CopperCreepAnimation.SUMMON, ageInTicks);
 		this.animate(copperCreepEntity.detonationAnimationState, CopperCreepAnimation.DETONATION, ageInTicks);
 
 		this.animateWalk(CopperCreepAnimation.RUNNING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
@@ -68,9 +81,10 @@ public class CopperCreepModel<T extends Entity> extends HierarchicalModel<T> {
 
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		left_leg.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		right_leg.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		coppercreep.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+//		left_leg.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+//		right_leg.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+//		body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
 	}
 
 	@Override

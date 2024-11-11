@@ -40,11 +40,13 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     private final byte TRIGGER_IDLE_ANIMATION_STATE = 70;
     private final byte TRIGGER_WALKING_ANIMATION_STATE = 71;
     private final byte TRIGGER_RUNNING_ANIMATION_STATE = 72;
-    private final byte TRIGGER_DETONATION_ANIMATION_STATE = 73;
+    private final byte TRIGGER_SUMMON_ANIMATION_STATE = 73;
+    private final byte TRIGGER_DETONATION_ANIMATION_STATE = 74;
 
     public AnimationState idleAnimationState = new AnimationState();
     public AnimationState walkingAnimationState = new AnimationState();
     public AnimationState runningAnimationState = new AnimationState();
+    public AnimationState summonAnimationState = new AnimationState();
     public AnimationState detonationAnimationState = new AnimationState();
     private int swell = 0;
     private int maxSwell = 30;
@@ -129,7 +131,8 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor $$0, DifficultyInstance $$1, MobSpawnType $$2, @Nullable SpawnGroupData $$3, @Nullable CompoundTag $$4) {
-        triggerIdleAnimation();
+//        triggerIdleAnimation();
+        triggerSummonAnimation();
         return super.finalizeSpawn($$0, $$1, $$2, $$3, $$4);
     }
 
@@ -218,6 +221,9 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             case TRIGGER_RUNNING_ANIMATION_STATE:
                 this.runningAnimationState.start(this.tickCount);
                 break;
+            case TRIGGER_SUMMON_ANIMATION_STATE:
+                this.summonAnimationState.start(this.tickCount);
+                break;
             case TRIGGER_DETONATION_ANIMATION_STATE:
                 this.detonationAnimationState.start(this.tickCount);
                 break;
@@ -250,6 +256,10 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     private void triggerRunningAnimation() {
         this.level().broadcastEntityEvent(this, TRIGGER_RUNNING_ANIMATION_STATE);
+    }
+
+    private void triggerSummonAnimation() {
+        this.level().broadcastEntityEvent(this, TRIGGER_SUMMON_ANIMATION_STATE);
     }
 
     private void triggerDetonationAnimation() {
