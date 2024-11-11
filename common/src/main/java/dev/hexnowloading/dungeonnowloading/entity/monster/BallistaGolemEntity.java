@@ -28,6 +28,7 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
 
     private static final EntityDataAccessor<BallistaGolemState> STATE = SynchedEntityData.defineId(BallistaGolemEntity.class, EntityStates.BALLISTA_GOLEM_STATE);
     private static final EntityDataAccessor<Integer> ARROW_COUNT = SynchedEntityData.defineId(BallistaGolemEntity.class, EntityDataSerializers.INT);
+    public static final int BALLISTA_GOLEM_MELEE_RANGE = 7;
     private int aiTick = 0;
 
     public final AnimationState wakeUpAnimationState = new AnimationState();

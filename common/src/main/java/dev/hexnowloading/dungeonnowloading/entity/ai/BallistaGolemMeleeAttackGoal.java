@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
+import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -8,7 +9,6 @@ import net.minecraft.world.entity.player.Player;
 
 public class BallistaGolemMeleeAttackGoal extends MeleeAttackGoal {
     private final float rangeInBbPercentage;
-    private final float MAX_DISTANCE = 10.0F;
 
     public BallistaGolemMeleeAttackGoal(PathfinderMob pathfinderMob, double $$1, boolean $$2, float rangeInBbPercentage) {
         super(pathfinderMob, $$1, $$2);
@@ -17,7 +17,7 @@ public class BallistaGolemMeleeAttackGoal extends MeleeAttackGoal {
 
     @Override
     public boolean canUse() {
-        return this.mob.getTarget() != null && this.mob.getTarget().distanceTo(this.mob) < MAX_DISTANCE;
+        return this.mob.getTarget() != null && this.mob.getTarget().distanceTo(this.mob) < BallistaGolemEntity.BALLISTA_GOLEM_MELEE_RANGE;
     }
 
     @Override

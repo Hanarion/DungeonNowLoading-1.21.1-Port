@@ -33,8 +33,7 @@ public class BallistaGolemArrowAttackGoal extends Goal {
             return false;
         } else {
             double DETECTION_RANGE = this.ballistaGolemEntity.getFollowDistance();
-            double MIN_DETECTION_RANGE = 10;
-            boolean hasTargetInRange = this.ballistaGolemEntity.getTarget() != null && this.ballistaGolemEntity.getTarget().distanceTo(this.ballistaGolemEntity) < DETECTION_RANGE && this.ballistaGolemEntity.getTarget().distanceTo(this.ballistaGolemEntity) > MIN_DETECTION_RANGE;
+            boolean hasTargetInRange = this.ballistaGolemEntity.getTarget() != null && this.ballistaGolemEntity.getTarget().distanceTo(this.ballistaGolemEntity) < DETECTION_RANGE && this.ballistaGolemEntity.getTarget().distanceTo(this.ballistaGolemEntity) > BallistaGolemEntity.BALLISTA_GOLEM_MELEE_RANGE;
             boolean isFacingTarget = this.ballistaGolemEntity.getTarget() != null && isFacingTarget(this.ballistaGolemEntity.getTarget());
             this.nextScanTick = this.nextStartTick();
             return this.ballistaGolemEntity.isState(BallistaGolemEntity.BallistaGolemState.IDLE)
