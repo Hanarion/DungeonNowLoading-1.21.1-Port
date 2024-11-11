@@ -52,7 +52,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         return PathfinderMob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 10.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.0D)
-                .add(Attributes.FOLLOW_RANGE, 10.0F)
+                .add(Attributes.FOLLOW_RANGE, 16.0F)
                 .add(Attributes.MOVEMENT_SPEED, 0.35F);
     }
 
