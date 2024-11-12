@@ -27,7 +27,7 @@ public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, CopperCr
     public CopperCreepRenderer(EntityRendererProvider.Context context) {
         super(context, new CopperCreepModel<>(context.bakeLayer(CopperCreepModel.LAYER_LOCATION)), 0.5F);
         // Match type parameters exactly here
-        this.addLayer(new CopperCreepPowerLayer(this, context.getModelSet()));
+        this.addLayer(new CopperCreepPowerLayer<>(this, getModel()));
     }
 
     @Override
