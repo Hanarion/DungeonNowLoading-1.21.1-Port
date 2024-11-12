@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterEntity {
+public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterEntity, PowerableMob {
     public enum State {
         SUMMONING,
         IDLE,
