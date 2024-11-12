@@ -31,6 +31,7 @@ import net.minecraft.world.entity.monster.Creeper;
 public class CopperCreepPowerLayer<T extends CopperCreepEntity, M extends CopperCreepModel<T>> extends RenderLayer<T, M> {
     private static final ResourceLocation POWER_LOCATION = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep_armor.png");
     private final CopperCreepModel<CopperCreepEntity> model;
+    private final float OFFSET_Y_BY_PIXEL = 0.75F;
 
     public CopperCreepPowerLayer(CopperCreepRenderer renderer, CopperCreepModel<CopperCreepEntity> model) {
         super((RenderLayerParent<T, M>) renderer);
@@ -46,15 +47,20 @@ public class CopperCreepPowerLayer<T extends CopperCreepEntity, M extends Copper
 //        return partialTick * 0.01F;
 //    }
 
-    public void render(PoseStack $$0, MultiBufferSource $$1, int $$2, CopperCreepEntity $$3, float $$4, float $$5, float $$6, float $$7, float $$8, float $$9) {
-        if (((PowerableMob)$$3).isPowered()) {
-            float $$10 = (float)$$3.tickCount + $$6;
-            EntityModel<CopperCreepEntity> $$11 = this.model();
-            $$11.prepareMobModel($$3, $$4, $$5, $$6);
-            this.getParentModel().copyPropertiesTo((EntityModel<T>) $$11);
-            VertexConsumer $$12 = $$1.getBuffer(RenderType.energySwirl(POWER_LOCATION, this.xOffset($$10) % 1.0F, $$10 * 0.01F % 1.0F));
-            $$11.setupAnim($$3, $$4, $$5, $$7, $$8, $$9);
-            $$11.renderToBuffer($$0, $$12, $$2, OverlayTexture.NO_OVERLAY, 0.5F, 0.5F, 0.5F, 1.0F);
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CopperCreepEntity copperCreepEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+        if (((PowerableMob)copperCreepEntity).isPowered()) {
+            float tickCount = (float)copperCreepEntity.tickCount + partialTicks;
+
+            poseStack.pushPose();
+            poseStack.scale(1.05F, 1.05F, 1.05F);
+            poseStack.translate(0, -(OFFSET_Y_BY_PIXEL / 16), 0);
+            EntityModel<CopperCreepEntity> entityModel = this.model();
+            entityModel.prepareMobModel(copperCreepEntity, limbSwing, limbSwingAmount, partialTicks);
+            this.getParentModel().copyPropertiesTo((EntityModel<T>) entityModel);
+            VertexConsumer $$12 = bufferSource.getBuffer(RenderType.energySwirl(POWER_LOCATION, this.xOffset(tickCount) % 1.0F, tickCount * 0.01F % 1.0F));
+            entityModel.setupAnim(copperCreepEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+            entityModel.renderToBuffer(poseStack, $$12, packedLight, OverlayTexture.NO_OVERLAY, 0.5F, 0.5F, 0.5F, 1.0F);
+            poseStack.popPose();
         }
     }
 
@@ -62,7 +68,7 @@ public class CopperCreepPowerLayer<T extends CopperCreepEntity, M extends Copper
 
 
     protected float xOffset(float $$0) {
-        return $$0 * 0.01F;
+        return $$0 * 0.00F;
     }
 
 
