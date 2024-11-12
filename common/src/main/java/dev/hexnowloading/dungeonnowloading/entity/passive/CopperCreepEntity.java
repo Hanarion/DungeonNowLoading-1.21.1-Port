@@ -20,6 +20,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -238,7 +240,13 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     public void tick() {
         if (this.isIgnited()) {
             if (this.swell == 0) {
+                this.setState(State.DETONATION);
+
+                triggerDetonationAnimation();
+
                 this.playSound(SoundEvents.CREEPER_PRIMED, 1.0F, 1.0F);
+                AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
+                moveSpeedAttr.setBaseValue(0.0f);
             }
 
             if (this.swell < this.maxSwell) {
