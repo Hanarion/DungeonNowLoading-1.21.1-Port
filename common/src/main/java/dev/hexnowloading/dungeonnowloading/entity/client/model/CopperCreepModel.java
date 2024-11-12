@@ -71,12 +71,18 @@ public class CopperCreepModel<T extends Entity> extends HierarchicalModel<T> {
 
 		CopperCreepEntity copperCreepEntity = (CopperCreepEntity) entity;
 		this.animate(copperCreepEntity.idleAnimationState, CopperCreepAnimation.IDLE, ageInTicks);
-		this.animate(copperCreepEntity.walkingAnimationState, CopperCreepAnimation.WALKING, ageInTicks);
+//		this.animate(copperCreepEntity.walkingAnimationState, CopperCreepAnimation.WALKING, ageInTicks);
 //		this.animate(copperCreepEntity.runningAnimationState, CopperCreepAnimation.RUNNING, ageInTicks);
 		this.animate(copperCreepEntity.summonAnimationState, CopperCreepAnimation.SUMMON, ageInTicks);
 		this.animate(copperCreepEntity.detonationAnimationState, CopperCreepAnimation.DETONATION, ageInTicks);
 
-		this.animateWalk(CopperCreepAnimation.RUNNING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
+//		System.out.println(copperCreepEntity.currentState);
+
+		if (copperCreepEntity.getState() == CopperCreepEntity.State.IDLE) {
+			this.animateWalk(CopperCreepAnimation.WALKING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
+		} else if (copperCreepEntity.getState() == CopperCreepEntity.State.FOLLOWING) {
+			this.animateWalk(CopperCreepAnimation.RUNNING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
+		}
 	}
 
 	@Override

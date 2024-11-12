@@ -37,7 +37,7 @@ public class CopperDetonatorItem extends Item {
         if (nearbyCreeps.isEmpty()) {
             this.consumeCopperBlock(player);
             this.summonCopperCreep(level, clickedPos, clickedFace, player.getUUID());
-            player.getCooldowns().addCooldown(this, 20);
+            player.getCooldowns().addCooldown(this, 5);
         } else {
             if ((!player.isCreative() && !playerHasCopperBlock)) {
                 // player.displayClientMessage(Component.translatable("item.dungeonnowloading.no_copper_block"), true);
@@ -73,6 +73,7 @@ public class CopperDetonatorItem extends Item {
         )
                 .stream()
                 .filter(entity -> !entity.isDefused())
+                .filter(entity -> !entity.isDeadOrDying())
                 .filter(entity -> player.distanceToSqr(entity) <= (creepTriggerRadius * creepTriggerRadius))
                 .toList();
     }

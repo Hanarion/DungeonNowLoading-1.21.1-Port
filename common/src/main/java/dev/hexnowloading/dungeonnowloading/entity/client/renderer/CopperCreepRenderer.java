@@ -39,6 +39,13 @@ public class CopperCreepRenderer<T extends CopperCreepEntity> extends MobRendere
     }
 
     @Override
+    public void render(T entity, float $$1, float $$2, PoseStack $$3, MultiBufferSource $$4, int $$5) {
+        if (entity.isAlreadySummoned()) {
+            super.render(entity, $$1, $$2, $$3, $$4, $$5);
+        }
+    }
+
+    @Override
     protected float getWhiteOverlayProgress(CopperCreepEntity $$0, float $$1) {
         float $$2 = $$0.getSwelling($$1);
         return (int)($$2 * 10.0F) % 2 == 0 ? 0.0F : Mth.clamp($$2, 0.5F, 1.0F);
