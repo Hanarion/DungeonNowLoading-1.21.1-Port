@@ -26,7 +26,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.animal.Cat;
+import net.minecraft.world.entity.animal.Ocelot;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -310,10 +313,12 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     @Override
     protected void registerGoals() {
         super.registerGoals();
-//        this.goalSelector.addGoal(1, new FollowMobGoal(this, this.getTarget(), 1.0f));
-        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1.0f, 60, false));
-        this.goalSelector.addGoal(1, new FollowMobGoal(this, 2.0, 0.5F, 16.0F));
-        this.targetSelector.addGoal(1, new NearestNonSummonerAttackableTargetGoal<>(this, Monster.class, true));
+        this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(4, new CustomMeleeAttackGoal(this, 2.0f, false));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Monster.class, 8.0F));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true));
     }
 
     public boolean isDefused() {
@@ -374,78 +379,25 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         this.level().broadcastEntityEvent(this, TRIGGER_DETONATION_ANIMATION_STATE);
     }
 
-//    private boolean stateChanged() {
-//        boolean hasStateChanged = this.currentState != lastState;
-//        if (hasStateChanged) {
-//            this.lastState = this.currentState;
-//        }
-//
-//        return hasStateChanged;
-//    }
-
     private void setState(State state) {
         this.currentState = state;
         this.entityData.set(STATE, state);
     }
 
-//
-//    private class MoveDirectlyTowardsTargetGoal extends Goal {
-//        private static final float AT_TARGET_STOP_DISTANCE = 0.5f;
-//        private final PathfinderMob mob;
-//        private final double speedModifier;
-//        private LivingEntity target;
-//
-//        public MoveDirectlyTowardsTargetGoal(PathfinderMob mob, LivingEntity target, double speedModifier) {
-//            this.mob = mob;
-//            this.target = target;
-//            this.speedModifier = speedModifier;
-//        }
-//
-//        @Override
-//        public boolean canUse() {
-//            // Make sure the target is not null
-//            if (this.target == null) {
-//                this.target = this.mob.getTarget(); // Try to set the target dynamically here
-//            }
-//
-//            if (this.mob.getAttribute(Attributes.FOLLOW_RANGE))
-//
-//            // Now check if the target exists and if it's far enough to move
-//            return this.target != null && this.mob.distanceTo(this.target) > AT_TARGET_STOP_DISTANCE;
-//        }
-//
-//        @Override
-//        public void tick() {
-//            // Move the mob directly towards the target
-//            this.mob.getNavigation().moveTo(this.target.getX(), this.target.getY(), this.target.getZ(), this.speedModifier);
-//        }
-//    }
+    private class CustomMeleeAttackGoal extends MeleeAttackGoal {
 
-    private class NearestNonSummonerAttackableTargetGoal<T extends LivingEntity> extends NearestAttackableTargetGoal<T> {
-        private final CopperCreepEntity mob;
-
-        public NearestNonSummonerAttackableTargetGoal(CopperCreepEntity mob, Class<T> targetClass, boolean mustSee) {
-            super(mob, targetClass, mustSee);
-            this.mob = mob;
+        public CustomMeleeAttackGoal(PathfinderMob $$0, double $$1, boolean $$2) {
+            super($$0, $$1, $$2);
         }
 
         @Override
-        public boolean canUse() {
-            // First, check if there is a valid target that meets the conditions of NearestAttackableTargetGoal
-            boolean canUse = super.canUse();
-
-            // Check if the mob has a summoner UUID set
-            Optional<UUID> summonerUUID = this.mob.getSummonerUUID();
-            if (summonerUUID.isPresent()) {
-                // Get the summoner Player from the UUID
-                Player summoner = this.mob.level().getPlayerByUUID(summonerUUID.get());
-                if (summoner != null && this.target != null && this.target.equals(summoner)) {
-                    // If the target is the summoner, return false
-                    return false;
-                }
-            }
-
-            return canUse;
+        protected void checkAndPerformAttack(LivingEntity $$0, double $$1) {
+//            double $$2 = this.getAttackReachSqr($$0);
+//            if ($$1 <= $$2 && this.ticksUntilNextAttack <= 0) {
+//                this.resetAttackCooldown();
+//                this.mob.swing(InteractionHand.MAIN_HAND);
+//                this.mob.doHurtTarget($$0);
+//            }
         }
     }
 }
