@@ -7,6 +7,7 @@ import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -43,7 +44,6 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         FOLLOWING,
         DETONATION
     }
-
     private static final String DEFUSED_CUSTOM_NAME = "Defused";
     private static final float EXPLOSION_RADIUS = 2.0f;
     private static final float POWERED_EXPLOSION_RADIUS = 5.0f;
@@ -52,38 +52,36 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_ALREADY_SUMMONED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<State> STATE = SynchedEntityData.defineId(CopperCreepEntity.class, EntityStates.COPPER_CREEP_STATE);
-    private final byte TRIGGER_IDLE_ANIMATION_STATE = 70;
-    private final byte TRIGGER_WALKING_ANIMATION_STATE = 71;
-    private final byte TRIGGER_RUNNING_ANIMATION_STATE = 72;
-    private final byte TRIGGER_SUMMON_ANIMATION_STATE = 73;
-    private final byte TRIGGER_DETONATION_ANIMATION_STATE = 74;
+    private static final byte TRIGGER_IDLE_ANIMATION_STATE = 70;
+    private static final byte TRIGGER_WALKING_ANIMATION_STATE = 71;
+    private static final byte TRIGGER_RUNNING_ANIMATION_STATE = 72;
+    private static final byte TRIGGER_SUMMON_ANIMATION_STATE = 73;
+    private static final byte TRIGGER_DETONATION_ANIMATION_STATE = 74;
 
     public AnimationState idleAnimationState = new AnimationState();
     public AnimationState walkingAnimationState = new AnimationState();
     public AnimationState runningAnimationState = new AnimationState();
     public AnimationState summonAnimationState = new AnimationState();
     public AnimationState detonationAnimationState = new AnimationState();
+    private int lightningAttractTimer = 0;
     private int swell = 0;
     private int maxSwell = 30;
     private Player summoner;
     private int aiTick;
 
-//    private boolean isSummonAnimInitialized;
-
     public State currentState;
-    private State lastState;
 
     public CopperCreepEntity(EntityType<? extends CopperCreepEntity> entityType, Level level) {
         super(entityType, level);
         this.xpReward = 0;
 
         this.summoner = null;
+        this.lightningAttractTimer = 60 * (3 + this.random.nextInt(28));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 10.0D)
-//                .add(Attributes.MOVEMENT_SPEED, 0.0D)
                 .add(Attributes.FOLLOW_RANGE, 16.0F)
                 .add(Attributes.MOVEMENT_SPEED, 0.175F);
     }
@@ -238,6 +236,14 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     @Override
     public void tick() {
+        if (this.lightningAttractTimer > 0) {
+            this.lightningAttractTimer--;
+        }
+
+        if (lightningAttractTimer == 0 && !this.isPowered()) {
+            attemptToAttractLightning();
+        }
+
         if (this.isIgnited()) {
             if (this.swell == 0) {
                 this.setState(State.DETONATION);
@@ -262,6 +268,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                 this.discard();
             }
         }
+
         super.tick();
     }
 
@@ -308,6 +315,29 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             return DEFUSED_CUSTOM_NAME.equals(this.getCustomName().getString());
         }
         return false;
+    }
+
+    private void attemptToAttractLightning() {
+        if (this.level().isThundering() && hasClearSkyAbove()) {
+            LightningBolt lightningBolt = EntityType.LIGHTNING_BOLT.create(this.level());
+            if (lightningBolt != null) {
+                lightningBolt.moveTo(this.getX(), this.getY(), this.getZ());
+                this.level().addFreshEntity(lightningBolt);
+
+                this.entityData.set(DATA_IS_POWERED, true);
+            }
+        }
+    }
+
+    private boolean hasClearSkyAbove() {
+        BlockPos posAbove = this.blockPosition().above();
+        while (posAbove.getY() < this.level().getMaxBuildHeight()) {
+            if (!this.level().isEmptyBlock(posAbove)) {
+                return false;
+            }
+            posAbove = posAbove.above();
+        }
+        return true;
     }
 
     public State getState() {
