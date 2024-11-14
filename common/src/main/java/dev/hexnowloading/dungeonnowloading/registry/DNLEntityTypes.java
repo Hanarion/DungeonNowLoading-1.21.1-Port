@@ -42,7 +42,7 @@ public class DNLEntityTypes {
     // Passive
     public static final Supplier<EntityType<SealedChaosEntity>> SEALED_CHAOS = register("sealed_chaos", () -> EntityType.Builder.of(SealedChaosEntity::new, MobCategory.CREATURE).sized(1F, 1F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "sealed_chaos").toString()));
     public static final Supplier<EntityType<WhimperEntity>> WHIMPER = register("whimper", () -> EntityType.Builder.of(WhimperEntity::new, MobCategory.CREATURE).sized(0.75F, 0.75F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "whimper").toString()));
-    public static final Supplier<EntityType<CopperCreepEntity>> COPPER_CREEP = register("copper_creep", () -> EntityType.Builder.of(CopperCreepEntity::new, MobCategory.CREATURE).sized(0.95F, 0.95F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "copper_creep").toString()));
+    public static final Supplier<EntityType<CopperCreepEntity>> COPPER_CREEP = register("copper_creep", () -> EntityType.Builder.of(CopperCreepEntity::new, MobCategory.CREATURE).sized(0.65F, 0.75F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "copper_creep").toString()));
 
 
     // Projectiles
