@@ -45,7 +45,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         DETONATION
     }
     private static final String DEFUSED_CUSTOM_NAME = "Defused";
-    private static final float EXPLOSION_RADIUS = 2.0f;
+    private static final float EXPLOSION_RADIUS = 3.0f;
     private static final float POWERED_EXPLOSION_RADIUS = 5.0f;
     private static final EntityDataAccessor<Optional<UUID>> SUMMONER_UUID = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> DATA_IS_POWERED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
