@@ -274,7 +274,13 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     @Override
     public void thunderHit(ServerLevel serverLevel, LightningBolt lightningBolt) {
-        super.thunderHit(serverLevel, lightningBolt);
+        this.setRemainingFireTicks(this.getRemainingFireTicks() + 1);
+        if (this.getRemainingFireTicks() == 0) {
+            this.setSecondsOnFire(8);
+        }
+
+//        this.hurt(this.damageSources().lightningBolt(), 5.0F);
+
         this.entityData.set(DATA_IS_POWERED, true);
     }
 
