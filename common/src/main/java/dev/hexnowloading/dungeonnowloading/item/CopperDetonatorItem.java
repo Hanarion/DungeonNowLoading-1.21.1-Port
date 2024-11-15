@@ -60,6 +60,7 @@ public class CopperDetonatorItem extends Item {
             if (consumeCopperBlockIfAvailable(player)) {
                 launchCreep(level, player);
                 player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
+                itemStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(hand));
                 return InteractionResultHolder.success(itemStack);
             }
             return InteractionResultHolder.fail(itemStack);
