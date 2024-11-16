@@ -46,6 +46,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
                 output.accept(DNLItems.SKULL_OF_CHAOS.get());
                 output.accept(DNLItems.REDSTONE_CATALYST.get());
+                output.accept(DNLItems.COMMAND_PYLON.get());
 
                 // Blocks
 

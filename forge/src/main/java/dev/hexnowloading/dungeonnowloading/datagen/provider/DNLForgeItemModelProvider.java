@@ -28,12 +28,13 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         ITEM_GENERATED = getExistingFile(mcLoc("item/generated"));
 
-        simpleItem(DNLItems.COPPER_DETONATOR.get());
         simpleItem(DNLItems.REDSTONE_SUPPRESSOR.get());
         simpleItem(DNLItems.REDSTONE_CORE.get());
         simpleItem(DNLItems.REDSTONE_CHIP.get());
         simpleItem(DNLItems.REDSTONE_CIRCUIT.get());
         simpleItem(DNLItems.REDSTONE_CATALYST.get());
+        simpleItem(DNLItems.COPPER_DETONATOR.get());
+        simpleItem(DNLItems.COMMAND_PYLON.get());
         spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
         spawnEggItem(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
