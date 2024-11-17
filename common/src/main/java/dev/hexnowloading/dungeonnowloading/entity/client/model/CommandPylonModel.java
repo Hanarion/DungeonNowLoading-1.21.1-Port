@@ -6,6 +6,8 @@ package dev.hexnowloading.dungeonnowloading.entity.client.model;// Made with Blo
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.CommandPylonAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.misc.CommandPylonEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import net.minecraft.client.model.HierarchicalModel;
@@ -95,6 +97,26 @@ public class CommandPylonModel<T extends CommandPylonEntity> extends Hierarchica
 	public void setupAnim(CommandPylonEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.root.getAllParts().forEach(ModelPart::resetPose);
 
+		System.out.println("setup: " + entity.setupAnimState);
+		System.out.println("idle: " + entity.idleAnimState);
+		this.animate(entity.setupAnimState, CommandPylonAnimation.SETUP, ageInTicks);
+		this.animate(entity.idleAnimState, CommandPylonAnimation.IDLE, ageInTicks);
+		this.animate(entity.baseDownAnimState, CommandPylonAnimation.BASE_DOWN, ageInTicks);
+		this.animate(entity.baseUpAnimState, CommandPylonAnimation.BASE_UP, ageInTicks);
+
+//		this.animate(entity.idleAnimationState, CopperCreepAnimation.IDLE, ageInTicks);
+////		this.animate(copperCreepEntity.walkingAnimationState, CopperCreepAnimation.WALKING, ageInTicks);
+////		this.animate(copperCreepEntity.runningAnimationState, CopperCreepAnimation.RUNNING, ageInTicks);
+//		this.animate(entity.summonAnimationState, CopperCreepAnimation.SUMMON, ageInTicks);
+//		this.animate(entity.detonationAnimationState, CopperCreepAnimation.DETONATION, ageInTicks);
+
+//		System.out.println(copperCreepEntity.currentState);
+
+//		if (entity.getState() == CopperCreepEntity.State.IDLE) {
+//			this.animateWalk(CopperCreepAnimation.WALKING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
+//		} else if (entity.getState() == CopperCreepEntity.State.FOLLOWING) {
+//			this.animateWalk(CopperCreepAnimation.RUNNING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
+//		}
 	}
 
 	@Override

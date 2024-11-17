@@ -56,7 +56,7 @@ public class DNLEntityTypes {
     // Misc
     public static final Supplier<EntityType<SpecialItemEntity>> SPECIAL_ITEM_ENTITY = register("special_item_entity", () -> EntityType.Builder.<SpecialItemEntity>of(SpecialItemEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "special_item_entity").toString()));
     public static final Supplier<EntityType<GreatExperienceBottleEntity>> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> EntityType.Builder.<GreatExperienceBottleEntity>of(GreatExperienceBottleEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "great_experience_bottle").toString()));
-    public static final Supplier<EntityType<CommandPylonEntity>> COMMAND_PYLON = register("command_pylon", () -> EntityType.Builder.<CommandPylonEntity>of(CommandPylonEntity::new, MobCategory.MISC).sized(0.99F, 0.99F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "command_pylon").toString()));
+    public static final Supplier<EntityType<CommandPylonEntity>> COMMAND_PYLON = register("command_pylon", () -> EntityType.Builder.<CommandPylonEntity>of(CommandPylonEntity::new, MobCategory.MISC).sized(0.99F, 0.3F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "command_pylon").toString()));
 
     private static <T extends EntityType<?>> Supplier<T> register(String name, Supplier<T> entityTypeSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ENTITY_TYPE, name, entityTypeSupplier);

@@ -69,7 +69,7 @@ public class CopperCreepModel<T extends CopperCreepEntity> extends HierarchicalM
 	@Override
 	public void setupAnim(CopperCreepEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.root.getAllParts().forEach(ModelPart::resetPose);
-		
+
 		this.animate(entity.idleAnimationState, CopperCreepAnimation.IDLE, ageInTicks);
 //		this.animate(copperCreepEntity.walkingAnimationState, CopperCreepAnimation.WALKING, ageInTicks);
 //		this.animate(copperCreepEntity.runningAnimationState, CopperCreepAnimation.RUNNING, ageInTicks);
