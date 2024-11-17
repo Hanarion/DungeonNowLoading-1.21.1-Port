@@ -122,6 +122,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WhimperModel.LAYER_LOCATION, WhimperModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(CopperCreepModel.LAYER_LOCATION, CopperCreepModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(CommandPylonModel.LAYER_LOCATION, CommandPylonModel::createBodyLayer);
 
 
         //Projectiles
