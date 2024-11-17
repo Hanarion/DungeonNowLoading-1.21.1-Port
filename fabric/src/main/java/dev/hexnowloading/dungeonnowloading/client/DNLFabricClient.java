@@ -90,6 +90,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.GREAT_EXPERIENCE_BOTTLE.get(), (context) -> {
             return new ThrownItemRenderer<>(context, 1.25F, false);
         });
+        EntityRendererRegistry.register(DNLEntityTypes.COMMAND_PYLON.get(), CommandPylonRenderer::new);
 
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);

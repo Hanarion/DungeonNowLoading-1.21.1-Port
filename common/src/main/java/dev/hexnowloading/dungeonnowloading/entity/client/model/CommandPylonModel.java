@@ -106,9 +106,4 @@ public class CommandPylonModel<T extends CommandPylonEntity> extends Hierarchica
 	public ModelPart root() {
 		return this.root;
 	}
-
-	@Override
-	public void setupAnim(T t, float v, float v1, float v2, float v3, float v4) {
-
-	}
 }
