@@ -216,7 +216,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             this.triggerSummonAnimation();
             this.entityData.set(DATA_IS_ALREADY_SUMMONED, true);
         }
-        if (this.aiTick == (int) CopperCreepAnimation.SUMMON.lengthInSeconds() * 20) {
+        if (this.aiTick == (int) (CopperCreepAnimation.SUMMON.lengthInSeconds() * 20)) {
 //            this.currentState = State.IDLE;
             this.setState(State.IDLE);
             this.triggerIdleAnimation();

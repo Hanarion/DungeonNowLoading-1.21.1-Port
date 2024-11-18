@@ -4,16 +4,25 @@ import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAn
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CommandPylonAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class CommandPylonEntity extends Mob{
     public enum State {
@@ -29,8 +38,7 @@ public class CommandPylonEntity extends Mob{
     public AnimationState baseUpAnimState = new AnimationState();
 
     private static final EntityDataAccessor<Boolean> DATA_CAN_RENDER = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> DATA_PLAYED_SETUP_ANIMATION = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.BOOLEAN);
-    private int aiTick;
+    private static final EntityDataAccessor<Integer> DATA_AGE = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.INT);
     private State currentState;
 
     public CommandPylonEntity(EntityType<? extends Mob> $$0, Level $$1) {
@@ -54,38 +62,42 @@ public class CommandPylonEntity extends Mob{
         return false;
     }
 
-    //    @Override
-//    public boolean ) {
-//        return false;
-//    }
+    @Override
+    protected boolean updateInWaterStateAndDoFluidPushing() {
+        return false;
+    }
 
-//    @Override
-//    public Vec3 getDeltaMovement() {
-//        return Vec3.ZERO;
-//    }
-//
-//    @Override
-//    public void setDeltaMovement(Vec3 vec3) {
-//
-//    }
+    @Override
+    public boolean isPushedByFluid() {
+        return false;
+    }
+
+    @Override
+    public PushReaction getPistonPushReaction() {
+        this.dropItem((Entity) null);
+        this.discard();
+        return PushReaction.NORMAL;
+    }
 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(DATA_PLAYED_SETUP_ANIMATION, false);
         this.entityData.define(DATA_CAN_RENDER, false);
+        this.entityData.define(DATA_AGE, 0);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag compoundTag) {
-        this.entityData.set(DATA_PLAYED_SETUP_ANIMATION, compoundTag.getBoolean("playedSetupAnimation"));
+        super.readAdditionalSaveData(compoundTag);
         this.entityData.set(DATA_CAN_RENDER, compoundTag.getBoolean("canRender"));
+        this.entityData.set(DATA_AGE, compoundTag.getInt("age"));
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag compoundTag) {
-        compoundTag.putBoolean("playedSetupAnimation", this.playedSetupAnimation());
+        super.addAdditionalSaveData(compoundTag);
         compoundTag.putBoolean("canRender", this.canRender());
+        compoundTag.putInt("age", this.getAge());
     }
 
     @Override
@@ -94,20 +106,69 @@ public class CommandPylonEntity extends Mob{
     }
 
     @Override
+    public void customServerAiStep() {
+        this.entityData.set(DATA_AGE, this.getAge() + 1);
+    }
+
+    @Override
+    public boolean hurt(DamageSource damageSource, float f) {
+        if (this.isInvulnerableTo(damageSource)) {
+            return false;
+        } else {
+            if (!this.isRemoved() && !this.level().isClientSide) {
+                this.discard();
+                this.markHurt();
+                this.dropItem(damageSource.getEntity());
+            }
+
+            return true;
+        }
+    }
+
+    public void push(double d, double e, double f) {
+        if (!this.level().isClientSide && !this.isRemoved() && d * d + e * e + f * f > 0.0) {
+            this.discard();
+            this.dropItem((Entity)null);
+        }
+    }
+
+    public void dropItem(@Nullable Entity entity) {
+        if (this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
+            this.playSound(SoundEvents.PAINTING_BREAK, 1.0F, 1.0F);
+            if (entity instanceof Player) {
+                Player player = (Player)entity;
+                if (player.getAbilities().instabuild) {
+                    return;
+                }
+            }
+
+            this.spawnAtLocation(DNLItems.COMMAND_PYLON.get());
+        }
+    }
+
+//    @Override
+//    public void die(DamageSource $$0) {
+//        System.out.println("dieded lolxd");
+//        this.discard();
+//    }
+//
+//    @Override
+//    public void handleDamageEvent(DamageSource $$0) {
+//        super.handleDamageEvent($$0);
+//    }
+
+    @Override
     public void tick() {
-        if (this.aiTick == 0 && !this.playedSetupAnimation()) {
+        if (this.getAge() == 0) {
             this.currentState = State.SETUP;
             this.setupAnimState.start(this.tickCount);
             this.entityData.set(DATA_CAN_RENDER, true);
-            this.entityData.set(DATA_PLAYED_SETUP_ANIMATION, true);
-        }
-        if (this.aiTick == (int) CommandPylonAnimation.SETUP.lengthInSeconds() * 20) {
+        } else if (this.getAge() == (int) (CommandPylonAnimation.SETUP.lengthInSeconds() * 20)) {
             this.currentState = State.IDLE;
             this.setupAnimState.stop();
             this.idleAnimState.start(this.tickCount);
         }
 
-        this.aiTick++;
         super.tick();
     }
 
@@ -115,7 +176,7 @@ public class CommandPylonEntity extends Mob{
         return this.entityData.get(DATA_CAN_RENDER);
     }
 
-    private boolean playedSetupAnimation() {
-        return this.entityData.get(DATA_PLAYED_SETUP_ANIMATION);
+    public int getAge() {
+        return this.entityData.get(DATA_AGE);
     }
 }
