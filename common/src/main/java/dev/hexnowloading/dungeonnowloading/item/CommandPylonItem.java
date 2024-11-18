@@ -72,6 +72,8 @@ public class CommandPylonItem extends Item{
 
 //                    float f = (float) Mth.floor((Mth.wrapDegrees(useOnContext.getRotation() - 180.0F) + 22.5F) / 45.0F) * 45.0F;
                     pylonEntity.moveTo(pylonEntity.getX(), pylonEntity.getY(), pylonEntity.getZ(), 0.0F, 0.0F);
+                    pylonEntity.setYRot(0.0f); // Set the entity's rotation based on the facing direction
+                    pylonEntity.setYHeadRot(0.0f);
                     serverLevel.addFreshEntityWithPassengers(pylonEntity);
                     level.playSound((Player)null, pylonEntity.getX(), pylonEntity.getY(), pylonEntity.getZ(), SoundEvents.ARMOR_STAND_PLACE, SoundSource.BLOCKS, 0.75F, 0.8F);
                     pylonEntity.gameEvent(GameEvent.ENTITY_PLACE, useOnContext.getPlayer());
