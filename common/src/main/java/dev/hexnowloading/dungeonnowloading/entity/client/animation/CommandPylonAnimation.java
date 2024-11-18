@@ -30,10 +30,7 @@ public class CommandPylonAnimation {
             new Keyframe(1.1667F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -180.0F), AnimationChannel.Interpolations.CATMULLROM),
             new Keyframe(1.25F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -180.0F), AnimationChannel.Interpolations.LINEAR),
             new Keyframe(1.4167F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -270.0F), AnimationChannel.Interpolations.CATMULLROM),
-            new Keyframe(1.4583F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -270.0F), AnimationChannel.Interpolations.LINEAR),
-            new Keyframe(1.75F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -270.0F), AnimationChannel.Interpolations.LINEAR),
-            new Keyframe(2.75F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -450.0F), AnimationChannel.Interpolations.LINEAR),
-            new Keyframe(3.75F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -630.0F), AnimationChannel.Interpolations.LINEAR)
+            new Keyframe(1.4583F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -270.0F), AnimationChannel.Interpolations.LINEAR)
         ))
         .addAnimation("gear1", new AnimationChannel(AnimationChannel.Targets.ROTATION,
             new Keyframe(0.75F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
@@ -42,15 +39,7 @@ public class CommandPylonAnimation {
             new Keyframe(1.1667F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -180.0F), AnimationChannel.Interpolations.CATMULLROM),
             new Keyframe(1.25F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -180.0F), AnimationChannel.Interpolations.LINEAR),
             new Keyframe(1.4167F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -270.0F), AnimationChannel.Interpolations.CATMULLROM),
-            new Keyframe(1.4583F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -270.0F), AnimationChannel.Interpolations.LINEAR),
-            new Keyframe(1.75F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -270.0F), AnimationChannel.Interpolations.LINEAR),
-            new Keyframe(2.75F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -450.0F), AnimationChannel.Interpolations.LINEAR),
-            new Keyframe(3.75F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -630.0F), AnimationChannel.Interpolations.LINEAR)
-        ))
-        .addAnimation("antenna", new AnimationChannel(AnimationChannel.Targets.ROTATION,
-            new Keyframe(1.75F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
-            new Keyframe(2.75F, KeyframeAnimations.degreeVec(0.0F, 360.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-            new Keyframe(3.75F, KeyframeAnimations.degreeVec(0.0F, 720.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+            new Keyframe(1.4583F, KeyframeAnimations.degreeVec(0.0F, 0.0F, -270.0F), AnimationChannel.Interpolations.LINEAR)
         ))
         .addAnimation("antenna", new AnimationChannel(AnimationChannel.Targets.POSITION,
             new Keyframe(0.75F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
@@ -81,7 +70,7 @@ public class CommandPylonAnimation {
             new Keyframe(1.75F, KeyframeAnimations.posVec(0.0F, 3.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
             new Keyframe(2.75F, KeyframeAnimations.posVec(0.0F, 3.5F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
             new Keyframe(3.75F, KeyframeAnimations.posVec(0.0F, 3.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
-        ))
+            ))
         .addAnimation("root", new AnimationChannel(AnimationChannel.Targets.POSITION,
             new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
             new Keyframe(0.1667F, KeyframeAnimations.posVec(0.0F, 5.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),

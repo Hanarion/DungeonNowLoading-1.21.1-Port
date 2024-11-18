@@ -114,6 +114,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+
         this.entityData.define(SUMMONER_UUID, Optional.empty()); // Initially, no UUID is set
         this.entityData.define(DATA_IS_POWERED, false);
         this.entityData.define(DATA_IS_IGNITED, false);

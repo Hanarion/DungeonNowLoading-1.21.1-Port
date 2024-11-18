@@ -80,6 +80,9 @@ public class DNLEntityTypes {
         map.put(WHIMPER.get(), WhimperEntity.createAttributes().build());
         map.put(COPPER_CREEP.get(), CopperCreepEntity.createAttributes().build());
 
+        // Misc
+        map.put(COMMAND_PYLON.get(), CommandPylonEntity.createAttributes().build());
+
         return map;
     }
 
