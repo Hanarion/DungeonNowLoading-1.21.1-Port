@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.misc;
 
+import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CommandPylonAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
@@ -15,6 +16,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
@@ -98,6 +100,11 @@ public class CommandPylonEntity extends Mob{
         super.addAdditionalSaveData(compoundTag);
         compoundTag.putBoolean("canRender", this.canRender());
         compoundTag.putInt("age", this.getAge());
+    }
+
+    @Override
+    protected BodyRotationControl createBodyControl() {
+        return new EntityBodyRotationControl(this);
     }
 
     @Override
