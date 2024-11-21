@@ -20,14 +20,18 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class CommandPylonEntity extends Mob {
     public enum State {
@@ -52,7 +56,7 @@ public class CommandPylonEntity extends Mob {
 
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 10.0D);
+                .add(Attributes.MAX_HEALTH, 540.0D);
 //                .add(Attributes.FOLLOW_RANGE, 16.0F),
 //                .add(Attributes.MOVEMENT_SPEED, 0.175F);
     }
@@ -107,6 +111,7 @@ public class CommandPylonEntity extends Mob {
 
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand interactionHand) {
+        // TODO: fix this crap, it overrides the item in hand even if the hand isnt empty
         ItemStack itemStack = player.getItemInHand(interactionHand);
 
         if (this.level().isClientSide()) {
@@ -174,17 +179,6 @@ public class CommandPylonEntity extends Mob {
         }
     }
 
-//    @Override
-//    public void die(DamageSource $$0) {
-//        System.out.println("dieded lolxd");
-//        this.discard();
-//    }
-//
-//    @Override
-//    public void handleDamageEvent(DamageSource $$0) {
-//        super.handleDamageEvent($$0);
-//    }
-
     @Override
     public void tick() {
         if (this.getAge() == 0) {
@@ -195,6 +189,29 @@ public class CommandPylonEntity extends Mob {
             this.currentState = State.IDLE;
             this.setupAnimState.stop();
             this.idleAnimState.start(this.tickCount);
+        }
+
+        if (!this.level().isClientSide) {
+            double centerX = this.getX();
+            double centerY = this.getY();
+            double centerZ = this.getZ();
+
+            AABB detectionBox = new AABB(
+                    centerX - 4.5, centerY - 4.5, centerZ - 4.5,
+                    centerX + 4.5, centerY + 4.5, centerZ + 4.5
+            );
+
+            List<Entity> nearbyEntities = this.level().getEntities(
+                    (Entity) null, detectionBox, entity -> entity instanceof Projectile
+            );
+
+            for (Entity entity : nearbyEntities) {
+                // this will not work
+//                float projectileDamage = calculateProjectileDamage((Projectile) entity);
+                System.out.println("temp behavior, discarded: " + entity);
+                entity.discard();
+            }
+
         }
 
         super.tick();
