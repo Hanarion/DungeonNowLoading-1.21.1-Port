@@ -34,6 +34,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class CommandPylonEntity extends Mob {
+    private static final float SHIELD_MAX_HEALTH = 540.0f;
+    private static final float SHIELD_PROJECTILE_DAMAGE = 10.0f;
+
     public enum State {
         SETUP,
         IDLE,
@@ -48,6 +51,7 @@ public class CommandPylonEntity extends Mob {
 
     private static final EntityDataAccessor<Boolean> DATA_CAN_RENDER = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_AGE = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> DATA_SHIELD_HEALTH = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.FLOAT);
     private State currentState;
 
     public CommandPylonEntity(EntityType<? extends Mob> $$0, Level $$1) {
@@ -56,7 +60,8 @@ public class CommandPylonEntity extends Mob {
 
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 540.0D);
+//                .add(Attributes.MAX_HEALTH, 540.0D);
+                .add(Attributes.MAX_HEALTH, 1.0D);
 //                .add(Attributes.FOLLOW_RANGE, 16.0F),
 //                .add(Attributes.MOVEMENT_SPEED, 0.175F);
     }
@@ -93,6 +98,7 @@ public class CommandPylonEntity extends Mob {
         super.defineSynchedData();
         this.entityData.define(DATA_CAN_RENDER, false);
         this.entityData.define(DATA_AGE, 0);
+        this.entityData.define(DATA_SHIELD_HEALTH, SHIELD_MAX_HEALTH);
     }
 
     @Override
@@ -100,6 +106,7 @@ public class CommandPylonEntity extends Mob {
         super.readAdditionalSaveData(compoundTag);
         this.entityData.set(DATA_CAN_RENDER, compoundTag.getBoolean("canRender"));
         this.entityData.set(DATA_AGE, compoundTag.getInt("age"));
+        this.entityData.set(DATA_SHIELD_HEALTH, compoundTag.getFloat("shieldHealth"));
     }
 
     @Override
@@ -107,6 +114,7 @@ public class CommandPylonEntity extends Mob {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.putBoolean("canRender", this.canRender());
         compoundTag.putInt("age", this.getAge());
+        compoundTag.putFloat("shieldHealth", this.entityData.get(DATA_SHIELD_HEALTH));
     }
 
     @Override
@@ -204,8 +212,14 @@ public class CommandPylonEntity extends Mob {
             );
 
             for (Entity entity : nearbyEntities) {
-                // this will not work
-//                float projectileDamage = calculateProjectileDamage((Projectile) entity);
+                float currentShieldHealth = this.entityData.get(DATA_SHIELD_HEALTH);
+                this.entityData.set(DATA_SHIELD_HEALTH, currentShieldHealth - SHIELD_PROJECTILE_DAMAGE);
+
+                if (currentShieldHealth - SHIELD_PROJECTILE_DAMAGE <= 0.0f) {
+                    this.dropItem(null);
+                    this.discard();
+                }
+
                 System.out.println("temp behavior, discarded: " + entity);
                 entity.discard();
             }
