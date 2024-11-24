@@ -111,19 +111,17 @@ public class CommandPylonEntity extends Mob {
 
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand interactionHand) {
-        // TODO: fix this crap, it overrides the item in hand even if the hand isnt empty
         ItemStack itemStack = player.getItemInHand(interactionHand);
 
         if (this.level().isClientSide()) {
             return InteractionResult.PASS;
         }
-
-        if (!itemStack.isEmpty()) {
+        if (!itemStack.isEmpty() || interactionHand.equals(InteractionHand.OFF_HAND)) {
             return InteractionResult.FAIL;
         }
 
         ItemStack itemStackToGivePlayer = new ItemStack(DNLItems.COMMAND_PYLON.get());
-        player.setItemInHand(InteractionHand.MAIN_HAND, itemStackToGivePlayer);
+        player.setItemInHand(interactionHand, itemStackToGivePlayer);
         this.discard();
         return InteractionResult.sidedSuccess(this.level().isClientSide);
     }
