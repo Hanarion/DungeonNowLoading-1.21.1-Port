@@ -8,14 +8,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CommandPylonAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.misc.CommandPylonEntity;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 
 public class CommandPylonModel<T extends CommandPylonEntity> extends HierarchicalModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
@@ -31,6 +29,8 @@ public class CommandPylonModel<T extends CommandPylonEntity> extends Hierarchica
 	private final ModelPart leg_ne;
 	private final ModelPart leg_sw;
 	private final ModelPart leg_se;
+	private float antennaRotation;
+	private float gearRotation;
 
 	public CommandPylonModel(ModelPart root) {
 		this.root = root.getChild("root");
@@ -99,6 +99,13 @@ public class CommandPylonModel<T extends CommandPylonEntity> extends Hierarchica
 		this.animate(entity.idleAnimState, CommandPylonAnimation.IDLE, ageInTicks);
 		this.animate(entity.baseDownAnimState, CommandPylonAnimation.BASE_DOWN, ageInTicks);
 		this.animate(entity.baseUpAnimState, CommandPylonAnimation.BASE_UP, ageInTicks);
+
+		antennaRotation += entity.getAntennaRotationSpeed() * (ageInTicks - entity.tickCount);
+		antenna.yRot = antennaRotation;
+
+		gearRotation += entity.getGearRotationSpeed() * (ageInTicks - entity.tickCount);
+		gear1.zRot = gearRotation;
+		gear2.zRot = gearRotation;
 	}
 
 	@Override

@@ -1,17 +1,14 @@
 package dev.hexnowloading.dungeonnowloading.entity.misc;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CommandPylonAnimation;
-import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -22,20 +19,30 @@ import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class CommandPylonEntity extends Mob {
-    private static final float SHIELD_MAX_HEALTH = 540.0f;
-    private static final float SHIELD_PROJECTILE_DAMAGE = 10.0f;
+    public float getAntennaRotationSpeed() {
+        return entityData.get(DATA_ANTENNA_ROTATION_SPEED);
+    }
+
+    public void setAntennaRotationSpeed(float rotationSpeed) {
+        entityData.set(DATA_ANTENNA_ROTATION_SPEED, rotationSpeed);
+    }
+
+    public float getGearRotationSpeed() {
+        return entityData.get(DATA_GEAR_ROTATION_SPEED);
+    }
+
+    public void setGearRotationSpeed(float rotationSpeed) {
+        entityData.set(DATA_GEAR_ROTATION_SPEED, rotationSpeed);
+    }
 
     public enum State {
         SETUP,
@@ -48,11 +55,20 @@ public class CommandPylonEntity extends Mob {
     public AnimationState idleAnimState = new AnimationState();
     public AnimationState baseDownAnimState = new AnimationState();
     public AnimationState baseUpAnimState = new AnimationState();
+//    private State currentState;
 
+//    private static final int ARM_START_TIME_TICKS = 35;
+//    private static final int ARM_END_TIME_TICKS = 55;
+    private static final float BASE_ANTENNA_ROTATION_SPEED = 0.05f;
+    private static final float BASE_GEAR_ROTATION_SPEED = 0.05f;
+    private static final float SHIELD_MAX_HEALTH = 540.0f;
+    private static final float SHIELD_PROJECTILE_DAMAGE = 10.0f;
     private static final EntityDataAccessor<Boolean> DATA_CAN_RENDER = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_AGE = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_SHIELD_HEALTH = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.FLOAT);
-    private State currentState;
+    private static final EntityDataAccessor<Float> DATA_ANTENNA_ROTATION_SPEED = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DATA_GEAR_ROTATION_SPEED = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<State> DATA_STATE = SynchedEntityData.defineId(CommandPylonEntity.class, EntityStates.COMMAND_PYLON_STATE);
 
     public CommandPylonEntity(EntityType<? extends Mob> $$0, Level $$1) {
         super($$0, $$1);
@@ -60,10 +76,7 @@ public class CommandPylonEntity extends Mob {
 
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
-//                .add(Attributes.MAX_HEALTH, 540.0D);
                 .add(Attributes.MAX_HEALTH, 1.0D);
-//                .add(Attributes.FOLLOW_RANGE, 16.0F),
-//                .add(Attributes.MOVEMENT_SPEED, 0.175F);
     }
 
     @Override
@@ -99,6 +112,9 @@ public class CommandPylonEntity extends Mob {
         this.entityData.define(DATA_CAN_RENDER, false);
         this.entityData.define(DATA_AGE, 0);
         this.entityData.define(DATA_SHIELD_HEALTH, SHIELD_MAX_HEALTH);
+        this.entityData.define(DATA_STATE, State.SETUP);
+        this.entityData.define(DATA_ANTENNA_ROTATION_SPEED, BASE_ANTENNA_ROTATION_SPEED);
+        this.entityData.define(DATA_GEAR_ROTATION_SPEED, BASE_GEAR_ROTATION_SPEED);
     }
 
     @Override
@@ -107,6 +123,8 @@ public class CommandPylonEntity extends Mob {
         this.entityData.set(DATA_CAN_RENDER, compoundTag.getBoolean("canRender"));
         this.entityData.set(DATA_AGE, compoundTag.getInt("age"));
         this.entityData.set(DATA_SHIELD_HEALTH, compoundTag.getFloat("shieldHealth"));
+        this.entityData.set(DATA_ANTENNA_ROTATION_SPEED, compoundTag.getFloat("antennaRotationSpeed"));
+        this.entityData.set(DATA_GEAR_ROTATION_SPEED, compoundTag.getFloat("gearRotationSpeed"));
     }
 
     @Override
@@ -115,6 +133,8 @@ public class CommandPylonEntity extends Mob {
         compoundTag.putBoolean("canRender", this.canRender());
         compoundTag.putInt("age", this.getAge());
         compoundTag.putFloat("shieldHealth", this.entityData.get(DATA_SHIELD_HEALTH));
+        compoundTag.putFloat("antennaRotationSpeed", this.entityData.get(DATA_ANTENNA_ROTATION_SPEED));
+        compoundTag.putFloat("gearRotationSpeed", this.entityData.get(DATA_GEAR_ROTATION_SPEED));
     }
 
     @Override
@@ -188,14 +208,24 @@ public class CommandPylonEntity extends Mob {
     @Override
     public void tick() {
         if (this.getAge() == 0) {
-            this.currentState = State.SETUP;
+//            this.currentState = State.SETUP;
             this.setupAnimState.start(this.tickCount);
             this.entityData.set(DATA_CAN_RENDER, true);
         } else if (this.getAge() == (int) (CommandPylonAnimation.SETUP.lengthInSeconds() * 20)) {
-            this.currentState = State.IDLE;
+//            this.currentState = State.IDLE;
             this.setupAnimState.stop();
             this.idleAnimState.start(this.tickCount);
         }
+//        } else if (this.getAge() == ARM_END_TIME_TICKS) {
+//            this.currentState = State.BASE_UP;
+//            this.baseUpAnimState.start(this.tickCount);
+//        }
+
+//        setAntennaRotationSpeed(0.5f);
+//        if (currentState == State.BASE_UP) {
+//            this.setAntennaRotationSpeed(this.getAntennaRotationSpeed() + 3.0f);
+//            System.out.println(this.getAntennaRotationSpeed());
+//        }
 
         if (!this.level().isClientSide) {
             double centerX = this.getX();
@@ -215,13 +245,12 @@ public class CommandPylonEntity extends Mob {
                 float currentShieldHealth = this.entityData.get(DATA_SHIELD_HEALTH);
                 this.entityData.set(DATA_SHIELD_HEALTH, currentShieldHealth - SHIELD_PROJECTILE_DAMAGE);
 
+                entity.discard();
+
                 if (currentShieldHealth - SHIELD_PROJECTILE_DAMAGE <= 0.0f) {
                     this.dropItem(null);
                     this.discard();
                 }
-
-                System.out.println("temp behavior, discarded: " + entity);
-                entity.discard();
             }
 
         }
