@@ -18,14 +18,20 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CommandPylonEntity extends Mob {
     public enum State {
@@ -51,6 +57,7 @@ public class CommandPylonEntity extends Mob {
     public AnimationState idleAnimState = new AnimationState();
     public AnimationState baseDownAnimState = new AnimationState();
     public AnimationState baseUpAnimState = new AnimationState();
+    private Set<ThrownTrident> processedTridents = new HashSet<>();
 
     public CommandPylonEntity(EntityType<? extends Mob> $$0, Level $$1) {
         super($$0, $$1);
@@ -220,10 +227,26 @@ public class CommandPylonEntity extends Mob {
         if (!this.level().isClientSide) {
             for (Entity entity : this.getNearbyProjectiles()) {
                 float currentShieldHealth = this.entityData.get(DATA_SHIELD_HEALTH);
-                this.entityData.set(DATA_SHIELD_HEALTH, currentShieldHealth - SHIELD_PROJECTILE_DAMAGE);
 
-                // TODO: make it fancier than just discarding the projectiles
-                entity.discard();
+                if (!processedTridents.contains((ThrownTrident) entity)) {
+                    this.entityData.set(DATA_SHIELD_HEALTH, currentShieldHealth - SHIELD_PROJECTILE_DAMAGE);
+                }
+
+                if (entity instanceof ThrownTrident thrownTrident) {
+                    if (!processedTridents.contains(thrownTrident)) {
+                        processedTridents.add(thrownTrident);
+
+                        Vec3 motion = thrownTrident.getDeltaMovement();
+                        thrownTrident.setDeltaMovement(new Vec3(
+                                motion.x * 0.1f,
+                                motion.y * 0.1f,
+                                motion.z * 0.1f
+                        ));
+                    }
+                } else {
+                    // TODO: make it fancier than just discarding the projectiles
+                    entity.discard();
+                }
 
                 if (currentShieldHealth - SHIELD_PROJECTILE_DAMAGE <= 0.0f) {
                     this.dropItem(null);
