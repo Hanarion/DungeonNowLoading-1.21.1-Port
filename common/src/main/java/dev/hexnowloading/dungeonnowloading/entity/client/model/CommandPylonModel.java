@@ -14,6 +14,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
 public class CommandPylonModel<T extends CommandPylonEntity> extends HierarchicalModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
@@ -100,10 +101,14 @@ public class CommandPylonModel<T extends CommandPylonEntity> extends Hierarchica
 		this.animate(entity.baseDownAnimState, CommandPylonAnimation.BASE_DOWN, ageInTicks);
 		this.animate(entity.baseUpAnimState, CommandPylonAnimation.BASE_UP, ageInTicks);
 
-		antennaRotation += entity.getAntennaRotationSpeed() * (ageInTicks - entity.tickCount);
+		float deltaTime = ageInTicks - entity.tickCount;
+		float pylonHealthRatio = entity.getShieldHealth() / CommandPylonEntity.SHIELD_MAX_HEALTH;
+		float setupTimeRatio = Mth.clamp(entity.getAge() / CommandPylonEntity.SETUP_DURATION_TICKS, 0.0f, 1.0f);
+
+		antennaRotation += entity.getAntennaRotationSpeed() * setupTimeRatio * pylonHealthRatio * deltaTime;
 		antenna.yRot = antennaRotation;
 
-		gearRotation += entity.getGearRotationSpeed() * (ageInTicks - entity.tickCount);
+		gearRotation -= entity.getGearRotationSpeed() * deltaTime;
 		gear1.zRot = gearRotation;
 		gear2.zRot = gearRotation;
 	}

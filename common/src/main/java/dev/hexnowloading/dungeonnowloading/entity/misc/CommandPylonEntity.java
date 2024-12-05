@@ -9,6 +9,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -44,6 +45,10 @@ public class CommandPylonEntity extends Mob {
         entityData.set(DATA_GEAR_ROTATION_SPEED, rotationSpeed);
     }
 
+    public float getShieldHealth() {
+        return entityData.get(DATA_SHIELD_HEALTH);
+    }
+
     public enum State {
         SETUP,
         IDLE,
@@ -55,13 +60,11 @@ public class CommandPylonEntity extends Mob {
     public AnimationState idleAnimState = new AnimationState();
     public AnimationState baseDownAnimState = new AnimationState();
     public AnimationState baseUpAnimState = new AnimationState();
-//    private State currentState;
 
-//    private static final int ARM_START_TIME_TICKS = 35;
-//    private static final int ARM_END_TIME_TICKS = 55;
+    public static final float SHIELD_MAX_HEALTH = 540.0f;
+    public static final float SETUP_DURATION_TICKS = (int) (CommandPylonAnimation.SETUP.lengthInSeconds() * 20);
     private static final float BASE_ANTENNA_ROTATION_SPEED = 0.05f;
     private static final float BASE_GEAR_ROTATION_SPEED = 0.05f;
-    private static final float SHIELD_MAX_HEALTH = 540.0f;
     private static final float SHIELD_PROJECTILE_DAMAGE = 10.0f;
     private static final EntityDataAccessor<Boolean> DATA_CAN_RENDER = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_AGE = SynchedEntityData.defineId(CommandPylonEntity.class, EntityDataSerializers.INT);
@@ -208,43 +211,19 @@ public class CommandPylonEntity extends Mob {
     @Override
     public void tick() {
         if (this.getAge() == 0) {
-//            this.currentState = State.SETUP;
             this.setupAnimState.start(this.tickCount);
             this.entityData.set(DATA_CAN_RENDER, true);
         } else if (this.getAge() == (int) (CommandPylonAnimation.SETUP.lengthInSeconds() * 20)) {
-//            this.currentState = State.IDLE;
             this.setupAnimState.stop();
             this.idleAnimState.start(this.tickCount);
         }
-//        } else if (this.getAge() == ARM_END_TIME_TICKS) {
-//            this.currentState = State.BASE_UP;
-//            this.baseUpAnimState.start(this.tickCount);
-//        }
-
-//        setAntennaRotationSpeed(0.5f);
-//        if (currentState == State.BASE_UP) {
-//            this.setAntennaRotationSpeed(this.getAntennaRotationSpeed() + 3.0f);
-//            System.out.println(this.getAntennaRotationSpeed());
-//        }
 
         if (!this.level().isClientSide) {
-            double centerX = this.getX();
-            double centerY = this.getY();
-            double centerZ = this.getZ();
-
-            AABB detectionBox = new AABB(
-                    centerX - 4.5, centerY - 4.5, centerZ - 4.5,
-                    centerX + 4.5, centerY + 4.5, centerZ + 4.5
-            );
-
-            List<Entity> nearbyEntities = this.level().getEntities(
-                    (Entity) null, detectionBox, entity -> entity instanceof Projectile
-            );
-
-            for (Entity entity : nearbyEntities) {
+            for (Entity entity : this.getNearbyProjectiles()) {
                 float currentShieldHealth = this.entityData.get(DATA_SHIELD_HEALTH);
                 this.entityData.set(DATA_SHIELD_HEALTH, currentShieldHealth - SHIELD_PROJECTILE_DAMAGE);
 
+                // TODO: make it fancier than just discarding the projectiles
                 entity.discard();
 
                 if (currentShieldHealth - SHIELD_PROJECTILE_DAMAGE <= 0.0f) {
@@ -252,10 +231,24 @@ public class CommandPylonEntity extends Mob {
                     this.discard();
                 }
             }
-
         }
 
         super.tick();
+    }
+
+    private List<Entity> getNearbyProjectiles() {
+        double centerX = this.getX();
+        double centerY = this.getY();
+        double centerZ = this.getZ();
+
+        AABB detectionBox = new AABB(
+                centerX - 4.5, centerY - 4.5, centerZ - 4.5,
+                centerX + 4.5, centerY + 4.5, centerZ + 4.5
+        );
+
+        return this.level().getEntities(
+                (Entity) null, detectionBox, entity -> entity instanceof Projectile
+        );
     }
 
     public boolean canRender() {
