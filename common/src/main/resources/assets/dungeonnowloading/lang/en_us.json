@@ -166,5 +166,10 @@
   "sounds.dungeonnowloading.scuttle_hurt": "Scuttle hurts",
   "sounds.dungeonnowloading.scuttle_death": "Scuttle dies",
   "effect.dungeonnowloading.vertex_transmission": "Vertex Transmission",
+  "sounds.dungeonnowloading.vertex_arrow_bootup": "Vertex Arrow boots up",
+  "sounds.dungeonnowloading.vertex_transmission_damage": "Vertex Transmission zaps",
+  "sounds.dungeonnowloading.vertex_node_connect": "Vertex Node links",
+  "sounds.dungeonnowloading.vertex_bow_arrow_convert": "Vertex Bow fully charges",
+  "sounds.dungeonnowloading.vertex_bow_pull": "Vertex Bow charges up",
   "warning.dungeonnowloading.cannot_open_fairkeeper_chest": "All enemies in the room must be defeated first!"
 }
