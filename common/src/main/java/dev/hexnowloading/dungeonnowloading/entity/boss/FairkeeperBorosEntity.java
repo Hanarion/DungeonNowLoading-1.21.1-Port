@@ -28,6 +28,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
+import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
@@ -67,6 +68,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
+        this.setMaxUpStep(3.0f);
         this.bossEvent = (ServerBossEvent)(new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS)).setDarkenScreen(true);
     }
 
@@ -75,7 +77,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 .add(Attributes.MAX_HEALTH, 300.0)
                 .add(Attributes.ATTACK_DAMAGE, 20.0)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5)
-                .add(Attributes.MOVEMENT_SPEED, 0.5)
+                .add(Attributes.MOVEMENT_SPEED, 0.6)
                 .add(Attributes.FOLLOW_RANGE, 30.0)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0);
     }
@@ -83,9 +85,10 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new BossResetGoal(this, this.getFollowDistance()));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, true));
-        this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
-        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(2, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.0, false));
+        //this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
+        //this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         //this.targetSelector.addGoal(2, new BossTargetSelectorGoal(this, this.getFollowDistance()));
     }
@@ -412,5 +415,30 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         DYING;
 
         private FairkeeperState() {}
+    }
+
+    public class FacingMoveControl extends MoveControl {
+        private final Mob mob;
+
+        public FacingMoveControl(Mob mob) {
+            super(mob);
+            this.mob = mob;
+        }
+
+        @Override
+        public void tick() {
+            // Get the mob's current yaw (facing direction)
+            float yaw = this.mob.getYRot();
+
+            // Calculate the forward movement direction based on yaw
+            double xSpeed = -Math.sin(Math.toRadians(yaw)) * this.speedModifier;
+            double zSpeed = Math.cos(Math.toRadians(yaw)) * this.speedModifier;
+
+            // Set the mob's velocity to move in the facing direction
+            this.mob.setDeltaMovement(new Vec3(xSpeed, this.mob.getDeltaMovement().y, zSpeed));
+
+            // Update the speed for the mob
+            this.mob.setSpeed((float) this.speedModifier);
+        }
     }
 }
