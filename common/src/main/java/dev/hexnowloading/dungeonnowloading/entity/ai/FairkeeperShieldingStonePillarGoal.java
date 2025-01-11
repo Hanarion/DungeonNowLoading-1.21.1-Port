@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperFlyingMoveControl;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.ShieldingStonePillarProjectileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -13,8 +13,8 @@ import java.util.List;
 
 public class FairkeeperShieldingStonePillarGoal extends Goal {
 
-    private final FairkeeperEntity fairkeeperEntity;
-    private final FairkeeperEntity.FairkeeperState state;
+    private final FairkeeperBorosEntity fairkeeperEntity;
+    private final FairkeeperBorosEntity.FairkeeperState state;
     private final double altitude;
     private final double strafeMaxSpeed;
     private final double strafeMinSpeed;
@@ -39,7 +39,7 @@ public class FairkeeperShieldingStonePillarGoal extends Goal {
     private int tickCount;
     private int phase;
 
-    public FairkeeperShieldingStonePillarGoal(FairkeeperEntity fairkeeperEntity, FairkeeperEntity.FairkeeperState state, double altitude, double strafeMaxSpeed, double strafeMinSpeed, double strafeStopAccuracy, int strafeToAttackInterval, int stonePillarCount, int stonePillarSummonInterval, double hoverMinimumDistance, int hoverRegionGridLength, int hoverRegionGridSpacing, double hoverRegionVarity, float stonePillarDamagePercentage, double hoverMaxSpeed, double hoverMinSpeed, double hoverStopAccuracy, boolean triggerRequiredForDrop, int lastPillarSummonToDropInterval, int stonePillarHoverToDropInterval, double stonePillarDropSpeed) {
+    public FairkeeperShieldingStonePillarGoal(FairkeeperBorosEntity fairkeeperEntity, FairkeeperBorosEntity.FairkeeperState state, double altitude, double strafeMaxSpeed, double strafeMinSpeed, double strafeStopAccuracy, int strafeToAttackInterval, int stonePillarCount, int stonePillarSummonInterval, double hoverMinimumDistance, int hoverRegionGridLength, int hoverRegionGridSpacing, double hoverRegionVarity, float stonePillarDamagePercentage, double hoverMaxSpeed, double hoverMinSpeed, double hoverStopAccuracy, boolean triggerRequiredForDrop, int lastPillarSummonToDropInterval, int stonePillarHoverToDropInterval, double stonePillarDropSpeed) {
         this.fairkeeperEntity = fairkeeperEntity;
         this.state = state;
         this.altitude = altitude;

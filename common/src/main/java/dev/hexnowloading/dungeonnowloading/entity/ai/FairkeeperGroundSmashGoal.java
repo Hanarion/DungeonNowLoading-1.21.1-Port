@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperFlyingMoveControl;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -10,8 +10,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -21,8 +19,8 @@ import java.util.List;
 
 public class FairkeeperGroundSmashGoal extends Goal {
 
-    private final FairkeeperEntity fairkeeperEntity;
-    private final FairkeeperEntity.FairkeeperState state;
+    private final FairkeeperBorosEntity fairkeeperEntity;
+    private final FairkeeperBorosEntity.FairkeeperState state;
     private final int strafeToSmashInterval;
     private final double strafeMaxSpeed;
     private final double strafeMinSpeed;
@@ -40,7 +38,7 @@ public class FairkeeperGroundSmashGoal extends Goal {
     private BlockPos targetBlockPos;
     private double altitude;
 
-    public FairkeeperGroundSmashGoal(FairkeeperEntity fairkeeperEntity, FairkeeperEntity.FairkeeperState state, int strafeToSmashInterval, double strafeMaxSpeed, double strafeMinSpeed, double strafeStopAccuracy, float damagePercentage, double groundSmashRange, double horizontalKnockbackStrength, double verticalKnockbackStrength, boolean shieldPenetration, float shieldDamageReduction, int postSmashInterval) {
+    public FairkeeperGroundSmashGoal(FairkeeperBorosEntity fairkeeperEntity, FairkeeperBorosEntity.FairkeeperState state, int strafeToSmashInterval, double strafeMaxSpeed, double strafeMinSpeed, double strafeStopAccuracy, float damagePercentage, double groundSmashRange, double horizontalKnockbackStrength, double verticalKnockbackStrength, boolean shieldPenetration, float shieldDamageReduction, int postSmashInterval) {
         this.fairkeeperEntity = fairkeeperEntity;
         this.state = state;
         this.strafeToSmashInterval = strafeToSmashInterval / 2;
@@ -126,7 +124,7 @@ public class FairkeeperGroundSmashGoal extends Goal {
                 }
 
                 AABB aabb = this.fairkeeperEntity.getBoundingBox().inflate(this.groundSmashRange);
-                List<LivingEntity> targets = this.fairkeeperEntity.level().getEntitiesOfClass(LivingEntity.class, aabb).stream().filter(livingEntity -> !(livingEntity instanceof FairkeeperEntity)).toList();
+                List<LivingEntity> targets = this.fairkeeperEntity.level().getEntitiesOfClass(LivingEntity.class, aabb).stream().filter(livingEntity -> !(livingEntity instanceof FairkeeperBorosEntity)).toList();
                 for (LivingEntity mob : targets) {
                     this.pushNearbyMobs(mob);
                 }

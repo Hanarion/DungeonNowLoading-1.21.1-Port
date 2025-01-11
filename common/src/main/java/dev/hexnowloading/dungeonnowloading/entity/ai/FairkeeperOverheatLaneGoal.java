@@ -1,13 +1,11 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperFlyingMoveControl;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -15,8 +13,8 @@ import java.util.List;
 
 public class FairkeeperOverheatLaneGoal extends Goal {
 
-    private final FairkeeperEntity fairkeeperEntity;
-    private final FairkeeperEntity.FairkeeperState state;
+    private final FairkeeperBorosEntity fairkeeperEntity;
+    private final FairkeeperBorosEntity.FairkeeperState state;
     private final double altitude;
     private final double strafeMaxSpeed;
     private final double strafeMinSpeed;
@@ -32,7 +30,7 @@ public class FairkeeperOverheatLaneGoal extends Goal {
     private int phase;
     private int tickCount;
 
-    public FairkeeperOverheatLaneGoal(FairkeeperEntity fairkeeperEntity, FairkeeperEntity.FairkeeperState state, double altitude, double strafeMaxSpeed, double strafeMinSpeed, double strafeStopAccuracy, int strafeToOverheatInterval, int nodeCount, int nodeGridLength, int nodeGridSpacing, int nodePlacingTime, int nodePlacingTimeVariety) {
+    public FairkeeperOverheatLaneGoal(FairkeeperBorosEntity fairkeeperEntity, FairkeeperBorosEntity.FairkeeperState state, double altitude, double strafeMaxSpeed, double strafeMinSpeed, double strafeStopAccuracy, int strafeToOverheatInterval, int nodeCount, int nodeGridLength, int nodeGridSpacing, int nodePlacingTime, int nodePlacingTimeVariety) {
         this.fairkeeperEntity = fairkeeperEntity;
         this.state = state;
         this.altitude = altitude;

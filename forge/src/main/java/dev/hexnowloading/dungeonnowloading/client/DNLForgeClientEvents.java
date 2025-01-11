@@ -21,7 +21,8 @@ public class DNLForgeClientEvents {
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         // Bosses
         event.registerLayerDefinition(ChaosSpawnerModel.LAYER_LOCATION, ChaosSpawnerModel::createBodyLayer);
-        event.registerLayerDefinition(FairkeeperModel.LAYER_LOCATION, FairkeeperModel::createBodyLayer);
+        event.registerLayerDefinition(FairkeeperBorosModel.LAYER_LOCATION, FairkeeperBorosModel::createBodyLayer);
+        event.registerLayerDefinition(FairkeeperBorosBodyModel.LAYER_LOCATION, FairkeeperBorosBodyModel::createBodyLayer);
 
         // Monsters
         event.registerLayerDefinition(HollowModel.LAYER_LOCATION, HollowModel::createBodyLayer);
@@ -47,7 +48,8 @@ public class DNLForgeClientEvents {
     public static void onRegisterRenderer(EntityRenderersEvent.RegisterRenderers event) {
         // Bosses
         event.registerEntityRenderer(DNLEntityTypes.CHAOS_SPAWNER.get(), ChaosSpawnerRenderer::new);
-        event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER.get(), FairkeeperRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER.get(), FairkeeperBorosRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_BOROS_PART.get(), FairkeeperBorosBodyRenderer::new);
 
         // Monsters
         event.registerEntityRenderer(DNLEntityTypes.HOLLOW.get(), HollowRenderer::new);

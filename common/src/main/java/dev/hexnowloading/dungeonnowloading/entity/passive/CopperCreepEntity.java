@@ -1,15 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.entity.passive;
 
-import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperEntity;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
-import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -20,7 +15,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;

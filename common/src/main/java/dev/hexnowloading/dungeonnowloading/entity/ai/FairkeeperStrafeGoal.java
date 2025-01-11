@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperFlyingMoveControl;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -11,8 +11,8 @@ import java.util.EnumSet;
 
 public class FairkeeperStrafeGoal extends Goal {
 
-    private final FairkeeperEntity fairkeeperEntity;
-    private final FairkeeperEntity.FairkeeperState state;
+    private final FairkeeperBorosEntity fairkeeperEntity;
+    private final FairkeeperBorosEntity.FairkeeperState state;
     private final int rangeXZ;
     private final int rangeY;
     private final int altitude;
@@ -30,7 +30,7 @@ public class FairkeeperStrafeGoal extends Goal {
     private int strafeCount;
     private int tickCount;
 
-    public FairkeeperStrafeGoal(FairkeeperEntity fairkeeperEntity, FairkeeperEntity.FairkeeperState state, int rangeXZ, int rangeY, int altitude, int maxDistance, int minDistance, int maxStrafeCount, int intervalInTick, double maxSpeed, double minSpeed, double stopAccuracy, int maxStrafeTries, StrafeReference strafeReference, boolean boundWithinArena) {
+    public FairkeeperStrafeGoal(FairkeeperBorosEntity fairkeeperEntity, FairkeeperBorosEntity.FairkeeperState state, int rangeXZ, int rangeY, int altitude, int maxDistance, int minDistance, int maxStrafeCount, int intervalInTick, double maxSpeed, double minSpeed, double stopAccuracy, int maxStrafeTries, StrafeReference strafeReference, boolean boundWithinArena) {
         this.fairkeeperEntity = fairkeeperEntity;
         this.state = state;
         this.rangeXZ = rangeXZ;

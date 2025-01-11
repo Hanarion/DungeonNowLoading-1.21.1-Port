@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -19,7 +19,6 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RedstoneCatalystItem extends Item {
 
@@ -31,14 +30,14 @@ public class RedstoneCatalystItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         AABB aabb = (new AABB(player.blockPosition())).inflate(16);
-        List<FairkeeperEntity> targets = level.getEntitiesOfClass(FairkeeperEntity.class, aabb);
-        List<FairkeeperEntity> sleepingTargets = targets.stream().filter(FairkeeperEntity::isSlumbering).toList();
+        List<FairkeeperBorosEntity> targets = level.getEntitiesOfClass(FairkeeperBorosEntity.class, aabb);
+        List<FairkeeperBorosEntity> sleepingTargets = targets.stream().filter(FairkeeperBorosEntity::isSlumbering).toList();
         if (!sleepingTargets.isEmpty()) {
             player.startUsingItem(hand);
             level.playSound(player, player, DNLSounds.CHAOS_SPAWNER_LAUGHTER.get(), SoundSource.RECORDS, 1.0F, 2.0F);
             player.getCooldowns().addCooldown(this, 7);
             player.awardStat(Stats.ITEM_USED.get(this));
-            for (FairkeeperEntity FairkeeperEntity : targets) {
+            for (FairkeeperBorosEntity FairkeeperEntity : targets) {
                 FairkeeperEntity.startBossFight();
             }
             if (player instanceof ServerPlayer) {
