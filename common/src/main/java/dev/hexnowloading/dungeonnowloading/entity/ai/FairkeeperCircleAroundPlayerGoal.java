@@ -13,7 +13,7 @@ public class FairkeeperCircleAroundPlayerGoal extends Goal {
     private final double speed;       // Speed of movement
     private final boolean clockwise;  // Direction of movement
     private double angle;             // Current angle in degrees
-    private double targetX, targetZ;  // Current target position (X, Z only)
+    private double targetX, targetY, targetZ;  // Current target position (X, Z only)
 
     private static final double THRESHOLD = 2.0; // Distance threshold to "reach" target
 
@@ -62,7 +62,7 @@ public class FairkeeperCircleAroundPlayerGoal extends Goal {
             }
 
             // Continue moving towards the current target position
-            this.boros.getMoveControl().setWantedPosition(this.targetX, this.boros.getY(), this.targetZ, this.speed);
+            this.boros.getMoveControl().setWantedPosition(this.targetX, this.targetY, this.targetZ, this.speed);
 
             // Adjust Boros's yaw to face the moving direction
             lookTowardTarget();
@@ -76,6 +76,7 @@ public class FairkeeperCircleAroundPlayerGoal extends Goal {
         // Calculate the target position on the circle with the player as the center (X, Z only)
         this.targetX = this.target.getX() + this.radius * Math.cos(angleRad);
         this.targetZ = this.target.getZ() + this.radius * Math.sin(angleRad);
+        this.targetY = this.target.getY();
     }
 
     private void lookTowardTarget() {

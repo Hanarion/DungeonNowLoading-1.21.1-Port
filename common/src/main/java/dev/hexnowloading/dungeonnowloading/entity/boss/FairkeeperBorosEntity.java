@@ -194,24 +194,23 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private void blockDestructionTick() {
         int DESTRUCTION_RANGE = 2;
-        Entity target = this.getTarget();
         int y = 0;
-        if (target != null) {
-            y = target.getBlockY() - this.getBlockY();
+        if (this.getMoveControl().hasWanted()) {
+            y = Mth.floor(this.getMoveControl().getWantedY()) - this.getBlockY();
             System.out.println(y);
         }
-        if (y < -2) {
+        if (y < -1) {
             this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
             return;
         }
         if (this.getDeltaMovement().lengthSqr() > 0.01) {
             return;
         }
-        if (y > 2) {
+        if (y > 1) {
             System.out.println("UP");
             this.setPos(this.getX(), this.getY() + 1, this.getZ());
-            //this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 1, 5, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
-            //return;
+            this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 0, 4, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+            return;
         }
         this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 0, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
     }
