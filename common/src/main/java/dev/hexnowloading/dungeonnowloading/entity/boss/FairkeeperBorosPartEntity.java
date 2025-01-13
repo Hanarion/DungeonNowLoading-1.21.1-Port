@@ -8,8 +8,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,6 +30,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> HEAD_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Integer> BODY_INDEX = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> ARMOR = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> TAIL = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
 
     public FairkeeperBorosPartEntity(EntityType<? extends Monster> entityType, LivingEntity parent, LivingEntity head, int bodyIndex) {
@@ -37,6 +38,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         this.setParent(parent);
         this.setHead(head);
         this.setBodyIndex(bodyIndex);
+        this.setArmor(isArmoredSegment());
     }
 
     public FairkeeperBorosPartEntity(EntityType<? extends Monster> entityType, Level level) {
@@ -56,6 +58,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.define(HEAD_UUID, Optional.empty());
         this.entityData.define(BODY_INDEX, 0);
         this.entityData.define(TAIL, false);
+        this.entityData.define(ARMOR, false);
     }
 
     @Override
@@ -69,6 +72,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         }
         compoundTag.putBoolean("TailPart", isTail());
         compoundTag.putInt("BodyIndex", getBodyIndex());
+        compoundTag.putBoolean("Armor", hasArmor());
     }
 
     @Override
@@ -82,6 +86,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         }
         this.setTail(compoundTag.getBoolean("TailPart"));
         this.setBodyIndex(compoundTag.getInt("BodyIndex"));
+        this.setArmor(compoundTag.getBoolean("Armor"));
     }
 
     @Override
@@ -126,6 +131,20 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         double deltaZ = targetPos.z - currentPos.z;
         float yaw = (float) (Math.atan2(deltaZ, deltaX) * (180 / Math.PI)) - 90;
         this.setYRot(yaw);
+    }
+
+    @Override
+    public boolean hurt(DamageSource damageSource, float damageAmount) {
+
+        if (!this.hasArmor() || damageSource.isCreativePlayer()) {
+            return super.hurt(damageSource, damageAmount);
+        }
+
+        if (damageSource.is(DamageTypes.EXPLOSION) || (damageSource.getDirectEntity() instanceof LivingEntity livingEntity && livingEntity.canDisableShield())) {
+            this.setArmor(false);
+        }
+
+        return false;
     }
 
     @Override
@@ -243,6 +262,12 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         }
         return null;
     }
+
+    public boolean isArmoredSegment() { return this.getBodyIndex() % 2 != 0; }
+
+    public boolean hasArmor() { return this.entityData.get(ARMOR); }
+
+    public void setArmor(boolean armor) { this.entityData.set(ARMOR, armor); }
 
     public boolean isTail() { return this.entityData.get(TAIL); }
 

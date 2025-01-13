@@ -21,6 +21,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -64,7 +66,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 13;
-    public static int SEGMENT_DELAY_STEP = 5;
+    public static int SEGMENT_DELAY_STEP = 7;
 
     public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -185,8 +187,52 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         //System.out.println(this.getState());
         if (this.isState(FairkeeperState.AWAKENING)) this.enableBossBar();
         //this.abilitySelectionTick();
+        this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
+    }
+
+    private void blockDestructionTick() {
+        int DESTRUCTION_RANGE = 2;
+        Entity target = this.getTarget();
+        int y = 0;
+        if (target != null) {
+            y = target.getBlockY() - this.getBlockY();
+            System.out.println(y);
+        }
+        if (y < -2) {
+            this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+            return;
+        }
+        if (this.getDeltaMovement().lengthSqr() > 0.01) {
+            return;
+        }
+        if (y > 2) {
+            System.out.println("UP");
+            this.setPos(this.getX(), this.getY() + 1, this.getZ());
+            //this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 1, 5, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+            //return;
+        }
+        this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 0, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+    }
+
+    private void destroyContactBlocks(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+        for (int ix = minX; ix <= maxX; ix++) {
+            for (int iz = minZ; iz <= maxZ; iz++) {
+                for (int iy = minY; iy <= maxY; iy++) {
+                    int dx = this.getBlockX() + ix;
+                    int dy = this.getBlockY() + iy;
+                    int dz = this.getBlockZ() + iz;
+                    BlockPos blockPos = new BlockPos(dx, dy, dz);
+                    BlockState blockState = this.level().getBlockState(blockPos);
+                    if (!blockState.isAir()) {
+                        if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
+                            this.level().destroyBlock(blockPos, true, this);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void abilitySelectionTick() {
