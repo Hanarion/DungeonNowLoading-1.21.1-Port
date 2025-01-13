@@ -371,6 +371,16 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
+    public boolean canCollideWith(Entity entity) {
+        entity.push(this);
+
+        if (entity instanceof LivingEntity && !(entity instanceof FairkeeperBorosPartEntity || entity instanceof FairkeeperBorosEntity)) {
+            entity.hurt(entity.level().damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+        }
+        return super.canCollideWith(entity);
+    }
+
+    @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag compoundTag) {
         this.setSpawnPoint(this.blockPosition());
         return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData, compoundTag);

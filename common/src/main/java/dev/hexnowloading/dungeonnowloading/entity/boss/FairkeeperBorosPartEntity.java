@@ -148,6 +148,17 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     }
 
     @Override
+    public boolean canCollideWith(Entity entity) {
+        entity.push(this);
+
+        if (entity instanceof LivingEntity && !(entity instanceof FairkeeperBorosPartEntity || entity instanceof FairkeeperBorosEntity)) {
+            LivingEntity parent = (LivingEntity) this.getParent();
+            entity.hurt(entity.level().damageSources().mobAttack(parent), (float) parent.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.5f);
+        }
+        return super.canCollideWith(entity);
+    }
+
+    @Override
     public void push(Entity entity) {
     }
 
