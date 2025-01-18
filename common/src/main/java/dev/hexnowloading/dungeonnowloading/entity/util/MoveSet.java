@@ -26,6 +26,10 @@ public class MoveSet<T extends Object> {
         moveSet.add(move);
     }
 
+    public void removeMove(T removeObject) {
+        moveSet.removeIf(move -> move.object.equals(removeObject));
+    }
+
     public void tick() {
         //System.out.println("Move Ticks: ---------------------------------------------------------");
         for (Move move : moveSet) {

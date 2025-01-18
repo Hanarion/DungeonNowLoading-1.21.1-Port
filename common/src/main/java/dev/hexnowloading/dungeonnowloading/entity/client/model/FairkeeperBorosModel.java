@@ -10,15 +10,19 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends HierarchicalModel<T> {
-    // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
+
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_boros_head"), "main");
     private final ModelPart boros;
     private final ModelPart head;
     private final ModelPart tongue;
     private final ModelPart eye;
     private final ModelPart root;
+
+    private float TILT_SPEED = 0.05F;
 
     public FairkeeperBorosModel(ModelPart root) {
         this.root = root;
@@ -32,19 +36,19 @@ public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends Hiera
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 
-        PartDefinition boros = partdefinition.addOrReplaceChild("boros", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
+        PartDefinition boros = partdefinition.addOrReplaceChild("boros", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
 
         PartDefinition head = boros.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 72).addBox(-21.0F, -12.0F, -21.0F, 42.0F, 12.0F, 42.0F, new CubeDeformation(0.0F))
                 .texOffs(0, 0).addBox(-24.0F, -36.0F, -24.0F, 48.0F, 24.0F, 48.0F, new CubeDeformation(0.0F))
                 .texOffs(92, 126).addBox(-2.0F, -42.0F, 1.0F, 4.0F, 6.0F, 21.0F, new CubeDeformation(0.0F))
-                .texOffs(0, 126).addBox(-2.0F, -59.0F, -20.0F, 4.0F, 17.0F, 42.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+                .texOffs(0, 126).addBox(-2.0F, -59.0F, -20.0F, 4.0F, 17.0F, 42.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
 
-        PartDefinition tongue = boros.addOrReplaceChild("tongue", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition tongue = boros.addOrReplaceChild("tongue", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
 
         PartDefinition cube_r1 = tongue.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(142, 126).addBox(-3.0F, 0.0F, -16.0F, 6.0F, 0.0F, 16.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -12.0F, -21.0F, 0.1309F, 0.0F, 0.0F));
 
         PartDefinition eye = boros.addOrReplaceChild("eye", CubeListBuilder.create().texOffs(142, 142).addBox(24.0F, -18.0F, -13.0F, 2.0F, 8.0F, 12.0F, new CubeDeformation(0.0F))
-                .texOffs(92, 153).addBox(-26.0F, -18.0F, -13.0F, 2.0F, 8.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -12.0F, 0.0F));
+                .texOffs(92, 153).addBox(-26.0F, -18.0F, -13.0F, 2.0F, 8.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 12.0F, 0.0F));
 
         return LayerDefinition.create(meshdefinition, 256, 256);
     }
@@ -60,7 +64,21 @@ public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends Hiera
     }
 
     @Override
-    public void setupAnim(T entity, float var2, float var3, float var4, float var5, float var6) {
+    public void setupAnim(FairkeeperBorosEntity entity, float var2, float var3, float var4, float var5, float var6) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
+
+        float targetTilt = (float) Math.toRadians(this.getTiltAngle(entity));
+        entity.setPreviousTilt(Mth.lerp(this.TILT_SPEED, entity.getPreviousTilt(), targetTilt));
+        this.boros.xRot = entity.getPreviousTilt();
+    }
+
+    public float getTiltAngle(FairkeeperBorosEntity entity) {
+        Vec3 motion = entity.getDeltaMovement();
+        if (motion.y * motion.y > 0.01) {
+            double horizontalSpeed = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+            float pitch = (float) Math.toDegrees(Math.atan2(-motion.y, horizontalSpeed));
+            return pitch;
+        }
+        return 0.0F;
     }
 }

@@ -2,8 +2,8 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.ShieldingStonePillarBlockEntity;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
-import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperLookControl;
-import dev.hexnowloading.dungeonnowloading.entity.ai.control.SmoothBodyRotationControl;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperOurosMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperSerpentMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
@@ -27,18 +27,11 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.control.BodyRotationControl;
-import net.minecraft.world.entity.ai.control.LookControl;
-import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -46,20 +39,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
+public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
-    private static final EntityDataAccessor<FairkeeperState> STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_STATE);
-    private static final EntityDataAccessor<BlockPos> SPAWN_POINT = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.BLOCK_POS);
-    private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
-    private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<FairkeeperOurosEntity.FairkeeperOurosState> STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_STATE);
+    private static final EntityDataAccessor<BlockPos> SPAWN_POINT = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BLOCK_POS);
+    private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
-    private MoveSet<FairkeeperState> stateSelector = new MoveSet<>();
+    private MoveSet<FairkeeperOurosEntity.FairkeeperOurosState> stateSelector = new MoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
 
     private int attackTick;
@@ -69,9 +61,11 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
     public static int SEGMENT_DELAY_STEP = 7;
-
-    public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
+    
+    public FairkeeperOurosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
+        //this.moveControl = new FairkeeperSerpentMoveControl(this, 5.0F);
+        this.moveControl = new FairkeeperOurosMoveControl(this);
         this.setMaxUpStep(3.0f);
         this.bossEvent = (ServerBossEvent)(new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS)).setDarkenScreen(true);
     }
@@ -82,6 +76,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 .add(Attributes.ATTACK_DAMAGE, 20.0)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5)
                 .add(Attributes.MOVEMENT_SPEED, 0.4)
+                .add(Attributes.FLYING_SPEED, 0.4)
                 .add(Attributes.FOLLOW_RANGE, 30.0)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0);
     }
@@ -89,8 +84,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new BossResetGoal(this, this.getFollowDistance()));
-        this.goalSelector.addGoal(2, new FairkeeperAwakenGoal(this));
-        this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
+        this.goalSelector.addGoal(2, new FairkeeperOurosAwakenGoal(this));
+        //this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
         this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
         //this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
@@ -102,7 +97,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(STATE, FairkeeperState.SLUMBERING);
+        this.entityData.define(STATE, FairkeeperOurosEntity.FairkeeperOurosState.SLUMBERING);
         this.entityData.define(SPAWN_POINT, BlockPos.ZERO);
         this.entityData.define(CHILD_UUID, Optional.empty());
         this.entityData.define(CALLER_UUID, Optional.empty());
@@ -125,7 +120,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     public void readAdditionalSaveData(CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         this.entityData.set(SPAWN_POINT, new BlockPos(compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(0), compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(1), compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(2)));
-        this.entityData.set(STATE, compoundTag.getBoolean("Slumbering") ? FairkeeperState.SLUMBERING : FairkeeperState.IDLE);
+        this.entityData.set(STATE, compoundTag.getBoolean("Slumbering") ? FairkeeperOurosEntity.FairkeeperOurosState.SLUMBERING : FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
         if (this.hasCustomName()) this.bossEvent.setName(this.getDisplayName());
         if (compoundTag.hasUUID("ChildUUID")) {
             this.setChildId(compoundTag.getUUID("ChildUUID"));
@@ -168,7 +163,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 LivingEntity partParent = this;
                 int segments = SEGMENT_COUNT;
                 for (int i = 0; i < segments; i++) {
-                    FairkeeperBorosPartEntity part = new FairkeeperBorosPartEntity(DNLEntityTypes.FAIRKEEPER_BOROS_PART.get(), partParent, this, i);
+                    FairkeeperOurosPartEntity part = new FairkeeperOurosPartEntity(DNLEntityTypes.FAIRKEEPER_OUROS_PART.get(), partParent, this, i);
                     if (partParent == this) {
                         this.setChildId(part.getUUID());
                     }
@@ -196,10 +191,10 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 }
             }
 
-            if (!this.onGround() && this.getDeltaMovement().y < 0.0) {
-                this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.8, 1.0));
+            /*if (!this.onGround() && this.getDeltaMovement().y < 0.0) {
+                this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, -0.8, 1.0));
 
-            }
+            }*/
         }
 
         /*FairkeeperLookControl lookControl = (FairkeeperLookControl) this.getLookControl();
@@ -214,8 +209,30 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
+    public void aiStep() {
+        super.aiStep();
+
+        // Invert gravity effect
+        Vec3 motion = this.getDeltaMovement();
+        this.setDeltaMovement(motion.x, 0.5, motion.z);
+
+        // Adjust position to ensure it stays on the ceiling
+        BlockPos aboveBlockPos = this.blockPosition().above();
+        if (this.level().getBlockState(aboveBlockPos).isSolidRender(this.level(), aboveBlockPos)) {
+            this.setPos(this.getX(), aboveBlockPos.getY() - this.getBbHeight(), this.getZ());
+        }
+
+    }
+
+    @Override
+    public boolean onGround() {
+        BlockPos aboveBlockPos = this.blockPosition().above();
+        return this.level().getBlockState(aboveBlockPos).isSolidRender(this.level(), aboveBlockPos);
+    }
+
+    @Override
     protected void customServerAiStep() {
-        if (this.isState(FairkeeperState.AWAKENING)) this.enableBossBar();
+        if (this.isState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING)) this.enableBossBar();
         this.performContactDamage();
         this.abilitySelectionTick();
         this.blockDestructionTick();
@@ -232,7 +249,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private boolean canPerformContactDamageTo(Entity entity) {
-        if (entity instanceof FairkeeperBorosPartEntity part) {
+        if (entity instanceof FairkeeperOurosPartEntity part) {
             return !this.getUUID().equals(part.getHeadId());
         }
         return true;
@@ -282,7 +299,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
         stateSelector.tick();
 
-        if (!this.isState(FairkeeperState.IDLE)) {
+        if (!this.isState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE)) {
             return;
         }
 
@@ -296,36 +313,36 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.getTarget() == null) return;
 
         if (stateSelector.isEmpty()) {
-            stateSelector.addMove(FairkeeperState.CIRCLING, 5, 60, 0);
-            stateSelector.addMove(FairkeeperState.GROUND_SMASH, 5, 400, 0);
-            stateSelector.addMove(FairkeeperState.STONE_PILLAR, 5, 400, 0);
-            stateSelector.addMove(FairkeeperState.SHIELDING_STONE_PILLAR, 4, 800, 200);
+            stateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.CIRCLING, 5, 60, 0);
+            stateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.GROUND_SMASH, 5, 400, 0);
+            stateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.STONE_PILLAR, 5, 400, 0);
+            stateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHIELDING_STONE_PILLAR, 4, 800, 200);
             System.out.println(stateSelector);
-            //stateSelector.removeMove(FairkeeperState.CIRCLING);
+            //stateSelector.removeMove(FairkeeperOurosState.CIRCLING);
             System.out.println(stateSelector);
         }
         this.setState(stateSelector.selectMove());
     }
 
     public void stopAttacking(int cooldown) {
-        this.setState(FairkeeperState.IDLE);
+        this.setState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
         this.setTarget(null);
         this.setAttackTick(cooldown);
     }
 
     @Override
     public void targetRandomPlayer() {
-        this.setState(FairkeeperState.TARGET);
+        this.setState(FairkeeperOurosEntity.FairkeeperOurosState.TARGET);
     }
 
     @Override
     public boolean playerTargetingCondition() {
-        return this.isState(FairkeeperState.TARGET);
+        return this.isState(FairkeeperOurosEntity.FairkeeperOurosState.TARGET);
     }
 
     @Override
     public void postPlayerTargeting() {
-        this.setState(FairkeeperState.IDLE);
+        this.setState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
     }
 
     @Override
@@ -344,7 +361,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.disableBossBar();
         this.setDeltaMovement(Vec3.ZERO);
         this.setPos(this.getSpawnPoint().getX() + 0.5, this.getSpawnPoint().getY(), this.getSpawnPoint().getZ() + 0.5);
-        this.setState(FairkeeperState.SLUMBERING);
+        this.setState(FairkeeperOurosEntity.FairkeeperOurosState.SLUMBERING);
         this.setTarget(null);
         this.stateSelector.clear();
     }
@@ -473,26 +490,85 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         return null;
     }
 
-    public void enableBossBar() { this.bossEvent.setVisible(true); }
-    public void disableBossBar() { this.bossEvent.setVisible(false); }
-    public int getAttackTick() { return this.attackTick; }
-    public void setAttackTick(int i) { this.attackTick = i; }
-    public double getAttackDamage() { return this.getAttributeValue(Attributes.ATTACK_DAMAGE); }
-    public double getFollowDistance() { return this.getAttributeValue(Attributes.FOLLOW_RANGE); }
-    public void setSpawnPoint(BlockPos blockPos) { this.entityData.set(SPAWN_POINT, blockPos); }
-    public BlockPos getSpawnPoint() { return this.entityData.get(SPAWN_POINT); }
-    public void setState(FairkeeperState fairkeeperState) { this.entityData.set(STATE, fairkeeperState); }
-    public FairkeeperState getState() { return this.entityData.get(STATE); }
-    public boolean isState(FairkeeperState fairkeeperState) { return this.getState().equals(fairkeeperState); }
-    public UUID getChildId() { return this.entityData.get(CHILD_UUID).orElse(null); }
-    public void setChildId(@Nullable UUID uniqueId) { this.entityData.set(CHILD_UUID, Optional.ofNullable(uniqueId)); }
-    public UUID getCallerId() { return this.entityData.get(CALLER_UUID).orElse(null); }
-    public void setCallerId(@Nullable UUID uniqueId) { this.entityData.set(CALLER_UUID, Optional.ofNullable(uniqueId)); }
-    public Queue<Vec3> getPositionHistory() { return this.positionHistory; }
-    public float getPreviousTilt() { return this.previousTilt; }
-    public void setPreviousTilt(float tilt) { this.previousTilt = tilt; }
-    public BlockPos getAwakenEndPos() { return this.awakenEndPos; }
-    public void setAwakenEndPos(BlockPos blockPos) { this.awakenEndPos = blockPos; }
+    public void enableBossBar() {
+        this.bossEvent.setVisible(true);
+    }
+
+    public void disableBossBar() {
+        this.bossEvent.setVisible(false);
+    }
+
+    public int getAttackTick() {
+        return this.attackTick;
+    }
+
+    public void setAttackTick(int i) {
+        this.attackTick = i;
+    }
+
+    public double getAttackDamage() {
+        return this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+    }
+
+    public double getFollowDistance() {
+        return this.getAttributeValue(Attributes.FOLLOW_RANGE);
+    }
+
+    public void setSpawnPoint(BlockPos blockPos) {
+        this.entityData.set(SPAWN_POINT, blockPos);
+    }
+
+    public BlockPos getSpawnPoint() {
+        return this.entityData.get(SPAWN_POINT);
+    }
+
+    public void setState(FairkeeperOurosEntity.FairkeeperOurosState FairkeeperOurosState) {
+        this.entityData.set(STATE, FairkeeperOurosState);
+    }
+
+    public FairkeeperOurosEntity.FairkeeperOurosState getState() {
+        return this.entityData.get(STATE);
+    }
+
+    public boolean isState(FairkeeperOurosEntity.FairkeeperOurosState FairkeeperOurosState) {
+        return this.getState().equals(FairkeeperOurosState);
+    }
+
+    public UUID getChildId() {
+        return this.entityData.get(CHILD_UUID).orElse(null);
+    }
+
+    public void setChildId(@Nullable UUID uniqueId) {
+        this.entityData.set(CHILD_UUID, Optional.ofNullable(uniqueId));
+    }
+
+    public UUID getCallerId() {
+        return this.entityData.get(CALLER_UUID).orElse(null);
+    }
+
+    public void setCallerId(@Nullable UUID uniqueId) {
+        this.entityData.set(CALLER_UUID, Optional.ofNullable(uniqueId));
+    }
+
+    public Queue<Vec3> getPositionHistory() {
+        return this.positionHistory;
+    }
+
+    public float getPreviousTilt() {
+        return this.previousTilt;
+    }
+
+    public void setPreviousTilt(float tilt) {
+        this.previousTilt = tilt;
+    }
+
+    public BlockPos getAwakenEndPos() {
+        return this.awakenEndPos;
+    }
+
+    public void setAwakenEndPos(BlockPos blockPos) {
+        this.awakenEndPos = blockPos;
+    }
 
 
     @Override
@@ -502,10 +578,10 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     public boolean isSlumbering() {
-        return isState(FairkeeperState.SLUMBERING);
+        return isState(FairkeeperOurosEntity.FairkeeperOurosState.SLUMBERING);
     }
 
-    public enum FairkeeperState {
+    public enum FairkeeperOurosState {
         SLUMBERING,
         AWAKENING,
         IDLE,
@@ -518,6 +594,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         SHIELDING_STONE_PILLAR,
         DYING;
 
-        private FairkeeperState() {}
+        private FairkeeperOurosState() {
+        }
     }
 }

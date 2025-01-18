@@ -1,9 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosPartEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.GreatExperienceBottleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
@@ -33,6 +31,9 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<ChaosSpawnerEntity>> CHAOS_SPAWNER = register("chaos_spawner", () -> EntityType.Builder.<ChaosSpawnerEntity>of(ChaosSpawnerEntity::new, MobCategory.MONSTER).fireImmune().sized(3.0F, 3.0F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "chaos_spawner").toString()));
     public static final Supplier<EntityType<FairkeeperBorosEntity>> FAIRKEEPER = register("fairkeeper", () -> EntityType.Builder.of(FairkeeperBorosEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper").toString()));
     public static final Supplier<EntityType<FairkeeperBorosPartEntity>> FAIRKEEPER_BOROS_PART = register("fairkeeper_boros_part", () -> EntityType.Builder.<FairkeeperBorosPartEntity>of(FairkeeperBorosPartEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_borus_part").toString()));
+    public static final Supplier<EntityType<FairkeeperOurosEntity>> FAIRKEEPER_OUROS = register("fairkeeper_ouros", () -> EntityType.Builder.of(FairkeeperOurosEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_ouros").toString()));
+    public static final Supplier<EntityType<FairkeeperOurosPartEntity>> FAIRKEEPER_OUROS_PART = register("fairkeeper_ouros_part", () -> EntityType.Builder.<FairkeeperOurosPartEntity>of(FairkeeperOurosPartEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_ouros_part").toString()));
+    public static final Supplier<EntityType<FairkeeperSerpentCallerEntity>> FAIRKEEPER_SERPENT_CALLER = register("fairkeeper_serpent_caller", () -> EntityType.Builder.of(FairkeeperSerpentCallerEntity::new, MobCategory.MONSTER).sized(1.0F, 1.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller").toString()));
 
     // Monsters
     public static final Supplier<EntityType<HollowEntity>> HOLLOW = register("hollow", () -> EntityType.Builder.of(HollowEntity::new, MobCategory.MONSTER).sized(0.95F, 0.95F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "hollow").toString()));
@@ -70,6 +71,10 @@ public class DNLEntityTypes {
         map.put(CHAOS_SPAWNER.get(), ChaosSpawnerEntity.createAttributes().build());
         map.put(FAIRKEEPER.get(), FairkeeperBorosEntity.createAttributes().build());
         map.put(FAIRKEEPER_BOROS_PART.get(), FairkeeperBorosPartEntity.createAttributes().build());
+        map.put(FAIRKEEPER_OUROS.get(), FairkeeperOurosEntity.createAttributes().build());
+        map.put(FAIRKEEPER_OUROS_PART.get(), FairkeeperBorosPartEntity.createAttributes().build());
+
+
 
         // Monster
         map.put(HOLLOW.get(), HollowEntity.createAttributes().build());

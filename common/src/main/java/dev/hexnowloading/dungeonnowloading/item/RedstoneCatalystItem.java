@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -29,16 +30,16 @@ public class RedstoneCatalystItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
-        AABB aabb = (new AABB(player.blockPosition())).inflate(16);
-        List<FairkeeperBorosEntity> targets = level.getEntitiesOfClass(FairkeeperBorosEntity.class, aabb);
-        List<FairkeeperBorosEntity> sleepingTargets = targets.stream().filter(FairkeeperBorosEntity::isSlumbering).toList();
+        AABB aabb = (new AABB(player.blockPosition())).inflate(32);
+        List<FairkeeperSerpentCallerEntity> targets = level.getEntitiesOfClass(FairkeeperSerpentCallerEntity.class, aabb);
+        List<FairkeeperSerpentCallerEntity> sleepingTargets = targets.stream().filter(entity -> !entity.isActivated()).toList();
         if (!sleepingTargets.isEmpty()) {
             player.startUsingItem(hand);
             level.playSound(player, player, DNLSounds.CHAOS_SPAWNER_LAUGHTER.get(), SoundSource.RECORDS, 1.0F, 2.0F);
             player.getCooldowns().addCooldown(this, 7);
             player.awardStat(Stats.ITEM_USED.get(this));
-            for (FairkeeperBorosEntity FairkeeperEntity : targets) {
-                FairkeeperEntity.startBossFight();
+            for (FairkeeperSerpentCallerEntity serpentCallerEntity : targets) {
+                serpentCallerEntity.startBossFight();
             }
             if (player instanceof ServerPlayer) {
                 itemStack.hurtAndBreak(1, player, (player1 -> player1.broadcastBreakEvent(hand)));

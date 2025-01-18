@@ -2,8 +2,6 @@ package dev.hexnowloading.dungeonnowloading.datagen.provider;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
-import net.minecraft.client.renderer.block.model.ItemTransform;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -34,7 +32,9 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.REDSTONE_CHIP.get());
         simpleItem(DNLItems.REDSTONE_CIRCUIT.get());
         simpleItem(DNLItems.REDSTONE_CATALYST.get());
+        simpleItem(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
         spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
+        spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
         spawnEggItem(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.65f, 0.9f, 1.5f);

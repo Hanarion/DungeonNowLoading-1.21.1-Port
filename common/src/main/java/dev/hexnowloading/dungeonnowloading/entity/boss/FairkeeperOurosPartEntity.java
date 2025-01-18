@@ -29,20 +29,20 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
+public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
-    private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
-    private static final EntityDataAccessor<Optional<UUID>> HEAD_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
-    private static final EntityDataAccessor<Integer> BODY_INDEX = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> ARMOR = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> TAIL = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> HEAD_MOVING = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> MODEL_VISIBLE = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<UUID>> HEAD_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Integer> BODY_INDEX = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DROPPER = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> TAIL = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> HEAD_MOVING = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> MODEL_VISIBLE = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
 
     private float previousTilt = 0.0F;
     private boolean enableRotation = true;
 
-    public FairkeeperBorosPartEntity(EntityType<? extends Monster> entityType, LivingEntity parent, LivingEntity head, int bodyIndex) {
+    public FairkeeperOurosPartEntity(EntityType<? extends Monster> entityType, LivingEntity parent, LivingEntity head, int bodyIndex) {
         super(entityType, parent.level());
         this.setParent(parent);
         this.setHead(head);
@@ -51,7 +51,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         this.setModelVisible(false);
     }
 
-    public FairkeeperBorosPartEntity(EntityType<? extends Monster> entityType, Level level) {
+    public FairkeeperOurosPartEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
     }
 
@@ -68,7 +68,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.define(HEAD_UUID, Optional.empty());
         this.entityData.define(BODY_INDEX, 0);
         this.entityData.define(TAIL, false);
-        this.entityData.define(ARMOR, false);
+        this.entityData.define(DROPPER, false);
         this.entityData.define(HEAD_MOVING, false);
         this.entityData.define(MODEL_VISIBLE, true);
     }
@@ -106,9 +106,9 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         Entity parent = getParent();
         if (parent != null && !this.level().isClientSide) {
             this.setNoGravity(true);
-            if (this.getHead() instanceof FairkeeperBorosEntity headEntity) {
+            if (this.getHead() instanceof FairkeeperOurosEntity headEntity) {
 
-                int historyIndex = (this.getBodyIndex() + 1) * FairkeeperBorosEntity.SEGMENT_DELAY_STEP;
+                int historyIndex = (this.getBodyIndex() + 1) * FairkeeperOurosEntity.SEGMENT_DELAY_STEP;
                 synchronized (headEntity.getPositionHistory()) {
                     if (headEntity.getPositionHistory().size() > historyIndex) {
                         this.setModelVisible(true);
@@ -124,7 +124,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
                         // Align rotation with the head's historical rotation
                         Vec3 nextPos = headEntity.getPositionHistory().stream().skip(historyIndex - 1).findFirst().orElse(targetPos);
-                        if (headEntity.isState(FairkeeperBorosEntity.FairkeeperState.AWAKENING)) {
+                        if (headEntity.isState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING)) {
                             this.enableRotation = false;
                         }
                         if (!this.enableRotation) {
@@ -166,22 +166,12 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
     @Override
     protected void customServerAiStep() {
-        if (this.isTail()) {
-            this.setPathOnFire();
-        }
 
         if (this.isHeadEntityMoving()) {
             this.performContactDamage();
         }
 
         super.customServerAiStep();
-    }
-
-    private void setPathOnFire() {
-        BlockPos blockPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getY() - 1), Mth.floor(this.getZ()));
-        if (this.level().getBlockState(blockPos.above()).is(Blocks.AIR)) {
-            this.level().setBlock(blockPos.above(), Blocks.FIRE.defaultBlockState(), Block.UPDATE_ALL);
-        }
     }
 
     private void performContactDamage() {
@@ -194,10 +184,10 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     }
 
     private boolean canPerformContactDamageTo(Entity entity) {
-        if (entity instanceof FairkeeperBorosEntity head) {
+        if (entity instanceof FairkeeperOurosEntity head) {
             return !this.getHeadId().equals(head.getUUID());
         }
-        if (entity instanceof FairkeeperBorosPartEntity part) {
+        if (entity instanceof FairkeeperOurosPartEntity part) {
             return !this.getHeadId().equals(part.getHeadId());
         }
         return true;
@@ -355,9 +345,9 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
     public boolean isArmoredSegment() { return this.getBodyIndex() % 2 != 0; }
 
-    public boolean hasArmor() { return this.entityData.get(ARMOR); }
+    public boolean hasArmor() { return this.entityData.get(DROPPER); }
 
-    public void setArmor(boolean armor) { this.entityData.set(ARMOR, armor); }
+    public void setArmor(boolean armor) { this.entityData.set(DROPPER, armor); }
 
     public boolean isTail() { return this.entityData.get(TAIL); }
 

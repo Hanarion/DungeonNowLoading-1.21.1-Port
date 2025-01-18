@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeper
 import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosPartEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.particle.FairkeeperBoundaryParticle;
@@ -66,6 +67,9 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.CHAOS_SPAWNER.get(), ChaosSpawnerRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER.get(), FairkeeperBorosRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER_BOROS_PART.get(), FairkeeperBorosBodyRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER_OUROS.get(), FairkeeperOurosRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER_OUROS_PART.get(), FairkeeperOurosBodyRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get(), FairkeeperSerpentCallerRenderer::new);
 
         // Monsters
         EntityRendererRegistry.register(DNLEntityTypes.HOLLOW.get(), HollowRenderer::new);
@@ -113,6 +117,9 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ChaosSpawnerModel.LAYER_LOCATION, ChaosSpawnerModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(FairkeeperBorosModel.LAYER_LOCATION, FairkeeperBorosModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(FairkeeperBorosBodyModel.LAYER_LOCATION, FairkeeperBorosBodyModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(FairkeeperOurosModel.LAYER_LOCATION, FairkeeperOurosModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(FairkeeperOurosBodyModel.LAYER_LOCATION, FairkeeperOurosBodyModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(FairkeeperSerpentCallerModel.LAYER_LOCATION, FairkeeperSerpentCallerModel::createBodyLayer);
 
         // Monsters
         EntityModelLayerRegistry.registerModelLayer(HollowModel.LAYER_LOCATION, HollowModel::createBodyLayer);

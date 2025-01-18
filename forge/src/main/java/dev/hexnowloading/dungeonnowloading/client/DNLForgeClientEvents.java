@@ -23,6 +23,9 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(ChaosSpawnerModel.LAYER_LOCATION, ChaosSpawnerModel::createBodyLayer);
         event.registerLayerDefinition(FairkeeperBorosModel.LAYER_LOCATION, FairkeeperBorosModel::createBodyLayer);
         event.registerLayerDefinition(FairkeeperBorosBodyModel.LAYER_LOCATION, FairkeeperBorosBodyModel::createBodyLayer);
+        event.registerLayerDefinition(FairkeeperOurosModel.LAYER_LOCATION, FairkeeperOurosModel::createBodyLayer);
+        event.registerLayerDefinition(FairkeeperOurosBodyModel.LAYER_LOCATION, FairkeeperOurosBodyModel::createBodyLayer);
+        event.registerLayerDefinition(FairkeeperSerpentCallerModel.LAYER_LOCATION, FairkeeperSerpentCallerModel::createBodyLayer);
 
         // Monsters
         event.registerLayerDefinition(HollowModel.LAYER_LOCATION, HollowModel::createBodyLayer);
@@ -50,6 +53,9 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.CHAOS_SPAWNER.get(), ChaosSpawnerRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER.get(), FairkeeperBorosRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_BOROS_PART.get(), FairkeeperBorosBodyRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_OUROS.get(), FairkeeperOurosRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_OUROS_PART.get(), FairkeeperOurosBodyRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get(), FairkeeperSerpentCallerRenderer::new);
 
         // Monsters
         event.registerEntityRenderer(DNLEntityTypes.HOLLOW.get(), HollowRenderer::new);

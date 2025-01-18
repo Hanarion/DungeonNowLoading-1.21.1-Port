@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -7,7 +8,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import java.util.EnumSet;
 
 public class FairkeeperCircleAroundPlayerGoal extends Goal {
-    private final Mob boros;          // The mob executing the goal
+    private final FairkeeperBorosEntity boros;          // The mob executing the goal
     private LivingEntity target;      // The player or entity at the center
     private final double radius;      // Radius of the circle
     private final double speed;       // Speed of movement
@@ -17,7 +18,7 @@ public class FairkeeperCircleAroundPlayerGoal extends Goal {
 
     private static final double THRESHOLD = 2.0; // Distance threshold to "reach" target
 
-    public FairkeeperCircleAroundPlayerGoal(Mob boros, double radius, double speed, boolean clockwise) {
+    public FairkeeperCircleAroundPlayerGoal(FairkeeperBorosEntity boros, double radius, double speed, boolean clockwise) {
         this.boros = boros;
         this.radius = radius;
         this.speed = speed;
@@ -30,7 +31,7 @@ public class FairkeeperCircleAroundPlayerGoal extends Goal {
     public boolean canUse() {
         // Activate the goal if the Boros has a valid target
         this.target = this.boros.getTarget();
-        return this.target != null && this.target.isAlive();
+        return this.target != null && this.target.isAlive() && this.boros.isState(FairkeeperBorosEntity.FairkeeperState.CIRCLING);
     }
 
     @Override
