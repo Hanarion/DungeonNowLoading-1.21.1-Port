@@ -56,12 +56,6 @@ public class FairkeeperAwakenGoal extends Goal {
     public void tick() {
         if (!movingHorizontally) {
             fairkeeper.setDeltaMovement(new Vec3(0.0F, -VERTICAL_SPEED, 0.0F));
-            // Move downward toward the initial target position
-            /*Vec3 direction = Vec3.atCenterOf(initialTarget).subtract(fairkeeper.position()).normalize();
-            fairkeeper.setDeltaMovement(direction.scale(verticalSpeed));*/
-
-            // Check if the boss has reached the initial target
-
             double deltaY = this.fairkeeper.getY() - this.initialTarget.getY();
             if (deltaY * deltaY < THRESHOLD * THRESHOLD) {
                 movingHorizontally = true;

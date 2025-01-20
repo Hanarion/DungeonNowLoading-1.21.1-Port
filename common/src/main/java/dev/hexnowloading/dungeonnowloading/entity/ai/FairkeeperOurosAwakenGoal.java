@@ -21,8 +21,8 @@ public class FairkeeperOurosAwakenGoal extends Goal {
     private BlockPos finalTarget;
     private boolean movingHorizontally;
 
-    private static final double VERTICAL_SPEED = 0.4F;
-    private static final double THRESHOLD = 2.0;
+    private static final double VERTICAL_SPEED = 0.335F;
+    private static final double THRESHOLD = 1.0;
 
     public FairkeeperOurosAwakenGoal(FairkeeperOurosEntity ouros) {
         this.ouros = ouros;
@@ -57,17 +57,10 @@ public class FairkeeperOurosAwakenGoal extends Goal {
     public void tick() {
         if (!movingHorizontally) {
             ouros.setDeltaMovement(new Vec3(0.0F, VERTICAL_SPEED, 0.0F));
-            // Move downward toward the initial target position
-            /*Vec3 direction = Vec3.atCenterOf(initialTarget).subtract(ouros.position()).normalize();
-            ouros.setDeltaMovement(direction.scale(verticalSpeed));*/
-
-            // Check if the boss has reached the initial target
-
-            double deltaY = this.ouros.getY() - this.initialTarget.getY();
+            double deltaY = this.ouros.getBoundingBox().maxY - this.initialTarget.getY();
             if (deltaY * deltaY < THRESHOLD * THRESHOLD) {
                 movingHorizontally = true;
                 ouros.setNoGravity(false);
-                //ouros.setDeltaMovement(Vec3.ZERO);
             }
         } else {
             // Move horizontally toward the final target position

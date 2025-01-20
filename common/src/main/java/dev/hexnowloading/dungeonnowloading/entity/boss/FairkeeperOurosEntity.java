@@ -19,6 +19,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
@@ -194,10 +195,10 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                 }
             }
 
-            /*if (!this.onGround() && this.getDeltaMovement().y < 0.0) {
-                this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, -0.8, 1.0));
+            if (!this.onGround() && this.getDeltaMovement().y > 0.0) {
+                this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.8, 1.0));
 
-            }*/
+            }
         }
 
         /*FairkeeperLookControl lookControl = (FairkeeperLookControl) this.getLookControl();
@@ -212,15 +213,99 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
+    public void travel(Vec3 $$0) {
+        if (this.isControlledByLocalInstance()) {
+            double $$1 = -0.08; // Negative value for upward gravity
+            boolean $$2 = this.getDeltaMovement().y >= 0.0; // Checks if the entity is rising
+
+            if ($$2 && this.hasEffect(MobEffects.SLOW_FALLING)) {
+                $$1 = -0.01; // Slower upward movement for slow falling effect
+            }
+
+            if (this.isFallFlying()) {
+                this.checkSlowFallDistance();
+                Vec3 $$13 = this.getDeltaMovement();
+                Vec3 $$14 = this.getLookAngle();
+                float $$15 = this.getXRot() * (float) (Math.PI / 180.0);
+                double $$16 = Math.sqrt($$14.x * $$14.x + $$14.z * $$14.z);
+                double $$17 = $$13.horizontalDistance();
+                double $$18 = $$14.length();
+                double $$19 = Math.cos((double) $$15);
+                $$19 = $$19 * $$19 * Math.min(1.0, $$18 / 0.4);
+                $$13 = this.getDeltaMovement().add(0.0, $$1 * (-1.0 + $$19 * 0.75), 0.0);
+
+                if ($$13.y > 0.0 && $$16 > 0.0) { // Adjust for rising motion
+                    double $$20 = $$13.y * 0.1 * $$19;
+                    $$13 = $$13.add($$14.x * $$20 / $$16, $$20, $$14.z * $$20 / $$16);
+                }
+
+                if ($$15 > 0.0F && $$16 > 0.0) { // Adjust for upward pitch
+                    double $$21 = $$17 * (double) (Mth.sin($$15)) * 0.04;
+                    $$13 = $$13.add(-$$14.x * $$21 / $$16, $$21 * 3.2, -$$14.z * $$21 / $$16);
+                }
+
+                if ($$16 > 0.0) {
+                    $$13 = $$13.add(($$14.x / $$16 * $$17 - $$13.x) * 0.1, 0.0, ($$14.z / $$16 * $$17 - $$13.z) * 0.1);
+                }
+
+                this.setDeltaMovement($$13.multiply(0.99F, 0.98F, 0.99F));
+                this.move(MoverType.SELF, this.getDeltaMovement());
+
+                if (this.horizontalCollision && !this.level().isClientSide) {
+                    double $$22 = this.getDeltaMovement().horizontalDistance();
+                    double $$23 = $$17 - $$22;
+                    float $$24 = (float) ($$23 * 10.0 - 3.0);
+                    if ($$24 > 0.0F) {
+                        this.playSound(this.getFallDamageSound((int) $$24), 1.0F, 1.0F);
+                        this.hurt(this.damageSources().flyIntoWall(), $$24);
+                    }
+                }
+
+                if (this.onGround() && !this.level().isClientSide) {
+                    this.setSharedFlag(7, false);
+                }
+            } else {
+                BlockPos $$25 = this.getBlockPosBelowThatAffectsMyMovement();
+                float $$26 = this.level().getBlockState($$25).getBlock().getFriction();
+                float $$27 = this.onGround() ? $$26 * 0.91F : 0.91F;
+                Vec3 $$28 = this.handleRelativeFrictionAndCalculateMovement($$0, $$26);
+                double $$29 = $$28.y;
+
+                if (this.hasEffect(MobEffects.LEVITATION)) {
+                    $$29 += (0.05 * (double) (this.getEffect(MobEffects.LEVITATION).getAmplifier() + 1) - $$28.y) * 0.2;
+                } else if (this.level().isClientSide && !this.level().hasChunkAt($$25)) {
+                    if (this.getY() > (double) this.level().getMinBuildHeight()) {
+                        $$29 = 0.1; // Upward motion when outside chunk area
+                    } else {
+                        $$29 = 0.0;
+                    }
+                } else if (!this.isNoGravity()) {
+                    $$29 -= $$1; // Apply upward gravity
+                }
+
+                if (this.shouldDiscardFriction()) {
+                    this.setDeltaMovement($$28.x, $$29, $$28.z);
+                } else {
+                    this.setDeltaMovement($$28.x * (double) $$27, $$29 * 0.98F, $$28.z * (double) $$27);
+                }
+            }
+        }
+    }
+
+    private SoundEvent getFallDamageSound(int $$0) {
+        return $$0 > 4 ? this.getFallSounds().big() : this.getFallSounds().small();
+    }
+
+    @Override
     public boolean onGround() {
-        BlockPos aboveBlockPos = this.blockPosition().above();
+        BlockPos aboveBlockPos = this.blockPosition().above(4);
         return this.level().getBlockState(aboveBlockPos).isSolidRender(this.level(), aboveBlockPos);
     }
 
     @Override
     protected void customServerAiStep() {
         if (this.isState(FairkeeperOurosState.AWAKENING)) this.enableBossBar();
-        this.cielingMovementCalculation();
+        //this.cielingMovementCalculation();
         this.performContactDamage();
         this.abilitySelectionTick();
         this.blockDestructionTick();
@@ -229,28 +314,23 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void cielingMovementCalculation() {
-        // Check if the entity is on the ceiling
         BlockPos aboveBlockPos = this.blockPosition().above(4);
         boolean isOnCeiling = this.level().getBlockState(aboveBlockPos).isCollisionShapeFullBlock(this.level(), aboveBlockPos);
         this.setIsOnCeiling(isOnCeiling);
 
         if (isOnCeiling) {
-            // Reset Y-motion to stick to the ceiling
+            System.out.println(tickCount + " : On Cieling");
             Vec3 motion = this.getDeltaMovement();
             this.setDeltaMovement(motion.x, 0, motion.z);
-
-            // Apply ceiling-specific friction (optional)
             if (!this.isNoGravity()) {
                 this.setDeltaMovement(motion.multiply(0.91, 1.0, 0.91));
             }
-
-            // Snap the entity's position to the ceiling
             this.setPos(this.getX(), aboveBlockPos.getY() - this.getBbHeight(), this.getZ());
-        } else {
-            // Handle inverted gravity when not on the ceiling
+        } else if (!this.isNoGravity()) {
+            System.out.println(tickCount + " : Inverted Gravity");
             Vec3 motion = this.getDeltaMovement();
-            double invertedGravity = 0.08; // Default gravity in Minecraft
-            double drag = 0.98; // Air drag factor
+            double invertedGravity = 0.08;
+            double drag = 0.98;
             double newYMotion = (motion.y + invertedGravity) * drag;
             this.setDeltaMovement(motion.x, newYMotion, motion.z);
         }
