@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -103,6 +104,10 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 .relative(counterClockWiseDirection, this.getHorizontalOffset())
                 .above(this.getVerticalOffset());
 
+        Vec3 centeredClockWiseTargetPosition = clockWiseTargetPosition.getCenter();
+
+        Vec3 centeredCounterClockWiseTargetPosition = counterClockWiseTargetPosition.getCenter();
+
         // Set the block to red wool at the target position
         FairkeeperBorosEntity boros = new FairkeeperBorosEntity(DNLEntityTypes.FAIRKEEPER.get(), this.level());
         if (boros != null) {
@@ -119,7 +124,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         FairkeeperOurosEntity ouros = new FairkeeperOurosEntity(DNLEntityTypes.FAIRKEEPER_OUROS.get(), this.level());
         if (ouros != null) {
-            ouros.moveTo(clockWiseTargetPosition.getX(), clockWiseTargetPosition.getY(), clockWiseTargetPosition.getZ());
+            ouros.moveTo(centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y, centeredClockWiseTargetPosition.z);
             ouros.setCallerId(this.getUUID());
             ouros.setState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING);
             ouros.setSpawnPoint(clockWiseTargetPosition);

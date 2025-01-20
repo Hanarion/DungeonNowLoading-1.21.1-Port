@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
@@ -22,6 +23,14 @@ public class FairkeeperOurosRenderer<T extends FairkeeperOurosEntity> extends Mo
     protected void scale(T entity, PoseStack poseStack, float v) {
         poseStack.scale(1.0F, 1.0F, 1.0F);
         super.scale(entity, poseStack, v);
+    }
+
+    @Override
+    protected void setupRotations(T entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
+        super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks);
+
+        poseStack.translate(0.0F, entity.getBbHeight(), 0.0F);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
     }
 
     @Override

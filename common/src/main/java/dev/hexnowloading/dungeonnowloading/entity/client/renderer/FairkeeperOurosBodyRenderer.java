@@ -1,12 +1,14 @@
 package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.FairkeeperOurosBodyModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
 public class FairkeeperOurosBodyRenderer<T extends FairkeeperOurosPartEntity> extends MobRenderer<T, FairkeeperOurosBodyModel<T>> {
 
@@ -20,6 +22,14 @@ public class FairkeeperOurosBodyRenderer<T extends FairkeeperOurosPartEntity> ex
     protected void scale(T entity, PoseStack poseStack, float v) {
         poseStack.scale(1.0F, 1.0F, 1.0F);
         super.scale(entity, poseStack, v);
+    }
+
+    @Override
+    protected void setupRotations(T entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
+        super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks);
+
+        poseStack.translate(0.0F, entity.getBbHeight(), 0.0F);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
     }
 
     @Override

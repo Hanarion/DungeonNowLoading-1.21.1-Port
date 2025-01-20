@@ -66,7 +66,7 @@ public class FairkeeperOurosModel<T extends FairkeeperOurosEntity> extends Hiera
         //System.out.println(b + " : " + motion.y * motion.y + " : " + motion.y);
         if (motion.y * motion.y > 0.01) {
             double horizontalSpeed = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
-            float pitch = (float) Math.toDegrees(Math.atan2(-motion.y, horizontalSpeed));
+            float pitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalSpeed));
             return pitch;
         }
         return 0.0F;

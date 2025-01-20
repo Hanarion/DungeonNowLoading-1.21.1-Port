@@ -20,6 +20,7 @@ public class FairkeeperOurosMoveControl extends MoveControl {
     @Override
     public void tick() {
         if (this.operation == Operation.MOVE_TO) {
+            this.operation = Operation.WAIT;
             Vec3 targetPos = new Vec3(this.wantedX, this.wantedY, this.wantedZ);
             Vec3 mobPos = this.mob.position();
 
@@ -30,7 +31,6 @@ public class FairkeeperOurosMoveControl extends MoveControl {
             double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
             if (distance < this.mob.getBoundingBox().getSize()) {
-                this.operation = Operation.WAIT;
                 this.mob.setDeltaMovement(this.mob.getDeltaMovement().scale(0.5));
                 return;
             }

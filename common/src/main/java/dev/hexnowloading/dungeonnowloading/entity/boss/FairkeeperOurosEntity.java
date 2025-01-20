@@ -36,6 +36,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -59,7 +60,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     private int attackTick;
     private float previousTilt = 0.0f;
-    private BlockPos awakenEndPos;
+    private Vec3 awakenEndPos;
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
@@ -268,6 +269,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                 BlockPos $$25 = this.getBlockPosBelowThatAffectsMyMovement();
                 float $$26 = this.level().getBlockState($$25).getBlock().getFriction();
                 float $$27 = this.onGround() ? $$26 * 0.91F : 0.91F;
+                System.out.println("Ouros : " + $$27 + " : OnGround : " + this.onGround());
                 Vec3 $$28 = this.handleRelativeFrictionAndCalculateMovement($$0, $$26);
                 double $$29 = $$28.y;
 
@@ -292,14 +294,33 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         }
     }
 
+    @Override
+    protected BlockPos getOnPos(float $$0) {
+        if (this.mainSupportingBlockPos.isPresent()) {
+            BlockPos $$1 = this.mainSupportingBlockPos.get();
+            if (!($$0 > 1.0E-5F)) {
+                return $$1;
+            } else {
+                BlockState $$2 = this.level().getBlockState($$1);
+                return (!((double) $$0 <= 0.5) || !$$2.is(BlockTags.FENCES)) && !$$2.is(BlockTags.WALLS) && !($$2.getBlock() instanceof FenceGateBlock)
+                        ? $$1.atY(Mth.floor(this.position().y + (double) $$0)) // Adjust for ceiling (add $$0 to y)
+                        : $$1;
+            }
+        } else {
+            int $$3 = Mth.floor(this.position().x);
+            int $$4 = Mth.floor(this.position().y + (double) $$0); // Adjust for ceiling (add $$0 to y)
+            int $$5 = Mth.floor(this.position().z);
+            return new BlockPos($$3, $$4, $$5);
+        }
+    }
+
     private SoundEvent getFallDamageSound(int $$0) {
         return $$0 > 4 ? this.getFallSounds().big() : this.getFallSounds().small();
     }
 
     @Override
     public boolean onGround() {
-        BlockPos aboveBlockPos = this.blockPosition().above(4);
-        return this.level().getBlockState(aboveBlockPos).isSolidRender(this.level(), aboveBlockPos);
+        return this.verticalCollision && !this.verticalCollisionBelow;
     }
 
     @Override
@@ -311,29 +332,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
-    }
-
-    private void cielingMovementCalculation() {
-        BlockPos aboveBlockPos = this.blockPosition().above(4);
-        boolean isOnCeiling = this.level().getBlockState(aboveBlockPos).isCollisionShapeFullBlock(this.level(), aboveBlockPos);
-        this.setIsOnCeiling(isOnCeiling);
-
-        if (isOnCeiling) {
-            System.out.println(tickCount + " : On Cieling");
-            Vec3 motion = this.getDeltaMovement();
-            this.setDeltaMovement(motion.x, 0, motion.z);
-            if (!this.isNoGravity()) {
-                this.setDeltaMovement(motion.multiply(0.91, 1.0, 0.91));
-            }
-            this.setPos(this.getX(), aboveBlockPos.getY() - this.getBbHeight(), this.getZ());
-        } else if (!this.isNoGravity()) {
-            System.out.println(tickCount + " : Inverted Gravity");
-            Vec3 motion = this.getDeltaMovement();
-            double invertedGravity = 0.08;
-            double drag = 0.98;
-            double newYMotion = (motion.y + invertedGravity) * drag;
-            this.setDeltaMovement(motion.x, newYMotion, motion.z);
-        }
     }
 
     private void performContactDamage() {
@@ -658,11 +656,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.previousTilt = tilt;
     }
 
-    public BlockPos getAwakenEndPos() {
+    public Vec3 getAwakenEndPos() {
         return this.awakenEndPos;
     }
 
-    public void setAwakenEndPos(BlockPos blockPos) {
+    public void setAwakenEndPos(Vec3 blockPos) {
         this.awakenEndPos = blockPos;
     }
 

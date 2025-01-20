@@ -17,8 +17,8 @@ import java.util.EnumSet;
 
 public class FairkeeperOurosAwakenGoal extends Goal {
     private final FairkeeperOurosEntity ouros;
-    private BlockPos initialTarget;
-    private BlockPos finalTarget;
+    private Vec3 initialTarget;
+    private Vec3 finalTarget;
     private boolean movingHorizontally;
 
     private static final double VERTICAL_SPEED = 0.335F;
@@ -37,14 +37,14 @@ public class FairkeeperOurosAwakenGoal extends Goal {
 
     @Override
     public void start() {
-        this.ouros.setNoGravity(true);
+        //this.ouros.setNoGravity(true);
         FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.ouros.getCaller();
         int verticalOffset = caller.getVerticalOffset();
         int horizontalOffset = caller.getHorizontalOffset();
         BlockPos callerPos = caller.blockPosition();
         Direction direction = caller.getDirection();
-        this.initialTarget = new BlockPos(callerPos.relative(direction.getClockWise(), horizontalOffset).above(verticalOffset));
-        this.finalTarget = new BlockPos(callerPos.relative(direction.getCounterClockWise(), horizontalOffset).above(verticalOffset));
+        this.initialTarget = (new BlockPos(callerPos.relative(direction.getClockWise(), horizontalOffset).above(verticalOffset))).getCenter().add(0.0f, 0.5f, 0.0f);
+        this.finalTarget = (new BlockPos(callerPos.relative(direction.getCounterClockWise(), horizontalOffset).above(verticalOffset))).getCenter().add(0.0f, 0.5f, 0.0f);
         this.ouros.setAwakenEndPos(this.finalTarget);
     }
 
@@ -56,44 +56,36 @@ public class FairkeeperOurosAwakenGoal extends Goal {
     @Override
     public void tick() {
         if (!movingHorizontally) {
-            ouros.setDeltaMovement(new Vec3(0.0F, VERTICAL_SPEED, 0.0F));
-            double deltaY = this.ouros.getBoundingBox().maxY - this.initialTarget.getY();
+            double deltaY = this.ouros.getBoundingBox().maxY - initialTarget.y;
+            System.out.println(deltaY * deltaY - THRESHOLD * THRESHOLD);
             if (deltaY * deltaY < THRESHOLD * THRESHOLD) {
                 movingHorizontally = true;
-                ouros.setNoGravity(false);
             }
         } else {
-            // Move horizontally toward the final target position
-            this.ouros.getMoveControl().setWantedPosition(this.finalTarget.getX(), this.finalTarget.getY(), this.finalTarget.getZ(), 1.0F);
-            //System.out.println("Horizontal");
-            //this.ouros.setZza((float) this.ouros.getAttributeValue(Attributes.MOVEMENT_SPEED));
+            this.ouros.getMoveControl().setWantedPosition(this.finalTarget.x, this.finalTarget.y, this.finalTarget.z, 1.0F);
 
             lookTowardTarget();
-            // Check if the boss has reached the final target
-            double deltaX = this.ouros.getX() - finalTarget.getX();
-            double deltaZ = this.ouros.getZ() - finalTarget.getZ();
+
+            double deltaX = this.ouros.getX() - finalTarget.x;
+            double deltaZ = this.ouros.getZ() - finalTarget.z;
 
             if ((deltaX * deltaX + deltaZ * deltaZ) < THRESHOLD * THRESHOLD) {
-                stop(); // Stop the goal when the final target is reached
+                stop();
             }
         }
-
-        // Ensure the boss faces the movement direction
     }
 
     private void lookTowardTarget() {
-        // Calculate the direction to the target position
-        double directionX = this.finalTarget.getX() - this.ouros.getX();
-        double directionZ = this.finalTarget.getZ() - this.ouros.getZ();
-        double yaw = Math.toDegrees(Math.atan2(directionZ, directionX)) - 90.0; // Subtract 90 degrees for Minecraft's yaw convention
+        double directionX = this.finalTarget.x - this.ouros.getX();
+        double directionZ = this.finalTarget.z - this.ouros.getZ();
+        double yaw = Math.toDegrees(Math.atan2(directionZ, directionX)) - 90.0;
 
-        // Update Boros's yaw to face the direction of movement
-        this.ouros.setYRot((float) yaw); // Horizontal rotation
-        this.ouros.yBodyRot = (float) yaw; // Body rotation
+        this.ouros.setYRot((float) yaw);
+        this.ouros.yBodyRot = (float) yaw;
     }
 
     @Override
     public boolean requiresUpdateEveryTick() {
-        return true; // Ensure the goal is updated every tick
+        return true;
     }
 }
