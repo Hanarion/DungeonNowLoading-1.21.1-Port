@@ -70,7 +70,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         super(entityType, level);
         //this.moveControl = new FairkeeperSerpentMoveControl(this, 5.0F);
         this.moveControl = new FairkeeperOurosMoveControl(this);
-        this.setMaxUpStep(3.0f);
+        this.setMaxUpStep(0.0f);
         this.bossEvent = (ServerBossEvent)(new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS)).setDarkenScreen(true);
     }
 
@@ -196,7 +196,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                 }
             }
 
-            if (!this.onGround() && this.getDeltaMovement().y > 0.0) {
+            if (!this.onCieling() && this.getDeltaMovement().y > 0.0) {
                 this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.8, 1.0));
 
             }
@@ -214,85 +214,107 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
-    public void travel(Vec3 $$0) {
+    public void travel(Vec3 movementInput) {
         if (this.isControlledByLocalInstance()) {
-            double $$1 = -0.08; // Negative value for upward gravity
-            boolean $$2 = this.getDeltaMovement().y >= 0.0; // Checks if the entity is rising
+            double upwardGravity = -0.08; // Negative value for upward gravity
+            boolean isRising = this.getDeltaMovement().y >= 0.0; // Checks if the entity is rising
 
-            if ($$2 && this.hasEffect(MobEffects.SLOW_FALLING)) {
-                $$1 = -0.01; // Slower upward movement for slow falling effect
+            if (isRising && this.hasEffect(MobEffects.SLOW_FALLING)) {
+                upwardGravity = -0.01; // Slower upward movement for slow falling effect
             }
 
             if (this.isFallFlying()) {
                 this.checkSlowFallDistance();
-                Vec3 $$13 = this.getDeltaMovement();
-                Vec3 $$14 = this.getLookAngle();
-                float $$15 = this.getXRot() * (float) (Math.PI / 180.0);
-                double $$16 = Math.sqrt($$14.x * $$14.x + $$14.z * $$14.z);
-                double $$17 = $$13.horizontalDistance();
-                double $$18 = $$14.length();
-                double $$19 = Math.cos((double) $$15);
-                $$19 = $$19 * $$19 * Math.min(1.0, $$18 / 0.4);
-                $$13 = this.getDeltaMovement().add(0.0, $$1 * (-1.0 + $$19 * 0.75), 0.0);
+                Vec3 currentVelocity = this.getDeltaMovement();
+                Vec3 lookDirection = this.getLookAngle();
+                float pitchRadians = this.getXRot() * (float) (Math.PI / 180.0);
+                double horizontalLookDistance = Math.sqrt(lookDirection.x * lookDirection.x + lookDirection.z * lookDirection.z);
+                double horizontalVelocity = currentVelocity.horizontalDistance();
+                double lookMagnitude = lookDirection.length();
+                double adjustedCosPitch = Math.cos(pitchRadians);
+                adjustedCosPitch = adjustedCosPitch * adjustedCosPitch * Math.min(1.0, lookMagnitude / 0.4);
 
-                if ($$13.y > 0.0 && $$16 > 0.0) { // Adjust for rising motion
-                    double $$20 = $$13.y * 0.1 * $$19;
-                    $$13 = $$13.add($$14.x * $$20 / $$16, $$20, $$14.z * $$20 / $$16);
+                currentVelocity = this.getDeltaMovement().add(0.0, upwardGravity * (-1.0 + adjustedCosPitch * 0.75), 0.0);
+
+                if (currentVelocity.y > 0.0 && horizontalLookDistance > 0.0) { // Adjust for rising motion
+                    double risingAdjustment = currentVelocity.y * 0.1 * adjustedCosPitch;
+                    currentVelocity = currentVelocity.add(
+                            lookDirection.x * risingAdjustment / horizontalLookDistance,
+                            risingAdjustment,
+                            lookDirection.z * risingAdjustment / horizontalLookDistance
+                    );
                 }
 
-                if ($$15 > 0.0F && $$16 > 0.0) { // Adjust for upward pitch
-                    double $$21 = $$17 * (double) (Mth.sin($$15)) * 0.04;
-                    $$13 = $$13.add(-$$14.x * $$21 / $$16, $$21 * 3.2, -$$14.z * $$21 / $$16);
+                if (pitchRadians > 0.0F && horizontalLookDistance > 0.0) { // Adjust for upward pitch
+                    double upwardAdjustment = horizontalVelocity * (double) (Mth.sin(pitchRadians)) * 0.04;
+                    currentVelocity = currentVelocity.add(
+                            -lookDirection.x * upwardAdjustment / horizontalLookDistance,
+                            upwardAdjustment * 3.2,
+                            -lookDirection.z * upwardAdjustment / horizontalLookDistance
+                    );
                 }
 
-                if ($$16 > 0.0) {
-                    $$13 = $$13.add(($$14.x / $$16 * $$17 - $$13.x) * 0.1, 0.0, ($$14.z / $$16 * $$17 - $$13.z) * 0.1);
+                if (horizontalLookDistance > 0.0) {
+                    currentVelocity = currentVelocity.add(
+                            (lookDirection.x / horizontalLookDistance * horizontalVelocity - currentVelocity.x) * 0.1,
+                            0.0,
+                            (lookDirection.z / horizontalLookDistance * horizontalVelocity - currentVelocity.z) * 0.1
+                    );
                 }
 
-                this.setDeltaMovement($$13.multiply(0.99F, 0.98F, 0.99F));
+                this.setDeltaMovement(currentVelocity.multiply(0.99F, 0.98F, 0.99F));
                 this.move(MoverType.SELF, this.getDeltaMovement());
 
                 if (this.horizontalCollision && !this.level().isClientSide) {
-                    double $$22 = this.getDeltaMovement().horizontalDistance();
-                    double $$23 = $$17 - $$22;
-                    float $$24 = (float) ($$23 * 10.0 - 3.0);
-                    if ($$24 > 0.0F) {
-                        this.playSound(this.getFallDamageSound((int) $$24), 1.0F, 1.0F);
-                        this.hurt(this.damageSources().flyIntoWall(), $$24);
+                    double collisionHorizontalVelocity = this.getDeltaMovement().horizontalDistance();
+                    double collisionVelocityDifference = horizontalVelocity - collisionHorizontalVelocity;
+                    float collisionDamage = (float) (collisionVelocityDifference * 10.0 - 3.0);
+
+                    if (collisionDamage > 0.0F) {
+                        this.playSound(this.getFallDamageSound((int) collisionDamage), 1.0F, 1.0F);
+                        this.hurt(this.damageSources().flyIntoWall(), collisionDamage);
                     }
                 }
 
-                if (this.onGround() && !this.level().isClientSide) {
+                if (this.onCieling() && !this.level().isClientSide) {
                     this.setSharedFlag(7, false);
                 }
             } else {
-                BlockPos $$25 = this.getBlockPosBelowThatAffectsMyMovement();
-                float $$26 = this.level().getBlockState($$25).getBlock().getFriction();
-                float $$27 = this.onGround() ? $$26 * 0.91F : 0.91F;
-                System.out.println("Ouros : " + $$27 + " : OnGround : " + this.onGround());
-                Vec3 $$28 = this.handleRelativeFrictionAndCalculateMovement($$0, $$26);
-                double $$29 = $$28.y;
+
+                BlockPos blockBelow = this.getBlockPosBelowThatAffectsMyMovement();
+                float blockFriction = this.level().getBlockState(blockBelow).getBlock().getFriction();
+                float groundFriction = this.onCieling() ? blockFriction * 0.91F : 0.91F;
+
+                System.out.println("Friction: " + groundFriction + " | onCieling: " + this.onCieling());
+
+                Vec3 adjustedMovement = this.handleRelativeFrictionAndCalculateMovement(movementInput, blockFriction);
+                double adjustedYVelocity = adjustedMovement.y;
 
                 if (this.hasEffect(MobEffects.LEVITATION)) {
-                    $$29 += (0.05 * (double) (this.getEffect(MobEffects.LEVITATION).getAmplifier() + 1) - $$28.y) * 0.2;
-                } else if (this.level().isClientSide && !this.level().hasChunkAt($$25)) {
+                    adjustedYVelocity += (0.05 * (double) (this.getEffect(MobEffects.LEVITATION).getAmplifier() + 1) - adjustedMovement.y) * 0.2;
+                } else if (this.level().isClientSide && !this.level().hasChunkAt(blockBelow)) {
                     if (this.getY() > (double) this.level().getMinBuildHeight()) {
-                        $$29 = 0.1; // Upward motion when outside chunk area
+                        adjustedYVelocity = -0.1; // Upward motion when outside chunk area
                     } else {
-                        $$29 = 0.0;
+                        adjustedYVelocity = 0.0;
                     }
                 } else if (!this.isNoGravity()) {
-                    $$29 -= $$1; // Apply upward gravity
+                    adjustedYVelocity -= upwardGravity; // Apply upward gravity
                 }
 
                 if (this.shouldDiscardFriction()) {
-                    this.setDeltaMovement($$28.x, $$29, $$28.z);
+                    this.setDeltaMovement(adjustedMovement.x, adjustedYVelocity, adjustedMovement.z);
                 } else {
-                    this.setDeltaMovement($$28.x * (double) $$27, $$29 * 0.98F, $$28.z * (double) $$27);
+                    this.setDeltaMovement(
+                            adjustedMovement.x * (double) groundFriction,
+                            adjustedYVelocity * 0.98F,
+                            adjustedMovement.z * (double) groundFriction
+                    );
                 }
             }
         }
     }
+
 
     @Override
     protected BlockPos getOnPos(float $$0) {
@@ -318,8 +340,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         return $$0 > 4 ? this.getFallSounds().big() : this.getFallSounds().small();
     }
 
-    @Override
-    public boolean onGround() {
+    public boolean onCieling() {
         return this.verticalCollision && !this.verticalCollisionBelow;
     }
 
@@ -353,7 +374,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         int DESTRUCTION_RANGE = 2;
         int y = 0;
         if (this.getMoveControl().hasWanted()) {
-            y = Mth.floor(this.getMoveControl().getWantedY()) - this.getBlockY();
+            y = (int) (Mth.floor(this.getMoveControl().getWantedY()) - this.getBoundingBox().maxY);
         }
         if (y < -1) {
             this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
@@ -367,7 +388,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 0, 4, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
             return;
         }
-        this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 0, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+        this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
     }
 
     private void destroyContactBlocks(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {

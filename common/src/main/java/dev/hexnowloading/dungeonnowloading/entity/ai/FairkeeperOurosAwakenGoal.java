@@ -57,7 +57,6 @@ public class FairkeeperOurosAwakenGoal extends Goal {
     public void tick() {
         if (!movingHorizontally) {
             double deltaY = this.ouros.getBoundingBox().maxY - initialTarget.y;
-            System.out.println(deltaY * deltaY - THRESHOLD * THRESHOLD);
             if (deltaY * deltaY < THRESHOLD * THRESHOLD) {
                 movingHorizontally = true;
             }
