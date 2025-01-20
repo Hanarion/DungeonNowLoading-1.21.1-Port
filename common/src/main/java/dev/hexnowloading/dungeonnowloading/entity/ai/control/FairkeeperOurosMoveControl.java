@@ -19,9 +19,7 @@ public class FairkeeperOurosMoveControl extends MoveControl {
 
     @Override
     public void tick() {
-        if (this.operation == MoveControl.Operation.MOVE_TO) {
-            this.operation = MoveControl.Operation.WAIT;
-
+        if (this.operation == Operation.MOVE_TO) {
             Vec3 targetPos = new Vec3(this.wantedX, this.wantedY, this.wantedZ);
             Vec3 mobPos = this.mob.position();
 
@@ -46,6 +44,4 @@ public class FairkeeperOurosMoveControl extends MoveControl {
             this.mob.getLookControl().setLookAt(targetPos.x, targetPos.y, targetPos.z);
         }
     }
-
-
 }

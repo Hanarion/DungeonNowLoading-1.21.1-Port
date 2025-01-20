@@ -24,6 +24,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -46,12 +47,13 @@ import java.util.stream.Collectors;
 
 public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
-    private static final EntityDataAccessor<FairkeeperOurosEntity.FairkeeperOurosState> STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_STATE);
+    private static final EntityDataAccessor<FairkeeperOurosState> STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_STATE);
     private static final EntityDataAccessor<BlockPos> SPAWN_POINT = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Boolean> IS_ON_CEILING = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BOOLEAN);
 
-    private MoveSet<FairkeeperOurosEntity.FairkeeperOurosState> stateSelector = new MoveSet<>();
+    private MoveSet<FairkeeperOurosState> stateSelector = new MoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
 
     private int attackTick;
@@ -97,10 +99,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(STATE, FairkeeperOurosEntity.FairkeeperOurosState.SLUMBERING);
+        this.entityData.define(STATE, FairkeeperOurosState.SLUMBERING);
         this.entityData.define(SPAWN_POINT, BlockPos.ZERO);
         this.entityData.define(CHILD_UUID, Optional.empty());
         this.entityData.define(CALLER_UUID, Optional.empty());
+        this.entityData.define(IS_ON_CEILING, false);
     }
 
     @Override
@@ -120,7 +123,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     public void readAdditionalSaveData(CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         this.entityData.set(SPAWN_POINT, new BlockPos(compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(0), compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(1), compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(2)));
-        this.entityData.set(STATE, compoundTag.getBoolean("Slumbering") ? FairkeeperOurosEntity.FairkeeperOurosState.SLUMBERING : FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
+        this.entityData.set(STATE, compoundTag.getBoolean("Slumbering") ? FairkeeperOurosState.SLUMBERING : FairkeeperOurosState.IDLE);
         if (this.hasCustomName()) this.bossEvent.setName(this.getDisplayName());
         if (compoundTag.hasUUID("ChildUUID")) {
             this.setChildId(compoundTag.getUUID("ChildUUID"));
@@ -209,22 +212,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
-    public void aiStep() {
-        super.aiStep();
-
-        // Invert gravity effect
-        Vec3 motion = this.getDeltaMovement();
-        this.setDeltaMovement(motion.x, 0.5, motion.z);
-
-        // Adjust position to ensure it stays on the ceiling
-        BlockPos aboveBlockPos = this.blockPosition().above();
-        if (this.level().getBlockState(aboveBlockPos).isSolidRender(this.level(), aboveBlockPos)) {
-            this.setPos(this.getX(), aboveBlockPos.getY() - this.getBbHeight(), this.getZ());
-        }
-
-    }
-
-    @Override
     public boolean onGround() {
         BlockPos aboveBlockPos = this.blockPosition().above();
         return this.level().getBlockState(aboveBlockPos).isSolidRender(this.level(), aboveBlockPos);
@@ -232,12 +219,41 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     protected void customServerAiStep() {
-        if (this.isState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING)) this.enableBossBar();
+        if (this.isState(FairkeeperOurosState.AWAKENING)) this.enableBossBar();
+        this.cielingMovementCalculation();
         this.performContactDamage();
         this.abilitySelectionTick();
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
+    }
+
+    private void cielingMovementCalculation() {
+        // Check if the entity is on the ceiling
+        BlockPos aboveBlockPos = this.blockPosition().above(4);
+        boolean isOnCeiling = this.level().getBlockState(aboveBlockPos).isCollisionShapeFullBlock(this.level(), aboveBlockPos);
+        this.setIsOnCeiling(isOnCeiling);
+
+        if (isOnCeiling) {
+            // Reset Y-motion to stick to the ceiling
+            Vec3 motion = this.getDeltaMovement();
+            this.setDeltaMovement(motion.x, 0, motion.z);
+
+            // Apply ceiling-specific friction (optional)
+            if (!this.isNoGravity()) {
+                this.setDeltaMovement(motion.multiply(0.91, 1.0, 0.91));
+            }
+
+            // Snap the entity's position to the ceiling
+            this.setPos(this.getX(), aboveBlockPos.getY() - this.getBbHeight(), this.getZ());
+        } else {
+            // Handle inverted gravity when not on the ceiling
+            Vec3 motion = this.getDeltaMovement();
+            double invertedGravity = 0.08; // Default gravity in Minecraft
+            double drag = 0.98; // Air drag factor
+            double newYMotion = (motion.y + invertedGravity) * drag;
+            this.setDeltaMovement(motion.x, newYMotion, motion.z);
+        }
     }
 
     private void performContactDamage() {
@@ -299,7 +315,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
         stateSelector.tick();
 
-        if (!this.isState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE)) {
+        if (!this.isState(FairkeeperOurosState.IDLE)) {
             return;
         }
 
@@ -313,10 +329,10 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.getTarget() == null) return;
 
         if (stateSelector.isEmpty()) {
-            stateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.CIRCLING, 5, 60, 0);
-            stateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.GROUND_SMASH, 5, 400, 0);
-            stateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.STONE_PILLAR, 5, 400, 0);
-            stateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHIELDING_STONE_PILLAR, 4, 800, 200);
+            stateSelector.addMove(FairkeeperOurosState.CIRCLING, 5, 60, 0);
+            stateSelector.addMove(FairkeeperOurosState.GROUND_SMASH, 5, 400, 0);
+            stateSelector.addMove(FairkeeperOurosState.STONE_PILLAR, 5, 400, 0);
+            stateSelector.addMove(FairkeeperOurosState.SHIELDING_STONE_PILLAR, 4, 800, 200);
             System.out.println(stateSelector);
             //stateSelector.removeMove(FairkeeperOurosState.CIRCLING);
             System.out.println(stateSelector);
@@ -325,24 +341,24 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     public void stopAttacking(int cooldown) {
-        this.setState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
+        this.setState(FairkeeperOurosState.IDLE);
         this.setTarget(null);
         this.setAttackTick(cooldown);
     }
 
     @Override
     public void targetRandomPlayer() {
-        this.setState(FairkeeperOurosEntity.FairkeeperOurosState.TARGET);
+        this.setState(FairkeeperOurosState.TARGET);
     }
 
     @Override
     public boolean playerTargetingCondition() {
-        return this.isState(FairkeeperOurosEntity.FairkeeperOurosState.TARGET);
+        return this.isState(FairkeeperOurosState.TARGET);
     }
 
     @Override
     public void postPlayerTargeting() {
-        this.setState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
+        this.setState(FairkeeperOurosState.IDLE);
     }
 
     @Override
@@ -361,7 +377,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.disableBossBar();
         this.setDeltaMovement(Vec3.ZERO);
         this.setPos(this.getSpawnPoint().getX() + 0.5, this.getSpawnPoint().getY(), this.getSpawnPoint().getZ() + 0.5);
-        this.setState(FairkeeperOurosEntity.FairkeeperOurosState.SLUMBERING);
+        this.setState(FairkeeperOurosState.SLUMBERING);
         this.setTarget(null);
         this.stateSelector.clear();
     }
@@ -522,15 +538,15 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         return this.entityData.get(SPAWN_POINT);
     }
 
-    public void setState(FairkeeperOurosEntity.FairkeeperOurosState FairkeeperOurosState) {
+    public void setState(FairkeeperOurosState FairkeeperOurosState) {
         this.entityData.set(STATE, FairkeeperOurosState);
     }
 
-    public FairkeeperOurosEntity.FairkeeperOurosState getState() {
+    public FairkeeperOurosState getState() {
         return this.entityData.get(STATE);
     }
 
-    public boolean isState(FairkeeperOurosEntity.FairkeeperOurosState FairkeeperOurosState) {
+    public boolean isState(FairkeeperOurosState FairkeeperOurosState) {
         return this.getState().equals(FairkeeperOurosState);
     }
 
@@ -570,6 +586,9 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.awakenEndPos = blockPos;
     }
 
+    public void setIsOnCeiling(boolean b) { this.entityData.set(IS_ON_CEILING, b); }
+
+    public boolean isOnCeiling() { return this.entityData.get(IS_ON_CEILING); }
 
     @Override
     public boolean isStationary() {
@@ -578,7 +597,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     public boolean isSlumbering() {
-        return isState(FairkeeperOurosEntity.FairkeeperOurosState.SLUMBERING);
+        return isState(FairkeeperOurosState.SLUMBERING);
     }
 
     public enum FairkeeperOurosState {
