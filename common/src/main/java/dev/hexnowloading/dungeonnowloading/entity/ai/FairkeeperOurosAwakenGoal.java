@@ -21,7 +21,6 @@ public class FairkeeperOurosAwakenGoal extends Goal {
     private Vec3 finalTarget;
     private boolean movingHorizontally;
 
-    private static final double VERTICAL_SPEED = 0.335F;
     private static final double THRESHOLD = 1.0;
 
     public FairkeeperOurosAwakenGoal(FairkeeperOurosEntity ouros) {
@@ -56,8 +55,8 @@ public class FairkeeperOurosAwakenGoal extends Goal {
     @Override
     public void tick() {
         if (!movingHorizontally) {
-            double deltaY = this.ouros.getBoundingBox().maxY - initialTarget.y;
-            if (deltaY * deltaY < THRESHOLD * THRESHOLD) {
+            //double deltaY = this.ouros.getBoundingBox().maxY - initialTarget.y;
+            if (ouros.onCieling()) {
                 movingHorizontally = true;
             }
         } else {

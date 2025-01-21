@@ -34,13 +34,23 @@ public class FairkeeperOurosMoveControl extends MoveControl {
 
             double speed = this.speedModifier * this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED);
 
-            float y = this.mob.horizontalCollision ? -0.5F : 0.0F;
 
-            Vec3 movement = new Vec3(deltaX / distance, deltaY / distance, deltaZ / distance)
+            System.out.println(deltaY + " : " + wantedY + " : " + this.mob.getBoundingBox().maxY);
+
+            Vec3 movement = new Vec3(deltaX / distance, 0.0F, deltaZ / distance)
                     .scale(speed);
 
-            this.mob.setDeltaMovement(movement.add(0, y, 0));
-            this.mob.getLookControl().setLookAt(wantedX, wantedY, wantedZ);
+            this.mob.setDeltaMovement(movement);
+            lookTowardTarget();
         }
+    }
+
+    private void lookTowardTarget() {
+        double directionX = this.wantedX - this.mob.getX();
+        double directionZ = this.wantedZ - this.mob.getZ();
+        double yaw = Math.toDegrees(Math.atan2(directionZ, directionX)) - 90.0;
+
+        this.mob.setYRot((float) yaw);
+        this.mob.yBodyRot = (float) yaw;
     }
 }

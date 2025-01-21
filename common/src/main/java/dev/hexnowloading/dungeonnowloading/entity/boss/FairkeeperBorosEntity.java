@@ -64,7 +64,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private int attackTick;
     private float previousTilt = 0.0f;
-    private BlockPos awakenEndPos;
+    private Vec3 awakenEndPos;
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
@@ -286,6 +286,11 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
+        if (this.isState(FairkeeperState.IDLE)) {
+            System.out.println("Boros TickCount : " + this.tickCount);
+            return;
+        }
+
         if (this.attackTick > 0) {
             --this.attackTick;
             return;
@@ -491,8 +496,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     public Queue<Vec3> getPositionHistory() { return this.positionHistory; }
     public float getPreviousTilt() { return this.previousTilt; }
     public void setPreviousTilt(float tilt) { this.previousTilt = tilt; }
-    public BlockPos getAwakenEndPos() { return this.awakenEndPos; }
-    public void setAwakenEndPos(BlockPos blockPos) { this.awakenEndPos = blockPos; }
+    public Vec3 getAwakenEndPos() { return this.awakenEndPos; }
+    public void setAwakenEndPos(Vec3 blockPos) { this.awakenEndPos = blockPos; }
 
 
     @Override

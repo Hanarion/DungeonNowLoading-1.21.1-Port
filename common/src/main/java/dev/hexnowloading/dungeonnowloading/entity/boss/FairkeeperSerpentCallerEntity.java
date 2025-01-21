@@ -70,7 +70,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     public void startBossFight() {
         this.activationTick = 60;
         this.setActivated(true);
-        this.setOffsets(5, 10);
+        this.setOffsets(8, 9);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         // Set the block to red wool at the target position
         FairkeeperBorosEntity boros = new FairkeeperBorosEntity(DNLEntityTypes.FAIRKEEPER.get(), this.level());
         if (boros != null) {
-            boros.moveTo(counterClockWiseTargetPosition.getX(), counterClockWiseTargetPosition.getY(), counterClockWiseTargetPosition.getZ());
+            boros.moveTo(centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y - boros.getBoundingBox().getYsize() / 2, centeredCounterClockWiseTargetPosition.z);
             boros.setCallerId(this.getUUID());
             boros.setState(FairkeeperBorosEntity.FairkeeperState.AWAKENING);
             boros.setSpawnPoint(counterClockWiseTargetPosition);
@@ -124,7 +124,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         FairkeeperOurosEntity ouros = new FairkeeperOurosEntity(DNLEntityTypes.FAIRKEEPER_OUROS.get(), this.level());
         if (ouros != null) {
-            ouros.moveTo(centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y, centeredClockWiseTargetPosition.z);
+            ouros.moveTo(centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y - ouros.getBoundingBox().getYsize() / 2, centeredClockWiseTargetPosition.z);
             ouros.setCallerId(this.getUUID());
             ouros.setState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING);
             ouros.setSpawnPoint(clockWiseTargetPosition);

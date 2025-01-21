@@ -418,6 +418,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
+        if (this.isState(FairkeeperOurosState.IDLE)) {
+            System.out.println("Ouros TickCount : " + this.tickCount);
+            return;
+        }
+
         if (this.attackTick > 0) {
             --this.attackTick;
             return;

@@ -128,10 +128,10 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
                             this.enableRotation = false;
                         }
                         if (!this.enableRotation) {
-                            BlockPos awakenEndPos = headEntity.getAwakenEndPos();
-                            double dx = awakenEndPos.getX() - this.getX();
-                            double dy = awakenEndPos.getY() - this.getY();
-                            double dz = awakenEndPos.getZ() - this.getZ();
+                            Vec3 awakenEndPos = headEntity.getAwakenEndPos();
+                            double dx = awakenEndPos.x - this.getX();
+                            double dy = awakenEndPos.y - this.getY();
+                            double dz = awakenEndPos.z - this.getZ();
 
                             if (dx * dx + dy * dy + dz * dz < 2.0F * 2.0F) {
                                 this.enableRotation = true;
