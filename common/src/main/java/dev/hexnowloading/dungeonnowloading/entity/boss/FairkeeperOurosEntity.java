@@ -50,7 +50,6 @@ import java.util.stream.Collectors;
 public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
     private static final EntityDataAccessor<FairkeeperOurosState> STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_STATE);
-    private static final EntityDataAccessor<BlockPos> SPAWN_POINT = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> IS_ON_CEILING = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BOOLEAN);
@@ -87,7 +86,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new BossResetGoal(this, this.getFollowDistance()));
         this.goalSelector.addGoal(2, new FairkeeperOurosAwakenGoal(this));
         //this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
         this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
@@ -101,17 +99,15 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(STATE, FairkeeperOurosState.SLUMBERING);
-        this.entityData.define(SPAWN_POINT, BlockPos.ZERO);
         this.entityData.define(CHILD_UUID, Optional.empty());
         this.entityData.define(CALLER_UUID, Optional.empty());
         this.entityData.define(IS_ON_CEILING, false);
+        this.entityData.define(STATE, FairkeeperOurosState.IDLE);
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
-        compoundTag.put("SpawnPoint", NbtHelper.newIntList(this.getSpawnPoint().getX(), this.getSpawnPoint().getY(), this.getSpawnPoint().getZ()));
         compoundTag.putBoolean("Slumbering", isSlumbering());
         if (this.getChildId() != null) {
             compoundTag.putUUID("ChildUUID", this.getChildId());
@@ -124,8 +120,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     public void readAdditionalSaveData(CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
-        this.entityData.set(SPAWN_POINT, new BlockPos(compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(0), compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(1), compoundTag.getList("SpawnPoint", CompoundTag.TAG_INT).getInt(2)));
-        this.entityData.set(STATE, compoundTag.getBoolean("Slumbering") ? FairkeeperOurosState.SLUMBERING : FairkeeperOurosState.IDLE);
         if (this.hasCustomName()) this.bossEvent.setName(this.getDisplayName());
         if (compoundTag.hasUUID("ChildUUID")) {
             this.setChildId(compoundTag.getUUID("ChildUUID"));
@@ -145,7 +139,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     public void startSeenByPlayer(ServerPlayer serverPlayer) {
         super.startSeenByPlayer(serverPlayer);
         this.bossEvent.addPlayer(serverPlayer);
-        if (this.isSlumbering()) this.disableBossBar();
     }
 
     @Override
@@ -451,6 +444,15 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
+    public void die(DamageSource damageSource) {
+        FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.getCaller();
+        if (caller != null) {
+            caller.setLastDamageSource(damageSource);
+        }
+        super.die(damageSource);
+    }
+
+    @Override
     public void targetRandomPlayer() {
         this.setState(FairkeeperOurosState.TARGET);
     }
@@ -467,93 +469,17 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     public BlockPos resetRegionCenter() {
-        return this.getSpawnPoint();
+        return this.getCaller().blockPosition();
     }
 
     @Override
     public boolean resetCondition() {
-        return !this.isSlumbering();
+        return false;
     }
 
     @Override
     public void resetBoss() {
-        this.setHealth(this.getMaxHealth());
-        this.disableBossBar();
-        this.setDeltaMovement(Vec3.ZERO);
-        this.setPos(this.getSpawnPoint().getX() + 0.5, this.getSpawnPoint().getY(), this.getSpawnPoint().getZ() + 0.5);
-        this.setState(FairkeeperOurosState.SLUMBERING);
-        this.setTarget(null);
-        this.stateSelector.clear();
-    }
-
-    @Override
-    public boolean hurt(DamageSource damageSource, float amount) {
-        if (damageSource.isCreativePlayer()) {
-            return super.hurt(damageSource, amount);
-        }
-        if (this.isSlumbering()) {
-            return false;
-        }
-        if (damageSource.is(DNLTags.FAIRKEEPER_HURTABLE)) {
-            return super.hurt(damageSource, amount);
-        }
-
-        double RANGE = this.getFollowDistance();
-
-        double maxRangeX = this.getX() + RANGE;
-        double minRangeX = this.getX() - RANGE;
-        double maxRangeY = this.getY() + RANGE;
-        double minRangeY = this.getY() - RANGE;
-        double maxRangeZ = this.getZ() + RANGE;
-        double minRangeZ = this.getZ() - RANGE;
-
-        Map<BlockPos, BlockEntity> map = new HashMap<>();
-        int chunkMinX = SectionPos.blockToSectionCoord(minRangeX);
-        int chunkMinZ = SectionPos.blockToSectionCoord(minRangeZ);
-        int chunkMaxX = SectionPos.blockToSectionCoord(maxRangeX);
-        int chunkMaxZ = SectionPos.blockToSectionCoord(maxRangeZ);
-        for (int x = 0; chunkMinX + x <= chunkMaxX; x++) {
-            for (int z = 0; chunkMinZ + z <= chunkMaxZ; z++) {
-                map.putAll(this.level().getChunk(chunkMinX + x, chunkMinZ + z).getBlockEntities());
-            }
-        }
-
-        Map<BlockPos, BlockEntity> filtered = map.entrySet()
-                .stream()
-                .filter(e -> (e.getValue() instanceof ShieldingStonePillarBlockEntity blockEntity && blockEntity.getBlockState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER))
-                .filter(e -> e.getKey().getX() < maxRangeX && e.getKey().getX() >= minRangeX && e.getKey().getY() < maxRangeY && e.getKey().getY() >= minRangeY && e.getKey().getZ() < maxRangeZ && e.getKey().getZ() >= minRangeZ)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        if (!filtered.isEmpty()) {
-            List<BlockPos> blockPosList = filtered.keySet().stream().toList();
-            for (BlockPos blockPos : blockPosList) {
-                this.redstoneBeam(this.level(), this.blockPosition(), blockPos);
-            }
-            return false;
-        }
-
-        return super.hurt(damageSource, amount);
-    }
-
-    private void redstoneBeam(Level level, BlockPos originPos, BlockPos targetPos) {
-        double d = (double) (targetPos.getX() - originPos.getX());
-        double e = (double) (targetPos.getY() - originPos.getY());
-        double f = (double) (targetPos.getZ() - originPos.getZ());
-        double s = Math.sqrt(d * d + e * e + f * f);
-        d /= s;
-        e /= s;
-        f /= s;
-        double r = level.random.nextDouble();
-        while (r < s) {
-            r += 0.2;
-            level.addAlwaysVisibleParticle(DustParticleOptions.REDSTONE, (double) originPos.getX() + 0.5D + d * r, (double) originPos.getY() + 0.5D + e * r, (double) originPos.getZ() + 0.5D + f * r, 0.0, 0.0, 0.0);
-        }
-    }
-
-    @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag compoundTag) {
-        this.setSpawnPoint(this.blockPosition());
-        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData, compoundTag);
+        this.remove(RemovalReason.DISCARDED);
     }
 
     @Override
@@ -634,14 +560,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         return this.getAttributeValue(Attributes.FOLLOW_RANGE);
     }
 
-    public void setSpawnPoint(BlockPos blockPos) {
-        this.entityData.set(SPAWN_POINT, blockPos);
-    }
-
-    public BlockPos getSpawnPoint() {
-        return this.entityData.get(SPAWN_POINT);
-    }
-
     public void setState(FairkeeperOurosState FairkeeperOurosState) {
         this.entityData.set(STATE, FairkeeperOurosState);
     }
@@ -696,16 +614,15 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     public boolean isStationary() {
-        return isSlumbering();
+        return false;
     }
 
     @Override
     public boolean isSlumbering() {
-        return isState(FairkeeperOurosState.SLUMBERING);
+        return false;
     }
 
     public enum FairkeeperOurosState {
-        SLUMBERING,
         AWAKENING,
         IDLE,
         CIRCLING,
