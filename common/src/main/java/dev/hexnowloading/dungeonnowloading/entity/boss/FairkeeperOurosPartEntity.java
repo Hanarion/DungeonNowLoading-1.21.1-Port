@@ -210,6 +210,11 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     }
 
     @Override
+    public boolean isInWall() {
+        return false;
+    }
+
+    @Override
     public void push(Entity entity) {
     }
 

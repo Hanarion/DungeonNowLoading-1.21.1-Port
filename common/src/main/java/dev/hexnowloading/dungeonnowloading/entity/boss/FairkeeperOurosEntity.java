@@ -30,13 +30,16 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.control.JumpControl;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.PowderSnowBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -69,6 +72,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         super(entityType, level);
         //this.moveControl = new FairkeeperSerpentMoveControl(this, 5.0F);
         this.moveControl = new FairkeeperOurosMoveControl(this);
+        this.jumpControl = new JumpControl(this);
         this.setMaxUpStep(0.0f);
         this.setPersistenceRequired();
         this.xpReward = 0;
@@ -280,9 +284,14 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                 float blockFriction = this.level().getBlockState(blockBelow).getBlock().getFriction();
                 float groundFriction = this.onCieling() ? blockFriction * 0.91F : 0.91F;
 
-                System.out.println("Friction: " + groundFriction + " | onCieling: " + this.onCieling());
-
-                Vec3 adjustedMovement = this.handleRelativeFrictionAndCalculateMovement(movementInput, blockFriction);
+                this.moveRelative(this.getFrictionInfluencedSpeed(blockFriction), movementInput);
+                this.setDeltaMovement(this.getDeltaMovement());
+                this.move(MoverType.SELF, this.getDeltaMovement());
+                //Vec3 adjustedMovement = this.handleRelativeFrictionAndCalculateMovement(movementInput, blockFriction);
+                Vec3 adjustedMovement = this.getDeltaMovement();
+                if ((this.horizontalCollision || this.jumping) && (this.onClimbable() || this.getFeetBlockState().is(Blocks.POWDER_SNOW) && PowderSnowBlock.canEntityWalkOnPowderSnow(this))) {
+                    adjustedMovement = new Vec3(adjustedMovement.x, -0.2, adjustedMovement.z);
+                }
                 double adjustedYVelocity = adjustedMovement.y;
 
                 if (this.hasEffect(MobEffects.LEVITATION)) {
@@ -310,6 +319,9 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         }
     }
 
+    private float getFrictionInfluencedSpeed(float $$0) {
+        return this.onCieling() ? this.getSpeed() * (0.21600002F / ($$0 * $$0 * $$0)) : this.getFlyingSpeed();
+    }
 
     @Override
     protected BlockPos getOnPos(float $$0) {
@@ -414,7 +426,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         }
 
         if (this.isState(FairkeeperOurosState.IDLE)) {
-            System.out.println("Ouros TickCount : " + this.tickCount);
             return;
         }
 
@@ -452,6 +463,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             caller.setLastDamageSource(damageSource);
         }
         super.die(damageSource);
+    }
+
+    @Override
+    public boolean isInWall() {
+        return false;
     }
 
     @Override
@@ -501,11 +517,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected boolean updateInWaterStateAndDoFluidPushing() {
         return false;
-    }
-
-    @Override
-    public boolean isInWall() {
-        return super.isInWall();
     }
 
     @Override

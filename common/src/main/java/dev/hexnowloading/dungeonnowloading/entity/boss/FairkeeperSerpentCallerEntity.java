@@ -117,7 +117,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     public void startBossFight() {
         this.activationTick = 60;
         this.setActivated(true);
-        this.setOffsets(8, 9);
+        this.setOffsets(10, 12);
         AABB bossArena = new AABB(this.blockPosition()).inflate(ARENA_SIZE);
         List<ServerPlayer> players = this.level().getEntitiesOfClass(ServerPlayer.class, bossArena);
         for (ServerPlayer p : players) {
@@ -282,7 +282,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     @Override
     public boolean isPickable() {
-        return !this.isRemoved();
+        return !this.isActivated() && !this.isRemoved();
     }
 
     @org.jetbrains.annotations.Nullable

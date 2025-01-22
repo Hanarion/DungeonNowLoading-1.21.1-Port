@@ -281,11 +281,6 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
-        if (this.isState(FairkeeperState.IDLE)) {
-            System.out.println("Boros TickCount : " + this.tickCount);
-            return;
-        }
-
         if (this.attackTick > 0) {
             --this.attackTick;
             return;
@@ -320,6 +315,15 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             caller.setLastDamageSource(damageSource);
         }
         super.die(damageSource);
+    }
+
+
+    @Override
+    protected void checkInsideBlocks() {
+    }
+
+    @Override
+    protected void onInsideBlock(BlockState $$0) {
     }
 
     @Override
@@ -373,7 +377,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     public boolean isInWall() {
-        return super.isInWall();
+        return false;
     }
 
     @Override

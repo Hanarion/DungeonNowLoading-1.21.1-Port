@@ -60,7 +60,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
                 movingHorizontally = true;
             }
         } else {
-            this.ouros.getMoveControl().setWantedPosition(this.finalTarget.x, this.finalTarget.y, this.finalTarget.z, 1.0F);
+            this.ouros.getMoveControl().setWantedPosition(this.finalTarget.x, this.ouros.getBoundingBox().maxY, this.finalTarget.z, 1.0F);
 
             lookTowardTarget();
 
