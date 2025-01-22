@@ -4,17 +4,21 @@ import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
@@ -274,6 +278,27 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             EntityScale.scaleBossHealth(ouros, playerCount);
             EntityScale.scaleBossAttack(ouros, playerCount);
         }
+    }
+
+    @Override
+    public boolean isPickable() {
+        return !this.isRemoved();
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public ItemStack getPickResult() {
+        return new ItemStack(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
+    }
+
+    @Override
+    public InteractionResult interact(Player player, InteractionHand hand) {
+        System.out.println("hello");
+        if (this.getPhase() < 1) {
+            player.displayClientMessage(Component.translatable("entity.dungeonnowloading.fairkeeper_serpent_caller.right_click"), true);
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
+        return super.interact(player, hand);
     }
 
     public Entity getBoros() {

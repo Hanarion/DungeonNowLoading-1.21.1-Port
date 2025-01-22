@@ -72,6 +72,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
         this.setMaxUpStep(3.0f);
+        this.setPersistenceRequired();
+        this.xpReward = 0;
         this.bossEvent = (ServerBossEvent)(new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS)).setDarkenScreen(true);
     }
 

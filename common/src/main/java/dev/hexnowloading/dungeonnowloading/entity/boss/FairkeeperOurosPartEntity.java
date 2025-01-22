@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -49,6 +50,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         this.setBodyIndex(bodyIndex);
         this.setArmor(isArmoredSegment());
         this.setModelVisible(false);
+        this.setPersistenceRequired();
     }
 
     public FairkeeperOurosPartEntity(EntityType<? extends Monster> entityType, Level level) {

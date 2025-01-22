@@ -49,6 +49,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         this.setBodyIndex(bodyIndex);
         this.setArmor(isArmoredSegment());
         this.setModelVisible(false);
+        this.setPersistenceRequired();
     }
 
     public FairkeeperBorosPartEntity(EntityType<? extends Monster> entityType, Level level) {

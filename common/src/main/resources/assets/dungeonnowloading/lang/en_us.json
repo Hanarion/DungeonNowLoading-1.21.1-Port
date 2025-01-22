@@ -131,6 +131,7 @@
   "death.attack.dungeonnowloading.spike.player": "%1$s was spiked to death",
   "entity.dungeonnowloading.chaos_spawner": "Chaos Spawner",
   "entity.dungeonnowloading.fairkeeper": "Fairkeeper",
+  "entity.dungeonnowloading.fairkeeper_serpent_caller.right_click": "Requires Redstone Catalyst",
   "entity.dungeonnowloading.chaos_spawner.right_click": "Requires \"Skull of Chaos\" to awaken the Chaos Spawner",
   "entity.dungeonnowloading.hollow": "Hollow",
   "entity.dungeonnowloading.sealed_chaos": "Sealed Chaos",
