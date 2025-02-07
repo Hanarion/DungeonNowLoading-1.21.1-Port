@@ -3,11 +3,10 @@ package dev.hexnowloading.dungeonnowloading.entity.util;
 import dev.hexnowloading.dungeonnowloading.util.ArmorTrimMaterial;
 import dev.hexnowloading.dungeonnowloading.util.ArmorTrimPattern;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -70,4 +69,11 @@ public class SpawnMobUtil {
         return itemStack;
     }
 
+    public static void createPoofParticle(ServerLevel serverLevel, Entity entity) {
+        double d = (double) entity.getX();
+        double e = (double) entity.getY() + entity.getBoundingBox().getYsize() / 2;
+        double f = (double) entity.getZ();
+        int particleCount = (int) (entity.getBoundingBox().getSize() * 15);
+        serverLevel.sendParticles(ParticleTypes.CLOUD, d, e, f, particleCount, entity.getBbWidth() / 2.0F, entity.getBbHeight() / 2.0F, entity.getBbWidth() / 2.0F, 0.0D);
+    }
 }

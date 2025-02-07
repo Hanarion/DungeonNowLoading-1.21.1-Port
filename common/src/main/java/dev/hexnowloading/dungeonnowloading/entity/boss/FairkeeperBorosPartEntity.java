@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -12,6 +13,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,6 +23,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -32,6 +37,7 @@ import java.util.UUID;
 public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
     private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> HEAD_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Integer> BODY_INDEX = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> ARMOR = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
@@ -67,6 +73,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         super.defineSynchedData();
         this.entityData.define(PARENT_UUID, Optional.empty());
         this.entityData.define(HEAD_UUID, Optional.empty());
+        this.entityData.define(CHILD_UUID, Optional.empty());
         this.entityData.define(BODY_INDEX, 0);
         this.entityData.define(TAIL, false);
         this.entityData.define(ARMOR, false);
@@ -79,6 +86,9 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         super.addAdditionalSaveData(compoundTag);
         if (this.getParentId() != null) {
             compoundTag.putUUID("ParentUUID", this.getParentId());
+        }
+        if (this.getChild() != null) {
+            compoundTag.putUUID("ChildUUID", this.getChildId());
         }
         if (this.getHead() != null) {
             compoundTag.putUUID("HeadUUID", this.getHeadId());
@@ -93,6 +103,9 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         super.readAdditionalSaveData(compoundTag);
         if (compoundTag.hasUUID("ParentUUID")) {
             this.setParentId(compoundTag.getUUID("ParentUUID"));
+        }
+        if (compoundTag.hasUUID("ChildUUID")) {
+            this.setChildId(compoundTag.getUUID("ChildUUID"));
         }
         if (compoundTag.hasUUID("HeadUUID")) {
             this.setHeadId(compoundTag.getUUID("HeadUUID"));
@@ -125,16 +138,15 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
                         // Align rotation with the head's historical rotation
                         Vec3 nextPos = headEntity.getPositionHistory().stream().skip(historyIndex - 1).findFirst().orElse(targetPos);
-                        if (headEntity.isState(FairkeeperBorosEntity.FairkeeperState.AWAKENING)) {
+                        if (headEntity.isState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING)) {
                             this.enableRotation = false;
                         }
                         if (!this.enableRotation) {
                             Vec3 awakenEndPos = headEntity.getAwakenEndPos();
                             double dx = awakenEndPos.x - this.getX();
-                            double dy = awakenEndPos.y - this.getY();
                             double dz = awakenEndPos.z - this.getZ();
 
-                            if (dx * dx + dy * dy + dz * dz < 2.0F * 2.0F) {
+                            if (dx * dx + dz * dz < 2.0F * 2.0F) {
                                 this.enableRotation = true;
                             }
                         }
@@ -178,6 +190,10 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         super.customServerAiStep();
     }
 
+    private void vertexTransmissionEffectImmunity() {
+        this.removeEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+    }
+
     private void setPathOnFire() {
         BlockPos blockPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getY() - 1), Mth.floor(this.getZ()));
         if (this.level().getBlockState(blockPos.above()).is(Blocks.AIR)) {
@@ -190,7 +206,9 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
                 .forEach(entity -> {
                     entity.push(this);
                     LivingEntity head = (LivingEntity) this.getHead();
-                    entity.hurt(entity.level().damageSources().mobAttack(head), (float) (head.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.5F));
+                    if (head != null) {
+                        entity.hurt(entity.level().damageSources().mobAttack(head), (float) (head.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.5F));
+                    }
                 });
     }
 
@@ -207,6 +225,13 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     @Override
     public boolean hurt(DamageSource damageSource, float damageAmount) {
 
+        if (damageSource.getEntity() instanceof FairkeeperSerpentEntity) {
+            if (damageSource.getDirectEntity() instanceof AbstractArrow arrow) {
+                arrow.remove(RemovalReason.DISCARDED);
+            }
+            return false;
+        }
+
         if (!this.hasArmor() || damageSource.isCreativePlayer()) {
             return super.hurt(damageSource, damageAmount);
         }
@@ -216,6 +241,15 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         }
 
         return false;
+    }
+
+    @Override
+    public boolean canBeAffected(MobEffectInstance mobEffectInstance) {
+        MobEffect effect = mobEffectInstance.getEffect();
+        if (effect == MobEffects.POISON || effect == DNLMobEffects.VERTEX_TRANSMISSION.get()) {
+            return false;
+        }
+        return super.canBeAffected(mobEffectInstance);
     }
 
     @Override
@@ -333,6 +367,25 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
     public Entity getParent() {
         UUID id = getParentId();
+        if (id != null && !this.level().isClientSide) {
+            return ((ServerLevel) this.level()).getEntity(id);
+        }
+        return null;
+    }
+
+    @Nullable
+    public UUID getChildId() { return this.entityData.get(CHILD_UUID).orElse(null); }
+
+    public void setChildId(@Nullable UUID uniqueId) {
+        this.entityData.set(CHILD_UUID, Optional.ofNullable(uniqueId));
+    }
+
+    public void setChild(Entity entity) {
+        this.setChildId(entity.getUUID());
+    }
+
+    public Entity getChild() {
+        UUID id = getChildId();
         if (id != null && !this.level().isClientSide) {
             return ((ServerLevel) this.level()).getEntity(id);
         }

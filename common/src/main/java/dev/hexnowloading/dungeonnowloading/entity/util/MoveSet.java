@@ -45,6 +45,9 @@ public class MoveSet<T extends Object> {
         choosenMove.priority = LOWEST_PRIORITY + 1;
         int i = 0;
         ArrayList<Move> moveList = new ArrayList<>(moveSet.stream().filter(move -> move.currentCooldownTick == 0).toList());
+        if (moveList.isEmpty()) {
+            moveList.addAll(moveSet);
+        }
         Collections.shuffle(moveList);
         for (Move move : moveList) {
             if (choosenMove.priority > move.priority) {

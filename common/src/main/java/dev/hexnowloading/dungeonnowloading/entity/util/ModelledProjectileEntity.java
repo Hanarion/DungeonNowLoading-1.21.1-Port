@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.TraceableEntity;
@@ -22,11 +21,11 @@ import java.util.UUID;
 public abstract class ModelledProjectileEntity extends Entity implements TraceableEntity {
 
     @Nullable
-    private UUID ownerUUID;
+    protected UUID ownerUUID;
     @Nullable
-    private Entity cachedOwner;
-    private boolean leftOwner;
-    private boolean hasBeenShot;
+    protected Entity cachedOwner;
+    protected boolean leftOwner;
+    protected boolean hasBeenShot;
 
     public ModelledProjectileEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);

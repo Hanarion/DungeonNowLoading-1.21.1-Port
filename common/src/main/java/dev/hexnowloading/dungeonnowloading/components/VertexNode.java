@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.components;
 
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexArrowProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.potion.VertexTransmissionEffect;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
@@ -134,6 +135,10 @@ public class VertexNode {
                 // Excludes self
                 entitiesTouchingBeam.remove(this.entityRef);
                 entitiesTouchingBeam.remove(connectedNode.entityRef);
+
+                // Excludes Fairkeeper Bosses
+                entitiesTouchingBeam.removeIf(livingEntity -> livingEntity instanceof FairkeeperSerpentEntity);
+
 
                 for (LivingEntity livingEntity : entitiesTouchingBeam) {
                     int slownessDurationTicks = ENTITY_EFFECT_DURATION_TICKS;

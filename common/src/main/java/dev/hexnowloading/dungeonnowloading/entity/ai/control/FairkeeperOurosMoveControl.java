@@ -34,9 +34,6 @@ public class FairkeeperOurosMoveControl extends MoveControl {
 
             double speed = this.speedModifier * this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED);
 
-
-            System.out.println(deltaY + " : " + wantedY + " : " + this.mob.getBoundingBox().maxY);
-
             Vec3 movement = new Vec3(deltaX / distance, 0.0F, deltaZ / distance)
                     .scale(speed);
 

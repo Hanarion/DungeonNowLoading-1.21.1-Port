@@ -48,11 +48,6 @@ public class FairkeeperOurosAwakenGoal extends Goal {
     }
 
     @Override
-    public void stop() {
-        this.ouros.setState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
-    }
-
-    @Override
     public void tick() {
         if (!movingHorizontally) {
             //double deltaY = this.ouros.getBoundingBox().maxY - initialTarget.y;
@@ -68,7 +63,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
             double deltaZ = this.ouros.getZ() - finalTarget.z;
 
             if ((deltaX * deltaX + deltaZ * deltaZ) < THRESHOLD * THRESHOLD) {
-                stop();
+                this.ouros.stopAttacking(0);
             }
         }
     }

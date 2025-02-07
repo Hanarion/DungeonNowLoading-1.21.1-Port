@@ -1,0 +1,96 @@
+package dev.hexnowloading.dungeonnowloading.entity.ai;
+
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+
+import java.util.EnumSet;
+
+public class FairkeeperBorosCircleAroundPlayerGoal extends Goal {
+    private final FairkeeperBorosEntity boros;          // The mob executing the goal
+    private LivingEntity circlingTarget;      // The player or entity at the center
+    private final double radius;      // Radius of the circle
+    private final double speed;       // Speed of movement
+    private final boolean clockwise;  // Direction of movement
+    private double angle;             // Current angle in degrees
+    private double targetX, targetY, targetZ;  // Current target position (X, Z only)
+    private int arenaSize;
+    private BlockPos arenaCenter;
+    private FairkeeperBorosEntity.FairkeeperBorosState state;
+
+    private static final double THRESHOLD = 2.0; // Distance threshold to "reach" target
+
+    public FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double radius, double speed, boolean clockwise) {
+        this.state = state;
+        this.boros = boros;
+        this.radius = radius;
+        this.speed = speed;
+        this.clockwise = clockwise;
+        this.angle = 0;
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+    }
+
+    @Override
+    public boolean canUse() {
+        this.circlingTarget = this.boros.getTarget();
+        return this.circlingTarget != null && this.circlingTarget.isAlive() && this.boros.isState(state);
+    }
+
+    @Override
+    public void start() {
+        FairkeeperSerpentCallerEntity caller = ((FairkeeperSerpentCallerEntity) boros.getCaller());
+        this.arenaSize = caller != null ? caller.getArenaSize() : 0;
+        this.arenaCenter = caller != null ? caller.blockPosition() : BlockPos.ZERO;
+
+        if (this.circlingTarget != null) {
+            double deltaX = this.boros.getX() - this.circlingTarget.getX();
+            double deltaZ = this.boros.getZ() - this.circlingTarget.getZ();
+
+            this.angle = Math.toDegrees(Math.atan2(deltaZ, deltaX));
+
+            this.angle = (this.angle + 360) % 360;
+        } else {
+            this.angle = 0;
+        }
+        updateTargetPosition();
+    }
+
+    @Override
+    public void tick() {
+        if (this.circlingTarget != null) {
+            double deltaX = this.boros.getX() - this.targetX;
+            double deltaZ = this.boros.getZ() - this.targetZ;
+            if ((deltaX * deltaX + deltaZ * deltaZ) < THRESHOLD * THRESHOLD) {
+                this.angle += this.clockwise ? -10 : 10;
+                this.angle = this.angle % 360;
+
+                updateTargetPosition();
+            }
+
+            this.boros.getMoveControl().setWantedPosition(this.targetX, this.targetY, this.targetZ, this.speed);
+        }
+    }
+
+    private void updateTargetPosition() {
+        double angleRad = Math.toRadians(this.angle);
+
+        // Calculate the potential target position on the circle
+        double potentialX = this.circlingTarget.getX() + this.radius * Math.cos(angleRad);
+        double potentialZ = this.circlingTarget.getZ() + this.radius * Math.sin(angleRad);
+
+        // Define arena boundaries
+        double minX = this.arenaCenter.getX() - this.arenaSize;
+        double maxX = this.arenaCenter.getX() + this.arenaSize;
+        double minZ = this.arenaCenter.getZ() - this.arenaSize;
+        double maxZ = this.arenaCenter.getZ() + this.arenaSize;
+
+        // Clamp the target position within the arena boundaries
+        this.targetX = Math.max(minX, Math.min(maxX, potentialX));
+        this.targetZ = Math.max(minZ, Math.min(maxZ, potentialZ));
+
+        // Maintain the circling target's Y-coordinate
+        this.targetY = this.circlingTarget.getY();
+    }
+}

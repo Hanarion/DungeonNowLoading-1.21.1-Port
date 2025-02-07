@@ -1,73 +1,108 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.block.ShieldingStonePillarBlock;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import dev.hexnowloading.dungeonnowloading.util.NbtHelper;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-public class ShieldingStonePillarProjectileEntity extends StonePillarProjectileEntity {
+public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEntity {
+
+    private static final float IMPACT_RANGE = 3.0F;
+    private static final float DAMAGE = 5.0F;
+    private static final float SHILED_DAMAGE_REDUCTION = 0.55F;
+    private static final boolean SHIELD_PENETRATION = true;
+    private static final int LIFETIME = 1000;
+    private static final int LIFETIME_AFTER_LANDING = 3;
+
+    private int tickCount;
+    private boolean hasLanded;
 
     public ShieldingStonePillarProjectileEntity(EntityType<? extends ShieldingStonePillarProjectileEntity> entityType, Level level) {
         super(entityType, level);
-    }
-
-    public ShieldingStonePillarProjectileEntity(LivingEntity livingEntity, Level level, float damagePercentage, double x, double y, double z, Vec3 hoverPos, double hoverMaxSpeed, double hoverMinSpeed, double hoverStopAccuracy, boolean triggerRequiredForDrop, int hoverToDropInterval, double dropSpeed, int dropToDespawnInterval, double stonePillarImpactRange, double horizontalKnockbackStrength, double verticalKnockbackStrength, boolean shieldPenetration, float shieldDamageReduction) {
-        this(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), level);
-        this.setOwner(livingEntity);
-        this.moveTo(x, y, z, this.getYRot(), this.getXRot());
-        this.setNoGravity(true);
-        this.damage = 0;
-        if (this.getOwner() instanceof LivingEntity entity) {
-            this.damage = (float) (damagePercentage * entity.getAttributeValue(Attributes.ATTACK_DAMAGE));
-        }
-        /*this.hoverX = hoverPos.x;
-        this.hoverY = hoverPos.y;
-        this.hoverZ = hoverPos.z;*/
-        this.targetPos = hoverPos;
-        this.maxSpeed = hoverMaxSpeed;
-        this.minSpeed = hoverMinSpeed;
-        this.stopAccuracy = hoverStopAccuracy;
-        this.dropSpeed = dropSpeed;
-        this.distanceToTarget = this.position().distanceTo(hoverPos);
-        this.phase = 0;
-        this.tickCount = 0;
-        this.triggerRequiredForDrop = triggerRequiredForDrop;
-        this.triggered = !triggerRequiredForDrop;
-        this.dropToDespawnInterval = dropToDespawnInterval;
-        this.hoverToDropInterval = hoverToDropInterval;
-        this.stonePillarImpactRange = stonePillarImpactRange;
-        this.horizontalKnockbackStrength = horizontalKnockbackStrength;
-        this.verticalKnockbackStrength = verticalKnockbackStrength;
-        this.shieldPenetration = shieldPenetration;
-        this.shieldDamageReduction = shieldDamageReduction;
-
-        //super(livingEntity, level, damagePercentage, x, y, z, hoverPos, hoverMaxSpeed, hoverMinSpeed, hoverStopAccuracy, triggerRequiredForDrop, hoverToDropInterval, dropSpeed, dropToDespawnInterval, stonePillarImpactRange, horizontalKnockbackStrength, verticalKnockbackStrength, shieldPenetration, shieldDamageReduction);
+        this.tickCount = LIFETIME;
+        this.hasLanded = false;
     }
 
     @Override
+    protected void defineSynchedData() {
+
+    }
+
+    @Override
+    protected void tickProjectile() {
+        if (!this.isNoGravity()) {
+            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.04, 0.0));
+        }
+
+        this.move(MoverType.SELF, this.getDeltaMovement());
+
+        if (this.onGround()) {
+            if (this.level().isClientSide) {
+                return;
+            }
+
+            if (!this.hasLanded) {
+                AABB aabb = this.getBoundingBox().inflate(IMPACT_RANGE);
+                List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, aabb);
+                for (LivingEntity mob : targets) {
+                    this.pushNearbyMobs(mob);
+                }
+                if (this.level().getBlockState(this.blockPosition().below()).is(this.getPillarBlock())) {
+                    this.level().destroyBlock(this.blockPosition().below(), false);
+                    this.discard();
+                } else {
+                    this.placePillarBlock();
+                }
+
+                this.tickCount = LIFETIME_AFTER_LANDING;
+                this.hasLanded = true;
+            }
+
+            if (this.tickCount <= 0) {
+                this.discard();
+            }
+            this.tickCount--;
+        } else {
+            if (this.tickCount <= 0) {
+                this.discard();
+            }
+            this.tickCount--;
+        }
+
+        this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
+    }
+
+    private void pushNearbyMobs(LivingEntity mob) {
+        float actualDamage = DAMAGE;
+        if (mob instanceof Player player && player.isBlocking()) {
+            player.disableShield(true);
+            actualDamage *= 1.0F - SHILED_DAMAGE_REDUCTION;
+        }
+        double x = mob.getX() - this.getX();
+        double z = mob.getZ() - this.getZ();
+        double a = x * x + z * z;
+
+        mob.push(x / a * 6.0F, 0.2F, z / a * 6.0F);
+        mob.hurt(this.damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), actualDamage);
+    }
+
     protected Block getPillarBlock() {
         return DNLBlocks.SHIELDING_STONE_PILLAR.get();
     }
 
-    @Override
     protected void placePillarBlock() {
         this.level().setBlock(this.blockPosition(), DNLBlocks.SHIELDING_STONE_PILLAR.get().defaultBlockState(), Block.UPDATE_ALL);
-        this.level().setBlock(this.blockPosition().above(), DNLBlocks.SHIELDING_STONE_PILLAR.get().defaultBlockState().setValue(BlockStateProperties.DOUBLE_BLOCK_HALF ,DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
+        this.level().setBlock(this.blockPosition().above(), DNLBlocks.SHIELDING_STONE_PILLAR.get().defaultBlockState().setValue(BlockStateProperties.DOUBLE_BLOCK_HALF , DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
+        ShieldingStonePillarBlock.linkOnPlaced(this.level(), this.blockPosition());
     }
 }

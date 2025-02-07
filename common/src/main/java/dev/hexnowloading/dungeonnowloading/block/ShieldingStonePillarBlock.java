@@ -1,8 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.ShieldingStonePillarBlockEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -12,6 +14,8 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -22,11 +26,18 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public class ShieldingStonePillarBlock extends BaseEntityBlock implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 16, 14);
+    private static final int RANGE = 15;
 
     public ShieldingStonePillarBlock(Properties properties) {
         super(properties);
@@ -82,13 +93,69 @@ public class ShieldingStonePillarBlock extends BaseEntityBlock implements Entity
     public void setPlacedBy(Level level, BlockPos blockPos, BlockState blockState, @Nullable LivingEntity livingEntity, ItemStack itemStack) {
         BlockPos upperBlockPos = blockPos.above();
         level.setBlock(upperBlockPos, this.defaultBlockState().setValue(HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
+        if (!level.isClientSide) {
+            linkOnPlaced(level, blockPos);
+        }
     }
 
+    public static void linkOnPlaced(Level level, BlockPos blockPos) {
+        ShieldingStonePillarBlockEntity thisBE = (ShieldingStonePillarBlockEntity) level.getBlockEntity(blockPos);
+        if (thisBE == null) return;
+
+        double maxRangeX = blockPos.getX() + RANGE;
+        double minRangeX = blockPos.getX() - RANGE;
+        double maxRangeY = blockPos.getY() + RANGE;
+        double minRangeY = blockPos.getY() - RANGE;
+        double maxRangeZ = blockPos.getZ() + RANGE;
+        double minRangeZ = blockPos.getZ() - RANGE;
+
+        Map<BlockPos, BlockEntity> blockEntityMap = new HashMap<>();
+        int chunkMaxX = SectionPos.blockToSectionCoord(maxRangeX);
+        int chunkMinX = SectionPos.blockToSectionCoord(minRangeX);
+        int chunkMaxZ = SectionPos.blockToSectionCoord(maxRangeZ);
+        int chunkMinZ = SectionPos.blockToSectionCoord(minRangeZ);
+        for (int x = 0; chunkMinX + x <= chunkMaxX; x++) {
+            for (int z = 0; chunkMinZ + z <= chunkMaxZ; z++) {
+                blockEntityMap.putAll(level.getChunk(chunkMinX + x, chunkMinZ + z).getBlockEntities());
+            }
+        }
+
+        Map<BlockPos, BlockEntity> filteredMap = blockEntityMap.entrySet()
+                .stream()
+                .filter(e -> (e.getValue() instanceof ShieldingStonePillarBlockEntity blockEntity && blockEntity.getBlockState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER))
+                .filter(e -> e.getKey().getX() < maxRangeX && e.getKey().getX() >= minRangeX && e.getKey().getY() < maxRangeY && e.getKey().getY() >= minRangeY && e.getKey().getZ() < maxRangeZ && e.getKey().getZ() >= minRangeZ)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        if (!filteredMap.isEmpty()) {
+            List<BlockPos> blockPosList = filteredMap.keySet().stream()
+                    .filter(e -> !e.equals(blockPos))
+                    .sorted(Comparator.comparingDouble(e -> e.distSqr(blockPos)))
+                    .toList();
+            for (BlockPos pos : blockPosList) {
+                BlockEntity linkingBE = level.getBlockEntity(pos);
+                if (linkingBE instanceof ShieldingStonePillarBlockEntity shieldingStonePillar) {
+                    if (thisBE.getLinkedPositions().size() < 2 && shieldingStonePillar.getLinkedPositions().size() < 2) {
+                        if (thisBE.addLink(pos) && shieldingStonePillar.addLink(blockPos)) {
+                            if (thisBE.getLinkedPositions().size() >= 2) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         return new ShieldingStonePillarBlockEntity(blockPos, blockState);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
+        return  createTickerHelper(blockEntityType, DNLBlockEntityTypes.SHIELDING_STONE_PILLAR.get(), ShieldingStonePillarBlockEntity::tick);
     }
 
     @Override

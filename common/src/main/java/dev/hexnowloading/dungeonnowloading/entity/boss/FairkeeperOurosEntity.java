@@ -1,16 +1,11 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
-import dev.hexnowloading.dungeonnowloading.block.entity.ShieldingStonePillarBlockEntity;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperOurosMoveControl;
-import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperSerpentMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
-import dev.hexnowloading.dungeonnowloading.util.NbtHelper;
+import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -23,32 +18,29 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.control.JumpControl;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.PowderSnowBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
@@ -63,6 +55,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private int attackTick;
     private float previousTilt = 0.0f;
     private Vec3 awakenEndPos;
+    private boolean targetRandomPlayer;
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
@@ -93,13 +86,23 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(2, new FairkeeperOurosAwakenGoal(this));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.CIRCLING, this, 20.0, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this, 20.0, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexArrowGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 20.0, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this));
+        this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false));
         //this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
-        this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
+        //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
+        //this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
         //this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
         //this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6.0F));
         //this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(2, new BossTargetSelectorGoal(this, this.getFollowDistance()));
+    }
+
+    private void setMoveSets() {
+        stateSelector.addMove(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, 4, 200, 0);
     }
 
     @Override
@@ -170,6 +173,12 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                     FairkeeperOurosPartEntity part = new FairkeeperOurosPartEntity(DNLEntityTypes.FAIRKEEPER_OUROS_PART.get(), partParent, this, i);
                     if (partParent == this) {
                         this.setChildId(part.getUUID());
+                    } else if (partParent instanceof FairkeeperOurosPartEntity bodyPartParent && !bodyPartParent.isTail()) {
+                        if (!bodyPartParent.isTail()) {
+                            bodyPartParent.setChildId(part.getUUID());
+                        } else {
+                            bodyPartParent.setChildId(null);
+                        }
                     }
                     //double offsetX = partParent.getX() - (i + 1) * 1.0; // Offset by 3 blocks for each segment
                     part.setPos(partParent.getX(), partParent.getY(), partParent.getZ());
@@ -197,7 +206,10 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
             if (!this.onCieling() && this.getDeltaMovement().y > 0.0) {
                 this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.8, 1.0));
+            }
 
+            if (!this.isState(FairkeeperOurosState.AWAKENING)) {
+                this.lookTowardTarget();
             }
         }
 
@@ -210,6 +222,15 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.getTarget() != null) {
             lookControl.setLookAt(this.getTarget().getX(), this.getTarget().getY(), this.getTarget().getZ());
         }*/
+    }
+
+    private void lookTowardTarget() {
+        double directionX = this.getMoveControl().getWantedX() - this.getX();
+        double directionZ = this.getMoveControl().getWantedZ() - this.getZ();
+        double yaw = Math.toDegrees(Math.atan2(directionZ, directionX)) - 90.0;
+
+        this.setYRot((float) yaw);
+        this.yBodyRot = (float) yaw;
     }
 
     @Override
@@ -356,7 +377,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.isState(FairkeeperOurosState.AWAKENING)) this.enableBossBar();
         //this.cielingMovementCalculation();
         this.performContactDamage();
-        this.abilitySelectionTick();
+        //this.abilitySelectionTick();
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
@@ -375,6 +396,10 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             return !this.getUUID().equals(part.getHeadId());
         }
         return true;
+    }
+
+    private void vertexTransmissionEffectImmunity() {
+        this.removeEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
     }
 
     private void blockDestructionTick() {
@@ -425,35 +450,39 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
-        if (this.isState(FairkeeperOurosState.IDLE)) {
-            return;
-        }
-
         if (this.attackTick > 0) {
             --this.attackTick;
             return;
         }
 
-        this.targetRandomPlayer();
-
         if (this.getTarget() == null) return;
 
         if (stateSelector.isEmpty()) {
-            stateSelector.addMove(FairkeeperOurosState.CIRCLING, 5, 60, 0);
-            stateSelector.addMove(FairkeeperOurosState.GROUND_SMASH, 5, 400, 0);
-            stateSelector.addMove(FairkeeperOurosState.STONE_PILLAR, 5, 400, 0);
-            stateSelector.addMove(FairkeeperOurosState.SHIELDING_STONE_PILLAR, 4, 800, 200);
-            System.out.println(stateSelector);
-            //stateSelector.removeMove(FairkeeperOurosState.CIRCLING);
-            System.out.println(stateSelector);
+            this.setMoveSets();
         }
-        this.setState(stateSelector.selectMove());
+        FairkeeperOurosState state = stateSelector.selectMove();
+        this.setState(state);
     }
 
     public void stopAttacking(int cooldown) {
         this.setState(FairkeeperOurosState.IDLE);
-        this.setTarget(null);
+        this.targetRandomPlayer();
         this.setAttackTick(cooldown);
+        if (this.getTarget() != null) {
+            this.getTarget().sendSystemMessage(Component.literal("Ouros : Stopped"));
+        }
+        ((FairkeeperSerpentCallerEntity) this.getCaller()).setOurosWaitingForCommand(true);
+    }
+
+    @Override
+    public boolean hurt(DamageSource damageSource, float amount) {
+        if (damageSource.getEntity() instanceof FairkeeperSerpentEntity) {
+            if (damageSource.getDirectEntity() instanceof AbstractArrow arrow) {
+                arrow.remove(RemovalReason.DISCARDED);
+            }
+            return false;
+        }
+        return super.hurt(damageSource, amount);
     }
 
     @Override
@@ -466,23 +495,32 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
+    public boolean canBeAffected(MobEffectInstance mobEffectInstance) {
+        MobEffect effect = mobEffectInstance.getEffect();
+        if (effect == MobEffects.POISON || effect == DNLMobEffects.VERTEX_TRANSMISSION.get()) {
+            return false;
+        }
+        return super.canBeAffected(mobEffectInstance);
+    }
+
+    @Override
     public boolean isInWall() {
         return false;
     }
 
     @Override
     public void targetRandomPlayer() {
-        this.setState(FairkeeperOurosState.TARGET);
+        this.targetRandomPlayer = true;
     }
 
     @Override
     public boolean playerTargetingCondition() {
-        return this.isState(FairkeeperOurosState.TARGET);
+        return this.targetRandomPlayer || this.getTarget() != null;
     }
 
     @Override
     public void postPlayerTargeting() {
-        this.setState(FairkeeperOurosState.IDLE);
+        this.targetRandomPlayer = false;
     }
 
     @Override
@@ -639,12 +677,8 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         AWAKENING,
         IDLE,
         CIRCLING,
-        TARGET,
-        STRAFE,
-        GROUND_SMASH,
-        OVERHEAT_LANE,
-        STONE_PILLAR,
-        SHIELDING_STONE_PILLAR,
+        SHOOT_VERTEX_ARROW_DIRECT,
+        SUMMON_SCUTTLE,
         DYING;
 
         private FairkeeperOurosState() {

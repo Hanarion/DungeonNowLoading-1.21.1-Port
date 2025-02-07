@@ -3,16 +3,18 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,9 +22,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -33,7 +34,9 @@ import java.util.UUID;
 public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
     private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+
     private static final EntityDataAccessor<Optional<UUID>> HEAD_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Integer> BODY_INDEX = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DROPPER = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> TAIL = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
@@ -67,6 +70,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(PARENT_UUID, Optional.empty());
+        this.entityData.define(CHILD_UUID, Optional.empty());
         this.entityData.define(HEAD_UUID, Optional.empty());
         this.entityData.define(BODY_INDEX, 0);
         this.entityData.define(TAIL, false);
@@ -81,6 +85,9 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         if (this.getParentId() != null) {
             compoundTag.putUUID("ParentUUID", this.getParentId());
         }
+        if (this.getChild() != null) {
+            compoundTag.putUUID("ChildUUID", this.getChildId());
+        }
         if (this.getHead() != null) {
             compoundTag.putUUID("HeadUUID", this.getHeadId());
         }
@@ -94,6 +101,9 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         super.readAdditionalSaveData(compoundTag);
         if (compoundTag.hasUUID("ParentUUID")) {
             this.setParentId(compoundTag.getUUID("ParentUUID"));
+        }
+        if (compoundTag.hasUUID("ChildUUID")) {
+            this.setChildId(compoundTag.getUUID("ChildUUID"));
         }
         if (compoundTag.hasUUID("HeadUUID")) {
             this.setHeadId(compoundTag.getUUID("HeadUUID"));
@@ -132,10 +142,9 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
                         if (!this.enableRotation) {
                             Vec3 awakenEndPos = headEntity.getAwakenEndPos();
                             double dx = awakenEndPos.x - this.getX();
-                            double dy = awakenEndPos.y - this.getY();
                             double dz = awakenEndPos.z - this.getZ();
 
-                            if (dx * dx + dy * dy + dz * dz < 2.0F * 2.0F) {
+                            if (dx * dx + dz * dz < 2.0F * 2.0F) {
                                 this.enableRotation = true;
                             }
                         }
@@ -176,6 +185,10 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         super.customServerAiStep();
     }
 
+    private void vertexTransmissionEffectImmunity() {
+        this.removeEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+    }
+
     private void performContactDamage() {
         this.level().getEntities(this, this.getBoundingBox(), this::canPerformContactDamageTo)
                 .forEach(entity -> {
@@ -198,6 +211,13 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     @Override
     public boolean hurt(DamageSource damageSource, float damageAmount) {
 
+        if (damageSource.getEntity() instanceof FairkeeperSerpentEntity) {
+            if (damageSource.getDirectEntity() instanceof AbstractArrow arrow) {
+                arrow.remove(RemovalReason.DISCARDED);
+            }
+            return false;
+        }
+
         if (!this.hasArmor() || damageSource.isCreativePlayer()) {
             return super.hurt(damageSource, damageAmount);
         }
@@ -207,6 +227,15 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         }
 
         return false;
+    }
+
+    @Override
+    public boolean canBeAffected(MobEffectInstance mobEffectInstance) {
+        MobEffect effect = mobEffectInstance.getEffect();
+        if (effect == MobEffects.POISON || effect == DNLMobEffects.VERTEX_TRANSMISSION.get()) {
+            return false;
+        }
+        return super.canBeAffected(mobEffectInstance);
     }
 
     @Override
@@ -324,6 +353,25 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
 
     public Entity getParent() {
         UUID id = getParentId();
+        if (id != null && !this.level().isClientSide) {
+            return ((ServerLevel) this.level()).getEntity(id);
+        }
+        return null;
+    }
+
+    @Nullable
+    public UUID getChildId() { return this.entityData.get(CHILD_UUID).orElse(null); }
+
+    public void setChildId(@Nullable UUID uniqueId) {
+        this.entityData.set(CHILD_UUID, Optional.ofNullable(uniqueId));
+    }
+
+    public void setChild(Entity entity) {
+        this.setChildId(entity.getUUID());
+    }
+
+    public Entity getChild() {
+        UUID id = getChildId();
         if (id != null && !this.level().isClientSide) {
             return ((ServerLevel) this.level()).getEntity(id);
         }

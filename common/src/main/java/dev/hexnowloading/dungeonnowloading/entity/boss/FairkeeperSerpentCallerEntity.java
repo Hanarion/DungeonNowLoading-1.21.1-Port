@@ -1,8 +1,11 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import com.google.common.collect.ImmutableList;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
+import dev.hexnowloading.dungeonnowloading.entity.util.MoveSet;
+import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.BlockPos;
@@ -20,26 +23,22 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.spongepowered.asm.mixin.MixinEnvironment;
+import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
 import java.util.*;
+
 
 public class FairkeeperSerpentCallerEntity extends Entity {
 
@@ -53,12 +52,17 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private final int ARENA_SIZE = 20;
     private DamageSource lastDamageSource;
 
+    private boolean borosWaitingForCommand;
+    private boolean ourosWaitingForCommand;
     private int activationTick;
     private Set<UUID> playerUUIDs;
+    private Set<UUID> minionUUIDs;
+    private MoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> stateSelector = new MoveSet<>();
 
     public FairkeeperSerpentCallerEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.playerUUIDs = new HashSet<>();
+        this.minionUUIDs = new HashSet<>();
     }
 
     @Override
@@ -133,34 +137,111 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 case 0:
                     if (this.activationTick > 0) {
                         this.activationTick--;
-                        return;
+                        break;
                     }
                     this.summonBosses();
                     this.setPhase(1);
                     this.activationTick = 60;
-                    return;
+                    break;
                 case 1:
-                    if (this.activationTick > 0) {
-                        this.activationTick--;
-                        return;
+
+                    if (this.isBorosWaitingForCommand() && this.isOurosWaitingForCommand()) {
+                        this.commandFairkeeperSerpents();
                     }
 
-                    if (this.getBoros() == null && this.getOuros() == null) {
-                        this.defeatedBosses();
+                    if (this.activationTick > 0) {
+                        this.activationTick--;
+                        break;
+                    }
+
+                    if (this.getBoros() == null || this.getOuros() == null) {
                         this.setPhase(2);
-                        return;
+                        break;
                     }
 
                     if (this.isAllPlayersInBound()) {
                         this.activationTick = 10;
-                        return;
+                        break;
                     }
 
                     this.resetBosses();
-                case 2:
                     break;
+                case 2:
+
+                    if (this.isBorosWaitingForCommand()) {
+                        this.commandBoros();
+                    } else if (this.isOurosWaitingForCommand()) {
+                        this.commandOuros();
+                    }
+
+                    if (this.activationTick > 0) {
+                        this.activationTick--;
+                        break;
+                    }
+
+                    if (this.getBoros() == null && this.getOuros() == null) {
+                        this.defeatedBosses();
+                        this.setPhase(3);
+                        break;
+                    }
+
+                    if (this.isAllPlayersInBound()) {
+                        this.activationTick = 10;
+                        break;
+                    }
+                    break;
+                case 3:
             }
         }
+    }
+
+    private static final ImmutableList<FairkeeperBorosEntity.FairkeeperBorosState> BOROS_WAITING_STATES = ImmutableList.of(
+            FairkeeperBorosEntity.FairkeeperBorosState.IDLE,
+            FairkeeperBorosEntity.FairkeeperBorosState.CIRCLING
+    );
+
+    private static final ImmutableList<FairkeeperOurosEntity.FairkeeperOurosState> OUROS_WAITING_STATES = ImmutableList.of(
+            FairkeeperOurosEntity.FairkeeperOurosState.IDLE,
+            FairkeeperOurosEntity.FairkeeperOurosState.CIRCLING
+    );
+
+    private void commandFairkeeperSerpents() {
+        if (stateSelector.isEmpty()) {
+            stateSelector.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.CIRCLING, FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT), 4, 1200, 0);
+            stateSelector.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.CIRCLING, FairkeeperOurosEntity.FairkeeperOurosState.SUMMON_SCUTTLE), 4, 1200, 0);
+            stateSelector.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_CIRCLING, FairkeeperOurosEntity.FairkeeperOurosState.CIRCLING), 4, 1200, 0);
+            stateSelector.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_POISON_ARROW, FairkeeperOurosEntity.FairkeeperOurosState.CIRCLING), 4, 1200, 0);
+            stateSelector.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_PURSUING, FairkeeperOurosEntity.FairkeeperOurosState.CIRCLING), 4, 1200, 0);
+            stateSelector.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, FairkeeperOurosEntity.FairkeeperOurosState.CIRCLING), 4, 1200, 0);
+
+        }
+        Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState> statePair = stateSelector.selectMove();
+        Entity boros = this.getBoros();
+        Entity ouros = this.getOuros();
+        System.out.println("Boros : " + statePair.getA());
+        System.out.println("Ouros : " + statePair.getB());
+        boolean isBorosWaiting = false;
+        boolean isOurosWaiting = false;
+        if (boros != null && ouros != null) {
+            ((FairkeeperBorosEntity) boros).setState(statePair.getA());
+            ((FairkeeperOurosEntity) ouros).setState(statePair.getB());
+            if (BOROS_WAITING_STATES.contains(statePair.getA())) {
+                isBorosWaiting = true;
+            }
+            if (OUROS_WAITING_STATES.contains(statePair.getB())) {
+                isOurosWaiting = true;
+            }
+        }
+        this.setBorosWaitingForCommand(isBorosWaiting);
+        this.setOurosWaitingForCommand(isOurosWaiting);
+    }
+
+    private void commandBoros() {
+
+    }
+
+    private void commandOuros() {
+
     }
 
     private void defeatedBosses() {
@@ -171,6 +252,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         } else {
             this.spawnLootTableItems(this.lastDamageSource, true, false, null);
         }
+        this.removeAllMinions();
         this.remove(RemovalReason.KILLED);
     }
 
@@ -218,6 +300,20 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.setPhase(0);
         this.activationTick = 0;
         this.playerUUIDs.clear();
+        this.removeAllMinions();
+        this.stateSelector.clear();
+    }
+
+    private void removeAllMinions() {
+        ServerLevel serverLevel = ((ServerLevel) this.level());
+        for (UUID minionUUID : this.minionUUIDs) {
+            Entity minion = serverLevel.getEntity(minionUUID);
+            if (minion != null) {
+                SpawnMobUtil.createPoofParticle(serverLevel, minion);
+                minion.discard();
+            }
+        }
+        this.minionUUIDs.clear();
     }
 
     private boolean isAllPlayersInBound() {
@@ -255,12 +351,13 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         if (boros != null) {
             boros.moveTo(centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y - boros.getBoundingBox().getYsize() / 2, centeredCounterClockWiseTargetPosition.z);
             boros.setCallerId(this.getUUID());
-            boros.setState(FairkeeperBorosEntity.FairkeeperState.AWAKENING);
+            boros.setState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING);
             boros.setYRot(clockWiseDirection.toYRot());
             boros.yBodyRot = boros.getYRot();
             boros.yHeadRot = boros.getYRot();
             this.level().addFreshEntity(boros);
             this.setBorosId(boros.getUUID());
+            this.setBorosWaitingForCommand(false);
             EntityScale.scaleBossHealth(boros, playerCount);
             EntityScale.scaleBossAttack(boros, playerCount);
         }
@@ -275,6 +372,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ouros.yHeadRot = ouros.getYRot();
             this.level().addFreshEntity(ouros);
             this.setOurosId(ouros.getUUID());
+            this.setOurosWaitingForCommand(false);
             EntityScale.scaleBossHealth(ouros, playerCount);
             EntityScale.scaleBossAttack(ouros, playerCount);
         }
@@ -293,7 +391,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     @Override
     public InteractionResult interact(Player player, InteractionHand hand) {
-        System.out.println("hello");
         if (this.getPhase() < 1) {
             player.displayClientMessage(Component.translatable("entity.dungeonnowloading.fairkeeper_serpent_caller.right_click"), true);
             return InteractionResult.sidedSuccess(this.level().isClientSide);
@@ -350,4 +447,39 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     public void setLastDamageSource(DamageSource damageSource) { this.lastDamageSource = damageSource; }
 
+    public int getArenaSize() { return ARENA_SIZE; }
+
+    public boolean isBorosWaitingForCommand() { return this.borosWaitingForCommand; }
+
+    public void setBorosWaitingForCommand(boolean waitingForCommand) {
+        this.borosWaitingForCommand = waitingForCommand;
+    }
+
+    public boolean isOurosWaitingForCommand() { return this.ourosWaitingForCommand; }
+
+    public void setOurosWaitingForCommand(boolean waitingForCommand) {
+        this.ourosWaitingForCommand = waitingForCommand;
+    }
+
+    public int getParticipatingPlayerCount() {
+        return this.playerUUIDs.size();
+    }
+
+    public void removeMinion(UUID uuid) {
+        this.minionUUIDs.remove(uuid);
+    }
+
+    public void addMinion(UUID uuid) {
+        this.minionUUIDs.add(uuid);
+    }
+
+    public Set<UUID> getMinionUUIDs() {
+        return this.minionUUIDs;
+    }
+
+    public enum FairkeeperSerpentCallerState {
+        ;
+
+        private FairkeeperSerpentCallerState() {}
+    }
 }

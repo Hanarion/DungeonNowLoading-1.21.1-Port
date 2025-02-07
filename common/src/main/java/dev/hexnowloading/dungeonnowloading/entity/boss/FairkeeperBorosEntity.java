@@ -1,16 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
-import dev.hexnowloading.dungeonnowloading.block.entity.ShieldingStonePillarBlockEntity;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
-import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperLookControl;
-import dev.hexnowloading.dungeonnowloading.entity.ai.control.SmoothBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
-import dev.hexnowloading.dungeonnowloading.util.NbtHelper;
+import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -22,48 +16,37 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.control.BodyRotationControl;
-import net.minecraft.world.entity.ai.control.LookControl;
-import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
-    private static final EntityDataAccessor<FairkeeperState> STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_STATE);
+    //private static final EntityDataAccessor<FairkeeperState> STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_STATE);
+    private static final EntityDataAccessor<FairkeeperBorosState> STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_BOROS_STATE);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
-    private MoveSet<FairkeeperState> stateSelector = new MoveSet<>();
+    private MoveSet<FairkeeperBorosState> stateSelector = new MoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
 
     private int attackTick;
     private float previousTilt = 0.0f;
     private Vec3 awakenEndPos;
+    private boolean targetRandomPlayer;
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
@@ -89,14 +72,35 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(2, new FairkeeperAwakenGoal(this));
-        this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
-        this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
+        this.goalSelector.addGoal(2, new FairkeeperBorosAwakenGoal(this));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.CIRCLING, this, 20.0, 1.5, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.SHOOT_POISON_ARROW, this, 10.0, 1.5, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosShootPoisonArrowGoal(FairkeeperBorosState.SHOOT_POISON_ARROW, this));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursuePlayerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 1.3));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 20));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.FLAME_CIRCLING, this, 5.0, 1.5, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_CIRCLING, this, 40));
+        this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.TACKLE, this, 1.3, 6.0F, 0.5F));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.SHOOT_POISON_POTION, this, 7.0, 1.5, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPoisonPotionGoal(FairkeeperBorosState.SHOOT_POISON_POTION, this));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursuePlayerGoal(FairkeeperBorosState.FOLLOW, this, 1.1));
+        this.goalSelector.addGoal(4, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true));
+        //this.goalSelector.addGoal(3, new FairkeeperBorosShootPoisonArrowGoal());
+        //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
+        //this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
         //this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
         //this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6.0F));
         //this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(2, new BossTargetSelectorGoal(this, this.getFollowDistance()));
+    }
+
+    private void setMoveSets() {
+        stateSelector.addMove(FairkeeperBorosState.FOLLOW, 4, 200, 0);
+        stateSelector.addMove(FairkeeperBorosState.TACKLE, 4, 200, 0);
+        stateSelector.addMove(FairkeeperBorosState.FLAME_CIRCLING, 4, 200, 0);
+        stateSelector.addMove(FairkeeperBorosState.FLAME_PURSUING, 4, 200, 0);
+        stateSelector.addMove(FairkeeperBorosState.SHOOT_POISON_ARROW, 4, 200, 0);
+        stateSelector.addMove(FairkeeperBorosState.SHOOT_POISON_POTION, 4, 60, 0);
     }
 
     @Override
@@ -104,7 +108,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         super.defineSynchedData();
         this.entityData.define(CHILD_UUID, Optional.empty());
         this.entityData.define(CALLER_UUID, Optional.empty());
-        this.entityData.define(STATE, FairkeeperState.IDLE);
+        this.entityData.define(STATE, FairkeeperBorosState.IDLE);
     }
 
     @Override
@@ -166,6 +170,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                     FairkeeperBorosPartEntity part = new FairkeeperBorosPartEntity(DNLEntityTypes.FAIRKEEPER_BOROS_PART.get(), partParent, this, i);
                     if (partParent == this) {
                         this.setChildId(part.getUUID());
+                    } else if (partParent instanceof FairkeeperBorosPartEntity bodyPartParent && !bodyPartParent.isTail()) {
+                        bodyPartParent.setChild(part);
                     }
                     //double offsetX = partParent.getX() - (i + 1) * 1.0; // Offset by 3 blocks for each segment
                     part.setPos(partParent.getX(), partParent.getY(), partParent.getZ());
@@ -193,26 +199,28 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
             if (!this.onGround() && this.getDeltaMovement().y < 0.0) {
                 this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.8, 1.0));
+            }
 
+            if (!this.isState(FairkeeperBorosState.AWAKENING)) {
+                this.lookTowardTarget();
             }
         }
+    }
 
-        /*FairkeeperLookControl lookControl = (FairkeeperLookControl) this.getLookControl();
+    private void lookTowardTarget() {
+        double directionX = this.getMoveControl().getWantedX() - this.getX();
+        double directionZ = this.getMoveControl().getWantedZ() - this.getZ();
+        double yaw = Math.toDegrees(Math.atan2(directionZ, directionX)) - 90.0;
 
-        // Always update pitch based on motion
-        lookControl.tick();
-
-        // Update yaw only if there's a target
-        if (this.getTarget() != null) {
-            lookControl.setLookAt(this.getTarget().getX(), this.getTarget().getY(), this.getTarget().getZ());
-        }*/
+        this.setYRot((float) yaw);
+        this.yBodyRot = (float) yaw;
     }
 
     @Override
     protected void customServerAiStep() {
-        if (this.isState(FairkeeperState.AWAKENING)) this.enableBossBar();
+        if (this.isState(FairkeeperBorosState.AWAKENING)) this.enableBossBar();
         this.performContactDamage();
-        this.abilitySelectionTick();
+        //this.abilitySelectionTick();
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
@@ -222,8 +230,12 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.level().getEntities(this, this.getBoundingBox(), this::canPerformContactDamageTo)
                 .forEach(entity -> {
                     entity.push(this);
-                    entity.hurt(entity.level().damageSources().mobAttack(this), (float) (this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.5F));
+                    entity.hurt(entity.level().damageSources().mobAttack(this), this.getContactDamage());
                 });
+    }
+
+    private float getContactDamage() {
+        return (float) (this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (this.isState(FairkeeperBorosState.TACKLE) ? 1.0F : 0.5F));
     }
 
     private boolean canPerformContactDamageTo(Entity entity) {
@@ -231,6 +243,10 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             return !this.getUUID().equals(part.getHeadId());
         }
         return true;
+    }
+
+    private void vertexTransmissionEffectImmunity() {
+        this.removeEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
     }
 
     private void blockDestructionTick() {
@@ -277,7 +293,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
         stateSelector.tick();
 
-        if (!this.isState(FairkeeperState.IDLE)) {
+        if (!this.isState(FairkeeperBorosState.IDLE)) {
             return;
         }
 
@@ -286,26 +302,34 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
-        this.targetRandomPlayer();
-
         if (this.getTarget() == null) return;
 
         if (stateSelector.isEmpty()) {
-            stateSelector.addMove(FairkeeperState.CIRCLING, 5, 60, 0);
-            stateSelector.addMove(FairkeeperState.GROUND_SMASH, 5, 400, 0);
-            stateSelector.addMove(FairkeeperState.STONE_PILLAR, 5, 400, 0);
-            stateSelector.addMove(FairkeeperState.SHIELDING_STONE_PILLAR, 4, 800, 200);
-            System.out.println(stateSelector);
-            //stateSelector.removeMove(FairkeeperState.CIRCLING);
-            System.out.println(stateSelector);
+            this.setMoveSets();
         }
-        this.setState(stateSelector.selectMove());
+        FairkeeperBorosState state = stateSelector.selectMove();
+        this.setState(state);
     }
 
     public void stopAttacking(int cooldown) {
-        this.setState(FairkeeperState.IDLE);
-        this.setTarget(null);
+        this.setState(FairkeeperBorosState.IDLE);
+        this.targetRandomPlayer();
         this.setAttackTick(cooldown);
+        if (this.getTarget() != null) {
+            this.getTarget().sendSystemMessage(Component.literal("Boros : Stopped"));
+        }
+        ((FairkeeperSerpentCallerEntity) this.getCaller()).setBorosWaitingForCommand(true);
+    }
+
+    @Override
+    public boolean hurt(DamageSource damageSource, float amount) {
+        if (damageSource.getEntity() instanceof FairkeeperSerpentEntity) {
+            if (damageSource.getDirectEntity() instanceof AbstractArrow arrow) {
+                arrow.remove(RemovalReason.DISCARDED);
+            }
+            return false;
+        }
+        return super.hurt(damageSource, amount);
     }
 
     @Override
@@ -317,28 +341,28 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         super.die(damageSource);
     }
 
-
     @Override
-    protected void checkInsideBlocks() {
-    }
-
-    @Override
-    protected void onInsideBlock(BlockState $$0) {
+    public boolean canBeAffected(MobEffectInstance mobEffectInstance) {
+        MobEffect effect = mobEffectInstance.getEffect();
+        if (effect == MobEffects.POISON || effect == DNLMobEffects.VERTEX_TRANSMISSION.get()) {
+            return false;
+        }
+        return super.canBeAffected(mobEffectInstance);
     }
 
     @Override
     public void targetRandomPlayer() {
-        this.setState(FairkeeperState.TARGET);
+        this.targetRandomPlayer = true;
     }
 
     @Override
     public boolean playerTargetingCondition() {
-        return this.isState(FairkeeperState.TARGET);
+        return this.targetRandomPlayer || this.getTarget() != null;
     }
 
     @Override
     public void postPlayerTargeting() {
-        this.setState(FairkeeperState.IDLE);
+        this.targetRandomPlayer = false;
     }
 
     @Override
@@ -416,9 +440,9 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     public void setAttackTick(int i) { this.attackTick = i; }
     public double getAttackDamage() { return this.getAttributeValue(Attributes.ATTACK_DAMAGE); }
     public double getFollowDistance() { return this.getAttributeValue(Attributes.FOLLOW_RANGE); }
-    public void setState(FairkeeperState fairkeeperState) { this.entityData.set(STATE, fairkeeperState); }
-    public FairkeeperState getState() { return this.entityData.get(STATE); }
-    public boolean isState(FairkeeperState fairkeeperState) { return this.getState().equals(fairkeeperState); }
+    public void setState(FairkeeperBorosState fairkeeperState) { this.entityData.set(STATE, fairkeeperState); }
+    public FairkeeperBorosState getState() { return this.entityData.get(STATE); }
+    public boolean isState(FairkeeperBorosState fairkeeperState) { return this.getState().equals(fairkeeperState); }
     public UUID getChildId() { return this.entityData.get(CHILD_UUID).orElse(null); }
     public void setChildId(@Nullable UUID uniqueId) { this.entityData.set(CHILD_UUID, Optional.ofNullable(uniqueId)); }
     public UUID getCallerId() { return this.entityData.get(CALLER_UUID).orElse(null); }
@@ -440,18 +464,18 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         return false;
     }
 
-    public enum FairkeeperState {
+    public enum FairkeeperBorosState {
         AWAKENING,
         IDLE,
         CIRCLING,
-        TARGET,
-        STRAFE,
-        GROUND_SMASH,
-        OVERHEAT_LANE,
-        STONE_PILLAR,
-        SHIELDING_STONE_PILLAR,
+        SHOOT_POISON_ARROW,
+        FLAME_PURSUING,
+        FLAME_CIRCLING,
+        TACKLE,
+        FOLLOW,
+        SHOOT_POISON_POTION,
         DYING;
 
-        private FairkeeperState() {}
+        private FairkeeperBorosState() {}
     }
 }

@@ -8,6 +8,7 @@
         "entities.EntityAvoidBlockMixin",
         "structures.StructureProcessorAccessor",
         "structures.StructureTemplateMixin",
+        "structures.NoGeodesInStructuresMixin",
         "forge.block.BlockPlaceMixin",
         "forge.block.BucketItemMixin",
         "forge.block.FlintAndSteelMixin",

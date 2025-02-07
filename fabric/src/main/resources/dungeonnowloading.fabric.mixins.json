@@ -13,7 +13,8 @@
     "fabric.entities.PlayerDamageMixin",
     "fabric.structures.StructurePoolMixin",
     "structures.StructureProcessorAccessor",
-    "structures.StructureTemplateMixin"
+    "structures.StructureTemplateMixin",
+    "structures.NoGeodesInStructuresMixin"
   ],
   "client": [
     "client.AbstractClientPlayerMixin",
