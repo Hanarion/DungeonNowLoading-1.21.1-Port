@@ -44,6 +44,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(VertexArrowProjectileModel.LAYER_LOCATION, VertexArrowProjectileModel::createBodyLayer);
         event.registerLayerDefinition(ShieldingStonePillarProjectileModel.LAYER_LOCATION, ShieldingStonePillarProjectileModel::createBodyLayer);
         event.registerLayerDefinition(BallistaArrowModel.LAYER_LOCATION, BallistaArrowModel::createBodyLayer);
+        event.registerLayerDefinition(VertexOrbProjectileModel.LAYER_LOCATION, VertexOrbProjectileModel::createBodyLayer);
 
         event.registerLayerDefinition(FairkeeperChestModel.LAYER_LOCATION, FairkeeperChestModel::createBodyLayer);
         event.registerLayerDefinition(DisabledFairkeeperChestModel.LAYER_LOCATION, DisabledFairkeeperChestModel::createBodyLayer);
@@ -75,6 +76,7 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), VertexArrowProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), ShieldingStonePillarProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BALLISTA_ARROW.get(), BallistaArrowRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), VertexOrbProjectileRenderer::new);
 
         // Misc
         event.registerEntityRenderer(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);

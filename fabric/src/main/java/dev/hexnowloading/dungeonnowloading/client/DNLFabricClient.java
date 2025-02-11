@@ -90,6 +90,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), VertexArrowProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), ShieldingStonePillarProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BALLISTA_ARROW.get(), BallistaArrowRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), VertexOrbProjectileRenderer::new);
 
         // Misc
         EntityRendererRegistry.register(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);
@@ -139,6 +140,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(VertexArrowProjectileModel.LAYER_LOCATION, VertexArrowProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ShieldingStonePillarProjectileModel.LAYER_LOCATION, ShieldingStonePillarProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BallistaArrowModel.LAYER_LOCATION, BallistaArrowModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(VertexOrbProjectileModel.LAYER_LOCATION, VertexOrbProjectileModel::createBodyLayer);
 
         // Block Entities
         EntityModelLayerRegistry.registerModelLayer(FairkeeperChestModel.LAYER_LOCATION, FairkeeperChestModel::createBodyLayer);
