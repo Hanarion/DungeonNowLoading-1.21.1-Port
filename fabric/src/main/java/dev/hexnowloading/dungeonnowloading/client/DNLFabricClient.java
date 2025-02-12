@@ -3,8 +3,6 @@ package dev.hexnowloading.dungeonnowloading.client;
 import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosPartEntity;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.particle.FairkeeperBoundaryParticle;
@@ -91,6 +89,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), ShieldingStonePillarProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BALLISTA_ARROW.get(), BallistaArrowRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), VertexOrbProjectileRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), VertexDomainProjectileRenderer::new);
 
         // Misc
         EntityRendererRegistry.register(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);
@@ -141,6 +140,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ShieldingStonePillarProjectileModel.LAYER_LOCATION, ShieldingStonePillarProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BallistaArrowModel.LAYER_LOCATION, BallistaArrowModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(VertexOrbProjectileModel.LAYER_LOCATION, VertexOrbProjectileModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(VertexDomainProjectileModel.LAYER_LOCATION, VertexDomainProjectileModel::createBodyLayer);
 
         // Block Entities
         EntityModelLayerRegistry.registerModelLayer(FairkeeperChestModel.LAYER_LOCATION, FairkeeperChestModel::createBodyLayer);

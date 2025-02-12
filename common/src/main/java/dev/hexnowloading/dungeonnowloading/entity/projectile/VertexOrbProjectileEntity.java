@@ -3,10 +3,17 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -14,14 +21,21 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
 public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
+
+    private static final EntityDataAccessor<Integer> HURT_TIME = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> HURT_TIME_DIRECT = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.FLOAT);
 
     private static final int BASE_DAMAGE = 6;
     private static final int SLOWNESS_DURATION = 20;
@@ -39,6 +53,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     private double yPower;
     private double zPower;
     private int life;
+
     //private final ParticleOptions TRAIL_PARTICLE = (ParticleOptions) DNLParticleTypes.VERTEX_SPARK_PARTICLE.get();
 
     public VertexOrbProjectileEntity(EntityType<? extends VertexOrbProjectileEntity> entityType, Level level) {
@@ -70,7 +85,9 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
     @Override
     protected void defineSynchedData() {
-
+        this.entityData.define(HURT_TIME, 0);
+        this.entityData.define(HURT_TIME_DIRECT, 1);
+        this.entityData.define(DAMAGE, 0.0f);
     }
 
     @Override
@@ -79,6 +96,10 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         if (this.tickCount > 400 && this.life <= 0) {
             this.remove(RemovalReason.DISCARDED);
             return;
+        }
+
+        if (this.getHurtTime() > 0) {
+            this.setHurtTime(this.getHurtTime() - 1);
         }
 
         this.checkInsideBlocks();
@@ -92,6 +113,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
             this.life = DURATION_ON_GROUND;
             this.setDeltaMovement(Vec3.ZERO);
             spawnInitialRedstoneParticles();
+            blockDestruction();
         }
 
         if (this.life > 0) {
@@ -104,6 +126,21 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         }
     }
 
+    private void blockDestruction() {
+        BlockPos pos = this.blockPosition();
+        for (int x = -2; x <= 2; x++) {
+            for (int z = -2; z <= 2; z++) {
+                for (int y = -2; y <= 2; y++) {
+                    BlockPos targetPos = new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+                    if (!this.level().getBlockState(targetPos).is(BlockTags.WITHER_IMMUNE)) {
+                        this.level().destroyBlock(targetPos, true);
+                    }
+                }
+            }
+        }
+    }
+
+
     private void applyEffect() {
         Level level = this.level();
         if (level.isClientSide) {
@@ -111,8 +148,8 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         }
 
         AABB effectBox = new AABB(
-                this.getX() - 2, this.getY() - 1, this.getZ() - 2,
-                this.getX() + 2, this.getY() + 1, this.getZ() + 2
+                this.getX() - 2, this.getY() - 2, this.getZ() - 2,
+                this.getX() + 2, this.getY() + 2, this.getZ() + 2
         );
         List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, effectBox);
         for (LivingEntity entity : entities) {
@@ -124,7 +161,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     }
 
     private void spawnRedstoneBeamParticle(ServerLevel level, LivingEntity target) {
-        Vec3 start = this.position();
+        Vec3 start = this.position().add(0.0F, this.getBoundingBox().getYsize() / 2, 0.0F);
         Vec3 end = target.position().add(0, target.getBbHeight() * 0.5, 0);
 
         Vec3 direction = end.subtract(start);
@@ -151,41 +188,60 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
 
     private void spawnInitialRedstoneParticles() {
-        double y = this.getY(); // Keep particles at the ground level
-        Level level = this.level();
         float particleScale = BEAM_INITIAL_PARTICLE_SCALE_MIN + (float) Math.random() * (BEAM_INITIAL_PARTICLE_SCALE_MAX - BEAM_INITIAL_PARTICLE_SCALE_MIN);
         ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
                 DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
                 particleScale
         );
 
-        // Iterate over a 5x5 square outline
-        for (double x = this.getX() - 3; x <= this.getX() + 2; x += 1) {
-            for (double z = this.getZ() - 3; z <= this.getZ() + 2; z += 1) {
-                if (x == this.getX() - 3 || x == this.getX() + 2 || z == this.getZ() - 3 || z == this.getZ() + 2) {
-                    level.addParticle(particleData, x + 0.5, y, z + 0.5, 1.0, 0.0, 0.0); // Red color
-                }
-            }
-        }
+        spawnParticleOnAllPlanes(particleData, this.position(), 2);
     }
 
     private void spawnRedstoneParticle() {
-        double y = this.getY(); // Keep particles at the ground level
-        Level level = this.level();
         float scaleMultiplier = (float) Math.random() * MAX_RANDOM_PARTICLE_SCALE_MULTIPLIER;
         ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
                 DNLParticleTypes.VERTEX_SPARK_PARTICLE.get(),
                 BEAM_PARTICLE_SCALE * scaleMultiplier
         );
 
-        // Iterate over a 5x5 square outline
-        for (double x = this.getX() - 3; x <= this.getX() + 2; x += 1) {
-            for (double z = this.getZ() - 3; z <= this.getZ() + 2; z += 1) {
-                if (x == this.getX() - 3 || x == this.getX() + 2 || z == this.getZ() - 3 || z == this.getZ() + 2) {
-                    level.addParticle(particleData, x + 0.5, y, z + 0.5, 1.0, 0.0, 0.0); // Red color
+        spawnParticleOnAllPlanes(particleData, this.position(), 2);
+    }
+
+    private void spawnParticleOnAllPlanes(ParticleOptions particleData, Vec3 center, int radius) {
+        double centerX = center.x;
+        double centerY = center.y;
+        double centerZ = center.z;
+
+        for (double x = centerX - radius - 1; x <= centerX + radius; x += 1) {
+            for (double z = centerZ - radius - 1; z <= centerZ + radius; z += 1) {
+                if (x == centerX - radius - 1 || x == centerX + radius || z == centerZ - radius - 1 || z == centerZ + radius) {
+                    this.level().addParticle(particleData, x + 0.5, centerY, z + 0.5, 0.0, 0.0, 0.0);
                 }
             }
         }
+
+        // **2. XY Plane (Vertical Front)**
+        for (double x = centerX - radius - 1; x <= centerX + radius; x += 1) {
+            for (double y = centerY - radius - 1; y <= centerY + radius; y += 1) {
+                if (x == centerX - radius - 1 || x == centerX + radius || y == centerY - radius - 1|| y == centerY + radius) {
+                    this.level().addParticle(particleData, x + 0.5, y + 0.5, centerZ, 0.0, 0.0, 0.0);
+                }
+            }
+        }
+
+        // **3. ZY Plane (Vertical Side)**
+        for (double z = centerZ - radius - 1; z <= centerZ + radius; z += 1) {
+            for (double y = centerY - radius - 1; y <= centerY + radius; y += 1) {
+                if (z == centerZ - radius - 1|| z == centerZ + radius || y == centerY - radius - 1 || y == centerY + radius) {
+                    this.level().addParticle(particleData, centerX, y + 0.5, z + 0.5, 0.0, 0.0, 0.0);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onHitBlock(BlockHitResult blockHitResult) {
+
     }
 
     @Override
@@ -204,5 +260,77 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
             return target.hurt(this.level().damageSources().mobProjectile(this, owner), damage);
         }
         return false;
+    }
+
+    @Override
+    public boolean isPickable() {
+        return !this.isRemoved();
+    }
+
+    @Override
+    public boolean canCollideWith(Entity entity) {
+        return entity.canBeCollidedWith() || entity.isPushable();
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return true;
+    }
+
+    @Override
+    public boolean isPushable() {
+        return false;
+    }
+
+    @Override
+    public boolean hurt(DamageSource damageSource, float f) {
+        boolean bl;
+        if (this.isInvulnerableTo(damageSource)) {
+            return false;
+        }
+        if (this.level().isClientSide || this.isRemoved()) {
+            return true;
+        }
+        this.setHurtDir(-this.getHurtDir());
+        this.setHurtTime(10);
+        this.setDamage(this.getDamage() + f * 10.0f);
+        this.markHurt();
+        this.gameEvent(GameEvent.ENTITY_DAMAGE, damageSource.getEntity());
+        boolean bl2 = bl = damageSource.getEntity() instanceof Player && ((Player)damageSource.getEntity()).getAbilities().instabuild;
+        if (bl || this.getDamage() > 40.0f) {
+            this.discard();
+        }
+        return true;
+    }
+
+    @Override
+    public void animateHurt(float f) {
+        this.setHurtDir(-this.getHurtDir());
+        this.setHurtTime(10);
+        this.setDamage(this.getDamage() * 11.0f);
+    }
+
+    public void setDamage(float f) {
+        this.entityData.set(DAMAGE, Float.valueOf(f));
+    }
+
+    public float getDamage() {
+        return this.entityData.get(DAMAGE).floatValue();
+    }
+
+    public void setHurtTime(int i) {
+        this.entityData.set(HURT_TIME, i);
+    }
+
+    public int getHurtTime() {
+        return this.entityData.get(HURT_TIME);
+    }
+
+    public void setHurtDir(int i) {
+        this.entityData.set(HURT_TIME_DIRECT, i);
+    }
+
+    public int getHurtDir() {
+        return this.entityData.get(HURT_TIME_DIRECT);
     }
 }

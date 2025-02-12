@@ -132,6 +132,7 @@
   "entity.dungeonnowloading.chaos_spawner": "Chaos Spawner",
   "entity.dungeonnowloading.fairkeeper": "Fairkeeper",
   "entity.dungeonnowloading.vertex_orb_projectile": "Vertex Orb",
+  "entity.dungeonnowloading.vertex_domain_projectile": "Vertex Domain",
   "entity.dungeonnowloading.fairkeeper_serpent_caller.right_click": "Requires Redstone Catalyst",
   "entity.dungeonnowloading.chaos_spawner.right_click": "Requires \"Skull of Chaos\" to awaken the Chaos Spawner",
   "entity.dungeonnowloading.hollow": "Hollow",

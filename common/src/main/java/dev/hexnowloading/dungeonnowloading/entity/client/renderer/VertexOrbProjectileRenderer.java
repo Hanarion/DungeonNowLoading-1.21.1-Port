@@ -27,9 +27,19 @@ public class VertexOrbProjectileRenderer<T extends VertexOrbProjectileEntity> ex
         poseStack.pushPose();
         poseStack.translate(0.0f, -entity.getBbHeight() * 1.5 + 0.5F, 0.0f);
         VertexConsumer vertexConsumer = buffer.getBuffer(RENDER_TYPE);
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        //int p = getOverlayCoords(entity, this.getWhiteOverlayProgress(entity, partialTicks));
+        boolean bl = entity.getHurtTime() > 0;
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.pack(0.0f, bl), 1.0F, 1.0F, 1.0F, 1.0F);
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
+    }
+
+    public static int getOverlayCoords(VertexOrbProjectileEntity entity, float f) {
+        return OverlayTexture.pack(OverlayTexture.u(f), OverlayTexture.v(entity.getHurtTime() > 0));
+    }
+
+    protected float getWhiteOverlayProgress(VertexOrbProjectileEntity entity, float f) {
+        return 0.0f;
     }
 
     @Override
