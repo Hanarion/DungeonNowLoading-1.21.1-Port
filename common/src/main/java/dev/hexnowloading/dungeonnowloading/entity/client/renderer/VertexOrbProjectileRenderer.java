@@ -34,14 +34,6 @@ public class VertexOrbProjectileRenderer<T extends VertexOrbProjectileEntity> ex
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
-    public static int getOverlayCoords(VertexOrbProjectileEntity entity, float f) {
-        return OverlayTexture.pack(OverlayTexture.u(f), OverlayTexture.v(entity.getHurtTime() > 0));
-    }
-
-    protected float getWhiteOverlayProgress(VertexOrbProjectileEntity entity, float f) {
-        return 0.0f;
-    }
-
     @Override
     public ResourceLocation getTextureLocation(VertexOrbProjectileEntity vertexOrbProjectileEntity) {
         return TEXTURE;

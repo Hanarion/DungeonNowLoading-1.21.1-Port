@@ -29,7 +29,8 @@ public class VertexDomainProjectileRenderer<T extends VertexDomainProjectileEnti
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.translate(0.0f, -entity.getBbHeight() * 1.5F, 0.0f);
         VertexConsumer vertexConsumer = buffer.getBuffer(RENDER_TYPE);
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        boolean bl = entity.getHurtTime() > 0;
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.pack(0.0f, bl), 1.0F, 1.0F, 1.0F, 1.0F);
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }

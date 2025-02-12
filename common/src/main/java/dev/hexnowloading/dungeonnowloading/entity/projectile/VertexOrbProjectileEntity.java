@@ -25,7 +25,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -40,6 +39,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     private static final int BASE_DAMAGE = 6;
     private static final int SLOWNESS_DURATION = 20;
     private static final int SLOWNESS_AMPLIFIER = 4;
+    private static final float HEALTH = 10;
 
     private static final double BEAM_INITIAL_PARTICLE_SPACING = 0.5d;
     private static final float BEAM_INITIAL_PARTICLE_SCALE_MIN = 0.2f;
@@ -92,11 +92,6 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
     @Override
     protected void tickProjectile() {
-
-        if (this.tickCount > 400 && this.life <= 0) {
-            this.remove(RemovalReason.DISCARDED);
-            return;
-        }
 
         if (this.getHurtTime() > 0) {
             this.setHurtTime(this.getHurtTime() - 1);
@@ -240,11 +235,6 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     }
 
     @Override
-    protected void onHitBlock(BlockHitResult blockHitResult) {
-
-    }
-
-    @Override
     protected void onHitEntity(EntityHitResult entityHitResult) {
         applyDamage(entityHitResult.getEntity(), BASE_DAMAGE, 0.6F);
     }
@@ -293,11 +283,11 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         }
         this.setHurtDir(-this.getHurtDir());
         this.setHurtTime(10);
-        this.setDamage(this.getDamage() + f * 10.0f);
+        this.setDamage(this.getDamage() + f);
         this.markHurt();
         this.gameEvent(GameEvent.ENTITY_DAMAGE, damageSource.getEntity());
         boolean bl2 = bl = damageSource.getEntity() instanceof Player && ((Player)damageSource.getEntity()).getAbilities().instabuild;
-        if (bl || this.getDamage() > 40.0f) {
+        if (bl || this.getDamage() > HEALTH) {
             this.discard();
         }
         return true;
