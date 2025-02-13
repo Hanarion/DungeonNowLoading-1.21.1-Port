@@ -49,7 +49,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> IS_ON_CEILING = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BOOLEAN);
 
-    private MoveSet<FairkeeperOurosState> stateSelector = new MoveSet<>();
+    private TickBaseMoveSet<FairkeeperOurosState> stateSelector = new TickBaseMoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
 
     private int attackTick;
@@ -91,6 +91,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexArrowGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this));
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 20.0, 1.3, false));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this));
+        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_SMALL_SQUARE));
+        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_SINGLE_LINE));
+        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_CROSS, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_CROSS));
+        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_LARGE_SQUARE));
+        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_DOUBLE_LINE));
         this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false));
         //this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
         //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
@@ -679,6 +684,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         CIRCLING,
         SHOOT_VERTEX_ARROW_DIRECT,
         SUMMON_SCUTTLE,
+        DROP_PILLAR_SMALL_SQUARE,
+        DROP_PILLAR_SINGLE_LINE,
+        DROP_PILLAR_LARGE_SQUARE,
+        DROP_PILLAR_CROSS,
+        DROP_PILLAR_DOUBLE_LINE,
         DYING;
 
         private FairkeeperOurosState() {

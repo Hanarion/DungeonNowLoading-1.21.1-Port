@@ -5,10 +5,7 @@ import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestMod
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
-import dev.hexnowloading.dungeonnowloading.particle.FairkeeperBoundaryParticle;
-import dev.hexnowloading.dungeonnowloading.particle.LargeFlameParticle;
-import dev.hexnowloading.dungeonnowloading.particle.RedstoneShockwaveParticle;
-import dev.hexnowloading.dungeonnowloading.particle.VertexSparkParticle;
+import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -155,5 +152,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.VERTEX_SPARK_PARTICLE.get(), VertexSparkParticle.Factory::new);
         registry.register(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), FairkeeperBoundaryParticle.Factory::new);
         registry.register(DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(), RedstoneShockwaveParticle.Factory::new);
+        registry.register(DNLParticleTypes.REDSTONE_HAZARD_INDICATOR_PARTICLE.get(), RedstoneHazardIndicatorParticle.Factory::new);
+        registry.register(DNLParticleTypes.WHITE_SHOCKWAVE_PARTICLE.get(), WhiteShockwaveParticle.Factory::new);
     }
 }

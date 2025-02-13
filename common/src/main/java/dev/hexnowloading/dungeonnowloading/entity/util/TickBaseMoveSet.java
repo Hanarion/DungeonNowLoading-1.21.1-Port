@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MoveSet<T extends Object> {
+public class TickBaseMoveSet<T extends Object> {
 
     private int LOWEST_PRIORITY = 5;
 

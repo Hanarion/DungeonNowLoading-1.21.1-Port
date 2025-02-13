@@ -102,12 +102,14 @@ public class ShieldingStonePillarBlock extends BaseEntityBlock implements Entity
         ShieldingStonePillarBlockEntity thisBE = (ShieldingStonePillarBlockEntity) level.getBlockEntity(blockPos);
         if (thisBE == null) return;
 
-        double maxRangeX = blockPos.getX() + RANGE;
-        double minRangeX = blockPos.getX() - RANGE;
-        double maxRangeY = blockPos.getY() + RANGE;
-        double minRangeY = blockPos.getY() - RANGE;
-        double maxRangeZ = blockPos.getZ() + RANGE;
-        double minRangeZ = blockPos.getZ() - RANGE;
+        float inflate = 0.1F;
+
+        double maxRangeX = blockPos.getX() + inflate + RANGE;
+        double minRangeX = blockPos.getX() - inflate - RANGE;
+        double maxRangeY = blockPos.getY() + inflate + RANGE;
+        double minRangeY = blockPos.getY() - inflate - RANGE;
+        double maxRangeZ = blockPos.getZ() + inflate + RANGE;
+        double minRangeZ = blockPos.getZ() - inflate - RANGE;
 
         Map<BlockPos, BlockEntity> blockEntityMap = new HashMap<>();
         int chunkMaxX = SectionPos.blockToSectionCoord(maxRangeX);
@@ -120,10 +122,24 @@ public class ShieldingStonePillarBlock extends BaseEntityBlock implements Entity
             }
         }
 
-        Map<BlockPos, BlockEntity> filteredMap = blockEntityMap.entrySet()
+        /*Map<BlockPos, BlockEntity> filteredMap = blockEntityMap.entrySet()
                 .stream()
                 .filter(e -> (e.getValue() instanceof ShieldingStonePillarBlockEntity blockEntity && blockEntity.getBlockState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER))
                 .filter(e -> e.getKey().getX() < maxRangeX && e.getKey().getX() >= minRangeX && e.getKey().getY() < maxRangeY && e.getKey().getY() >= minRangeY && e.getKey().getZ() < maxRangeZ && e.getKey().getZ() >= minRangeZ)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));*/
+
+        double range = RANGE * RANGE;
+
+        Map<BlockPos, BlockEntity> filteredMap = blockEntityMap.entrySet()
+                .stream()
+                .filter(e -> (e.getValue() instanceof ShieldingStonePillarBlockEntity blockEntity && blockEntity.getBlockState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER))
+                .filter(e -> {
+                            float x = e.getKey().getX() - blockPos.getX();
+                            float y = e.getKey().getY() - blockPos.getY();
+                            float z = e.getKey().getZ() - blockPos.getZ();
+                            return x * x + y * y + z * z < range;
+                        }
+                )
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         if (!filteredMap.isEmpty()) {

@@ -6,10 +6,7 @@ import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkee
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.FairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
-import dev.hexnowloading.dungeonnowloading.particle.FairkeeperBoundaryParticle;
-import dev.hexnowloading.dungeonnowloading.particle.LargeFlameParticle;
-import dev.hexnowloading.dungeonnowloading.particle.RedstoneShockwaveParticle;
-import dev.hexnowloading.dungeonnowloading.particle.VertexSparkParticle;
+import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -108,5 +105,7 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.VERTEX_SPARK_PARTICLE.get(), VertexSparkParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), FairkeeperBoundaryParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(), RedstoneShockwaveParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.REDSTONE_HAZARD_INDICATOR_PARTICLE.get(), RedstoneHazardIndicatorParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.WHITE_SHOCKWAVE_PARTICLE.get(), WhiteShockwaveParticle.Factory::new);
     }
 }

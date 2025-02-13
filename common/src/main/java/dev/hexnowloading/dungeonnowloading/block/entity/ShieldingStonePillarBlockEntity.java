@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
+import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
@@ -58,12 +59,10 @@ public class ShieldingStonePillarBlockEntity extends BlockEntity {
             posTag.putInt("Y", pos.getY());
             posTag.putInt("Z", pos.getZ());
             posList.add(posTag);
-            System.out.println("Saving LinkedPos: " + pos);  // Debug print
         }
 
         compoundTag.put("LinkedPositions", posList);
         compoundTag.putInt("Age", this.age);
-        System.out.println("Saved Age: " + this.age);
     }
 
     @Override
@@ -72,17 +71,14 @@ public class ShieldingStonePillarBlockEntity extends BlockEntity {
         this.linkedPositions.clear();
 
         ListTag posList = compoundTag.getList("LinkedPositions", CompoundTag.TAG_COMPOUND);
-        System.out.println("Loading LinkedPositions size: " + posList.size());  // Debug print
 
         for (Tag tag : posList) {
             CompoundTag posTag = (CompoundTag) tag;
             BlockPos loadedPos = new BlockPos(posTag.getInt("X"), posTag.getInt("Y"), posTag.getInt("Z"));
             linkedPositions.add(loadedPos);
-            System.out.println("Loaded LinkedPos: " + loadedPos);  // Debug print
         }
 
         this.age = compoundTag.getInt("Age");
-        System.out.println("Loaded Age: " + this.age);
     }
 
     public List<BlockPos> getLinkedPositions() {
@@ -133,6 +129,9 @@ public class ShieldingStonePillarBlockEntity extends BlockEntity {
         );
 
         for (LivingEntity entity : entities) {
+            if (entity instanceof FairkeeperSerpentEntity) {
+                continue;
+            }
             entity.hurt(entity.level().damageSources().magic(), DAMAGE);
             entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER));
         }

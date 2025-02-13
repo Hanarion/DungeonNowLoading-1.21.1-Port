@@ -40,7 +40,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
-    private MoveSet<FairkeeperBorosState> stateSelector = new MoveSet<>();
+    private TickBaseMoveSet<FairkeeperBorosState> stateSelector = new TickBaseMoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
 
     private int attackTick;

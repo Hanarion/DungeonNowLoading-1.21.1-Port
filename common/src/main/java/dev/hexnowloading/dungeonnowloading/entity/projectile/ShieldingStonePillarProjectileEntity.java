@@ -2,7 +2,11 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
 import dev.hexnowloading.dungeonnowloading.block.ShieldingStonePillarBlock;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableAxisParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -31,6 +35,11 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
         super(entityType, level);
         this.tickCount = LIFETIME;
         this.hasLanded = false;
+    }
+
+    public ShieldingStonePillarProjectileEntity(Level level, LivingEntity livingEntity) {
+        this(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), level);
+        this.setOwner(livingEntity);
     }
 
     @Override
@@ -104,5 +113,6 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
         this.level().setBlock(this.blockPosition(), DNLBlocks.SHIELDING_STONE_PILLAR.get().defaultBlockState(), Block.UPDATE_ALL);
         this.level().setBlock(this.blockPosition().above(), DNLBlocks.SHIELDING_STONE_PILLAR.get().defaultBlockState().setValue(BlockStateProperties.DOUBLE_BLOCK_HALF , DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
         ShieldingStonePillarBlock.linkOnPlaced(this.level(), this.blockPosition());
+        ((ServerLevel) this.level()).sendParticles(new ScalableAxisParticleType.ScalableAxisParticleData(DNLParticleTypes.WHITE_SHOCKWAVE_PARTICLE.get(), 0, 90, 5.0F), this.blockPosition().getX() + 0.5F, this.blockPosition().getY() + 0.01F, this.blockPosition().getZ() + 0.5F, 1, 0, 0, 0, 0);
     }
 }
