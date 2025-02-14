@@ -256,8 +256,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ourosStateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE, 1, 1, 100);
             ourosStateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE, 1, 1, 100);
             ourosStateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_CROSS, 1, 1, 100);
-            ourosStateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE, 1, 1, 0);
+            ourosStateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE, 1, 1, 100);
             ourosStateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE, 1, 1, 1);
+            ourosStateSelector.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SUMMON_SCUTTLE, 1, 1, 0);
         }
 
         FairkeeperOurosEntity.FairkeeperOurosState state = ourosStateSelector.selectMove();

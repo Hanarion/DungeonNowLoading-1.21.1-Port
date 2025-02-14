@@ -6,11 +6,18 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosPartEntity
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableAxisParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FairkeeperOurosDropScuttleGoal extends Goal {
     private final FairkeeperOurosEntity ouros;
@@ -82,17 +89,29 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
 
     private void summonScuttle() {
 
-        ScuttleEntity scuttle = DNLEntityTypes.SCUTTLE.get().create(this.ouros.level());
+        Level level = this.ouros.level();
+
+        ScuttleEntity scuttle = DNLEntityTypes.SCUTTLE.get().create(level);
         scuttle = (ScuttleEntity) SpawnMobUtil.spawnEntityWithRot(scuttle, this.currentPart.getX(), this.currentPart.getY() - 0.5F, this.currentPart.getZ(), this.currentPart.getYRot(), 0.0F, this.ouros.level());
         scuttle.setYBodyRot(this.currentPart.getYRot());
         scuttle.setYHeadRot(this.currentPart.getYRot());
         scuttle.lootTable = new ResourceLocation(DungeonNowLoading.MOD_ID, "empty");
         scuttle.skipDropExperience();
-        this.ouros.level().addFreshEntity(scuttle);
+        level.addFreshEntity(scuttle);
 
         this.caller.addMinion(scuttle.getUUID());
 
-        this.ouros.level().playSound(null, this.currentPart.getX(), this.currentPart.getY() - 0.5F, this.currentPart.getZ(), SoundEvents.WITHER_SHOOT, SoundSource.BLOCKS, 1.0F, this.ouros.level().random.nextFloat() * 0.2F + 0.8F);
+        level.playSound(null, this.currentPart.getX(), this.currentPart.getY() - 0.5F, this.currentPart.getZ(), SoundEvents.WITHER_SHOOT, SoundSource.BLOCKS, 1.0F, this.ouros.level().random.nextFloat() * 0.2F + 0.8F);
 
+        BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos(this.currentPart.getX(), this.currentPart.getY(), currentPart.getZ());
+
+        while (mutableBlockPos.getY() > level.getMinBuildHeight() && !level.getBlockState(mutableBlockPos).blocksMotion()) {
+            mutableBlockPos.move(Direction.DOWN);
+        }
+
+        BlockState blockState = level.getBlockState(mutableBlockPos);
+        if (blockState.blocksMotion()) {
+            ((ServerLevel) level).sendParticles(new ScalableAxisParticleType.ScalableAxisParticleData(DNLParticleTypes.REDSTONE_HAZARD_INDICATOR_PARTICLE.get(), 0, 90, 1.25F), mutableBlockPos.getX() + 0.5F, mutableBlockPos.getY() + 1.05F, mutableBlockPos.getZ() + 0.5F, 1, 0, 0, 0, 0);
+        }
     }
 }

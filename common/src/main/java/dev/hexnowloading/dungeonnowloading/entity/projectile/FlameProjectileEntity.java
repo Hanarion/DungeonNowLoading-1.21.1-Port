@@ -27,30 +27,19 @@ import net.minecraft.world.phys.HitResult;
 public class FlameProjectileEntity extends ThrowableItemProjectile {
     private static final EntityDataAccessor<ItemStack> FIRE_ITEM_STACK = SynchedEntityData.defineId(FlameProjectileEntity.class, EntityDataSerializers.ITEM_STACK);
 
-    private int lifeTime;
-    private float damageByPercentage;
-
     public FlameProjectileEntity(EntityType entityType, Level level) {
         super(entityType, level);
     }
 
     public FlameProjectileEntity(LivingEntity owner, Level level) {
         super(DNLEntityTypes.FLAME_PROJECTILE.get(), owner, level);
-        this.lifeTime = 60;
-        this.damageByPercentage = 1.0F;
-    }
-
-    public FlameProjectileEntity(LivingEntity owner, Level level, int lifeTime, float damageByPercentage) {
-        super(DNLEntityTypes.FLAME_PROJECTILE.get(), owner, level);
-        this.lifeTime = lifeTime;
-        this.damageByPercentage = damageByPercentage;
     }
 
     @Override
     public void tick() {
         super.tick();
         this.level().addAlwaysVisibleParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), true, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
-        if (this.tickCount > this.lifeTime) {
+        if (this.tickCount > 60) {
             this.remove(RemovalReason.DISCARDED);
         }
     }
@@ -77,7 +66,7 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
             return;
         }
         if (owner instanceof LivingEntity livingEntity) {
-            double damageAmount = livingEntity.getAttributeValue(Attributes.ATTACK_DAMAGE) * this.damageByPercentage;
+            double damageAmount = livingEntity.getAttributeValue(Attributes.ATTACK_DAMAGE);
             target.setSecondsOnFire(5);
             if (!(target instanceof LivingEntity targetLivingEntity)) {
                 return;

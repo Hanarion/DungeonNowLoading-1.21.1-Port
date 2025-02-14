@@ -1,34 +1,28 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
-import dev.hexnowloading.dungeonnowloading.entity.ai.*;
+import dev.hexnowloading.dungeonnowloading.entity.ai.ScuttleFlameThrowerAttackGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.SlumberingEntityLookAtPlayerGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.SlumberingEntityPlayerTargetGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.SlumberingEntityRandomStrollGoal;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
-import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -199,8 +193,11 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
             return false;
         }
         if (damageSource.is(DNLTags.SCUTTLE_HURTABLE) || this.isAttackingState() || damageSource.isCreativePlayer()) {
-            this.playDeflectSound();
-            return super.hurt(damageSource, damage);
+            boolean hurtFr = super.hurt(damageSource, damage);
+            if (hurtFr) {
+                this.playDeflectSound();
+            }
+            return hurtFr;
         }
         return false;
     }

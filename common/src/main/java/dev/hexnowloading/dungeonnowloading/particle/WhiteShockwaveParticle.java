@@ -62,8 +62,6 @@ public class WhiteShockwaveParticle extends TextureSheetParticle {
         return this.quadSize * this.scale * Mth.clamp(growthFactor, 0.0f, 1.0f);
     }
 
-
-
     @Override
     public void render(VertexConsumer vertexConsumer, Camera camera, float partialTick) {
         float startAlpha = 1.0f;
