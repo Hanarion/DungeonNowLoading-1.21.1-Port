@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.AxisParticleType;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -12,6 +13,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -41,7 +43,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     private static final int SLOWNESS_AMPLIFIER = 4;
     private static final int SLOWNESS_DURATION = 100;
     private static final int DURATION_ON_GROUND = 1200;
-    private static final float HEALTH = 100F;
+    private static final float BASE_HEALTH = 100F;
     private static final int RANGE = 7;
 
     private static final double BEAM_INITIAL_PARTICLE_SPACING = 0.5d;
@@ -52,10 +54,19 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     private double yPower;
     private double zPower;
     private int life;
+    private float health;
 
     public VertexDomainProjectileEntity(EntityType<? extends VertexDomainProjectileEntity> entityType, Level level) {
         super(entityType, level);
         this.dynamicBlockPlaceBreakListener = new DynamicGameEventListener<>(new BlockPlaceBreakListener(new EntityPositionSource(this, 1.0F), RANGE));
+        this.health = BASE_HEALTH;
+    }
+
+    public VertexDomainProjectileEntity(Level level, LivingEntity owner, float health) {
+        super(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), level);
+        this.dynamicBlockPlaceBreakListener = new DynamicGameEventListener<>(new BlockPlaceBreakListener(new EntityPositionSource(this, 1.0F), RANGE));
+        this.setOwner(owner);
+        this.health = health;
     }
 
     @Override
@@ -72,6 +83,9 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         if (compoundTag.contains("life", Tag.TAG_INT)) {
             this.life = compoundTag.getInt("life");
         }
+        if (compoundTag.contains("health", Tag.TAG_FLOAT)) {
+            this.health = compoundTag.getFloat("health");
+        }
     }
 
     @Override
@@ -79,6 +93,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.put("power", this.newDoubleList(this.xPower, this.yPower, this.zPower));
         compoundTag.putInt("life", this.life);
+        compoundTag.putFloat("health", this.health);
     }
 
     @Override
@@ -104,6 +119,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         if (this.verticalCollision || this.horizontalCollision) {
             this.life = DURATION_ON_GROUND;
             this.setDeltaMovement(Vec3.ZERO);
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.END_GATEWAY_SPAWN, this.getSoundSource(), 3.0F, 2.0F);
         }
 
         if (this.life > 0) {
@@ -254,6 +270,41 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     }
 
     @Override
+    public void push(Entity $$0) {
+    }
+
+    @Override
+    public void push(double $$0, double $$1, double $$2) {
+    }
+
+    public void shootTowardsTarget(double x, double y, double z, LivingEntity target, float speed, float inaccuracy) {
+        this.moveTo(x, y, z, this.getYRot(), this.getXRot());
+        this.reapplyPosition();
+        Vec3 direction = new Vec3(target.getX() - this.getX(), target.getY() - this.getY(), target.getZ() - this.getZ()).normalize();
+        double randX = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+        double randY = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+        double randZ = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+        Vec3 inaccurateDirection = new Vec3(direction.x + randX, direction.y + randY, direction.z + randZ).normalize();
+        this.xPower = inaccurateDirection.x * speed;
+        this.yPower = inaccurateDirection.y * speed;
+        this.zPower = inaccurateDirection.z * speed;
+    }
+
+    public void shoot(double x, double y, double z, double targetX, double targetY, double targetZ, float speed, float inaccuracy) {
+        this.moveTo(x, y, z, this.getYRot(), this.getXRot());
+        this.reapplyPosition();
+        Vec3 direction = new Vec3(targetX - this.getX(), targetY - this.getY(), targetZ - this.getZ()).normalize();
+        double randX = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+        double randY = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+        double randZ = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+        Vec3 inaccurateDirection = new Vec3(direction.x + randX, direction.y + randY, direction.z + randZ).normalize();
+        this.xPower = inaccurateDirection.x * speed;
+        this.yPower = inaccurateDirection.y * speed;
+        this.zPower = inaccurateDirection.z * speed;
+    }
+
+
+    @Override
     public boolean hurt(DamageSource damageSource, float f) {
         boolean bl;
         if (this.isInvulnerableTo(damageSource)) {
@@ -268,7 +319,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.markHurt();
         this.gameEvent(GameEvent.ENTITY_DAMAGE, damageSource.getEntity());
         bl = damageSource.getEntity() instanceof Player && ((Player)damageSource.getEntity()).getAbilities().instabuild;
-        if (bl || this.getDamage() > HEALTH) {
+        if (bl || this.getDamage() > this.health) {
             this.discard();
         }
         return true;
@@ -314,6 +365,14 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         return this.entityData.get(HURT_TIME_DIRECT);
     }
 
+    public float getHealth() {
+        return this.health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
+    }
+
 
 
     class BlockPlaceBreakListener implements GameEventListener {
@@ -337,6 +396,10 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
 
         @Override
         public boolean handleGameEvent(ServerLevel serverLevel, GameEvent gameEvent, GameEvent.Context context, Vec3 pos) {
+            if (VertexDomainProjectileEntity.this.life <= 0) {
+                return false;
+            }
+
             BlockPos eventBlockPos = new BlockPos((int) Math.floor(pos.x), (int) Math.floor(pos.y), (int) Math.floor(pos.z));
 
             Vec3 centerPos = this.getListenerSource().getPosition(serverLevel).orElseThrow();

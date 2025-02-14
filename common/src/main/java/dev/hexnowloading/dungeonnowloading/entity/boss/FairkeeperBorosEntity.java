@@ -220,7 +220,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     protected void customServerAiStep() {
         if (this.isState(FairkeeperBorosState.AWAKENING)) this.enableBossBar();
         this.performContactDamage();
-        //this.abilitySelectionTick();
+        this.abilityCooldown();
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
@@ -289,9 +289,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         }
     }
 
-    private void abilitySelectionTick() {
-
-        stateSelector.tick();
+    private void abilityCooldown() {
 
         if (!this.isState(FairkeeperBorosState.IDLE)) {
             return;
@@ -304,21 +302,16 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
         if (this.getTarget() == null) return;
 
-        if (stateSelector.isEmpty()) {
-            this.setMoveSets();
-        }
-        FairkeeperBorosState state = stateSelector.selectMove();
-        this.setState(state);
-    }
-
-    public void stopAttacking(int cooldown) {
-        this.setState(FairkeeperBorosState.IDLE);
         this.targetRandomPlayer();
-        this.setAttackTick(cooldown);
         if (this.getTarget() != null) {
             this.getTarget().sendSystemMessage(Component.literal("Boros : Stopped"));
         }
         ((FairkeeperSerpentCallerEntity) this.getCaller()).setBorosWaitingForCommand(true);
+    }
+
+    public void stopAttacking(int cooldown) {
+        this.setState(FairkeeperBorosState.IDLE);
+        this.setAttackTick(cooldown);
     }
 
     @Override

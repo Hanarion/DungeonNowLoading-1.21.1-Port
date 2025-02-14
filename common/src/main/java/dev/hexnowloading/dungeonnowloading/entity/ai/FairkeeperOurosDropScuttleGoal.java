@@ -64,7 +64,7 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
         }
 
         if (this.currentPart == null) {
-            this.ouros.stopAttacking(0);
+            this.ouros.stopAttacking(60);
             return;
         }
 
@@ -73,7 +73,7 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
         loopCount--;
 
         if (this.loopCount <= 0) {
-            this.ouros.stopAttacking(0);
+            this.ouros.stopAttacking(60);
             return;
         }
 
@@ -82,7 +82,7 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
         for (int i = 0; i < 4; i++) {
             this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();
             if (this.currentPart == null) {
-                this.ouros.stopAttacking(0);
+                this.ouros.stopAttacking(40 * this.playerCount);
             }
         }
     }

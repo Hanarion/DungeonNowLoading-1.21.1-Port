@@ -25,7 +25,7 @@ public class FairkeeperBorosTackleGoal extends Goal {
     private int totalDuration;
     private BlockPos arenaCenter;
 
-    private final int TACKLE_DURATION = reducedTickDelay(20);
+    private final int TACKLE_DURATION = reducedTickDelay(40);
     private final int SLOWDOWN_DURATION = reducedTickDelay(10);
     private final int TACKLE_COOLDOWN = reducedTickDelay(40);
     private final int EXPIRY_DURATION = reducedTickDelay(300);
@@ -70,7 +70,7 @@ public class FairkeeperBorosTackleGoal extends Goal {
         if (this.totalDuration > 0) {
             this.totalDuration--;
         } else {
-            this.boros.stopAttacking(0);
+            this.boros.stopAttacking(20);
             return;
         }
 
@@ -84,7 +84,7 @@ public class FairkeeperBorosTackleGoal extends Goal {
 
         if (this.tackleDuration > 0) {
             this.tackleDuration--;
-            if (this.tackleDuration > SLOWDOWN_DURATION) {
+            if (this.tackleDuration > TACKLE_DURATION) {
                 updatedSpeed = this.speed - SLOWDOWN_SPEED_BY;
             } else {
                 updatedSpeed = this.speed + this.addSpeedBy;
@@ -104,7 +104,7 @@ public class FairkeeperBorosTackleGoal extends Goal {
             }
             if (this.tackleDuration <= 0) {
                 if (loopCount == TOTAL_LOOP) {
-                    this.boros.stopAttacking(0);
+                    this.boros.stopAttacking(20);
                     return;
                 } else {
                     loopCount++;

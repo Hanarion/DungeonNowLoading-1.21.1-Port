@@ -60,7 +60,7 @@ public class FairkeeperBorosPoisonPotionGoal extends Goal {
         while (this.currentPart.hasArmor()) {
             this.currentPart = (FairkeeperBorosPartEntity) this.currentPart.getChild();
             if (this.currentPart == null) {
-                this.boros.stopAttacking(0);
+                this.boros.stopAttacking(20);
                 return;
             }
         }

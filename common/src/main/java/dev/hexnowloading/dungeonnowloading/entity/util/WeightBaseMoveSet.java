@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.util;
 
 import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class WeightBaseMoveSet<T extends Object> {
         moveSet.removeIf(move -> move.object.equals(removeObject));
     }
 
+    @Nullable
     public T selectMove() {
         Move chosenMove;
         WeightedRandomBag<Move> weightedPool = new WeightedRandomBag<>();
@@ -50,7 +52,9 @@ public class WeightBaseMoveSet<T extends Object> {
         });
 
         chosenMove = weightedPool.getRandom();
-        chosenMove.currentCooldown = chosenMove.cooldown;
+        if (chosenMove != null) {
+            chosenMove.currentCooldown = chosenMove.cooldown;
+        }
         return chosenMove.object;
     }
 

@@ -58,7 +58,7 @@ public class FairkeeperOurosShootVertexOrbGoal extends Goal {
     public void tick() {
 
         if (this.bulletCount <= 0) {
-            this.ouros.stopAttacking(0);
+            this.ouros.stopAttacking(20 * this.bulletPerPlayer);
             return;
         }
 
@@ -82,7 +82,7 @@ public class FairkeeperOurosShootVertexOrbGoal extends Goal {
         for (int i = 0; i < randomIndex; i++) {
             this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();
             if (this.currentPart == null) {
-                this.ouros.stopAttacking(0);
+                this.ouros.stopAttacking(20 * this.bulletPerPlayer);
                 return;
             }
         }

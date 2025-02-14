@@ -282,6 +282,14 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     }
 
     @Override
+    public void push(Entity $$0) {
+    }
+
+    @Override
+    public void push(double $$0, double $$1, double $$2) {
+    }
+
+    @Override
     public boolean hurt(DamageSource damageSource, float f) {
         boolean bl;
         if (this.isInvulnerableTo(damageSource)) {
@@ -312,19 +320,11 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     public void shootTowardsTarget(double x, double y, double z, LivingEntity target, float speed, float inaccuracy) {
         this.moveTo(x, y, z, this.getYRot(), this.getXRot());
         this.reapplyPosition();
-
-        // Calculate base direction
         Vec3 direction = new Vec3(target.getX() - this.getX(), target.getY() - this.getY(), target.getZ() - this.getZ()).normalize();
-
-        // Add random inaccuracy
         double randX = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
         double randY = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
         double randZ = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
-
-        // Apply inaccuracy to direction vector
         Vec3 inaccurateDirection = new Vec3(direction.x + randX, direction.y + randY, direction.z + randZ).normalize();
-
-        // Apply velocity
         this.xPower = inaccurateDirection.x * speed;
         this.yPower = inaccurateDirection.y * speed;
         this.zPower = inaccurateDirection.z * speed;

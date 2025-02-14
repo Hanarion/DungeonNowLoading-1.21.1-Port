@@ -69,7 +69,7 @@ public class FairkeeperOurosVertexPillarDropGoal extends Goal {
         }
 
         if (dropIndex >= pattern.getRight().size()) {
-            this.ouros.stopAttacking(0);
+            this.ouros.stopAttacking(10 * this.pattern.getRight().size());
             return;
         }
 
@@ -125,7 +125,7 @@ public class FairkeeperOurosVertexPillarDropGoal extends Goal {
             this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();
 
             if (dropIndex >= pattern.getRight().size()) {
-                this.ouros.stopAttacking(0);
+                this.ouros.stopAttacking(10 * this.pattern.getRight().size());
                 return;
             }
         }

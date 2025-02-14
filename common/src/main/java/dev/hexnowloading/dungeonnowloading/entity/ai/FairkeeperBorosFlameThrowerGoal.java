@@ -40,7 +40,7 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
         if (this.shootingInterval > 0) {
             this.shootingInterval--;
         } else {
-            this.boros.stopAttacking(0);
+            this.boros.stopAttacking(20);
             return;
         }
 

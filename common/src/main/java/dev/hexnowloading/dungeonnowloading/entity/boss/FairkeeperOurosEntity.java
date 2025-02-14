@@ -100,6 +100,8 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 1, 0.05F));
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 20.0, 1.3, false));
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 3, 0.2F));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, this, 20.0, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexDomainGoal(FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, this));
         this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false));
         //this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
         //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
@@ -386,7 +388,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.isState(FairkeeperOurosState.AWAKENING)) this.enableBossBar();
         //this.cielingMovementCalculation();
         this.performContactDamage();
-        //this.abilitySelectionTick();
+        this.abilityCooldown();
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
@@ -451,9 +453,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         }
     }
 
-    private void abilitySelectionTick() {
-
-        stateSelector.tick();
+    private void abilityCooldown() {
 
         if (!this.isState(FairkeeperOurosState.IDLE)) {
             return;
@@ -464,23 +464,16 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
-        if (this.getTarget() == null) return;
-
-        if (stateSelector.isEmpty()) {
-            this.setMoveSets();
-        }
-        FairkeeperOurosState state = stateSelector.selectMove();
-        this.setState(state);
-    }
-
-    public void stopAttacking(int cooldown) {
-        this.setState(FairkeeperOurosState.IDLE);
         this.targetRandomPlayer();
-        this.setAttackTick(cooldown);
         if (this.getTarget() != null) {
             this.getTarget().sendSystemMessage(Component.literal("Ouros : Stopped"));
         }
         ((FairkeeperSerpentCallerEntity) this.getCaller()).setOurosWaitingForCommand(true);
+    }
+
+    public void stopAttacking(int cooldown) {
+        this.setState(FairkeeperOurosState.IDLE);
+        this.setAttackTick(cooldown);
     }
 
     @Override
@@ -696,6 +689,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         DROP_PILLAR_DOUBLE_LINE,
         SHOOT_SINGLE_VERTEX_ORB,
         SHOOT_TRIPLE_VERTEX_ORB,
+        SHOOT_VERTEX_DOMAIN,
         DYING;
 
         private FairkeeperOurosState() {
