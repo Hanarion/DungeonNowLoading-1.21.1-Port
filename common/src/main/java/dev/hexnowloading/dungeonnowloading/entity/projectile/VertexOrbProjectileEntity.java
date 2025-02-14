@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -12,7 +13,9 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -58,6 +61,11 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
     public VertexOrbProjectileEntity(EntityType<? extends VertexOrbProjectileEntity> entityType, Level level) {
         super(entityType, level);
+    }
+
+    public VertexOrbProjectileEntity(Level level, LivingEntity owner) {
+        super(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), level);
+        this.setOwner(owner);
     }
 
     @Override
@@ -106,6 +114,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
         if (this.verticalCollision || this.horizontalCollision) {
             this.life = DURATION_ON_GROUND;
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.BEE_HURT, this.getSoundSource(), 3.0F, 2.0F);
             this.setDeltaMovement(Vec3.ZERO);
             spawnInitialRedstoneParticles();
             blockDestruction();
@@ -259,7 +268,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
     @Override
     public boolean canCollideWith(Entity entity) {
-        return entity.canBeCollidedWith() || entity.isPushable();
+        return false;
     }
 
     @Override
@@ -299,6 +308,28 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         this.setHurtTime(10);
         this.setDamage(this.getDamage() * 11.0f);
     }
+
+    public void shootTowardsTarget(double x, double y, double z, LivingEntity target, float speed, float inaccuracy) {
+        this.moveTo(x, y, z, this.getYRot(), this.getXRot());
+        this.reapplyPosition();
+
+        // Calculate base direction
+        Vec3 direction = new Vec3(target.getX() - this.getX(), target.getY() - this.getY(), target.getZ() - this.getZ()).normalize();
+
+        // Add random inaccuracy
+        double randX = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+        double randY = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+        double randZ = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
+
+        // Apply inaccuracy to direction vector
+        Vec3 inaccurateDirection = new Vec3(direction.x + randX, direction.y + randY, direction.z + randZ).normalize();
+
+        // Apply velocity
+        this.xPower = inaccurateDirection.x * speed;
+        this.yPower = inaccurateDirection.y * speed;
+        this.zPower = inaccurateDirection.z * speed;
+    }
+
 
     public void setDamage(float f) {
         this.entityData.set(DAMAGE, Float.valueOf(f));

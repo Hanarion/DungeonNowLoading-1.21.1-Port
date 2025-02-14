@@ -1,0 +1,106 @@
+package dev.hexnowloading.dungeonnowloading.entity.ai;
+
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosPartEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+
+import java.util.Set;
+import java.util.UUID;
+
+public class FairkeeperOurosShootVertexOrbGoal extends Goal {
+
+    private final FairkeeperOurosEntity ouros;
+    private FairkeeperOurosEntity.FairkeeperOurosState state;
+    private FairkeeperOurosPartEntity currentPart;
+    private FairkeeperSerpentCallerEntity caller;
+    private Set<UUID> playerUUIDs;
+    private int attackTicks;
+    private int playerCount;
+    private int bulletCount;
+    private final int bulletPerPlayer;
+    private final float inaccuracy;
+
+    private final int START_UP_DELAY = 40;
+    private final int BULLET_INTERVAL = 10;
+
+    public FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, int bulletPerPlayer, float inaccuracy) {
+        this.ouros = ouros;
+        this.state = state;
+        this.bulletPerPlayer = bulletPerPlayer;
+        this.inaccuracy = inaccuracy;
+    }
+
+    @Override
+    public boolean canUse() {
+        return this.ouros.getTarget() != null && this.ouros.getTarget().isAlive() && this.ouros.isState(state);
+    }
+
+    @Override
+    public void start() {
+        this.attackTicks = reducedTickDelay(START_UP_DELAY);
+        this.playerCount = 1;
+        this.caller = (FairkeeperSerpentCallerEntity) this.ouros.getCaller();
+        if (caller != null) {
+            this.playerCount = caller.getParticipatingPlayerCount();
+            this.playerUUIDs = caller.getParticipatingPlayerUUIDs();
+        }
+        this.bulletCount = this.playerCount * this.bulletPerPlayer;
+    }
+
+    @Override
+    public void tick() {
+
+        if (this.bulletCount <= 0) {
+            this.ouros.stopAttacking(0);
+            return;
+        }
+
+        if (this.attackTicks > 0) {
+            this.attackTicks--;
+            return;
+        }
+
+        this.randomCurrentPart();
+
+        this.shootRandomPlayer();
+
+        bulletCount--;
+        attackTicks = reducedTickDelay(BULLET_INTERVAL);
+    }
+
+    private void randomCurrentPart() {
+        RandomSource randomSource = this.ouros.getRandom();
+        int randomIndex = randomSource.nextInt(13) + 1;
+        this.currentPart = (FairkeeperOurosPartEntity) this.ouros.getChild();
+        for (int i = 0; i < randomIndex; i++) {
+            this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();
+            if (this.currentPart == null) {
+                this.ouros.stopAttacking(0);
+                return;
+            }
+        }
+    }
+
+    private void shootRandomPlayer() {
+        RandomSource randomSource = this.ouros.getRandom();
+        UUID playerUUID = playerUUIDs.stream().skip(randomSource.nextInt(playerCount)).findFirst().orElse(null);
+        Entity player = ((ServerLevel) this.ouros.level()).getEntity(playerUUID);
+        if (player != null) {
+            VertexOrbProjectileEntity vertexOrbProjectileEntity = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros);
+            vertexOrbProjectileEntity.shootTowardsTarget(this.currentPart.getX(), this.currentPart.getY() - 1, this.currentPart.getZ(), (LivingEntity) player, 1.0F, this.inaccuracy);
+            this.ouros.level().addFreshEntity(vertexOrbProjectileEntity);
+
+            this.caller.addMinion(vertexOrbProjectileEntity.getUUID());
+
+            this.ouros.level().playSound(null, this.currentPart.getX(), this.currentPart.getY() - 1, this.currentPart.getZ(), SoundEvents.WITHER_SHOOT, this.currentPart.getSoundSource(), 3.0F, 1.0F + (this.currentPart.getRandom().nextFloat() - this.currentPart.getRandom().nextFloat()) * 0.2F);
+
+        }
+    }
+}

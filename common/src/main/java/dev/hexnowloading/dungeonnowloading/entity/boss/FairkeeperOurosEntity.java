@@ -96,6 +96,10 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_CROSS, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_CROSS));
         this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_LARGE_SQUARE));
         this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_DOUBLE_LINE));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 20.0, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 1, 0.05F));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 20.0, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 3, 0.2F));
         this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false));
         //this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
         //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
@@ -684,11 +688,14 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         CIRCLING,
         SHOOT_VERTEX_ARROW_DIRECT,
         SUMMON_SCUTTLE,
+        DROP_PILLAR_RANDOM,
         DROP_PILLAR_SMALL_SQUARE,
         DROP_PILLAR_SINGLE_LINE,
         DROP_PILLAR_LARGE_SQUARE,
         DROP_PILLAR_CROSS,
         DROP_PILLAR_DOUBLE_LINE,
+        SHOOT_SINGLE_VERTEX_ORB,
+        SHOOT_TRIPLE_VERTEX_ORB,
         DYING;
 
         private FairkeeperOurosState() {
