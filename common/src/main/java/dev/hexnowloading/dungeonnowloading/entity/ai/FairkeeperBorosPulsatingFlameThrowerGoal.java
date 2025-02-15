@@ -6,15 +6,17 @@ import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEnti
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 
-public class FairkeeperBorosFlameThrowerGoal extends Goal {
-
+public class FairkeeperBorosPulsatingFlameThrowerGoal extends Goal {
     private final FairkeeperBorosEntity boros;
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
     private int shootingInterval;
     private int startUpDelay;
+    private int cycle;
     private FairkeeperBorosPartEntity currentPart;
 
-    public FairkeeperBorosFlameThrowerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, int startUpDelay) {
+    private final int CYCLE = 10;
+
+    public FairkeeperBorosPulsatingFlameThrowerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, int startUpDelay) {
         this.boros = boros;
         this.state = state;
         this.startUpDelay = reducedTickDelay(startUpDelay);
@@ -27,7 +29,8 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
 
     @Override
     public void start() {
-        this.shootingInterval = reducedTickDelay(200);
+        this.shootingInterval = reducedTickDelay(20);
+        this.cycle = 0;
     }
 
     @Override
@@ -37,18 +40,26 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
             return;
         }
 
-        if (this.shootingInterval > 0) {
-            this.shootingInterval--;
-        } else {
-            this.boros.stopAttacking(20);
+        if (this.cycle >= 5) {
+            this.boros.stopAttacking(40);
             return;
         }
 
-        if (this.shootingInterval % reducedTickDelay(2) == 0) {
-            this.shootFlame(90);
-            this.shootFlame(-90);
+        if (this.shootingInterval > 0) {
+            this.shootingInterval--;
+        } else {
+            this.shootingInterval = 40;
+            this.cycle++;
+        }
+
+        if (this.shootingInterval > 20) {
+            if (this.shootingInterval % reducedTickDelay(2) == 0) {
+                this.shootFlame(90);
+                this.shootFlame(-90);
+            }
         }
     }
+
 
     private void shootFlame(float angle) {
         double viewDistance = 2.0F;
@@ -61,7 +72,7 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
         FlameProjectileEntity flame = new FlameProjectileEntity(this.boros, this.boros.level());
         flame.setOwner(this.boros);
         flame.setPos(this.boros.getX() + rx * viewDistance, this.boros.getY() + this.boros.getBoundingBox().getYsize() / 2, this.boros.getZ() + rz * viewDistance);
-        flame.shootFromRotation(this.boros, this.boros.getXRot(), this.boros.getYRot() + (float) Math.toDegrees(angleRadians), 0.0F, 0.3F, 1.0F);
+        flame.shootFromRotation(this.boros, this.boros.getXRot(), this.boros.getYRot() + (float) Math .toDegrees(angleRadians), 0.0F, 0.3F, 1.0F);
         this.boros.level().addFreshEntity(flame);
     }
 }

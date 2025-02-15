@@ -253,8 +253,16 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     private void commandBoros() {
         if (this.borosStateSelector.isEmpty()) {
-            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, 1, 1, 0);
-            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_PURSUING, 1, 1, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_PURSUING, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_CIRCLING, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_PULSATING, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LINE, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SLITHER, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, 1, 10, 1);
+            borosStateSelector.addMove(FairkeeperBorosEntity.FairkeeperBorosState.CHASE_AND_SHOOT_ARROW, 1, 10, 0);
         }
 
         borosStateSelector.displayAllStats();

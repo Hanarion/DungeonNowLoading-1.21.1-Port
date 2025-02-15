@@ -180,7 +180,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     @Override
     protected void customServerAiStep() {
         if (this.isTail()) {
-            this.setPathOnFire();
+            //this.setPathOnFire();
         }
 
         if (this.isHeadEntityMoving()) {

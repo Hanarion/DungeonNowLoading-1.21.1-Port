@@ -18,6 +18,7 @@ public class DNLParticleTypes {
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> REDSTONE_SHOCKWAVE_PARTICLE = register("redstone_shockwave", () -> new ScalableParticleType(false));
     public static final Supplier<ParticleType<ScalableAxisParticleType.ScalableAxisParticleData>> REDSTONE_HAZARD_INDICATOR_PARTICLE = register("redstone_hazard_indicator", () -> new ScalableAxisParticleType(false));
     public static final Supplier<ParticleType<ScalableAxisParticleType.ScalableAxisParticleData>> WHITE_SHOCKWAVE_PARTICLE = register("white_shockwave", () -> new ScalableAxisParticleType(false));
+    public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> ARROW_HAZARD_INDICATOR = register("arrow_hazard_indicator", () -> new ScalableParticleType(false));
 
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> VERTEX_SPARK_PARTICLE = register("vertex_spark", () -> new ScalableParticleType(false));
 

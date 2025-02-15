@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,6 +31,14 @@ public class BorusArrowEntity extends AbstractArrow {
 
     public BorusArrowEntity(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+        this.constantDeltaMovement = Vec3.ZERO;
+        this.blockBreakCount = 0;
+        this.arrowPhase = 0;
+    }
+
+    public BorusArrowEntity(LivingEntity owner, Level level) {
+        super(DNLEntityTypes.BORUS_ARROW.get(), owner, level);
+        this.setOwner(owner);
         this.constantDeltaMovement = Vec3.ZERO;
         this.blockBreakCount = 0;
         this.arrowPhase = 0;
