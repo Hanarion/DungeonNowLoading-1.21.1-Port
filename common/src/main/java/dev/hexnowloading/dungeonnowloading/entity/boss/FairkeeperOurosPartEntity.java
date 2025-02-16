@@ -219,7 +219,11 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         }
 
         if (!this.hasArmor() || damageSource.isCreativePlayer()) {
-            return super.hurt(damageSource, damageAmount);
+            FairkeeperOurosEntity head = (FairkeeperOurosEntity) this.getHead();
+            if (head != null) {
+                head.hurt(damageSource, damageAmount);
+            }
+            return super.hurt(damageSource, 0);
         }
 
         if (damageSource.is(DamageTypes.EXPLOSION) || (damageSource.getDirectEntity() instanceof LivingEntity livingEntity && livingEntity.canDisableShield())) {
@@ -398,7 +402,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.set(MODEL_VISIBLE, moving);
     }
 
-    public boolean isArmoredSegment() { return this.getBodyIndex() % 2 != 0; }
+    public boolean isArmoredSegment() { return false; }
 
     public boolean hasArmor() { return this.entityData.get(DROPPER); }
 

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.entity.util.ProjectileUtils;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
@@ -46,6 +47,7 @@ public class BorusArrowEntity extends AbstractArrow {
 
     @Override
     public void tick() {
+        ProjectileUtils.checkAndUnloadProjectile(this);
         if (this.tickCount > 100) {
             this.discard();
         }

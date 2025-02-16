@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
@@ -157,6 +158,9 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         );
         List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, effectBox);
         for (LivingEntity entity : entities) {
+            if (entity instanceof FairkeeperSerpentEntity) {
+                continue;
+            }
             entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER)); // Slowness V (4 = level 5)
             if (applyDamage(entity, BASE_DAMAGE, 0.6F)) {
                 spawnRedstoneBeamParticle((ServerLevel) level, entity);

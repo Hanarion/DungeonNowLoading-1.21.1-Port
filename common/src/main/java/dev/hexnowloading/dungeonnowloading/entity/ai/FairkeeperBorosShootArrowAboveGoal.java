@@ -10,6 +10,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Triple;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-public class FairkeeperBorosCircleAndShootArrowGoal extends Goal {
+public class FairkeeperBorosShootArrowAboveGoal extends Goal {
     private final FairkeeperBorosEntity boros;
     private Entity circlingTarget;
     private final double radius;
@@ -43,7 +44,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends Goal {
     private static final int BEAM_TICK = 30;
     private static final float FULL_ARENA_SIZE = 49F;
 
-    public FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double speed, ShootingPattern pattern) {
+    public FairkeeperBorosShootArrowAboveGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double speed, ShootingPattern pattern) {
         this.state = state;
         this.boros = boros;
         this.radius = pattern.ratio * FULL_ARENA_SIZE / 2;
@@ -122,20 +123,20 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends Goal {
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.LEFT) {
-                        this.spawnRedstoneTrail(part, 90, 0, 0);
+                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
                     }
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.RIGHT) {
-                        this.spawnRedstoneTrail(part, -90, 0, 0);
+                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
                     }
                     if (shootingType == ShootingType.TRIPLE_BOTH || shootingType == ShootingType.TRIPLE_LEFT) {
-                        this.spawnRedstoneTrail(part, 90, -1.5, 0);
-                        this.spawnRedstoneTrail(part, 90, 0, 0);
-                        this.spawnRedstoneTrail(part, 90, 1.5, 0);
+                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
+                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
+                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
                     }
                     if (shootingType == ShootingType.TRIPLE_BOTH || shootingType == ShootingType.TRIPLE_RIGHT) {
-                        this.spawnRedstoneTrail(part, -90, -1.5, 0);
-                        this.spawnRedstoneTrail(part, -90, 0, 0);
-                        this.spawnRedstoneTrail(part, -90, 1.5, 0);
+                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
+                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
+                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
                     }
                     this.boros.playBeamSound(part.getX(), part.getY(), part.getZ());
                 });
@@ -146,20 +147,20 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends Goal {
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.LEFT) {
-                        this.shootArrow(part, 90, 0, 0);
+                        this.shootArrow(part, 0, 3, 0);
                     }
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.RIGHT) {
-                        this.shootArrow(part, -90, 0, 0);
+                        this.shootArrow(part, 0, 3, 0);
                     }
                     if (shootingType == ShootingType.TRIPLE_BOTH || shootingType == ShootingType.TRIPLE_LEFT) {
-                        this.shootArrow(part, 90, -1.5, 0);
-                        this.shootArrow(part, 90, 0, 0);
-                        this.shootArrow(part, 90, 1.5, 0);
+                        this.shootArrow(part, 0, 3, 0);
+                        this.shootArrow(part, 0, 3, 0);
+                        this.shootArrow(part, 0, 3, 0);
                     }
                     if (shootingType == ShootingType.TRIPLE_BOTH || shootingType == ShootingType.TRIPLE_RIGHT) {
-                        this.shootArrow(part, -90, -1.5, 0);
-                        this.shootArrow(part, -90, 0, 0);
-                        this.shootArrow(part, -90, 1.5, 0);
+                        this.shootArrow(part, 0, 3, 0);
+                        this.shootArrow(part, 0, 3, 0);
+                        this.shootArrow(part, 0, 3, 0);
                     }
                     this.boros.playArrowSound(part.getX(), part.getY(), part.getZ());
                 });
@@ -234,62 +235,67 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends Goal {
         return Math.abs(this.travelledAngle) >= this.pattern.positionList().get(targetIndex).getRight();
     }
 
-    private void shootArrow(FairkeeperBorosPartEntity partEntity, float angleOffset, double rxOffset, double rzOffset) {
-        double viewDistance = 2.0F;
+    private void shootArrow(FairkeeperBorosPartEntity partEntity, double rxOffset, double ryOffset, double rzOffset) {
+        LivingEntity target = this.boros.getTarget();
+        if (target == null) {
+            return; // No target, don't shoot
+        }
 
-        float borosFacingYaw = partEntity.getYRot();
-
-        double finalAngle = Math.toRadians(borosFacingYaw - angleOffset);
-        double cosFinal = Math.cos(finalAngle);
-        double sinFinal = Math.sin(finalAngle);
-
-        Vec3 shootDirection = new Vec3(-sinFinal, 0, cosFinal).normalize();
-
-        double rotatedRxOffset = rxOffset * cosFinal - rzOffset * sinFinal;
-        double rotatedRzOffset = rxOffset * sinFinal + rzOffset * cosFinal;
-
+        // Calculate direction to target
         Vec3 startPos = new Vec3(
-                partEntity.getX() + rotatedRxOffset,
-                partEntity.getY() + partEntity.getBoundingBox().getYsize() / 2,
-                partEntity.getZ() + rotatedRzOffset
+                partEntity.getX() + rxOffset,
+                partEntity.getY() + ryOffset + partEntity.getBoundingBox().getYsize() / 2,
+                partEntity.getZ() + rzOffset
         );
 
-        Vec3 arrowPos = startPos.add(shootDirection.scale(viewDistance));
+        Vec3 targetPos = target.position().add(0, target.getBbHeight() / 2, 0); // Aim at player's center
+        Vec3 direction = targetPos.subtract(startPos).normalize(); // Normalize to get unit vector
 
+        // Spawn arrow at calculated position
         BorusArrowEntity arrow = new BorusArrowEntity(this.boros, this.boros.level());
-        arrow.setPos(arrowPos);
-        arrow.shootFromRotation(partEntity, partEntity.getXRot(), borosFacingYaw - angleOffset, 0.0F, 2.0F, 1.0F);
+        arrow.setPos(startPos);
+        arrow.shoot(direction.x, direction.y, direction.z, 2.0F, 0.0F); // Directly shoot toward player
+
         this.boros.level().addFreshEntity(arrow);
     }
 
 
 
-    private void spawnRedstoneTrail(FairkeeperBorosPartEntity partEntity, float angleOffset, double rxOffset, double rzOffset) {
-        double viewDistance = 2.0F;
 
-        float borosFacingYaw = partEntity.getYRot();
+    private void spawnRedstoneTrail(FairkeeperBorosPartEntity partEntity, double rxOffset, double ryOffset, double rzOffset, double beamLength, int particleCount) {
+        LivingEntity target = this.boros.getTarget();
+        if (target == null) {
+            return; // No target, don't create beam
+        }
 
-        double finalAngle = Math.toRadians(borosFacingYaw - angleOffset);
-        double cosFinal = Math.cos(finalAngle);
-        double sinFinal = Math.sin(finalAngle);
-
-        Vec3 beamDirection = new Vec3(-sinFinal, 0, cosFinal).normalize();
-
-        double rotatedRxOffset = rxOffset * cosFinal - rzOffset * sinFinal;
-        double rotatedRzOffset = rxOffset * sinFinal + rzOffset * cosFinal;
-
+        // Get the starting position (same as the arrow)
         Vec3 startPos = new Vec3(
-                partEntity.getX() + rotatedRxOffset,
-                partEntity.getY() + partEntity.getBoundingBox().getYsize() / 2,
-                partEntity.getZ() + rotatedRzOffset
-        ).add(beamDirection.scale(viewDistance));
+                partEntity.getX() + rxOffset,
+                partEntity.getY() + ryOffset + partEntity.getBoundingBox().getYsize() / 2,
+                partEntity.getZ() + rzOffset
+        );
 
-        for (int i = 0; i <= 30; i++) {
-            Vec3 particlePos = startPos.add(beamDirection.scale(i));
-            ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(DNLParticleTypes.ARROW_HAZARD_INDICATOR.get(), 0.5F);
-            ((ServerLevel) partEntity.level()).sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1, 0, 0, 0, 0);
+        // Calculate direction toward the target
+        Vec3 targetPos = target.position().add(0, target.getBbHeight() / 2, 0); // Aim at player's center
+        Vec3 direction = targetPos.subtract(startPos).normalize(); // Normalize to get a unit vector
+
+        // Calculate step size for particles
+        double stepSize = beamLength / particleCount;
+
+        // Spawn particles along the beam path
+        for (int i = 0; i < particleCount; i++) {
+            Vec3 particlePos = startPos.add(direction.scale(i * stepSize)); // Move along the beam
+
+            ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
+                    DNLParticleTypes.ARROW_HAZARD_INDICATOR.get(), 0.5F
+            );
+
+            ((ServerLevel) partEntity.level()).sendParticles(particleData,
+                    particlePos.x, particlePos.y, particlePos.z,
+                    1, 0, 0, 0, 0);
         }
     }
+
 
     private record ShootingPattern(boolean circlePlayer, boolean rotateClockWise, float ratio, ImmutableList<Triple<ShootingType, List<Integer>, Float>> positionList) {}
 

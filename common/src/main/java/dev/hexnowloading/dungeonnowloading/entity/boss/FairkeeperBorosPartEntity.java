@@ -233,7 +233,11 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         }
 
         if (!this.hasArmor() || damageSource.isCreativePlayer()) {
-            return super.hurt(damageSource, damageAmount);
+            FairkeeperBorosEntity head = (FairkeeperBorosEntity) this.getHead();
+            if (head != null) {
+                head.hurt(damageSource, damageAmount);
+            }
+            return super.hurt(damageSource, 0);
         }
 
         if (damageSource.is(DamageTypes.EXPLOSION) || (damageSource.getDirectEntity() instanceof LivingEntity livingEntity && livingEntity.canDisableShield())) {
@@ -412,7 +416,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.set(MODEL_VISIBLE, moving);
     }
 
-    public boolean isArmoredSegment() { return this.getBodyIndex() % 2 != 0; }
+    public boolean isArmoredSegment() { return !this.isTail(); }
 
     public boolean hasArmor() { return this.entityData.get(ARMOR); }
 

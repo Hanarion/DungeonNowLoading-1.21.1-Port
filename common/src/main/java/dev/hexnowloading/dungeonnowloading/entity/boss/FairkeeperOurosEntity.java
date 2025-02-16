@@ -74,7 +74,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 300.0)
+                .add(Attributes.MAX_HEALTH, 500.0)
                 .add(Attributes.ATTACK_DAMAGE, 20.0)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5)
                 .add(Attributes.MOVEMENT_SPEED, 0.4)

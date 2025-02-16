@@ -103,6 +103,7 @@ public class FairkeeperBorosShootArrowGoal extends Goal {
                         this.spawnRedstoneTrail(part, -90, 0, 0);
                         this.spawnRedstoneTrail(part, -90, 1.5, 0);
                     }
+                    this.boros.playBeamSound(part.getX(), part.getY(), part.getZ());
                 });
             }
 
@@ -126,6 +127,7 @@ public class FairkeeperBorosShootArrowGoal extends Goal {
                         this.shootArrow(part, -90, 0, 0);
                         this.shootArrow(part, -90, 1.5, 0);
                     }
+                    this.boros.playArrowSound(part.getX(), part.getY(), part.getZ());
                 });
             }
 

@@ -13,6 +13,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
@@ -20,7 +22,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
@@ -42,6 +46,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private TickBaseMoveSet<FairkeeperBorosState> stateSelector = new TickBaseMoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
+    private Set<UUID> partList;
 
     private int attackTick;
     private float previousTilt = 0.0f;
@@ -62,7 +67,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 300.0)
+                .add(Attributes.MAX_HEALTH, 500.0)
                 .add(Attributes.ATTACK_DAMAGE, 20.0)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5)
                 .add(Attributes.MOVEMENT_SPEED, 0.4)
@@ -91,7 +96,9 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, this, 1.5f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_SMALL_CIRLCE));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, this, 1.5f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_LARGE_CIRCLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, this, 1.5f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_PLAYER_LARGE_CIRCLE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosChaseAndShootArrowGoal(FairkeeperBorosState.CHASE_AND_SHOOT_ARROW, this, 1.3f, 3.0F, FairkeeperBorosChaseAndShootArrowGoal.PATTERN_TRIPLE));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, this, 1.3f, 3.0F, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_TRIPLE));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_SINGLE_ARROW, this, 1.3f, 3.0F, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_SINGLE));
+        this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowAboveGoal(FairkeeperBorosState.SHOOT_ARROW_ABOVE, this, 1.5f, FairkeeperBorosShootArrowAboveGoal.PATTERN_PLAYER_LARGE_CIRCLE));
         this.goalSelector.addGoal(4, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true));
         //this.goalSelector.addGoal(3, new FairkeeperBorosShootPoisonArrowGoal());
         //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
@@ -419,6 +426,19 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         return false;
     }
 
+    public void playBeamSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, SoundEvents.ALLAY_THROW, this.getSoundSource(), 3.0F, 0.1F);
+    }
+
+    public void playArrowSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, SoundEvents.FIREWORK_ROCKET_BLAST_FAR, this.getSoundSource(), 3.0F, 0.1F);
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return super.getDeathSound();
+    }
+
     public Entity getChild() {
         UUID id = getChildId();
         if (id != null && !this.level().isClientSide) {
@@ -478,7 +498,9 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         SHOOT_ARROW_SMALL_CIRCLE,
         SHOOT_ARROW_LARGE_CIRCLE,
         SHOOT_ARROW_PLAYER_LARGE_CRICLE,
-        CHASE_AND_SHOOT_ARROW,
+        PURSUE_AND_SHOOT_TRIPLE_ARROW,
+        PURSUE_AND_SHOOT_SINGLE_ARROW,
+        SHOOT_ARROW_ABOVE,
         TACKLE,
         FOLLOW,
         SHOOT_POISON_POTION,

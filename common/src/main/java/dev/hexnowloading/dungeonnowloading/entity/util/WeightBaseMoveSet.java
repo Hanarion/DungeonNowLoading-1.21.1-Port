@@ -52,8 +52,9 @@ public class WeightBaseMoveSet<T extends Object> {
         chosenMove = weightedPool.getRandom();
         if (chosenMove != null) {
             chosenMove.currentCooldown = chosenMove.cooldown;
+            return chosenMove.object;
         }
-        return chosenMove.object;
+        return null;
     }
 
     public void reduceAllCooldown() {

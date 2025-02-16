@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.entity.util.ProjectileUtils;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
@@ -37,6 +38,7 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     public void tick() {
+        ProjectileUtils.checkAndUnloadProjectile(this);
         super.tick();
         this.level().addAlwaysVisibleParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), true, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
         if (this.tickCount > 60) {

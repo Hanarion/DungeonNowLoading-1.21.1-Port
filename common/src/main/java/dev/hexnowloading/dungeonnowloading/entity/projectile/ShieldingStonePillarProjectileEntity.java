@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
 import dev.hexnowloading.dungeonnowloading.block.ShieldingStonePillarBlock;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.ProjectileUtils;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableAxisParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
@@ -11,6 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -31,6 +33,7 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
 
     private int tickCount;
     private boolean hasLanded;
+    private float damagePercentage;
 
     public ShieldingStonePillarProjectileEntity(EntityType<? extends ShieldingStonePillarProjectileEntity> entityType, Level level) {
         super(entityType, level);
@@ -38,9 +41,10 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
         this.hasLanded = false;
     }
 
-    public ShieldingStonePillarProjectileEntity(Level level, LivingEntity livingEntity) {
+    public ShieldingStonePillarProjectileEntity(Level level, LivingEntity livingEntity, float damagePercentage) {
         this(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), level);
         this.setOwner(livingEntity);
+        this.damagePercentage = damagePercentage;
     }
 
     @Override
@@ -50,6 +54,7 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
 
     @Override
     protected void tickProjectile() {
+        ProjectileUtils.checkAndUnloadProjectile(this);
         if (!this.isNoGravity()) {
             this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.04, 0.0));
         }
@@ -94,6 +99,9 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
 
     private void pushNearbyMobs(LivingEntity mob) {
         float actualDamage = DAMAGE;
+        if (this.getOwner() instanceof LivingEntity owner) {
+            actualDamage = (float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE) * damagePercentage;
+        }
         if (mob instanceof Player player && player.isBlocking()) {
             player.disableShield(true);
             actualDamage *= 1.0F - SHILED_DAMAGE_REDUCTION;

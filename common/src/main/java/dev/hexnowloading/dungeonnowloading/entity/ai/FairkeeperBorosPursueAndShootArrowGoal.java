@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
-public class FairkeeperBorosChaseAndShootArrowGoal extends Goal {
+public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
     private final FairkeeperBorosEntity boros;
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
     private final ShootingPattern pattern;
@@ -32,7 +32,7 @@ public class FairkeeperBorosChaseAndShootArrowGoal extends Goal {
     private static final int SHOOTING_COOLDOWN = 60;
     private static final float ADDED_SPEED = 0.4F;
 
-    public FairkeeperBorosChaseAndShootArrowGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double speed, double shootingRange, ShootingPattern pattern) {
+    public FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double speed, double shootingRange, ShootingPattern pattern) {
         this.state = state;
         this.boros = boros;
         this.speed = speed;
@@ -137,8 +137,6 @@ public class FairkeeperBorosChaseAndShootArrowGoal extends Goal {
         arrow.shootFromRotation(partEntity, partEntity.getXRot(), borosFacingYaw - angleOffset, 0.0F, 2.0F, 1.0F);
         this.boros.level().addFreshEntity(arrow);
     }
-
-
 
     private void spawnRedstoneTrail(FairkeeperBorosEntity partEntity, float angleOffset, double rxOffset, double rzOffset) {
         double viewDistance = 2.0F;
