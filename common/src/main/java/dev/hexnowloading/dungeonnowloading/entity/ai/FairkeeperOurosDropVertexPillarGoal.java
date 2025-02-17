@@ -19,7 +19,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import java.util.EnumSet;
 import java.util.List;
 
-public class FairkeeperOurosVertexPillarDropGoal extends Goal {
+public class FairkeeperOurosDropVertexPillarGoal extends Goal {
 
     private final FairkeeperOurosEntity ouros;
     private FairkeeperOurosEntity.FairkeeperOurosState state;
@@ -34,7 +34,7 @@ public class FairkeeperOurosVertexPillarDropGoal extends Goal {
 
     private static final float FULL_ARENA_SIZE = 49F;
 
-    public FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, double speed, ImmutablePair<Float, List<Vec3>> pattern) {
+    public FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, double speed, ImmutablePair<Float, List<Vec3>> pattern) {
         this.ouros = ouros;
         this.state = state;
         this.pattern = pattern;

@@ -108,7 +108,7 @@ public class BorusArrowEntity extends AbstractArrow {
             damageSource = this.damageSources().arrow(this, this);
         } else {
             damageSource = this.damageSources().arrow(this, owner);
-            if (owner instanceof LivingEntity) {
+            if (owner instanceof LivingEntity && target instanceof LivingEntity) {
                 ((LivingEntity) owner).setLastHurtByMob((LivingEntity) target);
             }
         }

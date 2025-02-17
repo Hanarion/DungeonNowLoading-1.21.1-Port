@@ -39,6 +39,8 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> SCUTTLE_DEFLECT = registerSoundEvent("scuttle_deflect");
     public static final Supplier<SoundEvent> SCUTTLE_HURT = registerSoundEvent("scuttle_hurt");
     public static final Supplier<SoundEvent> SCUTTLE_DEATH = registerSoundEvent("scuttle_death");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_BEAM = registerSoundEvent("fairkeeper_boros_beam");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_HEAL = registerSoundEvent("fairkeeper_boros_heal");
 
 
     private static <T extends SoundEvent> Supplier<SoundEvent> registerSoundEvent(String string) {

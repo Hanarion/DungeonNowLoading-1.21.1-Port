@@ -45,6 +45,7 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
         }
 
         if (this.shootingInterval % reducedTickDelay(2) == 0) {
+            this.boros.playFlameShootingSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
             this.shootFlame(90);
             this.shootFlame(-90);
         }

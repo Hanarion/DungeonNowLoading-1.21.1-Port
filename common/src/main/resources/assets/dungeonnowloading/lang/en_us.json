@@ -169,6 +169,8 @@
   "sounds.dungeonnowloading.scuttle_deflect": "Scuttle deflects",
   "sounds.dungeonnowloading.scuttle_hurt": "Scuttle hurts",
   "sounds.dungeonnowloading.scuttle_death": "Scuttle dies",
+  "sounds.dungeonnowloading.fairkeeper_boros_beam": "Fairkeeper beams",
+  "sounds.dungeonnowloading.fairkeeper_boros_heal": "Fairkeeper healing",
   "effect.dungeonnowloading.vertex_transmission": "Vertex Transmission",
   "sounds.dungeonnowloading.vertex_arrow_bootup": "Vertex Arrow boots up",
   "sounds.dungeonnowloading.vertex_transmission_damage": "Vertex Transmission zaps",

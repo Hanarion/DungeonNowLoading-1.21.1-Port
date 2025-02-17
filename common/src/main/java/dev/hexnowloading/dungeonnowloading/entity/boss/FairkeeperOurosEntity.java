@@ -91,11 +91,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexArrowGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this));
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 20.0, 1.3, false));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this));
-        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_SMALL_SQUARE));
-        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_SINGLE_LINE));
-        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_CROSS, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_CROSS));
-        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_LARGE_SQUARE));
-        this.goalSelector.addGoal(3, new FairkeeperOurosVertexPillarDropGoal(FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE, this, 1.3, FairkeeperOurosVertexPillarDropGoal.PATTERN_DOUBLE_LINE));
+        this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE, this, 1.3, FairkeeperOurosDropVertexPillarGoal.PATTERN_SMALL_SQUARE));
+        this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE, this, 1.3, FairkeeperOurosDropVertexPillarGoal.PATTERN_SINGLE_LINE));
+        this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_CROSS, this, 1.7, FairkeeperOurosDropVertexPillarGoal.PATTERN_CROSS));
+        this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE, this, 1.7, FairkeeperOurosDropVertexPillarGoal.PATTERN_LARGE_SQUARE));
+        this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE, this, 1.7, FairkeeperOurosDropVertexPillarGoal.PATTERN_DOUBLE_LINE));
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 20.0, 1.3, false));
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 1, 0.05F));
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 20.0, 1.3, false));

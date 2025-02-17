@@ -3,6 +3,8 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import com.google.common.collect.ImmutableList;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
 import dev.hexnowloading.dungeonnowloading.entity.util.WeightBaseMoveSet;
@@ -66,6 +68,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private WeightBaseMoveSet<FairkeeperOurosEntity.FairkeeperOurosState> ourosMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<FairkeeperOurosEntity.FairkeeperOurosState> ourosPillarMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<FairkeeperBorosEntity.FairkeeperBorosState> borosMoveSet = new WeightBaseMoveSet<>();
+    private WeightBaseMoveSet<FairkeeperBorosEntity.FairkeeperBorosState> borosArrowMoveSet = new WeightBaseMoveSet<>();
+    private WeightBaseMoveSet<FairkeeperBorosEntity.FairkeeperBorosState> borosPursueMoveSet = new WeightBaseMoveSet<>();
 
 
     public FairkeeperSerpentCallerEntity(EntityType<?> entityType, Level level) {
@@ -129,11 +133,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     public void startBossFight() {
         this.activationTick = 60;
-        this.introMoveSet.clear();
-        this.comboMoveSet.clear();
-        this.directMoveSet.clear();
-        this.ourosMoveSet.clear();
-        this.borosMoveSet.clear();
+        this.clearAllMoveSet();
         this.setActivated(true);
         this.setOffsets(10, 12);
         AABB bossArena = new AABB(this.blockPosition()).inflate(ARENA_SIZE);
@@ -154,7 +154,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                         break;
                     }
                     this.summonBosses();
-                    System.out.println("Phase 1");
                     this.setPhase(1);
                     //this.activationTick = 60;
                     break;
@@ -170,7 +169,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
                     if (this.getHealthRatio() < 0.75F) {
                         this.setPhase(2);
-                        System.out.println("Phase 2");
+                        this.clearAllMoveSet();
                         break;
                     }
 
@@ -183,8 +182,11 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                     break;
                 case 2:
 
-                    if (this.isBorosWaitingForCommand() && this.isOurosWaitingForCommand()) {
-                        this.comboMoveSet();
+                    if (this.isBorosWaitingForCommand()) {
+                        this.commandBorosPhase2();
+                    }
+                    if (this.isOurosWaitingForCommand()) {
+                        this.commandOurosPhase2();
                     }
 
                     if (this.activationTick > 0) {
@@ -194,7 +196,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
                     if (this.getBoros() == null || this.getOuros() == null) {
                         this.setPhase(3);
-                        System.out.println("Phase 3");
+                        this.clearAllMoveSet();
                         break;
                     }
 
@@ -208,10 +210,10 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 case 3:
 
                     if (this.isBorosWaitingForCommand()) {
-                        this.commandBoros();
+                        this.commandBorosPhase2();
                     }
                     if (this.isOurosWaitingForCommand()) {
-                        this.commandOuros();
+                        this.commandOurosPhase2();
                     }
 
                     if (this.activationTick > 0) {
@@ -222,7 +224,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                     if (this.getBoros() == null && this.getOuros() == null) {
                         this.defeatedBosses();
                         this.setPhase(4);
-                        System.out.println("Phase 4");
                         break;
                     }
 
@@ -259,12 +260,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         if (introMoveSet.isEmpty()) {
             introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.IDLE, FairkeeperOurosEntity.FairkeeperOurosState.SUMMON_SCUTTLE), 1, 2, 2);
             introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.IDLE, FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB), 1, 0, 0);
-            introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.IDLE, FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB), 1, 1, 0);
+            //introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.IDLE, FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB), 1, 1, 0);
             introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.IDLE, FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM), 1, 2, 0);
-            introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LINE, FairkeeperOurosEntity.FairkeeperOurosState.IDLE), 1, 1, 1);
-            introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, FairkeeperOurosEntity.FairkeeperOurosState.IDLE), 1, 1, 0);
+            introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LINE, FairkeeperOurosEntity.FairkeeperOurosState.IDLE), 1, 2, 1);
+            introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, FairkeeperOurosEntity.FairkeeperOurosState.IDLE), 1, 2, 0);
             introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_AND_SHOOT_SINGLE_ARROW, FairkeeperOurosEntity.FairkeeperOurosState.IDLE), 1, 1, 0);
-            introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_PURSUING, FairkeeperOurosEntity.FairkeeperOurosState.IDLE), 1, 1, 0);
+            //introMoveSet.addMove(new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_PURSUING, FairkeeperOurosEntity.FairkeeperOurosState.IDLE), 1, 2, 0);
         }
 
         if (directMoveSet.isEmpty()) {
@@ -277,6 +278,78 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE), 1, 0, 1);
         }
 
+        ourosBorosAssignState();
+    }
+
+    private void commandBorosPhase2() {
+        if (this.borosMoveSet.isEmpty()) {
+            borosMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_RANDOM, 1, 0, 1);
+            borosMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_RANDOM, 1, 0, 0);
+        }
+
+        if (this.borosArrowMoveSet.isEmpty()) {
+            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LINE, 1, 3, 3);
+            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, 1, 3, 3);
+            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, 1, 3, 0);
+            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SLITHER, 1, 3, 0);
+            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, 1, 3, 0);
+        }
+
+        if (this.borosPursueMoveSet.isEmpty()) {
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, 1, 2, 2);
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_PURSUING, 1, 1, 0);
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, 1, 1, 1);
+        }
+
+        borosAssignState();
+    }
+
+    private void commandOurosPhase2() {
+        if (this.ourosMoveSet.isEmpty()) {
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SUMMON_SCUTTLE, 3, 2, 3);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, 1, 0, 3);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, 3, 2, 2);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, 6, 4, 1);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM, 3, 2, 0);
+        }
+
+        if (ourosPillarMoveSet.isEmpty()) {
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE), 1, 3, 3);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE), 1, 3, 3);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE), 1, 3, 1);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_CROSS), 1, 3, 0);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE), 1, 3, 1);
+        }
+
+        ourosAssignState();
+    }
+
+    private void commandBorosPhase3() {
+
+    }
+
+
+    private void commandOurosPhase3() {
+        if (this.ourosMoveSet.isEmpty()) {
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SUMMON_SCUTTLE, 3, 2, 1);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, 1, 0, 1);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, 3, 2, 1);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, 6, 4, 0);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM, 3, 2, 1);
+        }
+
+        if (ourosPillarMoveSet.isEmpty()) {
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE), 1, 0, 2);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE), 1, 0, 2);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE), 3, 0, 0);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_CROSS), 3, 0, 0);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE), 3, 0, 0);
+        }
+
+        ourosAssignState();
+    }
+
+    private void ourosBorosAssignState() {
         Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState> statePair;
 
         if (isAboveBoros()) {
@@ -308,6 +381,78 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         }
         this.setBorosWaitingForCommand(isBorosWaiting);
         this.setOurosWaitingForCommand(isOurosWaiting);
+    }
+
+    private void borosAssignState() {
+        FairkeeperBorosEntity.FairkeeperBorosState state;
+
+        if (isAboveBoros()) {
+            state = FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_ABOVE;
+        } else {
+            state = borosMoveSet.selectMove();
+        }
+
+        if (state.equals(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_RANDOM)) {
+            state = borosArrowMoveSet.selectMove();
+        }
+
+        if (state.equals(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_RANDOM)) {
+            state = borosPursueMoveSet.selectMove();
+        }
+
+        int halfSize = this.getArenaSize();
+        AABB arenaAABB = new AABB(
+                this.getX() - halfSize, this.getY() - halfSize, this.getZ() - halfSize,
+                this.getX() + halfSize, this.getY() + halfSize, this.getZ() + halfSize
+        );
+
+        List<Entity> targetProjectile = boros.level().getEntities((Entity) null, arenaAABB, entity ->
+                        entity instanceof VertexOrbProjectileEntity || entity instanceof VertexDomainProjectileEntity
+                ).stream()
+                .filter(entity -> entity.getY() < boros.getY() + 3) // Filter out unreachable projectiles
+                .toList();
+
+        if (targetProjectile.size() > 4 * (1 - (this.boros.getHealth() / this.boros.getMaxHealth())) && this.boros.getRandom().nextFloat() < 1.0F) {
+            state = FairkeeperBorosEntity.FairkeeperBorosState.EAT_VERTEX_PROJECTILES;
+        }
+
+        Entity boros = this.getBoros();
+        if (boros instanceof FairkeeperBorosEntity borosEntity) {
+            if (state == null) {
+                borosEntity.setState(FairkeeperBorosEntity.FairkeeperBorosState.IDLE);
+                borosEntity.setAttackTick(60);
+                this.ourosMoveSet.reduceAllCooldown();
+            } else {
+                ((FairkeeperBorosEntity) boros).setState(state);
+            }
+        }
+        this.setBorosWaitingForCommand(false);
+    }
+
+    private void ourosAssignState() {
+        FairkeeperOurosEntity.FairkeeperOurosState state;
+
+        if (isAboveBoros()) {
+            state = FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB;
+        } else {
+            state = ourosMoveSet.selectMove();
+        }
+
+        if (state.equals(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM)) {
+            state = ourosPillarMoveSet.selectMove();
+        }
+
+        Entity ouros = this.getOuros();
+        if (ouros instanceof FairkeeperOurosEntity ourosEntity) {
+            if (state == null) {
+                ourosEntity.setState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
+                ourosEntity.setAttackTick(60);
+                this.ourosMoveSet.reduceAllCooldown();
+            } else {
+                ((FairkeeperOurosEntity) ouros).setState(state);
+            }
+        }
+        this.setOurosWaitingForCommand(false);
     }
 
     private void comboMoveSet() {
@@ -426,8 +571,19 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.setOurosWaitingForCommand(false);
     }
 
+    private void clearAllMoveSet() {
+        introMoveSet.clear();
+        comboMoveSet.clear();
+        directMoveSet.clear();
+        ourosMoveSet.clear();
+        ourosPillarMoveSet.clear();
+        borosMoveSet.clear();
+        borosArrowMoveSet.clear();
+        borosPursueMoveSet.clear();
+    }
+
     private boolean isAboveBoros() {
-        return this.boros.getTarget().getY() > this.boros.getY() + 3;
+        return this.boros != null && this.boros.getTarget() != null && this.boros.getTarget().getY() > this.boros.getY() + 3;
     }
 
     private void defeatedBosses() {

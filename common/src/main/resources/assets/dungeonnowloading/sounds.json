@@ -202,5 +202,17 @@
     "sounds": [
         "dungeonnowloading:mob/scuttle/scuttle_death"
     ]
+  },
+  "fairkeeper_boros_beam": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_beam",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper_boros/fairkeeper_boros_beam"
+    ]
+  },
+  "fairkeeper_boros_heal": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_heal",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper_boros/fairkeeper_boros_heal"
+    ]
   }
 }

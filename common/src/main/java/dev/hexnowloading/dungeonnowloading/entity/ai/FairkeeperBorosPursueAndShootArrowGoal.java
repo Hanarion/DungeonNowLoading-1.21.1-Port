@@ -30,7 +30,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
     private static final int SHOOT_ARROW_TICK = 15;
     private static final int BEAM_TICK = 30;
     private static final int SHOOTING_COOLDOWN = 60;
-    private static final float ADDED_SPEED = 0.4F;
+    private static final float ADDED_SPEED = 0.2F;
 
     public FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double speed, double shootingRange, ShootingPattern pattern) {
         this.state = state;
@@ -65,12 +65,14 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
                 pattern.arrowPattern.get(targetIndex).stream().forEach(angle -> {
                     this.spawnRedstoneTrail(this.boros, angle, 0, 0);
                 });
+                this.boros.playBeamSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
             }
 
             if (stoppingTick == reducedTickDelay(SHOOT_ARROW_TICK)) {
                 pattern.arrowPattern.get(targetIndex).stream().forEach((angle -> {
                     this.shootArrow(this.boros, angle, 0, 0);
                 }));
+                this.boros.playArrowSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
             }
 
             if (this.stoppingTick <= 0) {
