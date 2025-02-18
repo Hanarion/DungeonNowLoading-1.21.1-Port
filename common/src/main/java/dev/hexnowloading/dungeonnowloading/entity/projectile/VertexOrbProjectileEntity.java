@@ -31,6 +31,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -39,6 +40,8 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     private static final EntityDataAccessor<Integer> HURT_TIME = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> HURT_TIME_DIRECT = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Vector3f> VELOCITY = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Integer> RADIUS = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.INT);
 
     private static final int BASE_DAMAGE = 6;
     private static final int SLOWNESS_DURATION = 20;
@@ -57,6 +60,9 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     private double yPower;
     private double zPower;
     private int life;
+    private boolean hasAppliedMovement;
+    private boolean hasLanded;
+    private boolean delayTick;
 
     //private final ParticleOptions TRAIL_PARTICLE = (ParticleOptions) DNLParticleTypes.VERTEX_SPARK_PARTICLE.get();
 
@@ -64,9 +70,11 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         super(entityType, level);
     }
 
-    public VertexOrbProjectileEntity(Level level, LivingEntity owner) {
-        super(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), level);
+
+    public VertexOrbProjectileEntity(Level level, LivingEntity owner, int radius) {
+        this(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), level);
         this.setOwner(owner);
+        this.setRadius(radius);
     }
 
     @Override
@@ -83,6 +91,11 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         if (compoundTag.contains("life", Tag.TAG_INT)) {
             this.life = compoundTag.getInt("life");
         }
+        if (compoundTag.contains("radius", Tag.TAG_INT)) {
+            this.setRadius(compoundTag.getInt("radius"));
+        }
+        this.hasLanded = compoundTag.getBoolean("hasLanded");
+
     }
 
     @Override
@@ -90,6 +103,8 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.put("power", this.newDoubleList(this.xPower, this.yPower, this.zPower));
         compoundTag.putInt("life", this.life);
+        compoundTag.putInt("radius", this.getRadius());
+        compoundTag.putBoolean("hasLanded", this.hasLanded);
     }
 
     @Override
@@ -97,10 +112,27 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         this.entityData.define(HURT_TIME, 0);
         this.entityData.define(HURT_TIME_DIRECT, 1);
         this.entityData.define(DAMAGE, 0.0f);
+        this.entityData.define(VELOCITY, Vec3.ZERO.toVector3f());
+        this.entityData.define(RADIUS, 0);
     }
 
     @Override
     protected void tickProjectile() {
+
+        if (!this.hasAppliedMovement) {
+            if (!this.level().isClientSide) {
+                this.setDeltaMovement(xPower, yPower, zPower);
+                this.setVelocity(new Vec3(xPower, yPower, zPower));
+            } else {
+                double d = this.getVelocity().x * this.getVelocity().x + this.getVelocity().y * this.getVelocity().y + this.getVelocity().z * this.getVelocity().z;
+                if (!delayTick && d < 1.0E-7) {
+                    delayTick = true;
+                    return;
+                }
+                this.setDeltaMovement(new Vec3(this.getVelocity().x, this.getVelocity().y, this.getVelocity().z));
+            }
+            this.hasAppliedMovement = true;
+        }
 
         if (this.getHurtTime() > 0) {
             this.setHurtTime(this.getHurtTime() - 1);
@@ -109,11 +141,8 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         this.checkInsideBlocks();
 
         this.move(MoverType.SELF, this.getDeltaMovement());
-        if (this.tickCount == 1) {
-            this.setDeltaMovement(xPower, yPower, zPower);
-        }
 
-        if (this.verticalCollision || this.horizontalCollision) {
+        if ((this.verticalCollision || this.horizontalCollision) || this.getDeltaMovement().lengthSqr() < 1.0E-7 && this.life <= 0) {
             this.life = DURATION_ON_GROUND;
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.BEE_HURT, this.getSoundSource(), 3.0F, 2.0F);
             this.setDeltaMovement(Vec3.ZERO);
@@ -133,9 +162,10 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
     private void blockDestruction() {
         BlockPos pos = this.blockPosition();
-        for (int x = -2; x <= 2; x++) {
-            for (int z = -2; z <= 2; z++) {
-                for (int y = -2; y <= 2; y++) {
+        int r = this.getRadius();
+        for (int x = -r; x <= r; x++) {
+            for (int z = -r; z <= r; z++) {
+                for (int y = -r; y <= r; y++) {
                     BlockPos targetPos = new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
                     if (!this.level().getBlockState(targetPos).is(BlockTags.WITHER_IMMUNE)) {
                         this.level().destroyBlock(targetPos, true);
@@ -152,9 +182,11 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
             return;
         }
 
+        int r = this.getRadius();
+
         AABB effectBox = new AABB(
-                this.getX() - 2, this.getY() - 2, this.getZ() - 2,
-                this.getX() + 2, this.getY() + 2, this.getZ() + 2
+                this.getX() - r, this.getY() - r, this.getZ() - r,
+                this.getX() + r, this.getY() + r, this.getZ() + r
         );
         List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, effectBox);
         for (LivingEntity entity : entities) {
@@ -202,7 +234,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
                 particleScale
         );
 
-        spawnParticleOnAllPlanes(particleData, this.position(), 2);
+        spawnParticleOnAllPlanes(particleData, this.position(), this.getRadius());
     }
 
     private void spawnRedstoneParticle() {
@@ -212,7 +244,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
                 BEAM_PARTICLE_SCALE * scaleMultiplier
         );
 
-        spawnParticleOnAllPlanes(particleData, this.position(), 2);
+        spawnParticleOnAllPlanes(particleData, this.position(), this.getRadius());
     }
 
     private void spawnParticleOnAllPlanes(ParticleOptions particleData, Vec3 center, int radius) {
@@ -322,9 +354,13 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     }
 
     public void shootTowardsTarget(double x, double y, double z, LivingEntity target, float speed, float inaccuracy) {
+        shoot(x, y, z, target.getX(), target.getY(), target.getZ(), speed, inaccuracy);
+    }
+
+    public void shoot(double x, double y, double z, double targetX, double targetY, double targetZ, float speed, float inaccuracy) {
         this.moveTo(x, y, z, this.getYRot(), this.getXRot());
         this.reapplyPosition();
-        Vec3 direction = new Vec3(target.getX() - this.getX(), target.getY() - this.getY(), target.getZ() - this.getZ()).normalize();
+        Vec3 direction = new Vec3(targetX - this.getX(), targetY - this.getY(), targetZ - this.getZ()).normalize();
         double randX = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
         double randY = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
         double randZ = (Mth.nextDouble(this.random, -1.0, 1.0)) * inaccuracy;
@@ -332,6 +368,9 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         this.xPower = inaccurateDirection.x * speed;
         this.yPower = inaccurateDirection.y * speed;
         this.zPower = inaccurateDirection.z * speed;
+        this.setDeltaMovement(xPower, yPower, zPower);
+        this.setVelocity(new Vec3(xPower, yPower, zPower));
+        this.hasAppliedMovement = true;
     }
 
 
@@ -357,5 +396,21 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
     public int getHurtDir() {
         return this.entityData.get(HURT_TIME_DIRECT);
+    }
+
+    public void setVelocity(Vec3 vec3) {
+        this.entityData.set(VELOCITY, vec3.toVector3f());
+    }
+
+    public Vector3f getVelocity() {
+        return this.entityData.get(VELOCITY);
+    }
+
+    public void setRadius (int radius) {
+        this.entityData.set(RADIUS, radius);
+    }
+
+    public int getRadius() {
+        return this.entityData.get(RADIUS);
     }
 }

@@ -12,11 +12,15 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
     private int shootingInterval;
     private int startUpDelay;
+    private boolean isMain;
     private FairkeeperBorosPartEntity currentPart;
 
-    public FairkeeperBorosFlameThrowerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, int startUpDelay) {
+    private static final int DURATION = 200;
+
+    public FairkeeperBorosFlameThrowerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, int startUpDelay, boolean isMain) {
         this.boros = boros;
         this.state = state;
+        this.isMain = isMain;
         this.startUpDelay = reducedTickDelay(startUpDelay);
     }
 
@@ -27,7 +31,7 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
 
     @Override
     public void start() {
-        this.shootingInterval = reducedTickDelay(200);
+        this.shootingInterval = reducedTickDelay(DURATION);
     }
 
     @Override
@@ -37,18 +41,25 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
             return;
         }
 
-        if (this.shootingInterval > 0) {
-            this.shootingInterval--;
-        } else {
-            this.boros.stopAttacking(20);
-            return;
-        }
+        if (isMain) {
+            if (this.shootingInterval > 0) {
+                this.shootingInterval--;
+            } else {
+                this.boros.stopAttacking(20);
+                return;
+            }
 
-        if (this.shootingInterval % reducedTickDelay(2) == 0) {
+            if (this.shootingInterval % reducedTickDelay(2) == 0) {
+                this.boros.playFlameShootingSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
+                this.shootFlame(90);
+                this.shootFlame(-90);
+            }
+        } else {
             this.boros.playFlameShootingSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
             this.shootFlame(90);
             this.shootFlame(-90);
         }
+
     }
 
     private void shootFlame(float angle) {

@@ -230,7 +230,6 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends Goal {
     }
 
     private boolean hasCompletedRevolution() {
-        System.out.println(this.angle + " : " + this.travelledAngle);
         return Math.abs(this.travelledAngle) >= this.pattern.positionList().get(targetIndex).getRight();
     }
 
@@ -308,20 +307,26 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends Goal {
     private static List<Integer> ALL_PARTS = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
 
     public static ShootingPattern PATTERN_SMALL_CIRLCE = new ShootingPattern(false, true, 14F/FULL_ARENA_SIZE, ImmutableList.of(
-            Triple.of(ShootingType.RIGHT, ODD_PARTS, 360F),
-            Triple.of(ShootingType.RIGHT, EVEN_PARTS, 360F),
-            Triple.of(ShootingType.RIGHT, ODD_PARTS, 360F)
+            Triple.of(ShootingType.RIGHT, ALL_PARTS, 360F)
+  /*          Triple.of(ShootingType.RIGHT, EVEN_PARTS, 360F),
+            Triple.of(ShootingType.RIGHT, ODD_PARTS, 360F)*/
     ));
 
     public static ShootingPattern PATTERN_LARGE_CIRCLE = new ShootingPattern(false, true, 29F/FULL_ARENA_SIZE, ImmutableList.of(
-            Triple.of(ShootingType.LEFT, ODD_PARTS, 120F),
-            Triple.of(ShootingType.LEFT, EVEN_PARTS, 240F),
-            Triple.of(ShootingType.LEFT, ODD_PARTS, 360F)
+            Triple.of(ShootingType.BOTH, ODD_PARTS, 240F),
+            Triple.of(ShootingType.BOTH, EVEN_PARTS, 360F),
+            Triple.of(ShootingType.BOTH, ODD_PARTS, 480F)
     ));
 
     public static ShootingPattern PATTERN_PLAYER_LARGE_CIRCLE = new ShootingPattern(false, true, 29F/FULL_ARENA_SIZE, ImmutableList.of(
             Triple.of(ShootingType.LEFT, ODD_PARTS, 120F),
             Triple.of(ShootingType.LEFT, EVEN_PARTS, 240F),
             Triple.of(ShootingType.LEFT, ODD_PARTS, 360F)
+    ));
+
+    public static ShootingPattern PATTERN_LARGE_CIRCLE_MORE_ARROWS = new ShootingPattern(false, true, 29F/FULL_ARENA_SIZE, ImmutableList.of(
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 180F),
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 3000F),
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 420F)
     ));
 }

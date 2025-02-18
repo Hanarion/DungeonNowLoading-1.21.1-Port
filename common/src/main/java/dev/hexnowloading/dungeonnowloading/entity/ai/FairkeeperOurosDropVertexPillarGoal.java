@@ -107,7 +107,7 @@ public class FairkeeperOurosDropVertexPillarGoal extends Goal {
         if (distanceSqChild < 1.5) {
             dropIndex++;
             Level level = this.ouros.level();
-            ShieldingStonePillarProjectileEntity stonePillar = new ShieldingStonePillarProjectileEntity(this.ouros.level(), this.ouros, 0.8F);
+            ShieldingStonePillarProjectileEntity stonePillar = new ShieldingStonePillarProjectileEntity(this.ouros.level(), this.ouros, 0.8F, true);
             stonePillar.setPos(dropTargetBlockPos.getX() + 0.5, this.currentPart.getBoundingBox().minY, dropTargetBlockPos.getZ() + 0.5);
             level.addFreshEntity(stonePillar);
 

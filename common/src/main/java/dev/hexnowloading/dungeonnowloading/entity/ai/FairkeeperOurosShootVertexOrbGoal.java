@@ -25,16 +25,18 @@ public class FairkeeperOurosShootVertexOrbGoal extends Goal {
     private int playerCount;
     private int bulletCount;
     private final int bulletPerPlayer;
+    private final int radius;
     private final float inaccuracy;
 
     private final int START_UP_DELAY = 40;
     private final int BULLET_INTERVAL = 10;
 
-    public FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, int bulletPerPlayer, float inaccuracy) {
+    public FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, int bulletPerPlayer, float inaccuracy, int radius) {
         this.ouros = ouros;
         this.state = state;
         this.bulletPerPlayer = bulletPerPlayer;
         this.inaccuracy = inaccuracy;
+        this.radius = radius;
     }
 
     @Override
@@ -93,7 +95,7 @@ public class FairkeeperOurosShootVertexOrbGoal extends Goal {
         UUID playerUUID = playerUUIDs.stream().skip(randomSource.nextInt(playerCount)).findFirst().orElse(null);
         Entity player = ((ServerLevel) this.ouros.level()).getEntity(playerUUID);
         if (player != null) {
-            VertexOrbProjectileEntity vertexOrbProjectileEntity = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros);
+            VertexOrbProjectileEntity vertexOrbProjectileEntity = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros, radius);
             vertexOrbProjectileEntity.shootTowardsTarget(this.currentPart.getX(), this.currentPart.getY() - 1, this.currentPart.getZ(), (LivingEntity) player, 1.0F, this.inaccuracy);
             this.ouros.level().addFreshEntity(vertexOrbProjectileEntity);
 

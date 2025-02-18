@@ -231,7 +231,6 @@ public class FairkeeperBorosShootArrowAboveGoal extends Goal {
     }
 
     private boolean hasCompletedRevolution() {
-        System.out.println(this.angle + " : " + this.travelledAngle);
         return Math.abs(this.travelledAngle) >= this.pattern.positionList().get(targetIndex).getRight();
     }
 

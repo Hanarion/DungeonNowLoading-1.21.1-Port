@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
@@ -219,7 +221,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         if (entity instanceof FairkeeperBorosPartEntity part) {
             return !this.getHeadId().equals(part.getHeadId());
         }
-        return true;
+        return !(entity instanceof VertexOrbProjectileEntity) && !(entity instanceof VertexDomainProjectileEntity);
     }
 
     @Override

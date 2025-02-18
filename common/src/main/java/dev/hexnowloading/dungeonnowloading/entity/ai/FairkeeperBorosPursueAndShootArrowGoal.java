@@ -21,6 +21,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
     private Vec3 targetPosition;
     private final double shootingRange;
     private int stoppingTick;
+    private int maxShootingCooldown;
     private int shootingCooldown;
     private int targetIndex;
     private int totalDuration;
@@ -29,14 +30,15 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
     private static final int STOP_DURATION = 32;
     private static final int SHOOT_ARROW_TICK = 15;
     private static final int BEAM_TICK = 30;
-    private static final int SHOOTING_COOLDOWN = 60;
+    private static final int DEFAULT_SHOOTING_COOLDOWN = 60;
     private static final float ADDED_SPEED = 0.2F;
 
-    public FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double speed, double shootingRange, ShootingPattern pattern) {
+    public FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double speed, double shootingRange, int shootingCooldown, ShootingPattern pattern) {
         this.state = state;
         this.boros = boros;
         this.speed = speed;
         this.shootingRange = shootingRange;
+        this.maxShootingCooldown = shootingCooldown;
         this.pattern = pattern;
         this.setFlags(EnumSet.of(Flag.MOVE));
     }
@@ -50,8 +52,8 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
     @Override
     public void start() {
         this.targetPosition = this.target.getPosition(1.0F);
-        this.shootingCooldown = reducedTickDelay(SHOOTING_COOLDOWN);
         this.targetIndex = 0;
+        this.shootingCooldown = this.maxShootingCooldown;
         this.totalDuration = reducedTickDelay(EXPIRY_DURATION);
     }
 
@@ -81,7 +83,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
                     this.boros.stopAttacking(20);
                     return;
                 }
-                this.shootingCooldown = reducedTickDelay(SHOOTING_COOLDOWN);
+                this.shootingCooldown = this.maxShootingCooldown;
             } else {
                 return;
             }
@@ -185,6 +187,14 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
             ImmutableList.of(15.0f, 0.0f, -15.0f),
             ImmutableList.of(15.0f, 0.0f, -15.0f),
             ImmutableList.of(15.0f, 0.0f, -15.0f)
+    ));
+
+    public static final ShootingPattern PATTERN_DESPERATE = new ShootingPattern(ImmutableList.of(
+            ImmutableList.of(25.0f, 15F, 0.0f, -15F, -25.0f),
+            ImmutableList.of(30F, 10F, -10F, -30F),
+            ImmutableList.of(25.0f, 15F, 0.0f, -15F, -25.0f),
+            ImmutableList.of(30F, 10F, -10F, -30F),
+            ImmutableList.of(30F, 20F, 10F, 0F, -10F, -20F -30F)
     ));
 
 

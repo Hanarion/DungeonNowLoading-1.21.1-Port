@@ -1,6 +1,8 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
@@ -79,17 +81,17 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(2, new FairkeeperBorosAwakenGoal(this));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.CIRCLING, this, 20.0, 1.5, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.SHOOT_POISON_ARROW, this, 10.0, 1.5, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.CIRCLING, this, 20.0, 1.5, true, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.SHOOT_POISON_ARROW, this, 10.0, 1.5, true, true));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootPoisonArrowGoal(FairkeeperBorosState.SHOOT_POISON_ARROW, this));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursuePlayerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 1.3));
-        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 20));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.FLAME_CIRCLING, this, 5.0, 1.5, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_CIRCLING, this, 40));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.FLAME_PULSATING, this, 8.0, 1.6, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 20, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.FLAME_CIRCLING, this, 5.0, 1.5, true, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_CIRCLING, this, 40, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.FLAME_PULSATING, this, 8.0, 1.6, true, true));
         this.goalSelector.addGoal(3, new FairkeeperBorosPulsatingFlameThrowerGoal(FairkeeperBorosState.FLAME_PULSATING, this, 40));
         this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.TACKLE, this, 1.3, 6.0F, 0.5F));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.SHOOT_POISON_POTION, this, 7.0, 1.5, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.SHOOT_POISON_POTION, this, 7.0, 1.5, true, true));
         this.goalSelector.addGoal(3, new FairkeeperBorosPoisonPotionGoal(FairkeeperBorosState.SHOOT_POISON_POTION, this));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursuePlayerGoal(FairkeeperBorosState.FOLLOW, this, 1.1));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LINE, this, 1.5, FairkeeperBorosShootArrowGoal.PATTERN_LINE));
@@ -97,11 +99,14 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, this, 1.5f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_SMALL_CIRLCE));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_LARGE_CIRCLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_PLAYER_LARGE_CIRCLE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, this, 1.3f, 3.0F, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_TRIPLE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_SINGLE_ARROW, this, 1.3f, 3.0F, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_SINGLE));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, this, 1.3f, 3.0F, 60, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_TRIPLE));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_SINGLE_ARROW, this, 1.3f, 3.0F, 60, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_SINGLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowAboveGoal(FairkeeperBorosState.SHOOT_ARROW_ABOVE, this, 1.5f, FairkeeperBorosShootArrowAboveGoal.PATTERN_PLAYER_LARGE_CIRCLE));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.DESPERATE, this, 20, false));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.DESPERATE, this, 1.5F, 2.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_DESPERATE));
         this.goalSelector.addGoal(3, new FairkeeperBorosEatVertexProjectilesGoal(FairkeeperBorosState.EAT_VERTEX_PROJECTILES, this, 1.5f));
-        this.goalSelector.addGoal(4, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true));
+        this.goalSelector.addGoal(4, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true, true));
+        this.goalSelector.addGoal(5, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true, false));
         //this.goalSelector.addGoal(3, new FairkeeperBorosShootPoisonArrowGoal());
         //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
         //this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
@@ -259,7 +264,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         if (entity instanceof FairkeeperBorosPartEntity part) {
             return !this.getUUID().equals(part.getHeadId());
         }
-        return true;
+
+        return !(entity instanceof VertexOrbProjectileEntity) && !(entity instanceof VertexDomainProjectileEntity);
     }
 
     private void vertexTransmissionEffectImmunity() {
@@ -317,12 +323,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
-        if (this.getTarget() == null) return;
-
         this.targetRandomPlayer();
-        if (this.getTarget() != null) {
-            this.getTarget().sendSystemMessage(Component.literal("Boros : Stopped"));
-        }
+
         ((FairkeeperSerpentCallerEntity) this.getCaller()).setBorosWaitingForCommand(true);
     }
 
@@ -367,7 +369,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     public boolean playerTargetingCondition() {
-        return this.targetRandomPlayer || this.getTarget() != null;
+        return this.targetRandomPlayer;
     }
 
     @Override
@@ -516,6 +518,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         EAT_VERTEX_PROJECTILES,
         FOLLOW,
         SHOOT_POISON_POTION,
+        DESPERATE,
         DYING;
 
         private FairkeeperBorosState() {}

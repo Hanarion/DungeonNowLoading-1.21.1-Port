@@ -2,6 +2,8 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperOurosMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
@@ -86,23 +88,28 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(2, new FairkeeperOurosAwakenGoal(this));
-        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.CIRCLING, this, 20.0, 1.3, false));
-        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this, 20.0, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.CIRCLING, this, 20.0, 1.3, false, true));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this, 20.0, 1.3, false, true));
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexArrowGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this));
-        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 20.0, 1.3, false));
-        this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 20.0, 1.3, false, true));
+        this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 1));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE, this, 1.3, FairkeeperOurosDropVertexPillarGoal.PATTERN_SMALL_SQUARE));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE, this, 1.3, FairkeeperOurosDropVertexPillarGoal.PATTERN_SINGLE_LINE));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_CROSS, this, 1.7, FairkeeperOurosDropVertexPillarGoal.PATTERN_CROSS));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE, this, 1.7, FairkeeperOurosDropVertexPillarGoal.PATTERN_LARGE_SQUARE));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE, this, 1.7, FairkeeperOurosDropVertexPillarGoal.PATTERN_DOUBLE_LINE));
-        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 20.0, 1.3, false));
-        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 1, 0.05F));
-        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 20.0, 1.3, false));
-        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 3, 0.2F));
-        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, this, 20.0, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 20.0, 1.3, false, true));
+        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, this, 1, 0.05F, 2));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 20.0, 1.3, false, true));
+        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, this, 3, 0.2F, 2));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, this, 20.0, 1.3, false, true));
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexDomainGoal(FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, this));
-        this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_MORE_SCUTTLES, this, 20.0, 1.3, false, true));
+        this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_MORE_SCUTTLES, this, 3));
+        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.DESPERATE, this, 20.0, 1.3, false, true));
+        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.DESPERATE, this, 9, 0.2F, 3));
+        this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false, true));
+        this.goalSelector.addGoal(5, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false, false));
         //this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
         //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
         //this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
@@ -406,7 +413,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         if (entity instanceof FairkeeperOurosPartEntity part) {
             return !this.getUUID().equals(part.getHeadId());
         }
-        return true;
+        return !(entity instanceof VertexOrbProjectileEntity) && !(entity instanceof VertexDomainProjectileEntity);
     }
 
     private void vertexTransmissionEffectImmunity() {
@@ -465,9 +472,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         }
 
         this.targetRandomPlayer();
-        if (this.getTarget() != null) {
-            this.getTarget().sendSystemMessage(Component.literal("Ouros : Stopped"));
-        }
+
         ((FairkeeperSerpentCallerEntity) this.getCaller()).setOurosWaitingForCommand(true);
     }
 
@@ -517,7 +522,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     public boolean playerTargetingCondition() {
-        return this.targetRandomPlayer || this.getTarget() != null;
+        return this.targetRandomPlayer;
     }
 
     @Override
@@ -681,6 +686,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         CIRCLING,
         SHOOT_VERTEX_ARROW_DIRECT,
         SUMMON_SCUTTLE,
+        SUMMON_MORE_SCUTTLES,
         DROP_PILLAR_RANDOM,
         DROP_PILLAR_SMALL_SQUARE,
         DROP_PILLAR_SINGLE_LINE,
@@ -690,6 +696,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         SHOOT_SINGLE_VERTEX_ORB,
         SHOOT_TRIPLE_VERTEX_ORB,
         SHOOT_VERTEX_DOMAIN,
+        DESPERATE,
         DYING;
 
         private FairkeeperOurosState() {

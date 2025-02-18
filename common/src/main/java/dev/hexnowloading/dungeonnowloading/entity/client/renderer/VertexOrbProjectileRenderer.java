@@ -29,7 +29,8 @@ public class VertexOrbProjectileRenderer<T extends VertexOrbProjectileEntity> ex
         VertexConsumer vertexConsumer = buffer.getBuffer(RENDER_TYPE);
         //int p = getOverlayCoords(entity, this.getWhiteOverlayProgress(entity, partialTicks));
         boolean bl = entity.getHurtTime() > 0;
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.pack(0.0f, bl), 1.0F, 1.0F, 1.0F, 1.0F);
+        float red = entity.getRadius() > 2 ? 0F : 1.0F;
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.pack(0.0f, bl), red, red, 1.0F, 1.0F);
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }

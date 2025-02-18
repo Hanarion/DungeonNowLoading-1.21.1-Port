@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class FairkeeperOurosDropScuttleGoal extends Goal {
     private final FairkeeperOurosEntity ouros;
     private final FairkeeperOurosEntity.FairkeeperOurosState state;
+    private final int scuttleCount;
 
     private int attackTicks;
     private int loopCount;
@@ -31,12 +32,13 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
 
     private final int START_UP_DELAY = 40;
     private final int SUMMON_INTERVAL = 20;
-    private final int MAX_SCUTTLE_COUNT = 3;
+    private final int MAX_SCUTTLE_COUNT = 5;
 
 
-    public FairkeeperOurosDropScuttleGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros) {
+    public FairkeeperOurosDropScuttleGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, int scuttleCount) {
         this.ouros = ouros;
         this.state = state;
+        this.scuttleCount = scuttleCount;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
         if (caller != null) {
             this.playerCount = caller.getParticipatingPlayerCount();
         }
-        this.loopCount = Math.min(this.playerCount, MAX_SCUTTLE_COUNT);
+        this.loopCount = Math.min(this.playerCount + this.scuttleCount - 1, MAX_SCUTTLE_COUNT);
     }
 
     @Override

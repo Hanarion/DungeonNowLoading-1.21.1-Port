@@ -305,10 +305,10 @@ public class FairkeeperBorosShootArrowGoal extends Goal {
 
     public static ShootingPattern PATTERN_SLITHER = new ShootingPattern(true, 39F/FULL_ARENA_SIZE, ImmutableList.of(
             Triple.of(ShootingType.NONE, List.of(), new Vec3(1, 0, 1)),
-            Triple.of(ShootingType.RIGHT, ALL_PARTS, new Vec3(-1, 0, 1)),
-            Triple.of(ShootingType.NONE, List.of(), new Vec3(-1, 0, 5/6F)),
+            Triple.of(ShootingType.RIGHT, ALL_PARTS, new Vec3(-1, 0, 1))
+            /*Triple.of(ShootingType.NONE, List.of(), new Vec3(-1, 0, 5/6F)),
             Triple.of(ShootingType.LEFT, ALL_PARTS, new Vec3(1, 0, 5/6F)),
             Triple.of(ShootingType.NONE, List.of(), new Vec3(1, 0, 4/6F)),
-            Triple.of(ShootingType.RIGHT, ALL_PARTS, new Vec3(-1, 0, 4/6F))
+            Triple.of(ShootingType.RIGHT, ALL_PARTS, new Vec3(-1, 0, 4/6F))*/
     ));
 }

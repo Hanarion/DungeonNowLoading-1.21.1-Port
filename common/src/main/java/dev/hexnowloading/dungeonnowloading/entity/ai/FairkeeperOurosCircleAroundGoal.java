@@ -3,17 +3,18 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
 public class FairkeeperOurosCircleAroundGoal extends Goal {
     private final FairkeeperOurosEntity ouros;          // The mob executing the goal
-    private LivingEntity circlingTarget;      // The player or entity at the center
+    private Entity circlingTarget;      // The player or entity at the center
     private final double radius;      // Radius of the circle
     private final double speed;       // Speed of movement
-    private final boolean clockwise;  // Direction of movement
+    private final boolean clockwise;
+    private final boolean circlePlayer; // Direction of movement
     private double angle;             // Current angle in degrees
     private double targetX, targetY, targetZ;  // Current target position (X, Z only)
     private int arenaSize;
@@ -22,20 +23,28 @@ public class FairkeeperOurosCircleAroundGoal extends Goal {
 
     private static final double THRESHOLD = 2.0; // Distance threshold to "reach" target
 
-    public FairkeeperOurosCircleAroundGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, double radius, double speed, boolean clockwise) {
+    public FairkeeperOurosCircleAroundGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, double radius, double speed, boolean clockwise, boolean circlePlayer) {
         this.state = state;
         this.ouros = ouros;
         this.radius = radius;
         this.speed = speed;
         this.clockwise = clockwise;
         this.angle = 0;
+        this.circlePlayer = circlePlayer;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE));
     }
 
     @Override
     public boolean canUse() {
-        this.circlingTarget = this.ouros.getTarget();
-        return this.circlingTarget != null && this.circlingTarget.isAlive() && this.ouros.isState(state);
+        boolean b;
+        if (this.circlePlayer) {
+            this.circlingTarget = this.ouros.getTarget();
+            b = this.circlingTarget != null && this.circlingTarget.isAlive();
+        } else {
+            this.circlingTarget = this.ouros.getCaller();
+            b = this.circlingTarget != null;
+        }
+        return b && this.ouros.isState(state);
     }
 
     @Override

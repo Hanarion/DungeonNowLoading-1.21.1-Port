@@ -40,7 +40,7 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
 
     @Override
     public void tick() {
-        if (this.targetProjectile == null) {
+        if (this.targetProjectile == null || !this.targetProjectile.isAlive()) {
             this.boros.stopAttacking(10);
             return;
         }
@@ -95,7 +95,7 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
                 .min(Comparator.comparingDouble(entity -> entity.distanceToSqr(boros))) // Get the closest one
                 .orElse(null);
 
-        if (targetProjectile == null) {
+        if (targetProjectile == null || !targetProjectile.isAlive()) {
             this.boros.stopAttacking(10);
         }
     }

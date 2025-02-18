@@ -57,9 +57,39 @@ public class WeightBaseMoveSet<T extends Object> {
         return null;
     }
 
-    public void reduceAllCooldown() {
-        moveSet.forEach(move -> move.currentCooldown--);
+    public T selectMoveWithoutCooldownReduction() {
+        Move chosenMove;
+        WeightedRandomBag<Move> weightedPool = new WeightedRandomBag<>();
+        moveSet.forEach(move -> {
+            if (move.currentCooldown <= 0) {
+                weightedPool.addEntry(move, move.weight);
+            }
+        });
+
+        chosenMove = weightedPool.getRandom();
+        if (chosenMove != null) {
+            chosenMove.currentCooldown = chosenMove.cooldown;
+            return chosenMove.object;
+        }
+        return null;
     }
+
+    public void reduceAllCooldown() {
+        reduceAllCooldownBy(1);
+    }
+
+    public void reduceAllCooldownBy(int cooldown) {
+        moveSet.forEach(move -> move.currentCooldown -= cooldown);
+    }
+
+    public void increaseAllCooldown() {
+        increaseAllCooldownBy(1);
+    }
+
+    public void increaseAllCooldownBy(int cooldown) {
+        moveSet.forEach(move -> move.currentCooldown += cooldown);
+    }
+
 
     public void reduceCooldown(T object) {
         moveSet.forEach(move -> {
@@ -92,6 +122,15 @@ public class WeightBaseMoveSet<T extends Object> {
             }
         });
     }
+
+    public int getTotalWeight() {
+        int totalWeight = 0;
+        for (Move move : moveSet) {
+            totalWeight += move.weight;
+        }
+        return totalWeight;
+    }
+
 
     public boolean isEmpty() {
         return moveSet.isEmpty();

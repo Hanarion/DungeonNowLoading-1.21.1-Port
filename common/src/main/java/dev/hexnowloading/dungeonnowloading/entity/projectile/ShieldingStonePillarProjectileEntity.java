@@ -33,6 +33,7 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
 
     private int tickCount;
     private boolean hasLanded;
+    private boolean canSummonVertexOrb;
     private float damagePercentage;
 
     public ShieldingStonePillarProjectileEntity(EntityType<? extends ShieldingStonePillarProjectileEntity> entityType, Level level) {
@@ -45,6 +46,14 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
         this(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), level);
         this.setOwner(livingEntity);
         this.damagePercentage = damagePercentage;
+        this.canSummonVertexOrb = false;
+    }
+
+    public ShieldingStonePillarProjectileEntity(Level level, LivingEntity livingEntity, float damagePercentage, boolean canSummonVertexOrb) {
+        this(DNLEntityTypes.SHIELDING_STONE_PILLAR_PROJECTILE.get(), level);
+        this.setOwner(livingEntity);
+        this.damagePercentage = damagePercentage;
+        this.canSummonVertexOrb = canSummonVertexOrb;
     }
 
     @Override
@@ -73,7 +82,7 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
                     this.pushNearbyMobs(mob);
                 }
                 if (this.level().getBlockState(this.blockPosition().below()).is(this.getPillarBlock())) {
-                    this.level().destroyBlock(this.blockPosition().below(), false);
+                    this.breakLogic();
                     this.discard();
                 } else {
                     this.placePillarBlock();
@@ -95,6 +104,17 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
         }
 
         this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
+    }
+
+    private void breakLogic() {
+
+        this.level().destroyBlock(this.blockPosition().below(), false);
+
+        if (this.canSummonVertexOrb) {
+            VertexOrbProjectileEntity vertexOrbProjectileEntity = new VertexOrbProjectileEntity(this.level(), (LivingEntity) this.getOwner(), 2);
+            vertexOrbProjectileEntity.shoot(this.getX(), this.getY() - 2, this.getZ(), this.getX(), vertexOrbProjectileEntity.getY() - 1, this.getZ(), 1.0F, 0.02F);
+            this.level().addFreshEntity(vertexOrbProjectileEntity);
+        }
     }
 
     private void pushNearbyMobs(LivingEntity mob) {
