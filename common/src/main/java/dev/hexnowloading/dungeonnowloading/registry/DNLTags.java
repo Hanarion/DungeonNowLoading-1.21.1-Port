@@ -15,6 +15,7 @@ public class DNLTags {
     public static final TagKey<DamageType> BALLISTA_GOLEM_HURTABLE = registerDamageTypeTag("ballista_golem_immunity");
     public static final TagKey<DamageType> FAIRKEEPER_HURTABLE = registerDamageTypeTag("fairkeeper_hurtable");
     public static final TagKey<Item> STONE_NOTCH_MATERIAL = registerItemTag("stone_notch_material");
+    public static final TagKey<Item> REDSTONE_CIRCUIT_OR_CORE = registerItemTag("redstone_circuit_or_core");
     public static final TagKey<Block> FAIRKEEPER_CHEST_IGNORE = registerBlockTag("fairkeeper_chest_ignore");
     public static final TagKey<Block> OVERCHARGED_REDSTONE_BLOCK_NEIGHBOUR_EXPLOSIVE = registerBlockTag("ovecharged_redstone_block_neighbour_explosive");
     public static final TagKey<Structure> NO_GEODES_TAG = registerStructureTag("no_geodes");

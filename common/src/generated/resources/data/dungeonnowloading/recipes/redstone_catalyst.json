@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": {
+      "item": "dungeonnowloading:redstone_circuit"
+    },
+    "b": {
+      "item": "dungeonnowloading:redstone_core"
+    },
+    "c": {
+      "item": "minecraft:cobblestone"
+    },
+    "r": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "pattern": [
+    "ccc",
+    "arb",
+    "ccc"
+  ],
+  "result": {
+    "item": "dungeonnowloading:redstone_catalyst"
+  },
+  "show_notification": true
+}

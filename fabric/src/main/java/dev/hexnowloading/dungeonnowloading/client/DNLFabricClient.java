@@ -60,7 +60,7 @@ public class DNLFabricClient implements ClientModInitializer {
     private void registerRenderers() {
         // Bosses
         EntityRendererRegistry.register(DNLEntityTypes.CHAOS_SPAWNER.get(), ChaosSpawnerRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER.get(), FairkeeperBorosRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER_BOROS.get(), FairkeeperBorosRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER_BOROS_PART.get(), FairkeeperBorosBodyRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER_OUROS.get(), FairkeeperOurosRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FAIRKEEPER_OUROS_PART.get(), FairkeeperOurosBodyRenderer::new);

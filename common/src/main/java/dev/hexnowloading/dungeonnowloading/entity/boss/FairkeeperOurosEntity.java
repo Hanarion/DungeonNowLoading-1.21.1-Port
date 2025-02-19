@@ -88,9 +88,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(2, new FairkeeperOurosAwakenGoal(this));
-        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.CIRCLING, this, 20.0, 1.3, false, true));
-        this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this, 20.0, 1.3, false, true));
-        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexArrowGoal(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, this));
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 20.0, 1.3, false, true));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 1));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE, this, 1.3, FairkeeperOurosDropVertexPillarGoal.PATTERN_SMALL_SQUARE));
@@ -110,17 +107,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.DESPERATE, this, 9, 0.2F, 3));
         this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false, true));
         this.goalSelector.addGoal(5, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false, false));
-        //this.goalSelector.addGoal(3, new FairkeeperCircleAroundPlayerGoal(this, 20.0, 1.0, true)); // Clockwise
-        //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
-        //this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
-        //this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
-        //this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6.0F));
-        //this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(2, new BossTargetSelectorGoal(this, this.getFollowDistance()));
-    }
-
-    private void setMoveSets() {
-        stateSelector.addMove(FairkeeperOurosState.SHOOT_VERTEX_ARROW_DIRECT, 4, 200, 0);
     }
 
     @Override
@@ -683,8 +670,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     public enum FairkeeperOurosState {
         AWAKENING,
         IDLE,
-        CIRCLING,
-        SHOOT_VERTEX_ARROW_DIRECT,
         SUMMON_SCUTTLE,
         SUMMON_MORE_SCUTTLES,
         DROP_PILLAR_RANDOM,

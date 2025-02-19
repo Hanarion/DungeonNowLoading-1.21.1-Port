@@ -39,16 +39,16 @@ public class FairkeeperOurosModel<T extends FairkeeperOurosEntity> extends Hiera
 
         PartDefinition head = ouros.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 72).addBox(-21.0F, -12.0F, -21.0F, 42.0F, 12.0F, 42.0F, new CubeDeformation(0.0F))
                 .texOffs(0, 0).addBox(-24.0F, -36.0F, -24.0F, 48.0F, 24.0F, 48.0F, new CubeDeformation(0.0F))
-                .texOffs(41, 109).addBox(-19.0F, -47.0F, -19.0F, 38.0F, 11.0F, 38.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
+                .texOffs(0, 126).addBox(-19.0F, -47.0F, -19.0F, 38.0F, 11.0F, 38.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
 
         PartDefinition tongue = ouros.addOrReplaceChild("tongue", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
 
-        PartDefinition cube_r1 = tongue.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(142, 126).addBox(-3.0F, 0.0F, -16.0F, 6.0F, 0.0F, 16.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -12.0F, -21.0F, 0.1309F, 0.0F, 0.0F));
+        PartDefinition cube_r1 = tongue.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(152, 126).addBox(-3.0F, 0.0F, -16.0F, 6.0F, 0.0F, 16.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -12.0F, -21.0F, 0.1309F, 0.0F, 0.0F));
 
-        PartDefinition eye = ouros.addOrReplaceChild("eye", CubeListBuilder.create().texOffs(142, 142).addBox(24.0F, -18.0F, -13.0F, 2.0F, 8.0F, 12.0F, new CubeDeformation(0.0F))
-                .texOffs(92, 153).addBox(-26.0F, -18.0F, -13.0F, 2.0F, 8.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 12.0F, 0.0F));
+        PartDefinition eye = ouros.addOrReplaceChild("eye", CubeListBuilder.create().texOffs(152, 142).addBox(24.0F, -18.0F, -13.0F, 2.0F, 8.0F, 12.0F, new CubeDeformation(0.0F))
+                .texOffs(152, 162).addBox(-26.0F, -18.0F, -13.0F, 2.0F, 8.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 12.0F, 0.0F));
 
-        return LayerDefinition.create(meshdefinition, 16, 16);
+        return LayerDefinition.create(meshdefinition, 256, 256);
     }
 
     @Override

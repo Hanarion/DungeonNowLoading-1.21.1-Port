@@ -81,19 +81,9 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(2, new FairkeeperBorosAwakenGoal(this));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.CIRCLING, this, 20.0, 1.5, true, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.SHOOT_POISON_ARROW, this, 10.0, 1.5, true, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosShootPoisonArrowGoal(FairkeeperBorosState.SHOOT_POISON_ARROW, this));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursuePlayerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 1.3));
         this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 20, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.FLAME_CIRCLING, this, 5.0, 1.5, true, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_CIRCLING, this, 40, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.FLAME_PULSATING, this, 8.0, 1.6, true, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosPulsatingFlameThrowerGoal(FairkeeperBorosState.FLAME_PULSATING, this, 40));
         this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.TACKLE, this, 1.3, 6.0F, 0.5F));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.SHOOT_POISON_POTION, this, 7.0, 1.5, true, true));
-        this.goalSelector.addGoal(3, new FairkeeperBorosPoisonPotionGoal(FairkeeperBorosState.SHOOT_POISON_POTION, this));
-        this.goalSelector.addGoal(3, new FairkeeperBorosPursuePlayerGoal(FairkeeperBorosState.FOLLOW, this, 1.1));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LINE, this, 1.5, FairkeeperBorosShootArrowGoal.PATTERN_LINE));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SLITHER, this, 1.7, FairkeeperBorosShootArrowGoal.PATTERN_SLITHER));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, this, 1.5f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_SMALL_CIRLCE));
@@ -107,22 +97,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperBorosEatVertexProjectilesGoal(FairkeeperBorosState.EAT_VERTEX_PROJECTILES, this, 1.5f));
         this.goalSelector.addGoal(4, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true, true));
         this.goalSelector.addGoal(5, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true, false));
-        //this.goalSelector.addGoal(3, new FairkeeperBorosShootPoisonArrowGoal());
-        //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, false));
-        //this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
-        //this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
-        //this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6.0F));
-        //this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(2, new BossTargetSelectorGoal(this, this.getFollowDistance()));
-    }
-
-    private void setMoveSets() {
-        stateSelector.addMove(FairkeeperBorosState.FOLLOW, 4, 200, 0);
-        stateSelector.addMove(FairkeeperBorosState.TACKLE, 4, 200, 0);
-        stateSelector.addMove(FairkeeperBorosState.FLAME_CIRCLING, 4, 200, 0);
-        stateSelector.addMove(FairkeeperBorosState.FLAME_PURSUING, 4, 200, 0);
-        stateSelector.addMove(FairkeeperBorosState.SHOOT_POISON_ARROW, 4, 200, 0);
-        stateSelector.addMove(FairkeeperBorosState.SHOOT_POISON_POTION, 4, 60, 0);
     }
 
     @Override
@@ -500,12 +475,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         AWAKENING,
         IDLE,
         TACKLE,
-        CIRCLING,
-        SHOOT_POISON_ARROW,
         PURSUE_RANDOM,
         FLAME_PURSUING,
-        FLAME_CIRCLING,
-        FLAME_PULSATING,
         SHOOT_ARROW_RANDOM,
         SHOOT_ARROW_LINE,
         SHOOT_ARROW_SLITHER,
@@ -516,8 +487,6 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         PURSUE_AND_SHOOT_SINGLE_ARROW,
         SHOOT_ARROW_ABOVE,
         EAT_VERTEX_PROJECTILES,
-        FOLLOW,
-        SHOOT_POISON_POTION,
         DESPERATE,
         DYING;
 

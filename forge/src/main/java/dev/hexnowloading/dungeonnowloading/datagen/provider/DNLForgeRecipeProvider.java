@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.datagen.provider;
 
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -211,6 +212,16 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .define('t', Items.STICK)
                 .define('r', Items.REDSTONE)
                 .unlockedBy("has_redstone_circuit", has(DNLItems.REDSTONE_CIRCUIT.get()))
+                .save(consumer);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, DNLItems.REDSTONE_CATALYST.get(), 1)
+                .pattern("ccc")
+                .pattern("arb")
+                .pattern("ccc")
+                .define('c', Items.COBBLESTONE)
+                .define('a', DNLItems.REDSTONE_CIRCUIT.get())
+                .define('b', DNLItems.REDSTONE_CORE.get())
+                .define('r', Items.REDSTONE_BLOCK)
+                .unlockedBy("has_redstone_circuit_or_core", has(DNLTags.REDSTONE_CIRCUIT_OR_CORE))
                 .save(consumer);
     }
 

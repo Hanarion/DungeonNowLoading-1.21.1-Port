@@ -29,7 +29,7 @@ public class DNLEntityTypes {
     //public static final Supplier<EntityType<Entity>> WINDSTONE = register("windstone", () -> EntityType.Builder.of(WindstoneEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).build(new ResourceLocation(Skyisland.MOD_ID, "windstone").toString()));
     // Bosses
     public static final Supplier<EntityType<ChaosSpawnerEntity>> CHAOS_SPAWNER = register("chaos_spawner", () -> EntityType.Builder.<ChaosSpawnerEntity>of(ChaosSpawnerEntity::new, MobCategory.MONSTER).fireImmune().sized(3.0F, 3.0F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "chaos_spawner").toString()));
-    public static final Supplier<EntityType<FairkeeperBorosEntity>> FAIRKEEPER = register("fairkeeper", () -> EntityType.Builder.of(FairkeeperBorosEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper").toString()));
+    public static final Supplier<EntityType<FairkeeperBorosEntity>> FAIRKEEPER_BOROS = register("fairkeeper_boros", () -> EntityType.Builder.of(FairkeeperBorosEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper").toString()));
     public static final Supplier<EntityType<FairkeeperBorosPartEntity>> FAIRKEEPER_BOROS_PART = register("fairkeeper_boros_part", () -> EntityType.Builder.<FairkeeperBorosPartEntity>of(FairkeeperBorosPartEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_borus_part").toString()));
     public static final Supplier<EntityType<FairkeeperOurosEntity>> FAIRKEEPER_OUROS = register("fairkeeper_ouros", () -> EntityType.Builder.of(FairkeeperOurosEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_ouros").toString()));
     public static final Supplier<EntityType<FairkeeperOurosPartEntity>> FAIRKEEPER_OUROS_PART = register("fairkeeper_ouros_part", () -> EntityType.Builder.<FairkeeperOurosPartEntity>of(FairkeeperOurosPartEntity::new, MobCategory.MONSTER).sized(3.0F, 3.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_ouros_part").toString()));
@@ -72,7 +72,7 @@ public class DNLEntityTypes {
 
         // Boss
         map.put(CHAOS_SPAWNER.get(), ChaosSpawnerEntity.createAttributes().build());
-        map.put(FAIRKEEPER.get(), FairkeeperBorosEntity.createAttributes().build());
+        map.put(FAIRKEEPER_BOROS.get(), FairkeeperBorosEntity.createAttributes().build());
         map.put(FAIRKEEPER_BOROS_PART.get(), FairkeeperBorosPartEntity.createAttributes().build());
         map.put(FAIRKEEPER_OUROS.get(), FairkeeperOurosEntity.createAttributes().build());
         map.put(FAIRKEEPER_OUROS_PART.get(), FairkeeperBorosPartEntity.createAttributes().build());

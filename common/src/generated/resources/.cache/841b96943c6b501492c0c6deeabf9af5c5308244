@@ -1,5 +1,6 @@
-// 1.20.1	2024-11-10T02:12:19.2842282	Item Models: dungeonnowloading
+// 1.20.1	2025-02-18T18:59:00.0361794	Item Models: dungeonnowloading
 96b7e98066f309bf7d9e5a9a74f3fb0e83a22e50 assets/dungeonnowloading/models/item/copper_detonator.json
+e0873f7caacb5be2419896d8686d2e623c811776 assets/dungeonnowloading/models/item/fairkeeper_serpent_caller.json
 221ea845b5ff1ae6763abf674be3357e8ed1c483 assets/dungeonnowloading/models/item/redstone_catalyst.json
 1d2a3a87ab091762563a976e3b3844f3f1a7d06c assets/dungeonnowloading/models/item/redstone_chip.json
 ff72d7c63d39fcf7a12ebb376593094ab0264219 assets/dungeonnowloading/models/item/redstone_circuit.json
@@ -7,6 +8,7 @@ d45b79f1905315579b72d81af8e7835ea327de36 assets/dungeonnowloading/models/item/re
 e6144c488cdc16c964b3ed94f8630ea485d4cec4 assets/dungeonnowloading/models/item/redstone_suppressor.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_ballista_golem.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_fairkeeper.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_fairkeeper_ouros.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_scuttle.json
 a454d11b77113f58ac5ccd1b182e589bc6a3c8fc assets/dungeonnowloading/models/item/vertex_bow.json
 8726821e61b6ae3b764849adcc140d13626c140c assets/dungeonnowloading/models/item/vertex_bow_pulling_0.json

@@ -51,7 +51,7 @@ public class DNLForgeClientEvents {
     public static void onRegisterRenderer(EntityRenderersEvent.RegisterRenderers event) {
         // Bosses
         event.registerEntityRenderer(DNLEntityTypes.CHAOS_SPAWNER.get(), ChaosSpawnerRenderer::new);
-        event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER.get(), FairkeeperBorosRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_BOROS.get(), FairkeeperBorosRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_BOROS_PART.get(), FairkeeperBorosBodyRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_OUROS.get(), FairkeeperOurosRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.FAIRKEEPER_OUROS_PART.get(), FairkeeperOurosBodyRenderer::new);

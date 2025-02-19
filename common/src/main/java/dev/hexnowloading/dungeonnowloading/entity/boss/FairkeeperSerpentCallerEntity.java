@@ -251,13 +251,11 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     }
 
     private static final ImmutableList<FairkeeperBorosEntity.FairkeeperBorosState> BOROS_WAITING_STATES = ImmutableList.of(
-            FairkeeperBorosEntity.FairkeeperBorosState.IDLE,
-            FairkeeperBorosEntity.FairkeeperBorosState.CIRCLING
+            FairkeeperBorosEntity.FairkeeperBorosState.IDLE
     );
 
     private static final ImmutableList<FairkeeperOurosEntity.FairkeeperOurosState> OUROS_WAITING_STATES = ImmutableList.of(
-            FairkeeperOurosEntity.FairkeeperOurosState.IDLE,
-            FairkeeperOurosEntity.FairkeeperOurosState.CIRCLING
+            FairkeeperOurosEntity.FairkeeperOurosState.IDLE
     );
 
     private void introMoveSet() {
@@ -769,7 +767,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         int playerCount = playerUUIDs.size();
 
-        FairkeeperBorosEntity boros = new FairkeeperBorosEntity(DNLEntityTypes.FAIRKEEPER.get(), this.level());
+        FairkeeperBorosEntity boros = new FairkeeperBorosEntity(DNLEntityTypes.FAIRKEEPER_BOROS.get(), this.level());
         if (boros != null) {
             boros.moveTo(centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y - boros.getBoundingBox().getYsize() / 2, centeredCounterClockWiseTargetPosition.z);
             boros.setCallerId(this.getUUID());
