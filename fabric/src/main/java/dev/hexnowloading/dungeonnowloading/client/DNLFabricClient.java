@@ -55,6 +55,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SCUTTLE_STATUE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BALLISTA_GOLEM_STATUE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BALLISTA_GOLEM_STATUE_PART.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA.get(), RenderType.translucent());
     }
 
     private void registerRenderers() {
@@ -155,5 +156,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.REDSTONE_HAZARD_INDICATOR_PARTICLE.get(), RedstoneHazardIndicatorParticle.Factory::new);
         registry.register(DNLParticleTypes.WHITE_SHOCKWAVE_PARTICLE.get(), WhiteShockwaveParticle.Factory::new);
         registry.register(DNLParticleTypes.ARROW_HAZARD_INDICATOR.get(), ArrowHazardIndicatorParticle.Factory::new);
+        registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        registry.register(DNLParticleTypes.MENDING_RUNE_PARITCLE.get(), MendingRuneParticle.Factory::new);
     }
 }

@@ -108,5 +108,7 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.REDSTONE_HAZARD_INDICATOR_PARTICLE.get(), RedstoneHazardIndicatorParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.WHITE_SHOCKWAVE_PARTICLE.get(), WhiteShockwaveParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.ARROW_HAZARD_INDICATOR.get(), ArrowHazardIndicatorParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_PARITCLE.get(), MendingRuneParticle.Factory::new);
     }
 }

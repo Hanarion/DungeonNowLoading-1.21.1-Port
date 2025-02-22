@@ -92,10 +92,10 @@ public class FairkeeperBorosTackleGoal extends Goal {
             double viewDistance = 1.5F;
             Vec3 offset = this.boros.getViewVector(1.0F).scale(viewDistance);
             Vec3 potentialTargetPosition = this.boros.position().add(offset);
-            double minX = this.arenaCenter.getX() - this.arenaSize;
-            double maxX = this.arenaCenter.getX() + this.arenaSize;
-            double minZ = this.arenaCenter.getZ() - this.arenaSize;
-            double maxZ = this.arenaCenter.getZ() + this.arenaSize;
+            double minX = this.arenaCenter.getX() - this.arenaSize + 1;
+            double maxX = this.arenaCenter.getX() + this.arenaSize - 1;
+            double minZ = this.arenaCenter.getZ() - this.arenaSize + 1;
+            double maxZ = this.arenaCenter.getZ() + this.arenaSize - 1;
             boolean isInsideArena = potentialTargetPosition.x >= minX && potentialTargetPosition.x <= maxX && potentialTargetPosition.z >= minZ && potentialTargetPosition.z <= maxZ;
             if (isInsideArena) {
                 this.targetPosition = potentialTargetPosition;

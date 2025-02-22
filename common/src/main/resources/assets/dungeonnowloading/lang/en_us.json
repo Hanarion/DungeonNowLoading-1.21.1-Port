@@ -127,6 +127,7 @@
   "block.dungeonnowloading.ballista_golem_statue": "Ballista Golem Statue",
   "block.dungeonnowloading.stone_pillar": "Stone Pillar",
   "block.dungeonnowloading.shielding_stone_pillar": "Shielding Stone Pillar",
+  "block.dungeonnowloading.mending_soul_block": "Mending Soul Block",
   "death.attack.dungeonnowloading.spike": "%1$s was spiked to death",
   "death.attack.dungeonnowloading.spike.player": "%1$s was spiked to death",
   "entity.dungeonnowloading.chaos_spawner": "Chaos Spawner",

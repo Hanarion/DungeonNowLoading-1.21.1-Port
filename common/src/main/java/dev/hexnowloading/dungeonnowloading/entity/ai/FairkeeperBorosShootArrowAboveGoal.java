@@ -217,10 +217,10 @@ public class FairkeeperBorosShootArrowAboveGoal extends Goal {
         double potentialZ = centerZ + this.radius * Math.sin(angleRad);
 
         // Define arena boundaries
-        double minX = this.arenaCenter.getX() - this.arenaSize;
-        double maxX = this.arenaCenter.getX() + this.arenaSize;
-        double minZ = this.arenaCenter.getZ() - this.arenaSize;
-        double maxZ = this.arenaCenter.getZ() + this.arenaSize;
+        double minX = this.arenaCenter.getX() - this.arenaSize + 1;
+        double maxX = this.arenaCenter.getX() + this.arenaSize - 1;
+        double minZ = this.arenaCenter.getZ() - this.arenaSize + 1;
+        double maxZ = this.arenaCenter.getZ() + this.arenaSize - 1;
 
         // Clamp position inside arena boundaries
         this.targetX = Math.max(minX, Math.min(maxX, potentialX));

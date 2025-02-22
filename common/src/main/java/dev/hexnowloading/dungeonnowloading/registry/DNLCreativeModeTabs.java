@@ -120,6 +120,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.BALLISTA_GOLEM_STATUE.get());
                 output.accept(DNLItems.STONE_PILLAR.get());
                 output.accept(DNLItems.SHIELDING_STONE_PILLAR.get());
+                output.accept(DNLItems.MENDING_AURA.get());
 
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());

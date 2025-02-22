@@ -12,7 +12,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
-import net.minecraftforge.client.model.generators.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
+import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -50,6 +54,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.DIAMOND_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
+        fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
 
 
         stairsBlockWithItem((StairBlock) DNLBlocks.STONE_TILE_STAIRS.get(), DNLBlocks.STONE_TILES.get());
@@ -162,6 +167,42 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                 .partialState().with(PillarCapBlock.FACING, Direction.WEST).modelForState().modelFile(reversed).rotationX(90).rotationY(270).addModel();
 
         simpleBlockItem(block, models().getExistingFile(blockTexture(block)));
+    }
+
+    private void horizontalRotatedVarientBlock(Block block) {
+        ModelFile model = models().cubeAll(name(block), blockTexture(block));
+
+        getVariantBuilder(block)
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model).rotationY(0).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model).rotationY(90).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model).rotationY(180).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model).rotationY(270).build());
+
+        simpleBlockItem(block, model);
+    }
+
+    private void fullyRotatedVarientBlock(Block block) {
+        ResourceLocation degree_0 = extend(blockTexture(block), "_0");
+        ResourceLocation degree_90 = extend(blockTexture(block), "_90");
+        ResourceLocation degree_180 = extend(blockTexture(block), "_180");
+        ResourceLocation degree_270 = extend(blockTexture(block), "_270");
+
+        ModelFile model_0 = models().cubeAll(name(block) + "_0", degree_0);
+        ModelFile model_90 = models().cubeAll(name(block) + "_90", degree_90);
+        ModelFile model_180 = models().cubeAll(name(block) + "_180", degree_180);
+        ModelFile model_270 = models().cubeAll(name(block) + "_270", degree_270);
+
+        getVariantBuilder(block)
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model_0).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model_90).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model_180).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model_270).build());
+
+        simpleBlockItem(block, model_0);
+    }
+
+    public static boolean always(BlockState blockState) {
+        return true;
     }
 
     private void orientableWithBottomBlockWithItem(HorizontalDirectionalBlock block) {
