@@ -1,10 +1,8 @@
 package dev.hexnowloading.dungeonnowloading.datagen.provider;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.block.FairkeeperSpawnerBlock;
-import dev.hexnowloading.dungeonnowloading.block.PillarCapBlock;
-import dev.hexnowloading.dungeonnowloading.block.RedstoneLaneBlock;
-import dev.hexnowloading.dungeonnowloading.block.SignalGateBlock;
+import dev.hexnowloading.dungeonnowloading.block.*;
+import dev.hexnowloading.dungeonnowloading.block.property.MendingRunes;
 import dev.hexnowloading.dungeonnowloading.block.property.RedstoneLaneMode;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
@@ -54,9 +52,8 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.DIAMOND_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
+
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
-
-
         stairsBlockWithItem((StairBlock) DNLBlocks.STONE_TILE_STAIRS.get(), DNLBlocks.STONE_TILES.get());
         slabBlockWithItems((SlabBlock) DNLBlocks.STONE_TILE_SLAB.get(), DNLBlocks.STONE_TILES.get());
         wallBlockWithItem((WallBlock) DNLBlocks.STONE_TILE_WALL.get(), DNLBlocks.STONE_TILES.get());
@@ -70,6 +67,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         redstoneLaneWithItem((RedstoneLaneBlock) DNLBlocks.REDSTONE_LANE_L.get());
         redstoneLaneWithItem((RedstoneLaneBlock) DNLBlocks.REDSTONE_LANE_T.get());
         signalGateWithItem((SignalGateBlock) DNLBlocks.SIGNAL_GATE.get());
+        preserverWithItem((PreserverBlock) DNLBlocks.STONE_PRESERVER.get());
 
         //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());
         //simpleRandomBlockWithItem(DNLBlocks.MOSS.get(), 5);
@@ -220,6 +218,50 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                 .partialState().with(HorizontalDirectionalBlock.FACING, Direction.WEST).modelForState().modelFile(normal).rotationX(90).addModel();
 
         simpleBlockItem(block, models().getExistingFile(blockTexture(block)));
+    }
+
+    private void preserverWithItem(PreserverBlock block) {
+        ResourceLocation m_on = extend(blockTexture(block), "_on_0");
+        ResourceLocation e_on = extend(blockTexture(block), "_on_1");
+        ResourceLocation n_on = extend(blockTexture(block), "_on_2");
+        ResourceLocation d_on = extend(blockTexture(block), "_on_3");
+        ResourceLocation i_on = extend(blockTexture(block), "_on_4");
+        ResourceLocation g_on = extend(blockTexture(block), "_on_5");
+        ResourceLocation m_off = extend(blockTexture(block), "_off_0");
+        ResourceLocation e_off = extend(blockTexture(block), "_off_1");
+        ResourceLocation n_off = extend(blockTexture(block), "_off_2");
+        ResourceLocation d_off = extend(blockTexture(block), "_off_3");
+        ResourceLocation i_off = extend(blockTexture(block), "_off_4");
+        ResourceLocation g_off = extend(blockTexture(block), "_off_5");
+
+        ModelFile m_on_model = models().cubeAll("_on_0", m_on);
+        ModelFile e_on_model = models().cubeAll("_on_1", e_on);
+        ModelFile n_on_model = models().cubeAll("_on_2", n_on);
+        ModelFile d_on_model = models().cubeAll("_on_3", d_on);
+        ModelFile i_on_model = models().cubeAll("_on_4", i_on);
+        ModelFile g_on_model = models().cubeAll("_on_5", g_on);
+        ModelFile m_off_model = models().cubeAll("_off_0", m_off);
+        ModelFile e_off_model = models().cubeAll("_off_1", e_off);
+        ModelFile n_off_model = models().cubeAll("_off_2", n_off);
+        ModelFile d_off_model = models().cubeAll("_off_3", d_off);
+        ModelFile i_off_model = models().cubeAll("_off_4", i_off);
+        ModelFile g_off_model = models().cubeAll("_off_5", g_off);
+
+        getVariantBuilder(block)
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.M_ON).modelForState().modelFile(m_on_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.E_ON).modelForState().modelFile(e_on_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.N_ON).modelForState().modelFile(n_on_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.D_ON).modelForState().modelFile(d_on_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.I_ON).modelForState().modelFile(i_on_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.G_ON).modelForState().modelFile(g_on_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.M_OFF).modelForState().modelFile(m_off_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.E_OFF).modelForState().modelFile(e_off_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.N_OFF).modelForState().modelFile(n_off_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.D_OFF).modelForState().modelFile(d_off_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.I_OFF).modelForState().modelFile(i_off_model).addModel()
+                .partialState().with(PreserverBlock.RUNES, MendingRunes.G_OFF).modelForState().modelFile(g_off_model).addModel();
+
+        simpleBlockItem(block, m_off_model);
     }
 
     private void signalGateWithItem(SignalGateBlock block) {

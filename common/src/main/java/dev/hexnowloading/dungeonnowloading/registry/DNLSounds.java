@@ -17,6 +17,7 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION = registerSoundEvent("overcharged_redstone_block_component_detonation");
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_DUST_COMBUSTION = registerSoundEvent("overcharged_redstone_block_dust_combustion");
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION = registerSoundEvent("overcharged_redstone_block_tnt_explosion");
+    public static final Supplier<SoundEvent> MENDING_AURA_POP = registerSoundEvent("mending_aura_pop");
     public static final Supplier<SoundEvent> CHAOS_SPAWNER_LAUGHTER = registerSoundEvent("chaos_spawner_laughter");
     public static final Supplier<SoundEvent> CHAOS_SPAWNER_CHAIN_BREAK = registerSoundEvent("chaos_spawner_chain_break");
     public static final Supplier<SoundEvent> CHAOS_SPAWNER_HURT = registerSoundEvent("chaos_spawner_hurt");

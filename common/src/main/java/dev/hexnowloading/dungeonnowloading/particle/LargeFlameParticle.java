@@ -3,7 +3,6 @@ package dev.hexnowloading.dungeonnowloading.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 public class LargeFlameParticle extends TextureSheetParticle {

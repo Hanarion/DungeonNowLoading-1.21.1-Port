@@ -9,6 +9,11 @@ import org.jetbrains.annotations.Nullable;
 public class MendingPopParticle extends TextureSheetParticle {
     private SpriteSet spriteSet;
 
+    private final int EARLY_SPAWN_TICK = 6;
+    private final double initialXSpeed;
+    private final double initialYSpeed;
+    private final double initialZSpeed;
+
     protected MendingPopParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet spriteSet) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.quadSize *= 1.5F;
@@ -16,11 +21,14 @@ public class MendingPopParticle extends TextureSheetParticle {
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
-        this.bCol = 1.0F;
-        this.gCol = 1.0F;
+        this.setAlpha(1.0F);
         this.spriteSet = spriteSet;
         this.friction = 0.95F;
         this.lifetime = 16;
+        this.initialXSpeed = xSpeed;
+        this.initialYSpeed = ySpeed;
+        this.initialZSpeed = zSpeed;
+
     }
 
     @Override
@@ -34,8 +42,12 @@ public class MendingPopParticle extends TextureSheetParticle {
             this.setSprite(spriteSet.get(sprite, 8));
         }
 
+        if (this.age == this.lifetime - EARLY_SPAWN_TICK) {
+            int tickMultiplier = EARLY_SPAWN_TICK - 2;
+            level.addParticle(DNLParticleTypes.MENDING_RUNE_PARITCLE.get(), this.x + this.initialXSpeed * tickMultiplier, this.y + this.initialYSpeed * tickMultiplier, this.z + this.initialZSpeed * tickMultiplier, this.xd, this.yd, this.zd);
+        }
+
         if (this.age++ >= this.lifetime) {
-            level.addParticle(DNLParticleTypes.MENDING_RUNE_PARITCLE.get(), this.x, this.y, this.z, this.xd, this.yd, this.zd);
             this.remove();
         }
     }

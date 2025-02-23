@@ -14,9 +14,11 @@ public class DNLProperties {
     public static final EnumProperty<TripleBlock> TRIPLE_BLOCK = EnumProperty.create("triple_block", TripleBlock.class);
     public static final EnumProperty<ChestStates> CHEST_STATES = EnumProperty.create("chest_state", ChestStates.class);
     public static final EnumProperty<BallistaGolemStatueStates> BALLISTA_GOLEM_STATUE_PARTS = EnumProperty.create("ballista_golem_statue_state", BallistaGolemStatueStates.class);
+    public static final EnumProperty<MendingRunes> MENDING_RUNES = EnumProperty.create("mending_rune", MendingRunes.class);
     public static final IntegerProperty REDSTONE_LANE_POWER = IntegerProperty.create("redstone_lane_power", 0, 150);
     public static final IntegerProperty PILE = IntegerProperty.create("pile", 1, 4);
     public static final BooleanProperty FAIRKEEPER_ALERT = BooleanProperty.create("fairkeeper_alert");
+    public static final BooleanProperty ACTIVATED = BooleanProperty.create("activated");
 
     public static void init() {}
 }

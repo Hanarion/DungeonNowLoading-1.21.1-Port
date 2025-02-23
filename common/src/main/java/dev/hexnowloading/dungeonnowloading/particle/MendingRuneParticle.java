@@ -16,8 +16,8 @@ public class MendingRuneParticle extends TextureSheetParticle {
     private float rotSpeed;
     private final float initialQuadSize;
     private Vec3 initialVelocity;
-    private final int REVERSE_DURATION = 40; // Ticks for reversing motion
-    private final int GROWTH_DURATION = 3;
+    private final int REVERSE_DURATION = 50; // Ticks for reversing motion
+    private final int GROWTH_DURATION = 5;
 
     protected MendingRuneParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet spriteSet) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
@@ -71,6 +71,7 @@ public class MendingRuneParticle extends TextureSheetParticle {
                 this.zd += zi;
             }
             double xt = this.xd;
+            double yt = this.yd;
             double zt = this.zd;
             this.move(this.xd, this.yd, this.zd);
             if (this.onGround) {
@@ -81,7 +82,8 @@ public class MendingRuneParticle extends TextureSheetParticle {
             boolean onSouthWall = (zt != zd && zt > 0.0);
             boolean onWestWall = (xt != xd && xt < 0.0);
             boolean onEastWall = (xt != xd && xt > 0.0);
-            if (onNorthWall || onEastWall || onSouthWall || onWestWall) {
+            boolean onCieling = (yt != yd && yt > 0.0);
+            if (onNorthWall || onEastWall || onSouthWall || onWestWall || onCieling) {
                 this.remove();
             }
         } else {

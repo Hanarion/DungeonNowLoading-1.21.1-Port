@@ -124,6 +124,7 @@ public class DNLItems {
     public static final Supplier<Item> STONE_PILLAR = register("stone_pillar", () -> new BlockItem(DNLBlocks.STONE_PILLAR.get(), new Item.Properties()));
     public static final Supplier<Item> SHIELDING_STONE_PILLAR = register("shielding_stone_pillar", () -> new BlockItem(DNLBlocks.SHIELDING_STONE_PILLAR.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA = register("mending_aura", () -> new BlockItem(DNLBlocks.MENDING_AURA.get(), new Item.Properties()));
+    public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> LABYRINTH_TROPHY = register("labyrinth_trophy", () -> new BlockItem(DNLBlocks.LABYRINTH_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));

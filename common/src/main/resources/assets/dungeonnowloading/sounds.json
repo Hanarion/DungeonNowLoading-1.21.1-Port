@@ -55,6 +55,17 @@
       "dungeonnowloading:block/overcharged_redstone_block/overcharged_redstone_block_tnt_explosion_1"
     ]
   },
+  "mending_aura_pop": {
+    "subtitle": "sounds.dungeonnowloading.mending_aura_pop",
+    "sounds": [
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_0",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_1",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_2",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_3",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_4",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_5"
+    ]
+  },
   "chaos_spawner_laughter": {
     "subtitle": "sounds.dungeonnowloading.chaos_spawner_laughter",
     "sounds": [

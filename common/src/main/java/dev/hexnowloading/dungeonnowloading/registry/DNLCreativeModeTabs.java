@@ -121,6 +121,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.STONE_PILLAR.get());
                 output.accept(DNLItems.SHIELDING_STONE_PILLAR.get());
                 output.accept(DNLItems.MENDING_AURA.get());
+                output.accept(DNLItems.STONE_PRESERVER.get());
 
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());

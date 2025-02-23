@@ -4,10 +4,14 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +25,18 @@ public class MendingAuraBlock extends Block {
     @Override
     public boolean skipRendering(BlockState p_53972_, BlockState p_53973_, Direction p_53974_) {
         return p_53973_.is(this) ? true : super.skipRendering(p_53972_, p_53973_, p_53974_);
+    }
+
+    public float getShadeBrightness(BlockState p_48731_, BlockGetter p_48732_, BlockPos p_48733_) {
+        return 1.0F;
+    }
+
+    public boolean propagatesSkylightDown(BlockState p_48740_, BlockGetter p_48741_, BlockPos p_48742_) {
+        return true;
+    }
+
+    public VoxelShape getVisualShape(BlockState p_48735_, BlockGetter p_48736_, BlockPos p_48737_, CollisionContext p_48738_) {
+        return Shapes.empty();
     }
 
     @Override
@@ -42,13 +58,13 @@ public class MendingAuraBlock extends Block {
 
             if (!possibleDirections.isEmpty()) {
                 Vec3 chosenDirection = possibleDirections.get(randomSource.nextInt(possibleDirections.size()));
-                velocity = chosenDirection.scale(0.08);
+                velocity = chosenDirection.scale(0.06);
                 spawnOffset = chosenDirection;
             }
 
-            double x = blockPos.getX() + randomSource.nextDouble() + spawnOffset.x * (0.5F + randomSource.nextDouble() * 1.5F);
-            double y = blockPos.getY() + randomSource.nextDouble() + spawnOffset.y * (0.5F + randomSource.nextDouble() * 1.5F);
-            double z = blockPos.getZ() + randomSource.nextDouble() + spawnOffset.z * (0.5F + randomSource.nextDouble() * 1.5F);
+            double x = blockPos.getX() + randomSource.nextDouble() + spawnOffset.x * (0.5F + randomSource.nextDouble() * 1.0F);
+            double y = blockPos.getY() + randomSource.nextDouble() + spawnOffset.y * (0.5F + randomSource.nextDouble() * 1.0F);
+            double z = blockPos.getZ() + randomSource.nextDouble() + spawnOffset.z * (0.5F + randomSource.nextDouble() * 1.0F);
 
             level.addParticle(DNLParticleTypes.MENDING_POP_PARTICLE.get(), true, x, y, z, -velocity.x, -velocity.y, -velocity.z);
         }
