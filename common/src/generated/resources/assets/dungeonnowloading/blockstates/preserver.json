@@ -1,0 +1,40 @@
+{
+  "variants": {
+    "mending_rune=d_off": {
+      "model": "dungeonnowloading:block/_off_3"
+    },
+    "mending_rune=d_on": {
+      "model": "dungeonnowloading:block/_on_3"
+    },
+    "mending_rune=e_off": {
+      "model": "dungeonnowloading:block/_off_1"
+    },
+    "mending_rune=e_on": {
+      "model": "dungeonnowloading:block/_on_1"
+    },
+    "mending_rune=g_off": {
+      "model": "dungeonnowloading:block/_off_5"
+    },
+    "mending_rune=g_on": {
+      "model": "dungeonnowloading:block/_on_5"
+    },
+    "mending_rune=i_off": {
+      "model": "dungeonnowloading:block/_off_4"
+    },
+    "mending_rune=i_on": {
+      "model": "dungeonnowloading:block/_on_4"
+    },
+    "mending_rune=m_off": {
+      "model": "dungeonnowloading:block/_off_0"
+    },
+    "mending_rune=m_on": {
+      "model": "dungeonnowloading:block/_on_0"
+    },
+    "mending_rune=n_off": {
+      "model": "dungeonnowloading:block/_off_2"
+    },
+    "mending_rune=n_on": {
+      "model": "dungeonnowloading:block/_on_2"
+    }
+  }
+}
