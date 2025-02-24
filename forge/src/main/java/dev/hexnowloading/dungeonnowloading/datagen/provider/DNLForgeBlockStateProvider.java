@@ -2,7 +2,6 @@ package dev.hexnowloading.dungeonnowloading.datagen.provider;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
-import dev.hexnowloading.dungeonnowloading.block.property.MendingRunes;
 import dev.hexnowloading.dungeonnowloading.block.property.RedstoneLaneMode;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
@@ -234,32 +233,32 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         ResourceLocation i_off = extend(blockTexture(block), "_off_4");
         ResourceLocation g_off = extend(blockTexture(block), "_off_5");
 
-        ModelFile m_on_model = models().cubeAll("_on_0", m_on);
-        ModelFile e_on_model = models().cubeAll("_on_1", e_on);
-        ModelFile n_on_model = models().cubeAll("_on_2", n_on);
-        ModelFile d_on_model = models().cubeAll("_on_3", d_on);
-        ModelFile i_on_model = models().cubeAll("_on_4", i_on);
-        ModelFile g_on_model = models().cubeAll("_on_5", g_on);
-        ModelFile m_off_model = models().cubeAll("_off_0", m_off);
-        ModelFile e_off_model = models().cubeAll("_off_1", e_off);
-        ModelFile n_off_model = models().cubeAll("_off_2", n_off);
-        ModelFile d_off_model = models().cubeAll("_off_3", d_off);
-        ModelFile i_off_model = models().cubeAll("_off_4", i_off);
-        ModelFile g_off_model = models().cubeAll("_off_5", g_off);
+        ModelFile m_on_model = models().cubeAll(name(block) + "_on_0", m_on);
+        ModelFile e_on_model = models().cubeAll(name(block) + "_on_1", e_on);
+        ModelFile n_on_model = models().cubeAll(name(block) + "_on_2", n_on);
+        ModelFile d_on_model = models().cubeAll(name(block) + "_on_3", d_on);
+        ModelFile i_on_model = models().cubeAll(name(block) + "_on_4", i_on);
+        ModelFile g_on_model = models().cubeAll(name(block) + "_on_5", g_on);
+        ModelFile m_off_model = models().cubeAll(name(block) + "_off_0", m_off);
+        ModelFile e_off_model = models().cubeAll(name(block) + "_off_1", e_off);
+        ModelFile n_off_model = models().cubeAll(name(block) + "_off_2", n_off);
+        ModelFile d_off_model = models().cubeAll(name(block) + "_off_3", d_off);
+        ModelFile i_off_model = models().cubeAll(name(block) + "_off_4", i_off);
+        ModelFile g_off_model = models().cubeAll(name(block) + "_off_5", g_off);
 
         getVariantBuilder(block)
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.M_ON).modelForState().modelFile(m_on_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.E_ON).modelForState().modelFile(e_on_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.N_ON).modelForState().modelFile(n_on_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.D_ON).modelForState().modelFile(d_on_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.I_ON).modelForState().modelFile(i_on_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.G_ON).modelForState().modelFile(g_on_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.M_OFF).modelForState().modelFile(m_off_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.E_OFF).modelForState().modelFile(e_off_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.N_OFF).modelForState().modelFile(n_off_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.D_OFF).modelForState().modelFile(d_off_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.I_OFF).modelForState().modelFile(i_off_model).addModel()
-                .partialState().with(PreserverBlock.RUNES, MendingRunes.G_OFF).modelForState().modelFile(g_off_model).addModel();
+                .partialState().with(PreserverBlock.LIT, true).addModels(ConfiguredModel.builder().modelFile(m_on_model).build())
+                .partialState().with(PreserverBlock.LIT, true).addModels(ConfiguredModel.builder().modelFile(e_on_model).build())
+                .partialState().with(PreserverBlock.LIT, true).addModels(ConfiguredModel.builder().modelFile(n_on_model).build())
+                .partialState().with(PreserverBlock.LIT, true).addModels(ConfiguredModel.builder().modelFile(d_on_model).build())
+                .partialState().with(PreserverBlock.LIT, true).addModels(ConfiguredModel.builder().modelFile(i_on_model).build())
+                .partialState().with(PreserverBlock.LIT, true).addModels(ConfiguredModel.builder().modelFile(g_on_model).build())
+                .partialState().with(PreserverBlock.LIT, false).addModels(ConfiguredModel.builder().modelFile(m_off_model).build())
+                .partialState().with(PreserverBlock.LIT, false).addModels(ConfiguredModel.builder().modelFile(e_off_model).build())
+                .partialState().with(PreserverBlock.LIT, false).addModels(ConfiguredModel.builder().modelFile(n_off_model).build())
+                .partialState().with(PreserverBlock.LIT, false).addModels(ConfiguredModel.builder().modelFile(d_off_model).build())
+                .partialState().with(PreserverBlock.LIT, false).addModels(ConfiguredModel.builder().modelFile(i_off_model).build())
+                .partialState().with(PreserverBlock.LIT, false).addModels(ConfiguredModel.builder().modelFile(g_off_model).build());
 
         simpleBlockItem(block, m_off_model);
     }

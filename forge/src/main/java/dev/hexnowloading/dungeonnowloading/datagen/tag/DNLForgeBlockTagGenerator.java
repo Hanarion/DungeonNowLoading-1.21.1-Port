@@ -71,7 +71,8 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.BALLISTA_GOLEM_STATUE.get(),
                 DNLBlocks.BALLISTA_GOLEM_STATUE_PART.get(),
                 DNLBlocks.STONE_PILLAR.get(),
-                DNLBlocks.SHIELDING_STONE_PILLAR.get()
+                DNLBlocks.SHIELDING_STONE_PILLAR.get(),
+                DNLBlocks.STONE_PRESERVER.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(
@@ -90,6 +91,14 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
 
         this.tag(BlockTags.INFINIBURN_OVERWORLD).add(
                 DNLBlocks.SCUTTLE_STATUE.get()
+        );
+
+        this.tag(BlockTags.WITHER_IMMUNE).add(
+                DNLBlocks.STONE_PRESERVER.get()
+        );
+
+        this.tag(BlockTags.DRAGON_IMMUNE).add(
+                DNLBlocks.STONE_PRESERVER.get()
         );
     }
 }

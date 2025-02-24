@@ -7,9 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.IDN;
-import java.util.Locale;
-
 public class DungeonNowLoading {
 
     public static final String MOD_ID = "dungeonnowloading";
@@ -35,6 +32,7 @@ public class DungeonNowLoading {
         DNLStructures.init();
         DNLProcessors.init();
         DNLCreativeModeTabs.init();
+        DNLGameEvents.init();
     }
 
     private static void registerConfigs() {
