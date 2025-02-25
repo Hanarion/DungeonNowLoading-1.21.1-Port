@@ -23,6 +23,8 @@ public class PreserverBlock extends BaseEntityBlock {
 
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     private final Block blockType;
+    private int radius;
+    private int thickness;
 
     public PreserverBlock(Properties $$0) {
         super($$0);
@@ -42,9 +44,42 @@ public class PreserverBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack tool) {
-        super.playerDestroy(world, player, pos, state, blockEntity, tool);
-        placeAndScheduleRuneBlock(world, pos);
+    public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
+        if (!level.isClientSide && !player.getAbilities().instabuild) {
+            BlockEntity blockEntityOld = level.getBlockEntity(blockPos);
+
+            System.out.println("Old Block Entity : " + blockEntityOld);
+            if (blockEntityOld instanceof PreserverBlockEntity preserverBlockEntity) {
+                radius = preserverBlockEntity.getUser().getListenerRadius();
+                thickness = preserverBlockEntity.getUser().getThickness();
+                System.out.println("Old Radius : " + preserverBlockEntity.getUser().getListenerRadius());
+                System.out.println("Old Thickness : " + preserverBlockEntity.getUser().getThickness());
+            }
+        }
+        super.playerWillDestroy(level, blockPos, blockState, player);
+    }
+
+    @Override
+    public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState state, BlockEntity blockEntity, ItemStack tool) {
+        super.playerDestroy(level, player, blockPos, state, blockEntity, tool);
+        if (!level.isClientSide && !player.getAbilities().instabuild) {
+            level.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true), Block.UPDATE_CLIENTS);
+
+            BlockEntity blockEntityNew = level.getBlockEntity(blockPos);
+
+            if (blockEntityNew instanceof PreserverBlockEntity preserverBlockEntity) {
+                preserverBlockEntity.getUser().setListenerRadius(radius);
+                preserverBlockEntity.getUser().setThickness(thickness);
+                System.out.println("New Radius : " + preserverBlockEntity.getUser().getListenerRadius());
+                System.out.println("New Thickness : " + preserverBlockEntity.getUser().getThickness());
+
+            }
+
+            if (!level.isClientSide) {
+                level.scheduleTick(blockPos, this, 20);
+            }
+        }
+
 
     }
 
@@ -53,15 +88,16 @@ public class PreserverBlock extends BaseEntityBlock {
         if (level.isClientSide) {
             return;
         }
-        placeAndScheduleRuneBlock(level, blockPos);
+        BlockEntity blockEntityOld = level.getBlockEntity(blockPos);
 
-    }
-
-    private void placeAndScheduleRuneBlock(Level level, BlockPos blockPos) {
-        level.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true), Block.UPDATE_CLIENTS);
-        if (!level.isClientSide) {
-            level.scheduleTick(blockPos, this, 20);
+        System.out.println("Old Block Entity : " + blockEntityOld);
+        if (blockEntityOld instanceof PreserverBlockEntity preserverBlockEntity) {
+            radius = preserverBlockEntity.getUser().getListenerRadius();
+            thickness = preserverBlockEntity.getUser().getThickness();
+            System.out.println("Old Radius : " + preserverBlockEntity.getUser().getListenerRadius());
+            System.out.println("Old Thickness : " + preserverBlockEntity.getUser().getThickness());
         }
+
     }
 
     @Override

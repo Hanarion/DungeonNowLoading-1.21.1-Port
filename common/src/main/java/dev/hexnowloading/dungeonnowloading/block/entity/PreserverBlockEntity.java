@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
 import com.mojang.logging.LogUtils;
-import dev.hexnowloading.dungeonnowloading.game_event_listener.PreserverBlockDestructionListener;
+import dev.hexnowloading.dungeonnowloading.game_event_listener.PreserverBlockDestructionSystem;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -11,44 +11,48 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import org.slf4j.Logger;
 
-public class PreserverBlockEntity extends BlockEntity implements GameEventListener.Holder<GameEventListener> {
+public class PreserverBlockEntity extends BlockEntity implements GameEventListener.Holder<PreserverBlockDestructionSystem.Listener>, PreserverBlockDestructionSystem {
 
     private static final Logger LOGGER = LogUtils.getLogger();
-    private PreserverBlockDestructionListener gameEventListener;
+    private PreserverBlockDestructionSystem.User user;
+    private PreserverBlockDestructionSystem.Listener gameEventListener;
 
-    private int range;
+    private int squareRange;
+    private int thickness;
 
     public PreserverBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(DNLBlockEntityTypes.PRESERVER_BLOCK.get(), blockPos, blockState);
-        this.gameEventListener = new PreserverBlockDestructionListener(this.getBlockPos(), PreserverBlockDestructionListener.squareRegionCalculation(10), PreserverBlockDestructionListener.PreserverPlane.XZ, 1);
+        this.user = new PreserverBlockDestructionSystem.User(this.getBlockPos(), PreserverBlockDestructionSystem.Listener.squareRegionCalculation(10), PreserverBlockDestructionSystem.User.PreserverPlane.XZ, 1);
+        this.gameEventListener = new PreserverBlockDestructionSystem.Listener(this);
     }
 
     @Override
     protected void saveAdditional(CompoundTag compoundTag) {
         super.saveAdditional(compoundTag);
-        PreserverBlockDestructionListener.CODEC.encodeStart(NbtOps.INSTANCE, this.gameEventListener)
+
+        PreserverBlockDestructionSystem.User.CODEC.encodeStart(NbtOps.INSTANCE, this.user)
                 .resultOrPartial(LOGGER::error)
                 .ifPresent(tag -> compoundTag.put("listener", tag));
-
     }
 
     @Override
     public void load(CompoundTag compoundTag) {
         if (compoundTag.contains("listener", 10)) { // 10 means it's a CompoundTag
-            PreserverBlockDestructionListener.CODEC.parse(NbtOps.INSTANCE, compoundTag.getCompound("listener"))
+            PreserverBlockDestructionSystem.User.CODEC.parse(NbtOps.INSTANCE, compoundTag.getCompound("listener"))
                     .resultOrPartial(LOGGER::error)
                     .ifPresent(listener -> {
-                        this.gameEventListener = listener;
+                        this.user = listener;
                     });
         }
     }
 
     @Override
-    public GameEventListener getListener() {
-        return this.gameEventListener;
+    public User getUser() {
+        return this.user;
     }
 
-    public void setGameEventListener(PreserverBlockDestructionListener gameEventListener) {
-        this.gameEventListener = gameEventListener;
+    @Override
+    public Listener getListener() {
+        return this.gameEventListener;
     }
 }
