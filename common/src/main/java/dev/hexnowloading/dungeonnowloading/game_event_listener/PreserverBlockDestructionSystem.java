@@ -10,10 +10,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLGameEvents;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
-import dev.hexnowloading.dungeonnowloading.util.event_managers.BlockBurnManager;
-import dev.hexnowloading.dungeonnowloading.util.event_managers.BlockDestructionManager;
-import dev.hexnowloading.dungeonnowloading.util.event_managers.ContainerDropManager;
-import dev.hexnowloading.dungeonnowloading.util.event_managers.ExplosionDestructionManager;
+import dev.hexnowloading.dungeonnowloading.util.event_managers.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -176,6 +173,11 @@ public interface PreserverBlockDestructionSystem {
                     eventBlockPos.getZ() >= minZ && eventBlockPos.getZ() <= maxZ) {
                 if (gameEvent == DNLGameEvents.BLOCK_DESTROY_EARLY.get()) {
 
+                    if (serverLevel.getBlockEntity(centerBlockPos) instanceof PreserverBlockEntity preserverBlock && preserverBlock.isPlayerPlaced(eventBlockPos)) {
+                        preserverBlock.removePlayerPlacedBlock(eventBlockPos);
+                        return false;
+                    }
+
                     if (context.sourceEntity() instanceof Player player && player.getAbilities().instabuild) {
                         return false;
                     }
@@ -185,11 +187,6 @@ public interface PreserverBlockDestructionSystem {
                     }
 
                     if (serverLevel.getBlockState(eventBlockPos).getBlock() instanceof PreserverBlock) {
-                        return false;
-                    }
-
-                    if (serverLevel.getBlockEntity(centerBlockPos) instanceof PreserverBlockEntity preserverBlock && preserverBlock.isPlayerPlaced(eventBlockPos)) {
-                        preserverBlock.removePlayerPlacedBlock(eventBlockPos);
                         return false;
                     }
 
@@ -288,6 +285,37 @@ public interface PreserverBlockDestructionSystem {
 
                     BlockBurnManager.cancel();
                     ContainerDropManager.cancel(eventBlockPos);
+
+                    serverLevel.setBlock(eventBlockPos, DNLBlocks.MENDING_AURA.get().defaultBlockState(), Block.UPDATE_CLIENTS);
+                    if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
+                        blockEntity.setStoredBlock(originalBlockState, compoundTag);
+                    }
+
+                    if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
+                        preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
+                        serverLevel.playSound(null, centerBlockPos, DNLSounds.MENDING_AURA_POP.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                    }
+
+                    return true;
+                }
+                if (gameEvent == DNLGameEvents.BLOCK_PUSHED_EARLY.get()) {
+
+                    if (serverLevel.getBlockState(eventBlockPos).isAir()) {
+                        return false;
+                    }
+
+                    if (serverLevel.getBlockState(eventBlockPos).is(DNLTags.PRESERVER_IGNORE)) {
+                        return false;
+                    }
+
+                    BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
+                    BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
+                    CompoundTag compoundTag = new CompoundTag();
+                    if (originalBlockEntity != null) {
+                        compoundTag = originalBlockEntity.saveWithFullMetadata();
+                    }
+
+                    PistonPushManager.cancel();
 
                     serverLevel.setBlock(eventBlockPos, DNLBlocks.MENDING_AURA.get().defaultBlockState(), Block.UPDATE_CLIENTS);
                     if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {

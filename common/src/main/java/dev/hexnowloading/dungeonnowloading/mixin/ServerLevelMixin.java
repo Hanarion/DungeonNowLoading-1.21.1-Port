@@ -1,9 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin;
 
-import dev.hexnowloading.dungeonnowloading.util.event_managers.BlockBurnManager;
-import dev.hexnowloading.dungeonnowloading.util.event_managers.BlockDestructionManager;
-import dev.hexnowloading.dungeonnowloading.util.event_managers.ContainerDropManager;
-import dev.hexnowloading.dungeonnowloading.util.event_managers.ExplosionDestructionManager;
+import dev.hexnowloading.dungeonnowloading.util.event_managers.*;
 import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,5 +18,6 @@ public abstract class ServerLevelMixin {
         BlockBurnManager.reset();
         ContainerDropManager.reset();
         ExplosionDestructionManager.reset();
+        PistonPushManager.reset();
     }
 }

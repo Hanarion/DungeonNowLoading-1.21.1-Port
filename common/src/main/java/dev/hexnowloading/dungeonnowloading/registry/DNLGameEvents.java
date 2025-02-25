@@ -12,6 +12,8 @@ public class DNLGameEvents {
     public static final Supplier<GameEvent> BLOCK_DESTROYED_BY_EXPLOSION = register("block_destroyed_by_explosion", () -> new GameEvent("block_destroyed_by_explosion", 16));
     public static final Supplier<GameEvent> BLOCK_CONTENT_DROPPING = register("block_content_dropping", () -> new GameEvent("block_content_dropped", 16));
     public static final Supplier<GameEvent> BLOCK_BURNED = register("block_burned", () -> new GameEvent("block_burned", 16));
+    public static final Supplier<GameEvent> BLOCK_PUSHED_EARLY = register("block_pushed", () -> new GameEvent("block_pushed", 16));
+    public static final Supplier<GameEvent> BLOCK_PUSHED_EARLY_FAILED = register("block_push_failed", () -> new GameEvent("block_push_failed", 16));
 
 
     public static <T extends GameEvent> Supplier<T> register(String name, Supplier<T> featureSupplier) {
