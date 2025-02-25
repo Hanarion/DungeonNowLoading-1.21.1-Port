@@ -5,7 +5,12 @@
     "refmap": "${mod_id}.refmap.json",
     "compatibilityLevel": "JAVA_17",
     "mixins": [
+        "ServerLevelMixin",
         "block.BlockDestroyCancelMixin",
+        "block.ExplosionMixin",
+        "block.ContainerMixin",
+        "block.DNLFireBlockMixin",
+        "block.LecternBlockMixin",
         "entities.EntityAvoidBlockMixin",
         "structures.StructureProcessorAccessor",
         "structures.StructureTemplateMixin",

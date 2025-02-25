@@ -1,22 +1,30 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MendingAuraBlock extends Block {
+public class MendingAuraBlock extends BaseEntityBlock {
 
     public MendingAuraBlock(Properties $$0) {
         super($$0);
@@ -37,6 +45,33 @@ public class MendingAuraBlock extends Block {
 
     public VoxelShape getVisualShape(BlockState p_48735_, BlockGetter p_48736_, BlockPos p_48737_, CollisionContext p_48738_) {
         return Shapes.empty();
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new MendingAuraBlockEntity(pos, state);
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState blockState) {
+        return RenderShape.MODEL;
+    }
+
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
+        return createTickerHelper(blockEntityType, DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntity::tick);
+    }
+
+    @Override
+    public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+        BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
+
+        if (blockEntity instanceof MendingAuraBlockEntity mendingAuraBlockEntity) {
+            MendingAuraBlockEntity.tick(serverLevel, blockPos, blockState, mendingAuraBlockEntity);
+        }
     }
 
     @Override

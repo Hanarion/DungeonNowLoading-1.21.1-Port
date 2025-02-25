@@ -117,4 +117,9 @@ public class PreserverBlock extends BaseEntityBlock {
     public RenderShape getRenderShape(BlockState blockState) {
         return RenderShape.MODEL;
     }
+
+    public void setLitPreserverBlock(ServerLevel serverLevel, BlockPos blockPos) {
+        serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true), Block.UPDATE_CLIENTS);
+        serverLevel.scheduleTick(blockPos, this, 20);
+    }
 }

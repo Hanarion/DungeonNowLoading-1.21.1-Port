@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.mixin.block;
 
 import dev.hexnowloading.dungeonnowloading.registry.DNLGameEvents;
-import dev.hexnowloading.dungeonnowloading.util.BlockDestructionManager;
+import dev.hexnowloading.dungeonnowloading.util.event_managers.BlockDestructionManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,9 +23,9 @@ public class BlockDestroyCancelMixin {
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void onBlockBreak(BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
+        BlockDestructionManager.reset();
         level.gameEvent(DNLGameEvents.BLOCK_DESTROY_EARLY.get(), blockPos, GameEvent.Context.of(player, level.getBlockState(blockPos)));
-        if (BlockDestructionManager.shouldCancelDestruction()) {
-            BlockDestructionManager.resetPlacementDestruction();
+        if (BlockDestructionManager.shouldCancel()) {
             cir.setReturnValue(false);
         }
     }
