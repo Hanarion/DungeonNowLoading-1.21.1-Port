@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.piston.PistonBaseBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,8 +27,7 @@ public abstract class PistonBlockMixin {
 
         // Fire a game event for debugging or tracking purposes
         if (level instanceof ServerLevel serverLevel) {
-            BlockState stateWithDirection = blockState.setValue(PistonBaseBlock.FACING, direction);
-            serverLevel.gameEvent(isPushable ? DNLGameEvents.BLOCK_PUSHED_EARLY.get() : DNLGameEvents.BLOCK_PUSHED_EARLY_FAILED.get(), Vec3.atCenterOf(blockPos), GameEvent.Context.of(stateWithDirection));
+            serverLevel.gameEvent(null, isPushable ? DNLGameEvents.BLOCK_PUSHED_EARLY.get() : DNLGameEvents.BLOCK_PUSHED_EARLY_FAILED.get(), Vec3.atCenterOf(blockPos));
         }
 
         if (PistonPushManager.shouldCancel()) {
