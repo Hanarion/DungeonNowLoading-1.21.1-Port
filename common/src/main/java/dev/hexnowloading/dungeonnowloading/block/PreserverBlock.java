@@ -2,58 +2,76 @@ package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class PreserverBlock extends BaseEntityBlock {
 
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+
     private final Block blockType;
-    private int radius;
-    private int thickness;
+    private CompoundTag transferData;
 
     public PreserverBlock(Properties $$0) {
         super($$0);
         this.blockType = this.asBlock();
-        this.registerDefaultState(this.defaultBlockState().setValue(LIT, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(LIT, false).setValue(FACING, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT);
+        builder.add(FACING);
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
-        return this.defaultBlockState().setValue(LIT, false);
+        Direction direction = blockPlaceContext.getHorizontalDirection().getOpposite();
+        return this.defaultBlockState().setValue(LIT, false).setValue(FACING, direction);
     }
 
+    @Override
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        if (level.getBlockEntity(pos) instanceof PreserverBlockEntity blockEntity) {
+            Direction facing = state.getValue(BlockStateProperties.FACING);
+            blockEntity.getUser().setFacing(facing);
+        }
+    }
     @Override
     public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
         if (!level.isClientSide && !player.getAbilities().instabuild) {
             BlockEntity blockEntityOld = level.getBlockEntity(blockPos);
 
-            System.out.println("Old Block Entity : " + blockEntityOld);
             if (blockEntityOld instanceof PreserverBlockEntity preserverBlockEntity) {
-                radius = preserverBlockEntity.getUser().getListenerRadius();
-                thickness = preserverBlockEntity.getUser().getThickness();
-                System.out.println("Old Radius : " + preserverBlockEntity.getUser().getListenerRadius());
-                System.out.println("Old Thickness : " + preserverBlockEntity.getUser().getThickness());
+                transferData = preserverBlockEntity.saveWithFullMetadata();
             }
         }
         super.playerWillDestroy(level, blockPos, blockState, player);
@@ -68,16 +86,10 @@ public class PreserverBlock extends BaseEntityBlock {
             BlockEntity blockEntityNew = level.getBlockEntity(blockPos);
 
             if (blockEntityNew instanceof PreserverBlockEntity preserverBlockEntity) {
-                preserverBlockEntity.getUser().setListenerRadius(radius);
-                preserverBlockEntity.getUser().setThickness(thickness);
-                System.out.println("New Radius : " + preserverBlockEntity.getUser().getListenerRadius());
-                System.out.println("New Thickness : " + preserverBlockEntity.getUser().getThickness());
-
+                preserverBlockEntity.load(transferData);
             }
 
-            if (!level.isClientSide) {
-                level.scheduleTick(blockPos, this, 20);
-            }
+            level.scheduleTick(blockPos, this, 20);
         }
 
 
@@ -90,12 +102,8 @@ public class PreserverBlock extends BaseEntityBlock {
         }
         BlockEntity blockEntityOld = level.getBlockEntity(blockPos);
 
-        System.out.println("Old Block Entity : " + blockEntityOld);
         if (blockEntityOld instanceof PreserverBlockEntity preserverBlockEntity) {
-            radius = preserverBlockEntity.getUser().getListenerRadius();
-            thickness = preserverBlockEntity.getUser().getThickness();
-            System.out.println("Old Radius : " + preserverBlockEntity.getUser().getListenerRadius());
-            System.out.println("Old Thickness : " + preserverBlockEntity.getUser().getThickness());
+            transferData = preserverBlockEntity.saveWithFullMetadata();
         }
 
     }

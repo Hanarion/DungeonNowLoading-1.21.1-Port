@@ -18,7 +18,7 @@ public class DNLProperties {
     public static final IntegerProperty REDSTONE_LANE_POWER = IntegerProperty.create("redstone_lane_power", 0, 150);
     public static final IntegerProperty PILE = IntegerProperty.create("pile", 1, 4);
     public static final BooleanProperty FAIRKEEPER_ALERT = BooleanProperty.create("fairkeeper_alert");
-    public static final BooleanProperty ACTIVATED = BooleanProperty.create("activated");
+    public static final BooleanProperty AURA_PERSISTENT = BooleanProperty.create("aura_persistent");
 
     public static void init() {}
 }

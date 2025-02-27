@@ -12,6 +12,8 @@
     "block.DNLFireBlockMixin",
     "block.LecternBlockMixin",
     "block.PistonBlockMixin",
+    "block.StairsMixin",
+    "block.FenceMixin",
     "entities.EntityAvoidBlockMixin",
     "fabric.block.BlockPlaceMixin",
     "fabric.block.BucketItemMixin",

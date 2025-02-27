@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import dev.hexnowloading.dungeonnowloading.game_event_listener.PreserverBlockDestructionSystem;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -26,7 +27,7 @@ public class PreserverBlockEntity extends BlockEntity implements GameEventListen
 
     public PreserverBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(DNLBlockEntityTypes.PRESERVER_BLOCK.get(), blockPos, blockState);
-        this.user = new PreserverBlockDestructionSystem.User(this.getBlockPos(), PreserverBlockDestructionSystem.Listener.squareRegionCalculation(10), PreserverBlockDestructionSystem.User.PreserverPlane.XZ, 1);
+        this.user = new PreserverBlockDestructionSystem.User(this.getBlockPos(), new BlockPos(10, 10, 10), new BlockPos(-10, -10, -10), Direction.NORTH);
         this.gameEventListener = new PreserverBlockDestructionSystem.Listener(this);
     }
 

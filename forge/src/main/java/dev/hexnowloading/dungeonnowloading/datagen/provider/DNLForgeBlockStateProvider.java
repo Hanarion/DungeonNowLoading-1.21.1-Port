@@ -10,15 +10,14 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.client.model.generators.ModelProvider;
+import net.minecraft.world.level.block.state.properties.*;
+import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class DNLForgeBlockStateProvider extends BlockStateProvider {
     public DNLForgeBlockStateProvider(DataGenerator gen, ExistingFileHelper exFileHelper) {
@@ -53,6 +52,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
 
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
+        fullyRotatedVarientStairsLikeBlockWithItem(DNLBlocks.MENDING_AURA_STAIRS.get(), DNLBlocks.MENDING_AURA.get());
+        fullyRotatedVarientSlabLikeBlockWithItem(DNLBlocks.MENDING_AURA_SLAB.get(), DNLBlocks.MENDING_AURA.get());
+        fullyRotatedVarientFenceLikeBlockWithItem(DNLBlocks.MENDING_AURA_FENCE.get(), DNLBlocks.MENDING_AURA.get());
+        fullyRotatedVarientWallLikeBlockWithItem(DNLBlocks.MENDING_AURA_WALL.get(), DNLBlocks.MENDING_AURA.get());
         stairsBlockWithItem((StairBlock) DNLBlocks.STONE_TILE_STAIRS.get(), DNLBlocks.STONE_TILES.get());
         slabBlockWithItems((SlabBlock) DNLBlocks.STONE_TILE_SLAB.get(), DNLBlocks.STONE_TILES.get());
         wallBlockWithItem((WallBlock) DNLBlocks.STONE_TILE_WALL.get(), DNLBlocks.STONE_TILES.get());
@@ -197,6 +200,211 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         simpleBlockItem(block, model_0);
     }
+
+    private void fullyRotatedVarientStairsLikeBlockWithItem(Block block, Block parent) {
+        ResourceLocation degree_0 = extend(blockTexture(parent), "_0");
+        ResourceLocation degree_90 = extend(blockTexture(parent), "_90");
+        ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
+        ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
+
+        ModelFile stairs_model_0 = models().stairs(name(block) + "_0", degree_0, degree_0, degree_0);
+        ModelFile stairs_model_90 = models().stairs(name(block) + "_90", degree_90, degree_90, degree_90);
+        ModelFile stairs_model_180 = models().stairs(name(block) + "_180", degree_180, degree_180, degree_180);
+        ModelFile stairs_model_270 = models().stairs(name(block) + "_270", degree_270, degree_270, degree_270);
+
+        ModelFile stairsInner_model_0 = models().stairsInner(name(block) + "_inner_0", degree_0, degree_0, degree_0);
+        ModelFile stairsInner_model_90 = models().stairsInner(name(block) + "_inner_90", degree_90, degree_90, degree_90);
+        ModelFile stairsInner_model_180 = models().stairsInner(name(block) + "_inner_180", degree_180, degree_180, degree_180);
+        ModelFile stairsInner_model_270 = models().stairsInner(name(block) + "_inner_270", degree_270, degree_270, degree_270);
+
+        ModelFile stairsOuter_model_0 = models().stairsOuter(name(block) + "_outer_0", degree_0, degree_0, degree_0);
+        ModelFile stairsOuter_model_90 = models().stairsOuter(name(block) + "_outer_90", degree_90, degree_90, degree_90);
+        ModelFile stairsOuter_model_180 = models().stairsOuter(name(block) + "_outer_180", degree_180, degree_180, degree_180);
+        ModelFile stairsOuter_model_270 = models().stairsOuter(name(block) + "_outer_270", degree_270, degree_270, degree_270);
+
+        this.getVariantBuilder(block).forAllStatesExcept((state) -> {
+            Direction facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING); // Use your block’s FACING property
+            Half half = state.getValue(BlockStateProperties.HALF);
+            StairsShape shape = state.getValue(BlockStateProperties.STAIRS_SHAPE);
+
+            int yRot = (int) facing.getClockWise().toYRot();
+
+            if (shape == StairsShape.INNER_LEFT || shape == StairsShape.OUTER_LEFT) {
+                yRot += 270;
+            }
+            if (shape != StairsShape.STRAIGHT && half == Half.TOP) {
+                yRot += 90;
+            }
+            yRot %= 360;
+
+            boolean uvlock = yRot != 0 || half == Half.TOP;
+
+            // Choose the correct model based on the shape and yRot
+            ModelFile selectedModel;
+            if (shape == StairsShape.STRAIGHT) {
+                selectedModel = switch (yRot) {
+                    case 90 -> stairs_model_90;
+                    case 180 -> stairs_model_180;
+                    case 270 -> stairs_model_270;
+                    default -> stairs_model_0;
+                };
+            } else if (shape == StairsShape.INNER_LEFT || shape == StairsShape.INNER_RIGHT) {
+                selectedModel = switch (yRot) {
+                    case 90 -> stairsInner_model_90;
+                    case 180 -> stairsInner_model_180;
+                    case 270 -> stairsInner_model_270;
+                    default -> stairsInner_model_0;
+                };
+            } else { // OUTER_LEFT or OUTER_RIGHT
+                selectedModel = switch (yRot) {
+                    case 90 -> stairsOuter_model_90;
+                    case 180 -> stairsOuter_model_180;
+                    case 270 -> stairsOuter_model_270;
+                    default -> stairsOuter_model_0;
+                };
+            }
+
+            return ConfiguredModel.builder()
+                    .modelFile(selectedModel)
+                    .rotationX(half == Half.BOTTOM ? 0 : 180)
+                    .rotationY(yRot)
+                    .uvLock(uvlock)
+                    .build();
+        }, BlockStateProperties.WATERLOGGED);
+
+        simpleBlockItem(block, stairs_model_0);
+        /*ModelFile stairs = models().stairs(name(block), side, ends, ends);
+        ModelFile stairsInner = models().stairsInner(name(block) + "_inner", side, ends, ends);
+        ModelFile stairsOuter = models().stairsOuter(name(block) + "_outer", side, ends, ends);
+        stairsBlock(block, stairs, stairsInner, stairsOuter);
+        simpleBlockItem(block, models().getExistingFile(blockTexture(block)));*/
+    }
+
+    private void fullyRotatedVarientSlabLikeBlockWithItem(Block block, Block parent) {
+        ResourceLocation degree_0 = extend(blockTexture(parent), "_0");
+        ResourceLocation degree_90 = extend(blockTexture(parent), "_90");
+        ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
+        ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
+
+        ModelFile slabBottom_0 = models().slab(name(block) + "_0", degree_0, degree_0, degree_0);
+        ModelFile slabBottom_90 = models().slab(name(block) + "_90", degree_90, degree_90, degree_90);
+        ModelFile slabBottom_180 = models().slab(name(block) + "_180", degree_180, degree_180, degree_180);
+        ModelFile slabBottom_270 = models().slab(name(block) + "_270", degree_270, degree_270, degree_270);
+
+        ModelFile slabTop_0 = models().slabTop(name(block) + "_top_0", degree_0, degree_0, degree_0);
+        ModelFile slabTop_90 = models().slabTop(name(block) + "_top_90", degree_90, degree_90, degree_90);
+        ModelFile slabTop_180 = models().slabTop(name(block) + "_top_180", degree_180, degree_180, degree_180);
+        ModelFile slabTop_270 = models().slabTop(name(block) + "_top_270", degree_270, degree_270, degree_270);
+
+        ModelFile slabDouble_0 = models().cubeAll(name(block) + "_double_0", blockTexture(parent));
+        ModelFile slabDouble_90 = models().cubeAll(name(block) + "_double_90", blockTexture(parent));
+        ModelFile slabDouble_180 = models().cubeAll(name(block) + "_double_180", blockTexture(parent));
+        ModelFile slabDouble_270 = models().cubeAll(name(block) + "_double_270", blockTexture(parent));
+
+        this.getVariantBuilder(block).forAllStatesExcept((state) -> {
+            SlabType slabType = state.getValue(SlabBlock.TYPE);
+
+            boolean uvlock = false; // No rotation needed
+
+            // Create random variations
+            ConfiguredModel[] randomVariants;
+            if (slabType == SlabType.BOTTOM) {
+                randomVariants = new ConfiguredModel[]{
+                        new ConfiguredModel(slabBottom_0),
+                        new ConfiguredModel(slabBottom_90),
+                        new ConfiguredModel(slabBottom_180),
+                        new ConfiguredModel(slabBottom_270)
+                };
+            } else if (slabType == SlabType.TOP) {
+                randomVariants = new ConfiguredModel[]{
+                        new ConfiguredModel(slabTop_0),
+                        new ConfiguredModel(slabTop_90),
+                        new ConfiguredModel(slabTop_180),
+                        new ConfiguredModel(slabTop_270)
+                };
+            } else { // DOUBLE SLAB
+                randomVariants = new ConfiguredModel[]{
+                        new ConfiguredModel(slabDouble_0),
+                        new ConfiguredModel(slabDouble_90),
+                        new ConfiguredModel(slabDouble_180),
+                        new ConfiguredModel(slabDouble_270)
+                };
+            }
+
+            return randomVariants;
+        }, BlockStateProperties.WATERLOGGED);
+
+        // Ensure correct item model (should match one of the variations)
+        simpleBlockItem(block, slabBottom_0);
+    }
+
+    private void fullyRotatedVarientFenceLikeBlockWithItem(Block block, Block parent) {
+        ResourceLocation degree_0 = extend(blockTexture(parent), "_0");
+        ResourceLocation degree_90 = extend(blockTexture(parent), "_90");
+        ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
+        ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
+
+        ModelFile post_0 = models().fencePost(name(block) + "_post_0", degree_0);
+        ModelFile post_90 = models().fencePost(name(block) + "_post_90", degree_90);
+        ModelFile post_180 = models().fencePost(name(block) + "_post_180", degree_180);
+        ModelFile post_270 = models().fencePost(name(block) + "_post_270", degree_270);
+
+        ModelFile side_0 = models().fenceSide(name(block) + "_side_0", degree_0);
+        ModelFile side_90 = models().fenceSide(name(block) + "_side_90", degree_90);
+        ModelFile side_180 = models().fenceSide(name(block) + "_side_180", degree_180);
+        ModelFile side_270 = models().fenceSide(name(block) + "_side_270", degree_270);
+
+        MultiPartBlockStateBuilder builder = ((MultiPartBlockStateBuilder.PartBuilder)this.getMultipartBuilder(block).part().modelFile(post_0).addModel()).end();
+        PipeBlock.PROPERTY_BY_DIRECTION.entrySet().forEach((e) -> {
+            Direction dir = (Direction)e.getKey();
+            if (dir.getAxis().isHorizontal()) {
+                ((MultiPartBlockStateBuilder.PartBuilder)builder.part().modelFile(side_0).rotationY(((int)dir.toYRot() + 180) % 360).uvLock(true).addModel()).condition((Property)e.getValue(), new Boolean[]{true});
+            }
+
+        });
+
+        itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/fence_inventory"))
+                .texture("texture", degree_0);
+    }
+
+    private void fullyRotatedVarientWallLikeBlockWithItem(Block block, Block parent) {
+        ResourceLocation degree_0 = extend(blockTexture(parent), "_0");
+        ResourceLocation degree_90 = extend(blockTexture(parent), "_90");
+        ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
+        ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
+
+        ModelFile post_0 = models().wallPost(name(block) + "_post_0", degree_0);
+        ModelFile post_90 = models().wallPost(name(block) + "_post_90", degree_90);
+        ModelFile post_180 = models().wallPost(name(block) + "_post_180", degree_180);
+        ModelFile post_270 = models().wallPost(name(block) + "_post_270", degree_270);
+
+        ModelFile side_0 = models().wallSide(name(block) + "_side_0", degree_0);
+        ModelFile side_90 = models().wallSide(name(block) + "_side_90", degree_90);
+        ModelFile side_180 = models().wallSide(name(block) + "_side_180", degree_180);
+        ModelFile side_270 = models().wallSide(name(block) + "_side_270", degree_270);
+
+        ModelFile side_tall_0 = models().wallSideTall(name(block) + "_side_tall_0", degree_0);
+        ModelFile side_tall_90 = models().wallSideTall(name(block) + "_side_tall_90", degree_90);
+        ModelFile side_tall_180 = models().wallSideTall(name(block) + "_side_tall_180", degree_180);
+        ModelFile side_tall_270 = models().wallSideTall(name(block) + "_side_tall_270", degree_270);
+
+        MultiPartBlockStateBuilder builder = ((MultiPartBlockStateBuilder.PartBuilder)this.getMultipartBuilder(block).part().modelFile(post_0).addModel()).condition(WallBlock.UP, new Boolean[]{true}).end();
+        WALL_PROPS.entrySet().stream().filter((e) -> {
+            return ((Direction)e.getKey()).getAxis().isHorizontal();
+        }).forEach((e) -> {
+            this.wallSidePart(builder, side_0, e, WallSide.LOW);
+            this.wallSidePart(builder, side_tall_0, e, WallSide.TALL);
+        });
+
+        itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", degree_0);
+    }
+
+    private void wallSidePart(MultiPartBlockStateBuilder builder, ModelFile model, Map.Entry<Direction, Property<WallSide>> entry, WallSide height) {
+        ((MultiPartBlockStateBuilder.PartBuilder)builder.part().modelFile(model).rotationY(((int)((Direction)entry.getKey()).toYRot() + 180) % 360).uvLock(true).addModel()).condition((Property)entry.getValue(), new WallSide[]{height});
+    }
+
+
 
     public static boolean always(BlockState blockState) {
         return true;

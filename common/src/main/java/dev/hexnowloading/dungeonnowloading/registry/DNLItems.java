@@ -124,6 +124,10 @@ public class DNLItems {
     public static final Supplier<Item> STONE_PILLAR = register("stone_pillar", () -> new BlockItem(DNLBlocks.STONE_PILLAR.get(), new Item.Properties()));
     public static final Supplier<Item> SHIELDING_STONE_PILLAR = register("shielding_stone_pillar", () -> new BlockItem(DNLBlocks.SHIELDING_STONE_PILLAR.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA = register("mending_aura", () -> new BlockItem(DNLBlocks.MENDING_AURA.get(), new Item.Properties()));
+    public static final Supplier<Item> MENDING_AURA_STAIRS = register("mending_aura_stairs", () -> new BlockItem(DNLBlocks.MENDING_AURA_STAIRS.get(), new Item.Properties()));
+    public static final Supplier<Item> MENDING_AURA_SLAB = register("mending_aura_slab", () -> new BlockItem(DNLBlocks.MENDING_AURA_SLAB.get(), new Item.Properties()));
+    public static final Supplier<Item> MENDING_AURA_FENCE = register("mending_aura_fence", () -> new BlockItem(DNLBlocks.MENDING_AURA_FENCE.get(), new Item.Properties()));
+    public static final Supplier<Item> MENDING_AURA_WALL = register("mending_aura_wall", () -> new BlockItem(DNLBlocks.MENDING_AURA_WALL.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
