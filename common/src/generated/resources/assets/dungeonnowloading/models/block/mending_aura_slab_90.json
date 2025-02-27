@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "dungeonnowloading:block/mending_aura_90",
+    "side": "dungeonnowloading:block/mending_aura_90",
+    "top": "dungeonnowloading:block/mending_aura_90"
+  }
+}

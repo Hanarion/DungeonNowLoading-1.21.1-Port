@@ -1,0 +1,46 @@
+{
+  "variants": {
+    "type=bottom": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_0"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_90"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_180"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_270"
+      }
+    ],
+    "type=double": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_double_0"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_double_90"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_double_180"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_double_270"
+      }
+    ],
+    "type=top": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_top_0"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_top_90"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_top_180"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_slab_top_270"
+      }
+    ]
+  }
+}

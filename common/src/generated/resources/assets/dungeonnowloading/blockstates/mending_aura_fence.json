@@ -1,0 +1,48 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "dungeonnowloading:block/mending_aura_fence_post_0"
+      }
+    },
+    {
+      "apply": {
+        "model": "dungeonnowloading:block/mending_aura_fence_side_0",
+        "uvlock": true
+      },
+      "when": {
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "dungeonnowloading:block/mending_aura_fence_side_0",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "dungeonnowloading:block/mending_aura_fence_side_0",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "dungeonnowloading:block/mending_aura_fence_side_0",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "east": "true"
+      }
+    }
+  ]
+}

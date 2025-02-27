@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/fence_post",
+  "textures": {
+    "texture": "dungeonnowloading:block/mending_aura_90"
+  }
+}

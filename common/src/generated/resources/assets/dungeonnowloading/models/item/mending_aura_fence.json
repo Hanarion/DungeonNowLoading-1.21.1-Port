@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/fence_inventory",
+  "textures": {
+    "texture": "dungeonnowloading:block/mending_aura_0"
+  }
+}
