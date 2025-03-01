@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.block;
 
+import dev.hexnowloading.dungeonnowloading.block.MendingAuraPaneBlock;
 import dev.hexnowloading.dungeonnowloading.block.MendingAuraWallBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
@@ -17,7 +18,7 @@ public class WallMixin {
     private void modifyConnectsTo(BlockState state, boolean hasSolidSide, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         Block block = state.getBlock();
 
-        if (block instanceof MendingAuraWallBlock) {
+        if (block instanceof MendingAuraWallBlock || block instanceof MendingAuraPaneBlock) {
             cir.setReturnValue(true);
         }
     }

@@ -14,6 +14,8 @@
     "block.PistonBlockMixin",
     "block.StairsMixin",
     "block.FenceMixin",
+    "block.WallMixin",
+    "block.IronBarsMixin",
     "entities.EntityAvoidBlockMixin",
     "fabric.block.BlockPlaceMixin",
     "fabric.block.BucketItemMixin",

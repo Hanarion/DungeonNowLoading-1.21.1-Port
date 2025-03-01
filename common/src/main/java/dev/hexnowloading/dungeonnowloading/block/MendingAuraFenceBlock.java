@@ -37,8 +37,6 @@ public class MendingAuraFenceBlock extends MendingAuraBlock {
     private final Object2IntMap<BlockState> stateToIndex = new Object2IntOpenHashMap();
     private final VoxelShape[] occlusionByIndex;
 
-    private boolean hasConnectionFixed;
-
     public MendingAuraFenceBlock(Properties properties) {
         super(properties);
         this.collisionShapeByIndex = this.makeShapes(2.0F, 2.0F, 24.0F, 0.0F, 24.0F);
@@ -50,7 +48,6 @@ public class MendingAuraFenceBlock extends MendingAuraBlock {
         }
         this.registerDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue(NORTH, false)).setValue(EAST, false)).setValue(SOUTH, false)).setValue(WEST, false)).setValue(WATERLOGGED, false));
         this.occlusionByIndex = this.makeShapes(2.0F, 1.0F, 16.0F, 6.0F, 15.0F);
-        this.hasConnectionFixed = false;
     }
 
     protected VoxelShape[] makeShapes(float p_52327_, float p_52328_, float p_52329_, float p_52330_, float p_52331_) {

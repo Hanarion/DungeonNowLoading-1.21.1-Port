@@ -4,10 +4,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FenceBlock;
-import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -19,12 +16,10 @@ public class MendingAuraBlockEntity extends BlockEntity {
     private BlockState storedBlockState;
     private CompoundTag storedBlockNbt;
     private int restoreTime;
-    private boolean persistent;
 
     public MendingAuraBlockEntity(BlockPos blockPos, BlockState state) {
         super(DNLBlockEntityTypes.MENDING_AURA.get(), blockPos, state);
         this.restoreTime = new Random().nextInt(100) + 100;
-        this.persistent = true;
     }
 
     public void setStoredBlock(BlockState blockState, CompoundTag blockNbt) {
@@ -45,7 +40,6 @@ public class MendingAuraBlockEntity extends BlockEntity {
         }
 
         compoundTag.putInt("RestoreTime", restoreTime);
-        compoundTag.putBoolean("Persistent", persistent);
     }
 
     @Override
@@ -61,11 +55,6 @@ public class MendingAuraBlockEntity extends BlockEntity {
         }
 
         restoreTime = compoundTag.getInt("RestoreTime");
-        persistent = compoundTag.getBoolean("Persistent");
-    }
-
-    public void setPersistent(boolean b) {
-        persistent = b;
     }
 
     public int getRestoreTime() { return restoreTime; }
@@ -83,6 +72,13 @@ public class MendingAuraBlockEntity extends BlockEntity {
                     .setValue(BlockStateProperties.WEST_WALL, state.getValue(BlockStateProperties.WEST_WALL));
             level.setBlock(pos, blockState, Block.UPDATE_CLIENTS);
         } else if (this.storedBlockState.getBlock() instanceof FenceBlock) {
+            BlockState blockState = this.storedBlockState
+                    .setValue(BlockStateProperties.NORTH, state.getValue(BlockStateProperties.NORTH))
+                    .setValue(BlockStateProperties.EAST, state.getValue(BlockStateProperties.EAST))
+                    .setValue(BlockStateProperties.SOUTH, state.getValue(BlockStateProperties.SOUTH))
+                    .setValue(BlockStateProperties.WEST, state.getValue(BlockStateProperties.WEST));
+            level.setBlock(pos, blockState, Block.UPDATE_CLIENTS);
+        } else if (this.storedBlockState.getBlock() instanceof IronBarsBlock) {
             BlockState blockState = this.storedBlockState
                     .setValue(BlockStateProperties.NORTH, state.getValue(BlockStateProperties.NORTH))
                     .setValue(BlockStateProperties.EAST, state.getValue(BlockStateProperties.EAST))

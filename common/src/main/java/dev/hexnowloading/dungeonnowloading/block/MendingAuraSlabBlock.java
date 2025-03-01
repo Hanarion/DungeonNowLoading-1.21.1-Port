@@ -33,6 +33,15 @@ public class MendingAuraSlabBlock extends MendingAuraBlock {
         this.registerDefaultState((BlockState)((BlockState)this.defaultBlockState().setValue(TYPE, SlabType.BOTTOM)).setValue(WATERLOGGED, false));
     }
 
+    public boolean useShapeForLightOcclusion(BlockState $$0) {
+        return $$0.getValue(TYPE) != SlabType.DOUBLE;
+    }
+
+    @Override
+    public boolean skipRendering(BlockState blockState, BlockState blockState1, Direction direction) {
+        return blockState1.is(this) && blockState1.getValue(TYPE) == SlabType.DOUBLE && blockState.getValue(TYPE) == SlabType.DOUBLE;
+    }
+
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(new Property[]{TYPE, WATERLOGGED});
     }

@@ -86,7 +86,8 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
 
         this.tag(BlockTags.WALLS).add(
                 DNLBlocks.COILING_STONE_PILLAR_WALL.get(),
-                DNLBlocks.STONE_TILE_WALL.get()
+                DNLBlocks.STONE_TILE_WALL.get(),
+                DNLBlocks.MENDING_AURA_WALL.get()
         );
 
         this.tag(BlockTags.INFINIBURN_OVERWORLD).add(
@@ -103,10 +104,6 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
 
         this.tag(BlockTags.WOODEN_FENCES).add(
                 DNLBlocks.MENDING_AURA_FENCE.get()
-        );
-
-        this.tag(BlockTags.WALLS).add(
-                DNLBlocks.MENDING_AURA_WALL.get()
         );
 
         this.tag(BlockTags.STAIRS).add(

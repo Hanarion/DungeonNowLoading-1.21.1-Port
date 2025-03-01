@@ -83,9 +83,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
         return RenderShape.MODEL;
     }
 
-
-    @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
+    public void startRestoration(Level level, BlockPos pos) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof MendingAuraBlockEntity mendingAuraBlockEntity) {
             level.scheduleTick(pos, this, mendingAuraBlockEntity.getRestoreTime());
         }

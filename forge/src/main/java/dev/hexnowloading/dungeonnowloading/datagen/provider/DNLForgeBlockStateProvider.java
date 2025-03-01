@@ -56,6 +56,8 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         fullyRotatedVarientSlabLikeBlockWithItem(DNLBlocks.MENDING_AURA_SLAB.get(), DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientFenceLikeBlockWithItem(DNLBlocks.MENDING_AURA_FENCE.get(), DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientWallLikeBlockWithItem(DNLBlocks.MENDING_AURA_WALL.get(), DNLBlocks.MENDING_AURA.get());
+        fullyRotatedVarientPathLikeBlockWithItem(DNLBlocks.MENDING_AURA_PATH.get(), DNLBlocks.MENDING_AURA.get());
+        fullyRotatedPaneLikeBlockWithItem(DNLBlocks.MENDING_AURA_PANE.get(), DNLBlocks.MENDING_AURA.get());
         stairsBlockWithItem((StairBlock) DNLBlocks.STONE_TILE_STAIRS.get(), DNLBlocks.STONE_TILES.get());
         slabBlockWithItems((SlabBlock) DNLBlocks.STONE_TILE_SLAB.get(), DNLBlocks.STONE_TILES.get());
         wallBlockWithItem((WallBlock) DNLBlocks.STONE_TILE_WALL.get(), DNLBlocks.STONE_TILES.get());
@@ -402,6 +404,81 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
     private void wallSidePart(MultiPartBlockStateBuilder builder, ModelFile model, Map.Entry<Direction, Property<WallSide>> entry, WallSide height) {
         ((MultiPartBlockStateBuilder.PartBuilder)builder.part().modelFile(model).rotationY(((int)((Direction)entry.getKey()).toYRot() + 180) % 360).uvLock(true).addModel()).condition((Property)entry.getValue(), new WallSide[]{height});
+    }
+
+    private void fullyRotatedVarientPathLikeBlockWithItem(Block block, Block parent) {
+        ResourceLocation degree_0 = extend(blockTexture(parent), "_0");
+        ResourceLocation degree_90 = extend(blockTexture(parent), "_90");
+        ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
+        ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
+
+        ModelFile model_0 = models().withExistingParent(name(block) + "_crop_0", mcLoc("block/template_farmland"))
+                .texture("dirt", degree_0)
+                .texture("top", degree_0);
+        ModelFile model_90 = models().withExistingParent(name(block) + "_crop_90", mcLoc("block/template_farmland"))
+                .texture("dirt", degree_90)
+                .texture("top", degree_90);
+        ModelFile model_180 = models().withExistingParent(name(block) + "_crop_180", mcLoc("block/template_farmland"))
+                .texture("dirt", degree_180)
+                .texture("top", degree_180);
+        ModelFile model_270 = models().withExistingParent(name(block) + "_crop_270", mcLoc("block/template_farmland"))
+                .texture("dirt", degree_270)
+                .texture("top", degree_270);
+
+        getVariantBuilder(block)
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model_0).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model_90).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model_180).build())
+                .partialState().addModels(ConfiguredModel.builder().modelFile(model_270).build());
+
+        simpleBlockItem(block, model_0);
+
+    }
+
+    private void fullyRotatedPaneLikeBlockWithItem(Block block, Block parent) {
+        ResourceLocation degree_0 = extend(blockTexture(parent), "_0");
+        ResourceLocation degree_90 = extend(blockTexture(parent), "_90");
+        ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
+        ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
+
+        ModelFile post_0 = models().panePost(name(block) + "_post_0", degree_0, degree_0);
+        ModelFile post_90 = models().panePost(name(block) + "_post_90", degree_90, degree_90);
+        ModelFile post_180 = models().panePost(name(block) + "_post_180", degree_180, degree_180);
+        ModelFile post_270 = models().panePost(name(block) + "_post_270", degree_270, degree_270);
+
+        ModelFile side_0 = models().paneSide(name(block) + "_side_0", degree_0, degree_0);
+        ModelFile side_90 = models().paneSide(name(block) + "_side_90", degree_90, degree_90);
+        ModelFile side_180 = models().paneSide(name(block) + "_side_180", degree_180, degree_180);
+        ModelFile side_270 = models().paneSide(name(block) + "_side_270", degree_270, degree_270);
+
+        ModelFile no_side_0 = models().paneNoSide(name(block) + "_no_side_0", degree_0);
+        ModelFile no_side_90 = models().paneNoSide(name(block) + "_no_side_90", degree_90);
+        ModelFile no_side_180 = models().paneNoSide(name(block) + "_no_side_180", degree_180);
+        ModelFile no_side_270 = models().paneNoSide(name(block) + "_no_side_270", degree_270);
+
+        ModelFile side_alt_0 = models().paneSideAlt(name(block) + "_side_alt_0", degree_0, degree_0);
+        ModelFile side_alt_90 = models().paneSideAlt(name(block) + "_side_alt_90", degree_90, degree_90);
+        ModelFile side_alt_180 = models().paneSideAlt(name(block) + "_side_alt_180", degree_180, degree_180);
+        ModelFile side_alt_270 = models().paneSideAlt(name(block) + "_side_alt_270", degree_270, degree_270);
+
+        ModelFile no_side_alt_0 = models().paneNoSideAlt(name(block) + "_no_side_alt_0", degree_0);
+        ModelFile no_side_alt_90 = models().paneNoSideAlt(name(block) + "_no_side_alt_90", degree_90);
+        ModelFile no_side_alt_180 = models().paneNoSideAlt(name(block) + "_no_side_alt_180", degree_180);
+        ModelFile no_side_alt_270 = models().paneNoSideAlt(name(block) + "_no_side_alt_270", degree_270);
+
+        MultiPartBlockStateBuilder builder = ((MultiPartBlockStateBuilder.PartBuilder)this.getMultipartBuilder(block).part().modelFile(post_0).addModel()).end();
+        PipeBlock.PROPERTY_BY_DIRECTION.entrySet().forEach((e) -> {
+            Direction dir = (Direction)e.getKey();
+            if (dir.getAxis().isHorizontal()) {
+                boolean alt = dir == Direction.SOUTH;
+                ((MultiPartBlockStateBuilder.PartBuilder)((MultiPartBlockStateBuilder.PartBuilder)builder.part().modelFile(!alt && dir != Direction.WEST ? side_0 : side_alt_0).rotationY(dir.getAxis() == Direction.Axis.X ? 90 : 0).addModel()).condition((Property)e.getValue(), new Boolean[]{true}).end().part().modelFile(!alt && dir != Direction.EAST ? no_side_0 : no_side_alt_0).rotationY(dir == Direction.WEST ? 270 : (dir == Direction.SOUTH ? 90 : 0)).addModel()).condition((Property)e.getValue(), new Boolean[]{false});
+            }
+
+        });
+        /*itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("item/generated"))
+                .texture("layer_0", degree_0);*/
+        itemModels().withExistingParent(this.key(block).getPath(), mcLoc("item/generated"))
+                .texture("layer0", modLoc("block/" + this.key(parent).getPath() + "_0"));
     }
 
 

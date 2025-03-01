@@ -188,6 +188,10 @@ public interface PreserverBlockDestructionSystem {
                     return false;
                 }
 
+                if (!ignoreBlockTransformation(serverLevel, eventBlockPos)) {
+                    return false;
+                }
+
                 BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
@@ -202,7 +206,6 @@ public interface PreserverBlockDestructionSystem {
 
                 if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
                     blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.setPersistent(false);
                 }
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
@@ -236,6 +239,10 @@ public interface PreserverBlockDestructionSystem {
                     return false;
                 }
 
+                if (!ignoreBlockTransformation(serverLevel, eventBlockPos)) {
+                    return false;
+                }
+
                 BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
@@ -250,7 +257,6 @@ public interface PreserverBlockDestructionSystem {
 
                 if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
                     blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.setPersistent(false);
                 }
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
@@ -270,7 +276,7 @@ public interface PreserverBlockDestructionSystem {
                     return false;
                 }
 
-                if (serverLevel.getBlockState(eventBlockPos).is(DNLTags.PRESERVER_IGNORE_ON_FIRE)) {
+                if (!ignoreBlockTransformation(serverLevel, eventBlockPos)) {
                     return false;
                 }
 
@@ -288,7 +294,6 @@ public interface PreserverBlockDestructionSystem {
 
                 if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
                     blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.setPersistent(false);
                 }
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
@@ -308,6 +313,10 @@ public interface PreserverBlockDestructionSystem {
                     return false;
                 }
 
+                if (!ignoreBlockTransformation(serverLevel, eventBlockPos)) {
+                    return false;
+                }
+
                 BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
@@ -321,7 +330,6 @@ public interface PreserverBlockDestructionSystem {
 
                 if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
                     blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.setPersistent(false);
                 }
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
@@ -343,6 +351,18 @@ public interface PreserverBlockDestructionSystem {
             }
 
             return false;
+        }
+
+        private boolean ignoreBlockTransformation(ServerLevel serverLevel, BlockPos eventBlockPos) {
+            BlockState blockState = serverLevel.getBlockState(eventBlockPos);
+            Block block = blockState.getBlock();
+            return blockState.isCollisionShapeFullBlock(serverLevel, eventBlockPos) ||
+                    blockState.is(DNLTags.NEAR_FULL_HEIGHT_BLOCKS) ||
+                    block instanceof IronBarsBlock ||
+                    block instanceof SlabBlock ||
+                    block instanceof StairBlock ||
+                    block instanceof FenceBlock ||
+                    block instanceof WallBlock;
         }
 
         private void placeMendingBlock(ServerLevel serverLevel, BlockState originalBlockState, BlockPos eventBlockPos, GameEvent gameEvent) {
@@ -373,6 +393,14 @@ public interface PreserverBlockDestructionSystem {
                         .setValue(BlockStateProperties.WATERLOGGED, originalBlockState.getValue(BlockStateProperties.WATERLOGGED));
 
             }
+            else if (originalBlockState.getBlock() instanceof IronBarsBlock) {
+                mendingAuraState = DNLBlocks.MENDING_AURA_PANE.get().defaultBlockState()
+                        .setValue(BlockStateProperties.NORTH, originalBlockState.getValue(BlockStateProperties.NORTH))
+                        .setValue(BlockStateProperties.SOUTH, originalBlockState.getValue(BlockStateProperties.SOUTH))
+                        .setValue(BlockStateProperties.EAST, originalBlockState.getValue(BlockStateProperties.EAST))
+                        .setValue(BlockStateProperties.WEST, originalBlockState.getValue(BlockStateProperties.WEST))
+                        .setValue(BlockStateProperties.WATERLOGGED, originalBlockState.getValue(BlockStateProperties.WATERLOGGED));
+            }
             else if (originalBlockState.getBlock() instanceof WallBlock) {
                 mendingAuraState = DNLBlocks.MENDING_AURA_WALL.get().defaultBlockState()
                         .setValue(BlockStateProperties.UP, originalBlockState.getValue(BlockStateProperties.UP))
@@ -382,50 +410,19 @@ public interface PreserverBlockDestructionSystem {
                         .setValue(BlockStateProperties.WEST_WALL, originalBlockState.getValue(BlockStateProperties.WEST_WALL))
                         .setValue(BlockStateProperties.WATERLOGGED, originalBlockState.getValue(BlockStateProperties.WATERLOGGED));
 
-            }
-            else {
+            } else if (originalBlockState.is(DNLTags.NEAR_FULL_HEIGHT_BLOCKS)) {
+              mendingAuraState = DNLBlocks.MENDING_AURA_PATH.get().defaultBlockState();
+            } else {
                 mendingAuraState = DNLBlocks.MENDING_AURA.get().defaultBlockState();
 
             }
 
             serverLevel.setBlock(eventBlockPos, mendingAuraState, Block.UPDATE_CLIENTS);
-
-
-            /*if (gameEvent == DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION.get() &&
-                    (mendingAuraState.getBlock() instanceof MendingAuraFenceBlock ||
-                    mendingAuraState.getBlock() instanceof MendingAuraWallBlock)) {
-
-            }*/
-
-            /*if (gameEvent == DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION.get()) {
-                Block mendingAuraBlock = mendingAuraState.getBlock();
-
-                if (mendingAuraBlock instanceof MendingAuraSlabBlock && mendingAuraState.getValue(BlockStateProperties.SLAB_TYPE) != SlabType.DOUBLE) {
-                    return;
-                }
-
-                for (Direction direction : Direction.Plane.HORIZONTAL) {
-                    fixConnection(serverLevel, eventBlockPos, direction);
-                }
-            }*/
-
-        }
-
-        private void fixConnection(ServerLevel serverLevel, BlockPos eventBlockPos, Direction direction) {
-            BlockPos neighborPos = eventBlockPos.relative(direction);
-            BlockState neighborState = serverLevel.getBlockState(neighborPos);
-            Block block = neighborState.getBlock();
-
-            if (block instanceof FenceBlock fenceBlock) {
-                serverLevel.setBlock(neighborPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-                serverLevel.setBlock(neighborPos, fenceBlock.defaultBlockState(), Block.UPDATE_CLIENTS);
+            Block block = serverLevel.getBlockState(eventBlockPos).getBlock();
+            if (block instanceof MendingAuraBlock mendingAuraBlock) {
+                mendingAuraBlock.startRestoration(serverLevel, eventBlockPos);
             }
 
-            if (block instanceof WallBlock wallBlock) {
-
-                serverLevel.setBlock(neighborPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-                serverLevel.setBlock(neighborPos, wallBlock.defaultBlockState(), Block.UPDATE_CLIENTS);
-            }
         }
     }
 }

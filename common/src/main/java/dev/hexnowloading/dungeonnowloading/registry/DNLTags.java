@@ -19,7 +19,7 @@ public class DNLTags {
     public static final TagKey<Block> FAIRKEEPER_CHEST_IGNORE = registerBlockTag("fairkeeper_chest_ignore");
     public static final TagKey<Block> OVERCHARGED_REDSTONE_BLOCK_NEIGHBOUR_EXPLOSIVE = registerBlockTag("ovecharged_redstone_block_neighbour_explosive");
     public static final TagKey<Block> PRESERVER_IGNORE = registerBlockTag("preserver_ignore");
-    public static final TagKey<Block> PRESERVER_IGNORE_ON_FIRE = registerBlockTag("preserver_ignore_on_fire");
+    public static final TagKey<Block> NEAR_FULL_HEIGHT_BLOCKS = registerBlockTag("near_full_height_blocks");
     public static final TagKey<Structure> NO_GEODES_TAG = registerStructureTag("no_geodes");
 
     private static TagKey<Block> registerBlockTag(String string) {

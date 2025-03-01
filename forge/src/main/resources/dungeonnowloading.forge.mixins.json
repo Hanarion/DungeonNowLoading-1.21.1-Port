@@ -13,6 +13,8 @@
         "block.PistonBlockMixin",
         "block.StairsMixin",
         "block.FenceMixin",
+        "block.WallMixin",
+        "block.IronBarsMixin",
         "entities.EntityAvoidBlockMixin",
         "structures.StructureProcessorAccessor",
         "structures.StructureTemplateMixin",
