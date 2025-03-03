@@ -25,6 +25,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -47,6 +48,17 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
+    public final AnimationState idleAnimationState = new AnimationState();
+    public final AnimationState pursueOpenMouthAnimationState = new AnimationState();
+    public final AnimationState pursueOpenedMouthAnimationState = new AnimationState();
+    public final AnimationState pursueCloseMouthAnimationState = new AnimationState();
+
+    private static final byte TRIGGER_IDLE_ANIMATION_BYTE = 70;
+    private static final byte TRIGGER_PURSUE_OPEN_MOUTH_ANIMATION_BYTE = 71;
+    private static final byte TRIGGER_PURSUE_OPENED_MOUTH_ANIMATION_BYTE = 72;
+    private static final byte TRIGGER_PURSUE_CLOSE_MOUTH_ANIMATION_BYTE = 73;
+
+
     private TickBaseMoveSet<FairkeeperBorosState> stateSelector = new TickBaseMoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
     private Set<UUID> partList;
@@ -58,7 +70,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
-    public static int SEGMENT_DELAY_STEP = 7;
+    public static int SEGMENT_DELAY_STEP = 11;
 
     public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -336,6 +348,40 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         }
         return super.canBeAffected(mobEffectInstance);
     }
+
+    @Override
+    public void handleEntityEvent(byte b) {
+        switch (b) {
+            case TRIGGER_IDLE_ANIMATION_BYTE:
+                this.idleAnimationState.start(this.tickCount);
+                break;
+            case TRIGGER_PURSUE_OPEN_MOUTH_ANIMATION_BYTE:
+                this.stopAllAnimation();
+                this.pursueOpenMouthAnimationState.start(this.tickCount);
+                //this.pursueOpenedMouthAnimationState.startIfStopped(this.tickCount);
+                break;
+            case TRIGGER_PURSUE_OPENED_MOUTH_ANIMATION_BYTE:
+                this.pursueOpenedMouthAnimationState.startIfStopped(this.tickCount);
+                break;
+            case TRIGGER_PURSUE_CLOSE_MOUTH_ANIMATION_BYTE:
+                this.stopAllAnimation();
+                this.pursueCloseMouthAnimationState.start(this.tickCount);
+                break;
+        }
+        super.handleEntityEvent(b);
+    }
+
+    private void stopAllAnimation() {
+        this.idleAnimationState.stop();
+        this.pursueOpenMouthAnimationState.stop();
+        this.pursueOpenedMouthAnimationState.stop();
+        this.pursueCloseMouthAnimationState.stop();
+    }
+
+    public void triggerIdleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_BYTE); }
+    public void triggerOpenMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_OPEN_MOUTH_ANIMATION_BYTE); }
+    public void triggerOpenedMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_OPENED_MOUTH_ANIMATION_BYTE); }
+    public void triggerCloseMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_CLOSE_MOUTH_ANIMATION_BYTE); }
 
     @Override
     public void targetRandomPlayer() {

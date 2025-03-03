@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FairkeeperBorosRenderer<T extends FairkeeperBorosEntity> extends MobRenderer<T, FairkeeperBorosModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper/fairkeeper_boros_head.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_boros/fairkeeper_boros_head.png");
 
     public FairkeeperBorosRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new FairkeeperBorosModel<>(renderManager.bakeLayer(FairkeeperBorosModel.LAYER_LOCATION)), 1.0F);
@@ -18,7 +18,7 @@ public class FairkeeperBorosRenderer<T extends FairkeeperBorosEntity> extends Mo
 
     @Override
     protected void scale(T entity, PoseStack poseStack, float v) {
-        poseStack.scale(1.0F, 1.0F, 1.0F);
+        poseStack.scale(1.5F, 1.5F, 1.5F);
         super.scale(entity, poseStack, v);
     }
 

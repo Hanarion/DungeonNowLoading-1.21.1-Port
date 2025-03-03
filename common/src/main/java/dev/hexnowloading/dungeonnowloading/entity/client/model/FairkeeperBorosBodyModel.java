@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosPartEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -13,42 +14,59 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class FairkeeperBorosBodyModel<T extends FairkeeperBorosPartEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("modid", "fairkeeper_boros_body_shield"), "main");
-    private final ModelPart boros;
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_boros_body"), "main");
+    private final ModelPart boros_segment;
     private final ModelPart body;
-    private final ModelPart shield;
     private final ModelPart dispenser;
+    private final ModelPart stone_shield;
     private final ModelPart tail;
+    private final ModelPart shield;
     private final ModelPart root;
 
     private float TILT_SPEED = 0.05F;
 
     public FairkeeperBorosBodyModel(ModelPart root) {
         this.root = root;
-        this.boros = root.getChild("boros");
-        this.tail = this.boros.getChild("tail");
-        this.body = this.boros.getChild("body");
-        this.shield = this.body.getChild("shield");
+        this.boros_segment = root.getChild("boros_segment");
+        this.body = this.boros_segment.getChild("body");
         this.dispenser = this.body.getChild("dispenser");
+        this.stone_shield = this.body.getChild("stone_shield");
+        this.tail = this.boros_segment.getChild("tail");
+        this.shield = this.tail.getChild("shield");
     }
 
     public static LayerDefinition createBodyLayer() {
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 
-        PartDefinition boros = partdefinition.addOrReplaceChild("boros", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition boros_segment = partdefinition.addOrReplaceChild("boros_segment", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
 
-        PartDefinition tail = boros.addOrReplaceChild("tail", CubeListBuilder.create().texOffs(0, 151).addBox(-16.0F, -32.0F, -8.0F, 32.0F, 32.0F, 32.0F, new CubeDeformation(0.0F))
-                .texOffs(128, 175).addBox(-8.0F, -16.0F, -23.0F, 16.0F, 16.0F, 15.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
+        PartDefinition body = boros_segment.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 284).addBox(-15.0F, -18.0F, -23.5F, 30.0F, 11.0F, 47.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 230).addBox(-14.0F, -7.0F, -23.5F, 28.0F, 7.0F, 47.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        PartDefinition body = boros.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 72).addBox(-21.0F, -33.0F, -23.0F, 42.0F, 33.0F, 46.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
+        PartDefinition dispenser = body.addOrReplaceChild("dispenser", CubeListBuilder.create().texOffs(196, 167).addBox(15.0F, -3.0F, -4.5F, 2.0F, 6.0F, 9.0F, new CubeDeformation(0.0F))
+                .texOffs(196, 167).mirror().addBox(-17.0F, -3.0F, -4.5F, 2.0F, 6.0F, 9.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(0.0F, -13.0F, 0.0F));
 
-        PartDefinition shield = body.addOrReplaceChild("shield", CubeListBuilder.create().texOffs(0, 0).addBox(-24.0F, -36.0F, -24.0F, 48.0F, 24.0F, 48.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition stone_shield = body.addOrReplaceChild("stone_shield", CubeListBuilder.create().texOffs(0, 183).addBox(-3.0F, -3.1F, -2.5F, 6.0F, 3.0F, 5.0F, new CubeDeformation(0.1F))
+                .texOffs(0, 0).addBox(-18.0F, -0.1F, -23.5F, 36.0F, 18.0F, 47.0F, new CubeDeformation(0.1F))
+                .texOffs(1, 196).addBox(-3.0F, -6.1F, -5.5F, 6.0F, 6.0F, 11.0F, new CubeDeformation(0.1F))
+                .texOffs(64, 167).addBox(-3.0F, -4.1F, -19.5F, 6.0F, 4.0F, 8.0F, new CubeDeformation(0.1F))
+                .texOffs(64, 167).addBox(-3.0F, -4.1F, 11.5F, 6.0F, 4.0F, 8.0F, new CubeDeformation(0.1F)), PartPose.offset(0.0F, -24.9F, 0.0F));
 
-        PartDefinition dispenser = body.addOrReplaceChild("dispenser", CubeListBuilder.create().texOffs(128, 151).addBox(-27.0F, -18.0F, -6.0F, 54.0F, 12.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition tail = boros_segment.addOrReplaceChild("tail", CubeListBuilder.create().texOffs(238, 26).addBox(-9.0F, -4.25F, -21.7F, 18.0F, 13.0F, 21.0F, new CubeDeformation(0.0F))
+                .texOffs(146, 65).addBox(-12.0F, -13.25F, -0.8F, 24.0F, 22.0F, 24.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -8.75F, -2.2F));
+
+        PartDefinition shield = tail.addOrReplaceChild("shield", CubeListBuilder.create().texOffs(166, 0).addBox(-12.0F, -0.2143F, -28.7143F, 24.0F, 11.0F, 18.0F, new CubeDeformation(0.0F))
+                .texOffs(144, 167).addBox(-3.0F, -4.2143F, -23.7143F, 6.0F, 4.0F, 8.0F, new CubeDeformation(0.0F))
+                .texOffs(138, 119).addBox(-15.0F, -7.2143F, -10.7143F, 30.0F, 18.0F, 30.0F, new CubeDeformation(0.0F))
+                .texOffs(32, 167).addBox(-3.0F, -13.2143F, -0.7143F, 6.0F, 6.0F, 10.0F, new CubeDeformation(0.0F))
+                .texOffs(172, 167).addBox(-3.0F, -3.2143F, 19.2857F, 6.0F, 10.0F, 6.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 213).addBox(15.0F, -1.2143F, -0.7143F, 6.0F, 6.0F, 10.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 213).mirror().addBox(-21.0F, -1.2143F, -0.7143F, 6.0F, 6.0F, 10.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(0.0F, -9.0357F, 6.9143F));
 
         return LayerDefinition.create(meshdefinition, 512, 512);
     }
+
 
     @Override
     public void setupAnim(FairkeeperBorosPartEntity entity, float var2, float var3, float var4, float var5, float var6) {
@@ -56,15 +74,19 @@ public class FairkeeperBorosBodyModel<T extends FairkeeperBorosPartEntity> exten
         this.tail.visible = entity.isTail();
         this.body.visible = !this.tail.visible;
         if (this.body.visible) {
+            this.stone_shield.visible = entity.hasArmor();
+            //this.dispenser.visible = !entity.isArmoredSegment();
+            this.body.visible = entity.isModelVisible();
+        }
+        if (this.tail.visible) {
             this.shield.visible = entity.hasArmor();
-            this.dispenser.visible = !entity.isArmoredSegment();
+            this.tail.visible = entity.isModelVisible();
         }
 
-        this.boros.visible = entity.isModelVisible();
 
         float targetTilt = (float) Math.toRadians(this.getTiltAngle(entity));
         entity.setPreviousTilt(Mth.lerp(this.TILT_SPEED, entity.getPreviousTilt(), targetTilt));
-        this.boros.xRot = entity.getPreviousTilt();
+        this.boros_segment.xRot = entity.getPreviousTilt();
     }
 
     public float getTiltAngle(FairkeeperBorosPartEntity entity) {
@@ -82,7 +104,7 @@ public class FairkeeperBorosBodyModel<T extends FairkeeperBorosPartEntity> exten
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        boros.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        boros_segment.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
     @Override

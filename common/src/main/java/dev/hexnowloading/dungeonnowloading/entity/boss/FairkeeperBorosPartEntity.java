@@ -418,7 +418,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.set(MODEL_VISIBLE, moving);
     }
 
-    public boolean isArmoredSegment() { return this.getBodyIndex() != 13; }
+    public boolean isArmoredSegment() { return true; }
 
     public boolean hasArmor() { return this.entityData.get(ARMOR); }
 
