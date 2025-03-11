@@ -45,6 +45,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     //private static final EntityDataAccessor<FairkeeperState> STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_STATE);
     private static final EntityDataAccessor<FairkeeperBorosState> STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_BOROS_STATE);
+    private static final EntityDataAccessor<FairkeeperBorosAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_BOROS_ANIMATION_STATE);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
@@ -53,10 +54,10 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     public final AnimationState pursueOpenedMouthAnimationState = new AnimationState();
     public final AnimationState pursueCloseMouthAnimationState = new AnimationState();
 
-    private static final byte TRIGGER_IDLE_ANIMATION_BYTE = 70;
+    /*private static final byte TRIGGER_IDLE_ANIMATION_BYTE = 70;
     private static final byte TRIGGER_PURSUE_OPEN_MOUTH_ANIMATION_BYTE = 71;
     private static final byte TRIGGER_PURSUE_OPENED_MOUTH_ANIMATION_BYTE = 72;
-    private static final byte TRIGGER_PURSUE_CLOSE_MOUTH_ANIMATION_BYTE = 73;
+    private static final byte TRIGGER_PURSUE_CLOSE_MOUTH_ANIMATION_BYTE = 73;*/
 
 
     private TickBaseMoveSet<FairkeeperBorosState> stateSelector = new TickBaseMoveSet<>();
@@ -71,6 +72,10 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
     public static int SEGMENT_DELAY_STEP = 11;
+
+    private int mouthOpenAnimationTimeOut;
+    private static final int MOUTH_OPEN_ANIMATION_DURATION = 19;
+
 
     public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -118,6 +123,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.entityData.define(CHILD_UUID, Optional.empty());
         this.entityData.define(CALLER_UUID, Optional.empty());
         this.entityData.define(STATE, FairkeeperBorosState.IDLE);
+        this.entityData.define(ANIMATION_STATE, FairkeeperBorosAnimationState.IDLE);
     }
 
     @Override
@@ -170,6 +176,28 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     public void tick() {
         super.tick();
+        this.segmentControl();
+        this.animationControl();
+    }
+
+    private void animationControl() {
+        if (!this.level().isClientSide) {
+            return;
+        }
+
+        if (this.mouthOpenAnimationTimeOut-- > 0) {
+            if (this.mouthOpenAnimationTimeOut <= 0) {
+                this.transitionTo(FairkeeperBorosAnimationState.MOUTH_OPENED);
+            }
+        }
+
+        if (this.pursueOpenMouthAnimationState.isStarted() && this.mouthOpenAnimationTimeOut <= 0) {
+            this.mouthOpenAnimationTimeOut = MOUTH_OPEN_ANIMATION_DURATION;
+        }
+
+    }
+
+    private void segmentControl() {
         if (!this.level().isClientSide) {
             Entity child = getChild();
             if (child == null) {
@@ -349,39 +377,76 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         return super.canBeAffected(mobEffectInstance);
     }
 
-    @Override
+    /*@Override
     public void handleEntityEvent(byte b) {
         switch (b) {
             case TRIGGER_IDLE_ANIMATION_BYTE:
                 this.idleAnimationState.start(this.tickCount);
                 break;
             case TRIGGER_PURSUE_OPEN_MOUTH_ANIMATION_BYTE:
-                this.stopAllAnimation();
+                this.resetAnimations();
                 this.pursueOpenMouthAnimationState.start(this.tickCount);
                 //this.pursueOpenedMouthAnimationState.startIfStopped(this.tickCount);
                 break;
             case TRIGGER_PURSUE_OPENED_MOUTH_ANIMATION_BYTE:
-                this.pursueOpenedMouthAnimationState.startIfStopped(this.tickCount);
+                this.resetAnimations();
+                System.out.println("animation triggered");
+                this.pursueOpenedMouthAnimationState.start(this.tickCount);
                 break;
             case TRIGGER_PURSUE_CLOSE_MOUTH_ANIMATION_BYTE:
-                this.stopAllAnimation();
+                this.resetAnimations();
                 this.pursueCloseMouthAnimationState.start(this.tickCount);
                 break;
         }
         super.handleEntityEvent(b);
+    }*/
+
+    /*public void triggerIdleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_BYTE); }
+    public void triggerOpenMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_OPEN_MOUTH_ANIMATION_BYTE); }
+    public void triggerOpenedMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_OPENED_MOUTH_ANIMATION_BYTE); }
+    public void triggerCloseMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_CLOSE_MOUTH_ANIMATION_BYTE); }*/
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            FairkeeperBorosAnimationState animationState = this.getAnimationState();
+            this.resetAnimations();
+            switch (animationState) {
+                case IDLE -> this.idleAnimationState.startIfStopped(this.tickCount);
+                case MOUTH_OPEN -> this.pursueOpenMouthAnimationState.startIfStopped(this.tickCount);
+                case MOUTH_OPENED -> this.pursueOpenedMouthAnimationState.startIfStopped(this.tickCount);
+                case MOUTH_CLOSE -> this.pursueCloseMouthAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
     }
 
-    private void stopAllAnimation() {
+    private void resetAnimations() {
         this.idleAnimationState.stop();
         this.pursueOpenMouthAnimationState.stop();
         this.pursueOpenedMouthAnimationState.stop();
         this.pursueCloseMouthAnimationState.stop();
     }
 
-    public void triggerIdleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_BYTE); }
-    public void triggerOpenMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_OPEN_MOUTH_ANIMATION_BYTE); }
-    public void triggerOpenedMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_OPENED_MOUTH_ANIMATION_BYTE); }
-    public void triggerCloseMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_PURSUE_CLOSE_MOUTH_ANIMATION_BYTE); }
+    public FairkeeperBorosEntity transitionTo(FairkeeperBorosAnimationState state) {
+        switch (state) {
+            case IDLE:
+                this.setAnimationState(FairkeeperBorosAnimationState.IDLE);
+                break;
+            case MOUTH_OPEN:
+                this.setAnimationState(FairkeeperBorosAnimationState.MOUTH_OPEN);
+                break;
+            case MOUTH_OPENED:
+                this.setAnimationState(FairkeeperBorosAnimationState.MOUTH_OPENED);
+                break;
+            case MOUTH_CLOSE:
+                this.setAnimationState(FairkeeperBorosAnimationState.MOUTH_CLOSE);
+                break;
+        }
+
+        return this;
+    }
+
 
     @Override
     public void targetRandomPlayer() {
@@ -495,6 +560,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     public double getFollowDistance() { return this.getAttributeValue(Attributes.FOLLOW_RANGE); }
     public void setState(FairkeeperBorosState fairkeeperState) { this.entityData.set(STATE, fairkeeperState); }
     public FairkeeperBorosState getState() { return this.entityData.get(STATE); }
+    public void setAnimationState(FairkeeperBorosAnimationState animationState) { this.entityData.set(ANIMATION_STATE, animationState); }
+    public FairkeeperBorosAnimationState getAnimationState() { return this.entityData.get(ANIMATION_STATE); }
     public boolean isState(FairkeeperBorosState fairkeeperState) { return this.getState().equals(fairkeeperState); }
     public UUID getChildId() { return this.entityData.get(CHILD_UUID).orElse(null); }
     public void setChildId(@Nullable UUID uniqueId) { this.entityData.set(CHILD_UUID, Optional.ofNullable(uniqueId)); }
@@ -515,6 +582,13 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     public boolean isSlumbering() {
         return false;
+    }
+
+    public enum FairkeeperBorosAnimationState {
+        IDLE,
+        MOUTH_OPEN,
+        MOUTH_OPENED,
+        MOUTH_CLOSE
     }
 
     public enum FairkeeperBorosState {

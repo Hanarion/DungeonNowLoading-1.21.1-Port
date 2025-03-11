@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -9,6 +10,7 @@ import net.minecraft.sounds.SoundEvent;
 import java.util.function.Supplier;
 
 public class DNLSounds {
+    public static final Supplier<Holder<SoundEvent>> MUSIC_TEMPLE_OF_DUALITY = registerSoundEventHolder("music_temple_of_duality");
     public static final Supplier<SoundEvent> VERTEX_ARROW_BOOTUP = registerSoundEvent("vertex_arrow_bootup");
     public static final Supplier<SoundEvent> VERTEX_NODE_CONNECT = registerSoundEvent("vertex_node_connect");
     public static final Supplier<SoundEvent> VERTEX_TRANSMISSION_DAMAGE = registerSoundEvent("vertex_transmission_damage");
@@ -47,6 +49,16 @@ public class DNLSounds {
     private static <T extends SoundEvent> Supplier<SoundEvent> registerSoundEvent(String string) {
         return Services.REGISTRY.register(BuiltInRegistries.SOUND_EVENT, string, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(DungeonNowLoading.MOD_ID, string)));
     }
+
+    private static Supplier<Holder<SoundEvent>> registerSoundEventHolder(String string) {
+        return () -> BuiltInRegistries.SOUND_EVENT.wrapAsHolder(
+                Services.REGISTRY.register(
+                        BuiltInRegistries.SOUND_EVENT, string,
+                        () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(DungeonNowLoading.MOD_ID, string))
+                ).get()
+        );
+    }
+
 
     public static void init() {}
 

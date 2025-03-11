@@ -181,5 +181,6 @@
   "sounds.dungeonnowloading.vertex_node_connect": "Vertex Node links",
   "sounds.dungeonnowloading.vertex_bow_arrow_convert": "Vertex Bow fully charges",
   "sounds.dungeonnowloading.vertex_bow_pull": "Vertex Bow charges up",
+  "sounds.dungeonnowloading.nightstride": "Nightstride playing",
   "warning.dungeonnowloading.cannot_open_fairkeeper_chest": "All enemies in the room must be defeated first!"
 }

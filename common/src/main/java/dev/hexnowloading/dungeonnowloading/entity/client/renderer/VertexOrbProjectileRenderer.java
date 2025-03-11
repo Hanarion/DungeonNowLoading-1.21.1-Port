@@ -7,10 +7,12 @@ import dev.hexnowloading.dungeonnowloading.entity.client.model.VertexOrbProjecti
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
 
 public class VertexOrbProjectileRenderer<T extends VertexOrbProjectileEntity> extends EntityRenderer<VertexOrbProjectileEntity> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_orb_projectile.png");
@@ -23,14 +25,41 @@ public class VertexOrbProjectileRenderer<T extends VertexOrbProjectileEntity> ex
     }
 
     @Override
+    public boolean shouldRender(VertexOrbProjectileEntity entity, Frustum frustum, double x, double y, double z) {
+        if (!entity.shouldRender(x, y, z)) {
+            return false;
+        } else if (entity.noCulling) {
+            return true;
+        } else {
+            AABB aabb = entity.getBoundingBoxForCulling().inflate(2.5);
+            if (aabb.hasNaN() || aabb.getSize() == 0.0) {
+                aabb = new AABB(entity.getX() - 2.0, entity.getY() - 2.0, entity.getZ() - 2.0, entity.getX() + 2.0, entity.getY() + 2.0, entity.getZ() + 2.0);
+            }
+
+            return frustum.isVisible(aabb);
+        }
+    }
+
+    @Override
     public void render(VertexOrbProjectileEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
-        poseStack.translate(0.0f, -entity.getBbHeight() * 1.5 + 0.5F, 0.0f);
+        poseStack.scale(-1.0f, -1.0F, 1.0F);
+        poseStack.translate(0.0f, 0.0f, 0.0f);
         VertexConsumer vertexConsumer = buffer.getBuffer(RENDER_TYPE);
-        //int p = getOverlayCoords(entity, this.getWhiteOverlayProgress(entity, partialTicks));
         boolean bl = entity.getHurtTime() > 0;
-        float red = entity.getRadius() > 2 ? 0.5F : 1.0F;
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.pack(0.0f, bl), red, red, 1.0F, 1.0F);
+
+        float alpha = 1.0F;
+        int fadeStart = 20;
+        if (entity.getLife() > 0 && entity.getLife() < fadeStart) {
+            alpha = Math.max((float) entity.getLife() / fadeStart, 0.0F);
+        } else if (entity.getDyingTick() > 0) {
+            alpha = Math.max((float) entity.getDyingTick() / fadeStart, 0.0F);
+        }
+
+        int emissiveLight = 0xF000F0;
+
+        this.model.setupAnim(entity, 0, 0, entity.tickCount + partialTicks, entityYaw, 0);
+        this.model.renderToBufferWithEntity(entity, poseStack, vertexConsumer, emissiveLight, OverlayTexture.pack(0.0f, bl), 1.0F, 1.0F, 1.0F, alpha);
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }

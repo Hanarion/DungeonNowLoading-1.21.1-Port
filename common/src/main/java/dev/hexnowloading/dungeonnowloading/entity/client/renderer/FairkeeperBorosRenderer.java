@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
+import dev.hexnowloading.dungeonnowloading.entity.client.layer.FairkeeperBorosLayer;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.FairkeeperBorosModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -14,6 +15,7 @@ public class FairkeeperBorosRenderer<T extends FairkeeperBorosEntity> extends Mo
 
     public FairkeeperBorosRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new FairkeeperBorosModel<>(renderManager.bakeLayer(FairkeeperBorosModel.LAYER_LOCATION)), 1.0F);
+        this.addLayer(new FairkeeperBorosLayer<>(this));
     }
 
     @Override

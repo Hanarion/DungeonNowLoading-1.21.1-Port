@@ -24,10 +24,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.JumpControl;
@@ -51,6 +48,16 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> IS_ON_CEILING = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BOOLEAN);
 
+    public final AnimationState idleAnimationState = new AnimationState();
+    public final AnimationState openMouthAnimationState = new AnimationState();
+    public final AnimationState openedMouthAnimationState = new AnimationState();
+    public final AnimationState closeMouthAnimationState = new AnimationState();
+
+    private static final byte TRIGGER_IDLE_ANIMATION_BYTE = 70;
+    private static final byte TRIGGER_OPEN_MOUTH_ANIMATION_BYTE = 71;
+    private static final byte TRIGGER_OPENED_MOUTH_ANIMATION_BYTE = 72;
+    private static final byte TRIGGER_CLOSE_MOUTH_ANIMATION_BYTE = 73;
+
     private TickBaseMoveSet<FairkeeperOurosState> stateSelector = new TickBaseMoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
 
@@ -61,7 +68,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
-    public static int SEGMENT_DELAY_STEP = 7;
+    public static int SEGMENT_DELAY_STEP = 11;
     
     public FairkeeperOurosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -104,7 +111,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_MORE_SCUTTLES, this, 20.0, 1.3, false, true));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_MORE_SCUTTLES, this, 3));
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.DESPERATE, this, 20.0, 1.3, false, true));
-        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.DESPERATE, this, 9, 0.2F, 3));
+        this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.DESPERATE, this, 9, 0.2F, 2));
         this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false, true));
         this.goalSelector.addGoal(5, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false, false));
         this.targetSelector.addGoal(2, new BossTargetSelectorGoal(this, this.getFollowDistance()));
@@ -195,6 +202,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                         part.setTail(true);
                     }
                     this.level().addFreshEntity(part);
+                    part.triggerIdleAnimation();
                 }
             }
 
@@ -496,6 +504,37 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         }
         return super.canBeAffected(mobEffectInstance);
     }
+
+    @Override
+    public void handleEntityEvent(byte b) {
+        switch (b) {
+            case TRIGGER_IDLE_ANIMATION_BYTE:
+                this.idleAnimationState.start(this.tickCount);
+                break;
+            case TRIGGER_OPEN_MOUTH_ANIMATION_BYTE:
+                this.openMouthAnimationState.start(this.tickCount);
+                break;
+            case TRIGGER_OPENED_MOUTH_ANIMATION_BYTE:
+                this.openedMouthAnimationState.start(this.tickCount);
+                break;
+            case TRIGGER_CLOSE_MOUTH_ANIMATION_BYTE:
+                this.closeMouthAnimationState.start(this.tickCount);
+                break;
+        }
+        super.handleEntityEvent(b);
+    }
+
+    private void stopAllAnimations() {
+        this.idleAnimationState.stop();
+        this.openMouthAnimationState.stop();
+        this.openedMouthAnimationState.stop();
+        this.closeMouthAnimationState.stop();
+    }
+
+    public void triggerIdleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_BYTE); }
+    public void triggerOpenMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_OPEN_MOUTH_ANIMATION_BYTE); }
+    public void triggerOpenedMOuthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_OPENED_MOUTH_ANIMATION_BYTE); }
+    public void setTriggerCloseMouthAnimationByte() { this.level().broadcastEntityEvent(this, TRIGGER_CLOSE_MOUTH_ANIMATION_BYTE); }
 
     @Override
     public boolean isInWall() {

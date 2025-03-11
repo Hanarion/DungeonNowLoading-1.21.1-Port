@@ -21,6 +21,7 @@ public class DNLTags {
     public static final TagKey<Block> PRESERVER_IGNORE = registerBlockTag("preserver_ignore");
     public static final TagKey<Block> NEAR_FULL_HEIGHT_BLOCKS = registerBlockTag("near_full_height_blocks");
     public static final TagKey<Structure> NO_GEODES_TAG = registerStructureTag("no_geodes");
+    public static final TagKey<Structure> TEMPLE_OF_DUALITY = registerStructureTag("temple_of_duality");
 
     private static TagKey<Block> registerBlockTag(String string) {
         return TagKey.create(Registries.BLOCK, new ResourceLocation(DungeonNowLoading.MOD_ID, string));

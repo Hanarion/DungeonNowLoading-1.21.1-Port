@@ -34,7 +34,6 @@ public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends Hiera
     private final ModelPart root;
 
     private float TILT_SPEED = 0.05F;
-    private boolean mouthOpened;
 
     public FairkeeperBorosModel(ModelPart root) {
         this.root = root;
@@ -154,13 +153,6 @@ public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends Hiera
         float targetTilt = (float) Math.toRadians(this.getTiltAngle(entity));
         entity.setPreviousTilt(Mth.lerp(this.TILT_SPEED, entity.getPreviousTilt(), targetTilt));
         this.boros.xRot = entity.getPreviousTilt();
-
-        if (mouthOpened && !entity.pursueOpenMouthAnimationState.isStarted()) {
-            entity.triggerOpenedMouthAnimation();
-            mouthOpened = false;
-        }
-
-        mouthOpened = entity.pursueOpenMouthAnimationState.isStarted();
 
         this.animate(entity.idleAnimationState, FairkeeperBorosAnimation.IDLE, ageInTicks);
         this.animate(entity.pursueOpenMouthAnimationState, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH, ageInTicks);

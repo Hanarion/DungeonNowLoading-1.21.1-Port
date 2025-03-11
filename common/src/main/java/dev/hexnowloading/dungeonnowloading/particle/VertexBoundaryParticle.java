@@ -12,21 +12,21 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class FairkeeperBoundaryParticle extends TextureSheetParticle {
+public class VertexBoundaryParticle extends TextureSheetParticle {
 
     private SpriteSet spriteSet;
     private int axis;
     private float degree;
 
-    protected FairkeeperBoundaryParticle(ClientLevel clientLevel, double x, double y, double z, int axis, float degree, SpriteSet spriteSet) {
+    protected VertexBoundaryParticle(ClientLevel clientLevel, double x, double y, double z, int axis, float degree, SpriteSet spriteSet) {
         super(clientLevel, x, y, z);
-        this.quadSize = 1.0F;
+        this.quadSize = 0.5F;
         this.gravity = 0.0F;
         this.xd = 0;
         this.yd = 0;
         this.zd = 0;
         this.spriteSet = spriteSet;
-        this.lifetime = 50;
+        this.lifetime = 70;
         this.axis = axis;
         this.degree = degree;
     }
@@ -36,35 +36,44 @@ public class FairkeeperBoundaryParticle extends TextureSheetParticle {
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;
-        int sprite = Mth.clamp(4 * this.age / this.lifetime, 0, 4);
-        this.setSprite(spriteSet.get(0, 4));
-        if (sprite > 0) {
-            this.xd = 0;
-            this.yd = 0;
-            this.zd = 0;
-        }
+
+        this.xd = 0;
+        this.yd = 0.02F;
+        this.zd = 0;
+
+        this.move(this.xd, this.yd, this.zd);
+
         if (this.age++ >= this.lifetime) {
             this.remove();
-        } else {
-            this.move(this.xd, this.yd, this.zd);
         }
     }
 
+
+
     @Override
     public float getQuadSize(float f) {
-        return this.quadSize * Mth.clamp(((float)this.age + f) / (float)this.lifetime * 0.75f, 0.0f, 1.0f);
+        return this.quadSize;
     }
 
     @Override
     public void render(VertexConsumer vertexConsumer, Camera camera, float partialTick) {
-        this.alpha = 1.0F - Mth.clamp((((float)this.age + partialTick) / (float)this.lifetime), 0.0f, 1.0f);
-        this.rCol = 1.0f;
-        this.gCol = 1.0f;
+        float fadeStart = this.lifetime * (2.0F / 3.0F); // Fade starts at 2/3 of lifetime
+
+        if (this.age >= fadeStart) {
+            float fadeProgress = (this.age + partialTick - fadeStart) / (this.lifetime - fadeStart);
+            this.alpha = 1.0F - Mth.clamp(fadeProgress, 0.0F, 1.0F); // Gradually reduce alpha
+        } else {
+            this.alpha = 1.0F; // Fully visible before fade starts
+        }
+
+        this.rCol = 1f;
+        this.gCol = 1f;
         this.renderRotatedParticle(vertexConsumer, camera, partialTick, this.axis, this.degree);
         this.rCol = 0.8f;
         this.gCol = 0.8f;
         this.renderRotatedParticle(vertexConsumer, camera, partialTick, this.axis, this.degree + 180F);
     }
+
 
     private void renderRotatedParticle(VertexConsumer vertexConsumer, Camera camera, float partialTick, int axis, float degree) {
         Vec3 vec3 = camera.getPosition();
@@ -120,10 +129,11 @@ public class FairkeeperBoundaryParticle extends TextureSheetParticle {
 
         @Nullable
         public Particle createParticle(AxisParticleType.AxisParticleData data, ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            FairkeeperBoundaryParticle particle = new FairkeeperBoundaryParticle(clientLevel, x, y, z, data.getAxis() , data.getDegree(), this.sprites);
+            VertexBoundaryParticle particle = new VertexBoundaryParticle(clientLevel, x, y, z, data.getAxis() , data.getDegree(), this.sprites);
             particle.setSprite(sprites.get(0, 1));
             particle.setAlpha(1.0F);
             return particle;
         }
     }
 }
+

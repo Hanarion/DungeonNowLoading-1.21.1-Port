@@ -1,11 +1,15 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.AxisParticleType;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -14,20 +18,21 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.*;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 import java.util.function.BiConsumer;
 
@@ -36,13 +41,21 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     private static final EntityDataAccessor<Integer> HURT_TIME = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> HURT_TIME_DIRECT = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Vector3f> VELOCITY = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<VertexDomainAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityStates.VERTEX_DOMAIN_ANIMATION_STATE);
+    private static final EntityDataAccessor<Integer> DYING_TICK = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.INT);
+
 
     private final DynamicGameEventListener<BlockPlaceBreakListener> dynamicBlockPlaceBreakListener;
+
+    public final AnimationState spinAnimationState = new AnimationState();
+    public final AnimationState impactAnimationState = new AnimationState();
+    public final AnimationState idleAnimationState = new AnimationState();
 
     private static final int BASE_DAMAGE = 20;
     private static final int SLOWNESS_AMPLIFIER = 4;
     private static final int SLOWNESS_DURATION = 100;
-    private static final int DURATION_ON_GROUND = 1200;
+    public static final int DURATION_ON_GROUND = 100;
     private static final float BASE_HEALTH = 100F;
     private static final int RANGE = 7;
 
@@ -55,6 +68,14 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     private double zPower;
     private int life;
     private float health;
+    private boolean hasAppliedMovement;
+    private boolean delayTick;
+    private boolean explosionImmune;
+
+    private int impactAnimationTimeOut;
+    private int expansionTick;
+    public static final int IMPACT_ANIMATION_DURATION = 5;
+    public static final int EXPANSION_DURATION = 40;
 
     public VertexDomainProjectileEntity(EntityType<? extends VertexDomainProjectileEntity> entityType, Level level) {
         super(entityType, level);
@@ -67,6 +88,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.dynamicBlockPlaceBreakListener = new DynamicGameEventListener<>(new BlockPlaceBreakListener(new EntityPositionSource(this, 1.0F), RANGE));
         this.setOwner(owner);
         this.health = health;
+        this.setDyingTick(0);
     }
 
     @Override
@@ -101,10 +123,38 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.entityData.define(HURT_TIME, 0);
         this.entityData.define(HURT_TIME_DIRECT, 1);
         this.entityData.define(DAMAGE, 0.0f);
+        this.entityData.define(VELOCITY, Vec3.ZERO.toVector3f());
+        this.entityData.define(ANIMATION_STATE, VertexDomainAnimationState.IDLE);
+        this.entityData.define(DYING_TICK, 0);
     }
 
     @Override
     protected void tickProjectile() {
+
+        if (this.getDyingTick() > 0) {
+            this.setDyingTick(this.getDyingTick() - 1);
+            if (this.getDyingTick() <= 0) {
+                discard();
+            }
+            return;
+        }
+
+        if (!this.hasAppliedMovement) {
+            if (!this.level().isClientSide) {
+                this.setDeltaMovement(xPower, yPower, zPower);
+                this.setVelocity(new Vec3(xPower, yPower, zPower));
+            } else {
+                double d = this.getVelocity().x * this.getVelocity().x + this.getVelocity().y * this.getVelocity().y + this.getVelocity().z * this.getVelocity().z;
+                if (!delayTick && d < 1.0E-7) {
+                    delayTick = true;
+                    return;
+                }
+                this.setDeltaMovement(new Vec3(this.getVelocity().x, this.getVelocity().y, this.getVelocity().z));
+            }
+            this.transitionTo(VertexDomainAnimationState.SPIN);
+            this.hasAppliedMovement = true;
+        }
+
         if (this.getHurtTime() > 0) {
             this.setHurtTime(this.getHurtTime() - 1);
         }
@@ -112,22 +162,98 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.checkInsideBlocks();
 
         this.move(MoverType.SELF, this.getDeltaMovement());
-        if (this.tickCount == 1) {
-            this.setDeltaMovement(xPower, yPower, zPower);
+
+        if (this.life <= 0) {
+            for (int i = 0; i < 5; i++) {
+                double offsetX = (Math.random() - 0.5) * 2.0;
+                double offsetY = (Math.random() - 0.5) * 2.0;
+                double offsetZ = (Math.random() - 0.5) * 2.0;
+
+                this.level().addParticle(DustParticleOptions.REDSTONE,
+                        this.getX() + offsetX,
+                        this.getY() + offsetY + this.getBbHeight() * 0.5F,
+                        this.getZ() + offsetZ,
+                        0.0, 0.0, 0.0);
+            }
         }
 
         if (this.verticalCollision || this.horizontalCollision) {
             this.life = DURATION_ON_GROUND;
+            this.transitionTo(VertexDomainAnimationState.IMPACT);
+            this.impactDamage();
+            this.expansionTick = EXPANSION_DURATION;
             this.setDeltaMovement(Vec3.ZERO);
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.END_GATEWAY_SPAWN, this.getSoundSource(), 3.0F, 2.0F);
         }
 
         if (this.life > 0) {
             this.life--;
+            if (this.expansionTick > 0) {
+                this.expansionTick--;
+            }
+            this.setDeltaMovement(Vec3.ZERO);
             spawnBoundaryParticles(RANGE);
             if (this.life <= 0) {
-                this.discard();
+                this.remove(RemovalReason.DISCARDED);
             }
+        }
+
+        this.animationControl();
+        if (this.life <= 0) {
+            int DESTRUCTION_RANGE = 2;
+            this.blockDestructionTick(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+        }
+    }
+
+    private void impactDamage() {
+        float particleScale = BEAM_INITIAL_PARTICLE_SCALE_MIN + (float) Math.random() * (BEAM_INITIAL_PARTICLE_SCALE_MAX - BEAM_INITIAL_PARTICLE_SCALE_MIN);
+        ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
+                DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
+                particleScale
+        );
+        for (int i = 0; i < 30; i++) {
+            this.level().addParticle(particleData, this.getX() + 6 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()), this.getY()  + 6 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()),this.getZ()  + 6 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()), 0, 0, 0);
+        }
+        this.explosionImmune = true;
+        this.level().explode(null, this.getX(), this.getY(), this.getZ(), 4.0F, Level.ExplosionInteraction.NONE);
+        this.explosionImmune = false;
+    }
+
+    private void blockDestructionTick(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+        if (this.level().isClientSide) {
+            return;
+        }
+        for (int ix = minX; ix <= maxX; ix++) {
+            for (int iz = minZ; iz <= maxZ; iz++) {
+                for (int iy = minY; iy <= maxY; iy++) {
+                    int dx = this.getBlockX() + ix;
+                    int dy = this.getBlockY() + iy;
+                    int dz = this.getBlockZ() + iz;
+                    BlockPos blockPos = new BlockPos(dx, dy, dz);
+                    BlockState blockState = this.level().getBlockState(blockPos);
+                    if (!blockState.isAir()) {
+                        if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
+                            this.level().destroyBlock(blockPos, true, this);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void animationControl() {
+        if (!this.level().isClientSide) {
+            return;
+        }
+
+        if (this.impactAnimationTimeOut-- > 0) {
+            if (this.impactAnimationTimeOut <= 0) {
+                this.transitionTo(VertexDomainAnimationState.IDLE);
+            }
+        }
+
+        if (this.impactAnimationState.isStarted() && this.impactAnimationTimeOut <= 0) {
+            this.impactAnimationTimeOut = IMPACT_ANIMATION_DURATION;
         }
     }
 
@@ -178,8 +304,8 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         for (int i = 0; i <= particleCount; i++) {
             Vec3 particlePos = start.add(step.scale(i));
 
-            level.sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1,
-                    0.0F, 0.0F, 0.0F, 0.0F);
+            level.sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1, 0.0F, 0.0F, 0.0F, 0.0F);
+            level.sendParticles(DustParticleOptions.REDSTONE, particlePos.x, particlePos.y, particlePos.z, 1, 0.0D, 0.0, 0.0, 0.0);
         }
     }
 
@@ -277,6 +403,11 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     public void push(double $$0, double $$1, double $$2) {
     }
 
+    @Override
+    public boolean isPushedByFluid() {
+        return false;
+    }
+
     public void shootTowardsTarget(double x, double y, double z, LivingEntity target, float speed, float inaccuracy) {
         this.moveTo(x, y, z, this.getYRot(), this.getXRot());
         this.reapplyPosition();
@@ -301,6 +432,10 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.xPower = inaccurateDirection.x * speed;
         this.yPower = inaccurateDirection.y * speed;
         this.zPower = inaccurateDirection.z * speed;
+        this.setDeltaMovement(xPower, yPower, zPower);
+        this.setVelocity(new Vec3(xPower, yPower, zPower));
+        this.transitionTo(VertexDomainAnimationState.SPIN);
+        this.hasAppliedMovement = true;
     }
 
 
@@ -310,8 +445,14 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         if (this.isInvulnerableTo(damageSource)) {
             return false;
         }
+        if (this.getDyingTick() > 0) {
+            return false;
+        }
         if (this.level().isClientSide || this.isRemoved()) {
             return true;
+        }
+        if (this.explosionImmune) {
+            return false;
         }
         this.setHurtDir(-this.getHurtDir());
         this.setHurtTime(10);
@@ -320,7 +461,20 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.gameEvent(GameEvent.ENTITY_DAMAGE, damageSource.getEntity());
         bl = damageSource.getEntity() instanceof Player && ((Player)damageSource.getEntity()).getAbilities().instabuild;
         if (bl || this.getDamage() > this.health) {
-            this.discard();
+            if (this.getLife() > 0) {
+                this.setDyingTick(20);
+                this.refreshDimensions();
+            } else {
+                this.discard();
+            }
+            ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
+                    DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
+                    3.0F
+            );
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 1.0F, 2.0F);
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION.get(), this.getSoundSource(), 1.0F, 2.0F);
+            ((ServerLevel)this.level()).sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 5, 2, 2, 2, 0.0f);
+            ((ServerLevel)this.level()).sendParticles(particleData, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0.0f);
         }
         return true;
     }
@@ -335,10 +489,61 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     }
 
     @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        if (this.getDyingTick() > 0) {
+            return EntityDimensions.fixed(0.0F, 0.0F);
+        }
+        return EntityDimensions.scalable(1.0F, 1.0F);
+    }
+
+    @Override
     public void animateHurt(float f) {
         this.setHurtDir(-this.getHurtDir());
         this.setHurtTime(10);
         this.setDamage(this.getDamage() * 11.0f);
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            VertexDomainAnimationState animationState = this.getAnimationState();
+            this.resetAnimations();
+            switch (animationState) {
+                case IDLE -> this.idleAnimationState.startIfStopped(this.tickCount);
+                case SPIN -> this.spinAnimationState.startIfStopped(this.tickCount);
+                case IMPACT -> this.impactAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    private void resetAnimations() {
+        this.idleAnimationState.stop();
+        this.spinAnimationState.stop();
+        this.impactAnimationState.stop();
+    }
+
+    public VertexDomainProjectileEntity transitionTo(VertexDomainAnimationState state) {
+        switch (state) {
+            case IDLE:
+                this.setAnimationState(VertexDomainAnimationState.IDLE);
+                break;
+            case SPIN:
+                this.setAnimationState(VertexDomainAnimationState.SPIN);
+                break;
+            case IMPACT:
+                this.setAnimationState(VertexDomainAnimationState.IMPACT);
+                break;
+        }
+        return this;
+    }
+
+    public Vector3f getVelocity() {
+        return this.entityData.get(VELOCITY);
+    }
+
+    public void setVelocity(Vec3 vec3) {
+        this.entityData.set(VELOCITY, vec3.toVector3f());
     }
 
     public void setDamage(float f) {
@@ -373,7 +578,25 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.health = health;
     }
 
+    public void setDyingTick(int tick) { this.entityData.set(DYING_TICK, tick); }
 
+    public int getDyingTick() { return this.entityData.get(DYING_TICK); }
+
+    public int getLife() { return this.life; }
+
+    public int getImpactAnimationTimeOut() { return this.impactAnimationTimeOut; }
+
+    public int getExpansionTick() { return this.expansionTick; }
+
+    public VertexDomainAnimationState getAnimationState() { return this.entityData.get(ANIMATION_STATE); }
+
+    public void setAnimationState(VertexDomainAnimationState state) { this.entityData.set(ANIMATION_STATE, state); }
+
+    public enum VertexDomainAnimationState {
+        IDLE,
+        SPIN,
+        IMPACT
+    }
 
     class BlockPlaceBreakListener implements GameEventListener {
         private final PositionSource listenerSource;
@@ -408,6 +631,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
                 if (gameEvent == GameEvent.BLOCK_PLACE || gameEvent == GameEvent.BLOCK_DESTROY) {
                     if (context.sourceEntity() instanceof Player player && !player.getAbilities().instabuild && applyDamage(player, BASE_DAMAGE, 1.0F)) {
                         spawnRedstoneBeamParticle(serverLevel, player);
+                        serverLevel.playSound((Entity) null, centerBlockPos, SoundEvents.WITHER_SHOOT, SoundSource.BLOCKS, 3.0F, 1.0F);
                         player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER));
                         outlineCauseBlock(serverLevel, eventBlockPos);
                     }

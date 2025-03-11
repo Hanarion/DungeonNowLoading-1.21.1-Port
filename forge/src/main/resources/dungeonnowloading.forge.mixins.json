@@ -16,8 +16,10 @@
         "block.WallMixin",
         "block.IronBarsMixin",
         "entities.EntityAvoidBlockMixin",
+        "entities.ServerPlayerMixin",
         "structures.StructureProcessorAccessor",
         "structures.StructureTemplateMixin",
+        "structures.SituationalMusicMixin",
         "structures.NoGeodesInStructuresMixin",
         "forge.block.BlockPlaceMixin",
         "forge.block.BucketItemMixin",
@@ -30,6 +32,7 @@
     ],
     "client": [
         "client.AbstractClientPlayerMixin",
+        "structures.SituationalMusicMixin",
         "MixinTitleScreen",
         "MaxHealthAttributeMixin"
     ],

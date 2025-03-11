@@ -1,4 +1,11 @@
 {
+  "music_temple_of_duality" : {
+    "subtitle": "sounds.dungeonnowloading.music_temple_of_duality",
+    "sounds": [
+      "dungeonnowloading:music/hike",
+      "dungeonnowloading:music/nightstride"
+    ]
+  },
   "vertex_arrow_bootup": {
     "subtitle": "sounds.dungeonnowloading.vertex_arrow_bootup",
     "sounds": [

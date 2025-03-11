@@ -17,6 +17,7 @@
     "block.WallMixin",
     "block.IronBarsMixin",
     "entities.EntityAvoidBlockMixin",
+    "entities.ServerPlayerMixin",
     "fabric.block.BlockPlaceMixin",
     "fabric.block.BucketItemMixin",
     "fabric.block.FlintAndSteelMixin",
@@ -29,6 +30,7 @@
   ],
   "client": [
     "client.AbstractClientPlayerMixin",
+    "structures.SituationalMusicMixin",
     "MaxHealthAttributeMixin",
     "MixinTitleScreen"
   ],

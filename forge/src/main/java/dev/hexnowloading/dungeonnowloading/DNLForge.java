@@ -44,6 +44,7 @@ public class DNLForge {
         bus.addListener(DNLForgeClientEvents::onRegisterRenderer);
         bus.addListener(DNLForgeClientEvents::onRegisterLayers);
         bus.addListener(DNLForgeClientEvents::onRegisterParticleProviders);
+        bus.addListener(DNLForgeClientEvents::onRegisterPackets);
     }
 
     private void addForgeListeners() {

@@ -70,7 +70,7 @@ public class FairkeeperBorosTackleGoal extends Goal {
         if (this.totalDuration > 0) {
             this.totalDuration--;
         } else {
-            this.boros.triggerCloseMouthAnimation();
+            this.boros.setAnimationState(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
             this.boros.stopAttacking(20);
             return;
         }
@@ -81,7 +81,7 @@ public class FairkeeperBorosTackleGoal extends Goal {
 
         if (this.tackleCooldown <= 0 && this.tackleDuration <= 0 && distanceSqr < this.tackleRange * this.tackleRange) {
             this.tackleDuration = TACKLE_DURATION + SLOWDOWN_DURATION;
-            this.boros.triggerOpenMouthAnimation();
+            this.boros.setAnimationState(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_OPEN);
         }
 
         if (this.tackleDuration > 0) {
@@ -105,7 +105,7 @@ public class FairkeeperBorosTackleGoal extends Goal {
                 this.tackleDuration = 0;
             }
             if (this.tackleDuration == 3) {
-                this.boros.triggerCloseMouthAnimation();
+                this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
             }
             if (this.tackleDuration <= 0) {
                 if (loopCount == TOTAL_LOOP) {

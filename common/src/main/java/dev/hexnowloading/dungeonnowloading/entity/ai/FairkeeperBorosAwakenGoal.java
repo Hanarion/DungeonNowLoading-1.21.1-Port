@@ -38,12 +38,14 @@ public class FairkeeperBorosAwakenGoal extends Goal {
         this.initialTarget = (new BlockPos(callerPos.relative(direction.getCounterClockWise(), horizontalOffset).below(verticalOffset))).getCenter().add(0.0f, -0.5f, 0.0f);
         this.finalTarget = (new BlockPos(callerPos.relative(direction.getClockWise(), horizontalOffset).below(verticalOffset))).getCenter().add(0.0f, -0.5f, 0.0f);
         this.fairkeeper.setAwakenEndPos(this.finalTarget);
+        this.fairkeeper.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_OPEN);
     }
 
     @Override
     public void tick() {
         if (!movingHorizontally) {
             double deltaY = this.fairkeeper.getY() - this.initialTarget.y;
+            //BlockState blockState = this.fairkeeper.level().getBlockState(this.fairkeeper.blockPosition().below(2));
             if (fairkeeper.onGround()) {
                 movingHorizontally = true;
             }
@@ -56,6 +58,7 @@ public class FairkeeperBorosAwakenGoal extends Goal {
 
             if ((deltaX * deltaX + deltaZ * deltaZ) < THRESHOLD * THRESHOLD) {
                 this.fairkeeper.targetRandomPlayer();
+                this.fairkeeper.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
                 this.fairkeeper.stopAttacking(20);
             }
         }

@@ -776,6 +776,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             boros.yBodyRot = boros.getYRot();
             boros.yHeadRot = boros.getYRot();
             this.level().addFreshEntity(boros);
+            boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.IDLE);
             this.setBorosId(boros.getUUID());
             this.setBorosWaitingForCommand(false);
             EntityScale.scaleBossHealth(boros, playerCount);
@@ -792,6 +793,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ouros.yBodyRot = ouros.getYRot();
             ouros.yHeadRot = ouros.getYRot();
             this.level().addFreshEntity(ouros);
+            ouros.triggerIdleAnimation();
             this.setOurosId(ouros.getUUID());
             this.setOurosWaitingForCommand(false);
             EntityScale.scaleBossHealth(ouros, playerCount);

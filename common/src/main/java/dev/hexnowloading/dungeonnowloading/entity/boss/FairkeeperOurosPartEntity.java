@@ -17,6 +17,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -44,6 +45,14 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     private static final EntityDataAccessor<Boolean> TAIL = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HEAD_MOVING = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> MODEL_VISIBLE = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
+
+    public final AnimationState idleAnimationState = new AnimationState();
+    public final AnimationState dropScuttleAnimationState = new AnimationState();
+    public final AnimationState setupCannonAnimationState = new AnimationState();
+
+    private static final byte TRIGGER_IDLE_ANIMATION_BYTE = 70;
+    private static final byte TRIGGER_DROP_SCUTTLE_ANIMATION_BYTE = 71;
+    private static final byte TRIGGER_SETUP_CANNON_ANIMATION_BYTE = 72;
 
     private float previousTilt = 0.0F;
     private boolean enableRotation = true;
@@ -196,7 +205,9 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
                 .forEach(entity -> {
                     entity.push(this);
                     LivingEntity head = (LivingEntity) this.getHead();
-                    entity.hurt(entity.level().damageSources().mobAttack(head), (float) (head.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.5F));
+                    if (head != null) {
+                        entity.hurt(entity.level().damageSources().mobAttack(head), (float) (head.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.5F));
+                    }
                 });
     }
 
@@ -243,6 +254,32 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         }
         return super.canBeAffected(mobEffectInstance);
     }
+
+    @Override
+    public void handleEntityEvent(byte b) {
+        switch (b) {
+            case TRIGGER_IDLE_ANIMATION_BYTE:
+                this.idleAnimationState.start(this.tickCount);
+                break;
+            case TRIGGER_DROP_SCUTTLE_ANIMATION_BYTE:
+                this.dropScuttleAnimationState.start(this.tickCount);
+                break;
+            case TRIGGER_SETUP_CANNON_ANIMATION_BYTE:
+                this.setupCannonAnimationState.start(this.tickCount);
+                break;
+        }
+        super.handleEntityEvent(b);
+    }
+
+    private void stopAllAnimation() {
+        this.idleAnimationState.stop();
+        this.dropScuttleAnimationState.stop();
+        this.setupCannonAnimationState.stop();
+    }
+
+    public void triggerIdleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_BYTE); }
+    public void triggerDropScuttleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_DROP_SCUTTLE_ANIMATION_BYTE); }
+    public void triggerSetupCannonAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_SETUP_CANNON_ANIMATION_BYTE); }
 
     @Override
     public boolean isInWall() {
