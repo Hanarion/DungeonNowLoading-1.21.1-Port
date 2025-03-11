@@ -1,7 +1,7 @@
-package dev.hexnowloading.dungeonnowloading.mixin.structures;
+package dev.hexnowloading.dungeonnowloading.mixin.client;
 
 import dev.hexnowloading.dungeonnowloading.network.packets.ClientboundStructureDetectionPacket;
-import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.registry.DNLMusics;
 import net.minecraft.Optionull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -29,10 +29,8 @@ public abstract class SituationalMusicMixin {
 
         if (music == null && player != null) {
             if (ClientboundStructureDetectionPacket.isClientInStructure()) {
-                cir.setReturnValue(MUSIC_TEMPLE_OF_DUALITY);
+                cir.setReturnValue(DNLMusics.TEMPLE_OF_DUALITY_MUSIC.get());
             }
         }
     }
-
-    private static final Music MUSIC_TEMPLE_OF_DUALITY = new Music(DNLSounds.MUSIC_TEMPLE_OF_DUALITY.get(), 0, 0, true);
 }

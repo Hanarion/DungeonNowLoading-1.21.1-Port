@@ -30,7 +30,7 @@
   ],
   "client": [
     "client.AbstractClientPlayerMixin",
-    "structures.SituationalMusicMixin",
+    "client.SituationalMusicMixin",
     "MaxHealthAttributeMixin",
     "MixinTitleScreen"
   ],

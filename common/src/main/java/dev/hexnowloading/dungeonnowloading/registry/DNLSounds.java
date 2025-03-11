@@ -51,12 +51,8 @@ public class DNLSounds {
     }
 
     private static Supplier<Holder<SoundEvent>> registerSoundEventHolder(String string) {
-        return () -> BuiltInRegistries.SOUND_EVENT.wrapAsHolder(
-                Services.REGISTRY.register(
-                        BuiltInRegistries.SOUND_EVENT, string,
-                        () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(DungeonNowLoading.MOD_ID, string))
-                ).get()
-        );
+        Supplier<SoundEvent> soundEvent = registerSoundEvent(string);
+        return () -> BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent.get());
     }
 
 

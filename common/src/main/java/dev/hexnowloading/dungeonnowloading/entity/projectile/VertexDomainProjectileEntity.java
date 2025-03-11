@@ -55,7 +55,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     private static final int BASE_DAMAGE = 20;
     private static final int SLOWNESS_AMPLIFIER = 4;
     private static final int SLOWNESS_DURATION = 100;
-    public static final int DURATION_ON_GROUND = 100;
+    public static final int DURATION_ON_GROUND = 1200;
     private static final float BASE_HEALTH = 100F;
     private static final int RANGE = 7;
 

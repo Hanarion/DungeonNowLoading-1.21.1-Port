@@ -5,10 +5,7 @@ import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
 import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.IGenericEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
@@ -44,7 +41,6 @@ public class DNLForge {
         bus.addListener(DNLForgeClientEvents::onRegisterRenderer);
         bus.addListener(DNLForgeClientEvents::onRegisterLayers);
         bus.addListener(DNLForgeClientEvents::onRegisterParticleProviders);
-        bus.addListener(DNLForgeClientEvents::onRegisterPackets);
     }
 
     private void addForgeListeners() {
