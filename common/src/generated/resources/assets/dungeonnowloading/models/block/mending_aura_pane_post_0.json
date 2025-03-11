@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_glass_pane_post",
+  "textures": {
+    "edge": "dungeonnowloading:block/mending_aura_0",
+    "pane": "dungeonnowloading:block/mending_aura_0"
+  }
+}

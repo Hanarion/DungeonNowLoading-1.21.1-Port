@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_farmland",
+  "textures": {
+    "dirt": "dungeonnowloading:block/mending_aura_180",
+    "top": "dungeonnowloading:block/mending_aura_180"
+  }
+}
