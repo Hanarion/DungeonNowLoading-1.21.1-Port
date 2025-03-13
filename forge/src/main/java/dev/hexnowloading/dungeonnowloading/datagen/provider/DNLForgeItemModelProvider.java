@@ -51,6 +51,12 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         withExistingParent(ITEM_FOLDER + "/" + name, mcLoc(ITEM_FOLDER + "/template_spawn_egg"));
     }
 
+    private void generatedItem(Item item) {
+        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        singleTexture(name, mcLoc("item/generated"), "layer0", modLoc("item/" + name));
+
+    }
+
     private void fourStageBowItem(Item item, float pulling1, float pulling2, float pulling3) {
         String name = ForgeRegistries.ITEMS.getKey(item).getPath();
 

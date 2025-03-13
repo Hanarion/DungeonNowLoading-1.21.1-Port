@@ -6,6 +6,7 @@ import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkee
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.FairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
+import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
@@ -48,8 +49,12 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(VertexDomainProjectileModel.LAYER_LOCATION, VertexDomainProjectileModel::createBodyLayer);
         event.registerLayerDefinition(BorusArrowModel.LAYER_LOCATION, BorusArrowModel::createBodyLayer);
 
+        // Block
         event.registerLayerDefinition(FairkeeperChestModel.LAYER_LOCATION, FairkeeperChestModel::createBodyLayer);
         event.registerLayerDefinition(DisabledFairkeeperChestModel.LAYER_LOCATION, DisabledFairkeeperChestModel::createBodyLayer);
+
+        // Item
+        event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
     }
     public static void onRegisterRenderer(EntityRenderersEvent.RegisterRenderers event) {
         // Bosses
@@ -101,6 +106,7 @@ public class DNLForgeClientEvents {
 
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pulling"), (stack, level, entity, idk) ->
                 entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
+
     }
 
     public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {

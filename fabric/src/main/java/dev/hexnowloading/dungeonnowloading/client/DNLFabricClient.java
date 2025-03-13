@@ -5,6 +5,8 @@ import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestMod
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
+import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
+import dev.hexnowloading.dungeonnowloading.item.client.renderer.ScorcherRenderer;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.fabricmc.api.ClientModInitializer;
@@ -22,6 +24,7 @@ import net.minecraft.resources.ResourceLocation;
 public class DNLFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        registerItemModelLayers();
         registerItemRenderers();
         registerBlockRenderers();
         registerRenderers();
@@ -29,10 +32,21 @@ public class DNLFabricClient implements ClientModInitializer {
         registerParticleFactories();
     }
 
+    private void registerItemModelLayers() {
+        EntityModelLayerRegistry.registerModelLayer(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
+    }
+
     private void registerItemRenderers() {
+
+        // Block
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.FAIRKEEPER_CHEST.get(), FairkeeperChestItemRenderer.getInstance()::renderByItem);
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.WISE_FAIRKEEPER_CHEST.get(), WiseFairkeeperChestItemRenderer.getInstance()::renderByItem);
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.FIERCE_FAIRKEEPER_CHEST.get(), FierceFairkeeperChestItemRenderer.getInstance()::renderByItem);
+
+        // Item
+        BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
+        //BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), new DifferentProspectiveItemRenderer(DNLClientRegistry.SCORCHER_3D_MODEL, DNLClientRegistry.SCORCHER_3D_MODEL));
+
     }
 
     private void registerBlockRenderers() {

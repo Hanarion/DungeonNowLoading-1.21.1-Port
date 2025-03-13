@@ -36,10 +36,10 @@ public class ClientboundStructureDetectionPacket implements DNLPacket {
 
     @Override
     public void handle(@Nullable ServerPlayer sender) {
-        if (sender != null) return;  // ✅ Ignore this on the server
+        if (sender != null) return;
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;  // ✅ Prevents crashes if the world isn't loaded
+        if (mc.level == null) return;
 
         Entity entity = mc.level.getEntity(playerId);
         if (entity != null) {
