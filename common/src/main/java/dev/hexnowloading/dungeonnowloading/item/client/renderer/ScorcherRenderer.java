@@ -34,7 +34,7 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
         if (itemStack.getItem() instanceof ScorcherItem scorcherItem) {
             Player player = Minecraft.getInstance().player;
             if (player == null) return;
-            this.model.setUpAnim(scorcherItem, player, itemStack, getTimeWithPartialTicks());
+            this.model.setUpAnim(scorcherItem, player, itemStack, getPartialTick());
 
         }
         this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -42,9 +42,9 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
         poseStack.popPose();
     }
 
-    private float getTimeWithPartialTicks() {
+    private float getPartialTick() {
         Minecraft minecraft = Minecraft.getInstance();
-        return (minecraft.level != null) ? minecraft.level.getGameTime() + minecraft.getFrameTime() : 0;
+        return (minecraft.level != null) ? minecraft.getFrameTime() : 0;
     }
 
     public static ScorcherRenderer getInstance() {

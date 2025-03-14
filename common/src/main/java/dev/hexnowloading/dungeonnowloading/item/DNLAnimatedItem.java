@@ -8,33 +8,33 @@ public interface DNLAnimatedItem<T extends Enum<T> & DNLAnimationState> {
 
     Class<T> getAnimationEnum(); // Get the correct animation enum
 
-    // ✅ Retrieve animation state from NBT
+    // ✅ Retrieve animation state from NBT safely
     default T getAnimationState(ItemStack stack) {
-        if (!stack.hasTag()) return null;
+        if (!stack.hasTag()) return getDefaultAnimationState();
 
         CompoundTag tag = stack.getTag();
         String animationName = tag.getString("AnimationState");
 
-        try {
-            return DNLAnimationState.fromString(getAnimationEnum(), animationName);
-        } catch (IllegalArgumentException e) {
-            System.err.println("⚠ ERROR: Invalid animation state in NBT: " + animationName);
-            return null;
-        }
+        return DNLAnimationState.fromString(getAnimationEnum(), animationName, getDefaultAnimationState());
     }
 
-    // ✅ Retrieve animation start time from NBT
-    default long getAnimationStartTime(ItemStack stack) {
-        if (!stack.hasTag()) return 0;
-        return stack.getTag().getLong("AnimationStartTime");
+    // ✅ Provide a default animation state (Override per item)
+    default T getDefaultAnimationState() {
+        return null; // Items should override this with their own default
     }
 
-    // ✅ Set animation state and store start time in NBT
+
+    // ✅ Set animation state and store start time in NBT (Only if changed)
     default void setAnimationState(ItemStack stack, T newState, Level level) {
         if (newState == null) return;
 
         CompoundTag tag = stack.getOrCreateTag();
-        tag.putString("AnimationState", newState.getName()); // Store the animation state
-        tag.putLong("AnimationStartTime", level.getGameTime()); // Store when animation started
+
+        // Only update if animation state has changed
+        String currentState = tag.getString("AnimationState");
+        if (!currentState.equals(newState.getName())) {
+            tag.putString("AnimationState", newState.getName());
+            tag.putLong("AnimationStartTime", level.getGameTime());
+        }
     }
 }

@@ -7,13 +7,14 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3f;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-public class AnimatedItemModel extends Model {
+public abstract class AnimatedItemModel extends Model {
 
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
 
@@ -25,26 +26,28 @@ public class AnimatedItemModel extends Model {
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
     }
 
-    public ModelPart root() {
-        return null;
-    }
+    public abstract ModelPart root(); // Ensure each model provides a root
 
     public Optional<ModelPart> getAnyDescendantWithName(String string) {
-        return string.equals("root") ? Optional.of(this.root()) : this.root().getAllParts().filter((p_233400_) -> {
-            return p_233400_.hasChild(string);
-        }).findFirst().map((p_233397_) -> {
-            return p_233397_.getChild(string);
-        });
+        return string.equals("root") ? Optional.of(this.root()) : this.root().getAllParts()
+                .filter(part -> part.hasChild(string))
+                .findFirst()
+                .map(part -> part.getChild(string));
     }
 
-    public void animate(AnimationState animationState, AnimationDefinition animationDefinition ,float ageInTicks) {
-        this.animate(animationState, animationDefinition, ageInTicks, 1.0F);
-    }
+    /*public void animate(Player player, ItemStack stack, String animationKey, AnimationDefinition animationDefinition, float ageInTicks) {
+        Level level = player.level();
+        float progress = ItemAnimationState.getProgress(stack, animationKey, level.getGameTime());
 
-    public void animate(AnimationState animationState, AnimationDefinition animationDefinition, float ageInTicks, float i) {
-        animationState.updateTime(ageInTicks, i);
-        animationState.ifStarted(animationState1 -> {
-            ItemKeyframeAnimations.animate(this, animationDefinition, animationState1.getAccumulatedTime(), 1.0F, ANIMATION_VECTOR_CACHE);
-        });
+        if (progress > 0) {
+            this.animate(stack, animationKey, animationDefinition, (long) progress);
+        }
+    }*/
+
+    public void animate(String animationKey, AnimationDefinition animationDefinition, ItemStack stack, Player player, float partialTicks) {
+        float progress = ItemAnimationState.getProgress(stack, animationKey, player.level().getGameTime(), partialTicks);
+        if (progress > 0) {
+            ItemKeyframeAnimations.animate(this, animationDefinition, (long)(progress * animationDefinition.lengthInSeconds() * 1000), 1.0F, ANIMATION_VECTOR_CACHE);
+        }
     }
 }

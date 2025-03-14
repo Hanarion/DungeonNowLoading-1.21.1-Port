@@ -1,43 +1,59 @@
 package dev.hexnowloading.dungeonnowloading.item.client;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemAnimationState {
-    private static final String NBT_KEY = "AnimationStartTime";
-    private static final String NBT_DURATION = "AnimationDuration";
-    private static final String NBT_LOOPING = "AnimationLooping";
+    private static final String ANIMATIONS_TAG = "Animations"; // NBT Key
 
-    public static void startAnimation(ItemStack stack, long currentGameTime, long duration, boolean looping) {
+    // ✅ Starts a specific animation for this item
+    public static void start(ItemStack stack, String animationName, long gameTime, long duration, boolean loop) {
         CompoundTag tag = stack.getOrCreateTag();
-        tag.putLong(NBT_KEY, currentGameTime);
-        tag.putLong(NBT_DURATION, duration);
-        tag.putBoolean(NBT_LOOPING, looping);
+        CompoundTag animationsTag = tag.getCompound(ANIMATIONS_TAG);
+
+        CompoundTag animTag = new CompoundTag();
+        animTag.putLong("StartTime", gameTime);
+        animTag.putLong("Duration", duration);
+        animTag.putBoolean("Looping", loop);
+
+        animationsTag.put(animationName, animTag);
+        tag.put(ANIMATIONS_TAG, animationsTag);
     }
 
-    public static void stopAnimation(ItemStack stack) {
-        stack.getOrCreateTag().remove(NBT_KEY);
-    }
-
-    public static boolean isAnimating(ItemStack stack) {
-        return stack.hasTag() && stack.getTag().contains(NBT_KEY);
-    }
-
-    public static float getProgress(ItemStack stack, long currentGameTime) {
-        if (!isAnimating(stack)) return 0.0F;
-
-        CompoundTag tag = stack.getTag();
-        long startTime = tag.getLong(NBT_KEY);
-        long duration = tag.getLong(NBT_DURATION);
-        boolean looping = tag.getBoolean(NBT_LOOPING);
-
-        long elapsedTime = currentGameTime - startTime;
-        if (!looping && elapsedTime >= duration) {
-            stopAnimation(stack);
-            return 1.0F; // Animation has fully completed
+    public static void startIfStopped(ItemStack stack, String animationName, long gameTime, long duration, boolean loop) {
+        if (!isAnimating(stack, animationName, gameTime)) {
+            start(stack, animationName, gameTime, duration, loop);
         }
+    }
 
-        return Mth.clamp((float) elapsedTime / duration, 0.0F, 1.0F);
+    public static float getProgress(ItemStack stack, String animationName, long gameTime, float partialTicks) {
+        if (!stack.hasTag()) return 0.0f;
+
+        CompoundTag animationsTag = stack.getTag().getCompound("Animations");
+        if (!animationsTag.contains(animationName)) return 0.0f;
+
+        CompoundTag animTag = animationsTag.getCompound(animationName);
+        long startTime = animTag.getLong("StartTime");
+        long duration = animTag.getLong("Duration");
+
+        if (duration <= 0) return 0.0f; // Prevent divide by zero
+
+        float progress = (float) (gameTime + partialTicks - startTime) / duration;
+
+        return Math.min(progress, 1.0f);
+    }
+
+    public static boolean isAnimating(ItemStack stack, String animationName, long gameTime) {
+        if (!stack.hasTag()) return false;
+
+        CompoundTag animationsTag = stack.getTag().getCompound(ANIMATIONS_TAG);
+        if (!animationsTag.contains(animationName)) return false;
+
+        CompoundTag animTag = animationsTag.getCompound(animationName);
+        long startTime = animTag.getLong("StartTime");
+        long duration = animTag.getLong("Duration");
+        boolean looping = animTag.getBoolean("Looping");
+
+        return looping || (gameTime - startTime) < duration;
     }
 }

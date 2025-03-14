@@ -3,7 +3,6 @@ package dev.hexnowloading.dungeonnowloading.item.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.item.DNLAnimationState;
 import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
 import dev.hexnowloading.dungeonnowloading.item.client.AnimatedItemModel;
 import dev.hexnowloading.dungeonnowloading.item.client.animation.ScorcherAnimation;
@@ -13,7 +12,6 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -110,22 +108,10 @@ public class ScorcherModel extends AnimatedItemModel {
         scorcher.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
-    public void setUpAnim(ScorcherItem item, Player player, ItemStack stack, float ageInTicks) {
+    public void setUpAnim(ScorcherItem item, Player player, ItemStack stack, float partialTicks) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
 
-        item.updateAnimation(stack, player.level(), player);
-
-        DNLAnimationState genericState = item.getAnimationState(stack);
-        float progress = item.getAnimationProgress(stack, player.level());
-
-        if (genericState instanceof ScorcherItem.ScorcherAnimationState state) {
-            switch (state) {
-                case SCORCHER_ACTIVATED ->
-                        this.animate("scorcher_activated", ScorcherAnimation.SCORCHER_ACTIVATE, progress);
-                case SCORCHER_IDLE ->
-                        this.animate("scorcher_idle", ScorcherAnimation.SCORCHER_SHOOT, progress);
-            }
-        }
+        this.animate(ScorcherItem.ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), ScorcherAnimation.SCORCHER_ACTIVATE, stack, player, partialTicks);
     }
 
     @Override
