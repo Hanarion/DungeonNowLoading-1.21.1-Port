@@ -35,15 +35,6 @@ public abstract class AnimatedItemModel extends Model {
                 .map(part -> part.getChild(string));
     }
 
-    /*public void animate(Player player, ItemStack stack, String animationKey, AnimationDefinition animationDefinition, float ageInTicks) {
-        Level level = player.level();
-        float progress = ItemAnimationState.getProgress(stack, animationKey, level.getGameTime());
-
-        if (progress > 0) {
-            this.animate(stack, animationKey, animationDefinition, (long) progress);
-        }
-    }*/
-
     public void animate(String animationKey, AnimationDefinition animationDefinition, ItemStack stack, Player player, float partialTicks) {
         float progress = ItemAnimationState.getProgress(stack, animationKey, player.level().getGameTime(), partialTicks);
         if (progress > 0) {

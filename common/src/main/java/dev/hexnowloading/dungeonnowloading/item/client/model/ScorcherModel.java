@@ -16,14 +16,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class ScorcherModel extends AnimatedItemModel {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher.png");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher.png");
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "scorcher"), "main");
     private final ModelPart root;
     private final ModelPart scorcher;
     private final ModelPart vfx;
-    private final ModelPart smokepuffsmall;
-    private final ModelPart smokepuffbig;
-    private final ModelPart smokepuffcluster;
     private final ModelPart firebig;
     private final ModelPart firemedium;
     private final ModelPart firesmall;
@@ -41,9 +38,6 @@ public class ScorcherModel extends AnimatedItemModel {
         this.root = root;
         this.scorcher = root.getChild("scorcher");
         this.vfx = this.scorcher.getChild("vfx");
-        this.smokepuffsmall = this.vfx.getChild("smokepuffsmall");
-        this.smokepuffbig = this.vfx.getChild("smokepuffbig");
-        this.smokepuffcluster = this.vfx.getChild("smokepuffcluster");
         this.firebig = this.vfx.getChild("firebig");
         this.firemedium = this.vfx.getChild("firemedium");
         this.firesmall = this.vfx.getChild("firesmall");
@@ -64,12 +58,6 @@ public class ScorcherModel extends AnimatedItemModel {
         PartDefinition scorcher = partdefinition.addOrReplaceChild("scorcher", CubeListBuilder.create(), PartPose.offset(-0.5F, 21.5F, 2.0F));
 
         PartDefinition vfx = scorcher.addOrReplaceChild("vfx", CubeListBuilder.create(), PartPose.offset(0.5F, 2.5F, -2.0F));
-
-        PartDefinition smokepuffsmall = vfx.addOrReplaceChild("smokepuffsmall", CubeListBuilder.create().texOffs(44, 30).addBox(-9.0F, -7.0F, 0.0F, 10.0F, 8.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(-49.0F, -2.0F, -1.0F));
-
-        PartDefinition smokepuffbig = vfx.addOrReplaceChild("smokepuffbig", CubeListBuilder.create().texOffs(40, 48).addBox(-1.0F, -10.0F, 0.0F, 12.0F, 11.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(-33.0F, 0.0F, -1.0F));
-
-        PartDefinition smokepuffcluster = vfx.addOrReplaceChild("smokepuffcluster", CubeListBuilder.create().texOffs(40, 38).addBox(-6.0F, -5.0F, 0.0F, 12.0F, 10.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(-41.0F, -5.0F, -1.0F));
 
         PartDefinition firebig = vfx.addOrReplaceChild("firebig", CubeListBuilder.create().texOffs(54, 0).addBox(-2.5F, -8.0F, 0.0F, 5.0F, 11.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(-18.5F, -3.0F, -1.0F));
 
@@ -112,6 +100,11 @@ public class ScorcherModel extends AnimatedItemModel {
         this.root().getAllParts().forEach(ModelPart::resetPose);
 
         this.animate(ScorcherItem.ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), ScorcherAnimation.SCORCHER_ACTIVATE, stack, player, partialTicks);
+        this.animate(ScorcherItem.ScorcherAnimationState.SCORCHER_SHOOT.getName(), ScorcherAnimation.SCORCHER_SHOOT, stack, player, partialTicks);
+        this.animate(ScorcherItem.ScorcherAnimationState.SCORCHER_STOP.getName(), ScorcherAnimation.SCORCHER_STOP, stack, player, partialTicks);
+        this.animate(ScorcherItem.ScorcherAnimationState.SCORCHER_STALLING.getName(), ScorcherAnimation.SCORCHER_STALLING, stack, player, partialTicks);
+        this.animate(ScorcherItem.ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), ScorcherAnimation.SCORCHER_OVERHEAT, stack, player, partialTicks);
+        this.animate(ScorcherItem.ScorcherAnimationState.SCORCHER_BASE.getName(), ScorcherAnimation.SCORCHER_BASE, stack, player, partialTicks);
     }
 
     @Override

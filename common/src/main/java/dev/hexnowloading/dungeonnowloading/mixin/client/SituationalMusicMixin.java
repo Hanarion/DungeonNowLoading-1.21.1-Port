@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.client;
 
-import dev.hexnowloading.dungeonnowloading.network.packets.ClientboundStructureDetectionPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStructureDetectionPacket;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMusics;
 import net.minecraft.Optionull;
 import net.minecraft.client.Minecraft;
@@ -28,7 +28,7 @@ public abstract class SituationalMusicMixin {
         Music music = (Music) Optionull.map(screen, Screen::getBackgroundMusic);
 
         if (music == null && player != null) {
-            if (ClientboundStructureDetectionPacket.isClientInStructure()) {
+            if (S2CStructureDetectionPacket.isClientInStructure()) {
                 cir.setReturnValue(DNLMusics.TEMPLE_OF_DUALITY_MUSIC.get());
             }
         }

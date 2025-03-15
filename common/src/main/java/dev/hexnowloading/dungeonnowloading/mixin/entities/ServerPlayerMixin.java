@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.entities;
 
-import dev.hexnowloading.dungeonnowloading.network.packets.ClientboundStructureDetectionPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStructureDetectionPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.core.BlockPos;
@@ -33,6 +33,6 @@ public abstract class ServerPlayerMixin {
 
         boolean isInTemple = serverLevel().structureManager().getStructureWithPieceAt(currentPos, DNLTags.TEMPLE_OF_DUALITY).isValid();
 
-        Services.NETWORK.sendToPlayer(new ClientboundStructureDetectionPacket(isInTemple, player.getId()), player);
+        Services.NETWORK.sendToPlayer(new S2CStructureDetectionPacket(isInTemple, player.getId()), player);
     }
 }

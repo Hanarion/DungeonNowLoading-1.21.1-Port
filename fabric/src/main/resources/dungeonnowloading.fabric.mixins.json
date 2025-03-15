@@ -16,6 +16,7 @@
     "block.FenceMixin",
     "block.WallMixin",
     "block.IronBarsMixin",
+    "items.ItemStackMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
     "fabric.block.BlockPlaceMixin",

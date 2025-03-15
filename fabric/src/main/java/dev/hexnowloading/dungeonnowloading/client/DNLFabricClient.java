@@ -45,6 +45,7 @@ public class DNLFabricClient implements ClientModInitializer {
 
         // Item
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
+        BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SOUL_SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
         //BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), new DifferentProspectiveItemRenderer(DNLClientRegistry.SCORCHER_3D_MODEL, DNLClientRegistry.SCORCHER_3D_MODEL));
 
     }

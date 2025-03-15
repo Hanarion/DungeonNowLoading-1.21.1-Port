@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ClientboundStructureDetectionPacket implements DNLPacket {
+public class S2CStructureDetectionPacket implements DNLPacket {
 
     private final boolean insideStructure;
     private final int playerId;
@@ -19,7 +19,7 @@ public class ClientboundStructureDetectionPacket implements DNLPacket {
     private static final Map<UUID, Boolean> playerStructureStatus = new HashMap<>();
 
 
-    public ClientboundStructureDetectionPacket(boolean insideStructure, int playerId) {
+    public S2CStructureDetectionPacket(boolean insideStructure, int playerId) {
         this.insideStructure = insideStructure;
         this.playerId = playerId;
     }
@@ -30,8 +30,8 @@ public class ClientboundStructureDetectionPacket implements DNLPacket {
         buffer.writeInt(playerId);
     }
 
-    public static ClientboundStructureDetectionPacket decode(FriendlyByteBuf buffer) {
-        return new ClientboundStructureDetectionPacket(buffer.readBoolean(), buffer.readInt());
+    public static S2CStructureDetectionPacket decode(FriendlyByteBuf buffer) {
+        return new S2CStructureDetectionPacket(buffer.readBoolean(), buffer.readInt());
     }
 
     @Override

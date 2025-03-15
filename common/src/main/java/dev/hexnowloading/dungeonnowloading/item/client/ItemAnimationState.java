@@ -1,13 +1,20 @@
 package dev.hexnowloading.dungeonnowloading.item.client;
 
+import dev.hexnowloading.dungeonnowloading.network.packets.C2SItemAnimationPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ItemAnimationState {
-    private static final String ANIMATIONS_TAG = "Animations"; // NBT Key
 
-    // ✅ Starts a specific animation for this item
-    public static void start(ItemStack stack, String animationName, long gameTime, long duration, boolean loop) {
+    private static final String ANIMATIONS_TAG = "Animations";
+
+    public static void start(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
+        if (resetAnimations) stopAll(stack);
+
         CompoundTag tag = stack.getOrCreateTag();
         CompoundTag animationsTag = tag.getCompound(ANIMATIONS_TAG);
 
@@ -18,11 +25,29 @@ public class ItemAnimationState {
 
         animationsTag.put(animationName, animTag);
         tag.put(ANIMATIONS_TAG, animationsTag);
+
+        /*if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.level().isClientSide) {
+            Services.NETWORK.sendToServer(new C2SItemAnimationPacket(animationName, duration, loop));
+        }*/
     }
 
-    public static void startIfStopped(ItemStack stack, String animationName, long gameTime, long duration, boolean loop) {
+    public static void startAndSendPacket(Level level, Player player, ItemStack itemStack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
+        if (level.isClientSide) {
+            ItemAnimationState.start(itemStack, animationName, gameTime, duration, loop, resetAnimations);
+        }
+        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+            ItemAnimationState.start(itemStack, animationName, gameTime, duration, loop, resetAnimations);
+            ItemAnimationState.sendStartAnimationPacket(serverPlayer, animationName, duration, loop, resetAnimations);
+        }
+    }
+
+    public static void sendStartAnimationPacket(ServerPlayer serverPlayer, String animationName, long duration, boolean loop, boolean resetAnimations) {
+        Services.NETWORK.sendToServer(new C2SItemAnimationPacket(serverPlayer.getUUID(), animationName, duration, loop, resetAnimations));
+    }
+
+    public static void startIfStopped(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
         if (!isAnimating(stack, animationName, gameTime)) {
-            start(stack, animationName, gameTime, duration, loop);
+            start(stack, animationName, gameTime, duration, loop, resetAnimations);
         }
     }
 
@@ -43,6 +68,24 @@ public class ItemAnimationState {
         return Math.min(progress, 1.0f);
     }
 
+    public static String getCurrentAnimation(ItemStack stack, long gameTime) {
+        if (!stack.hasTag()) return null;
+
+        CompoundTag animationsTag = stack.getTag().getCompound(ANIMATIONS_TAG);
+
+        for (String key : animationsTag.getAllKeys()) {
+            CompoundTag animTag = animationsTag.getCompound(key);
+            long startTime = animTag.getLong("StartTime");
+            long duration = animTag.getLong("Duration");
+            boolean looping = animTag.getBoolean("Looping");
+
+            if (looping || (gameTime - startTime) < duration) {
+                return key; // Return the first valid animation found
+            }
+        }
+        return null; // No active animation
+    }
+
     public static boolean isAnimating(ItemStack stack, String animationName, long gameTime) {
         if (!stack.hasTag()) return false;
 
@@ -55,5 +98,14 @@ public class ItemAnimationState {
         boolean looping = animTag.getBoolean("Looping");
 
         return looping || (gameTime - startTime) < duration;
+    }
+
+    public static void stopAll(ItemStack itemStack) {
+        if (!itemStack.hasTag()) return;
+
+        CompoundTag tag = itemStack.getTag();
+        if (tag.contains(ANIMATIONS_TAG)) {
+            tag.remove(ANIMATIONS_TAG);
+        }
     }
 }
