@@ -82,8 +82,9 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
     private float getFlameAlpha(Player player, ItemStack itemStack) {
         long gameTime = player.level().getGameTime();
         float partialTick = getPartialTick();
+        System.out.println(ItemAnimationState.getCurrentAnimation(itemStack, gameTime));
         if (ItemAnimationState.isAnimating(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime)) {
-            return ItemAnimationState.getProgress(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime, getPartialTick());
+            return Math.min(ItemAnimationState.getProgress(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime, getPartialTick()), 1.0F);
         } else if (ItemAnimationState.isAnimating(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime)) {
             return 1.0F - ItemAnimationState.getProgress(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime, getPartialTick());
         } else if (ItemAnimationState.isAnimating(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime)) {
@@ -103,16 +104,6 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
             return Math.max(0.0F, 1.0F - fadeProgress);
         }
         return 0;
-    }
-
-    private void updateOncePerTick(Player player, ItemStack itemStack) {
-        long currentTick = player.level().getGameTime();
-
-        if (currentTick == lastProcessedTick) {
-            return;
-        }
-        lastProcessedTick = currentTick;
-
     }
 
     private float getPartialTick() {

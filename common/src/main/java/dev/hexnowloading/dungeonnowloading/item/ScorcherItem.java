@@ -30,6 +30,10 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        if (level.isClientSide) {
+            return InteractionResultHolder.fail(stack);
+        }
+
         if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), level.getGameTime())) {
             return InteractionResultHolder.fail(stack);
         }
@@ -52,6 +56,8 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
     @Override
     public void onUseTick(Level level, LivingEntity player, ItemStack itemStack, int remainingUseDuration) {
+        if (level.isClientSide) return;
+
         int chargeTime = getUseDuration(itemStack) - remainingUseDuration;
         float maxHeatDuration = ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20;
         float overHeatedDuration = ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() / ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds();
@@ -60,9 +66,8 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         boolean animCheck = ItemAnimationState.isAnimating(itemStack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), level.getGameTime());
 
         if (animCheck) {
-            if (!level.isClientSide) {
-                shootFlame(level, player);
-            }
+            shootFlame(level, player);
+
             float heat = getHeatLevel(itemStack);
             heat = Math.min(1.0F, heat + heatIncreasePerTick);
             setHeatAndSendPacket(level, (Player) player, itemStack, heat);
@@ -70,12 +75,13 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             if (heat >= 1.0F) {
                 ItemAnimationState.startAndSendPacket(level, (Player) player, itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() * 20L), false, true);
                 setHeatAndSendPacket(level, (Player) player, itemStack, overHeatedDuration);
+                ((Player) player).getCooldowns().addCooldown(this, 160);
                 player.releaseUsingItem();
                 return;
             }
         }
 
-        float activeAnimDuration = ScorcherAnimation.SCORCHER_ACTIVATE.lengthInSeconds() * 20;
+        float activeAnimDuration = ScorcherAnimation.SCORCHER_ACTIVATE.lengthInSeconds() * 20 - 1;
         float shootAnimDuration = ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20 + activeAnimDuration;
 
 
@@ -94,6 +100,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         if (chargeTime == shootAnimDuration) {
             ItemAnimationState.startAndSendPacket(level, (Player) player, itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() * 20L), false, true);
             setHeatAndSendPacket(level, (Player) player, itemStack, overHeatedDuration);
+            ((Player) player).getCooldowns().addCooldown(this, 160);
             player.releaseUsingItem();
         }
 
@@ -121,10 +128,10 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
                 setHeatAndSendPacket(level, player, stack, heat);
             }
         }
-        if (!isSelected) {
+        if (level.isClientSide && !isSelected) {
             if (!ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime)) {
                 if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime)) {
-                    ItemAnimationState.startAndSendPacket(level, (Player) entity, stack, ScorcherAnimationState.SCORCHER_STOP.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_STOP.lengthInSeconds() * 20L), false, true);
+                    ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_STOP.lengthInSeconds() * 20L), false, true);
                 } else if (!ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime)) {
                     ItemAnimationState.stopAll(stack);
                 }
@@ -144,12 +151,13 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
                 player.getZ() + viewVector.z * viewDistance
         );
         flame.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 0.3F, 1.0F);
-
         level.addFreshEntity(flame);
     }
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity player, int timeCharged) {
+
+        if (level.isClientSide) return;
 
         if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime())) {
             return;

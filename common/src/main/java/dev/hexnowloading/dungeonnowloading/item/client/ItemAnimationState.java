@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item.client;
 
-import dev.hexnowloading.dungeonnowloading.network.packets.C2SItemAnimationPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CItemAnimationPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,17 +32,14 @@ public class ItemAnimationState {
     }
 
     public static void startAndSendPacket(Level level, Player player, ItemStack itemStack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
-        if (level.isClientSide) {
-            ItemAnimationState.start(itemStack, animationName, gameTime, duration, loop, resetAnimations);
-        }
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+        if (player instanceof ServerPlayer serverPlayer) {
             ItemAnimationState.start(itemStack, animationName, gameTime, duration, loop, resetAnimations);
             ItemAnimationState.sendStartAnimationPacket(serverPlayer, animationName, duration, loop, resetAnimations);
         }
     }
 
     public static void sendStartAnimationPacket(ServerPlayer serverPlayer, String animationName, long duration, boolean loop, boolean resetAnimations) {
-        Services.NETWORK.sendToServer(new C2SItemAnimationPacket(serverPlayer.getUUID(), animationName, duration, loop, resetAnimations));
+        Services.NETWORK.sendToAllPlayers(new S2CItemAnimationPacket(serverPlayer.getUUID(), animationName, duration, loop, resetAnimations), serverPlayer.getServer());
     }
 
     public static void startIfStopped(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
