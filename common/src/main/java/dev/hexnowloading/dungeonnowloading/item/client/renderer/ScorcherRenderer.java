@@ -17,6 +17,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
+import static dev.hexnowloading.dungeonnowloading.item.ScorcherItem.getHeatLevel;
+
 public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
 
     private static final ResourceLocation TEXTURE_EMISSIVE_FLAME = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher_emissive_flame.png");
@@ -27,11 +29,7 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
     private static final RenderType RENDER_TYPE_EMISSIVE_HEAT = RenderType.entityTranslucent(TEXTURE_EMISSIVE_HEAT);
 
     private ScorcherModel model;
-
-    private static long lastProcessedTick = -1;
-
-    private static final String LAST_USE_TAG = "LastScorcherUseTime";
-    private static final String HEAT_LEVEL_TAG = "ScorcherHeatLevel";
+    private ScorcherModel guiModel;
 
     public ScorcherRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
@@ -42,41 +40,55 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
         poseStack.pushPose();
 
         if (this.model == null) {
-            this.model = new ScorcherModel(Minecraft.getInstance().getEntityModels().bakeLayer(ScorcherModel.LAYER_LOCATION));
+            if (onlyRenderInHands(itemDisplayContext)) {
+                this.model = new ScorcherModel(Minecraft.getInstance().getEntityModels().bakeLayer(ScorcherModel.LAYER_LOCATION));
+            } else {
+                this.guiModel = new ScorcherModel(Minecraft.getInstance().getEntityModels().bakeLayer(ScorcherModel.LAYER_LOCATION));
+            }
         }
 
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.translate(0, 0, 1.5 / 16);
+        poseStack.translate(0, 0, 0.0);
         poseStack.scale(-1.0F, -1.0f, 1.0f);
 
-        float flameAlpha = 0.0f;
-        float heatAlpha = 0.0f;
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(this.model.renderType(ScorcherModel.TEXTURE));
-        if (itemStack.getItem() instanceof ScorcherItem scorcherItem) {
-            Player player = Minecraft.getInstance().player;
-            if (player == null) return;
-            this.model.setUpAnim(scorcherItem, player, itemStack, getPartialTick());
-            flameAlpha = getFlameAlpha(player, itemStack);
-            int playerHeat = ScorcherItem.getPlayerHeat(player);
-            heatAlpha = Math.min((float) playerHeat / 120, 1.0F);
-        }
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0f, 1.0f, 1.0f, 1.0f);
+        if (onlyRenderInHands(itemDisplayContext)) {
+            float flameAlpha = 0.0f;
+            float heatAlpha = Math.min(getHeatLevel(itemStack), 1.0f);
 
-        if (flameAlpha > 0.0F) {
-            VertexConsumer emissiveFlame = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_FLAME);
-            if (itemStack.is(DNLItems.SOUL_SCORCHER.get())) {
-                emissiveFlame = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_SOUL_FLAME);
+            VertexConsumer vertexConsumer = bufferSource.getBuffer(this.model.renderType(ScorcherModel.TEXTURE));
+            if (itemStack.getItem() instanceof ScorcherItem scorcherItem) {
+                Player player = Minecraft.getInstance().player;
+                if (player == null) return;
+                this.model.setUpAnim(scorcherItem, player, itemStack, getPartialTick());
+                flameAlpha = getFlameAlpha(player, itemStack);
             }
-            this.model.renderToBuffer(poseStack, emissiveFlame, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, flameAlpha);
+
+            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0f, 1.0f, 1.0f, 1.0f);
+
+            if (flameAlpha > 0.0F) {
+                VertexConsumer emissiveFlame = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_FLAME);
+                if (itemStack.is(DNLItems.SOUL_SCORCHER.get())) {
+                    emissiveFlame = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_SOUL_FLAME);
+                }
+                this.model.renderToBuffer(poseStack, emissiveFlame, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, flameAlpha);
+            }
+
+            if (heatAlpha > 0.0F) {
+                VertexConsumer emissiveHeat = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_HEAT);
+                this.model.renderToBuffer(poseStack, emissiveHeat, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, heatAlpha);
+            }
+        } else {
+            VertexConsumer vertexConsumer = bufferSource.getBuffer(this.guiModel.renderType(ScorcherModel.TEXTURE));
+            this.guiModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0f, 1.0f, 1.0f, 1.0f);
         }
 
-        if (heatAlpha > 0.0F) {
-            VertexConsumer emissiveHeat = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_HEAT);
-            this.model.renderToBuffer(poseStack, emissiveHeat, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, heatAlpha);
-        }
 
         poseStack.popPose();
+    }
+
+    private boolean onlyRenderInHands(ItemDisplayContext itemDisplayContext) {
+        return itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
     }
 
     private float getFlameAlpha(Player player, ItemStack itemStack) {

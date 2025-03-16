@@ -18,7 +18,6 @@
         "items.ItemStackMixin",
         "entities.EntityAvoidBlockMixin",
         "entities.ServerPlayerMixin",
-        "entities.ScorcherHeatMixin",
         "structures.StructureProcessorAccessor",
         "structures.StructureTemplateMixin",
         "structures.NoGeodesInStructuresMixin",
