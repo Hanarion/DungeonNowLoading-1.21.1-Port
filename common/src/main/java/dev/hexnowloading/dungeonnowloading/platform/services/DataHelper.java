@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface DataHelper {
 
-    void setPoint(Player player, int amount);
+    int getScorcherHeat(Player player);
 
-    int getPoint(Player player);
+    void setScorcherHeat(Player player, int heat);
 
     Optional<List<BlockPos>> getFairkeeperChestPositionList(Player player);
 

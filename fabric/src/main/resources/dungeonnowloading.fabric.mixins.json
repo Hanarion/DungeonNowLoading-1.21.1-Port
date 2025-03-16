@@ -19,6 +19,7 @@
     "items.ItemStackMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
+    "entities.ScorcherHeatMixin",
     "fabric.block.BlockPlaceMixin",
     "fabric.block.BucketItemMixin",
     "fabric.block.FlintAndSteelMixin",

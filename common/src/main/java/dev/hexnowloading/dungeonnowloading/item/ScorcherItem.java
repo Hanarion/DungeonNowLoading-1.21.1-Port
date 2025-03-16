@@ -3,7 +3,6 @@ package dev.hexnowloading.dungeonnowloading.item;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.item.client.ItemAnimationState;
 import dev.hexnowloading.dungeonnowloading.item.client.animation.ScorcherAnimation;
-import dev.hexnowloading.dungeonnowloading.network.packets.S2CScorcherHeatPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +41,6 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime())) {
             ItemAnimationState.startAndSendPacket(level, player, stack, ScorcherAnimationState.SCORCHER_STALLING.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_STALLING.lengthInSeconds() * 20L), false, false);
 
-            System.out.println(level + " : Has Overheated");
             return InteractionResultHolder.fail(stack);
         }
 
@@ -61,32 +59,23 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
         if (!(entity instanceof Player player)) return;
 
-        int slot = -1;
-
-        if (player.getMainHandItem() == itemStack) {
-            slot = player.getInventory().selected;
-        } else if (player.getOffhandItem() == itemStack) {
-            slot = 40;
-        }
 
         int chargeTime = getUseDuration(itemStack) - remainingUseDuration;
-        float maxHeatDuration = ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20;
-        float overHeatedDuration = ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() / ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds();
-        float heatIncreasePerTick = 1.0f / maxHeatDuration;
+        int overHeatedDuration = 160;
 
         boolean animCheck = ItemAnimationState.isAnimating(itemStack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), level.getGameTime());
 
         if (animCheck) {
             shootFlame(level, player, itemStack);
 
-            float heat = getHeatLevel(itemStack);
-            heat = Math.min(1.0F, heat + heatIncreasePerTick);
-            setHeatAndSendPacket(level, (Player) player, itemStack, slot, heat);
+            int heat = getPlayerHeat(player);
+            setPlayerHeat(player, heat + 1);
 
-            if (heat >= 1.0F) {
+            if (heat >= 120) {
                 ItemAnimationState.startAndSendPacket(level, (Player) player, itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() * 20L), false, true);
-                setHeatAndSendPacket(level, (Player) player, itemStack, slot, overHeatedDuration);
-                ((Player) player).getCooldowns().addCooldown(this, 160);
+                setPlayerHeat(player, overHeatedDuration);
+                player.getCooldowns().addCooldown(DNLItems.SCORCHER.get(), 160);
+                player.getCooldowns().addCooldown(DNLItems.SOUL_SCORCHER.get(), 160);
                 player.releaseUsingItem();
                 return;
             }
@@ -110,7 +99,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
         if (chargeTime == shootAnimDuration) {
             ItemAnimationState.startAndSendPacket(level, (Player) player, itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() * 20L), false, true);
-            setHeatAndSendPacket(level, (Player) player, itemStack, slot, overHeatedDuration);
+            setPlayerHeat(player, overHeatedDuration);
             ((Player) player).getCooldowns().addCooldown(this, 160);
             player.releaseUsingItem();
         }
@@ -119,7 +108,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean isSelected) {
         long gameTime = level.getGameTime();
-        decreaseHeat(level, entity, stack, gameTime, slot);
+        //decreaseHeat(level, entity, stack, gameTime, slot);
         if (level.isClientSide && !isSelected) {
             if (!ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime)) {
                 if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime)) {
@@ -131,7 +120,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         }
     }
 
-    private void decreaseHeat(Level level, Entity entity, ItemStack stack, long gameTime, int slot) {
+    /*private void decreaseHeat(Level level, Entity entity, ItemStack stack, long gameTime, int slot) {
         if (!level.isClientSide && stack.getItem() instanceof ScorcherItem && entity instanceof Player player) {
 
             for (int i = 0; i < 9; i++) {
@@ -154,7 +143,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             heat = Math.max(0.0F, heat - heatDecayPerTick);
             setHeatAndSendPacket(level, player, stack, slot, heat);
         }
-    }
+    }*/
 
     private void shootFlame(Level level, LivingEntity player, ItemStack itemStack) {
         Vec3 eyePosition = player.getEyePosition(); // ✅ Get eye position like arrows
@@ -207,6 +196,14 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
     }
 
+    public static int getPlayerHeat(Player player) {
+        return Services.DATA.getScorcherHeat(player);
+    }
+
+    public static void setPlayerHeat(Player player, int heat) {
+        Services.DATA.setScorcherHeat(player, heat);
+    }
+
     @Override
     public int getUseDuration(ItemStack stack) {
         return 72000;
@@ -216,10 +213,10 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         stack.getOrCreateTag().putFloat(HEAT_TAG, heatLevel);
     }
 
-    private static void setHeatAndSendPacket(Level level, Player player, ItemStack itemStack, int slot, float heatLevel) {
+    /*private static void setHeatAndSendPacket(Level level, Player player, ItemStack itemStack, int slot, float heatLevel) {
         setHeatLevel(itemStack, heatLevel);
         Services.NETWORK.sendToAllPlayers(new S2CScorcherHeatPacket(itemStack, player.getUUID(), slot, heatLevel), player.getServer());
-    }
+    }*/
 
     private static void ensureUUID(ItemStack stack) {
         if (!stack.hasTag()) {

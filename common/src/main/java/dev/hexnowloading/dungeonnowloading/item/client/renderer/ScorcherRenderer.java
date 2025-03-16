@@ -17,8 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-import static dev.hexnowloading.dungeonnowloading.item.ScorcherItem.getHeatLevel;
-
 public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
 
     private static final ResourceLocation TEXTURE_EMISSIVE_FLAME = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher_emissive_flame.png");
@@ -52,7 +50,7 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
         poseStack.scale(-1.0F, -1.0f, 1.0f);
 
         float flameAlpha = 0.0f;
-        float heatAlpha = Math.min(getHeatLevel(itemStack), 1.0f);
+        float heatAlpha = 0.0f;
 
         VertexConsumer vertexConsumer = bufferSource.getBuffer(this.model.renderType(ScorcherModel.TEXTURE));
         if (itemStack.getItem() instanceof ScorcherItem scorcherItem) {
@@ -60,6 +58,8 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
             if (player == null) return;
             this.model.setUpAnim(scorcherItem, player, itemStack, getPartialTick());
             flameAlpha = getFlameAlpha(player, itemStack);
+            int playerHeat = ScorcherItem.getPlayerHeat(player);
+            heatAlpha = Math.min((float) playerHeat / 120, 1.0F);
         }
         this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -82,7 +82,6 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
     private float getFlameAlpha(Player player, ItemStack itemStack) {
         long gameTime = player.level().getGameTime();
         float partialTick = getPartialTick();
-        System.out.println(ItemAnimationState.getCurrentAnimation(itemStack, gameTime));
         if (ItemAnimationState.isAnimating(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime)) {
             return Math.min(ItemAnimationState.getProgress(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime, getPartialTick()), 1.0F);
         } else if (ItemAnimationState.isAnimating(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime)) {

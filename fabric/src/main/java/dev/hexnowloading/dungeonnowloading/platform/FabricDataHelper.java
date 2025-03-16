@@ -9,13 +9,21 @@ import java.util.List;
 import java.util.Optional;
 
 public class FabricDataHelper implements DataHelper {
+
     @Override
-    public void setPoint(Player player, int amount) {
+    public int getScorcherHeat(Player player) {
+        if (CapabilityList.SCORCHER_HEAT.isProvidedBy(player)) {
+            return CapabilityList.SCORCHER_HEAT.get(player).getValue();
+        }
+        return 0;
     }
 
     @Override
-    public int getPoint(Player player) {
-        return 0;
+    public void setScorcherHeat(Player player, int heat) {
+        if (CapabilityList.SCORCHER_HEAT.isProvidedBy(player)) {
+            CapabilityList.SCORCHER_HEAT.get(player).setValue(heat);
+            CapabilityList.SCORCHER_HEAT.sync(player);
+        }
     }
 
     @Override
