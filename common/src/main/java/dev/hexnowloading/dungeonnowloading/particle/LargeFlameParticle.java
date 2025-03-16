@@ -1,15 +1,16 @@
 package dev.hexnowloading.dungeonnowloading.particle;
 
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.Nullable;
 
 public class LargeFlameParticle extends TextureSheetParticle {
 
+    private final float scale;
     private SpriteSet spriteSet;
 
-    protected LargeFlameParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet spriteSet) {
+    protected LargeFlameParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, float scale, SpriteSet spriteSet) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.quadSize *= 2.9F + level.random.nextFloat() * 0.5F;
         this.hasPhysics = true;
@@ -21,6 +22,7 @@ public class LargeFlameParticle extends TextureSheetParticle {
         this.spriteSet = spriteSet;
         this.friction = 0.95F;
         this.lifetime = 5 + level.random.nextInt(10);
+        this.scale = scale;
     }
 
     @Override
@@ -52,6 +54,11 @@ public class LargeFlameParticle extends TextureSheetParticle {
     }
 
     @Override
+    public float getQuadSize(float quadSize) {
+        return this.quadSize * this.scale;
+    }
+
+    @Override
     public int getLightColor(float $$0) {
         return 240;
     }
@@ -59,7 +66,7 @@ public class LargeFlameParticle extends TextureSheetParticle {
     @Override
     public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
 
-    public static class Factory implements ParticleProvider<SimpleParticleType> {
+    public static class Factory implements ParticleProvider<ScalableParticleType.ScalableParticleData> {
 
         private final SpriteSet sprites;
 
@@ -69,8 +76,8 @@ public class LargeFlameParticle extends TextureSheetParticle {
 
         @Nullable
         @Override
-        public Particle createParticle(SimpleParticleType simpleParticleType, ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            LargeFlameParticle particle = new LargeFlameParticle(clientLevel, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites);
+        public Particle createParticle(ScalableParticleType.ScalableParticleData scalableParticleData, ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+            LargeFlameParticle particle = new LargeFlameParticle(clientLevel, x, y, z, xSpeed, ySpeed, zSpeed, scalableParticleData.getScale(), this.sprites);
             particle.setSprite(sprites.get(0, 1));
             return particle;
         }

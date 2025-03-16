@@ -13,25 +13,28 @@ import java.util.UUID;
 
 public class S2CScorcherHeatPacket implements DNLPacket {
 
-    private UUID itemUUID;
+    private ItemStack itemStack;
     private final UUID playerUUID;
+    private int slot;
     private float heat;
 
-    public S2CScorcherHeatPacket(UUID itemStack, UUID playerUUID, float heat) {
-        this.itemUUID = itemStack;
+    public S2CScorcherHeatPacket(ItemStack itemStack, UUID playerUUID, int slot, float heat) {
+        this.itemStack = itemStack;
         this.playerUUID = playerUUID;
+        this.slot = slot;
         this.heat = heat;
     }
 
     @Override
     public void encode(FriendlyByteBuf buffer) {
-        buffer.writeUUID(itemUUID);
+        buffer.writeItem(itemStack);
         buffer.writeUUID(playerUUID);
+        buffer.writeInt(slot);
         buffer.writeFloat(heat);
     }
 
     public static S2CScorcherHeatPacket decode(FriendlyByteBuf buffer) {
-        return new S2CScorcherHeatPacket(buffer.readUUID(), buffer.readUUID(), buffer.readFloat());
+        return new S2CScorcherHeatPacket(buffer.readItem(), buffer.readUUID(), buffer.readInt(), buffer.readFloat());
     }
 
     @Override
@@ -42,14 +45,10 @@ public class S2CScorcherHeatPacket implements DNLPacket {
         Player player = mc.level.getPlayerByUUID(playerUUID);
         if (player == null) return;
 
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.hasTag() && stack.getTag().contains("ScorcherUUID")) {
-                UUID stackUUID = stack.getTag().getUUID("ScorcherUUID");
-                if (stackUUID.equals(this.itemUUID)) {
-                    ScorcherItem.setHeatLevel(stack, heat);
-                    return; // ✅ Stop once the correct Scorcher is found
-                }
-            }
+        ItemStack stack = player.getInventory().items.get(slot);
+
+        if (stack.is(itemStack.getItem())) {
+            ScorcherItem.setHeatLevel(stack, heat);
         }
     }
 }

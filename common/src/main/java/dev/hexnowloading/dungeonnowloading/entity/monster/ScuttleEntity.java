@@ -7,6 +7,7 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.SlumberingEntityRandomStrol
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
@@ -130,7 +131,8 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
             case OPENED:
                 this.setMouthOpeningStarted(false);
                 this.animateParticles(0.2F, HIGHER_FLAME_HEIGHT, 0.7D);
-                this.level().addParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), this.getX() + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getY() + HIGHER_FLAME_HEIGHT + 0.3D + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getZ() + (this.getRandom().nextFloat() - 0.5D) * 0.3D, 0.0, 0.0, 0.0);
+                ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), 1.0F);
+                this.level().addParticle(particleData, this.getX() + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getY() + HIGHER_FLAME_HEIGHT + 0.3D + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getZ() + (this.getRandom().nextFloat() - 0.5D) * 0.3D, 0.0, 0.0, 0.0);
                 break;
             case CLOSING:
                 if (!this.isMouthClosingStarted()) {
@@ -150,7 +152,8 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
     }
 
     private void animateParticles(float chance, double height, double spread) {
-        this.level().addAlwaysVisibleParticle(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), this.getX() + (this.getRandom().nextFloat() - 0.5D) * spread, this.getY() + height + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getZ() + (this.getRandom().nextFloat() - 0.5D) * spread, 0.0, 0.0, 0.0);
+        ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), 1.0F);
+        this.level().addAlwaysVisibleParticle(particleData, this.getX() + (this.getRandom().nextFloat() - 0.5D) * spread, this.getY() + height + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getZ() + (this.getRandom().nextFloat() - 0.5D) * spread, 0.0, 0.0, 0.0);
         if (this.getRandom().nextFloat() < chance) {
             this.level().addParticle(ParticleTypes.LAVA, this.getX() + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getY() + height + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getZ() + (this.getRandom().nextFloat() - 0.5D) * 0.3D, 0.0, 0.0, 0.0);
             this.level().addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, this.getX() + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getY() + height + (this.getRandom().nextFloat() - 0.5D) * 0.3D, this.getZ() + (this.getRandom().nextFloat() - 0.5D) * 0.3D, 0.0, 0.02, 0.0);

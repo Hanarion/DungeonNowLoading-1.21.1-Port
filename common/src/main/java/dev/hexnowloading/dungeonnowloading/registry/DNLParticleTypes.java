@@ -13,7 +13,8 @@ import java.util.function.Supplier;
 
 public class DNLParticleTypes {
 
-    public static final Supplier<SimpleParticleType> LARGE_FLAME_PARTICLE = register("large_flame", () -> new SimpleParticleTypeOverride(false));
+    public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> LARGE_FLAME_PARTICLE = register("large_flame", () -> new ScalableParticleType(false));
+    public static final Supplier<SimpleParticleType> SCORCHER_FLAME_PARTICLE = register("scorcher_flame", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<ParticleType<AxisParticleType.AxisParticleData>> FAIRKEEPER_BOUNDARY_PARTICLE = register("fairkeeper_boundary", () -> new AxisParticleType(false));
     public static final Supplier<ParticleType<AxisParticleType.AxisParticleData>> VERTEX_BOUNDARY_PARTICLE = register("vertex_boundary", () -> new AxisParticleType(false));
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> REDSTONE_SHOCKWAVE_PARTICLE = register("redstone_shockwave", () -> new ScalableParticleType(false));
