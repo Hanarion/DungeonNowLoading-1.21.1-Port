@@ -1,6 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.mixin.client;
 
+import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
 import dev.hexnowloading.dungeonnowloading.item.VertexBowItem;
+import dev.hexnowloading.dungeonnowloading.item.client.DNLArmPose;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +17,8 @@ public class AbstractClientPlayerMixin {
     private void modifyFov(CallbackInfoReturnable<Float> cir) {
         AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
 
-        // Check if the player is using the custom bow
+        Services.DATA.setArmPose(player, DNLArmPose.EMPTY);
+
         if (player.isUsingItem()) {
             ItemStack itemStack = player.getUseItem();
             if (itemStack.getItem() instanceof VertexBowItem) {
@@ -30,6 +34,9 @@ public class AbstractClientPlayerMixin {
 
                 // Apply FOV change
                 cir.setReturnValue(cir.getReturnValue() * fovModifier);
+            }
+            if (itemStack.getItem() instanceof ScorcherItem) {
+                Services.DATA.setArmPose(player, DNLArmPose.SCORCHER);
             }
         }
     }

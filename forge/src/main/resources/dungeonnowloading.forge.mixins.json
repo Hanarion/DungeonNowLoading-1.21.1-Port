@@ -32,6 +32,7 @@
         "forge.item.ScorcherItemMixin"
     ],
     "client": [
+        "client.HumanoidModelMixin",
         "client.AbstractClientPlayerMixin",
         "client.SituationalMusicMixin",
         "MixinTitleScreen",

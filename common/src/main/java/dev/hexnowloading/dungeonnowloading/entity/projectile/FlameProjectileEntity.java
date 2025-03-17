@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -28,8 +27,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class FlameProjectileEntity extends ThrowableItemProjectile {
-    private static final EntityDataAccessor<ItemStack> FIRE_ITEM_STACK = SynchedEntityData.defineId(FlameProjectileEntity.class, EntityDataSerializers.ITEM_STACK);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(FlameProjectileEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> SOUL = SynchedEntityData.defineId(FlameProjectileEntity.class, EntityDataSerializers.BOOLEAN);
 
     public FlameProjectileEntity(EntityType entityType, Level level) {
         super(entityType, level);
@@ -38,12 +37,14 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
     public FlameProjectileEntity(LivingEntity owner, Level level) {
         super(DNLEntityTypes.FLAME_PROJECTILE.get(), owner, level);
         this.setDamage(0);
+        this.setSoul(false);
     }
 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(DAMAGE, 0.0f);
+        this.entityData.define(SOUL, false);
     }
 
     @Override
@@ -57,7 +58,11 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
         ScalableParticleType.ScalableParticleData particleData;
 
         if (this.getOwner() instanceof Player) {
-            particleData = new ScalableParticleType.ScalableParticleData(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), scale);
+            if (getSoul()) {
+                particleData = new ScalableParticleType.ScalableParticleData(DNLParticleTypes.LARGE_SOUL_FLAME_PARTICLE.get(), scale);
+            } else {
+                particleData = new ScalableParticleType.ScalableParticleData(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), scale);
+            }
         } else {
             particleData = new ScalableParticleType.ScalableParticleData(DNLParticleTypes.LARGE_FLAME_PARTICLE.get(), 1.0F);
         }
@@ -119,6 +124,11 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
         if (this.level().isClientSide) {
             return;
         }
+
+        if (this.getSoul()) {
+            return;
+        }
+
         Entity owner = this.getOwner();
         if (!(owner instanceof LivingEntity) || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
             BlockPos blockPos = blockHitResult.getBlockPos().relative(blockHitResult.getDirection());
@@ -157,5 +167,13 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
 
     public float getDamage() {
         return this.entityData.get(DAMAGE).floatValue();
+    }
+
+    public void setSoul(boolean b) {
+        this.entityData.set(SOUL, Boolean.valueOf(b));
+    }
+
+    public boolean getSoul() {
+        return this.entityData.get(SOUL).booleanValue();
     }
 }

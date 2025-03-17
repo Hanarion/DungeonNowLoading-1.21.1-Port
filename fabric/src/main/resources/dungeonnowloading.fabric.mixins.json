@@ -30,6 +30,7 @@
     "structures.NoGeodesInStructuresMixin"
   ],
   "client": [
+    "client.HumanoidModelMixin",
     "client.AbstractClientPlayerMixin",
     "client.SituationalMusicMixin",
     "MaxHealthAttributeMixin",

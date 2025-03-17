@@ -1,12 +1,13 @@
 package dev.hexnowloading.dungeonnowloading.item.client;
 
-import dev.hexnowloading.dungeonnowloading.network.packets.S2CItemAnimationPacket;
+import dev.hexnowloading.dungeonnowloading.item.DNLAnimatedItem;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartItemAnimationPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopItemAnimationPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 public class ItemAnimationState {
 
@@ -31,21 +32,34 @@ public class ItemAnimationState {
         }*/
     }
 
-    public static void startAndSendPacket(Level level, Player player, ItemStack itemStack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
+    public static void startAndSendPacket(Player player, ItemStack itemStack, int slot, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
         if (player instanceof ServerPlayer serverPlayer) {
+            ensureUUID(itemStack);
             ItemAnimationState.start(itemStack, animationName, gameTime, duration, loop, resetAnimations);
-            ItemAnimationState.sendStartAnimationPacket(serverPlayer, animationName, duration, loop, resetAnimations);
+            ItemAnimationState.sendStartAnimationPacket(serverPlayer, itemStack, slot, animationName, duration, loop, resetAnimations);
         }
     }
 
-    public static void sendStartAnimationPacket(ServerPlayer serverPlayer, String animationName, long duration, boolean loop, boolean resetAnimations) {
-        Services.NETWORK.sendToAllPlayers(new S2CItemAnimationPacket(serverPlayer.getUUID(), animationName, duration, loop, resetAnimations), serverPlayer.getServer());
+    public static void sendStartAnimationPacket(ServerPlayer serverPlayer, ItemStack itemStack, int slot, String animationName, long duration, boolean loop, boolean resetAnimations) {
+        Services.NETWORK.sendToAllPlayers(new S2CStartItemAnimationPacket(serverPlayer.getUUID(), itemStack, slot, animationName, duration, loop, resetAnimations), serverPlayer.getServer());
     }
 
     public static void startIfStopped(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
         if (!isAnimating(stack, animationName, gameTime)) {
             start(stack, animationName, gameTime, duration, loop, resetAnimations);
         }
+    }
+
+    public static void stopAllAndSendPacket(Player player, ItemStack itemStack) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            ensureUUID(itemStack);
+            ItemAnimationState.stopAll(itemStack);
+            ItemAnimationState.sendStopAllAnimationPacket(serverPlayer);
+        }
+    }
+
+    public static void sendStopAllAnimationPacket(ServerPlayer serverPlayer) {
+        Services.NETWORK.sendToAllPlayers(new S2CStopItemAnimationPacket(serverPlayer.getUUID()), serverPlayer.getServer());
     }
 
     public static float getProgress(ItemStack stack, String animationName, long gameTime, float partialTicks) {
@@ -97,12 +111,47 @@ public class ItemAnimationState {
         return looping || (gameTime - startTime) < duration;
     }
 
+    public static boolean isAnimatingOrHanging(ItemStack stack, String animationName, long gameTime) {
+        if (!stack.hasTag()) return false;
+
+        CompoundTag animationsTag = stack.getTag().getCompound(ANIMATIONS_TAG);
+        if (!animationsTag.contains(animationName)) return false;
+
+        CompoundTag animTag = animationsTag.getCompound(animationName);
+        long startTime = animTag.getLong("StartTime");
+        long duration = animTag.getLong("Duration");
+        boolean looping = animTag.getBoolean("Looping");
+
+        return looping || (gameTime - startTime) < duration || (!looping && (gameTime - startTime) >= duration);
+    }
+
+    public static boolean isAnimationHanging(ItemStack stack, String animationName, long gameTime) {
+        if (!stack.hasTag()) return false;
+
+        CompoundTag animationsTag = stack.getTag().getCompound(ANIMATIONS_TAG);
+        if (!animationsTag.contains(animationName)) return false;
+
+        CompoundTag animTag = animationsTag.getCompound(animationName);
+        long startTime = animTag.getLong("StartTime");
+        long duration = animTag.getLong("Duration");
+        boolean looping = animTag.getBoolean("Looping");
+
+        // Check if animation has ended but is still in NBT
+        return !looping && (gameTime - startTime) >= duration;
+    }
+
     public static void stopAll(ItemStack itemStack) {
         if (!itemStack.hasTag()) return;
 
         CompoundTag tag = itemStack.getTag();
         if (tag.contains(ANIMATIONS_TAG)) {
             tag.remove(ANIMATIONS_TAG);
+        }
+    }
+
+    private static void ensureUUID(ItemStack itemStack) {
+        if (itemStack.getItem() instanceof DNLAnimatedItem<?> dnlAnimatedItem) {
+            dnlAnimatedItem.ensureItemUUID(itemStack);
         }
     }
 }

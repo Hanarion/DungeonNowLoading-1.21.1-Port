@@ -42,7 +42,8 @@
     "custom": {
         "cardinal-components": [
             "dungeonnowloading:fairkeeper_chest_positions",
-            "dungeonnowloading:scorcher_heat"
+            "dungeonnowloading:scorcher_heat",
+            "dungeonnowloading:dnl_arm_pose"
         ]
     }
 }

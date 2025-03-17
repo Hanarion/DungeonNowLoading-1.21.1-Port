@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.platform;
 
 import dev.hexnowloading.dungeonnowloading.capabilities.CapabilityList;
+import dev.hexnowloading.dungeonnowloading.item.client.DNLArmPose;
 import dev.hexnowloading.dungeonnowloading.platform.services.DataHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -9,6 +10,22 @@ import java.util.List;
 import java.util.Optional;
 
 public class FabricDataHelper implements DataHelper {
+
+    @Override
+    public DNLArmPose getArmPose(Player player) {
+        if (CapabilityList.DNL_ARM_POSE.isProvidedBy(player)) {
+            return CapabilityList.DNL_ARM_POSE.get(player).getArmPose();
+        }
+        return DNLArmPose.EMPTY; // Default pose
+    }
+
+    @Override
+    public void setArmPose(Player player, DNLArmPose pose) {
+        if (CapabilityList.DNL_ARM_POSE.isProvidedBy(player)) {
+            CapabilityList.DNL_ARM_POSE.get(player).setArmPose(pose);
+            CapabilityList.DNL_ARM_POSE.sync(player);
+        }
+    }
 
     @Override
     public int getScorcherHeat(Player player) {
