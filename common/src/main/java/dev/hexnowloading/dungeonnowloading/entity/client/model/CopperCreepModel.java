@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.model.EntityModel;
@@ -18,7 +19,7 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-public class CopperCreepModel<T extends Entity> extends HierarchicalModel<T> {
+public class CopperCreepModel<T extends CopperCreepEntity> extends HierarchicalModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "copper_creep"), "main");
 	private final ModelPart coppercreep;
@@ -66,21 +67,20 @@ public class CopperCreepModel<T extends Entity> extends HierarchicalModel<T> {
 	}
 
 	@Override
-	public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(CopperCreepEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.root.getAllParts().forEach(ModelPart::resetPose);
-
-		CopperCreepEntity copperCreepEntity = (CopperCreepEntity) entity;
-		this.animate(copperCreepEntity.idleAnimationState, CopperCreepAnimation.IDLE, ageInTicks);
+		
+		this.animate(entity.idleAnimationState, CopperCreepAnimation.IDLE, ageInTicks);
 //		this.animate(copperCreepEntity.walkingAnimationState, CopperCreepAnimation.WALKING, ageInTicks);
 //		this.animate(copperCreepEntity.runningAnimationState, CopperCreepAnimation.RUNNING, ageInTicks);
-		this.animate(copperCreepEntity.summonAnimationState, CopperCreepAnimation.SUMMON, ageInTicks);
-		this.animate(copperCreepEntity.detonationAnimationState, CopperCreepAnimation.DETONATION, ageInTicks);
+		this.animate(entity.summonAnimationState, CopperCreepAnimation.SUMMON, ageInTicks);
+		this.animate(entity.detonationAnimationState, CopperCreepAnimation.DETONATION, ageInTicks);
 
 //		System.out.println(copperCreepEntity.currentState);
 
-		if (copperCreepEntity.getState() == CopperCreepEntity.State.IDLE) {
+		if (entity.getState() == CopperCreepEntity.State.IDLE) {
 			this.animateWalk(CopperCreepAnimation.WALKING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
-		} else if (copperCreepEntity.getState() == CopperCreepEntity.State.FOLLOWING) {
+		} else if (entity.getState() == CopperCreepEntity.State.FOLLOWING) {
 			this.animateWalk(CopperCreepAnimation.RUNNING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
 		}
 	}

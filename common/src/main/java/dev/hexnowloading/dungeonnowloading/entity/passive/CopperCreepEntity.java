@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.passive;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -19,7 +20,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.animal.Cat;
+import net.minecraft.world.entity.animal.Ocelot;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -30,54 +34,51 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterEntity {
+public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterEntity, PowerableMob {
     public enum State {
         SUMMONING,
         IDLE,
         FOLLOWING,
         DETONATION
     }
-
     private static final String DEFUSED_CUSTOM_NAME = "Defused";
-    private static final float EXPLOSION_RADIUS = 2.0f;
+    private static final float EXPLOSION_RADIUS = 3.0f;
     private static final float POWERED_EXPLOSION_RADIUS = 5.0f;
     private static final EntityDataAccessor<Optional<UUID>> SUMMONER_UUID = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> DATA_IS_POWERED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_ALREADY_SUMMONED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<State> STATE = SynchedEntityData.defineId(CopperCreepEntity.class, EntityStates.COPPER_CREEP_STATE);
-    private final byte TRIGGER_IDLE_ANIMATION_STATE = 70;
-    private final byte TRIGGER_WALKING_ANIMATION_STATE = 71;
-    private final byte TRIGGER_RUNNING_ANIMATION_STATE = 72;
-    private final byte TRIGGER_SUMMON_ANIMATION_STATE = 73;
-    private final byte TRIGGER_DETONATION_ANIMATION_STATE = 74;
+    private static final byte TRIGGER_IDLE_ANIMATION_STATE = 70;
+    private static final byte TRIGGER_WALKING_ANIMATION_STATE = 71;
+    private static final byte TRIGGER_RUNNING_ANIMATION_STATE = 72;
+    private static final byte TRIGGER_SUMMON_ANIMATION_STATE = 73;
+    private static final byte TRIGGER_DETONATION_ANIMATION_STATE = 74;
 
     public AnimationState idleAnimationState = new AnimationState();
     public AnimationState walkingAnimationState = new AnimationState();
     public AnimationState runningAnimationState = new AnimationState();
     public AnimationState summonAnimationState = new AnimationState();
     public AnimationState detonationAnimationState = new AnimationState();
+    private int lightningAttractTimer = 0;
     private int swell = 0;
     private int maxSwell = 30;
     private Player summoner;
     private int aiTick;
 
-//    private boolean isSummonAnimInitialized;
-
     public State currentState;
-    private State lastState;
 
     public CopperCreepEntity(EntityType<? extends CopperCreepEntity> entityType, Level level) {
         super(entityType, level);
         this.xpReward = 0;
 
         this.summoner = null;
+        this.lightningAttractTimer = 60 * (3 + this.random.nextInt(28));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 10.0D)
-//                .add(Attributes.MOVEMENT_SPEED, 0.0D)
                 .add(Attributes.FOLLOW_RANGE, 16.0F)
                 .add(Attributes.MOVEMENT_SPEED, 0.175F);
     }
@@ -232,6 +233,14 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     @Override
     public void tick() {
+        if (this.lightningAttractTimer > 0) {
+            this.lightningAttractTimer--;
+        }
+
+        if (lightningAttractTimer == 0 && !this.isPowered()) {
+            attemptToAttractLightning();
+        }
+
         if (this.isIgnited()) {
             if (this.swell == 0) {
                 this.setState(State.DETONATION);
@@ -256,12 +265,19 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                 this.discard();
             }
         }
+
         super.tick();
     }
 
     @Override
     public void thunderHit(ServerLevel serverLevel, LightningBolt lightningBolt) {
-        super.thunderHit(serverLevel, lightningBolt);
+        this.setRemainingFireTicks(this.getRemainingFireTicks() + 1);
+        if (this.getRemainingFireTicks() == 0) {
+            this.setSecondsOnFire(8);
+        }
+
+//        this.hurt(this.damageSources().lightningBolt(), 5.0F);
+
         this.entityData.set(DATA_IS_POWERED, true);
     }
 
@@ -291,10 +307,12 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     @Override
     protected void registerGoals() {
         super.registerGoals();
-//        this.goalSelector.addGoal(1, new FollowMobGoal(this, this.getTarget(), 1.0f));
-        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1.0f, 60, false));
-        this.goalSelector.addGoal(1, new FollowMobGoal(this, 2.0, 0.5F, 16.0F));
-        this.targetSelector.addGoal(1, new NearestNonSummonerAttackableTargetGoal<>(this, Monster.class, true));
+        this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(4, new CustomMeleeAttackGoal(this, 2.0f, false));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Monster.class, 8.0F));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true));
     }
 
     public boolean isDefused() {
@@ -302,6 +320,29 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             return DEFUSED_CUSTOM_NAME.equals(this.getCustomName().getString());
         }
         return false;
+    }
+
+    private void attemptToAttractLightning() {
+        if (this.level().isThundering() && hasClearSkyAbove()) {
+            LightningBolt lightningBolt = EntityType.LIGHTNING_BOLT.create(this.level());
+            if (lightningBolt != null) {
+                lightningBolt.moveTo(this.getX(), this.getY(), this.getZ());
+                this.level().addFreshEntity(lightningBolt);
+
+                this.entityData.set(DATA_IS_POWERED, true);
+            }
+        }
+    }
+
+    private boolean hasClearSkyAbove() {
+        BlockPos posAbove = this.blockPosition().above();
+        while (posAbove.getY() < this.level().getMaxBuildHeight()) {
+            if (!this.level().isEmptyBlock(posAbove)) {
+                return false;
+            }
+            posAbove = posAbove.above();
+        }
+        return true;
     }
 
     public State getState() {
@@ -332,78 +373,25 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         this.level().broadcastEntityEvent(this, TRIGGER_DETONATION_ANIMATION_STATE);
     }
 
-//    private boolean stateChanged() {
-//        boolean hasStateChanged = this.currentState != lastState;
-//        if (hasStateChanged) {
-//            this.lastState = this.currentState;
-//        }
-//
-//        return hasStateChanged;
-//    }
-
     private void setState(State state) {
         this.currentState = state;
         this.entityData.set(STATE, state);
     }
 
-//
-//    private class MoveDirectlyTowardsTargetGoal extends Goal {
-//        private static final float AT_TARGET_STOP_DISTANCE = 0.5f;
-//        private final PathfinderMob mob;
-//        private final double speedModifier;
-//        private LivingEntity target;
-//
-//        public MoveDirectlyTowardsTargetGoal(PathfinderMob mob, LivingEntity target, double speedModifier) {
-//            this.mob = mob;
-//            this.target = target;
-//            this.speedModifier = speedModifier;
-//        }
-//
-//        @Override
-//        public boolean canUse() {
-//            // Make sure the target is not null
-//            if (this.target == null) {
-//                this.target = this.mob.getTarget(); // Try to set the target dynamically here
-//            }
-//
-//            if (this.mob.getAttribute(Attributes.FOLLOW_RANGE))
-//
-//            // Now check if the target exists and if it's far enough to move
-//            return this.target != null && this.mob.distanceTo(this.target) > AT_TARGET_STOP_DISTANCE;
-//        }
-//
-//        @Override
-//        public void tick() {
-//            // Move the mob directly towards the target
-//            this.mob.getNavigation().moveTo(this.target.getX(), this.target.getY(), this.target.getZ(), this.speedModifier);
-//        }
-//    }
+    private class CustomMeleeAttackGoal extends MeleeAttackGoal {
 
-    private class NearestNonSummonerAttackableTargetGoal<T extends LivingEntity> extends NearestAttackableTargetGoal<T> {
-        private final CopperCreepEntity mob;
-
-        public NearestNonSummonerAttackableTargetGoal(CopperCreepEntity mob, Class<T> targetClass, boolean mustSee) {
-            super(mob, targetClass, mustSee);
-            this.mob = mob;
+        public CustomMeleeAttackGoal(PathfinderMob $$0, double $$1, boolean $$2) {
+            super($$0, $$1, $$2);
         }
 
         @Override
-        public boolean canUse() {
-            // First, check if there is a valid target that meets the conditions of NearestAttackableTargetGoal
-            boolean canUse = super.canUse();
-
-            // Check if the mob has a summoner UUID set
-            Optional<UUID> summonerUUID = this.mob.getSummonerUUID();
-            if (summonerUUID.isPresent()) {
-                // Get the summoner Player from the UUID
-                Player summoner = this.mob.level().getPlayerByUUID(summonerUUID.get());
-                if (summoner != null && this.target != null && this.target.equals(summoner)) {
-                    // If the target is the summoner, return false
-                    return false;
-                }
-            }
-
-            return canUse;
+        protected void checkAndPerformAttack(LivingEntity $$0, double $$1) {
+//            double $$2 = this.getAttackReachSqr($$0);
+//            if ($$1 <= $$2 && this.ticksUntilNextAttack <= 0) {
+//                this.resetAttackCooldown();
+//                this.mob.swing(InteractionHand.MAIN_HAND);
+//                this.mob.doHurtTarget($$0);
+//            }
         }
     }
 }

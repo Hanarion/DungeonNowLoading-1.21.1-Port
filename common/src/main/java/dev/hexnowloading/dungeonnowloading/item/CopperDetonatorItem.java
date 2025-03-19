@@ -18,126 +18,109 @@ import java.util.List;
 import java.util.UUID;
 
 public class CopperDetonatorItem extends Item {
-    private static final double CREEP_TRIGGER_RADIUS = 16.0d;
+    private static final double TRIGGER_RADIUS = 16.0;
+    private static final int SUMMON_COOLDOWN = 5;
+    private static final int IGNITE_COOLDOWN = 200;
 
     public CopperDetonatorItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext ctx) {
-        Level level = ctx.getLevel();
-        Player player = ctx.getPlayer();
-        BlockPos clickedPos = ctx.getClickedPos();
-        Direction clickedFace = ctx.getClickedFace();
+    public InteractionResult useOn(UseOnContext context) {
+        Level level = context.getLevel();
+        Player player = context.getPlayer();
+        BlockPos targetPos = context.getClickedPos();
+        Direction targetFace = context.getClickedFace();
 
-        boolean playerHasCopperBlock = this.checkPlayerHasCopperBlock(player);
-        List<CopperCreepEntity> nearbyCreeps = this.getNearbyCreeps(player, CREEP_TRIGGER_RADIUS);
+        if (player == null) return InteractionResult.PASS;
 
-        if (nearbyCreeps.isEmpty()) {
-            this.consumeCopperBlock(player);
-            this.summonCopperCreep(level, clickedPos, clickedFace, player.getUUID());
-            player.getCooldowns().addCooldown(this, 5);
-        } else {
-            if ((!player.isCreative() && !playerHasCopperBlock)) {
-                // player.displayClientMessage(Component.translatable("item.dungeonnowloading.no_copper_block"), true);
-                return InteractionResult.FAIL;
+        List<CopperCreepEntity> creepsInRange = findNearbyCreeps(player, TRIGGER_RADIUS);
+
+        if (creepsInRange.isEmpty()) {
+            if (consumeCopperBlockIfAvailable(player)) {
+                summonCreep(level, targetPos.relative(targetFace), player.getUUID());
+                player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
+                return InteractionResult.SUCCESS;
             }
-
-            nearbyCreeps.forEach(CopperCreepEntity::ignite);
-            player.getCooldowns().addCooldown(this, 200);
+            return InteractionResult.FAIL;
         }
 
+        igniteCreeps(creepsInRange);
+        player.getCooldowns().addCooldown(this, IGNITE_COOLDOWN);
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
+        List<CopperCreepEntity> creepsInRange = findNearbyCreeps(player, TRIGGER_RADIUS);
 
-        List<CopperCreepEntity> nearbyCreeps = this.getNearbyCreeps(player, CREEP_TRIGGER_RADIUS);
-        if (nearbyCreeps.isEmpty()) {
+        if (creepsInRange.isEmpty()) {
+            if (consumeCopperBlockIfAvailable(player)) {
+                launchCreep(level, player);
+                player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
+                itemStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(hand));
+                return InteractionResultHolder.success(itemStack);
+            }
             return InteractionResultHolder.fail(itemStack);
         }
 
-        nearbyCreeps.forEach(CopperCreepEntity::ignite);
-        player.getCooldowns().addCooldown(this, 200);
-
+        igniteCreeps(creepsInRange);
+        player.getCooldowns().addCooldown(this, IGNITE_COOLDOWN);
         return InteractionResultHolder.success(itemStack);
     }
 
-    private List<CopperCreepEntity> getNearbyCreeps(Player player, double creepTriggerRadius) {
-        return player.level().getEntitiesOfClass(
-                CopperCreepEntity.class,
-                player.getBoundingBox().inflate(creepTriggerRadius)
-        )
+    private void launchCreep(Level level, Player player) {
+        CopperCreepEntity creep = DNLEntityTypes.COPPER_CREEP.get().create(level);
+        if (creep == null) return;
+
+        double offset = 1.0;
+        double launchX = player.getX() - Math.sin(Math.toRadians(player.getYRot())) * offset;
+        double launchY = player.getY() + player.getEyeHeight() * 0.6;
+        double launchZ = player.getZ() + Math.cos(Math.toRadians(player.getYRot())) * offset;
+        creep.moveTo(launchX, launchY, launchZ, player.getYRot(), player.getXRot());
+
+        double velocity = 1.0;
+        double motionX = -Math.sin(Math.toRadians(player.getYRot())) * Math.cos(Math.toRadians(player.getXRot())) * velocity;
+        double motionY = -Math.sin(Math.toRadians(player.getXRot())) * velocity;
+        double motionZ = Math.cos(Math.toRadians(player.getYRot())) * Math.cos(Math.toRadians(player.getXRot())) * velocity;
+        creep.setDeltaMovement(motionX, motionY, motionZ);
+
+        level.addFreshEntity(creep);
+    }
+
+    private List<CopperCreepEntity> findNearbyCreeps(Player player, double radius) {
+        return player.level()
+                .getEntitiesOfClass(CopperCreepEntity.class, player.getBoundingBox().inflate(radius))
                 .stream()
-                .filter(entity -> !entity.isDefused())
-                .filter(entity -> !entity.isDeadOrDying())
-                .filter(entity -> player.distanceToSqr(entity) <= (creepTriggerRadius * creepTriggerRadius))
+                .filter(creep -> !creep.isDefused() && !creep.isDeadOrDying() && player.distanceToSqr(creep) <= radius * radius)
                 .toList();
     }
 
-    private void summonCopperCreep(Level level, BlockPos pos, Direction clickedFace, UUID summonerUUID) {
-        pos = pos.relative(clickedFace);
+    private void summonCreep(Level level, BlockPos position, UUID summonerUUID) {
+        CopperCreepEntity creep = DNLEntityTypes.COPPER_CREEP.get().create(level);
+        if (creep == null) return;
 
-        CopperCreepEntity entity = DNLEntityTypes.COPPER_CREEP.get().create(level);
-        if (entity != null) {
-            entity.moveTo(pos, 0.0f, 0.0f);
-            entity.setSummonerUUID(summonerUUID);
-            level.addFreshEntity(entity);
-        }
+        creep.moveTo(position, 0.0f, 0.0f);
+        creep.setSummonerUUID(summonerUUID);
+        level.addFreshEntity(creep);
     }
 
-    private boolean checkPlayerHasCopperBlock(Player player) {
-        boolean hasCopperBlock = false;
+    private boolean consumeCopperBlockIfAvailable(Player player) {
+        if (player.isCreative()) return true;
+
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             ItemStack stack = player.getInventory().getItem(i);
             if (stack.getItem() == Items.COPPER_BLOCK && stack.getCount() > 0) {
-                hasCopperBlock = true;
-                break;
+                stack.shrink(1);
+                return true;
             }
         }
-        return hasCopperBlock;
+        return false;
     }
 
-    private void consumeCopperBlock(Player player) {
-        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            ItemStack stack = player.getInventory().getItem(i);
-            if (stack.getItem() == Items.COPPER_BLOCK && stack.getCount() > 0) {
-                stack.shrink(1); // Removes 1 copper block
-                break;
-            }
-        }
+    private void igniteCreeps(List<CopperCreepEntity> creeps) {
+        creeps.forEach(CopperCreepEntity::ignite);
     }
-
-//        return InteractionResultHolder.fail(itemStack);
-
-//        ItemStack itemStack = player.getItemInHand(hand);
-//        AABB aabb = (new AABB(player.blockPosition())).inflate(16);
-//        List<FairkeeperEntity> targets = level.getEntitiesOfClass(FairkeeperEntity.class, aabb);
-//        List<FairkeeperEntity> sleepingTargets = targets.stream().filter(FairkeeperEntity::isSlumbering).toList();
-//        if (!sleepingTargets.isEmpty()) {
-//            player.startUsingItem(hand);
-//            level.playSound(player, player, DNLSounds.CHAOS_SPAWNER_LAUGHTER.get(), SoundSource.RECORDS, 1.0F, 2.0F);
-//            player.getCooldowns().addCooldown(this, 7);
-//            player.awardStat(Stats.ITEM_USED.get(this));
-//            for (FairkeeperEntity FairkeeperEntity : targets) {
-//                FairkeeperEntity.startBossFight();
-//            }
-//            if (player instanceof ServerPlayer) {
-//                itemStack.hurtAndBreak(1, player, (player1 -> player1.broadcastBreakEvent(hand)));
-//            }
-//            return InteractionResultHolder.consume(itemStack);
-//        }
-//        return InteractionResultHolder.fail(itemStack);
-
-
-//    @Override
-//    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
-//        super.appendHoverText(itemStack, level, components, tooltipFlag);
-//        if (GeneralConfig.TOGGLE_HELPFUL_ITEM_TOOLTIP.get()) {
-//            components.add(Component.translatable("item.dungeonnowloading.redstone_catalyst.tooltip").withStyle(ChatFormatting.GRAY));
-//        }
-//    }
 }

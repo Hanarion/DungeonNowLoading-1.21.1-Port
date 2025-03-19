@@ -37,6 +37,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.LIFE_STEALER.get());
                 output.accept(DNLItems.SPAWNER_SWORD.get());
                 output.accept(DNLItems.VERTEX_BOW.get());
+                output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.SCORCHER.get());
                 output.accept(DNLItems.SOUL_SCORCHER.get());
                 output.accept(DNLItems.COPPER_DETONATOR.get());
