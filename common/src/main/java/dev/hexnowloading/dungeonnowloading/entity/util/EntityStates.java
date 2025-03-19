@@ -17,6 +17,7 @@ public class EntityStates {
     public static final EntityDataSerializer<FairkeeperBorosEntity.FairkeeperBorosState> FAIRKEEPER_BOROS_STATE;
     public static final EntityDataSerializer<FairkeeperBorosEntity.FairkeeperBorosAnimationState> FAIRKEEPER_BOROS_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperOurosEntity.FairkeeperOurosState> FAIRKEEPER_OUROS_STATE;
+    public static final EntityDataSerializer<FairkeeperOurosEntity.FairkeeperOurosAnimationState> FAIRKEEPER_OUROS_ANIMATION_STATE;
     public static final EntityDataSerializer<ScuttleEntity.ScuttleState> SCUTTLE_STATE;
     public static final EntityDataSerializer<BallistaGolemEntity.BallistaGolemState> BALLISTA_GOLEM_STATE;
     public static final EntityDataSerializer<CopperCreepEntity.State> COPPER_CREEP_STATE;
@@ -28,6 +29,7 @@ public class EntityStates {
         FAIRKEEPER_BOROS_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosState.class);
         FAIRKEEPER_BOROS_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosAnimationState.class);
         FAIRKEEPER_OUROS_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosEntity.FairkeeperOurosState.class);
+        FAIRKEEPER_OUROS_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosEntity.FairkeeperOurosAnimationState.class);
         SCUTTLE_STATE = EntityDataSerializer.simpleEnum(ScuttleEntity.ScuttleState.class);
         BALLISTA_GOLEM_STATE = EntityDataSerializer.simpleEnum(BallistaGolemEntity.BallistaGolemState.class);
         COPPER_CREEP_STATE = EntityDataSerializer.simpleEnum(CopperCreepEntity.State.class);
@@ -38,6 +40,7 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_STATE);
+        EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(SCUTTLE_STATE);
         EntityDataSerializers.registerSerializer(BALLISTA_GOLEM_STATE);
         EntityDataSerializers.registerSerializer(COPPER_CREEP_STATE);

@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
-import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;

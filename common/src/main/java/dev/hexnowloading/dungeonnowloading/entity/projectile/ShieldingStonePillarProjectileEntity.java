@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
 import dev.hexnowloading.dungeonnowloading.block.ShieldingStonePillarBlock;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.ProjectileUtils;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableAxisParticleType;
@@ -119,6 +120,9 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
 
     private void pushNearbyMobs(LivingEntity mob) {
         float actualDamage = DAMAGE;
+        if (mob instanceof FairkeeperSerpentEntity) {
+            return;
+        }
         if (this.getOwner() instanceof LivingEntity owner) {
             actualDamage = (float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE) * damagePercentage;
         }

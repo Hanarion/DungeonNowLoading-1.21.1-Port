@@ -1,6 +1,8 @@
 package dev.hexnowloading.dungeonnowloading.server;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.capability.forge.DNLArmPoseCapability;
+import dev.hexnowloading.dungeonnowloading.capability.forge.DNLArmPoseCapabilityProvider;
 import dev.hexnowloading.dungeonnowloading.capability.forge.FairkeeperChestPositionsCapability;
 import dev.hexnowloading.dungeonnowloading.capability.forge.FairkeeperChestPositionsCapabilityProvider;
 import dev.hexnowloading.dungeonnowloading.entity.DNLEntityEvents;
@@ -67,6 +69,9 @@ public class DNLForgeEntityEvents {
             if(!event.getObject().getCapability(FairkeeperChestPositionsCapabilityProvider.FAIRKEEPER_CHEST_POSITIONS).isPresent()) {
                 event.addCapability(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_chest_positions"), new FairkeeperChestPositionsCapabilityProvider());
             }
+            if (!event.getObject().getCapability(DNLArmPoseCapabilityProvider.DNL_ARM_POSE).isPresent()) {
+                event.addCapability(new ResourceLocation(DungeonNowLoading.MOD_ID, "dnl_arm_pose"), new DNLArmPoseCapabilityProvider());
+            }
         }
     }
 
@@ -83,6 +88,11 @@ public class DNLForgeEntityEvents {
                     newStore.copyFrom(oldStore);
                 });
             });
+            event.getOriginal().getCapability(DNLArmPoseCapabilityProvider.DNL_ARM_POSE).ifPresent(oldStore -> {
+                event.getOriginal().getCapability(DNLArmPoseCapabilityProvider.DNL_ARM_POSE).ifPresent(newStore -> {
+                    newStore.copyFrom(oldStore);
+                });
+            });
         }
     }
 
@@ -90,5 +100,6 @@ public class DNLForgeEntityEvents {
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         //event.register(DNLForgePlayerPoint.class);
         event.register(FairkeeperChestPositionsCapability.class);
+        event.register(DNLArmPoseCapability.class);
     }
 }

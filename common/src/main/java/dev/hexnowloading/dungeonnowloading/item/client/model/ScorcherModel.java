@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class ScorcherModel extends AnimatedItemModel {
     public static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher.png");
+    public static final ResourceLocation TEXTURE_SOUL = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher/soul_scorcher.png");
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "scorcher"), "main");
     private final ModelPart root;
     private final ModelPart scorcher;

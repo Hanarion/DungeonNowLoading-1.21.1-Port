@@ -110,36 +110,34 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
     public void tick() {
         super.tick();
 
-        if (!this.level().isClientSide) {
-            if (!this.inGround) {
-                this.vertexNode.disconnect_all();
-                this.powerIncrementTimer = 0;
-                this.powerLevel = 0;
-                this.entityData.set(POWER_LEVEL, 0);
-            } else {
-                if (this.powerLevel == 0 && this.powerIncrementTimer == 0) {
-                    this.level().playSound(
-                            null,
-                            this.getX(),
-                            this.getY(),
-                            this.getZ(),
-                            DNLSounds.VERTEX_ARROW_BOOTUP.get(),
-                            SoundSource.PLAYERS,
-                            1.0F,
-                            1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
-                    );
-                }
+        if (!this.inGround) {
+            this.vertexNode.disconnect_all();
+            this.powerIncrementTimer = 0;
+            this.powerLevel = 0;
+            this.entityData.set(POWER_LEVEL, 0);
+        } else {
+            if (this.powerLevel == 0 && this.powerIncrementTimer == 0) {
+                this.level().playSound(
+                        null,
+                        this.getX(),
+                        this.getY(),
+                        this.getZ(),
+                        DNLSounds.VERTEX_ARROW_BOOTUP.get(),
+                        SoundSource.PLAYERS,
+                        1.0F,
+                        1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
+                );
+            }
 
-                if (this.powerLevel < MAX_POWER_LEVEL) {
-                    this.powerIncrementTimer++;
-                    if (this.powerIncrementTimer >= ADVANCE_POWER_LEVEL_THRESHOLD_TICKS) {
-                        this.powerLevel++;
-                        this.entityData.set(POWER_LEVEL, this.powerLevel);
-                        this.powerIncrementTimer = 0;
-                    }
-                } else if (!this.vertexNode.attemptedConnection() && this.life != DESPAWN_TIME_TICKS) {
-                    this.vertexNode.connectToNearbyNodes(this);
+            if (this.powerLevel < MAX_POWER_LEVEL) {
+                this.powerIncrementTimer++;
+                if (this.powerIncrementTimer >= ADVANCE_POWER_LEVEL_THRESHOLD_TICKS) {
+                    this.powerLevel++;
+                    this.entityData.set(POWER_LEVEL, this.powerLevel);
+                    this.powerIncrementTimer = 0;
                 }
+            } else if (!this.level().isClientSide && !this.vertexNode.attemptedConnection() && this.life != DESPAWN_TIME_TICKS) {
+                this.vertexNode.connectToNearbyNodes(this);
             }
         }
 

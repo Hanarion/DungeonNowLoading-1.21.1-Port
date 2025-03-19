@@ -3,7 +3,6 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
-import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
@@ -34,7 +33,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
+public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, FairkeeperSerpentBodyEntity {
 
     private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
@@ -45,6 +44,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     private static final EntityDataAccessor<Boolean> TAIL = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HEAD_MOVING = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> MODEL_VISIBLE = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> ROTATABLE = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
 
     public final AnimationState idleAnimationState = new AnimationState();
     public final AnimationState dropScuttleAnimationState = new AnimationState();
@@ -55,7 +55,6 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     private static final byte TRIGGER_SETUP_CANNON_ANIMATION_BYTE = 72;
 
     private float previousTilt = 0.0F;
-    private boolean enableRotation = true;
 
     public FairkeeperOurosPartEntity(EntityType<? extends Monster> entityType, LivingEntity parent, LivingEntity head, int bodyIndex) {
         super(entityType, parent.level());
@@ -88,6 +87,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.define(DROPPER, false);
         this.entityData.define(HEAD_MOVING, false);
         this.entityData.define(MODEL_VISIBLE, true);
+        this.entityData.define(ROTATABLE, true);
     }
 
     @Override
@@ -147,19 +147,18 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
 
                         // Align rotation with the head's historical rotation
                         Vec3 nextPos = headEntity.getPositionHistory().stream().skip(historyIndex - 1).findFirst().orElse(targetPos);
-                        if (headEntity.isState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING)) {
+                        /*if (headEntity.isState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING)) {
                             this.enableRotation = false;
-                        }
-                        if (!this.enableRotation) {
+                        }*/
+                        if (!this.isRotatable()) {
                             Vec3 awakenEndPos = headEntity.getAwakenEndPos();
-                            double dx = awakenEndPos.x - this.getX();
-                            double dz = awakenEndPos.z - this.getZ();
+                            double dy = awakenEndPos.y - (this.getY() + this.getBbHeight());
 
-                            if (dx * dx + dz * dz < 2.0F * 2.0F) {
-                                this.enableRotation = true;
+                            if (dy * dy < 5.0F * 5.0F) {
+                                this.setRotatable(true);
                             }
                         }
-                        if (this.enableRotation) {
+                        if (this.isRotatable()) {
                             alignRotation(targetPos, nextPos);
                         }
                     }
@@ -450,5 +449,9 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     public boolean isTail() { return this.entityData.get(TAIL); }
 
     public void setTail(boolean tail) { this.entityData.set(TAIL, tail); }
+
+    public void setRotatable(boolean enableRotation) { this.entityData.set(ROTATABLE, enableRotation); }
+
+    public boolean isRotatable() { return this.entityData.get(ROTATABLE); }
 
 }

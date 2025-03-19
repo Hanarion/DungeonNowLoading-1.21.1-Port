@@ -38,13 +38,17 @@ public class FairkeeperOurosAwakenGoal extends Goal {
         Direction direction = caller.getDirection();
         this.initialTarget = (new BlockPos(callerPos.relative(direction.getClockWise(), horizontalOffset).above(verticalOffset))).getCenter().add(0.0f, 0.5f, 0.0f);
         this.finalTarget = (new BlockPos(callerPos.relative(direction.getCounterClockWise(), horizontalOffset).above(verticalOffset))).getCenter().add(0.0f, 0.5f, 0.0f);
-        this.ouros.setAwakenEndPos(this.finalTarget);
+        this.ouros.setAwakenEndPos(this.initialTarget);
+        this.ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.MOUTH_OPEN);
     }
 
     @Override
     public void tick() {
         if (!movingHorizontally) {
-            //double deltaY = this.ouros.getBoundingBox().maxY - initialTarget.y;
+            double deltaY = this.ouros.getBoundingBox().maxY - initialTarget.y;
+            if (deltaY * deltaY < 5.0F * 5.0F) {
+                this.ouros.addDeltaMovement(this.ouros.getLookAngle().scale(0.1F));
+            }
             if (ouros.onCieling()) {
                 movingHorizontally = true;
             }
@@ -58,6 +62,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
 
             if ((deltaX * deltaX + deltaZ * deltaZ) < THRESHOLD * THRESHOLD) {
                 this.ouros.targetRandomPlayer();
+                this.ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.MOUTH_CLOSE);
                 this.ouros.stopAttacking(20);
             }
         }

@@ -119,7 +119,10 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
 
         this.ouros_segment.visible = entity.isModelVisible();
 
-        float targetTilt = (float) Math.toRadians(this.getTiltAngle(entity));
+        float targetTilt = (float) Math.toRadians(90.0F);
+        if (entity.isRotatable()) {
+            targetTilt = (float) Math.toRadians(this.getTiltAngle(entity));
+        }
         entity.setPreviousTilt(Mth.lerp(TILT_SPEED, entity.getPreviousTilt(), targetTilt));
         this.ouros_segment.xRot = entity.getPreviousTilt();
 

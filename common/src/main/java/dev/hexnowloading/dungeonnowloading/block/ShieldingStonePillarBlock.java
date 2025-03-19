@@ -37,7 +37,7 @@ public class ShieldingStonePillarBlock extends BaseEntityBlock implements Entity
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 16, 14);
-    private static final int RANGE = 15;
+    private static final int RANGE = 23;
 
     public ShieldingStonePillarBlock(Properties properties) {
         super(properties);

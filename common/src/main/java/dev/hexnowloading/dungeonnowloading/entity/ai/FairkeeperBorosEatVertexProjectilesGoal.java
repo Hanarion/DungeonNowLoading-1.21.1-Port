@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
@@ -20,6 +21,9 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
     private final double speed;
     private Entity targetProjectile;
+
+    private static final int ORB_HEAL_AMOUNT = 1;
+    private static final int DOMAIN_HEAL_AMOUNT = 5;
 
     public FairkeeperBorosEatVertexProjectilesGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double speed) {
         this.state = state;
@@ -47,7 +51,9 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
 
         this.boros.getMoveControl().setWantedPosition(targetProjectile.getX(), this.boros.getY(), targetProjectile.getZ(), this.speed);
 
-        if (this.boros.distanceTo(targetProjectile) < 1.5) {
+        float consumeRange = targetProjectile instanceof VertexDomainProjectileEntity ? 3.0F : 1.5F;
+
+        if (this.boros.distanceTo(targetProjectile) < consumeRange) {
             absorbProjectile(targetProjectile);
         }
 
@@ -58,7 +64,29 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
         float healMultiplier = 1;
 
         if (projectile instanceof VertexDomainProjectileEntity) {
-            healMultiplier = 5; // Heal 15% max HP
+            healMultiplier = 5;
+        }
+
+        if (healMultiplier / DOMAIN_HEAL_AMOUNT > this.boros.getRandom().nextFloat()) {
+            if (!this.boros.hasArmor()) {
+                this.boros.setArmor(true);
+                this.boros.setArmorHealth(150f);
+            } else {
+                FairkeeperBorosPartEntity currentPart = (FairkeeperBorosPartEntity) this.boros.getChild();
+                if (currentPart != null) {
+                    for (int i = 0; i < 14; i++) {
+                        if (!currentPart.hasArmor()) {
+                            currentPart.setArmor(true);
+                            currentPart.heal(currentPart.getMaxHealth());
+                            break;
+                        }
+                        currentPart = (FairkeeperBorosPartEntity) currentPart.getChild();
+                        if (currentPart == null) {
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         boros.heal(maxHealth * 0.03F * healMultiplier);
@@ -66,8 +94,8 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
         projectile.remove(Entity.RemovalReason.DISCARDED);
         for (int i = 0; i < healMultiplier; i++) {
             RandomSource randomSource = this.boros.getRandom();
-            double offsetX = (randomSource.nextDouble() - 0.5); // Random value between -1 and +1
-            double offsetY = (randomSource.nextDouble() - 0.5); // Random value between -0.75 and +0.75
+            double offsetX = (randomSource.nextDouble() - 0.5);
+            double offsetY = (randomSource.nextDouble() - 0.5);
             double offsetZ = (randomSource.nextDouble() - 0.5);
             ((ServerLevel) this.boros.level()).sendParticles(ParticleTypes.HEART, this.boros.getX() + offsetX, this.boros.getY() + 3 + offsetY, this.boros.getZ() + offsetZ, 1, 0, 0, 0, 0);
         }
@@ -89,10 +117,10 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
 
         // Find the closest valid projectile
         targetProjectile = boros.level().getEntities((Entity) null, arenaAABB, entity ->
-                        entity instanceof VertexOrbProjectileEntity || entity instanceof VertexDomainProjectileEntity
+                (entity instanceof VertexOrbProjectileEntity vertexOrb && vertexOrb.getLife() > 0 && vertexOrb.getLife() < VertexOrbProjectileEntity.DURATION_ON_GROUND * 0.5F) || (entity instanceof VertexDomainProjectileEntity vertexDomain && vertexDomain.getLife() > 0 && vertexDomain.getLife() < VertexDomainProjectileEntity.DURATION_ON_GROUND * 0.5F)
                 ).stream()
-                .filter(entity -> entity.getY() < boros.getY() + 3) // Filter out unreachable projectiles
-                .min(Comparator.comparingDouble(entity -> entity.distanceToSqr(boros))) // Get the closest one
+                .filter(entity -> entity.getY() < boros.getY() + 3)
+                .min(Comparator.comparingDouble(entity -> entity.distanceToSqr(boros)))
                 .orElse(null);
 
         if (targetProjectile == null || !targetProjectile.isAlive()) {

@@ -28,22 +28,6 @@ public class FabricDataHelper implements DataHelper {
     }
 
     @Override
-    public int getScorcherHeat(Player player) {
-        if (CapabilityList.SCORCHER_HEAT.isProvidedBy(player)) {
-            return CapabilityList.SCORCHER_HEAT.get(player).getValue();
-        }
-        return 0;
-    }
-
-    @Override
-    public void setScorcherHeat(Player player, int heat) {
-        if (CapabilityList.SCORCHER_HEAT.isProvidedBy(player)) {
-            CapabilityList.SCORCHER_HEAT.get(player).setValue(heat);
-            CapabilityList.SCORCHER_HEAT.sync(player);
-        }
-    }
-
-    @Override
     public Optional<List<BlockPos>> getFairkeeperChestPositionList(Player player) {
         if (CapabilityList.FAIRKEEPER_CHEST_POSITIONS_CAP.isProvidedBy(player)) {
             List<BlockPos> blockPosList = CapabilityList.FAIRKEEPER_CHEST_POSITIONS_CAP.get(player).getList();

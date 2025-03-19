@@ -1,12 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.item.client;
 
 import dev.hexnowloading.dungeonnowloading.item.DNLAnimatedItem;
-import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartItemAnimationPacket;
-import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopItemAnimationPacket;
-import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemAnimationState {
@@ -14,6 +9,8 @@ public class ItemAnimationState {
     private static final String ANIMATIONS_TAG = "Animations";
 
     public static void start(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
+        ensureUUID(stack);
+
         if (resetAnimations) stopAll(stack);
 
         CompoundTag tag = stack.getOrCreateTag();
@@ -26,40 +23,12 @@ public class ItemAnimationState {
 
         animationsTag.put(animationName, animTag);
         tag.put(ANIMATIONS_TAG, animationsTag);
-
-        /*if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.level().isClientSide) {
-            Services.NETWORK.sendToServer(new C2SItemAnimationPacket(animationName, duration, loop));
-        }*/
-    }
-
-    public static void startAndSendPacket(Player player, ItemStack itemStack, int slot, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
-        if (player instanceof ServerPlayer serverPlayer) {
-            ensureUUID(itemStack);
-            ItemAnimationState.start(itemStack, animationName, gameTime, duration, loop, resetAnimations);
-            ItemAnimationState.sendStartAnimationPacket(serverPlayer, itemStack, slot, animationName, duration, loop, resetAnimations);
-        }
-    }
-
-    public static void sendStartAnimationPacket(ServerPlayer serverPlayer, ItemStack itemStack, int slot, String animationName, long duration, boolean loop, boolean resetAnimations) {
-        Services.NETWORK.sendToAllPlayers(new S2CStartItemAnimationPacket(serverPlayer.getUUID(), itemStack, slot, animationName, duration, loop, resetAnimations), serverPlayer.getServer());
     }
 
     public static void startIfStopped(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
         if (!isAnimating(stack, animationName, gameTime)) {
             start(stack, animationName, gameTime, duration, loop, resetAnimations);
         }
-    }
-
-    public static void stopAllAndSendPacket(Player player, ItemStack itemStack) {
-        if (player instanceof ServerPlayer serverPlayer) {
-            ensureUUID(itemStack);
-            ItemAnimationState.stopAll(itemStack);
-            ItemAnimationState.sendStopAllAnimationPacket(serverPlayer);
-        }
-    }
-
-    public static void sendStopAllAnimationPacket(ServerPlayer serverPlayer) {
-        Services.NETWORK.sendToAllPlayers(new S2CStopItemAnimationPacket(serverPlayer.getUUID()), serverPlayer.getServer());
     }
 
     public static float getProgress(ItemStack stack, String animationName, long gameTime, float partialTicks) {

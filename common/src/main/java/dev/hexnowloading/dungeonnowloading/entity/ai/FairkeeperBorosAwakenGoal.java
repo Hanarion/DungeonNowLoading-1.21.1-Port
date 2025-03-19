@@ -37,7 +37,7 @@ public class FairkeeperBorosAwakenGoal extends Goal {
         Direction direction = caller.getDirection();
         this.initialTarget = (new BlockPos(callerPos.relative(direction.getCounterClockWise(), horizontalOffset).below(verticalOffset))).getCenter().add(0.0f, -0.5f, 0.0f);
         this.finalTarget = (new BlockPos(callerPos.relative(direction.getClockWise(), horizontalOffset).below(verticalOffset))).getCenter().add(0.0f, -0.5f, 0.0f);
-        this.fairkeeper.setAwakenEndPos(this.finalTarget);
+        this.fairkeeper.setAwakenEndPos(this.initialTarget);
         this.fairkeeper.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_OPEN);
     }
 
@@ -46,11 +46,14 @@ public class FairkeeperBorosAwakenGoal extends Goal {
         if (!movingHorizontally) {
             double deltaY = this.fairkeeper.getY() - this.initialTarget.y;
             //BlockState blockState = this.fairkeeper.level().getBlockState(this.fairkeeper.blockPosition().below(2));
+            if (deltaY * deltaY < 5.0F * 5.0F) {
+                this.fairkeeper.addDeltaMovement(this.fairkeeper.getLookAngle().scale(0.1F));
+            }
             if (fairkeeper.onGround()) {
                 movingHorizontally = true;
             }
         } else {
-            this.fairkeeper.getMoveControl().setWantedPosition(this.finalTarget.x, this.finalTarget.y, this.finalTarget.z, 1.0F);
+            this.fairkeeper.getMoveControl().setWantedPosition(this.finalTarget.x, this.finalTarget.y, this.finalTarget.z, 1.1F);
 
             lookTowardTarget();
             double deltaX = this.fairkeeper.getX() - finalTarget.x;

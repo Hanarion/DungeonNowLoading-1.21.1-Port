@@ -4,7 +4,10 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperOurosMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.*;
+import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.TickBaseMoveSet;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
@@ -41,9 +44,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
+public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, FairkeeperSerpentHeadEntity {
 
     private static final EntityDataAccessor<FairkeeperOurosState> STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_STATE);
+    private static final EntityDataAccessor<FairkeeperOurosAnimationState> OUROS_ANIMATION_STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_ANIMATION_STATE);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> IS_ON_CEILING = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BOOLEAN);
@@ -52,11 +56,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     public final AnimationState openMouthAnimationState = new AnimationState();
     public final AnimationState openedMouthAnimationState = new AnimationState();
     public final AnimationState closeMouthAnimationState = new AnimationState();
-
-    private static final byte TRIGGER_IDLE_ANIMATION_BYTE = 70;
-    private static final byte TRIGGER_OPEN_MOUTH_ANIMATION_BYTE = 71;
-    private static final byte TRIGGER_OPENED_MOUTH_ANIMATION_BYTE = 72;
-    private static final byte TRIGGER_CLOSE_MOUTH_ANIMATION_BYTE = 73;
 
     private TickBaseMoveSet<FairkeeperOurosState> stateSelector = new TickBaseMoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
@@ -69,6 +68,9 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
     public static int SEGMENT_DELAY_STEP = 11;
+
+    private int mouthOpenAnimationTimeOut;
+    private static final int MOUTH_OPEN_ANIMATION_DURATION = 19;
     
     public FairkeeperOurosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -124,6 +126,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.entityData.define(CALLER_UUID, Optional.empty());
         this.entityData.define(IS_ON_CEILING, false);
         this.entityData.define(STATE, FairkeeperOurosState.IDLE);
+        this.entityData.define(OUROS_ANIMATION_STATE, FairkeeperOurosAnimationState.IDLE);
     }
 
     @Override
@@ -176,6 +179,27 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     public void tick() {
         super.tick();
+        this.segmentControl();
+        this.animationControl();
+    }
+
+    private void animationControl() {
+        if (!this.level().isClientSide) {
+            return;
+        }
+
+        if (this.mouthOpenAnimationTimeOut-- > 0) {
+            if (this.mouthOpenAnimationTimeOut <= 0) {
+                this.transitionTo(FairkeeperOurosAnimationState.MOUTH_OPENED);
+            }
+        }
+
+        if (this.openMouthAnimationState.isStarted() && this.mouthOpenAnimationTimeOut <= 0) {
+            this.mouthOpenAnimationTimeOut = MOUTH_OPEN_ANIMATION_DURATION;
+        }
+    }
+
+    private void segmentControl() {
         if (!this.level().isClientSide) {
             Entity child = getChild();
             if (child == null) {
@@ -197,6 +221,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                     part.setYRot(partParent.getYRot());
                     part.yBodyRot = partParent.getYRot();
                     part.yHeadRot = partParent.getYRot();
+                    part.setRotatable(false);
                     partParent = part;
                     if (i == segments - 1) {
                         part.setTail(true);
@@ -225,16 +250,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                 this.lookTowardTarget();
             }
         }
-
-        /*FairkeeperLookControl lookControl = (FairkeeperLookControl) this.getLookControl();
-
-        // Always update pitch based on motion
-        lookControl.tick();
-
-        // Update yaw only if there's a target
-        if (this.getTarget() != null) {
-            lookControl.setLookAt(this.getTarget().getX(), this.getTarget().getY(), this.getTarget().getZ());
-        }*/
     }
 
     private void lookTowardTarget() {
@@ -506,35 +521,45 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
-    public void handleEntityEvent(byte b) {
-        switch (b) {
-            case TRIGGER_IDLE_ANIMATION_BYTE:
-                this.idleAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_OPEN_MOUTH_ANIMATION_BYTE:
-                this.openMouthAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_OPENED_MOUTH_ANIMATION_BYTE:
-                this.openedMouthAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_CLOSE_MOUTH_ANIMATION_BYTE:
-                this.closeMouthAnimationState.start(this.tickCount);
-                break;
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (OUROS_ANIMATION_STATE.equals(entityDataAccessor)) {
+            FairkeeperOurosAnimationState animationState = this.getAnimationState();
+            this.resetAnimations();
+            switch (animationState) {
+                case IDLE -> this.idleAnimationState.startIfStopped(this.tickCount);
+                case MOUTH_OPEN -> this.openMouthAnimationState.startIfStopped(this.tickCount);
+                case MOUTH_OPENED -> this.openedMouthAnimationState.startIfStopped(this.tickCount);
+                case MOUTH_CLOSE -> this.closeMouthAnimationState.startIfStopped(this.tickCount);
+            }
         }
-        super.handleEntityEvent(b);
+        super.onSyncedDataUpdated(entityDataAccessor);
     }
 
-    private void stopAllAnimations() {
+    private void resetAnimations() {
         this.idleAnimationState.stop();
         this.openMouthAnimationState.stop();
         this.openedMouthAnimationState.stop();
         this.closeMouthAnimationState.stop();
     }
 
-    public void triggerIdleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_BYTE); }
-    public void triggerOpenMouthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_OPEN_MOUTH_ANIMATION_BYTE); }
-    public void triggerOpenedMOuthAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_OPENED_MOUTH_ANIMATION_BYTE); }
-    public void setTriggerCloseMouthAnimationByte() { this.level().broadcastEntityEvent(this, TRIGGER_CLOSE_MOUTH_ANIMATION_BYTE); }
+    public FairkeeperOurosEntity transitionTo(FairkeeperOurosAnimationState state) {
+        switch (state) {
+            case IDLE:
+                this.setAnimationState(FairkeeperOurosAnimationState.IDLE);
+                break;
+            case MOUTH_OPEN:
+                this.setAnimationState(FairkeeperOurosAnimationState.MOUTH_OPEN);
+                break;
+            case MOUTH_OPENED:
+                this.setAnimationState(FairkeeperOurosAnimationState.MOUTH_OPENED);
+                break;
+            case MOUTH_CLOSE:
+                this.setAnimationState(FairkeeperOurosAnimationState.MOUTH_CLOSE);
+                break;
+        }
+
+        return this;
+    }
 
     @Override
     public boolean isInWall() {
@@ -704,6 +729,17 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     public boolean isSlumbering() {
         return false;
+    }
+
+    public void setAnimationState(FairkeeperOurosAnimationState animationState) { this.entityData.set(OUROS_ANIMATION_STATE, animationState); }
+
+    public FairkeeperOurosAnimationState getAnimationState() { return this.entityData.get(OUROS_ANIMATION_STATE); }
+
+    public enum FairkeeperOurosAnimationState {
+        IDLE,
+        MOUTH_OPEN,
+        MOUTH_OPENED,
+        MOUTH_CLOSE
     }
 
     public enum FairkeeperOurosState {

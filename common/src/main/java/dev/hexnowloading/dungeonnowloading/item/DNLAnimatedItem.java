@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.UUID;
@@ -14,6 +15,8 @@ public interface DNLAnimatedItem<T extends Enum<T> & DNLAnimationState> {
     default T getDefaultAnimationState() {
         return null;
     }
+
+    void playDroppedAnimation(Player player, ItemStack itemStack);
 
     default void ensureItemUUID(ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();

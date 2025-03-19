@@ -57,11 +57,11 @@ public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends Hiera
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 
-        PartDefinition boros = partdefinition.addOrReplaceChild("boros", CubeListBuilder.create(), PartPose.offset(0.0F, 27.0F, -3.0F));
+        PartDefinition boros = partdefinition.addOrReplaceChild("boros", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
 
-        PartDefinition head = boros.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 2.3713F));
+        PartDefinition head = boros.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.offset(0.0F, -7.0F, 21.3713F));
 
-        PartDefinition upper_jaw = head.addOrReplaceChild("upper_jaw", CubeListBuilder.create().texOffs(0, 0).addBox(-15.0F, -9.0F, -41.0F, 30.0F, 11.0F, 44.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -12.0F, 20.0F));
+        PartDefinition upper_jaw = head.addOrReplaceChild("upper_jaw", CubeListBuilder.create().texOffs(0, 0).addBox(-15.0F, -9.0F, -41.0F, 30.0F, 11.0F, 44.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -2.0F, -2.0F));
 
         PartDefinition fuel_gland = upper_jaw.addOrReplaceChild("fuel_gland", CubeListBuilder.create().texOffs(154, 225).addBox(-15.0F, -19.0F, 12.0F, 4.0F, 7.0F, 11.0F, new CubeDeformation(0.0F))
                 .texOffs(154, 225).mirror().addBox(-49.0F, -19.0F, 12.0F, 4.0F, 7.0F, 11.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(30.0F, 12.0F, -20.0F));
@@ -103,33 +103,37 @@ public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends Hiera
         PartDefinition fang_sheath = upper_jaw.addOrReplaceChild("fang_sheath", CubeListBuilder.create().texOffs(112, 241).addBox(9.0F, 2.0F, -37.0F, 4.0F, 3.0F, 8.0F, new CubeDeformation(0.0F))
                 .texOffs(0, 242).addBox(-13.0F, 2.0F, -37.0F, 4.0F, 3.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        PartDefinition small_teeth = upper_jaw.addOrReplaceChild("small_teeth", CubeListBuilder.create().texOffs(148, 160).addBox(13.0F, 2.0F, -29.0F, 0.0F, 10.0F, 30.0F, new CubeDeformation(0.0F))
-                .texOffs(0, 191).addBox(-13.0F, 2.0F, -29.0F, 0.0F, 5.0F, 30.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition small_teeth = upper_jaw.addOrReplaceChild("small_teeth", CubeListBuilder.create().texOffs(148, 160).addBox(13.0F, 2.0F, -29.0F, 0.0F, 6.0F, 30.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 190).addBox(-13.0F, 2.0F, -29.0F, 0.0F, 6.0F, 30.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        PartDefinition fang = upper_jaw.addOrReplaceChild("fang", CubeListBuilder.create().texOffs(0, 278).addBox(11.0F, -17.0F, -36.0F, 0.0F, 12.0F, 7.0F, new CubeDeformation(0.0F))
-                .texOffs(0, 278).mirror().addBox(-11.0F, -17.0F, -36.0F, 0.0F, 12.0F, 7.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(0.0F, 9.0F, 0.0F));
+        PartDefinition fang = upper_jaw.addOrReplaceChild("fang", CubeListBuilder.create().texOffs(0, 278).addBox(11.0F, -6.0F, -3.5F, 0.0F, 12.0F, 7.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 278).mirror().addBox(-11.0F, -6.0F, -3.5F, 0.0F, 12.0F, 7.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(0.0F, -2.0F, -32.5F));
 
-        PartDefinition lower_jaw = head.addOrReplaceChild("lower_jaw", CubeListBuilder.create().texOffs(0, 55).addBox(-14.0F, 2.0F, -44.0F, 28.0F, 7.0F, 42.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -12.0F, 24.0F));
+        PartDefinition lower_jaw = head.addOrReplaceChild("lower_jaw", CubeListBuilder.create().texOffs(0, 55).addBox(-14.0F, 2.0F, -44.0F, 28.0F, 7.0F, 42.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -2.0F, 2.0F));
 
-        PartDefinition glottis = lower_jaw.addOrReplaceChild("glottis", CubeListBuilder.create().texOffs(80, 165).addBox(-3.0F, -8.0F, -30.0F, 6.0F, 6.0F, 28.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition glottis = lower_jaw.addOrReplaceChild("glottis", CubeListBuilder.create().texOffs(80, 165).addBox(-3.0F, -3.1667F, -19.0F, 6.0F, 6.0F, 28.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -4.8333F, -11.0F));
 
-        PartDefinition cube_r3 = glottis.addOrReplaceChild("cube_r3", CubeListBuilder.create().texOffs(220, 54).addBox(-3.0F, -3.0F, -6.5F, 6.0F, 6.0F, 13.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(6.0F, -4.75F, -8.5F, 0.0F, -0.3927F, 0.0F));
+        PartDefinition cube_r3 = glottis.addOrReplaceChild("cube_r3", CubeListBuilder.create().texOffs(220, 54).addBox(-3.0F, -3.0F, -6.5F, 6.0F, 6.0F, 13.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(6.0F, 0.0833F, 2.5F, 0.0F, -0.3927F, 0.0F));
 
-        PartDefinition cube_r4 = glottis.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(220, 73).addBox(-3.0F, -3.0F, -6.5F, 6.0F, 6.0F, 13.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-6.0F, -4.75F, -8.5F, 0.0F, 0.3927F, 0.0F));
+        PartDefinition cube_r4 = glottis.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(220, 73).addBox(-3.0F, -3.0F, -6.5F, 6.0F, 6.0F, 13.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-6.0F, 0.0833F, 2.5F, 0.0F, 0.3927F, 0.0F));
 
         PartDefinition tongue_sheath = lower_jaw.addOrReplaceChild("tongue_sheath", CubeListBuilder.create().texOffs(148, 0).addBox(-5.0F, -2.0F, -34.0F, 10.0F, 4.0F, 32.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        PartDefinition tongue = lower_jaw.addOrReplaceChild("tongue", CubeListBuilder.create().texOffs(60, 199).addBox(-3.0F, -11.0F, -35.0F, 6.0F, 2.0F, 25.0F, new CubeDeformation(0.0F))
-                .texOffs(102, 243).addBox(1.0F, -16.0F, -35.0F, 2.0F, 5.0F, 3.0F, new CubeDeformation(0.0F))
-                .texOffs(178, 243).addBox(-3.0F, -16.0F, -35.0F, 2.0F, 5.0F, 3.0F, new CubeDeformation(0.0F))
-                .texOffs(154, 243).addBox(1.0F, -16.0F, -32.0F, 2.0F, 2.0F, 4.0F, new CubeDeformation(0.0F))
-                .texOffs(166, 243).addBox(-3.0F, -16.0F, -32.0F, 2.0F, 2.0F, 4.0F, new CubeDeformation(0.0F))
-                .texOffs(208, 196).addBox(2.0F, -14.0F, -30.0F, 1.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
-                .texOffs(214, 196).addBox(-3.0F, -14.0F, -30.0F, 1.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 11.0F, -24.0F));
+        PartDefinition tongue = lower_jaw.addOrReplaceChild("tongue", CubeListBuilder.create().texOffs(60, 199).addBox(-3.0F, 2.2857F, -5.3571F, 6.0F, 2.0F, 25.0F, new CubeDeformation(0.0F))
+                .texOffs(102, 243).addBox(1.0F, -2.7143F, -5.3571F, 2.0F, 5.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(178, 243).addBox(-3.0F, -2.7143F, -5.3571F, 2.0F, 5.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(154, 243).addBox(1.0F, -2.7143F, -2.3571F, 2.0F, 2.0F, 4.0F, new CubeDeformation(0.0F))
+                .texOffs(166, 243).addBox(-3.0F, -2.7143F, -2.3571F, 2.0F, 2.0F, 4.0F, new CubeDeformation(0.0F))
+                .texOffs(208, 196).addBox(2.0F, -0.7143F, -0.3571F, 1.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(214, 196).addBox(-3.0F, -0.7143F, -0.3571F, 1.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -2.2857F, -51.6429F));
 
-        PartDefinition teeth = lower_jaw.addOrReplaceChild("teeth", CubeListBuilder.create().texOffs(206, 190).addBox(10.0F, -6.0F, -3.0F, 28.0F, 6.0F, 0.0F, new CubeDeformation(0.0F))
-                .texOffs(140, 46).mirror().addBox(38.0F, -15.0F, -3.0F, 0.0F, 15.0F, 40.0F, new CubeDeformation(0.0F)).mirror(false)
-                .texOffs(140, 46).mirror().addBox(10.0F, -15.0F, -3.0F, 0.0F, 15.0F, 40.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(-24.0F, 2.0F, -41.0F));
+        PartDefinition teeth = lower_jaw.addOrReplaceChild("teeth", CubeListBuilder.create().texOffs(206, 190).addBox(-14.0F, 0.0F, -13.3333F, 28.0F, 6.0F, 0.0F, new CubeDeformation(0.0F))
+                .texOffs(140, 46).mirror().addBox(14.0F, -9.0F, -13.3333F, 0.0F, 15.0F, 40.0F, new CubeDeformation(0.0F)).mirror(false)
+                .texOffs(140, 46).mirror().addBox(-14.0F, -9.0F, -13.3333F, 0.0F, 15.0F, 40.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(0.0F, -4.0F, -30.6667F));
+
+        PartDefinition mouth_flap_right = teeth.addOrReplaceChild("mouth_flap_right", CubeListBuilder.create().texOffs(256, -12).addBox(0.0F, -15.0F, -6.0F, 0.0F, 15.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offset(-14.0F, 6.0F, 20.6667F));
+
+        PartDefinition mouth_flap_left = teeth.addOrReplaceChild("mouth_flap_left", CubeListBuilder.create().texOffs(256, -12).mirror().addBox(0.0F, -15.0F, -6.0F, 0.0F, 15.0F, 12.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(14.0F, 6.0F, 20.6667F));
 
         return LayerDefinition.create(meshdefinition, 512, 512);
     }
@@ -148,7 +152,7 @@ public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends Hiera
     public void setupAnim(FairkeeperBorosEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
 
-        this.stone_helmet.visible = entity.getHealth() / entity.getMaxHealth() > 0.5F;
+        this.stone_helmet.visible = entity.hasArmor();
 
         float targetTilt = (float) Math.toRadians(this.getTiltAngle(entity));
         entity.setPreviousTilt(Mth.lerp(this.TILT_SPEED, entity.getPreviousTilt(), targetTilt));

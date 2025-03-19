@@ -45,8 +45,8 @@ public class DNLItems {
     public static final Supplier<Item> VERTEX_BOW = register("vertex_bow", () -> new VertexBowItem(new Item.Properties().rarity(Rarity.COMMON).durability(384)));
     public static final Supplier<Item> COPPER_DETONATOR = register("copper_detonator", () -> new CopperDetonatorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
     public static final Supplier<Item> FAIRKEEPER_SERPENT_CALLER = register("fairkeeper_serpent_caller", () -> new FairkeeperSerpentCallerItem(new Item.Properties().rarity(Rarity.EPIC)));
-    public static final Supplier<Item> SCORCHER = register("scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(100)));
-    public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(100)));
+    public static final Supplier<Item> SCORCHER = register("scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
+    public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     // BLOCKS
     //public static final Supplier<Item> SKYLIGHT_STONE = register("skylight_stone", () -> new BlockItem(DNLBlocks.SKYLIGHT_STONE.get(), new Item.Properties()));
     //public static final Supplier<Item> SKYLIGHT_GRASS_BLOCK = register("skylight_grass_block", () -> new BlockItem(DNLBlocks.SKYLIGHT_GRASS_BLOCK.get(), new Item.Properties()));

@@ -29,8 +29,8 @@ public class LargeSoulFlameParticle extends TextureSheetParticle {
     public void tick() {
         //this.rCol = (float) (this.lifetime - this.age) / this.lifetime;
         this.quadSize -= Math.min(this.quadSize, 0.05F);
-        this.gCol = 1.0F - 0.9F * ((float)this.age / this.lifetime);
-        this.rCol = 1.0F - 0.9F * ((float)this.age / this.lifetime);
+        this.gCol = 1.0F - 0.5F * ((float)this.age / this.lifetime);
+        this.rCol = 1.0F - 0.5F * ((float)this.age / this.lifetime);
         //this.gCol = (float) this.age / this.lifetime;
         //this.bCol = (float) this.age / this.lifetime;
         this.xo = this.x;

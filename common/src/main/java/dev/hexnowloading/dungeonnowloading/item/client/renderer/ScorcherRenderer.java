@@ -53,10 +53,14 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
         float heatAlpha = 0.0f;
 
         VertexConsumer vertexConsumer = bufferSource.getBuffer(this.model.renderType(ScorcherModel.TEXTURE));
+        if (itemStack.is(DNLItems.SOUL_SCORCHER.get())) {
+            vertexConsumer = bufferSource.getBuffer(this.model.renderType(ScorcherModel.TEXTURE_SOUL));
+        }
+
         if (itemStack.getItem() instanceof ScorcherItem scorcherItem) {
             Player player = Minecraft.getInstance().player;
             if (player == null) return;
-            animateOutsideInventory(player, itemStack);
+            animateOutsideInventory(player, itemStack, itemDisplayContext);
             this.model.setUpAnim(scorcherItem, player, itemStack, getPartialTick());
             flameAlpha = getFlameAlpha(player, itemStack);
             heatAlpha = getHeat(player, itemStack);
@@ -76,23 +80,21 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
             VertexConsumer emissiveHeat = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_HEAT);
             this.model.renderToBuffer(poseStack, emissiveHeat, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, heatAlpha);
         }
-
         poseStack.popPose();
     }
+
 
     private boolean onlyRenderInHands(ItemDisplayContext itemDisplayContext) {
         return itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
     }
 
-    private void animateOutsideInventory(Player player, ItemStack stack) {
+    private void animateOutsideInventory(Player player, ItemStack stack, ItemDisplayContext itemDisplayContext) {
         long storedGameTime = getTimeStamp(stack);
         long currentGameTime = player.level().getGameTime();
 
         if (storedGameTime == currentGameTime) return;
 
-        boolean isSelected = player.getMainHandItem().equals(stack) || player.getOffhandItem().equals(stack);
-
-        if (isSelected) return;
+        if (itemDisplayContext != ItemDisplayContext.GROUND) return;
 
         if (!ItemAnimationState.isAnimating(stack, ScorcherItem.ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), currentGameTime)) {
             if (ItemAnimationState.isAnimating(stack, ScorcherItem.ScorcherAnimationState.SCORCHER_SHOOT.getName(), currentGameTime)) {
@@ -109,12 +111,10 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
         float heatLevel = getHeatLevel(itemStack);
 
         if (storedGameTime == currentGameTime) {
-            // Item is in player's inventory, return stored heat
             return Math.min(heatLevel, 1.0f);
         } else {
-            // Item is NOT in player's inventory, apply decay at the same rate
             long timeElapsed = currentGameTime - storedGameTime;
-            float heatDecayPerTick = 1.0f / (6.0f * 20); // Same decay rate as in inventory (6s = 120 ticks)
+            float heatDecayPerTick = 1.0f / (6.0f * 20);
 
             float newHeatLevel = Math.max(0.0f, heatLevel - (timeElapsed * heatDecayPerTick));
             return Math.min(newHeatLevel, 1.0F);

@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
-import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.AxisParticleType;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
@@ -55,7 +55,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     private static final double BEAM_PARTICLE_SPACING = 0.1d;
     private static final float BEAM_PARTICLE_SCALE = 0.05f;
     private static final float MAX_RANDOM_PARTICLE_SCALE_MULTIPLIER = 3;
-    private static final int DURATION_ON_GROUND = 300;
+    public static final int DURATION_ON_GROUND = 300;
 
     private double xPower;
     private double yPower;

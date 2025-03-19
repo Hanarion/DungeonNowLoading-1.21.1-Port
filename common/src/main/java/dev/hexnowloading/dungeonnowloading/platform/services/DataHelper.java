@@ -13,10 +13,6 @@ public interface DataHelper {
 
     void setArmPose(Player player, DNLArmPose pose);
 
-    int getScorcherHeat(Player player);
-
-    void setScorcherHeat(Player player, int heat);
-
     Optional<List<BlockPos>> getFairkeeperChestPositionList(Player player);
 
     void addFairkeeperChestPositionList(Player player, BlockPos blockPos);

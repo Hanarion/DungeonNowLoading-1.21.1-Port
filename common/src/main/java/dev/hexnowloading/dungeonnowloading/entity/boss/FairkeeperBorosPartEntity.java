@@ -3,15 +3,17 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
-import dev.hexnowloading.dungeonnowloading.entity.util.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -36,7 +38,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
+public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, FairkeeperSerpentBodyEntity {
 
     private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -46,6 +48,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     private static final EntityDataAccessor<Boolean> TAIL = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HEAD_MOVING = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> MODEL_VISIBLE = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> ROTATABLE = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.BOOLEAN);
 
     private float previousTilt = 0.0F;
     private boolean enableRotation = true;
@@ -66,7 +69,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 10.0D)
+                .add(Attributes.MAX_HEALTH, 50.0D)
                 .add(Attributes.ATTACK_DAMAGE, 8.0D);
     }
 
@@ -81,6 +84,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.define(ARMOR, false);
         this.entityData.define(HEAD_MOVING, false);
         this.entityData.define(MODEL_VISIBLE, true);
+        this.entityData.define(ROTATABLE, true);
     }
 
     @Override
@@ -140,19 +144,18 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
                         // Align rotation with the head's historical rotation
                         Vec3 nextPos = headEntity.getPositionHistory().stream().skip(historyIndex - 1).findFirst().orElse(targetPos);
-                        if (headEntity.isState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING)) {
-                            this.enableRotation = false;
-                        }
-                        if (!this.enableRotation) {
+                        /*if (headEntity.isState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING)) {
+                            this.setRotatable(false);
+                        }*/
+                        if (!this.isRotatable()) {
                             Vec3 awakenEndPos = headEntity.getAwakenEndPos();
-                            double dx = awakenEndPos.x - this.getX();
-                            double dz = awakenEndPos.z - this.getZ();
+                            double dy = awakenEndPos.y - this.getY();
 
-                            if (dx * dx + dz * dz < 2.0F * 2.0F) {
-                                this.enableRotation = true;
+                            if (dy * dy < 5.0F * 5.0F) {
+                                this.setRotatable(true);
                             }
                         }
-                        if (this.enableRotation) {
+                        if (this.isRotatable()) {
                             alignRotation(targetPos, nextPos);
                         }
                     }
@@ -237,15 +240,29 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         if (!this.hasArmor() || damageSource.isCreativePlayer()) {
             FairkeeperBorosEntity head = (FairkeeperBorosEntity) this.getHead();
             if (head != null) {
+                head.setDamageFromOtherSegment(true);
                 head.hurt(damageSource, damageAmount);
             }
             return super.hurt(damageSource, 0);
         }
 
         if (damageSource.is(DamageTypes.EXPLOSION) || (damageSource.getDirectEntity() instanceof LivingEntity livingEntity && livingEntity.canDisableShield() && damageAmount > 6)) {
-            this.setArmor(false);
+            boolean doesKill = this.getHealth() - damageAmount <= 0;
+            float nonKillableDamage = doesKill ? 0 : damageAmount;
+            if (doesKill) {
+                this.setArmor(false);
+                if (this.level() instanceof ServerLevel serverLevel) {
+                    serverLevel.sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);
+                }
+                this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 1.0F, 1.0F);
+                return super.hurt(damageSource, 0);
+            } else {
+                this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.HOSTILE, 1.0F, 1.0F);
+                return super.hurt(damageSource, nonKillableDamage);
+            }
         }
 
+        this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.HOSTILE, 1.0F, 1.0F);
         return false;
     }
 
@@ -428,4 +445,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
     public void setTail(boolean tail) { this.entityData.set(TAIL, tail); }
 
+    public void setRotatable(boolean enableRotation) { this.entityData.set(ROTATABLE, enableRotation); }
+
+    public boolean isRotatable() { return this.entityData.get(ROTATABLE); }
 }
