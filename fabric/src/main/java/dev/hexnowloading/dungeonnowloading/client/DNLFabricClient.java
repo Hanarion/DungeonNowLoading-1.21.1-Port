@@ -116,6 +116,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.GREAT_EXPERIENCE_BOTTLE.get(), (context) -> {
             return new ThrownItemRenderer<>(context, 1.25F, false);
         });
+        EntityRendererRegistry.register(DNLEntityTypes.COMMAND_PYLON.get(), CommandPylonRenderer::new);
 
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
@@ -151,6 +152,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WhimperModel.LAYER_LOCATION, WhimperModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(CopperCreepModel.LAYER_LOCATION, CopperCreepModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(CommandPylonModel.LAYER_LOCATION, CommandPylonModel::createBodyLayer);
 
 
         //Projectiles

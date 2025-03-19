@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.*;
+import dev.hexnowloading.dungeonnowloading.entity.misc.CommandPylonEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.GreatExperienceBottleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
@@ -47,7 +48,6 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<WhimperEntity>> WHIMPER = register("whimper", () -> EntityType.Builder.of(WhimperEntity::new, MobCategory.CREATURE).sized(0.75F, 0.75F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "whimper").toString()));
     public static final Supplier<EntityType<CopperCreepEntity>> COPPER_CREEP = register("copper_creep", () -> EntityType.Builder.of(CopperCreepEntity::new, MobCategory.CREATURE).sized(0.65F, 0.75F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "copper_creep").toString()));
 
-
     // Projectiles
     public static final Supplier<EntityType<ChaosSpawnerProjectileEntity>> CHAOS_SPAWNER_PROJECTILE = register("chaos_spawner_projectile", () -> EntityType.Builder.<ChaosSpawnerProjectileEntity>of(ChaosSpawnerProjectileEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).clientTrackingRange(4).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "chaos_spawner_projectile").toString()));
     public static final Supplier<EntityType<FlameProjectileEntity>> FLAME_PROJECTILE = register("flame_projectile", () -> EntityType.Builder.<FlameProjectileEntity>of(FlameProjectileEntity::new, MobCategory.MISC).sized(1.0f, 1.0f).clientTrackingRange(4).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "flame_projectile").toString()));
@@ -62,6 +62,7 @@ public class DNLEntityTypes {
     // Misc
     public static final Supplier<EntityType<SpecialItemEntity>> SPECIAL_ITEM_ENTITY = register("special_item_entity", () -> EntityType.Builder.<SpecialItemEntity>of(SpecialItemEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "special_item_entity").toString()));
     public static final Supplier<EntityType<GreatExperienceBottleEntity>> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> EntityType.Builder.<GreatExperienceBottleEntity>of(GreatExperienceBottleEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "great_experience_bottle").toString()));
+    public static final Supplier<EntityType<CommandPylonEntity>> COMMAND_PYLON = register("command_pylon", () -> EntityType.Builder.<CommandPylonEntity>of(CommandPylonEntity::new, MobCategory.MISC).sized(0.99F, 0.3F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "command_pylon").toString()));
 
     private static <T extends EntityType<?>> Supplier<T> register(String name, Supplier<T> entityTypeSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ENTITY_TYPE, name, entityTypeSupplier);
@@ -89,6 +90,9 @@ public class DNLEntityTypes {
         map.put(SEALED_CHAOS.get(), SealedChaosEntity.createAttributes().build());
         map.put(WHIMPER.get(), WhimperEntity.createAttributes().build());
         map.put(COPPER_CREEP.get(), CopperCreepEntity.createAttributes().build());
+
+        // Misc
+        map.put(COMMAND_PYLON.get(), CommandPylonEntity.createAttributes().build());
 
         return map;
     }

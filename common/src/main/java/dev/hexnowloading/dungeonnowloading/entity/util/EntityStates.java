@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
+import dev.hexnowloading.dungeonnowloading.entity.misc.CommandPylonEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
@@ -22,6 +23,7 @@ public class EntityStates {
     public static final EntityDataSerializer<BallistaGolemEntity.BallistaGolemState> BALLISTA_GOLEM_STATE;
     public static final EntityDataSerializer<CopperCreepEntity.State> COPPER_CREEP_STATE;
     public static final EntityDataSerializer<VertexDomainProjectileEntity.VertexDomainAnimationState> VERTEX_DOMAIN_ANIMATION_STATE;
+    public static final EntityDataSerializer<CommandPylonEntity.State> COMMAND_PYLON_STATE;
 
     static {
         CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
@@ -34,6 +36,7 @@ public class EntityStates {
         BALLISTA_GOLEM_STATE = EntityDataSerializer.simpleEnum(BallistaGolemEntity.BallistaGolemState.class);
         COPPER_CREEP_STATE = EntityDataSerializer.simpleEnum(CopperCreepEntity.State.class);
         VERTEX_DOMAIN_ANIMATION_STATE = EntityDataSerializer.simpleEnum(VertexDomainProjectileEntity.VertexDomainAnimationState.class);
+        COMMAND_PYLON_STATE = EntityDataSerializer.simpleEnum(CommandPylonEntity.State.class);
 
         EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_STATE);
@@ -45,5 +48,6 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(BALLISTA_GOLEM_STATE);
         EntityDataSerializers.registerSerializer(COPPER_CREEP_STATE);
         EntityDataSerializers.registerSerializer(VERTEX_DOMAIN_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(COMMAND_PYLON_STATE);
     }
 }

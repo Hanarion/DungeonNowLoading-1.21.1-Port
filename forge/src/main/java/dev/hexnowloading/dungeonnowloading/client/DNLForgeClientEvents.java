@@ -38,6 +38,8 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);
         event.registerLayerDefinition(WhimperModel.LAYER_LOCATION, WhimperModel::createBodyLayer);
         event.registerLayerDefinition(CopperCreepModel.LAYER_LOCATION, CopperCreepModel::createBodyLayer);
+        event.registerLayerDefinition(CommandPylonModel.LAYER_LOCATION, CommandPylonModel::createBodyLayer);
+
 
         // Projectiles
         event.registerLayerDefinition(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
@@ -92,6 +94,7 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.GREAT_EXPERIENCE_BOTTLE.get(), (context) -> {
             return new ThrownItemRenderer<>(context, 1.25F, false);
         });
+        event.registerEntityRenderer(DNLEntityTypes.COMMAND_PYLON.get(), CommandPylonRenderer::new);
 
         // Block Entities
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);

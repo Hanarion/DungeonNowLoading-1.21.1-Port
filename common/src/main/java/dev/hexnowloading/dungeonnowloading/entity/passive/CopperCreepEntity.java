@@ -108,6 +108,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+
         this.entityData.define(SUMMONER_UUID, Optional.empty()); // Initially, no UUID is set
         this.entityData.define(DATA_IS_POWERED, false);
         this.entityData.define(DATA_IS_IGNITED, false);
@@ -209,7 +210,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             this.triggerSummonAnimation();
             this.entityData.set(DATA_IS_ALREADY_SUMMONED, true);
         }
-        if (this.aiTick == (int) CopperCreepAnimation.SUMMON.lengthInSeconds() * 20) {
+        if (this.aiTick == (int) (CopperCreepAnimation.SUMMON.lengthInSeconds() * 20)) {
 //            this.currentState = State.IDLE;
             this.setState(State.IDLE);
             this.triggerIdleAnimation();

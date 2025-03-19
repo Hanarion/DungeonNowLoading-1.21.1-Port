@@ -47,6 +47,8 @@ public class DNLItems {
     public static final Supplier<Item> FAIRKEEPER_SERPENT_CALLER = register("fairkeeper_serpent_caller", () -> new FairkeeperSerpentCallerItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> SCORCHER = register("scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
+    public static final Supplier<Item> COMMAND_PYLON = register("command_pylon", () -> new CommandPylonItem(new Item.Properties().rarity(Rarity.COMMON).durability(540)));
+
     // BLOCKS
     //public static final Supplier<Item> SKYLIGHT_STONE = register("skylight_stone", () -> new BlockItem(DNLBlocks.SKYLIGHT_STONE.get(), new Item.Properties()));
     //public static final Supplier<Item> SKYLIGHT_GRASS_BLOCK = register("skylight_grass_block", () -> new BlockItem(DNLBlocks.SKYLIGHT_GRASS_BLOCK.get(), new Item.Properties()));
