@@ -95,7 +95,14 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
         );
 
         this.tag(BlockTags.WITHER_IMMUNE).add(
-                DNLBlocks.STONE_PRESERVER.get()
+                DNLBlocks.STONE_PRESERVER.get(),
+                DNLBlocks.MENDING_AURA.get(),
+                DNLBlocks.MENDING_AURA_STAIRS.get(),
+                DNLBlocks.MENDING_AURA_SLAB.get(),
+                DNLBlocks.MENDING_AURA_FENCE.get(),
+                DNLBlocks.MENDING_AURA_WALL.get(),
+                DNLBlocks.MENDING_AURA_PANE.get(),
+                DNLBlocks.MENDING_AURA_PATH.get()
         );
 
         this.tag(BlockTags.DRAGON_IMMUNE).add(

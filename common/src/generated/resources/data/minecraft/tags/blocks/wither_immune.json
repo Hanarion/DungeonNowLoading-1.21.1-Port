@@ -1,5 +1,12 @@
 {
   "values": [
-    "dungeonnowloading:stone_preserver"
+    "dungeonnowloading:stone_preserver",
+    "dungeonnowloading:mending_aura",
+    "dungeonnowloading:mending_aura_stairs",
+    "dungeonnowloading:mending_aura_slab",
+    "dungeonnowloading:mending_aura_fence",
+    "dungeonnowloading:mending_aura_wall",
+    "dungeonnowloading:mending_aura_pane",
+    "dungeonnowloading:mending_aura_path"
   ]
 }

@@ -27,6 +27,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -191,7 +192,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
                 for (int y = -r; y <= r; y++) {
                     BlockPos targetPos = new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
                     if (!this.level().getBlockState(targetPos).is(BlockTags.WITHER_IMMUNE)) {
-                        this.level().destroyBlock(targetPos, true);
+                        this.level().destroyBlock(targetPos, false, this, Block.UPDATE_CLIENTS);
                     }
                 }
             }

@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,11 +34,10 @@ public interface PreserverBlockDestructionSystem {
 
     public static class User {
         public static final Codec<User> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                BlockPos.CODEC.fieldOf("pos").forGetter(User::getBlockPos),
                 BlockPos.CODEC.fieldOf("cornerA").forGetter(User::getCornerA),
                 BlockPos.CODEC.fieldOf("cornerB").forGetter(User::getCornerB),
                 Direction.CODEC.fieldOf("facing").forGetter(User::getFacing)
-        ).apply(instance, User::new));
+        ).apply(instance, (cornerA, cornerB, facing) -> new User(BlockPos.ZERO, cornerA, cornerB, facing)));
 
         private final BlockPos blockPos;
         private BlockPos cornerA;
@@ -83,9 +83,14 @@ public interface PreserverBlockDestructionSystem {
             this.direction = direction;
         }
 
-        public boolean isInsideRegion(BlockPos pos, Direction blockFacing) {
-            BlockPos absCornerA = blockPos.offset(rotateOffset(cornerA, blockFacing));
-            BlockPos absCornerB = blockPos.offset(rotateOffset(cornerB, blockFacing));
+        public boolean isInsideRegion(Level level, BlockPos eventBlockPos, BlockPos centerBlock) {
+            BlockEntity blockEntity = level.getBlockEntity(centerBlock);
+            if (!(blockEntity instanceof PreserverBlockEntity preserverBlockEntity)) return false;
+
+            Direction nbtDirection = preserverBlockEntity.getUser().getFacing();
+
+            BlockPos absCornerA = blockPos.offset(rotateOffset(level, centerBlock, cornerA, nbtDirection));
+            BlockPos absCornerB = blockPos.offset(rotateOffset(level, centerBlock, cornerB, nbtDirection));
 
             int minX = Math.min(absCornerA.getX(), absCornerB.getX());
             int minY = Math.min(absCornerA.getY(), absCornerB.getY());
@@ -94,19 +99,37 @@ public interface PreserverBlockDestructionSystem {
             int maxY = Math.max(absCornerA.getY(), absCornerB.getY());
             int maxZ = Math.max(absCornerA.getZ(), absCornerB.getZ());
 
-            return pos.getX() >= minX && pos.getX() <= maxX &&
-                    pos.getY() >= minY && pos.getY() <= maxY &&
-                    pos.getZ() >= minZ && pos.getZ() <= maxZ;
+            return eventBlockPos.getX() >= minX && eventBlockPos.getX() <= maxX &&
+                    eventBlockPos.getY() >= minY && eventBlockPos.getY() <= maxY &&
+                    eventBlockPos.getZ() >= minZ && eventBlockPos.getZ() <= maxZ;
         }
 
 
-        public static BlockPos rotateOffset(BlockPos offset, Direction facing) {
-            return switch (facing) {
-                case NORTH -> new BlockPos(offset.getX(), offset.getY(), offset.getZ());  // No change
-                case SOUTH -> new BlockPos(-offset.getX(), offset.getY(), -offset.getZ()); // Mirror XZ
-                case EAST -> new BlockPos(-offset.getZ(), offset.getY(), offset.getX());   // Rotate +90°
-                case WEST -> new BlockPos(offset.getZ(), offset.getY(), -offset.getX());   // Rotate -90°
+        public static BlockPos rotateOffset(Level level, BlockPos pos, BlockPos offset, Direction nbtFacing) {
+
+            Direction propertyDirection = level.getBlockState(pos).getValue(BlockStateProperties.FACING);
+
+            int propertyFacingIndex = switch (propertyDirection) {
+                default -> 0;
+                case EAST -> 1;
+                case SOUTH -> 2;
+                case WEST -> 3;
+            };
+
+            int nbtFacingIndex = switch (nbtFacing) {
+                default -> 0;
+                case EAST -> 1;
+                case SOUTH -> 2;
+                case WEST -> 3;
+            };
+
+            int facingDifference = propertyFacingIndex - nbtFacingIndex;
+
+            return switch (facingDifference) {
                 default -> offset;
+                case 1, -3 -> offset.rotate(Rotation.CLOCKWISE_90);
+                case -1, 3 -> offset.rotate(Rotation.COUNTERCLOCKWISE_90);
+                case -2, 2 -> offset.rotate(Rotation.CLOCKWISE_180);
             };
         }
     }
@@ -161,11 +184,11 @@ public interface PreserverBlockDestructionSystem {
 
             User user = system.getUser();
 
-            if (!user.isInsideRegion(eventBlockPos, serverLevel.getBlockState(centerBlockPos).getValue(BlockStateProperties.FACING))) {
+            if (!user.isInsideRegion(serverLevel, eventBlockPos, centerBlockPos)) {
                 return false;
             }
 
-            if (gameEvent == DNLGameEvents.BLOCK_DESTROY_EARLY.get()) {
+            if (gameEvent == DNLGameEvents.PLAYER_BLOCK_DESTROY_EARLY.get()) {
 
                 if (serverLevel.getBlockEntity(centerBlockPos) instanceof PreserverBlockEntity preserverBlock && preserverBlock.isPlayerPlaced(eventBlockPos)) {
                     preserverBlock.removePlayerPlacedBlock(eventBlockPos);
@@ -173,6 +196,55 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 if (context.sourceEntity() instanceof Player player && player.getAbilities().instabuild) {
+                    return false;
+                }
+
+                if (serverLevel.getBlockState(eventBlockPos).getBlock() instanceof MendingAuraBlock) {
+                    return false;
+                }
+
+                if (serverLevel.getBlockState(eventBlockPos).getBlock() instanceof PreserverBlock) {
+                    return false;
+                }
+
+                if (serverLevel.getBlockState(eventBlockPos).is(DNLTags.PRESERVER_IGNORE)) {
+                    return false;
+                }
+
+                if (!ignoreBlockTransformation(serverLevel, eventBlockPos)) {
+                    return false;
+                }
+
+                BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
+                BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
+                CompoundTag compoundTag = new CompoundTag();
+                if (originalBlockEntity != null) {
+                    compoundTag = originalBlockEntity.saveWithFullMetadata();
+                }
+
+                BlockDestructionManager.cancel();
+                ContainerDropManager.cancel(eventBlockPos);
+
+                placeMendingBlock(serverLevel, originalBlockState, eventBlockPos, gameEvent);
+
+                if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
+                    blockEntity.setStoredBlock(originalBlockState, compoundTag);
+                }
+
+                if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
+                    preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
+                    serverLevel.playSound(null, centerBlockPos, DNLSounds.MENDING_AURA_POP.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+
+                return true;
+            }
+            if (gameEvent == DNLGameEvents.BLOCK_DESTROY_EARLY.get()) {
+                if (serverLevel.getBlockState(eventBlockPos).isAir()) {
+                    return false;
+                }
+
+                if (serverLevel.getBlockEntity(centerBlockPos) instanceof PreserverBlockEntity preserverBlock && preserverBlock.isPlayerPlaced(eventBlockPos)) {
+                    preserverBlock.removePlayerPlacedBlock(eventBlockPos);
                     return false;
                 }
 

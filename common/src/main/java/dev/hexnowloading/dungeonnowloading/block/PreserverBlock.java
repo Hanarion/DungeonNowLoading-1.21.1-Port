@@ -81,7 +81,8 @@ public class PreserverBlock extends BaseEntityBlock {
     public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState state, BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, blockPos, state, blockEntity, tool);
         if (!level.isClientSide && !player.getAbilities().instabuild) {
-            level.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true), Block.UPDATE_CLIENTS);
+            Direction direction = state.getValue(FACING);
+            level.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true).setValue(FACING, direction), Block.UPDATE_CLIENTS);
 
             BlockEntity blockEntityNew = level.getBlockEntity(blockPos);
 
@@ -111,7 +112,8 @@ public class PreserverBlock extends BaseEntityBlock {
     @Override
     public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
         if (!serverLevel.getBlockTicks().hasScheduledTick(blockPos, this)) {
-            serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, false), Block.UPDATE_CLIENTS);
+            Direction direction = serverLevel.getBlockState(blockPos).getValue(FACING);
+            serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, false).setValue(FACING, direction), Block.UPDATE_CLIENTS);
         }
     }
 
@@ -127,7 +129,8 @@ public class PreserverBlock extends BaseEntityBlock {
     }
 
     public void setLitPreserverBlock(ServerLevel serverLevel, BlockPos blockPos) {
-        serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true), Block.UPDATE_CLIENTS);
+        Direction direction = serverLevel.getBlockState(blockPos).getValue(FACING);
+        serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true).setValue(FACING, direction), Block.UPDATE_CLIENTS);
         serverLevel.scheduleTick(blockPos, this, 20);
     }
 }

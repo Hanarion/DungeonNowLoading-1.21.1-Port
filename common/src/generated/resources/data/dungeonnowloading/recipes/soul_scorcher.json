@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "b": {
+      "item": "minecraft:bone"
+    },
+    "l": {
+      "item": "minecraft:lever"
+    },
+    "r": {
+      "item": "dungeonnowloading:redstone_core"
+    },
+    "s": {
+      "item": "minecraft:cobblestone"
+    }
+  },
+  "pattern": [
+    "sbb",
+    " sr",
+    "sl "
+  ],
+  "result": {
+    "item": "dungeonnowloading:soul_scorcher"
+  },
+  "show_notification": true
+}

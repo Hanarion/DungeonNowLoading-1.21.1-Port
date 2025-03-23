@@ -1,25 +1,28 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexArrowProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.util.DNLMath;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.SpectralArrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class VertexBowItem extends BowItem implements Vanishable {
     private static final float VERTEX_USE_THRESHOLD = 30.0f;
@@ -177,6 +180,15 @@ public class VertexBowItem extends BowItem implements Vanishable {
                 float targetFov = Minecraft.getInstance().options.fovEffectScale().get().floatValue() / 1.5F; // Target FOV when fully drawn
                 options.fov = Mth.lerp(drawRatio, options.fov, targetFov); // Smoothly transition towards target FOV
             }*/
+        }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, level, components, tooltipFlag);
+        if (GeneralConfig.TOGGLE_HELPFUL_ITEM_TOOLTIP.get()) {
+            components.add(Component.translatable("item.dungeonnowloading.vertex_bow.tooltip.ability_name").withStyle(ChatFormatting.GRAY));
+            components.add(Component.translatable("item.dungeonnowloading.vertex_bow.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 }

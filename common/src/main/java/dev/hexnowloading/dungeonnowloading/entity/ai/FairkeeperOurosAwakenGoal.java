@@ -51,6 +51,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
             }
             if (ouros.onCieling()) {
                 movingHorizontally = true;
+                ouros.setCanDestroyBlocks(true);
             }
         } else {
             this.ouros.getMoveControl().setWantedPosition(this.finalTarget.x, this.ouros.getBoundingBox().maxY, this.finalTarget.z, 1.0F);

@@ -5,9 +5,11 @@ import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEnti
 import dev.hexnowloading.dungeonnowloading.item.client.ItemAnimationState;
 import dev.hexnowloading.dungeonnowloading.item.client.animation.ScorcherAnimation;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stats;
@@ -63,6 +65,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
         if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime())) {
             if (!level.isClientSide) {
+                player.playSound(DNLSounds.SCORCHER_START.get());
                 ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STALLING.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_STALLING.lengthInSeconds() * 20L), false, false);
             }
 
@@ -327,10 +330,18 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         if (GeneralConfig.TOGGLE_HELPFUL_ITEM_TOOLTIP.get()) {
             //components.add(Component.translatable("item.dungeonnowloading.scorcher.tooltip.ability_name").withStyle(ChatFormatting.GRAY));
             if (itemStack.is(DNLItems.SCORCHER.get())) {
-                components.add(Component.translatable("item.dungeonnowloading.scorcher.tooltip.ability_description").withStyle(ChatFormatting.GRAY));
+                components.add(Component.translatable("item.dungeonnowloading.scorcher.tooltip.ability_name").withStyle(ChatFormatting.GRAY));
+                components.add(Component.translatable("item.dungeonnowloading.scorcher.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY));
             } else if (itemStack.is(DNLItems.SOUL_SCORCHER.get())) {
-                components.add(Component.translatable("item.dungeonnowloading.soul_scorcher.tooltip.ability_description").withStyle(ChatFormatting.GRAY));
+                components.add(Component.translatable("item.dungeonnowloading.soul_scorcher.tooltip.ability_name").withStyle(ChatFormatting.GRAY));
+                components.add(Component.translatable("item.dungeonnowloading.soul_scorcher.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY));
             }
+            components.add(CommonComponents.EMPTY);
+            components.add(Component.translatable("item.dungeonnowloading.scorcher_common.tooltip.cost").withStyle(ChatFormatting.GRAY));
+            components.add(Component.translatable("item.dungeonnowloading.scorcher_common.tooltip.cost.coal").withStyle(ChatFormatting.DARK_GRAY));
+            components.add(Component.translatable("item.dungeonnowloading.scorcher_common.tooltip.cost.charcoal").withStyle(ChatFormatting.DARK_GRAY));
+
+
         }
     }
 

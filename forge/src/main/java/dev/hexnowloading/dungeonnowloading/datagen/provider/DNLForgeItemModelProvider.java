@@ -33,7 +33,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.REDSTONE_CATALYST.get());
         simpleItem(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
         simpleItem(DNLItems.COPPER_DETONATOR.get());
-        simpleItem(DNLItems.COMMAND_PYLON.get());
+        simpleItem(DNLItems.REPULSOR.get());
         spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());

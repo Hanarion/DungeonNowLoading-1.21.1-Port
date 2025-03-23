@@ -366,7 +366,7 @@ public class RedstoneLaneBlock extends DirectionalBlock {
             case UNPOWERED:
                 break;
             case POWERED:
-                if (randomSource.nextFloat() > 0.7F) {
+                if (randomSource.nextFloat() < 0.1F) {
                     float r = randomSource.nextFloat() - randomSource.nextFloat();
                     double x = (double)blockPos.getX() + randomSource.nextFloat();
                     double y = (double)blockPos.getY() + 1.1 + 0.1 * r;
@@ -375,14 +375,14 @@ public class RedstoneLaneBlock extends DirectionalBlock {
                 }
                 break;
             case OVERPOWERED:
-                if (randomSource.nextFloat() > 0.7F) {
+                if (randomSource.nextFloat() < 0.1F) {
                     float r = randomSource.nextFloat() - randomSource.nextFloat();
                     double x = (double)blockPos.getX() + randomSource.nextFloat();
                     double y = (double)blockPos.getY() + 1.1 + 0.1 * r;
                     double z = (double)blockPos.getZ() + randomSource.nextFloat();
                     level.addParticle(DustParticleOptions.REDSTONE, x, y, z, 0.0D, 0.0D, 0.0D);
                 }
-                if (randomSource.nextFloat() > 0.9F) {
+                if (randomSource.nextFloat() < 0.03F) {
                     float r = randomSource.nextFloat() - randomSource.nextFloat();
                     double x = (double)blockPos.getX() + randomSource.nextFloat();
                     double y = (double)blockPos.getY() + 1.1 + 0.1 * r;
@@ -391,13 +391,13 @@ public class RedstoneLaneBlock extends DirectionalBlock {
                 }
                 break;
         }
-        if (blockState.getValue(DNLProperties.REDSTONE_LANE_MODE) == RedstoneLaneMode.POWERED && randomSource.nextFloat() > 0.5F) {
+       /* if (blockState.getValue(DNLProperties.REDSTONE_LANE_MODE) == RedstoneLaneMode.POWERED && randomSource.nextFloat() > 0.5F) {
             float r = randomSource.nextFloat() - randomSource.nextFloat();
             double x = (double)blockPos.getX() + randomSource.nextFloat();
             double y = (double)blockPos.getY() + 1.1 + 0.1 * r;
             double z = (double)blockPos.getZ() + randomSource.nextFloat();
             level.addParticle(DustParticleOptions.REDSTONE, x, y, z, 0.0D, 0.0D, 0.0D);
-        }
+        }*/
     }
 
     private void poweredParticle(Level level, BlockState blockState, BlockPos blockPos) {

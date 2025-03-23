@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "b": {
+      "item": "minecraft:copper_block"
+    },
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "e": {
+      "item": "minecraft:lightning_rod"
+    },
+    "i": {
+      "item": "dungeonnowloading:redstone_circuit"
+    },
+    "r": {
+      "item": "dungeonnowloading:redstone_core"
+    }
+  },
+  "pattern": [
+    "e e",
+    "cic",
+    "brb"
+  ],
+  "result": {
+    "item": "dungeonnowloading:repulsor"
+  },
+  "show_notification": true
+}

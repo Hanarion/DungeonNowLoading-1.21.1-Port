@@ -6,6 +6,140 @@
       "dungeonnowloading:music/nightstride"
     ]
   },
+  "scorcher_overheat": {
+    "subtitle": "sounds.dungeonnowloading.scorcher_overheat",
+    "sounds": [
+      "dungeonnowloading:item/scorcher/scorcher_overheat_0",
+      "dungeonnowloading:item/scorcher/scorcher_overheat_1",
+      "dungeonnowloading:item/scorcher/scorcher_overheat_2"
+    ]
+  },
+  "scorcher_shoot": {
+    "subtitle": "sounds.dungeonnowloading.scorcher_shoot",
+    "sounds": [
+      "dungeonnowloading:item/scorcher/scorcher_shoot_0",
+      "dungeonnowloading:item/scorcher/scorcher_shoot_1",
+      "dungeonnowloading:item/scorcher/scorcher_shoot_2"
+    ]
+  },
+  "scorcher_stall": {
+    "subtitle": "sounds.dungeonnowloading.scorcher_stall",
+    "sounds": [
+      "dungeonnowloading:item/scorcher/scorcher_stall_0",
+      "dungeonnowloading:item/scorcher/scorcher_stall_1",
+      "dungeonnowloading:item/scorcher/scorcher_stall_2"
+    ]
+  },
+  "scorcher_start": {
+    "subtitle": "sounds.dungeonnowloading.scorcher_start",
+    "sounds": [
+      "dungeonnowloading:item/scorcher/scorcher_start_0",
+      "dungeonnowloading:item/scorcher/scorcher_start_1",
+      "dungeonnowloading:item/scorcher/scorcher_start_2"
+    ]
+  },
+  "scorcher_stop": {
+    "subtitle": "sounds.dungeonnowloading.scorcher_stop",
+    "sounds": [
+      "dungeonnowloading:item/scorcher/scorcher_stop_0",
+      "dungeonnowloading:item/scorcher/scorcher_stop_1",
+      "dungeonnowloading:item/scorcher/scorcher_stop_2"
+    ]
+  },
+  "scorcher_unstable": {
+    "subtitle": "sounds.dungeonnowloading.scorcher_unstable",
+    "sounds": [
+      "dungeonnowloading:item/scorcher/scorcher_unstable"
+    ]
+  },
+  "soul_scorcher_overheat": {
+    "subtitle": "sounds.dungeonnowloading.soul_scorcher_overheat",
+    "sounds": [
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_overheat_0",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_overheat_1",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_overheat_2"
+    ]
+  },
+  "soul_scorcher_shoot": {
+    "subtitle": "sounds.dungeonnowloading.soul_scorcher_shoot",
+    "sounds": [
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_shoot_0",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_shoot_1",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_shoot_2"
+    ]
+  },
+  "soul_scorcher_stall": {
+    "subtitle": "sounds.dungeonnowloading.soul_scorcher_stall",
+    "sounds": [
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_stall_0",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_stall_1",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_stall_2"
+    ]
+  },
+  "soul_scorcher_start": {
+    "subtitle": "sounds.dungeonnowloading.soul_scorcher_start",
+    "sounds": [
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_start_0",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_start_1",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_start_2"
+    ]
+  },
+  "soul_scorcher_stop": {
+    "subtitle": "sounds.dungeonnowloading.soul_scorcher_stop",
+    "sounds": [
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_stop_0",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_stop_1",
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_stop_2"
+    ]
+  },
+  "soul_scorcher_unstable": {
+    "subtitle": "sounds.dungeonnowloading.soul_scorcher_unstable",
+    "sounds": [
+      "dungeonnowloading:item/soul_scorcher/soul_scorcher_unstable"
+    ]
+  },
+  "repulsor_barrier_build": {
+    "subtitle": "sounds.dungeonnowloading.repulsor_barrier_build",
+    "sounds": [
+      "dungeonnowloading:entity/repulsor/repulsor_barrier_build_0",
+      "dungeonnowloading:entity/repulsor/repulsor_barrier_build_1"
+    ]
+  },
+  "repulsor_fizzle": {
+    "subtitle": "sounds.dungeonnowloading.repulsor_fizzle",
+    "sounds": [
+      "dungeonnowloading:entity/repulsor/repulsor_fizzle_0",
+      "dungeonnowloading:entity/repulsor/repulsor_fizzle_1"
+    ]
+  },
+  "repulsor_alert": {
+    "subtitle": "sounds.dungeonnowloading.repulsor_alert",
+    "sounds": [
+      "dungeonnowloading:entity/repulsor/repulsor_50_alert_0",
+      "dungeonnowloading:entity/repulsor/repulsor_50_alert_1"
+    ]
+  },
+  "repulsor_blink": {
+    "subtitle": "sounds.dungeonnowloading.repulsor_blink",
+    "sounds": [
+      "dungeonnowloading:entity/repulsor/repulsor_blink_0",
+      "dungeonnowloading:entity/repulsor/repulsor_blink_1"
+    ]
+  },
+  "repulsor_break": {
+    "subtitle": "sounds.dungeonnowloading.repulsor_break",
+    "sounds": [
+      "dungeonnowloading:entity/repulsor/repulsor_break_0",
+      "dungeonnowloading:entity/repulsor/repulsor_break_1"
+    ]
+  },
+  "repulsor_place": {
+    "subtitle": "sounds.dungeonnowloading.repulsor_place",
+    "sounds": [
+      "dungeonnowloading:entity/repulsor/repulsor_place_0",
+      "dungeonnowloading:entity/repulsor/repulsor_place_1"
+    ]
+  },
   "vertex_arrow_bootup": {
     "subtitle": "sounds.dungeonnowloading.vertex_arrow_bootup",
     "sounds": [

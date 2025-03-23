@@ -47,7 +47,7 @@ public class PreserverBlockEntity extends BlockEntity implements GameEventListen
             PreserverBlockDestructionSystem.User.CODEC.parse(NbtOps.INSTANCE, compoundTag.getCompound("listener"))
                     .resultOrPartial(LOGGER::error)
                     .ifPresent(listener -> {
-                        this.user = listener;
+                        this.user = new User(this.getBlockPos(), listener.getCornerA(), listener.getCornerB(), listener.getFacing());
                     });
         }
         if (compoundTag.contains("PlayerPlacedBlocks")) {

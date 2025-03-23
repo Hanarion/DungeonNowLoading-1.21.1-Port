@@ -51,6 +51,7 @@ public class FairkeeperBorosAwakenGoal extends Goal {
             }
             if (fairkeeper.onGround()) {
                 movingHorizontally = true;
+                fairkeeper.setCanDestroyBlocks(true);
             }
         } else {
             this.fairkeeper.getMoveControl().setWantedPosition(this.finalTarget.x, this.finalTarget.y, this.finalTarget.z, 1.1F);

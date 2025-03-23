@@ -3,7 +3,10 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.*;
+import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.TickBaseMoveSet;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -74,6 +77,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private boolean targetRandomPlayer;
     private float armorHealth;
     private boolean damageFromOtherSegment;
+    private boolean canDestroyBlocks;
 
 
     private final ServerBossEvent bossEvent;
@@ -87,7 +91,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
-        this.setMaxUpStep(0.0f);
+        this.setMaxUpStep(1.0f);
         this.setPersistenceRequired();
         this.setArmor(true);
         this.setArmorHealth(150f);
@@ -300,15 +304,18 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void blockDestructionTick() {
-        int DESTRUCTION_RANGE = 4;
+        if (!this.canDestroyBlocks) {
+            return;
+        }
+        int DESTRUCTION_RANGE = 3;
         int y = 0;
         if (this.getMoveControl().hasWanted()) {
             y = Mth.floor(this.getMoveControl().getWantedY()) - this.getBlockY();
         }
-        if (y < -1) {
+        /*if (y < -1) {
             this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
             return;
-        }
+        }*/
         if (this.getDeltaMovement().lengthSqr() > 0.01) {
             return;
         }
@@ -331,7 +338,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
                         if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
-                            this.level().destroyBlock(blockPos, true, this);
+                            this.level().destroyBlock(blockPos, false, this);
                         }
                     }
                 }
@@ -589,6 +596,15 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     public void setArmorHealth(float f) { this.armorHealth = f; }
     public void setDamageFromOtherSegment(boolean b) { this.damageFromOtherSegment = b; }
     public boolean isDamageFromOtherSegment() { return this.damageFromOtherSegment; }
+    public void setCanDestroyBlocks(boolean b) {
+        this.canDestroyBlocks = b;
+    }
+
+    public boolean canDestroyBlocks() {
+        return this.canDestroyBlocks;
+    }
+
+
 
     @Override
     public boolean isStationary() {

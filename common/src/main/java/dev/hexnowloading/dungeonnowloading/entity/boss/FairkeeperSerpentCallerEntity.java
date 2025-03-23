@@ -655,6 +655,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             boros.setYRot(clockWiseDirection.toYRot());
             boros.yBodyRot = boros.getYRot();
             boros.yHeadRot = boros.getYRot();
+            boros.setCanDestroyBlocks(false);
             this.level().addFreshEntity(boros);
             boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.IDLE);
             this.setBorosId(boros.getUUID());
@@ -672,6 +673,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ouros.setYRot(counterClockWiseDirection.toYRot());
             ouros.yBodyRot = ouros.getYRot();
             ouros.yHeadRot = ouros.getYRot();
+            ouros.setCanDestroyBlocks(false);
             this.level().addFreshEntity(ouros);
             ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.IDLE);
             this.setOurosId(ouros.getUUID());

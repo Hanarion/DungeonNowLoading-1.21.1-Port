@@ -28,29 +28,29 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SOUL_CLOTH.get());
                 output.accept(DNLItems.SOUL_SILK.get());
                 output.accept(DNLItems.CHAOTIC_HEXAHEDRON.get());
-                output.accept(DNLItems.REDSTONE_SUPPRESSOR.get());
-                output.accept(DNLItems.REDSTONE_CORE.get());
                 output.accept(DNLItems.REDSTONE_CHIP.get());
+                output.accept(DNLItems.REDSTONE_SUPPRESSOR.get());
                 output.accept(DNLItems.REDSTONE_CIRCUIT.get());
-                // Items - Combat
+                output.accept(DNLItems.REDSTONE_CORE.get());
+                // Items - Combat (Boss Item, then non-boss Item order)
                 output.accept(DNLItems.SCEPTER_OF_SEALED_CHAOS.get());
                 output.accept(DNLItems.LIFE_STEALER.get());
                 output.accept(DNLItems.SPAWNER_SWORD.get());
                 output.accept(DNLItems.VERTEX_BOW.get());
-                output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.SCORCHER.get());
                 output.accept(DNLItems.SOUL_SCORCHER.get());
-                output.accept(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
+                output.accept(DNLItems.COPPER_DETONATOR.get());
+                output.accept(DNLItems.REPULSOR.get());
                 // Items - Armors
                 output.accept(DNLItems.SPAWNER_HELMET.get());
                 output.accept(DNLItems.SPAWNER_CHESTPLATE.get());
                 output.accept(DNLItems.SPAWNER_LEGGINGS.get());
                 output.accept(DNLItems.SPAWNER_BOOTS.get());
-                // Items - Functional
+                // Items - Boss Related
                 output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
                 output.accept(DNLItems.SKULL_OF_CHAOS.get());
                 output.accept(DNLItems.REDSTONE_CATALYST.get());
-                output.accept(DNLItems.COMMAND_PYLON.get());
+                output.accept(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
 
                 // Blocks
 

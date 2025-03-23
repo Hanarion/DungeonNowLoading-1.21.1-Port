@@ -76,6 +76,10 @@ public class ShieldingStonePillarProjectileEntity extends ModelledProjectileEnti
                 return;
             }
 
+            if (!this.hasLanded && this.level().destroyBlock(this.blockPosition().below(), false, this)) {
+                return;
+            }
+
             if (!this.hasLanded) {
                 AABB aabb = this.getBoundingBox().inflate(IMPACT_RANGE);
                 List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, aabb);

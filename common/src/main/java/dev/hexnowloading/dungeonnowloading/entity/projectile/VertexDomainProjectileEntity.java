@@ -233,7 +233,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
                         if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
-                            this.level().destroyBlock(blockPos, true, this);
+                            this.level().destroyBlock(blockPos, false, this);
                         }
                     }
                 }

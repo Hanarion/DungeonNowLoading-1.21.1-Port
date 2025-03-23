@@ -1,9 +1,13 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
-import dev.hexnowloading.dungeonnowloading.entity.misc.CommandPylonEntity;
+import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
+import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -14,17 +18,20 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
-public class CommandPylonItem extends Item{
-    public CommandPylonItem(Item.Properties properties) {
+public class RepulsorItem extends Item{
+    public RepulsorItem(Item.Properties properties) {
         super(properties);
     }
 
@@ -60,12 +67,12 @@ public class CommandPylonItem extends Item{
             BlockPos blockPos = blockPlaceContext.getClickedPos();
             ItemStack itemStack = useOnContext.getItemInHand();
             Vec3 vec3 = Vec3.atBottomCenterOf(blockPos);
-            AABB aABB = DNLEntityTypes.COMMAND_PYLON.get().getDimensions().makeBoundingBox(vec3.x(), vec3.y(), vec3.z());
+            AABB aABB = DNLEntityTypes.REPULSOR.get().getDimensions().makeBoundingBox(vec3.x(), vec3.y(), vec3.z());
             if (level.noCollision((Entity)null, aABB) && level.getEntities((Entity)null, aABB).isEmpty()) {
                 if (level instanceof ServerLevel) {
                     ServerLevel serverLevel = (ServerLevel)level;
-                    Consumer<CommandPylonEntity> consumer = EntityType.createDefaultStackConfig(serverLevel, itemStack, useOnContext.getPlayer());
-                    CommandPylonEntity pylonEntity = (CommandPylonEntity)DNLEntityTypes.COMMAND_PYLON.get().create(serverLevel, itemStack.getTag(), consumer, blockPos, MobSpawnType.SPAWN_EGG, true, true);
+                    Consumer<RepulsorEntity> consumer = EntityType.createDefaultStackConfig(serverLevel, itemStack, useOnContext.getPlayer());
+                    RepulsorEntity pylonEntity = (RepulsorEntity)DNLEntityTypes.REPULSOR.get().create(serverLevel, itemStack.getTag(), consumer, blockPos, MobSpawnType.SPAWN_EGG, true, true);
                     if (pylonEntity == null) {
                         return InteractionResult.FAIL;
                     }
@@ -74,6 +81,7 @@ public class CommandPylonItem extends Item{
                     pylonEntity.moveTo(pylonEntity.getX(), pylonEntity.getY(), pylonEntity.getZ(), 0.0F, 0.0F);
                     pylonEntity.setYRot(0.0f); // Set the entity's rotation based on the facing direction
                     pylonEntity.setYHeadRot(0.0f);
+                    pylonEntity.setShieldHealth(this.getMaxDamage() - itemStack.getDamageValue());
                     serverLevel.addFreshEntityWithPassengers(pylonEntity);
                     level.playSound((Player)null, pylonEntity.getX(), pylonEntity.getY(), pylonEntity.getZ(), SoundEvents.ARMOR_STAND_PLACE, SoundSource.BLOCKS, 0.75F, 0.8F);
                     pylonEntity.gameEvent(GameEvent.ENTITY_PLACE, useOnContext.getPlayer());
@@ -84,6 +92,18 @@ public class CommandPylonItem extends Item{
             } else {
                 return InteractionResult.FAIL;
             }
+        }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, level, components, tooltipFlag);
+        if (GeneralConfig.TOGGLE_HELPFUL_ITEM_TOOLTIP.get()) {
+            components.add(Component.translatable("item.dungeonnowloading.repulsor.tooltip.ability_name").withStyle(ChatFormatting.GRAY));
+            components.add(Component.translatable("item.dungeonnowloading.repulsor.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY));
+            components.add(CommonComponents.EMPTY);
+            components.add(Component.translatable("item.dungeonnowloading.repulsor.tooltip.right_click").withStyle(ChatFormatting.GRAY));
+            components.add(Component.translatable("item.dungeonnowloading.repulsor.tooltip.right_click.description").withStyle(ChatFormatting.DARK_GREEN));
         }
     }
 }

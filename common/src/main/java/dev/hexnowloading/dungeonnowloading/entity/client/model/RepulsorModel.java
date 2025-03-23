@@ -6,40 +6,41 @@ package dev.hexnowloading.dungeonnowloading.entity.client.model;// Made with Blo
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.CommandPylonAnimation;
-import dev.hexnowloading.dungeonnowloading.entity.misc.CommandPylonEntity;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.RepulsorAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 
-public class CommandPylonModel<T extends CommandPylonEntity> extends HierarchicalModel<T> {
+public class RepulsorModel<T extends RepulsorEntity> extends HierarchicalModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "command_pylon"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "repulsor"), "main");
 	private final ModelPart root;
 	private final ModelPart base;
 	private final ModelPart gear1;
 	private final ModelPart gear2;
 	private final ModelPart coil;
 	private final ModelPart antenna;
+	private final ModelPart Shockwave2;
+	private final ModelPart Shockwave;
 	private final ModelPart legs;
 	private final ModelPart leg_nw;
 	private final ModelPart leg_ne;
 	private final ModelPart leg_sw;
 	private final ModelPart leg_se;
-	private float antennaRotation;
-	private float gearRotation;
 
-	public CommandPylonModel(ModelPart root) {
+	public RepulsorModel(ModelPart root) {
 		this.root = root.getChild("root");
 		this.base = this.root.getChild("base");
 		this.gear1 = this.base.getChild("gear1");
 		this.gear2 = this.base.getChild("gear2");
 		this.coil = this.base.getChild("coil");
 		this.antenna = this.base.getChild("antenna");
+		this.Shockwave2 = this.root.getChild("Shockwave2");
+		this.Shockwave = this.root.getChild("Shockwave");
 		this.legs = this.root.getChild("legs");
 		this.leg_nw = this.legs.getChild("leg_nw");
 		this.leg_ne = this.legs.getChild("leg_ne");
@@ -54,8 +55,8 @@ public class CommandPylonModel<T extends CommandPylonEntity> extends Hierarchica
 		PartDefinition root = partdefinition.addOrReplaceChild("root", CubeListBuilder.create(), PartPose.offset(0.0F, 25.0F, 0.0F));
 
 		PartDefinition base = root.addOrReplaceChild("base", CubeListBuilder.create().texOffs(0, 106).addBox(-5.0F, -5.0F, -5.0F, 10.0F, 5.0F, 10.0F, new CubeDeformation(0.0F))
-		.texOffs(41, 114).mirror().addBox(-2.0F, -5.0F, -7.0F, 4.0F, 5.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false)
-		.texOffs(40, 10).addBox(-2.0F, -6.0F, -2.0F, 4.0F, 1.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+				.texOffs(41, 114).mirror().addBox(-2.0F, -5.0F, -7.0F, 4.0F, 5.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false)
+				.texOffs(40, 10).addBox(-2.0F, -6.0F, -2.0F, 4.0F, 1.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
 		PartDefinition cube_r1 = base.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(41, 114).addBox(-2.0F, -2.5F, -1.5F, 4.0F, 5.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-5.5F, -2.5F, 0.0F, 0.0F, 1.5708F, 0.0F));
 
@@ -72,6 +73,10 @@ public class CommandPylonModel<T extends CommandPylonEntity> extends Hierarchica
 		PartDefinition antenna = base.addOrReplaceChild("antenna", CubeListBuilder.create().texOffs(0, -1).addBox(0.0F, -5.5F, -8.0F, 0.0F, 11.0F, 16.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -10.5F, 0.0F));
 
 		PartDefinition cube_r4 = antenna.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(0, -1).addBox(0.0F, -5.5F, -8.0F, 0.0F, 11.0F, 16.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, -1.5708F, 0.0F));
+
+		PartDefinition Shockwave2 = root.addOrReplaceChild("Shockwave2", CubeListBuilder.create().texOffs(58, 104).addBox(-11.5F, 0.0F, -11.5F, 23.0F, 0.0F, 23.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -16.0F, 0.0F));
+
+		PartDefinition Shockwave = root.addOrReplaceChild("Shockwave", CubeListBuilder.create().texOffs(58, 104).addBox(-11.5F, 0.0F, -11.5F, 23.0F, 0.0F, 23.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -16.0F, 0.0F));
 
 		PartDefinition legs = root.addOrReplaceChild("legs", CubeListBuilder.create().texOffs(56, 0).addBox(-4.1F, -2.4656F, -5.7F, 10.0F, 4.0F, 10.0F, new CubeDeformation(0.0F)), PartPose.offset(-0.9F, -2.5344F, 0.7F));
 
@@ -93,24 +98,12 @@ public class CommandPylonModel<T extends CommandPylonEntity> extends Hierarchica
 	}
 
 	@Override
-	public void setupAnim(CommandPylonEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(RepulsorEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.root.getAllParts().forEach(ModelPart::resetPose);
 
-		this.animate(entity.setupAnimState, CommandPylonAnimation.SETUP, ageInTicks);
-		this.animate(entity.idleAnimState, CommandPylonAnimation.IDLE, ageInTicks);
-		this.animate(entity.baseDownAnimState, CommandPylonAnimation.BASE_DOWN, ageInTicks);
-		this.animate(entity.baseUpAnimState, CommandPylonAnimation.BASE_UP, ageInTicks);
+		this.animate(entity.setupAnimState, RepulsorAnimation.SETUP, ageInTicks);
+		this.animate(entity.idleAnimState, RepulsorAnimation.IDLE, ageInTicks);
 
-		float deltaTime = ageInTicks - entity.tickCount;
-		float pylonHealthRatio = entity.getShieldHealth() / CommandPylonEntity.SHIELD_MAX_HEALTH;
-		float setupTimeRatio = Mth.clamp(entity.getAge() / CommandPylonEntity.SETUP_DURATION_TICKS, 0.0f, 1.0f);
-
-		antennaRotation += entity.getAntennaRotationSpeed() * setupTimeRatio * pylonHealthRatio * deltaTime;
-		antenna.yRot = antennaRotation;
-
-		gearRotation -= entity.getGearRotationSpeed() * deltaTime;
-		gear1.zRot = gearRotation;
-		gear2.zRot = gearRotation;
 	}
 
 	@Override

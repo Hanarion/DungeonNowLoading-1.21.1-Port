@@ -11,6 +11,24 @@ import java.util.function.Supplier;
 
 public class DNLSounds {
     public static final Supplier<Holder<SoundEvent>> MUSIC_TEMPLE_OF_DUALITY = registerSoundEventHolder("music_temple_of_duality");
+    public static final Supplier<SoundEvent> SCORCHER_OVERHEAT = registerSoundEvent("scorcher_overheat");
+    public static final Supplier<SoundEvent> SCORCHER_SHOOT = registerSoundEvent("scorcher_shoot");
+    public static final Supplier<SoundEvent> SCORCHER_STALL = registerSoundEvent("scorcher_stall");
+    public static final Supplier<SoundEvent> SCORCHER_START = registerSoundEvent("scorcher_start");
+    public static final Supplier<SoundEvent> SCORCHER_STOP = registerSoundEvent("scorcher_stop");
+    public static final Supplier<SoundEvent> SCORCHER_UNSTABLE = registerSoundEvent("scorcher_unstable");
+    public static final Supplier<SoundEvent> SOUL_SCORCHER_OVERHEAT = registerSoundEvent("soul_scorcher_overheat");
+    public static final Supplier<SoundEvent> SOUL_SCORCHER_SHOOT = registerSoundEvent("soul_scorcher_shoot");
+    public static final Supplier<SoundEvent> SOUL_SCORCHER_STALL = registerSoundEvent("soul_scorcher_stall");
+    public static final Supplier<SoundEvent> SOUL_SCORCHER_START = registerSoundEvent("soul_scorcher_start");
+    public static final Supplier<SoundEvent> SOUL_SCORCHER_STOP = registerSoundEvent("soul_scorcher_stop");
+    public static final Supplier<SoundEvent> SOUL_SCORCHER_UNSTABLE = registerSoundEvent("soul_scorcher_unstable");
+    public static final Supplier<SoundEvent> REPULSOR_BARRIER_BUILD = registerSoundEvent("repulsor_barrier_build");
+    public static final Supplier<SoundEvent> REPULSOR_FIZZLE = registerSoundEvent("repulsor_fizzle");
+    public static final Supplier<SoundEvent> REPULSOR_ALERT = registerSoundEvent("repulsor_alert");
+    public static final Supplier<SoundEvent> REPULSOR_BLINK = registerSoundEvent("repulsor_blink");
+    public static final Supplier<SoundEvent> REPULSOR_BREAK = registerSoundEvent("repulsor_break");
+    public static final Supplier<SoundEvent> REPULSOR_PLACE = registerSoundEvent("repulsor_place");
     public static final Supplier<SoundEvent> VERTEX_ARROW_BOOTUP = registerSoundEvent("vertex_arrow_bootup");
     public static final Supplier<SoundEvent> VERTEX_NODE_CONNECT = registerSoundEvent("vertex_node_connect");
     public static final Supplier<SoundEvent> VERTEX_TRANSMISSION_DAMAGE = registerSoundEvent("vertex_transmission_damage");

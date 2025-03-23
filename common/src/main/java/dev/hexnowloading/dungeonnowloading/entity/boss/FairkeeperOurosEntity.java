@@ -64,6 +64,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private float previousTilt = 0.0f;
     private Vec3 awakenEndPos;
     private boolean targetRandomPlayer;
+    private boolean canDestroyBlocks;
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
@@ -431,24 +432,28 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void blockDestructionTick() {
+        if (!this.canDestroyBlocks) {
+            return;
+        }
+
         int DESTRUCTION_RANGE = 2;
         int y = 0;
         if (this.getMoveControl().hasWanted()) {
             y = (int) (Mth.floor(this.getMoveControl().getWantedY()) - this.getBoundingBox().maxY);
         }
         if (y < -1) {
-            this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+            this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 2, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
             return;
         }
         if (this.getDeltaMovement().lengthSqr() > 0.01) {
             return;
         }
-        if (y > 1) {
+        /*if (y > 1) {
             this.setPos(this.getX(), this.getY() + 1, this.getZ());
             this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 0, 4, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
             return;
-        }
-        this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+        }*/
+        this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 2, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
     }
 
     private void destroyContactBlocks(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
@@ -462,7 +467,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
                         if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
-                            this.level().destroyBlock(blockPos, true, this);
+                            this.level().destroyBlock(blockPos, false, this);
                         }
                     }
                 }
@@ -734,6 +739,14 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     public void setAnimationState(FairkeeperOurosAnimationState animationState) { this.entityData.set(OUROS_ANIMATION_STATE, animationState); }
 
     public FairkeeperOurosAnimationState getAnimationState() { return this.entityData.get(OUROS_ANIMATION_STATE); }
+
+    public void setCanDestroyBlocks(boolean b) {
+        this.canDestroyBlocks = b;
+    }
+
+    public boolean canDestroyBlocks() {
+        return this.canDestroyBlocks;
+    }
 
     public enum FairkeeperOurosAnimationState {
         IDLE,

@@ -4,3 +4,6 @@ accessible field net/minecraft/world/entity/projectile/Arrow potion Lnet/minecra
 accessible field net/minecraft/world/entity/Mob lootTable Lnet/minecraft/resources/ResourceLocation;
 accessible method net/minecraft/world/level/block/StairBlock <init> (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
 accessible method net/minecraft/client/renderer/entity/ItemRenderer renderModelLists (Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/item/ItemStack;IILcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V
+accessible method net/minecraft/world/entity/projectile/ThrownPotion applySplash (Ljava/util/List;Lnet/minecraft/world/entity/Entity;)V
+accessible method net/minecraft/world/entity/projectile/ThrownPotion applyWater ()V
+accessible method net/minecraft/world/entity/projectile/ThrownPotion makeAreaOfEffectCloud (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)V

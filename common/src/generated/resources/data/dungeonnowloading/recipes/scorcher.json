@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "l": {
+      "item": "minecraft:lever"
+    },
+    "r": {
+      "item": "dungeonnowloading:redstone_core"
+    },
+    "s": {
+      "item": "minecraft:cobblestone"
+    }
+  },
+  "pattern": [
+    "s  ",
+    " sr",
+    "sl "
+  ],
+  "result": {
+    "item": "dungeonnowloading:scorcher"
+  },
+  "show_notification": true
+}
