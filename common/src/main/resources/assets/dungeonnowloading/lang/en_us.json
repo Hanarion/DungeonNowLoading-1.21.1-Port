@@ -222,6 +222,7 @@
   "sounds.dungeonnowloading.soul_scorcher_stop": "Soul Scorcher stops",
   "sounds.dungeonnowloading.soul_scorcher_unstable": "Soul Scorcher unstable",
   "sounds.dungeonnowloading.nightstride": "Nightstride playing",
+  "sounds.dungeonnowloading.hike": "Hike playing",
   "effect.dungeonnowloading.vertex_transmission": "Vertex Transmission",
   "warning.dungeonnowloading.cannot_open_fairkeeper_chest": "All enemies in the room must be defeated first!"
 }

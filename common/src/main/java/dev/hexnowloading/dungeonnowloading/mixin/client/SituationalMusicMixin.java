@@ -27,6 +27,7 @@ public abstract class SituationalMusicMixin {
 
         Music music = (Music) Optionull.map(screen, Screen::getBackgroundMusic);
 
+
         if (music == null && player != null) {
             if (S2CStructureDetectionPacket.isClientInStructure()) {
                 cir.setReturnValue(DNLMusics.TEMPLE_OF_DUALITY_MUSIC.get());

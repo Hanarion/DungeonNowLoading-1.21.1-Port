@@ -2,8 +2,27 @@
   "music_temple_of_duality" : {
     "subtitle": "sounds.dungeonnowloading.music_temple_of_duality",
     "sounds": [
-      "dungeonnowloading:music/hike",
-      "dungeonnowloading:music/nightstride"
+      {
+        "name": "dungeonnowloading:music/hike",
+        "stream": true
+      },
+      {
+        "name": "dungeonnowloading:music/nightstride",
+        "stream": true
+      }
+    ]
+  },
+  "hike" : {
+    "subtitle": "sounds.dungeonnowloading.hike",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/hike",
+        "stream": true
+      },
+      {
+        "name": "dungeonnowloading:music/nightstride",
+        "stream": true
+      }
     ]
   },
   "scorcher_overheat": {
@@ -122,8 +141,7 @@
   "repulsor_blink": {
     "subtitle": "sounds.dungeonnowloading.repulsor_blink",
     "sounds": [
-      "dungeonnowloading:entity/repulsor/repulsor_blink_0",
-      "dungeonnowloading:entity/repulsor/repulsor_blink_1"
+      "dungeonnowloading:entity/repulsor/repulsor_blink_0"
     ]
   },
   "repulsor_break": {

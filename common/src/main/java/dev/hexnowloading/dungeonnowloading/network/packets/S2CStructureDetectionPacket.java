@@ -49,8 +49,8 @@ public class S2CStructureDetectionPacket implements DNLPacket {
 
     public static boolean isClientInStructure() {
         if (Minecraft.getInstance() == null || Minecraft.getInstance().player == null) {
-            return false; // ✅ Prevents crashes
-        }// ✅ Prevents null errors
+            return false;
+        }
         UUID clientUUID = Minecraft.getInstance().player.getUUID();
         return playerStructureStatus.getOrDefault(clientUUID, false);
     }

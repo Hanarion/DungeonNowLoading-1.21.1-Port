@@ -295,7 +295,7 @@ public class RepulsorEntity extends Mob {
 
                     if ((this.getAge() % (int) blinkCycle) == 0) {
                         float normalizedSpeed = 1F - ((blinkCycle - 5F) / 35F);
-                        float pitch = 1.0F + normalizedSpeed * 0.8F;
+                        float pitch = 1.0F + normalizedSpeed;
 
                         this.level().playSound(
                                 null,

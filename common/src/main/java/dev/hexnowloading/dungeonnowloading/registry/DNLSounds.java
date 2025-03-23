@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 
 public class DNLSounds {
     public static final Supplier<Holder<SoundEvent>> MUSIC_TEMPLE_OF_DUALITY = registerSoundEventHolder("music_temple_of_duality");
+    public static final Supplier<SoundEvent> MUSIC_TEMPLE_OF_DUALITY_TEST = registerSoundEvent("music_temple_of_duality_test");
+    public static final Supplier<SoundEvent> HIKE = registerSoundEvent("hike");
     public static final Supplier<SoundEvent> SCORCHER_OVERHEAT = registerSoundEvent("scorcher_overheat");
     public static final Supplier<SoundEvent> SCORCHER_SHOOT = registerSoundEvent("scorcher_shoot");
     public static final Supplier<SoundEvent> SCORCHER_STALL = registerSoundEvent("scorcher_stall");
@@ -72,7 +74,6 @@ public class DNLSounds {
         Supplier<SoundEvent> soundEvent = registerSoundEvent(string);
         return () -> BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent.get());
     }
-
 
     public static void init() {}
 
