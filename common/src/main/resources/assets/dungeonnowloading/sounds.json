@@ -160,11 +160,11 @@
       "dungeonnowloading:entity/vertex_arrow/vertex_arrow_bootup_1"
     ]
   },
-  "vertex_transmission_damage": {
-    "subtitle": "sounds.dungeonnowloading.vertex_transmission_damage",
+  "vertex_arrow_damage": {
+    "subtitle": "sounds.dungeonnowloading.vertex_arrow_damage",
     "sounds": [
-      "dungeonnowloading:effect/vertex_transmission/vertex_transmission_damage_0",
-      "dungeonnowloading:effect/vertex_transmission/vertex_transmission_damage_1"
+      "dungeonnowloading:entity/vertex_arrow/vertex_arrow_damage_0",
+      "dungeonnowloading:entity/vertex_arrow/vertex_arrow_damage_1"
     ]
   },
   "vertex_node_connect": {

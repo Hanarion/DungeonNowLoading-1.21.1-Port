@@ -6,8 +6,6 @@ import dev.hexnowloading.dungeonnowloading.util.DNLMath;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 
@@ -70,7 +68,7 @@ public class VertexTransmissionEffect extends MobEffect {
                         entity.getX(),
                         entity.getY(),
                         entity.getZ(),
-                        DNLSounds.VERTEX_TRANSMISSION_DAMAGE.get(),
+                        DNLSounds.VERTEX_ARROW_DAMAGE.get(),
                         SoundSource.NEUTRAL,
                         1.0F,
                         1.2F / (DNLMath.randomRange(0.0f, 1.0f) * 0.2F + 0.9F)
