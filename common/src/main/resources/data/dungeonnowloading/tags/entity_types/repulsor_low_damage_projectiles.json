@@ -6,6 +6,7 @@
     "minecraft:firework_rocket",
     "minecraft:potion",
     "minecraft:trident",
+    "dungeonnowloading:shielding_stone_pillar_projectile",
     "dungeonnowloading:vertex_orb_projectile"
   ]
 }
