@@ -52,8 +52,8 @@ public class RepulsorEntity extends Mob {
     public static final float SHIELD_MAX_HEALTH = 100.0f;
     public static final float SHIELD_ALERT_THRESHOLD = SHIELD_MAX_HEALTH * 0.5F;
     private static final double BEAM_INITIAL_PARTICLE_SPACING = 0.5d;
-    private static final float BEAM_INITIAL_PARTICLE_SCALE_MIN = 0.2f;
-    private static final float BEAM_INITIAL_PARTICLE_SCALE_MAX = 0.4f;
+    private static final float BEAM_INITIAL_PARTICLE_SCALE_MIN = 0.1f;
+    private static final float BEAM_INITIAL_PARTICLE_SCALE_MAX = 0.3f;
     private static final int SHIELD_HEAL_AMOUNT = 5;
     private static final EntityDataAccessor<Boolean> DATA_CAN_RENDER = SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_AGE = SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.INT);
@@ -62,7 +62,10 @@ public class RepulsorEntity extends Mob {
 
     public AnimationState setupAnimState = new AnimationState();
     public AnimationState idleAnimState = new AnimationState();
+    public AnimationState rechargeAnimState = new AnimationState();
     private Set<ThrownTrident> processedTridents = new HashSet<>();
+
+    private int rechargeAnimDuration;
 
     public RepulsorEntity(EntityType<? extends Mob> $$0, Level $$1) {
         super($$0, $$1);
@@ -128,20 +131,22 @@ public class RepulsorEntity extends Mob {
     protected InteractionResult mobInteract(Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
 
-        if (this.level().isClientSide()) {
-            return InteractionResult.PASS;
-        }
-        if (itemStack.isEmpty() || interactionHand.equals(InteractionHand.OFF_HAND)) {
-            return InteractionResult.FAIL;
-        }
+        if (itemStack.is(Items.REDSTONE) && this.getAge() >= 35 && this.getShieldHealth() < SHIELD_MAX_HEALTH && this.rechargeAnimDuration <= 0) {
+            if (this.getShieldHealth() >= 95) {
+                this.playSound(DNLSounds.REPULSOR_RECHARGE.get(), 0.5f, 0.5f);
+            } else {
+                this.playSound(DNLSounds.REPULSOR_RECHARGE.get(), 0.5f, 1f);
+            }
+            this.rechargeAnimDuration = (int) (RepulsorAnimation.RECHARGE.lengthInSeconds() * 20);
+            if (!this.level().isClientSide) {
+                itemStack.shrink(1);
+                this.setShieldHealth(this.getShieldHealth() + SHIELD_HEAL_AMOUNT);
+            }
 
-        if (this.getShieldHealth() < SHIELD_MAX_HEALTH && itemStack.is(Items.REDSTONE)) {
-            this.setShieldHealth(this.getShieldHealth() + SHIELD_HEAL_AMOUNT);
-            itemStack.shrink(1);
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
 
-        return InteractionResult.FAIL;
+        return super.mobInteract(player, interactionHand);
     }
 
     @Override
@@ -214,12 +219,18 @@ public class RepulsorEntity extends Mob {
             this.idleAnimState.startIfStopped(this.tickCount);
         }
 
+        if (this.rechargeAnimDuration-- > 0) {
+            this.rechargeAnimState.startIfStopped(this.tickCount);
+            if (this.rechargeAnimDuration <= 0) {
+                this.rechargeAnimState.stop();
+            }
+        }
+
         if (!this.level().isClientSide) {
             if (this.getAge() >= 35) {
                 for (Entity entity : this.getNearbyProjectiles()) {
                     boolean discardEntity = false;
                     boolean aboveHalfHealth = this.entityData.get(DATA_SHIELD_HEALTH) > SHIELD_ALERT_THRESHOLD;
-
                     if (entity instanceof ThrownTrident thrownTrident) {
                         if (!processedTridents.contains(thrownTrident)) {
                             processedTridents.add(thrownTrident);
@@ -230,6 +241,7 @@ public class RepulsorEntity extends Mob {
                                     -motion.y * 0.1f,
                                     -motion.z * 0.1f
                             ));
+                            thrownTrident.hasImpulse = true;
                         } else {
                             continue;
                         }
@@ -268,10 +280,7 @@ public class RepulsorEntity extends Mob {
                     float updatedShieldHealth = this.entityData.get(DATA_SHIELD_HEALTH) - shieldDamage;
                     this.entityData.set(DATA_SHIELD_HEALTH, updatedShieldHealth);
 
-                    System.out.println("Above Half Health: " + aboveHalfHealth + " | Updated Half: " + updatedShieldHealth);
-
                     if (aboveHalfHealth && this.getShieldHealth() <= SHIELD_MAX_HEALTH * 0.5F) {
-                        System.out.println("Alert");
                         this.playSound(DNLSounds.REPULSOR_ALERT.get());
                     }
 
@@ -304,13 +313,12 @@ public class RepulsorEntity extends Mob {
                                 this.getZ(),
                                 DNLSounds.REPULSOR_BLINK.get(),
                                 SoundSource.BLOCKS,
-                                1.0F, // volume
+                                0.5F,
                                 pitch
                         );
                     }
                 }
             }
-
 
             this.entityData.set(DATA_AGE, this.getAge() + 1);
         }
@@ -338,6 +346,12 @@ public class RepulsorEntity extends Mob {
         for (int i = 0; i <= particleCount; i++) {
             Vec3 particlePos = start.add(step.scale(i));
 
+            if (i == particleCount) {
+                particleData = new ScalableParticleType.ScalableParticleData(
+                        DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
+                        BEAM_INITIAL_PARTICLE_SCALE_MAX + 0.2F
+                );
+            }
             level.sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1,
                     0.0F, 0.0F, 0.0F, 0.0F);
         }
@@ -354,8 +368,11 @@ public class RepulsorEntity extends Mob {
         );
 
         return this.level().getEntities(
-                (Entity) null, detectionBox, entity ->
-                        (entity instanceof Projectile || entity.getType().is(DNLTags.PROJECTILES) || entity instanceof ThrownPotion) && !entity.getType().is(DNLTags.REPULSOR_OMITTED_PROJECTILES)
+                (Entity) null, detectionBox, entity -> (
+                                entity instanceof Projectile
+                                || entity.getType().is(DNLTags.PROJECTILES)
+                                || entity instanceof ThrownPotion)
+                                && !entity.getType().is(DNLTags.REPULSOR_OMITTED_PROJECTILES)
         );
     }
 

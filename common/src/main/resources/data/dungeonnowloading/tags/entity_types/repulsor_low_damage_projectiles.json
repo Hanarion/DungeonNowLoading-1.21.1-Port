@@ -5,6 +5,7 @@
     "minecraft:small_fireball",
     "minecraft:firework_rocket",
     "minecraft:potion",
+    "minecraft:trident",
     "dungeonnowloading:vertex_orb_projectile"
   ]
 }

@@ -12,19 +12,6 @@
       }
     ]
   },
-  "hike" : {
-    "subtitle": "sounds.dungeonnowloading.hike",
-    "sounds": [
-      {
-        "name": "dungeonnowloading:music/hike",
-        "stream": true
-      },
-      {
-        "name": "dungeonnowloading:music/nightstride",
-        "stream": true
-      }
-    ]
-  },
   "scorcher_overheat": {
     "subtitle": "sounds.dungeonnowloading.scorcher_overheat",
     "sounds": [
@@ -156,6 +143,14 @@
     "sounds": [
       "dungeonnowloading:entity/repulsor/repulsor_place_0",
       "dungeonnowloading:entity/repulsor/repulsor_place_1"
+    ]
+  },
+  "repulsor_recharge": {
+    "subtitle": "sounds.dungeonnowloading.repulsor_recharge",
+    "sounds": [
+      "dungeonnowloading:entity/repulsor/repulsor_recharge_0",
+      "dungeonnowloading:entity/repulsor/repulsor_recharge_1",
+      "dungeonnowloading:entity/repulsor/repulsor_recharge_2"
     ]
   },
   "vertex_arrow_bootup": {

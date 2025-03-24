@@ -103,6 +103,7 @@ public class RepulsorModel<T extends RepulsorEntity> extends HierarchicalModel<T
 
 		this.animate(entity.setupAnimState, RepulsorAnimation.SETUP, ageInTicks);
 		this.animate(entity.idleAnimState, RepulsorAnimation.IDLE, ageInTicks);
+		this.animate(entity.rechargeAnimState, RepulsorAnimation.RECHARGE, ageInTicks);
 
 	}
 
