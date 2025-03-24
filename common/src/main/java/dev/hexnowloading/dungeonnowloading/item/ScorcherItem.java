@@ -4,6 +4,9 @@ import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.item.client.ItemAnimationState;
 import dev.hexnowloading.dungeonnowloading.item.client.animation.ScorcherAnimation;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
@@ -12,6 +15,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -22,13 +27,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.ScorcherAnimationState> {
 
@@ -39,8 +42,8 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     private static final Map<Item, FuelProperties> FUEL_TYPE = new HashMap<>();
 
     static {
-        FUEL_TYPE.put(Items.COAL, new FuelProperties(0.5, 0, 0.3, 30));
-        FUEL_TYPE.put(Items.CHARCOAL, new FuelProperties(0.5, 0, 0.3, 20));
+        FUEL_TYPE.put(Items.COAL, new FuelProperties(0.5, 0, 0.4, 30));
+        FUEL_TYPE.put(Items.CHARCOAL, new FuelProperties(0.5, 0, 0.4, 20));
     }
 
     public ScorcherItem(Properties properties) {
@@ -65,8 +68,8 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
         if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime())) {
             if (!level.isClientSide) {
-                player.playSound(DNLSounds.SCORCHER_START.get());
                 ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STALLING.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_STALLING.lengthInSeconds() * 20L), false, false);
+                playScorcherSounds(stack, player, DNLSounds.SCORCHER_STALL.get(), DNLSounds.SOUL_SCORCHER_STALL.get());
             }
 
             return InteractionResultHolder.fail(stack);
@@ -127,14 +130,18 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
         if (chargeTime == 0) {
             ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_ACTIVATE.lengthInSeconds() * 20L), false, true);
+            playScorcherSounds(itemStack, player, DNLSounds.SCORCHER_START.get(), DNLSounds.SOUL_SCORCHER_START.get());
         }
 
         if (chargeTime == activeAnimDuration) {
             ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20L), false, true);
+            playScorcherSounds(itemStack, player, DNLSounds.SCORCHER_SHOOT.get(), DNLSounds.SOUL_SCORCHER_SHOOT.get());
+
         }
 
         if (chargeTime == shootAnimDuration) {
             ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() * 20L), false, true);
+            playScorcherSounds(itemStack, player, DNLSounds.SCORCHER_OVERHEAT.get(), DNLSounds.SOUL_SCORCHER_OVERHEAT.get());
             setHeatLevel(itemStack, overHeatedDuration, gameTime);
             //((Player) player).getCooldowns().addCooldown(this, 160);
             player.releaseUsingItem();
@@ -184,6 +191,8 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
             if (heat >= 1.0F) {
                 ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() * 20L), false, true);
+                playScorcherSounds(itemStack, player, DNLSounds.SCORCHER_OVERHEAT.get(), DNLSounds.SOUL_SCORCHER_OVERHEAT.get());
+                stopScorcherSounds(itemStack, player, DNLSounds.SCORCHER_SHOOT.get(), DNLSounds.SOUL_SCORCHER_SHOOT.get());
                 setHeatLevel(itemStack, overHeatedDuration, gameTime);
                 player.releaseUsingItem();
                 return;
@@ -241,6 +250,9 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
                 }*/
                 setHeatLevel(stack, heat, gameTime);
             }
+            if (!isSelected) {
+                stopScorcherLingeringSounds(stack, player);
+            }
 
             if (!isSelected && !ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime)) {
                 if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime)) {
@@ -255,6 +267,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     @Override
     public void playDroppedAnimation(Player player, ItemStack itemStack) {
         long gameTime = player.level().getGameTime();
+        stopScorcherLingeringSounds(itemStack, player);
         ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_STOP.lengthInSeconds() * 20L), false, true);
     }
 
@@ -316,7 +329,66 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         }
 
         ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_STOP.lengthInSeconds() * 20L), false, true);
+        playScorcherSounds(stack, (Player) entity, DNLSounds.SCORCHER_STOP.get(), DNLSounds.SOUL_SCORCHER_STOP.get());
+        stopScorcherSounds(stack, (Player) entity, DNLSounds.SCORCHER_SHOOT.get(), DNLSounds.SOUL_SCORCHER_SHOOT.get());
+    }
 
+    private void playScorcherSounds(ItemStack itemStack, Player player, SoundEvent scorcher, SoundEvent soulScorcher) {
+        float radius = 32.0f;
+        AABB detectionBox = player.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = player.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        ResourceLocation sound;
+        if (itemStack.is(DNLItems.SOUL_SCORCHER.get())) {
+            sound = soulScorcher.getLocation();
+        } else {
+            sound = scorcher.getLocation();
+        }
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(player.getId(), sound, true), otherPlayer);
+        }
+    }
+
+    private void stopScorcherLingeringSounds(ItemStack itemStack, Player player) {
+        float radius = 32.0f;
+        AABB detectionBox = player.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = player.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        List<ResourceLocation> soundsToStop = new ArrayList<>(List.of());
+        if (itemStack.is(DNLItems.SOUL_SCORCHER.get())) {
+            soundsToStop.add(DNLSounds.SOUL_SCORCHER_START.get().getLocation());
+            soundsToStop.add(DNLSounds.SOUL_SCORCHER_SHOOT.get().getLocation());
+            soundsToStop.add(DNLSounds.SOUL_SCORCHER_OVERHEAT.get().getLocation());
+        } else {
+            soundsToStop.add(DNLSounds.SCORCHER_START.get().getLocation());
+            soundsToStop.add(DNLSounds.SCORCHER_SHOOT.get().getLocation());
+            soundsToStop.add(DNLSounds.SCORCHER_OVERHEAT.get().getLocation());
+        }
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(player.getId(), soundsToStop), otherPlayer);
+        }
+    }
+
+    private void stopScorcherSounds(ItemStack itemStack, Player player, SoundEvent scorcher, SoundEvent soulScorcher) {
+        float radius = 32.0f;
+        AABB detectionBox = player.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = player.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        ResourceLocation sound;
+        if (itemStack.is(DNLItems.SOUL_SCORCHER.get())) {
+            sound = soulScorcher.getLocation();
+        } else {
+            sound = scorcher.getLocation();
+        }
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(player.getId(), sound), otherPlayer);
+        }
     }
 
     @Override
