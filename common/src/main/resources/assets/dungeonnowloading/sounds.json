@@ -188,6 +188,12 @@
       "dungeonnowloading:item/vertex_bow/vertex_bow_pull_1"
     ]
   },
+  "signal_gate_click": {
+    "subtitle": "sounds.dungeonnowloading.signal_gate_click",
+    "sounds": [
+      "dungeonnowloading:block/signal_gate_click"
+    ]
+  },
   "overcharged_redstone_block_component_detonation": {
     "subtitle": "sounds.dungeonnowloading.overcharged_redstone_block_component_detonation",
     "sounds": [

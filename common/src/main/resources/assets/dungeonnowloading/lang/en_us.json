@@ -170,6 +170,7 @@
   "entity.dungeonnowloading.ballista_arrow": "Ballista Arrow",
   "entity.dungeonnowloading.copper_creep": "Copper Creep",
   "entity.dungeonnowloading.repulsor": "Repulsor",
+  "sounds.dungeonnowloading.signal_gate_click": "Signal Gate clicks",
   "sounds.dungeonnowloading.overcharged_redstone_block_component_detonation": "Redstone component detonates",
   "sounds.dungeonnowloading.overcharged_redstone_block_dust_combustion": "Redstone dust combusts",
   "sounds.dungeonnowloading.overcharged_redstone_block_tnt_explosion": "Tnt explodes",

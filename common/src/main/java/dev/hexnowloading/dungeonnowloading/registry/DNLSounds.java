@@ -36,6 +36,7 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> VERTEX_ARROW_DAMAGE = registerSoundEvent("vertex_arrow_damage");
     public static final Supplier<SoundEvent> VERTEX_BOW_ARROW_CONVERT = registerSoundEvent("vertex_bow_arrow_convert");
     public static final Supplier<SoundEvent> VERTEX_BOW_PULL = registerSoundEvent("vertex_bow_pull");
+    public static final Supplier<SoundEvent> SIGNAL_GATE_CLICK = registerSoundEvent("signal_gate_click");
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_COMPONENT_DETONATION = registerSoundEvent("overcharged_redstone_block_component_detonation");
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_DUST_COMBUSTION = registerSoundEvent("overcharged_redstone_block_dust_combustion");
     public static final Supplier<SoundEvent> OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION = registerSoundEvent("overcharged_redstone_block_tnt_explosion");

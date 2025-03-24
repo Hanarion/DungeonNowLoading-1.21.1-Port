@@ -1,9 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -12,7 +13,10 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -61,6 +65,7 @@ public class SignalGateBlock extends DirectionalBlock {
             Direction direction = blockState.getValue(FACING);
             boolean b = blockState.getValue(POWERED);
             level.setBlock(blockPos, blockState.setValue(POWER, power).setValue(FACING, direction).setValue(POWERED, b), 2);
+            level.playSound(null, blockPos, DNLSounds.SIGNAL_GATE_CLICK.get(), SoundSource.BLOCKS, 1.0F, 1.0F + 1.0F * power / 15);
             this.startSignal(level, blockPos);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
