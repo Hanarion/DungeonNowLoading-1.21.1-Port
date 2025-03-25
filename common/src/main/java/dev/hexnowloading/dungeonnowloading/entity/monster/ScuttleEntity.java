@@ -1,9 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
-import dev.hexnowloading.dungeonnowloading.entity.ai.ScuttleFlameThrowerAttackGoal;
-import dev.hexnowloading.dungeonnowloading.entity.ai.SlumberingEntityLookAtPlayerGoal;
-import dev.hexnowloading.dungeonnowloading.entity.ai.SlumberingEntityPlayerTargetGoal;
-import dev.hexnowloading.dungeonnowloading.entity.ai.SlumberingEntityRandomStrollGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
@@ -22,7 +19,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
@@ -80,7 +76,7 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new ScuttleFlameThrowerAttackGoal(this));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, true));
+        this.goalSelector.addGoal(2, new AllRangeMeleeAttackGoal(this, 1.0, true, 1.1f));
         this.goalSelector.addGoal(3, new MoveTowardsRestrictionGoal(this, 1.0));
         this.goalSelector.addGoal(4, new SlumberingEntityRandomStrollGoal(this, 0.5));
         this.goalSelector.addGoal(5, new SlumberingEntityLookAtPlayerGoal(this, Player.class, 6.0F));

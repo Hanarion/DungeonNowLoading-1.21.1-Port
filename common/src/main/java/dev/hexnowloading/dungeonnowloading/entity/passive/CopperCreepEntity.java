@@ -20,10 +20,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.animal.Cat;
-import net.minecraft.world.entity.animal.Ocelot;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -38,6 +35,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     public enum State {
         SUMMONING,
         IDLE,
+        RUNNING_TOWARDS_PLAYER,
         FOLLOWING,
         DETONATION
     }
@@ -205,22 +203,18 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     @Override
     public void customServerAiStep() {
         if (this.aiTick == 0 && !this.isAlreadySummoned()) {
-//            this.currentState = State.SUMMONING;
             this.setState(State.SUMMONING);
             this.triggerSummonAnimation();
             this.entityData.set(DATA_IS_ALREADY_SUMMONED, true);
         }
         if (this.aiTick == (int) (CopperCreepAnimation.SUMMON.lengthInSeconds() * 20)) {
-//            this.currentState = State.IDLE;
             this.setState(State.IDLE);
             this.triggerIdleAnimation();
         }
 
         if (this.getTarget() == null) {
-//            this.currentState = State.IDLE;
             this.setState(State.IDLE);
         } else {
-//            this.currentState = State.FOLLOWING;
             this.setState(State.FOLLOWING);
         }
 

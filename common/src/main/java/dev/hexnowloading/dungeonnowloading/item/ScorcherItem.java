@@ -120,8 +120,8 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         long gameTime = player.level().getGameTime();
         float overHeatedDuration = ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() / ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds();
 
-        float activeAnimDuration = ScorcherAnimation.SCORCHER_ACTIVATE.lengthInSeconds() * 20 - 1;
-        float shootAnimDuration = ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20 + activeAnimDuration;
+        int activeAnimDuration = (int) (ScorcherAnimation.SCORCHER_ACTIVATE.lengthInSeconds() * 20);
+        int shootAnimDuration = (int) (ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20 + activeAnimDuration);
 
 
         if (ItemAnimationState.isAnimating(itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime())) {
