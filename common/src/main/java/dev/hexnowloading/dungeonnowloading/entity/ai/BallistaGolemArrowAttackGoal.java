@@ -18,7 +18,7 @@ public class BallistaGolemArrowAttackGoal extends Goal {
 
     public BallistaGolemArrowAttackGoal(BallistaGolemEntity ballistaGolemEntity) {
         this.ballistaGolemEntity = ballistaGolemEntity;
-        this.setFlags(EnumSet.of(Flag.LOOK));
+        this.setFlags(EnumSet.of(Flag.LOOK, Flag.MOVE));
     }
 
     private int nextStartTick() { return reducedTickDelay(10); }
@@ -82,15 +82,12 @@ public class BallistaGolemArrowAttackGoal extends Goal {
     private boolean isFacingTarget(LivingEntity target) {
         if (target == null) return false;
 
-        // Calculate the angle between the golem's facing and the target
         double deltaX = target.getX() - this.ballistaGolemEntity.getX();
         double deltaZ = target.getZ() - this.ballistaGolemEntity.getZ();
         float targetYaw = (float) (Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0);
 
-        // Calculate the difference in rotation
         float angleDifference = Math.abs(Mth.wrapDegrees(this.ballistaGolemEntity.getYRot() - targetYaw));
 
-        // Return true if within the threshold
         return angleDifference < FACING_THRESHOLD;
     }
 }
