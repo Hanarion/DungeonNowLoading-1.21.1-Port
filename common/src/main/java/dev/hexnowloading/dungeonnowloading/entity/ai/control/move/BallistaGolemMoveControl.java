@@ -86,6 +86,7 @@ public class BallistaGolemMoveControl extends MoveControl {
                 }
             }
         }
+
         // Jumping logic
         BlockPos blockPos = this.mob.blockPosition();
         BlockState blockState = this.mob.level().getBlockState(blockPos);
