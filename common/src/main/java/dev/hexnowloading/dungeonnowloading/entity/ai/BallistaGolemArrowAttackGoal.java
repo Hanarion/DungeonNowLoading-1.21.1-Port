@@ -2,7 +2,6 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.BallistaArrowEntity;
-import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -19,7 +18,7 @@ public class BallistaGolemArrowAttackGoal extends Goal {
 
     public BallistaGolemArrowAttackGoal(BallistaGolemEntity ballistaGolemEntity) {
         this.ballistaGolemEntity = ballistaGolemEntity;
-        this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+        this.setFlags(EnumSet.of(Flag.LOOK));
     }
 
     private int nextStartTick() { return reducedTickDelay(10); }

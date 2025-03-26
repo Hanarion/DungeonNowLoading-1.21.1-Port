@@ -40,7 +40,7 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<HollowEntity>> HOLLOW = register("hollow", () -> EntityType.Builder.of(HollowEntity::new, MobCategory.MONSTER).sized(0.95F, 0.95F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "hollow").toString()));
     public static final Supplier<EntityType<SpawnerCarrierEntity>> SPAWNER_CARRIER = register("spawner_carrier", () -> EntityType.Builder.of(SpawnerCarrierEntity::new, MobCategory.MONSTER).sized(1.95F, 1.95F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "spawner_carrier").toString()));
     public static final Supplier<EntityType<ScuttleEntity>> SCUTTLE = register("scuttle", () -> EntityType.Builder.of(ScuttleEntity::new, MobCategory.MONSTER).sized(0.97F, 1.95F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "scuttle").toString()));
-    public static final Supplier<EntityType<BallistaGolemEntity>> BALLISTA_GOLEM = register("ballista_golem", () -> EntityType.Builder.of(BallistaGolemEntity::new, MobCategory.MONSTER).sized(2.97F, 4.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "ballista_golem").toString()));
+    public static final Supplier<EntityType<BallistaGolemEntity>> BALLISTA_GOLEM = register("ballista_golem", () -> EntityType.Builder.of(BallistaGolemEntity::new, MobCategory.MONSTER).sized(2.9F, 4.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "ballista_golem").toString()));
 
 
     // Passive

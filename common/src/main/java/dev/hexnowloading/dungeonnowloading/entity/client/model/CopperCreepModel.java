@@ -72,12 +72,10 @@ public class CopperCreepModel<T extends CopperCreepEntity> extends HierarchicalM
 		this.animate(entity.summonAnimationState, CopperCreepAnimation.SUMMON, ageInTicks);
 		this.animate(entity.detonationAnimationState, CopperCreepAnimation.DETONATION, ageInTicks);
 
-//		System.out.println(copperCreepEntity.currentState);
-
 		if (entity.getState() == CopperCreepEntity.State.IDLE) {
 			this.animateWalk(CopperCreepAnimation.WALKING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
 		} else if (entity.getState() == CopperCreepEntity.State.FOLLOWING || entity.getState() == CopperCreepEntity.State.RUNNING_TOWARDS_PLAYER) {
-			this.animateWalk(CopperCreepAnimation.RUNNING, limbSwing, limbSwingAmount, 4f, 4.5f);
+			this.animateWalk(CopperCreepAnimation.RUNNING, limbSwing, limbSwingAmount, 2f, 2.25f);
 		}
 	}
 

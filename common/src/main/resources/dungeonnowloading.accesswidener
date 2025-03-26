@@ -7,3 +7,4 @@ accessible method net/minecraft/client/renderer/entity/ItemRenderer renderModelL
 accessible method net/minecraft/world/entity/projectile/ThrownPotion applySplash (Ljava/util/List;Lnet/minecraft/world/entity/Entity;)V
 accessible method net/minecraft/world/entity/projectile/ThrownPotion applyWater ()V
 accessible method net/minecraft/world/entity/projectile/ThrownPotion makeAreaOfEffectCloud (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)V
+accessible field net/minecraft/world/level/pathfinder/WalkNodeEvaluator collisionCache Lit/unimi/dsi/fastutil/objects/Object2BooleanMap;

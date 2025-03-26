@@ -1,7 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
-import dev.hexnowloading.dungeonnowloading.entity.ai.*;
-import dev.hexnowloading.dungeonnowloading.entity.ai.control.SmoothBodyRotationControl;
+import dev.hexnowloading.dungeonnowloading.entity.ai.BallistaGolemMeleeAttackGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.SlumberingEntityPlayerTargetGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.BallistaGolemMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.pathfinding.BallistaGolemPathNavigation;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
@@ -13,12 +15,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEntity {
 
@@ -41,6 +40,10 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
         super(entityType, level);
         this.setState(BallistaGolemState.SLUMBERING);
         this.setBallistaArrowCount(6);
+        this.setMaxUpStep(1.0F);
+        this.moveControl = new BallistaGolemMoveControl(this);
+        this.navigation = new BallistaGolemPathNavigation(this, this.level());
+        //this.lookControl = new BallistaGolemSmoothLookControl(this, 5.0F, 5.0F, 30.0F);
         this.xpReward = 50;
     }
 
@@ -56,12 +59,13 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new BallistaGolemReloadGoal(this));
-        this.goalSelector.addGoal(2, new BallistaGolemArrowAttackGoal(this));
+        //this.goalSelector.addGoal(1, new BallistaGolemReloadGoal(this));
+        //this.goalSelector.addGoal(2, new BallistaGolemArrowAttackGoal(this));
         this.goalSelector.addGoal(3, new BallistaGolemMeleeAttackGoal(this, 1.0, true, 1.1F));
-        this.goalSelector.addGoal(4, new AllRangeMeleeAttackGoal(this, 0.5, true, 1.1F));
-        this.goalSelector.addGoal(5, new SlumberingEntityRandomStrollGoal(this, 0.5));
-        this.goalSelector.addGoal(6, new SlumberingEntityLookAtPlayerGoal(this, Player.class, 6.0F));
+        //this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 0.5, true));
+        //this.goalSelector.addGoal(5, new AllRangeMeleeAttackGoal(this, 0.5, true, 1.1F));
+        //this.goalSelector.addGoal(6, new SlumberingEntityRandomStrollGoal(this, 0.5));
+        //this.goalSelector.addGoal(7, new SlumberingEntityLookAtPlayerGoal(this, Player.class, 6.0F));
         this.targetSelector.addGoal(1, new SlumberingEntityPlayerTargetGoal(this));
     }
 
@@ -85,11 +89,6 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
         boolean isSlumbering = compoundTag.getBoolean("Slumbering");
         this.entityData.set(STATE, isSlumbering ? BallistaGolemState.SLUMBERING : BallistaGolemState.IDLE);
         this.entityData.set(ARROW_COUNT, compoundTag.getInt("ArrowCount"));
-    }
-
-    @Override
-    protected @NotNull BodyRotationControl createBodyControl() {
-        return new SmoothBodyRotationControl(this, 5.0f);
     }
 
     @Override

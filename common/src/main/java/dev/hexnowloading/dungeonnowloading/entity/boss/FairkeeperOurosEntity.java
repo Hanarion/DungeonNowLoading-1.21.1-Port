@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
-import dev.hexnowloading.dungeonnowloading.entity.ai.control.FairkeeperOurosMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.FairkeeperOurosMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;

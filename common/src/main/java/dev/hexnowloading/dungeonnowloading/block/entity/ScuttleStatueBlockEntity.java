@@ -8,18 +8,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-
-import java.util.Properties;
 
 public class ScuttleStatueBlockEntity extends BlockEntity {
     public ScuttleStatueBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -31,6 +23,7 @@ public class ScuttleStatueBlockEntity extends BlockEntity {
         if (level.isClientSide) {
             return;
         }
+        level.destroyBlock(blockPos.above(2), true);
         BlockState blockState = scuttleStatueBlockEntity.getBlockState();
         Direction direction = blockState.getValue(HorizontalDirectionalBlock.FACING);
         level.removeBlock(blockPos, false);
@@ -47,6 +40,7 @@ public class ScuttleStatueBlockEntity extends BlockEntity {
         mob = (ScuttleEntity) SpawnMobUtil.spawnEntityWithRot(mob, x, y, z, mobYRot, 0.0F, level);
         mob.setYBodyRot(mobYRot);
         mob.setYHeadRot(mobYRot);
+        mob.setPersistenceRequired();
         level.addFreshEntity(mob);
 
         level.playSound(null, x, y, z, SoundEvents.WITHER_SHOOT, SoundSource.BLOCKS, 1.0F, level.random.nextFloat() * 0.2F + 0.8F);

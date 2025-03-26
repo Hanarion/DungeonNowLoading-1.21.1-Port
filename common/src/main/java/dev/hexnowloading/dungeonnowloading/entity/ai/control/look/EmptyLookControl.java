@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.entity.ai.control;
+package dev.hexnowloading.dungeonnowloading.entity.ai.control.look;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.LookControl;

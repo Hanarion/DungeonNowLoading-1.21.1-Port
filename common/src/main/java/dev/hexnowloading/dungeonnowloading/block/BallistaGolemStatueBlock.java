@@ -1,7 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.BallistaGolemStatueBlockEntity;
-import dev.hexnowloading.dungeonnowloading.block.entity.ScuttleStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.BallistaGolemStatueStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.core.BlockPos;
@@ -18,10 +17,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityBlock {
@@ -142,19 +139,15 @@ public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityB
 
     @Override
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
-        // Ensure this block is actually being removed and not replaced by another block
         if (!world.isClientSide && state.getBlock() != newState.getBlock()) {
-            // Iterate over each part position in the statue
             destroyAllBlocks(world, pos);
-
-            // Optionally destroy the core block itself (already removed if this method is called)
-            // world.destroyBlock(pos, false);
+            destroyBlocksAbove(world, pos);
 
             if (playerDestroyed) {
                 if (state.getBlock() instanceof BallistaGolemStatueBlock) {
                     BallistaGolemStatueBlockEntity blockEntity = (BallistaGolemStatueBlockEntity) world.getBlockEntity(pos);
                     if (blockEntity != null) {
-                        blockEntity.summonBallistaGolemEntity(world, pos, state.getValue(FACING));// Exit if the core block isn't found or is incorrect
+                        blockEntity.summonBallistaGolemEntity(world, pos, state.getValue(FACING));
                     }
                 }
             }
@@ -166,10 +159,19 @@ public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityB
     public static void destroyAllBlocks(Level world, BlockPos pos) {
         for (Map.Entry<BallistaGolemStatueStates, BlockPos> entry : statePositions.entrySet()) {
             BlockPos relativePos = entry.getValue();
-            BlockPos partPos = pos.offset(relativePos); // Calculate the absolute position
+            BlockPos partPos = pos.offset(relativePos);
 
-            // Destroy the part block without dropping items
             world.destroyBlock(partPos, false);
+        }
+    }
+
+    public static void destroyBlocksAbove(Level level, BlockPos blockPos) {
+        BlockPos targetPlane = blockPos; // Y + 3
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                BlockPos breakPos = targetPlane.offset(x, 3, z); // (x, y+3, z)
+                level.destroyBlock(breakPos, true);
+            }
         }
     }
 
@@ -202,6 +204,7 @@ public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityB
         }
 
         destroyAllBlocks(level, blockPos);
+        destroyBlocksAbove(level, blockPos);
     }
 
     private BlockPos getRotatedPos(BlockPos pos, Direction facing) {

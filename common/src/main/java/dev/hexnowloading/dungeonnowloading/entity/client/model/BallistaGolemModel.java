@@ -1,19 +1,14 @@
 package dev.hexnowloading.dungeonnowloading.entity.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.BallistaGolemAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 
 public class BallistaGolemModel<T extends BallistaGolemEntity> extends HierarchicalModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
@@ -156,5 +151,10 @@ public class BallistaGolemModel<T extends BallistaGolemEntity> extends Hierarchi
         this.animate(entity.wakeUpAnimationState, BallistaGolemAnimation.WAKE_UP, ageInTicks);
         this.animate(entity.reloadAnimationState, BallistaGolemAnimation.RELOAD, ageInTicks);
         this.animate(entity.shootAnimationState, BallistaGolemAnimation.SHOOT, ageInTicks);
+        this.animateHeadLookTarget(netHeadYaw, headPitch);
+    }
+
+    private void animateHeadLookTarget(float netHeadYaw, float headPitch) {
+        this.BallistaGolem.yRot = netHeadYaw * ((float)Math.PI / 180F);
     }
 }

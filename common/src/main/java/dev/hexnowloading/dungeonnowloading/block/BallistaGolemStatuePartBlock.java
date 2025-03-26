@@ -1,7 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.BallistaGolemStatueBlockEntity;
-import dev.hexnowloading.dungeonnowloading.block.entity.ScuttleStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.BallistaGolemStatueStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
 import net.minecraft.core.BlockPos;
@@ -13,10 +12,12 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -42,36 +43,27 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
 
     @Override
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
-        // Ensure this block is actually being removed and not replaced
         if (!world.isClientSide && state.getBlock() != newState.getBlock()) {
-            // Get the part's relative position from its state and facing direction before removal
             BallistaGolemStatueStates partState = state.getValue(STATES);
-            Direction partFacing = state.getValue(FACING);  // Retrieve the facing before the block is removed
+            Direction partFacing = state.getValue(FACING);
 
-            // Calculate the core position based on the part's position and its relative position
             BlockPos corePos = findCorePosition(pos, partState, partFacing);
 
-            // Check if core block exists and is the correct type
             BlockState coreState = world.getBlockState(corePos);
             if (!(coreState.getBlock() instanceof BallistaGolemStatueBlock ballistaGolemStatueBlock)) {
-                return; // Exit if the core block isn't found or is incorrect
+                return;
             }
 
             ballistaGolemStatueBlock.setPlayerDestroyed(this.playerDestroyedPart);
 
             Direction coreFacing = coreState.getValue(FACING);
 
-            // Break all parts relative to the core position, adjusted for the core's facing direction
             for (Map.Entry<BallistaGolemStatueStates, BlockPos> entry : BallistaGolemStatueBlock.statePositions.entrySet()) {
                 BlockPos relativePos = entry.getValue();
-                BlockPos adjustedPos = applyReverseRotation(relativePos, coreFacing); // Reverse the rotation
+                BlockPos adjustedPos = applyReverseRotation(relativePos, coreFacing);
                 BlockPos partPos = corePos.offset(adjustedPos);
-
-                // Destroy each part block without dropping items
                 world.destroyBlock(partPos, false);
             }
-
-            // Also destroy the core block
             world.destroyBlock(corePos, false);
         }
 
@@ -91,13 +83,8 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
     }
 
     private BlockPos findCorePosition(BlockPos partPos, BallistaGolemStatueStates partState, Direction partFacing) {
-        // Retrieve the part's relative position from its state
         BlockPos relativePos = BallistaGolemStatueBlock.statePositions.get(partState);
-
-        // Apply the reverse rotation based on the part's facing direction
         BlockPos adjustedPos = applyReverseRotation(relativePos, partFacing);
-
-        // Calculate core position by subtracting the adjusted relative position from the part's position
         return partPos.subtract(adjustedPos);
     }
 
@@ -106,11 +93,11 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
             case NORTH:
                 return pos; // No rotation needed
             case SOUTH:
-                return new BlockPos(-pos.getX(), pos.getY(), -pos.getZ()); // Reverse 180-degree rotation
+                return new BlockPos(-pos.getX(), pos.getY(), -pos.getZ());
             case WEST:
-                return new BlockPos(pos.getZ(), pos.getY(), -pos.getX()); // 90-degree clockwise rotation
+                return new BlockPos(pos.getZ(), pos.getY(), -pos.getX());
             case EAST:
-                return new BlockPos(-pos.getZ(), pos.getY(), pos.getX()); // 90-degree counterclockwise rotation
+                return new BlockPos(-pos.getZ(), pos.getY(), pos.getX());
             default:
                 return pos;
         }
@@ -132,9 +119,11 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
         BallistaGolemStatueBlockEntity blockEntity = (BallistaGolemStatueBlockEntity) level.getBlockEntity(corePos);
         if (blockEntity != null) {
             blockEntity.summonBallistaGolemEntity(level, corePos, facing);
+            this.playerDestroyedPart = false;
         }
 
         BallistaGolemStatueBlock.destroyAllBlocks(level, corePos);
+        BallistaGolemStatueBlock.destroyBlocksAbove(level, corePos);
     }
 
     @Override
