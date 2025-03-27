@@ -1,15 +1,12 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
 
 import java.util.EnumSet;
@@ -118,17 +115,6 @@ public class BallistaGolemMeleeAttackGoal extends Goal {
             this.mob.doHurtTarget(target);
             if (target instanceof Player player && player.isBlocking()) {
                 player.disableShield(true);
-            }
-        }
-
-        Path path = mob.getNavigation().getPath();
-        if (path != null && !path.isDone()) {
-            int count = path.getNodeCount();
-            for (int i = 0; i < count; i++) {
-                Node node = path.getNode(i);
-                ((ServerLevel)mob.level()).sendParticles(ParticleTypes.END_ROD,
-                        node.x + 0.5, node.y + 0.1, node.z + 0.5,
-                        1, 0, 0, 0, 0);
             }
         }
     }
