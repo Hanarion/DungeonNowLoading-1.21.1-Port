@@ -8,19 +8,27 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.BallistaGolemM
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.pathfinding.BallistaGolemPathNavigation;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
-import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.AABB;
 
 public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEntity {
 
@@ -67,7 +75,8 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
         this.goalSelector.addGoal(3, new BallistaGolemMeleeAttackGoal(this, 1.0, true, 1.1F));
         //this.goalSelector.addGoal(6, new SlumberingEntityRandomStrollGoal(this, 0.5));
         //this.goalSelector.addGoal(7, new SlumberingEntityLookAtPlayerGoal(this, Player.class, 6.0F));
-        this.targetSelector.addGoal(1, new SlumberingEntityPlayerTargetGoal(this));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new SlumberingEntityPlayerTargetGoal(this));
     }
 
     @Override
@@ -112,6 +121,28 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
                 this.triggerIdleAnimation();
             }
         }
+
+        if (this.horizontalCollision && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+            boolean brokeLeaves = false;
+            AABB box = this.getBoundingBox().inflate(0.2);
+
+            for (BlockPos pos : BlockPos.betweenClosed(
+                    Mth.floor(box.minX), Mth.floor(box.minY), Mth.floor(box.minZ),
+                    Mth.floor(box.maxX), Mth.floor(box.maxY), Mth.floor(box.maxZ))) {
+
+                BlockState state = this.level().getBlockState(pos);
+                if (state.getBlock() instanceof LeavesBlock) {
+                    boolean destroyed = this.level().destroyBlock(pos, true, this);
+                    if (destroyed) {
+                        brokeLeaves = true;
+                    }
+                }
+            }
+
+            if (!brokeLeaves && this.onGround()) {
+                this.jumpFromGround();
+            }
+        }
         super.customServerAiStep();
     }
 
@@ -123,25 +154,6 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
     @Override
     protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
         return 2.0F;
-    }
-
-    @Override
-    public void push(Entity entity) {
-    }
-
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
-    @Override
-    public boolean isPushedByFluid() {
-        return false;
-    }
-
-    @Override
-    protected boolean updateInWaterStateAndDoFluidPushing() {
-        return false;
     }
 
     @Override
@@ -173,9 +185,12 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
 
     @Override
     public boolean hurt(DamageSource damageSource, float amount) {
-        if (damageSource.is(DNLTags.BALLISTA_GOLEM_HURTABLE)) {
+        if (damageSource.getDirectEntity() instanceof Arrow arrow && !(arrow.getOwner() instanceof Player)) {
             return false;
         }
+        /*if (damageSource.is(DNLTags.BALLISTA_GOLEM_HURTABLE)) {
+            return false;
+        }*/
         return super.hurt(damageSource, amount);
     }
 

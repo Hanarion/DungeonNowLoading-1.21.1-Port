@@ -202,25 +202,6 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
     }
 
     @Override
-    public void push(Entity entity) {
-    }
-
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
-    @Override
-    public boolean isPushedByFluid() {
-        return false;
-    }
-
-    @Override
-    protected boolean updateInWaterStateAndDoFluidPushing() {
-        return false;
-    }
-
-    @Override
     public boolean canBeCollidedWith() {
         return this.isSlumbering();
     }

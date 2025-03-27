@@ -53,37 +53,40 @@ public class BallistaGolemMoveControl extends MoveControl {
             this.ballistaGolem.setSpeed((float) (this.speedModifier * this.ballistaGolem.getAttributeValue(Attributes.MOVEMENT_SPEED)));
 
             Path path = this.ballistaGolem.getNavigation().getPath();
-            int index = path.getNextNodeIndex();
 
-            if (path != null && index > 0 && index < path.getNodeCount() - 1) {
-                Node prev = path.getNode(index - 1);
-                Node turn = path.getNode(index);
-                Node next = path.getNode(index + 1);
+            if (path != null && path.getNodeCount() >= 2 && path.getNextNodeIndex() > 0) {
+                int index = path.getNextNodeIndex();
 
-                boolean isMinusXtoPlusZ =
-                        (prev.x == turn.x - 1 && prev.z == turn.z) &&
-                                (next.x == turn.x && next.z == turn.z + 1);
+                if (index < path.getNodeCount() - 1) {
+                    Node prev = path.getNode(index - 1);
+                    Node turn = path.getNode(index);
+                    Node next = path.getNode(index + 1);
 
-                boolean isMinusZtoPlusX =
-                        (prev.x == turn.x && prev.z == turn.z - 1) &&
-                                (next.x == turn.x + 1 && next.z == turn.z);
+                    boolean isMinusXtoPlusZ =
+                            (prev.x == turn.x - 1 && prev.z == turn.z) &&
+                                    (next.x == turn.x && next.z == turn.z + 1);
 
-                if (isMinusXtoPlusZ || isMinusZtoPlusX) {
-                    double dx = (next.x + 0.5) - this.ballistaGolem.getX();
-                    double dz = (next.z + 0.5) - this.ballistaGolem.getZ();
+                    boolean isMinusZtoPlusX =
+                            (prev.x == turn.x && prev.z == turn.z - 1) &&
+                                    (next.x == turn.x + 1 && next.z == turn.z);
 
-                    float yawRad = this.ballistaGolem.getYRot() * ((float) Math.PI / 180F);
-                    double strafeDirX = -Math.sin(yawRad);
-                    double strafeDirZ = Math.cos(yawRad);
+                    if (isMinusXtoPlusZ || isMinusZtoPlusX) {
+                        double dx = (next.x + 0.5) - this.ballistaGolem.getX();
+                        double dz = (next.z + 0.5) - this.ballistaGolem.getZ();
 
-                    double dot = dx * strafeDirX + dz * strafeDirZ;
+                        float yawRad = this.ballistaGolem.getYRot() * ((float) Math.PI / 180F);
+                        double strafeDirX = -Math.sin(yawRad);
+                        double strafeDirZ = Math.cos(yawRad);
 
-                    if (isMinusXtoPlusZ && dot > 0.0) {
-                        this.ballistaGolem.setXxa(0.2F);
-                    } else if (isMinusZtoPlusX && dot > 0.0) {
-                        this.ballistaGolem.setXxa(-0.2F);
-                    } else {
-                        this.ballistaGolem.setXxa(0.0F);
+                        double dot = dx * strafeDirX + dz * strafeDirZ;
+
+                        if (isMinusXtoPlusZ && dot > 0.0) {
+                            this.ballistaGolem.setXxa(0.2F);
+                        } else if (isMinusZtoPlusX && dot > 0.0) {
+                            this.ballistaGolem.setXxa(-0.2F);
+                        } else {
+                            this.ballistaGolem.setXxa(0.0F);
+                        }
                     }
                 }
             }
