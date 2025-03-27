@@ -7,7 +7,6 @@ import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
-import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -23,13 +22,13 @@ import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
-
     private static final EntityDataAccessor<ScuttleState> STATE = SynchedEntityData.defineId(ScuttleEntity.class, EntityStates.SCUTTLE_STATE);
     private int aiTick = 0;
     private int renderOldTick;
@@ -70,7 +69,8 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
                 .add(Attributes.ATTACK_KNOCKBACK, 1.25)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.5)
-                .add(Attributes.FOLLOW_RANGE, 32.0);
+                .add(Attributes.FOLLOW_RANGE, 32.0)
+                .add(Attributes.ARMOR, 20.0F);
     }
 
     @Override
@@ -188,17 +188,27 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
 
     @Override
     public boolean hurt(DamageSource damageSource, float damage) {
+        if (!this.isAttackingState() && damageSource.getDirectEntity() instanceof AbstractArrow) {
+            return false;
+        }
         if (damageSource.getDirectEntity() instanceof FlameProjectileEntity) {
             return false;
         }
-        if (damageSource.is(DNLTags.SCUTTLE_HURTABLE) || this.isAttackingState() || damageSource.isCreativePlayer()) {
+        boolean hurtFr = super.hurt(damageSource, damage);
+
+        if (hurtFr) {
+            this.playDeflectSound();
+        }
+
+        return hurtFr;
+        /*if (damageSource.is(DNLTags.SCUTTLE_HURTABLE) || this.isAttackingState() || damageSource.isCreativePlayer()) {
             boolean hurtFr = super.hurt(damageSource, damage);
             if (hurtFr) {
                 this.playDeflectSound();
             }
             return hurtFr;
         }
-        return false;
+        return false;*/
     }
 
     @Override

@@ -21,8 +21,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -60,12 +59,13 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 115.0F)
+                .add(Attributes.MAX_HEALTH, 100.0F)
                 .add(Attributes.ATTACK_DAMAGE, 19.0F)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.35)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0F)
-                .add(Attributes.FOLLOW_RANGE, 32.0F);
+                .add(Attributes.FOLLOW_RANGE, 32.0F)
+                .add(Attributes.ARMOR, 15.0F);
     }
 
     @Override
@@ -185,12 +185,9 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
 
     @Override
     public boolean hurt(DamageSource damageSource, float amount) {
-        if (damageSource.getDirectEntity() instanceof Arrow arrow && !(arrow.getOwner() instanceof Player)) {
+        if (damageSource.getDirectEntity() instanceof AbstractArrow) {
             return false;
         }
-        /*if (damageSource.is(DNLTags.BALLISTA_GOLEM_HURTABLE)) {
-            return false;
-        }*/
         return super.hurt(damageSource, amount);
     }
 

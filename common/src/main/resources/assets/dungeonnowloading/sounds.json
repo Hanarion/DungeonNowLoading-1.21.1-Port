@@ -315,25 +315,25 @@
     ]
   },
   "scuttle_shooting_open": {
-    "subtitle": "sounds.dungeonnowloading.shooting_open",
+    "subtitle": "sounds.dungeonnowloading.scuttle_shooting_open",
     "sounds": [
       "dungeonnowloading:mob/scuttle/scuttle_shooting_0_open"
     ]
   },
   "scuttle_shooting_charge": {
-    "subtitle": "sounds.dungeonnowloading.shooting_charge",
+    "subtitle": "sounds.dungeonnowloading.scuttle_shooting_charge",
     "sounds": [
       "dungeonnowloading:mob/scuttle/scuttle_shooting_1_charge"
     ]
   },
   "scuttle_shooting_burst": {
-    "subtitle": "sounds.dungeonnowloading.shooting_burst",
+    "subtitle": "sounds.dungeonnowloading.scuttle_shooting_burst",
     "sounds": [
       "dungeonnowloading:mob/scuttle/scuttle_shooting_2_burst"
     ]
   },
   "scuttle_shooting_flame": {
-    "subtitle": "sounds.dungeonnowloading.shooting_flame",
+    "subtitle": "sounds.dungeonnowloading.scuttle_shooting_flame",
     "sounds": [
       "dungeonnowloading:mob/scuttle/scuttle_shooting_3_flame_0",
       "dungeonnowloading:mob/scuttle/scuttle_shooting_3_flame_1",
@@ -342,13 +342,13 @@
     ]
   },
   "scuttle_shooting_stop": {
-    "subtitle": "sounds.dungeonnowloading.shooting_stop",
+    "subtitle": "sounds.dungeonnowloading.scuttle_shooting_stop",
     "sounds": [
       "dungeonnowloading:mob/scuttle/scuttle_shooting_4_stop"
     ]
   },
   "scuttle_shooting_close": {
-    "subtitle": "sounds.dungeonnowloading.shooting_close",
+    "subtitle": "sounds.dungeonnowloading.scuttle_shooting_close",
     "sounds": [
       "dungeonnowloading:mob/scuttle/scuttle_shooting_5_close"
     ]
@@ -361,7 +361,7 @@
     ]
   },
   "scuttle_hurt": {
-    "subtitle": "sounds.dungeonnowloading.hurt",
+    "subtitle": "sounds.dungeonnowloading.scuttle_hurt",
     "sounds": [
       "dungeonnowloading:mob/scuttle/scuttle_hurt_0",
       "dungeonnowloading:mob/scuttle/scuttle_hurt_1",

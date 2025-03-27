@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.BallistaGolemStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.BallistaGolemStatueStates;
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -82,13 +84,13 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
         super.playerWillDestroy(world, pos, state, player);
     }
 
-    private BlockPos findCorePosition(BlockPos partPos, BallistaGolemStatueStates partState, Direction partFacing) {
+    public static BlockPos findCorePosition(BlockPos partPos, BallistaGolemStatueStates partState, Direction partFacing) {
         BlockPos relativePos = BallistaGolemStatueBlock.statePositions.get(partState);
         BlockPos adjustedPos = applyReverseRotation(relativePos, partFacing);
         return partPos.subtract(adjustedPos);
     }
 
-    private BlockPos applyReverseRotation(BlockPos pos, Direction facing) {
+    private static BlockPos applyReverseRotation(BlockPos pos, Direction facing) {
         switch (facing) {
             case NORTH:
                 return pos; // No rotation needed
@@ -141,5 +143,10 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
     @Override
     public BlockState mirror(BlockState blockState, Mirror mirror) {
         return blockState.rotate(mirror.getRotation(blockState.getValue(FACING)));
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter $$0, BlockPos $$1, BlockState $$2) {
+        return new ItemStack(DNLItems.BALLISTA_GOLEM_STATUE.get());
     }
 }

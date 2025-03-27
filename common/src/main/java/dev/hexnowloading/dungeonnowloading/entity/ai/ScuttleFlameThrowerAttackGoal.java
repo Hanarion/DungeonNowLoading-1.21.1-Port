@@ -2,20 +2,13 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -25,6 +18,8 @@ public class ScuttleFlameThrowerAttackGoal extends Goal {
 
     private static final UUID FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID = UUID.fromString("2a6f22a4-5468-4eed-b100-fe77cdc8bd98");
     private final AttributeModifier FULL_KNOCKBACK_RESISTANCE = new AttributeModifier(FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID, "Full knockback resistance", 0.5F, AttributeModifier.Operation.ADDITION);
+    private final AttributeModifier CLOSED_ARMOR = new AttributeModifier(UUID.randomUUID(), "Closed armor bonus", -1.0, AttributeModifier.Operation.MULTIPLY_BASE);
+
     private final ScuttleEntity scuttleEntity;
     private int nextScanTick;
     private int attackTicks;
@@ -65,6 +60,10 @@ public class ScuttleFlameThrowerAttackGoal extends Goal {
         if (attributeInstance != null) {
             attributeInstance.addTransientModifier(FULL_KNOCKBACK_RESISTANCE);
         }
+        AttributeInstance attributeInstance1 = scuttleEntity.getAttribute(Attributes.ARMOR);
+        if (attributeInstance1 != null) {
+            attributeInstance1.addTransientModifier(CLOSED_ARMOR);
+        }
         this.attackTicks = 10;
     }
 
@@ -97,6 +96,10 @@ public class ScuttleFlameThrowerAttackGoal extends Goal {
                     AttributeInstance attributeInstance = scuttleEntity.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
                     if (attributeInstance != null) {
                         attributeInstance.removeModifier(FULL_KNOCKBACK_RESISTANCE);
+                    }
+                    AttributeInstance attributeInstance1 = scuttleEntity.getAttribute(Attributes.ARMOR);
+                    if (attributeInstance1 != null) {
+                        attributeInstance1.removeModifier(CLOSED_ARMOR);
                     }
                     scuttleEntity.setState(ScuttleEntity.ScuttleState.CLOSED);
                     scuttleEntity.triggerIdleClosedAnimation();

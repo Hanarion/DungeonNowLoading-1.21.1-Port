@@ -21,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+import static dev.hexnowloading.dungeonnowloading.block.BallistaGolemStatuePartBlock.STATES;
+
 public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -115,6 +117,8 @@ public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityB
             // Get the player's facing direction
             Direction playerFacing = placer.getDirection().getOpposite();
 
+            boolean triggeredByRedstone = false;
+
             // Iterate over each state and position in this.statePositions
             for (Map.Entry<BallistaGolemStatueStates, BlockPos> entry : this.statePositions.entrySet()) {
                 BallistaGolemStatueStates golemState = entry.getKey();
@@ -129,10 +133,21 @@ public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityB
                 // Set the appropriate block state with the player's facing direction and any additional properties
                 BlockState partBlockState = DNLBlocks.BALLISTA_GOLEM_STATUE_PART.get().defaultBlockState()
                         .setValue(BallistaGolemStatuePartBlock.FACING, playerFacing) // Set the facing direction
-                        .setValue(BallistaGolemStatuePartBlock.STATES, golemState);  // Set custom state
+                        .setValue(STATES, golemState);  // Set custom state
 
                 // Place the part block with the designated state
-                world.setBlock(partPos, partBlockState, 3);
+                world.setBlock(partPos, partBlockState, Block.UPDATE_ALL);
+                if (world.hasNeighborSignal(partPos)) {
+                    triggeredByRedstone = true;
+                }
+            }
+
+            if (triggeredByRedstone) {
+                // For clean up
+                destroyAllBlocks(world, pos);
+            } else if (world.hasNeighborSignal(pos)) {
+                destroyAllBlocks(world, pos);
+                destroyBlocksAbove(world, pos);
             }
         }
     }
