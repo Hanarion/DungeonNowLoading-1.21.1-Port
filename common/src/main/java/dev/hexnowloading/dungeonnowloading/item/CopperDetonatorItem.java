@@ -4,7 +4,6 @@ import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -18,7 +17,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.UUID;
 
 public class CopperDetonatorItem extends Item {
     private static final double TRIGGER_RADIUS = 16.0;
@@ -89,6 +87,7 @@ public class CopperDetonatorItem extends Item {
         double motionY = -Math.sin(Math.toRadians(player.getXRot())) * velocity;
         double motionZ = Math.cos(Math.toRadians(player.getYRot())) * Math.cos(Math.toRadians(player.getXRot())) * velocity;
         creep.setDeltaMovement(motionX, motionY, motionZ);
+        creep.setSummonerUUID(player.getUUID());
 
         level.addFreshEntity(creep);
     }
@@ -99,15 +98,6 @@ public class CopperDetonatorItem extends Item {
                 .stream()
                 .filter(creep -> !creep.isDefused() && !creep.isDeadOrDying() && player.distanceToSqr(creep) <= radius * radius)
                 .toList();
-    }
-
-    private void summonCreep(Level level, BlockPos position, UUID summonerUUID) {
-        CopperCreepEntity creep = DNLEntityTypes.COPPER_CREEP.get().create(level);
-        if (creep == null) return;
-
-        creep.moveTo(position, 0.0f, 0.0f);
-        creep.setSummonerUUID(summonerUUID);
-        level.addFreshEntity(creep);
     }
 
     private boolean consumeCopperBlockIfAvailable(Player player) {

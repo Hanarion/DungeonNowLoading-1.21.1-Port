@@ -71,12 +71,21 @@ public class CopperCreepModel<T extends CopperCreepEntity> extends HierarchicalM
 //		this.animate(copperCreepEntity.runningAnimationState, CopperCreepAnimation.RUNNING, ageInTicks);
 		this.animate(entity.summonAnimationState, CopperCreepAnimation.SUMMON, ageInTicks);
 		this.animate(entity.detonationAnimationState, CopperCreepAnimation.DETONATION, ageInTicks);
+		this.animate(entity.sitAnimationState, CopperCreepAnimation.SIT, ageInTicks);
+		this.animate(entity.standAniamtionState, CopperCreepAnimation.STAND, ageInTicks);
+		this.animate(entity.wrongOwnerAnimationState, CopperCreepAnimation.WRONG_OWNER, ageInTicks);
+		this.animate(entity.sittingAnimationState, CopperCreepAnimation.SITTING, ageInTicks);
 
-		if (entity.getState() == CopperCreepEntity.State.IDLE) {
+		if (entity.getState() == CopperCreepEntity.State.IDLE || entity.getState() == CopperCreepEntity.State.WALKING_TOWARDS_PLAYER) {
 			this.animateWalk(CopperCreepAnimation.WALKING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
 		} else if (entity.getState() == CopperCreepEntity.State.FOLLOWING || entity.getState() == CopperCreepEntity.State.RUNNING_TOWARDS_PLAYER) {
 			this.animateWalk(CopperCreepAnimation.RUNNING, limbSwing, limbSwingAmount, 2f, 2.25f);
 		}
+		this.animateHeadLookTarget(netHeadYaw, headPitch);
+	}
+
+	private void animateHeadLookTarget(float netHeadYaw, float headPitch) {
+		this.coppercreep.yRot = netHeadYaw * ((float)Math.PI / 180F);
 	}
 
 	@Override
