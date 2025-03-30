@@ -3,73 +3,84 @@ package dev.hexnowloading.dungeonnowloading.item;
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class CopperDetonatorItem extends Item {
-    private static final double TRIGGER_RADIUS = 16.0;
+    private static final double TRIGGER_RADIUS = 32.0;
     private static final int SUMMON_COOLDOWN = 5;
-    private static final int IGNITE_COOLDOWN = 200;
+    private static final int IGNITE_COOLDOWN_PER_CREEP = 100;
+    private static final int MODE_SWITCH_TIMING = 10;
 
     public CopperDetonatorItem(Properties properties) {
         super(properties);
     }
 
-    /*@Override
-    public InteractionResult useOn(UseOnContext context) {
-        Level level = context.getLevel();
-        Player player = context.getPlayer();
-        BlockPos targetPos = context.getClickedPos();
-        Direction targetFace = context.getClickedFace();
-
-        if (player == null) return InteractionResult.PASS;
-
-        List<CopperCreepEntity> creepsInRange = findNearbyCreeps(player, TRIGGER_RADIUS);
-
-        if (creepsInRange.isEmpty()) {
-            if (consumeCopperBlockIfAvailable(player)) {
-                summonCreep(level, targetPos.relative(targetFace), player.getUUID());
-                player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
-                return InteractionResult.SUCCESS;
-            }
-            return InteractionResult.FAIL;
-        }
-
-        igniteCreeps(creepsInRange);
-        player.getCooldowns().addCooldown(this, IGNITE_COOLDOWN);
-        return InteractionResult.SUCCESS;
-    }
-*/
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
+        player.startUsingItem(hand);
+        return InteractionResultHolder.fail(itemStack);
+    }
+
+    @Override
+    public void onUseTick(Level level, LivingEntity livingEntity, ItemStack itemStack, int remainingUseTick) {
+        int usedTime = itemStack.getUseDuration() - remainingUseTick;
+        if (usedTime == MODE_SWITCH_TIMING) {
+            if (level.isClientSide) {
+                livingEntity.playSound(DNLSounds.REPULSOR_BLINK.get());
+            }
+        }
+        super.onUseTick(level, livingEntity, itemStack, remainingUseTick);
+    }
+
+    @Override
+    public UseAnim getUseAnimation(ItemStack $$0) {
+        return super.getUseAnimation($$0);
+    }
+
+    @Override
+    public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int remainingTicks) {
+        int usedTime = itemStack.getUseDuration() - remainingTicks;
+
+        if (!(livingEntity instanceof Player player)) return;
+
+        InteractionHand hand = player.getUsedItemHand();
+
         List<CopperCreepEntity> creepsInRange = findNearbyCreeps(player, TRIGGER_RADIUS);
 
-        if (creepsInRange.isEmpty()) {
-            if (consumeCopperBlockIfAvailable(player)) {
+        if (usedTime <= MODE_SWITCH_TIMING) {
+            if (consumeCopperBlockIfAvailable(player) && creepsInRange.size() < 3) {
                 launchCreep(level, player);
                 player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
-                itemStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(hand));
-                return InteractionResultHolder.success(itemStack);
+                itemStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(player1.getUsedItemHand()));
+                player.swing(hand);
             }
-            return InteractionResultHolder.fail(itemStack);
+        } else {
+            if (!creepsInRange.isEmpty()) {
+                igniteCreeps(creepsInRange);
+                player.getCooldowns().addCooldown(this, creepsInRange.size() * IGNITE_COOLDOWN_PER_CREEP);
+                player.swing(hand);
+            }
         }
 
-        igniteCreeps(creepsInRange);
-        player.getCooldowns().addCooldown(this, IGNITE_COOLDOWN);
-        return InteractionResultHolder.success(itemStack);
+        super.releaseUsing(itemStack, level, livingEntity, remainingTicks);
+    }
+
+    @Override
+    public int getUseDuration(ItemStack itemStack) {
+        return 72000;
     }
 
     private void launchCreep(Level level, Player player) {
@@ -96,7 +107,7 @@ public class CopperDetonatorItem extends Item {
         return player.level()
                 .getEntitiesOfClass(CopperCreepEntity.class, player.getBoundingBox().inflate(radius))
                 .stream()
-                .filter(creep -> !creep.isDefused() && !creep.isDeadOrDying() && player.distanceToSqr(creep) <= radius * radius)
+                .filter(creep -> !creep.isDefused() && !creep.isDeadOrDying() && creep.getSummonerUUID().filter(uuid -> uuid.equals(player.getUUID())).isPresent() && player.distanceToSqr(creep) <= radius * radius)
                 .toList();
     }
 
