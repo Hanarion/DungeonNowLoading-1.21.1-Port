@@ -72,6 +72,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private Set<UUID> partList;
 
     private int attackTick;
+    private int stuckTick;
     private float previousTilt = 0.0f;
     private Vec3 awakenEndPos;
     private boolean targetRandomPlayer;
@@ -87,6 +88,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private int mouthOpenAnimationTimeOut;
     private static final int MOUTH_OPEN_ANIMATION_DURATION = 19;
+    private static final int STUCK_THRESHOLD = 100;
 
 
     public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
@@ -274,9 +276,24 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.isState(FairkeeperBorosState.AWAKENING)) this.enableBossBar();
         this.performContactDamage();
         this.abilityCooldown();
+        this.stuckTracker();
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
+    }
+
+    private void stuckTracker() {
+        Vec3 motion = this.getDeltaMovement();
+        boolean isStuck = motion.lengthSqr() < 1.0E-6;
+
+        if (isStuck) {
+            this.stuckTick++;
+        }
+        if (this.stuckTick > 0) {
+            if (!isStuck) {
+                this.stuckTick = 0;
+            }
+        }
     }
 
     private void performContactDamage() {
@@ -359,7 +376,9 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
         this.targetRandomPlayer();
 
-        ((FairkeeperSerpentCallerEntity) this.getCaller()).setBorosWaitingForCommand(true);
+        if (this.getCaller() != null) {
+            ((FairkeeperSerpentCallerEntity) this.getCaller()).setBorosWaitingForCommand(true);
+        }
     }
 
     public void stopAttacking(int cooldown) {
@@ -569,6 +588,10 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         }
         return null;
     }
+
+    public boolean isStuck() {
+        System.out.println(this.getDeltaMovement().lengthSqr());
+        return this.getDeltaMovement().lengthSqr() < 1.0E-2f; }
 
     public void enableBossBar() { this.bossEvent.setVisible(true); }
     public void disableBossBar() { this.bossEvent.setVisible(false); }

@@ -13,7 +13,7 @@ public class FairkeeperBorosCircleAroundPlayerGoal extends Goal {
     private Entity circlingTarget;      // The player or entity at the center
     private final double radius;      // Radius of the circle
     private final double speed;       // Speed of movement
-    private final boolean clockwise;
+    private boolean clockwise;
     private final boolean circlePlayer;// Direction of movement
     private double angle;             // Current angle in degrees
     private double targetX, targetY, targetZ;  // Current target position (X, Z only)
@@ -22,6 +22,7 @@ public class FairkeeperBorosCircleAroundPlayerGoal extends Goal {
     private FairkeeperBorosEntity.FairkeeperBorosState state;
 
     private static final double THRESHOLD = 2.0; // Distance threshold to "reach" target
+    private static final float OFFSET_FROM_WALL = 1.5f;
 
     public FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, double radius, double speed, boolean clockwise, boolean circlePlayer) {
         this.state = state;
@@ -78,7 +79,12 @@ public class FairkeeperBorosCircleAroundPlayerGoal extends Goal {
                 updateTargetPosition();
             }
 
+            if (this.boros.isStuck()) {
+                this.clockwise = !this.clockwise;
+            }
+
             this.boros.getMoveControl().setWantedPosition(this.targetX, this.targetY, this.targetZ, this.speed);
+
         }
     }
 
@@ -90,10 +96,10 @@ public class FairkeeperBorosCircleAroundPlayerGoal extends Goal {
         double potentialZ = this.circlingTarget.getZ() + this.radius * Math.sin(angleRad);
 
         // Define arena boundaries
-        double minX = this.arenaCenter.getX() - this.arenaSize + 1;
-        double maxX = this.arenaCenter.getX() + this.arenaSize - 1;
-        double minZ = this.arenaCenter.getZ() - this.arenaSize + 1;
-        double maxZ = this.arenaCenter.getZ() + this.arenaSize - 1;
+        double minX = this.arenaCenter.getX() + 0.5F - this.arenaSize + OFFSET_FROM_WALL;
+        double maxX = this.arenaCenter.getX() + 0.5F + this.arenaSize - OFFSET_FROM_WALL;
+        double minZ = this.arenaCenter.getZ() + 0.5F - this.arenaSize + OFFSET_FROM_WALL;
+        double maxZ = this.arenaCenter.getZ() + 0.5F + this.arenaSize - OFFSET_FROM_WALL;
 
         // Clamp the target position within the arena boundaries
         this.targetX = Math.max(minX, Math.min(maxX, potentialX));

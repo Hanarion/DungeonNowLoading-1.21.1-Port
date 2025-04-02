@@ -152,6 +152,9 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
                         }*/
                         if (!this.isRotatable()) {
                             Vec3 awakenEndPos = headEntity.getAwakenEndPos();
+                            if (awakenEndPos == null) {
+                                awakenEndPos = Vec3.ZERO;
+                            }
                             double dy = awakenEndPos.y - (this.getY() + this.getBbHeight());
 
                             if (dy * dy < 5.0F * 5.0F) {

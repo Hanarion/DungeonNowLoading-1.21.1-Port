@@ -10,6 +10,7 @@ import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.TickBaseMoveSet;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
+import dev.hexnowloading.dungeonnowloading.util.NbtHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -140,6 +141,9 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.getCallerId() != null) {
             compoundTag.putUUID("CallerUUID", this.getCallerId());
         }
+        if (this.getAwakenEndPos() != null) {
+            compoundTag.put("AwakenEndPos", NbtHelper.newDoubleList(this.getAwakenEndPos().x, this.getAwakenEndPos().y, this.getAwakenEndPos().z));
+        }
     }
 
     @Override
@@ -151,6 +155,9 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         }
         if (compoundTag.hasUUID("CallerUUID")) {
             this.setCallerId(compoundTag.getUUID("CallerUUID"));
+        }
+        if (compoundTag.contains("AwakenEndPos")) {
+            this.awakenEndPos = new Vec3(compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(0), compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(1), compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(2));
         }
     }
 
@@ -488,7 +495,9 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
         this.targetRandomPlayer();
 
-        ((FairkeeperSerpentCallerEntity) this.getCaller()).setOurosWaitingForCommand(true);
+        if (this.getCaller() != null) {
+            ((FairkeeperSerpentCallerEntity) this.getCaller()).setOurosWaitingForCommand(true);
+        }
     }
 
     public void stopAttacking(int cooldown) {

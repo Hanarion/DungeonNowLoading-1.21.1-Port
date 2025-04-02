@@ -21,7 +21,8 @@ public class FairkeeperOurosCircleAroundGoal extends Goal {
     private BlockPos arenaCenter;
     private FairkeeperOurosEntity.FairkeeperOurosState state;
 
-    private static final double THRESHOLD = 2.0; // Distance threshold to "reach" target
+    private static final double THRESHOLD = 2.0;
+    private static final float OFFSET_FROM_WALL = 1.5f;
 
     public FairkeeperOurosCircleAroundGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros, double radius, double speed, boolean clockwise, boolean circlePlayer) {
         this.state = state;
@@ -90,10 +91,10 @@ public class FairkeeperOurosCircleAroundGoal extends Goal {
         double potentialZ = this.circlingTarget.getZ() + this.radius * Math.sin(angleRad);
 
         // Define arena boundaries
-        double minX = this.arenaCenter.getX() - this.arenaSize + 1;
-        double maxX = this.arenaCenter.getX() + this.arenaSize - 1;
-        double minZ = this.arenaCenter.getZ() - this.arenaSize + 1;
-        double maxZ = this.arenaCenter.getZ() + this.arenaSize - 1;
+        double minX = this.arenaCenter.getX() + 0.5F - this.arenaSize + OFFSET_FROM_WALL;
+        double maxX = this.arenaCenter.getX() + 0.5F + this.arenaSize - OFFSET_FROM_WALL;
+        double minZ = this.arenaCenter.getZ() + 0.5F - this.arenaSize + OFFSET_FROM_WALL;
+        double maxZ = this.arenaCenter.getZ() + 0.5F + this.arenaSize - OFFSET_FROM_WALL;
 
         // Clamp the target position within the arena boundaries
         this.targetX = Math.max(minX, Math.min(maxX, potentialX));
