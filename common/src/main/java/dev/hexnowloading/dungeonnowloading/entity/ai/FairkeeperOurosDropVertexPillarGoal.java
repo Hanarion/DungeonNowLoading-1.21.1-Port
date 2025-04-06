@@ -10,7 +10,6 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -19,7 +18,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import java.util.EnumSet;
 import java.util.List;
 
-public class FairkeeperOurosDropVertexPillarGoal extends Goal {
+public class FairkeeperOurosDropVertexPillarGoal extends StoppableGoal {
 
     private final FairkeeperOurosEntity ouros;
     private FairkeeperOurosEntity.FairkeeperOurosState state;
@@ -50,6 +49,7 @@ public class FairkeeperOurosDropVertexPillarGoal extends Goal {
 
     @Override
     public void start() {
+        super.start();
         FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.ouros.getCaller();
         if (caller != null) {
             this.arenaSize = caller.getArenaSize();
@@ -62,6 +62,11 @@ public class FairkeeperOurosDropVertexPillarGoal extends Goal {
     }
 
     @Override
+    public void stop() {
+        this.ouros.stopAttacking(20);
+    }
+
+    @Override
     public void tick() {
 
         if (this.currentPart == null || this.currentPart.isTail()) {
@@ -69,7 +74,7 @@ public class FairkeeperOurosDropVertexPillarGoal extends Goal {
         }
 
         if (dropIndex >= pattern.getRight().size()) {
-            this.ouros.stopAttacking(10 * this.pattern.getRight().size());
+            this.stopGoal();
             return;
         }
 
@@ -125,7 +130,7 @@ public class FairkeeperOurosDropVertexPillarGoal extends Goal {
             this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();
 
             if (dropIndex >= pattern.getRight().size()) {
-                this.ouros.stopAttacking(10 * this.pattern.getRight().size());
+                this.stopGoal();
                 return;
             }
         }

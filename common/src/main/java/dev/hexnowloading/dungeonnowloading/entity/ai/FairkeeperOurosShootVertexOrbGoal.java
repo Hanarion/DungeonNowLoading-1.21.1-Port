@@ -9,12 +9,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.Set;
 import java.util.UUID;
 
-public class FairkeeperOurosShootVertexOrbGoal extends Goal {
+public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
 
     private final FairkeeperOurosEntity ouros;
     private FairkeeperOurosEntity.FairkeeperOurosState state;
@@ -46,6 +45,7 @@ public class FairkeeperOurosShootVertexOrbGoal extends Goal {
 
     @Override
     public void start() {
+        super.start();
         this.attackTicks = reducedTickDelay(START_UP_DELAY);
         this.playerCount = 1;
         this.caller = (FairkeeperSerpentCallerEntity) this.ouros.getCaller();
@@ -57,10 +57,15 @@ public class FairkeeperOurosShootVertexOrbGoal extends Goal {
     }
 
     @Override
+    public void stop() {
+        this.ouros.stopAttacking(20);
+    }
+
+    @Override
     public void tick() {
 
         if (this.bulletCount <= 0) {
-            this.ouros.stopAttacking(10 * this.bulletPerPlayer);
+            this.stopGoal();
             return;
         }
 
@@ -84,7 +89,7 @@ public class FairkeeperOurosShootVertexOrbGoal extends Goal {
         for (int i = 0; i < randomIndex; i++) {
             this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();
             if (this.currentPart == null) {
-                this.ouros.stopAttacking(10 * this.bulletPerPlayer);
+                this.stopGoal();
                 return;
             }
         }

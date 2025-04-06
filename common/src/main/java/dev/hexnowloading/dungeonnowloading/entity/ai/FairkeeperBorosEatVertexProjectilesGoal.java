@@ -9,13 +9,12 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.AABB;
 
 import java.util.Comparator;
 import java.util.EnumSet;
 
-public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
+public class FairkeeperBorosEatVertexProjectilesGoal extends StoppableGoal {
 
     private final FairkeeperBorosEntity boros;
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
@@ -40,6 +39,11 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
     @Override
     public void start() {
         this.getTargetProjectile();
+    }
+
+    @Override
+    public void stop() {
+        this.boros.stopAttacking(10);
     }
 
     @Override
@@ -106,7 +110,7 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
     private void getTargetProjectile() {
         FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.boros.getCaller();
         if (caller == null) {
-            this.boros.stopAttacking(10);
+            this.stopGoal();
             return;
         }
         int halfSize = caller.getArenaSize();
@@ -124,7 +128,7 @@ public class FairkeeperBorosEatVertexProjectilesGoal extends Goal {
                 .orElse(null);
 
         if (targetProjectile == null || !targetProjectile.isAlive()) {
-            this.boros.stopAttacking(10);
+            this.stopGoal();
         }
     }
 }

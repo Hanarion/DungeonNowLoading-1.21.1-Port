@@ -9,7 +9,6 @@ import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-public class FairkeeperBorosShootArrowGoal extends Goal {
+public class FairkeeperBorosShootArrowGoal extends StoppableGoal {
     private final FairkeeperBorosEntity boros;
     private FairkeeperBorosEntity.FairkeeperBorosState state;
     ShootingPattern pattern;
@@ -29,6 +28,7 @@ public class FairkeeperBorosShootArrowGoal extends Goal {
     private final double speed;
     private List<FairkeeperBorosPartEntity> partList = new ArrayList<>();
     private int stoppingTick;
+    private boolean forceStop;
 
     private static final float FULL_ARENA_SIZE = 49F;
     private static final int STOP_DURATION = 32;
@@ -50,6 +50,7 @@ public class FairkeeperBorosShootArrowGoal extends Goal {
 
     @Override
     public void start() {
+        super.start();
         FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.boros.getCaller();
         if (caller != null) {
             this.arenaSize = caller.getArenaSize();
@@ -58,14 +59,14 @@ public class FairkeeperBorosShootArrowGoal extends Goal {
         }
         this.currentPart = (FairkeeperBorosPartEntity) this.boros.getChild();
         if (this.currentPart == null) {
-            this.boros.stopAttacking(20);
+            this.stopGoal();
             return;
         }
         this.partList.add(this.currentPart);
         for (int i = 0; i < 12; i++) {
             this.currentPart = (FairkeeperBorosPartEntity) this.currentPart.getChild();
             if (this.currentPart == null) {
-                this.boros.stopAttacking(20);
+                this.stopGoal();
                 return;
             }
             this.partList.add(this.currentPart);
@@ -75,6 +76,11 @@ public class FairkeeperBorosShootArrowGoal extends Goal {
         if (this.pattern.shiftStartingPoint) {
             rotatePatternToClosest();
         }
+    }
+
+    @Override
+    public void stop() {
+        this.boros.stopAttacking(20);
     }
 
     @Override
@@ -135,7 +141,7 @@ public class FairkeeperBorosShootArrowGoal extends Goal {
                 targetIndex++;
 
                 if (targetIndex >= pattern.positionList().size()) {
-                    this.boros.stopAttacking(20);
+                    this.stopGoal();
                     return;
                 }
 

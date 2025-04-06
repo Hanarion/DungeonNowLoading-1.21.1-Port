@@ -7,12 +7,11 @@ import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
-public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
+public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
     private final FairkeeperBorosEntity boros;
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
     private final ShootingPattern pattern;
@@ -51,10 +50,16 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
 
     @Override
     public void start() {
+        super.start();
         this.targetPosition = this.target.getPosition(1.0F);
         this.targetIndex = 0;
         this.shootingCooldown = this.maxShootingCooldown;
         this.totalDuration = reducedTickDelay(EXPIRY_DURATION);
+    }
+
+    @Override
+    public void stop() {
+        this.boros.stopAttacking(20);
     }
 
     @Override
@@ -80,7 +85,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
             if (this.stoppingTick <= 0) {
                 targetIndex++;
                 if (targetIndex >= pattern.arrowPattern.size()) {
-                    this.boros.stopAttacking(20);
+                    this.stopGoal();
                     return;
                 }
                 this.shootingCooldown = this.maxShootingCooldown;
@@ -92,7 +97,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends Goal {
         if (this.totalDuration > 0) {
             this.totalDuration--;
         } else {
-            this.boros.stopAttacking(20);
+            this.stopGoal();
             return;
         }
 

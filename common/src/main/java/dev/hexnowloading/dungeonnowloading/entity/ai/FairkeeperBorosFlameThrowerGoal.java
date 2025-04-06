@@ -3,10 +3,9 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 
-public class FairkeeperBorosFlameThrowerGoal extends Goal {
+public class FairkeeperBorosFlameThrowerGoal extends StoppableGoal {
 
     private final FairkeeperBorosEntity boros;
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
@@ -35,6 +34,11 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
     }
 
     @Override
+    public void stop() {
+        this.boros.stopAttacking(20);
+    }
+
+    @Override
     public void tick() {
         if (this.startUpDelay > 0) {
             this.startUpDelay--;
@@ -45,7 +49,7 @@ public class FairkeeperBorosFlameThrowerGoal extends Goal {
             if (this.shootingInterval > 0) {
                 this.shootingInterval--;
             } else {
-                this.boros.stopAttacking(20);
+                this.stopGoal();
                 return;
             }
 

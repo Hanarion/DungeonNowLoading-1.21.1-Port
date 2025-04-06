@@ -61,7 +61,6 @@ public class FairkeeperBorosAwakenGoal extends Goal {
             double deltaZ = this.fairkeeper.getZ() - finalTarget.z;
 
             if ((deltaX * deltaX + deltaZ * deltaZ) < THRESHOLD * THRESHOLD) {
-                this.fairkeeper.targetRandomPlayer();
                 this.fairkeeper.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
                 this.fairkeeper.stopAttacking(20);
             }

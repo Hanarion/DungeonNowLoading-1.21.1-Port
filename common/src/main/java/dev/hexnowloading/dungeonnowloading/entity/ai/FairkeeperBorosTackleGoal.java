@@ -4,12 +4,11 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
-public class FairkeeperBorosTackleGoal extends Goal {
+public class FairkeeperBorosTackleGoal extends StoppableGoal {
 
     private final FairkeeperBorosEntity boros;
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
@@ -58,6 +57,13 @@ public class FairkeeperBorosTackleGoal extends Goal {
         this.loopCount = 0;
         this.tackleCooldown = 0;
         this.totalDuration = EXPIRY_DURATION;
+        super.start();
+    }
+
+    @Override
+    public void stop() {
+        this.boros.stopAttacking(20);
+        this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
     }
 
     @Override
@@ -70,8 +76,8 @@ public class FairkeeperBorosTackleGoal extends Goal {
         if (this.totalDuration > 0) {
             this.totalDuration--;
         } else {
-            this.boros.setAnimationState(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
-            this.boros.stopAttacking(20);
+            //this.boros.setAnimationState(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
+            this.stopGoal();
             return;
         }
 

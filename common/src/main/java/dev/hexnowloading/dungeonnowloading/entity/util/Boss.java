@@ -8,10 +8,4 @@ public interface Boss {
     boolean resetCondition();
 
     BlockPos resetRegionCenter();
-
-    void targetRandomPlayer();
-
-    boolean playerTargetingCondition();
-
-    void postPlayerTargeting();
 }

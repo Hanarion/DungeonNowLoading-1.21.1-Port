@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import com.google.common.collect.ImmutableList;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
+import dev.hexnowloading.dungeonnowloading.entity.ai.BossTargetSelectorGoal;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
@@ -262,6 +263,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     private void introMoveSet() {
 
+        BossTargetSelectorGoal.changeTarget(this.boros);
+        BossTargetSelectorGoal.changeTarget(this.ouros);
+
         if (this.boros.getTarget() == null || this.ouros.getTarget() == null) {
             return;
         }
@@ -292,6 +296,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     private void commandBorosPhase2() {
 
+        BossTargetSelectorGoal.changeTarget(this.boros);
+
         if (this.boros.getTarget() == null) {
             return;
         }
@@ -319,6 +325,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     }
 
     private void commandOurosPhase2() {
+
+        BossTargetSelectorGoal.changeTarget(this.ouros);
 
         if (this.ouros.getTarget() == null) {
             return;
@@ -397,7 +405,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         }
 
 
-        introMoveSet.displayAllStats();
+        //introMoveSet.displayAllStats();
         Entity boros = this.getBoros();
         Entity ouros = this.getOuros();
         boolean isBorosWaiting = false;
@@ -647,10 +655,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         int playerCount = playerUUIDs.size();
 
-        FairkeeperBorosEntity boros = new FairkeeperBorosEntity(DNLEntityTypes.FAIRKEEPER_BOROS.get(), this.level());
+        FairkeeperBorosEntity boros = new FairkeeperBorosEntity(this.level(), this);
         if (boros != null) {
             boros.moveTo(centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y - boros.getBoundingBox().getYsize() / 2, centeredCounterClockWiseTargetPosition.z);
-            boros.setCallerId(this.getUUID());
             boros.setState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING);
             boros.setYRot(clockWiseDirection.toYRot());
             boros.yBodyRot = boros.getYRot();
@@ -665,10 +672,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             this.boros = boros;
         }
 
-        FairkeeperOurosEntity ouros = new FairkeeperOurosEntity(DNLEntityTypes.FAIRKEEPER_OUROS.get(), this.level());
+        FairkeeperOurosEntity ouros = new FairkeeperOurosEntity(this.level(), this);
         if (ouros != null) {
             ouros.moveTo(centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y - ouros.getBoundingBox().getYsize() / 2, centeredClockWiseTargetPosition.z);
-            ouros.setCallerId(this.getUUID());
             ouros.setState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING);
             ouros.setYRot(counterClockWiseDirection.toYRot());
             ouros.yBodyRot = ouros.getYRot();

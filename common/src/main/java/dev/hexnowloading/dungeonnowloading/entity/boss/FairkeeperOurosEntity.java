@@ -7,7 +7,7 @@ import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectile
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.TickBaseMoveSet;
+import dev.hexnowloading.dungeonnowloading.entity.util.WeightedTargetProvider;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.util.NbtHelper;
@@ -45,12 +45,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, FairkeeperSerpentHeadEntity {
+public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, WeightedTargetProvider {
 
     private static final EntityDataAccessor<FairkeeperOurosState> STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_STATE);
     private static final EntityDataAccessor<FairkeeperOurosAnimationState> OUROS_ANIMATION_STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_ANIMATION_STATE);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
-    private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    //private static final EntityDataAccessor<Optional<UUID>> CALLER_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> IS_ON_CEILING = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.BOOLEAN);
 
     public final AnimationState idleAnimationState = new AnimationState();
@@ -58,14 +58,17 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     public final AnimationState openedMouthAnimationState = new AnimationState();
     public final AnimationState closeMouthAnimationState = new AnimationState();
 
-    private TickBaseMoveSet<FairkeeperOurosState> stateSelector = new TickBaseMoveSet<>();
     private final Deque<Vec3> positionHistory = new LinkedList<>();
+    private final Map<UUID, Double> damageMap = new HashMap<>();
+    private final Map<UUID, LivingEntity> attackers = new HashMap<>();
+    private float previousTilt = 0.0f;
+    private FairkeeperSerpentCallerEntity fairkeeperSerpentCaller;
 
     private int attackTick;
-    private float previousTilt = 0.0f;
     private Vec3 awakenEndPos;
     private boolean targetRandomPlayer;
     private boolean canDestroyBlocks;
+    private boolean changeTarget;
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
@@ -85,6 +88,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.bossEvent = (ServerBossEvent)(new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS)).setDarkenScreen(true);
     }
 
+    public FairkeeperOurosEntity(Level level, FairkeeperSerpentCallerEntity fairkeeperSerpentCaller) {
+        this(DNLEntityTypes.FAIRKEEPER_OUROS.get(), level);
+        this.fairkeeperSerpentCaller = fairkeeperSerpentCaller;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 500.0)
@@ -98,7 +106,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(2, new FairkeeperOurosAwakenGoal(this));
+        this.goalSelector.addGoal(1, new FairkeeperOurosAwakenGoal(this));
         this.goalSelector.addGoal(3, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 20.0, 1.3, false, true));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropScuttleGoal(FairkeeperOurosState.SUMMON_SCUTTLE, this, 1));
         this.goalSelector.addGoal(3, new FairkeeperOurosDropVertexPillarGoal(FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE, this, 1.3, FairkeeperOurosDropVertexPillarGoal.PATTERN_SMALL_SQUARE));
@@ -118,14 +126,14 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperOurosShootVertexOrbGoal(FairkeeperOurosState.DESPERATE, this, 9, 0.2F, 2));
         this.goalSelector.addGoal(4, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false, true));
         this.goalSelector.addGoal(5, new FairkeeperOurosCircleAroundGoal(FairkeeperOurosState.IDLE, this, 20.0F, 1.3, false, false));
-        this.targetSelector.addGoal(2, new BossTargetSelectorGoal(this, this.getFollowDistance()));
+        this.targetSelector.addGoal(2, new BossTargetSelectorGoal(this));
     }
 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(CHILD_UUID, Optional.empty());
-        this.entityData.define(CALLER_UUID, Optional.empty());
+        //this.entityData.define(CALLER_UUID, Optional.empty());
         this.entityData.define(IS_ON_CEILING, false);
         this.entityData.define(STATE, FairkeeperOurosState.IDLE);
         this.entityData.define(OUROS_ANIMATION_STATE, FairkeeperOurosAnimationState.IDLE);
@@ -154,7 +162,10 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             this.setChildId(compoundTag.getUUID("ChildUUID"));
         }
         if (compoundTag.hasUUID("CallerUUID")) {
-            this.setCallerId(compoundTag.getUUID("CallerUUID"));
+            Entity entity = ((ServerLevel)this.level()).getEntity(compoundTag.getUUID("CallerUUID"));
+            if (entity != null && entity instanceof FairkeeperSerpentCallerEntity fairkeeperSerpentCaller) {
+                this.fairkeeperSerpentCaller = fairkeeperSerpentCaller;
+            }
         }
         if (compoundTag.contains("AwakenEndPos")) {
             this.awakenEndPos = new Vec3(compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(0), compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(1), compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(2));
@@ -434,10 +445,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         return !(entity instanceof VertexOrbProjectileEntity) && !(entity instanceof VertexDomainProjectileEntity);
     }
 
-    private void vertexTransmissionEffectImmunity() {
-        this.removeEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
-    }
-
     private void blockDestructionTick() {
         if (!this.canDestroyBlocks) {
             return;
@@ -493,7 +500,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
-        this.targetRandomPlayer();
+        //this.changeTarget(true);
 
         if (this.getCaller() != null) {
             ((FairkeeperSerpentCallerEntity) this.getCaller()).setOurosWaitingForCommand(true);
@@ -581,21 +588,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
-    public void targetRandomPlayer() {
-        this.targetRandomPlayer = true;
-    }
-
-    @Override
-    public boolean playerTargetingCondition() {
-        return this.targetRandomPlayer;
-    }
-
-    @Override
-    public void postPlayerTargeting() {
-        this.targetRandomPlayer = false;
-    }
-
-    @Override
     public BlockPos resetRegionCenter() {
         return this.getCaller().blockPosition();
     }
@@ -651,12 +643,24 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         return null;
     }
 
-    public Entity getCaller() {
-        UUID id = getCallerId();
-        if (id != null && !this.level().isClientSide) {
-            return ((ServerLevel) this.level()).getEntity(id);
+    public FairkeeperSerpentCallerEntity getCaller() {
+        return this.fairkeeperSerpentCaller;
+    }
+
+    public BlockPos getArenaCenter() {
+        FairkeeperSerpentCallerEntity entity = this.getCaller();
+        if (entity != null) {
+            return entity.blockPosition();
         }
-        return null;
+        return this.blockPosition();
+    }
+
+    public int getArenaSize() {
+        FairkeeperSerpentCallerEntity entity = this.getCaller();
+        if (entity != null) {
+            return entity.getArenaSize();
+        }
+        return (int) this.getFollowDistance();
     }
 
     public void enableBossBar() {
@@ -704,11 +708,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     public UUID getCallerId() {
-        return this.entityData.get(CALLER_UUID).orElse(null);
-    }
-
-    public void setCallerId(@Nullable UUID uniqueId) {
-        this.entityData.set(CALLER_UUID, Optional.ofNullable(uniqueId));
+        return this.fairkeeperSerpentCaller.getUUID();
     }
 
     public Queue<Vec3> getPositionHistory() {
@@ -755,6 +755,26 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     public boolean canDestroyBlocks() {
         return this.canDestroyBlocks;
+    }
+
+    @Override
+    public Map<UUID, Double> getDamageMap() {
+        return damageMap;
+    }
+
+    @Override
+    public Map<UUID, LivingEntity> getAttackers() {
+        return attackers;
+    }
+
+    @Override
+    public boolean shouldChangeTarget() {
+        return changeTarget;
+    }
+
+    @Override
+    public void changeTarget(boolean b) {
+        this.changeTarget = b;
     }
 
     public enum FairkeeperOurosAnimationState {

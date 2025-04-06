@@ -62,7 +62,6 @@ public class FairkeeperOurosAwakenGoal extends Goal {
             double deltaZ = this.ouros.getZ() - finalTarget.z;
 
             if ((deltaX * deltaX + deltaZ * deltaZ) < THRESHOLD * THRESHOLD) {
-                this.ouros.targetRandomPlayer();
                 this.ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.MOUTH_CLOSE);
                 this.ouros.stopAttacking(20);
             }

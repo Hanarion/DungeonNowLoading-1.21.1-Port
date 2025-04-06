@@ -15,6 +15,8 @@ public class DNLTags {
     public static final TagKey<DamageType> SCUTTLE_HURTABLE = registerDamageTypeTag("scuttle_hurtable");
     public static final TagKey<DamageType> BALLISTA_GOLEM_HURTABLE = registerDamageTypeTag("ballista_golem_immunity");
     public static final TagKey<DamageType> FAIRKEEPER_HURTABLE = registerDamageTypeTag("fairkeeper_hurtable");
+    public static final TagKey<DamageType> FAIRKEEPER_BOROS_ARMOR_HURTABLE = registerDamageTypeTag("fairkeeper_boros_armor_hurtable");
+    public static final TagKey<DamageType> FAIRKEEPER_BOROS_BYPASS_ARMOR = registerDamageTypeTag("fairkeeper_boros_bypass_armor");
     public static final TagKey<EntityType<?>> PROJECTILES = registerEntityTypeTag("projectiles");
     public static final TagKey<EntityType<?>> REPULSOR_OMITTED_PROJECTILES = registerEntityTypeTag("repulsor_omitted_projectiles");
     public static final TagKey<EntityType<?>> REPULSOR_HIGH_DAMAGE_PROJECTILES = registerEntityTypeTag("repulsor_high_damage_projectiles");

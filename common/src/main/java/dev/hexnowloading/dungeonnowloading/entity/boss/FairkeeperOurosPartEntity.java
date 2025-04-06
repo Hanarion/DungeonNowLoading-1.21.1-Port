@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, FairkeeperSerpentBodyEntity {
+public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
     private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
@@ -334,21 +334,6 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     @Override
     public BlockPos resetRegionCenter() {
         return null;
-    }
-
-    @Override
-    public void targetRandomPlayer() {
-
-    }
-
-    @Override
-    public boolean playerTargetingCondition() {
-        return false;
-    }
-
-    @Override
-    public void postPlayerTargeting() {
-
     }
 
     @Override

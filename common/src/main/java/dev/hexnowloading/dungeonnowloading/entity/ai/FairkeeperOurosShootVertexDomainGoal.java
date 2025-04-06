@@ -4,12 +4,11 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.Set;
 import java.util.UUID;
 
-public class FairkeeperOurosShootVertexDomainGoal extends Goal {
+public class FairkeeperOurosShootVertexDomainGoal extends StoppableGoal {
 
     private final FairkeeperOurosEntity ouros;
     private FairkeeperOurosEntity.FairkeeperOurosState state;
@@ -33,6 +32,7 @@ public class FairkeeperOurosShootVertexDomainGoal extends Goal {
 
     @Override
     public void start() {
+        super.start();
         this.attackTicks = reducedTickDelay(START_UP_DELAY);
         this.playerCount = 1;
         this.caller = (FairkeeperSerpentCallerEntity) this.ouros.getCaller();
@@ -40,6 +40,11 @@ public class FairkeeperOurosShootVertexDomainGoal extends Goal {
             this.playerCount = caller.getParticipatingPlayerCount();
             this.playerUUIDs = caller.getParticipatingPlayerUUIDs();
         }
+    }
+
+    @Override
+    public void stop() {
+        this.ouros.stopAttacking(20);
     }
 
     @Override
@@ -59,6 +64,6 @@ public class FairkeeperOurosShootVertexDomainGoal extends Goal {
 
         this.ouros.level().playSound(null, this.ouros.getX(), this.ouros.getY() - 1, this.ouros.getZ(), SoundEvents.WITHER_SHOOT, this.ouros.getSoundSource(), 3.0F, 1.0F + (this.ouros.getRandom().nextFloat() - this.ouros.getRandom().nextFloat()) * 0.2F);
 
-        this.ouros.stopAttacking(100);
+        this.stopGoal();
     }
 }

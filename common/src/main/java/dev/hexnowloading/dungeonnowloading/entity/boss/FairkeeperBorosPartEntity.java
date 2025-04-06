@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectile
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
+import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -16,7 +17,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, FairkeeperSerpentBodyEntity {
+public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
     private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -237,7 +237,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
             return false;
         }
 
-        if (!this.hasArmor() || damageSource.isCreativePlayer()) {
+        if (!this.hasArmor() || damageSource.isCreativePlayer() || damageSource.is(DNLTags.FAIRKEEPER_BOROS_BYPASS_ARMOR)) {
             FairkeeperBorosEntity head = (FairkeeperBorosEntity) this.getHead();
             if (head != null) {
                 head.setDamageFromOtherSegment(true);
@@ -246,7 +246,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
             return super.hurt(damageSource, 0);
         }
 
-        if (damageSource.is(DamageTypes.EXPLOSION) || (damageSource.getDirectEntity() instanceof LivingEntity livingEntity && livingEntity.canDisableShield() && damageAmount > 6)) {
+        if (damageSource.is(DNLTags.FAIRKEEPER_BOROS_ARMOR_HURTABLE) || (damageSource.getDirectEntity() instanceof LivingEntity livingEntity && livingEntity.canDisableShield() && damageAmount > 6)) {
             boolean doesKill = this.getHealth() - damageAmount <= 0;
             float nonKillableDamage = doesKill ? 0 : damageAmount;
             if (doesKill) {
@@ -326,21 +326,6 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     @Override
     public BlockPos resetRegionCenter() {
         return null;
-    }
-
-    @Override
-    public void targetRandomPlayer() {
-
-    }
-
-    @Override
-    public boolean playerTargetingCondition() {
-        return false;
-    }
-
-    @Override
-    public void postPlayerTargeting() {
-
     }
 
     @Override

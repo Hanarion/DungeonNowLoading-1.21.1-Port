@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-public class FairkeeperBorosShootArrowAboveGoal extends Goal {
+public class FairkeeperBorosShootArrowAboveGoal extends StoppableGoal {
     private final FairkeeperBorosEntity boros;
     private Entity circlingTarget;
     private final double radius;
@@ -71,6 +71,7 @@ public class FairkeeperBorosShootArrowAboveGoal extends Goal {
 
     @Override
     public void start() {
+        super.start();
         FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.boros.getCaller();
         if (caller != null) {
             this.arenaSize = caller.getArenaSize();
@@ -80,14 +81,14 @@ public class FairkeeperBorosShootArrowAboveGoal extends Goal {
 
         FairkeeperBorosPartEntity currentPart = (FairkeeperBorosPartEntity) this.boros.getChild();
         if (currentPart == null) {
-            this.boros.stopAttacking(20);
+            this.stopGoal();
             return;
         }
         this.partList.add(currentPart);
         for (int i = 0; i < 12; i++) {
             currentPart = (FairkeeperBorosPartEntity) currentPart.getChild();
             if (currentPart == null) {
-                this.boros.stopAttacking(20);
+                this.stopGoal();
                 return;
             }
             this.partList.add(currentPart);
@@ -102,7 +103,7 @@ public class FairkeeperBorosShootArrowAboveGoal extends Goal {
             this.angle = Math.toDegrees(Math.atan2(deltaZ, deltaX));
             this.angle = (this.angle + 360) % 360;
         } else {
-            this.boros.stopAttacking(20);
+            this.stopGoal();
             return;
         }
 
@@ -110,6 +111,11 @@ public class FairkeeperBorosShootArrowAboveGoal extends Goal {
         targetIndex = 0;
         this.stoppingTick = 0;
         updateTargetPosition();
+    }
+
+    @Override
+    public void stop() {
+        this.boros.stopAttacking(20);
     }
 
     @Override
@@ -170,7 +176,7 @@ public class FairkeeperBorosShootArrowAboveGoal extends Goal {
                 targetIndex++;
 
                 if (targetIndex >= pattern.positionList().size()) {
-                    this.boros.stopAttacking(20);
+                    this.stopGoal();
                     return;
                 }
 

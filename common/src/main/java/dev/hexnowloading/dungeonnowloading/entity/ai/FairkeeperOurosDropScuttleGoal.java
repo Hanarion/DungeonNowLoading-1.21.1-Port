@@ -15,11 +15,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class FairkeeperOurosDropScuttleGoal extends Goal {
+public class FairkeeperOurosDropScuttleGoal extends StoppableGoal {
     private final FairkeeperOurosEntity ouros;
     private final FairkeeperOurosEntity.FairkeeperOurosState state;
     private final int scuttleCount;
@@ -48,6 +47,7 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
 
     @Override
     public void start() {
+        super.start();
         this.attackTicks = reducedTickDelay(START_UP_DELAY);
         this.currentPart = (FairkeeperOurosPartEntity) this.ouros.getChild();
         this.playerCount = 1;
@@ -59,6 +59,11 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
     }
 
     @Override
+    public void stop() {
+        this.ouros.stopAttacking(20);
+    }
+
+    @Override
     public void tick() {
         if (this.attackTicks > 0) {
             this.attackTicks--;
@@ -66,7 +71,7 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
         }
 
         if (this.currentPart == null) {
-            this.ouros.stopAttacking(60);
+            this.stopGoal();
             return;
         }
 
@@ -75,7 +80,7 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
         loopCount--;
 
         if (this.loopCount <= 0) {
-            this.ouros.stopAttacking(60);
+            this.stopGoal();
             return;
         }
 
@@ -84,7 +89,7 @@ public class FairkeeperOurosDropScuttleGoal extends Goal {
         for (int i = 0; i < 4; i++) {
             this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();
             if (this.currentPart == null) {
-                this.ouros.stopAttacking(40 * this.playerCount);
+                this.stopGoal();
             }
         }
     }

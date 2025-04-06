@@ -40,7 +40,6 @@ public class BallistaGolemStatueBlockEntity extends BlockEntity {
         BallistaGolemStatueBlock ballistaGolemStatueBlock = (BallistaGolemStatueBlock) ballistaGolemStatueBlockEntity.getBlockState().getBlock();
 
         summonBallistaGolemEntity(level, blockPos, BallistaGolemStatueBlock.getDirection(ballistaGolemStatueBlockEntity.getBlockState()));
-        System.out.println("Alerted");
         BallistaGolemStatueBlock.destroyAllBlocks(level, blockPos);
         BallistaGolemStatueBlock.destroyBlocksAbove(level, blockPos);
         SoundEvent soundType = ballistaGolemStatueBlock.getSoundType(level.getBlockState(blockPos)).getBreakSound();
