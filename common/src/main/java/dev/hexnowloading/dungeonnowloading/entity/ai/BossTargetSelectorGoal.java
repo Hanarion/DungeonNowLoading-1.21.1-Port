@@ -83,6 +83,15 @@ public class BossTargetSelectorGoal extends TargetGoal {
         if (mob.getTarget() == null) {
             return;
         }
+
+        mob.setTarget(weightTargets(targetProvider, mob));
+    }
+
+    private void findTarget() {
+        selectedTarget = weightTargets(targetProvider, mob);
+    }
+
+    private static LivingEntity weightTargets(WeightedTargetProvider targetProvider, Mob mob) {
         BlockPos arenaCenter = targetProvider.getArenaCenter();
         int range = targetProvider.getArenaSize();
         AABB aabb = new AABB(arenaCenter).inflate(range);
@@ -103,65 +112,44 @@ public class BossTargetSelectorGoal extends TargetGoal {
             }
         }
 
-        WeightedRandomBag<LivingEntity> weightedPool = new WeightedRandomBag<>();
-
-        System.out.println("------------------- Target Selection -------------------");
-        System.out.println(mob.getType());
-        for (LivingEntity entity : candidates) {
-            double distanceScore = 1.0 / (mob.distanceToSqr(entity) + 1);
-            double damageScore = targetProvider.getDamageMap().getOrDefault(entity.getUUID(), 0.0);
-            double score = distanceScore * 2.0 + damageScore * 0.5;
-
-            System.out.println("   - " + entity.getType() + " : " + score);
-
-            weightedPool.addEntry(entity, score);
-        }
-
-        LivingEntity selectedTarget = weightedPool.getRandom();
-        if (selectedTarget != null) {
-            System.out.println("Selected : " + selectedTarget.getType());
-        }
-        mob.setTarget(selectedTarget);
-    }
-
-    private void findTarget() {
-        BlockPos arenaCenter = this.targetProvider.getArenaCenter();
-        int range = this.targetProvider.getArenaSize();
-        AABB aabb = new AABB(arenaCenter).inflate(range);
-        Set<UUID> seen = new HashSet<>();
-        List<LivingEntity> candidates = new ArrayList<>();
-
-        for (Player player : mob.level().getEntitiesOfClass(Player.class, aabb)) {
-            if (player.isAlive() && mob.canAttack(player)) {
-                candidates.add(player);
-                seen.add(player.getUUID ());
-            }
-        }
-
-        for (Map.Entry<UUID, LivingEntity> entry : targetProvider.getAttackers().entrySet()) {
-            LivingEntity attacker = entry.getValue();
-            if (attacker != null && attacker.isAlive() && mob.canAttack(attacker) && seen.add(entry.getKey())) {
-                candidates.add(attacker);
-            }
-        }
+        targetProvider.getThreatScoreMap().clear();
 
         WeightedRandomBag<LivingEntity> weightedPool = new WeightedRandomBag<>();
 
-        System.out.println("------------------- Target Selection -------------------");
-        System.out.println(mob.getType());
-        for (LivingEntity entity : candidates) {
-            double distanceScore = 1.0 / (mob.distanceToSqr(entity) + 1);
-            double damageScore = targetProvider.getDamageMap().getOrDefault(entity.getUUID(), 0.0);
-            double score = distanceScore * 2.0 + damageScore * 0.5;
+        // Step 1: Sort candidates by distance (closest first)
+        candidates.sort(Comparator.comparingDouble(mob::distanceToSqr));
 
-            System.out.println(" - " + entity.getType() + " : " + score);
+        System.out.println("========================================");
 
-            weightedPool.addEntry(entity, score);
+        for (int i = 0; i < candidates.size(); i++) {
+            LivingEntity entity = candidates.get(i);
+
+            // Step 2: Determine distance multiplier
+            double distanceMultiplier = switch (i) {
+                case 0 -> 2.0;
+                case 1 -> 1.5;
+                default -> 1.0;
+            };
+
+            // Step 3: Calculate damage-based score
+            double damage = targetProvider.getDamageMap().getOrDefault(entity.getUUID(), 0.0);
+            int damageScore = (int) Math.floor(damage / (mob.getMaxHealth() * 0.1F));
+
+            // Step 4: Final weighted score
+            int finalScore = (int) Math.floor(damageScore * distanceMultiplier + 1.0F);
+
+            System.out.println("   - " + entity.getType() + " : " + finalScore);
+
+            targetProvider.getThreatScoreMap().put(entity.getUUID(), (double) finalScore);
+            weightedPool.addEntry(entity, finalScore);
         }
 
-        selectedTarget = weightedPool.getRandom();
-        if (this.selectedTarget != null) {
-            System.out.println("   Selected : " + selectedTarget.getType());
+        LivingEntity entity = weightedPool.getRandom();
+
+        if (entity != null) {
+            System.out.println("Selected : " + entity.getType());
         }
+
+        return entity;
     }
 }

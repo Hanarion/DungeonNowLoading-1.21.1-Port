@@ -61,6 +61,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private final Deque<Vec3> positionHistory = new LinkedList<>();
     private final Map<UUID, Double> damageMap = new HashMap<>();
     private final Map<UUID, LivingEntity> attackers = new HashMap<>();
+    private final Map<UUID, Double> threatScores = new HashMap<>();
     private float previousTilt = 0.0f;
     private FairkeeperSerpentCallerEntity fairkeeperSerpentCaller;
 
@@ -520,7 +521,18 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             }
             return false;
         }
-        return super.hurt(damageSource, amount);
+        return hurtAndTrackAttackers(damageSource, amount);
+    }
+
+    private boolean hurtAndTrackAttackers(DamageSource source, float amount) {
+        boolean result = super.hurt(source, amount);
+        Entity attacker = source.getEntity();
+
+        if (attacker instanceof LivingEntity livingEntity) {
+            this.recordDamage(livingEntity, amount);
+        }
+
+        return result;
     }
 
     @Override
@@ -768,13 +780,8 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
-    public boolean shouldChangeTarget() {
-        return changeTarget;
-    }
-
-    @Override
-    public void changeTarget(boolean b) {
-        this.changeTarget = b;
+    public Map<UUID, Double> getThreatScoreMap() {
+        return threatScores;
     }
 
     public enum FairkeeperOurosAnimationState {

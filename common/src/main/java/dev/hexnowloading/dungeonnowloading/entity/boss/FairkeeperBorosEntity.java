@@ -65,6 +65,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private Set<UUID> partList;
     private final Map<UUID, Double> damageMap = new HashMap<>();
     private final Map<UUID, LivingEntity> attackers = new HashMap<>();
+    private final Map<UUID, Double> threatScores = new HashMap<>();
     private Vec3 awakenEndPos;
     private FairkeeperSerpentCallerEntity fairkeeperSerpentCaller;
 
@@ -652,13 +653,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
-    public boolean shouldChangeTarget() {
-        return this.changeTarget;
-    }
-
-    @Override
-    public void changeTarget(boolean b) {
-        this.changeTarget = b;
+    public Map<UUID, Double> getThreatScoreMap() {
+        return threatScores;
     }
 
     public enum FairkeeperBorosAnimationState {

@@ -9,9 +9,7 @@ import java.util.UUID;
 public interface WeightedTargetProvider {
     Map<UUID, Double> getDamageMap();
     Map<UUID, LivingEntity> getAttackers();
-
-    boolean shouldChangeTarget();
-    void changeTarget(boolean b);
+    Map<UUID, Double> getThreatScoreMap();
 
     BlockPos getArenaCenter();
     int getArenaSize();

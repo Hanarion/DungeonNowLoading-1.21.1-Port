@@ -4,13 +4,13 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
-import java.util.Set;
 import java.util.UUID;
 
 public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
@@ -19,9 +19,8 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
     private FairkeeperOurosEntity.FairkeeperOurosState state;
     private FairkeeperOurosPartEntity currentPart;
     private FairkeeperSerpentCallerEntity caller;
-    private Set<UUID> playerUUIDs;
     private int attackTicks;
-    private int playerCount;
+    private int targetCount;
     private int bulletCount;
     private final int bulletPerPlayer;
     private final int radius;
@@ -47,13 +46,12 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
     public void start() {
         super.start();
         this.attackTicks = reducedTickDelay(START_UP_DELAY);
-        this.playerCount = 1;
+        this.targetCount = 1;
         this.caller = (FairkeeperSerpentCallerEntity) this.ouros.getCaller();
         if (caller != null) {
-            this.playerCount = caller.getParticipatingPlayerCount();
-            this.playerUUIDs = caller.getParticipatingPlayerUUIDs();
+            this.targetCount = this.ouros.getThreatScoreMap().size();
         }
-        this.bulletCount = this.playerCount * this.bulletPerPlayer;
+        this.bulletCount = this.targetCount * this.bulletPerPlayer;
     }
 
     @Override
@@ -96,9 +94,10 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
     }
 
     private void shootRandomPlayer() {
-        RandomSource randomSource = this.ouros.getRandom();
-        UUID playerUUID = playerUUIDs.stream().skip(randomSource.nextInt(playerCount)).findFirst().orElse(null);
-        Entity player = ((ServerLevel) this.ouros.level()).getEntity(playerUUID);
+        WeightedRandomBag<UUID> bag = new WeightedRandomBag<>();
+        this.ouros.getThreatScoreMap().forEach(bag::addEntry);
+        UUID randomUUID = bag.getRandom();
+        Entity player = ((ServerLevel) this.ouros.level()).getEntity(randomUUID);
         if (player != null) {
             VertexOrbProjectileEntity vertexOrbProjectileEntity = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros, radius);
             vertexOrbProjectileEntity.shootTowardsTarget(this.currentPart.getX(), this.currentPart.getY() - 1, this.currentPart.getZ(), (LivingEntity) player, 1.0F, this.inaccuracy);
