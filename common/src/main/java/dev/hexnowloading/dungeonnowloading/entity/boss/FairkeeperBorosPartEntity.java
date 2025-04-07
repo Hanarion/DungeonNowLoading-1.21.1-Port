@@ -70,6 +70,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 50.0D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0F)
                 .add(Attributes.ATTACK_DAMAGE, 8.0D);
     }
 
@@ -133,7 +134,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
                     if (headEntity.getPositionHistory().size() > historyIndex) {
                         this.setModelVisible(true);
 
-                        Vec3 targetPos = headEntity.getPositionHistory().stream().skip(historyIndex).findFirst().orElse(this.getPosition(1.0F));
+                        Vec3 targetPos = headEntity.getSegmentTargetPosition(this.getBodyIndex() + 1);
 
                         // Move towards the target position
                         this.setPos(
@@ -143,7 +144,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
                         );
 
                         // Align rotation with the head's historical rotation
-                        Vec3 nextPos = headEntity.getPositionHistory().stream().skip(historyIndex - 1).findFirst().orElse(targetPos);
+                        //Vec3 nextPos = headEntity.getPositionHistory().stream().skip(historyIndex - 1).findFirst().orElse(targetPos);
                         /*if (headEntity.isState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING)) {
                             this.setRotatable(false);
                         }*/
@@ -155,8 +156,9 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
                                 this.setRotatable(true);
                             }
                         }
-                        if (this.isRotatable()) {
-                            alignRotation(targetPos, nextPos);
+                        //Vec3 nextPos = headEntity.getSegmentTargetPosition(this.getBodyIndex());
+                        if (this.isRotatable() && this.isHeadEntityMoving()) {
+                            alignRotation(this.position(), targetPos);
                         }
                     }
                 }

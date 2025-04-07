@@ -80,7 +80,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
-    public static int SEGMENT_DELAY_STEP = 11;
+    public static int SEGMENT_DELAY_STEP = 13;
     private static final float MAX_ARMOR_HEALTH = 150F;
 
     private int mouthOpenAnimationTimeOut;
@@ -264,6 +264,35 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 this.lookTowardTarget();
             }
         }
+    }
+
+    public Vec3 getSegmentTargetPosition(int segmentIndex) {
+        double segmentSpacing = 4.0; // Distance between segments
+        double targetDistance = segmentIndex * segmentSpacing;
+
+        List<Vec3> history = new ArrayList<>(this.positionHistory); // safest to copy for thread safety
+        if (history.size() < 2) {
+            return this.position(); // fallback if not enough history
+        }
+
+        Vec3 current = history.get(0);
+        double accumulated = 0.0;
+
+        for (int i = 1; i < history.size(); i++) {
+            Vec3 next = history.get(i);
+            double dist = current.distanceTo(next);
+
+            if (accumulated + dist >= targetDistance) {
+                double remaining = targetDistance - accumulated;
+                double t = remaining / dist;
+                return current.lerp(next, t); // interpolated position
+            }
+
+            accumulated += dist;
+            current = next;
+        }
+
+        return history.get(history.size() - 1); // fallback: end of path
     }
 
     private void lookTowardTarget() {

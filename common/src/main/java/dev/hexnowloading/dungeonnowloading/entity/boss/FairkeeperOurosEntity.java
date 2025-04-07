@@ -272,6 +272,35 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         }
     }
 
+    public Vec3 getSegmentTargetPosition(int segmentIndex) {
+        double segmentSpacing = 4.0; // Distance between segments
+        double targetDistance = segmentIndex * segmentSpacing;
+
+        List<Vec3> history = new ArrayList<>(this.positionHistory); // safest to copy for thread safety
+        if (history.size() < 2) {
+            return this.position(); // fallback if not enough history
+        }
+
+        Vec3 current = history.get(0);
+        double accumulated = 0.0;
+
+        for (int i = 1; i < history.size(); i++) {
+            Vec3 next = history.get(i);
+            double dist = current.distanceTo(next);
+
+            if (accumulated + dist >= targetDistance) {
+                double remaining = targetDistance - accumulated;
+                double t = remaining / dist;
+                return current.lerp(next, t); // interpolated position
+            }
+
+            accumulated += dist;
+            current = next;
+        }
+
+        return history.get(history.size() - 1); // fallback: end of path
+    }
+
     private void lookTowardTarget() {
         double directionX = this.getMoveControl().getWantedX() - this.getX();
         double directionZ = this.getMoveControl().getWantedZ() - this.getZ();
