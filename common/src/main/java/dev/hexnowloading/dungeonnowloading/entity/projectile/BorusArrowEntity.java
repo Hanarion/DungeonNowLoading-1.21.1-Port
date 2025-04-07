@@ -85,7 +85,9 @@ public class BorusArrowEntity extends AbstractArrow {
         }
         BlockState blockState = this.level().getBlockState(blockHitResult.getBlockPos());
         if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
-            this.level().destroyBlock(blockHitResult.getBlockPos(), true);
+            if (!this.level().isClientSide) {
+                this.level().destroyBlock(blockHitResult.getBlockPos(), true);
+            }
             this.setDeltaMovement(this.constantDeltaMovement);
             this.blockBreakCount++;
             if (blockBreakCount >= MAX_BLOCK_PENETRATION) {

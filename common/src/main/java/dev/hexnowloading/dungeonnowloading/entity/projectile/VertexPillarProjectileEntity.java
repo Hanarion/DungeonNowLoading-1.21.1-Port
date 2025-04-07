@@ -112,6 +112,7 @@ public class VertexPillarProjectileEntity extends ModelledProjectileEntity {
     }
 
     private void breakLogic() {
+        if (this.level().isClientSide) return;
 
         this.level().destroyBlock(this.blockPosition().below(), false);
 
