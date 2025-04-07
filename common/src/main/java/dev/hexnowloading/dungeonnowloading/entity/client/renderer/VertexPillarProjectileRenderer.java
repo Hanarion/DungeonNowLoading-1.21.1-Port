@@ -3,9 +3,8 @@ package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.client.model.ShieldingStonePillarProjectileModel;
-import dev.hexnowloading.dungeonnowloading.entity.projectile.ShieldingStonePillarProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.entity.projectile.StonePillarProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.client.model.VertexPillarProjectileModel;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexPillarProjectileEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -13,19 +12,19 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
-public class ShieldingStonePillarProjectileRenderer<T extends ShieldingStonePillarProjectileEntity> extends EntityRenderer<ShieldingStonePillarProjectileEntity> {
+public class VertexPillarProjectileRenderer<T extends VertexPillarProjectileEntity> extends EntityRenderer<VertexPillarProjectileEntity> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/stone_pillar/shielding_stone_pillar.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_pillar.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TEXTURE);
-    private ShieldingStonePillarProjectileModel model;
+    private VertexPillarProjectileModel model;
 
-    public ShieldingStonePillarProjectileRenderer(EntityRendererProvider.Context context) {
+    public VertexPillarProjectileRenderer(EntityRendererProvider.Context context) {
         super(context);
-        model = new ShieldingStonePillarProjectileModel(context.bakeLayer(ShieldingStonePillarProjectileModel.LAYER_LOCATION));
+        model = new VertexPillarProjectileModel(context.bakeLayer(VertexPillarProjectileModel.LAYER_LOCATION));
     }
 
     @Override
-    public void render(ShieldingStonePillarProjectileEntity entity, float v, float v1, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
+    public void render(VertexPillarProjectileEntity entity, float v, float v1, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
         poseStack.pushPose();
         poseStack.scale(-0.99f, -0.99F, 0.99F);
         poseStack.translate(0.0f, -entity.getBbHeight() + 0.5F, 0.0f);
@@ -36,7 +35,7 @@ public class ShieldingStonePillarProjectileRenderer<T extends ShieldingStonePill
     }
 
     @Override
-    public ResourceLocation getTextureLocation(ShieldingStonePillarProjectileEntity entity) {
+    public ResourceLocation getTextureLocation(VertexPillarProjectileEntity entity) {
         return TEXTURE;
     }
 }

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ShieldingStonePillarBlockEntity extends BlockEntity {
+public class VertexPillarBlockEntity extends BlockEntity {
 
     private final List<BlockPos> linkedPositions = new ArrayList<>();
     private int age;
@@ -44,8 +44,8 @@ public class ShieldingStonePillarBlockEntity extends BlockEntity {
     private static final float BEAM_INITIAL_PARTICLE_SCALE_MIN = 0.2f;
     private static final float BEAM_INITIAL_PARTICLE_SCALE_MAX = 0.4f;
 
-    public ShieldingStonePillarBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(DNLBlockEntityTypes.SHIELDING_STONE_PILLAR.get(), blockPos, blockState);
+    public VertexPillarBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(DNLBlockEntityTypes.VERTEX_PILLAR.get(), blockPos, blockState);
     }
 
     @Override
@@ -99,11 +99,11 @@ public class ShieldingStonePillarBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, ShieldingStonePillarBlockEntity blockEntity) {
+    public static void tick(Level level, BlockPos pos, BlockState state, VertexPillarBlockEntity blockEntity) {
         if (!level.isClientSide) {
             for (BlockPos linkedPos : blockEntity.getLinkedPositions()) {
                 BlockEntity targetBE = level.getBlockEntity(linkedPos);
-                if (targetBE instanceof ShieldingStonePillarBlockEntity pillarBlockEntity && pillarBlockEntity.age > blockEntity.age) {
+                if (targetBE instanceof VertexPillarBlockEntity pillarBlockEntity && pillarBlockEntity.age > blockEntity.age) {
                     if (blockEntity.age > 0) {
                         spawnRedstoneLaser((ServerLevel) level, pos, linkedPos);
                     } else {

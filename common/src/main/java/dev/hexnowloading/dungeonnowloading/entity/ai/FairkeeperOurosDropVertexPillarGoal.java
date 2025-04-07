@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
-import dev.hexnowloading.dungeonnowloading.entity.projectile.ShieldingStonePillarProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexPillarProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableAxisParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
@@ -112,7 +112,7 @@ public class FairkeeperOurosDropVertexPillarGoal extends StoppableGoal {
         if (distanceSqChild < 1.5) {
             dropIndex++;
             Level level = this.ouros.level();
-            ShieldingStonePillarProjectileEntity stonePillar = new ShieldingStonePillarProjectileEntity(this.ouros.level(), this.ouros, 0.8F, true);
+            VertexPillarProjectileEntity stonePillar = new VertexPillarProjectileEntity(this.ouros.level(), this.ouros, 0.8F, true);
             stonePillar.setPos(dropTargetBlockPos.getX() + 0.5, this.currentPart.getBoundingBox().minY, dropTargetBlockPos.getZ() + 0.5);
             level.addFreshEntity(stonePillar);
 

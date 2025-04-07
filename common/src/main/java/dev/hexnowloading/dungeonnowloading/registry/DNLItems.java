@@ -124,8 +124,7 @@ public class DNLItems {
     public static final Supplier<Item> SCUTTLE_STATUE = register("scuttle_statue", () -> new BlockItem(DNLBlocks.SCUTTLE_STATUE.get(), new Item.Properties()));
     public static final Supplier<Item> BALLISTA_GOLEM_STATUE = register("ballista_golem_statue", () -> new BlockItem(DNLBlocks.BALLISTA_GOLEM_STATUE.get(), new Item.Properties()));
     public static final Supplier<Item> OVERCHARGED_REDSTONE_BLOCK = register("overcharged_redstone_block", () -> new BlockItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get(), new Item.Properties()));
-    public static final Supplier<Item> STONE_PILLAR = register("stone_pillar", () -> new BlockItem(DNLBlocks.STONE_PILLAR.get(), new Item.Properties()));
-    public static final Supplier<Item> SHIELDING_STONE_PILLAR = register("shielding_stone_pillar", () -> new BlockItem(DNLBlocks.SHIELDING_STONE_PILLAR.get(), new Item.Properties()));
+    public static final Supplier<Item> VERTEX_PILLAR = register("vertex_pillar", () -> new BlockItem(DNLBlocks.VERTEX_PILLAR.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA = register("mending_aura", () -> new BlockItem(DNLBlocks.MENDING_AURA.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA_STAIRS = register("mending_aura_stairs", () -> new BlockItem(DNLBlocks.MENDING_AURA_STAIRS.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA_SLAB = register("mending_aura_slab", () -> new BlockItem(DNLBlocks.MENDING_AURA_SLAB.get(), new Item.Properties()));

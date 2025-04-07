@@ -71,7 +71,7 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.BALLISTA_GOLEM_STATUE.get(),
                 DNLBlocks.BALLISTA_GOLEM_STATUE_PART.get(),
                 DNLBlocks.STONE_PILLAR.get(),
-                DNLBlocks.SHIELDING_STONE_PILLAR.get(),
+                DNLBlocks.VERTEX_PILLAR.get(),
                 DNLBlocks.STONE_PRESERVER.get()
         );
 

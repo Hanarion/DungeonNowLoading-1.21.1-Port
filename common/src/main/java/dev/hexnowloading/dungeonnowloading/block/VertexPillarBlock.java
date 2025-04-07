@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
-import dev.hexnowloading.dungeonnowloading.block.entity.ShieldingStonePillarBlockEntity;
+import dev.hexnowloading.dungeonnowloading.block.entity.VertexPillarBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,14 +32,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ShieldingStonePillarBlock extends BaseEntityBlock implements EntityBlock, SimpleWaterloggedBlock {
+public class VertexPillarBlock extends BaseEntityBlock implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 16, 14);
     private static final int RANGE = 23;
 
-    public ShieldingStonePillarBlock(Properties properties) {
+    public VertexPillarBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, Boolean.FALSE).setValue(HALF, DoubleBlockHalf.LOWER));
     }
@@ -99,7 +99,7 @@ public class ShieldingStonePillarBlock extends BaseEntityBlock implements Entity
     }
 
     public static void linkOnPlaced(Level level, BlockPos blockPos) {
-        ShieldingStonePillarBlockEntity thisBE = (ShieldingStonePillarBlockEntity) level.getBlockEntity(blockPos);
+        VertexPillarBlockEntity thisBE = (VertexPillarBlockEntity) level.getBlockEntity(blockPos);
         if (thisBE == null) return;
 
         float inflate = 0.1F;
@@ -132,7 +132,7 @@ public class ShieldingStonePillarBlock extends BaseEntityBlock implements Entity
 
         Map<BlockPos, BlockEntity> filteredMap = blockEntityMap.entrySet()
                 .stream()
-                .filter(e -> (e.getValue() instanceof ShieldingStonePillarBlockEntity blockEntity && blockEntity.getBlockState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER))
+                .filter(e -> (e.getValue() instanceof VertexPillarBlockEntity blockEntity && blockEntity.getBlockState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER))
                 .filter(e -> {
                             float x = e.getKey().getX() - blockPos.getX();
                             float y = e.getKey().getY() - blockPos.getY();
@@ -149,7 +149,7 @@ public class ShieldingStonePillarBlock extends BaseEntityBlock implements Entity
                     .toList();
             for (BlockPos pos : blockPosList) {
                 BlockEntity linkingBE = level.getBlockEntity(pos);
-                if (linkingBE instanceof ShieldingStonePillarBlockEntity shieldingStonePillar) {
+                if (linkingBE instanceof VertexPillarBlockEntity shieldingStonePillar) {
                     if (thisBE.getLinkedPositions().size() < 2 && shieldingStonePillar.getLinkedPositions().size() < 2) {
                         if (thisBE.addLink(pos) && shieldingStonePillar.addLink(blockPos)) {
                             if (thisBE.getLinkedPositions().size() >= 2) {
@@ -165,13 +165,13 @@ public class ShieldingStonePillarBlock extends BaseEntityBlock implements Entity
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new ShieldingStonePillarBlockEntity(blockPos, blockState);
+        return new VertexPillarBlockEntity(blockPos, blockState);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return  createTickerHelper(blockEntityType, DNLBlockEntityTypes.SHIELDING_STONE_PILLAR.get(), ShieldingStonePillarBlockEntity::tick);
+        return  createTickerHelper(blockEntityType, DNLBlockEntityTypes.VERTEX_PILLAR.get(), VertexPillarBlockEntity::tick);
     }
 
     @Override
