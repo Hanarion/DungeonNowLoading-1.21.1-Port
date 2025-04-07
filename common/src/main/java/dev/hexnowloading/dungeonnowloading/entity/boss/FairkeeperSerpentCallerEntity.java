@@ -1,6 +1,8 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import com.google.common.collect.ImmutableList;
+import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
+import dev.hexnowloading.dungeonnowloading.block.entity.VertexPillarBlockEntity;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.BossTargetSelectorGoal;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
@@ -14,6 +16,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -33,6 +36,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -266,7 +272,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         BossTargetSelectorGoal.changeTarget(this.boros);
         BossTargetSelectorGoal.changeTarget(this.ouros);
 
-        if (this.boros.getTarget() == null || this.ouros.getTarget() == null) {
+        if (this.boros.getTarget() == null && this.ouros.getTarget() == null) {
             return;
         }
 
@@ -402,6 +408,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             if (scuttleCount > MAX_SCUTTLE_COUNT) {
                 statePair = introMoveSet.selectMoveWithoutCooldownReduction();
             }
+        }
+
+        if (this.boros.getTarget() == null) {
+            statePair = new Pair<>(FairkeeperBorosEntity.FairkeeperBorosState.IDLE, statePair.getB());
+        } else if (this.ouros.getTarget() == null) {
+            statePair = new Pair<>(statePair.getA(), FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
         }
 
 
@@ -562,7 +574,46 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             this.spawnLootTableItems(this.lastDamageSource, true, false, null);
         }
         this.removeAllMinions();
+        this.removePreservers();
+        this.removePillars();
         this.remove(RemovalReason.KILLED);
+    }
+
+    private void removePreservers() {
+        Level level = this.level();
+        BlockPos center = this.blockPosition();
+        int includeWallPreserver = 1;
+        int arenaSize = this.getArenaSize() + includeWallPreserver;
+
+        Map<BlockPos, BlockEntity> map = new HashMap<>();
+
+        int minX = center.getX() - arenaSize;
+        int minZ = center.getZ() - arenaSize;
+        int maxX = center.getX() + arenaSize;
+        int maxZ = center.getZ() + arenaSize;
+
+        int chunkMinX = SectionPos.blockToSectionCoord(minX);
+        int chunkMinZ = SectionPos.blockToSectionCoord(minZ);
+        int chunkMaxX = SectionPos.blockToSectionCoord(maxX);
+        int chunkMaxZ = SectionPos.blockToSectionCoord(maxZ);
+
+        for (int x = chunkMinX; x <= chunkMaxX; x++) {
+            for (int z = chunkMinZ; z <= chunkMaxZ; z++) {
+                map.putAll(level.getChunk(x, z).getBlockEntities());
+            }
+        }
+
+        Map<BlockPos, BlockEntity> preserver = map.entrySet().stream()
+                .filter(e -> e.getValue() instanceof PreserverBlockEntity)
+                .filter(e -> {
+                    BlockPos pos = e.getKey();
+                    return pos.getX() >= minX && pos.getX() <= maxX &&
+                            pos.getZ() >= minZ && pos.getZ() <= maxZ &&
+                            Math.abs(pos.getY() - center.getY()) <= arenaSize;
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        preserver.keySet().forEach(pos -> level.setBlock(pos, Blocks.CHISELED_STONE_BRICKS.defaultBlockState(), Block.UPDATE_ALL));
     }
 
     private void spawnLootTableItems(DamageSource damageSource, boolean b, boolean multiplayer, @Nullable UUID uuid) {
@@ -610,6 +661,43 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.activationTick = 0;
         this.playerUUIDs.clear();
         this.removeAllMinions();
+        this.removePillars();
+    }
+
+    public void removePillars() {
+        Level level = this.level();
+        BlockPos center = this.blockPosition();
+        int arenaSize = this.getArenaSize();
+
+        Map<BlockPos, BlockEntity> map = new HashMap<>();
+
+        int minX = center.getX() - arenaSize;
+        int minZ = center.getZ() - arenaSize;
+        int maxX = center.getX() + arenaSize;
+        int maxZ = center.getZ() + arenaSize;
+
+        int chunkMinX = SectionPos.blockToSectionCoord(minX);
+        int chunkMinZ = SectionPos.blockToSectionCoord(minZ);
+        int chunkMaxX = SectionPos.blockToSectionCoord(maxX);
+        int chunkMaxZ = SectionPos.blockToSectionCoord(maxZ);
+
+        for (int x = chunkMinX; x <= chunkMaxX; x++) {
+            for (int z = chunkMinZ; z <= chunkMaxZ; z++) {
+                map.putAll(level.getChunk(x, z).getBlockEntities());
+            }
+        }
+
+        Map<BlockPos, BlockEntity> filtered = map.entrySet().stream()
+                .filter(e -> e.getValue() instanceof VertexPillarBlockEntity)
+                .filter(e -> {
+                    BlockPos pos = e.getKey();
+                    return pos.getX() >= minX && pos.getX() <= maxX &&
+                            pos.getZ() >= minZ && pos.getZ() <= maxZ &&
+                            Math.abs(pos.getY() - center.getY()) <= arenaSize;
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        filtered.keySet().forEach(pos -> level.removeBlock(pos, false));
     }
 
     private void removeAllMinions() {

@@ -6,7 +6,6 @@ import dev.hexnowloading.dungeonnowloading.particle.type.AxisParticleType;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -18,7 +17,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -27,7 +25,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -66,6 +63,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     private boolean hasAppliedMovement;
     private boolean hasLanded;
     private boolean delayTick;
+    private boolean explosionImmune;
 
     //private final ParticleOptions TRAIL_PARTICLE = (ParticleOptions) DNLParticleTypes.VERTEX_SPARK_PARTICLE.get();
 
@@ -163,9 +161,9 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         if ((this.verticalCollision || this.horizontalCollision) || this.getDeltaMovement().lengthSqr() < 1.0E-7 && this.life <= 0) {
             this.life = DURATION_ON_GROUND;
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 3.0F, 1.0F);
+            blockDestruction();
             this.setDeltaMovement(Vec3.ZERO);
             spawnInitialRedstoneParticles();
-            blockDestruction();
             this.expansionTick = 40;
         }
 
@@ -174,6 +172,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
             if (this.expansionTick > 0) {
                 this.expansionTick--;
             }
+            this.setDeltaMovement(Vec3.ZERO);
             applyEffect();
             if (this.life > 50) {
                 spawnRedstoneParticle();
@@ -185,18 +184,22 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     }
 
     private void blockDestruction() {
-        BlockPos pos = this.blockPosition();
+        if (this.level().isClientSide) return;
+        this.explosionImmune = true;
+        this.level().explode(null, this.getX(), this.getY(), this.getZ(), 3.0F, Level.ExplosionInteraction.BLOCK);
+        this.explosionImmune = false;
+        /*BlockPos pos = this.blockPosition();
         int r = this.getRadius();
         for (int x = -r; x <= r; x++) {
             for (int z = -r; z <= r; z++) {
                 for (int y = -r; y <= r; y++) {
                     BlockPos targetPos = new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
                     if (!this.level().getBlockState(targetPos).is(BlockTags.WITHER_IMMUNE)) {
-                        this.level().destroyBlock(targetPos, false, this, Block.UPDATE_CLIENTS);
+                        //this.level().destroyBlock(targetPos, false, this, 0);
                     }
                 }
             }
-        }
+        }*/
     }
 
 
@@ -407,6 +410,9 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         }
         if (this.level().isClientSide || this.isRemoved()) {
             return true;
+        }
+        if (this.explosionImmune) {
+            return false;
         }
         this.setHurtDir(-this.getHurtDir());
         this.setHurtTime(10);

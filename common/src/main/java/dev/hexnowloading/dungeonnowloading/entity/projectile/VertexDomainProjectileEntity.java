@@ -215,7 +215,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
             this.level().addParticle(particleData, this.getX() + 6 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()), this.getY()  + 6 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()),this.getZ()  + 6 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()), 0, 0, 0);
         }
         this.explosionImmune = true;
-        this.level().explode(null, this.getX(), this.getY(), this.getZ(), 4.0F, Level.ExplosionInteraction.NONE);
+        this.level().explode(null, this.getX(), this.getY(), this.getZ(), 6.0F, Level.ExplosionInteraction.NONE);
         this.explosionImmune = false;
     }
 

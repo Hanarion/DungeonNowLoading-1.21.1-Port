@@ -354,7 +354,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                     BlockPos blockPos = new BlockPos(dx, dy, dz);
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
-                        if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
+                        if (!blockState.is(BlockTags.WITHER_IMMUNE) || !blockState.is(DNLTags.TORCH_BLOCKS)) {
                             this.level().destroyBlock(blockPos, false, this);
                         }
                     }
