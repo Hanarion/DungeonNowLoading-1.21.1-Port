@@ -41,9 +41,9 @@ public class RedstoneCatalystItem extends Item {
             for (FairkeeperSerpentCallerEntity serpentCallerEntity : targets) {
                 serpentCallerEntity.startBossFight();
             }
-            if (player instanceof ServerPlayer) {
+            /*if (player instanceof ServerPlayer) {
                 itemStack.hurtAndBreak(1, player, (player1 -> player1.broadcastBreakEvent(hand)));
-            }
+            }*/
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);

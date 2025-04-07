@@ -4,12 +4,7 @@ import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -46,9 +41,9 @@ public class SkullOfChaosItem extends Item {
             for (ChaosSpawnerEntity chaosSpawnerEntity : targets) {
                 chaosSpawnerEntity.startBossFight();
             }
-            if (player instanceof ServerPlayer) {
+            /*if (player instanceof ServerPlayer) {
                 itemStack.hurtAndBreak(1, player, (player1 -> player1.broadcastBreakEvent(hand)));
-            }
+            }*/
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);
