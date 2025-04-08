@@ -119,7 +119,7 @@ public class BossTargetSelectorGoal extends TargetGoal {
         // Step 1: Sort candidates by distance (closest first)
         candidates.sort(Comparator.comparingDouble(mob::distanceToSqr));
 
-        System.out.println("========================================");
+        //System.out.println("========================================");
 
         for (int i = 0; i < candidates.size(); i++) {
             LivingEntity entity = candidates.get(i);
@@ -138,7 +138,7 @@ public class BossTargetSelectorGoal extends TargetGoal {
             // Step 4: Final weighted score
             int finalScore = (int) Math.floor(damageScore * distanceMultiplier + 1.0F);
 
-            System.out.println("   - " + entity.getType() + " : " + finalScore);
+            //System.out.println("   - " + entity.getType() + " : " + finalScore);
 
             targetProvider.getThreatScoreMap().put(entity.getUUID(), (double) finalScore);
             weightedPool.addEntry(entity, finalScore);
@@ -147,7 +147,7 @@ public class BossTargetSelectorGoal extends TargetGoal {
         LivingEntity entity = weightedPool.getRandom();
 
         if (entity != null) {
-            System.out.println("Selected : " + entity.getType());
+            //System.out.println("Selected : " + entity.getType());
         }
 
         return entity;

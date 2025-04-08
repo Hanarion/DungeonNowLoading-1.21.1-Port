@@ -97,10 +97,10 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         if (this.getParentId() != null) {
             compoundTag.putUUID("ParentUUID", this.getParentId());
         }
-        if (this.getChild() != null) {
+        if (this.getChildId() != null) {
             compoundTag.putUUID("ChildUUID", this.getChildId());
         }
-        if (this.getHead() != null) {
+        if (this.getHeadId() != null) {
             compoundTag.putUUID("HeadUUID", this.getHeadId());
         }
         compoundTag.putBoolean("TailPart", isTail());
@@ -153,12 +153,13 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
                         if (!this.isRotatable()) {
                             Vec3 awakenEndPos = headEntity.getAwakenEndPos();
                             if (awakenEndPos == null) {
-                                awakenEndPos = Vec3.ZERO;
-                            }
-                            double dy = awakenEndPos.y - (this.getY() + this.getBbHeight());
-
-                            if (dy * dy < 5.0F * 5.0F) {
                                 this.setRotatable(true);
+                            } else {
+                                double dy = awakenEndPos.y - (this.getY() + this.getBbHeight());
+
+                                if (dy * dy < 5.0F * 5.0F) {
+                                    this.setRotatable(true);
+                                }
                             }
                         }
                         if (this.isRotatable() && this.isHeadEntityMoving()) {

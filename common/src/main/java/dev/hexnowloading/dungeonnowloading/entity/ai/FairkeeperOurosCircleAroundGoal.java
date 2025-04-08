@@ -37,13 +37,14 @@ public class FairkeeperOurosCircleAroundGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        boolean b;
+        boolean callerExists = this.ouros.getCaller() != null;
+        if (!callerExists) return false;
+        boolean b = true;
         if (this.circlePlayer) {
             this.circlingTarget = this.ouros.getTarget();
             b = this.circlingTarget != null && this.circlingTarget.isAlive();
         } else {
             this.circlingTarget = this.ouros.getCaller();
-            b = this.circlingTarget != null;
         }
         return b && this.ouros.isState(state);
     }

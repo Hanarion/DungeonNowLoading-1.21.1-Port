@@ -37,13 +37,14 @@ public class FairkeeperBorosCircleAroundPlayerGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        boolean b;
+        boolean callerExists = this.boros.getCaller() != null;
+        if (!callerExists) return false;
+        boolean b = true;
         if (this.circlePlayer) {
             this.circlingTarget = this.boros.getTarget();
             b = this.circlingTarget != null && this.circlingTarget.isAlive();
         } else {
             this.circlingTarget = this.boros.getCaller();
-            b = this.circlingTarget != null;
         }
         return b && this.boros.isState(state);
     }

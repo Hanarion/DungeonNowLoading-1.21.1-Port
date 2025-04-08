@@ -20,7 +20,7 @@ public class FairkeeperBorosRenderer<T extends FairkeeperBorosEntity> extends Mo
 
     @Override
     protected void scale(T entity, PoseStack poseStack, float v) {
-        poseStack.scale(1.5F, 1.5F, 1.5F);
+        poseStack.scale(1.75F, 1.75F, 1.75F);
         super.scale(entity, poseStack, v);
     }
 

@@ -25,7 +25,7 @@ public class FairkeeperBorosAwakenGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return this.fairkeeper.isState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING);
+        return this.fairkeeper.isState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING) && this.fairkeeper.getCaller() != null;
     }
 
     @Override

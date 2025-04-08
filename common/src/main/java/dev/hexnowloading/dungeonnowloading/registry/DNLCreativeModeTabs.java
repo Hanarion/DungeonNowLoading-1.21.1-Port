@@ -13,8 +13,8 @@ public class DNLCreativeModeTabs {
             (itemDisplayParameters, output) -> {
                 // Spawn Eggs
                 output.accept(DNLItems.CHAOS_SPAWNER_SPAWNEGG.get());
-                output.accept(DNLItems.FAIRKEEPER_SPAWNEGG.get());
-                output.accept(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
+                //output.accept(DNLItems.FAIRKEEPER_SPAWNEGG.get());
+                //output.accept(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
                 output.accept(DNLItems.HOLLOW_SPAWNEGG.get());
                 output.accept(DNLItems.SPAWNER_CARRIER_SPAWNEGG.get());
                 output.accept(DNLItems.SCUTTLE_SPAWNEGG.get());

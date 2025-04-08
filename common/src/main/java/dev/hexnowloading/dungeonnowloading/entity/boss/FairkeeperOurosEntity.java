@@ -10,6 +10,7 @@ import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.WeightedTargetProvider;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
+import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import dev.hexnowloading.dungeonnowloading.util.NbtHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -64,6 +65,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private final Map<UUID, Double> threatScores = new HashMap<>();
     private float previousTilt = 0.0f;
     private FairkeeperSerpentCallerEntity fairkeeperSerpentCaller;
+    private UUID callerUUID;
 
     private int attackTick;
     private Vec3 awakenEndPos;
@@ -92,6 +94,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     public FairkeeperOurosEntity(Level level, FairkeeperSerpentCallerEntity fairkeeperSerpentCaller) {
         this(DNLEntityTypes.FAIRKEEPER_OUROS.get(), level);
         this.fairkeeperSerpentCaller = fairkeeperSerpentCaller;
+        this.callerUUID = this.fairkeeperSerpentCaller.getUUID();
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -153,6 +156,8 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.getAwakenEndPos() != null) {
             compoundTag.put("AwakenEndPos", NbtHelper.newDoubleList(this.getAwakenEndPos().x, this.getAwakenEndPos().y, this.getAwakenEndPos().z));
         }
+        compoundTag.putBoolean("CanDestroyBlocks", this.canDestroyBlocks);
+        compoundTag.putBoolean("Awakened", !this.isState(FairkeeperOurosState.AWAKENING));
     }
 
     @Override
@@ -163,14 +168,13 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             this.setChildId(compoundTag.getUUID("ChildUUID"));
         }
         if (compoundTag.hasUUID("CallerUUID")) {
-            Entity entity = ((ServerLevel)this.level()).getEntity(compoundTag.getUUID("CallerUUID"));
-            if (entity != null && entity instanceof FairkeeperSerpentCallerEntity fairkeeperSerpentCaller) {
-                this.fairkeeperSerpentCaller = fairkeeperSerpentCaller;
-            }
+            this.setCallerId(compoundTag.getUUID("CallerUUID"));
         }
         if (compoundTag.contains("AwakenEndPos")) {
             this.awakenEndPos = new Vec3(compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(0), compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(1), compoundTag.getList("AwakenEndPos", CompoundTag.TAG_DOUBLE).getDouble(2));
         }
+        this.setCanDestroyBlocks(compoundTag.getBoolean("CanDestroyBlocks"));
+        this.setState(compoundTag.getBoolean("Awakened") ? FairkeeperOurosState.IDLE : FairkeeperOurosState.AWAKENING);
     }
 
     @Override
@@ -222,9 +226,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private void segmentControl() {
         if (!this.level().isClientSide) {
             Entity child = getChild();
-            if (child == null) {
-                this.positionHistory.clear();
-
+            if (positionHistory.isEmpty()) {
                 Vec3 currentPos = this.position();
 
                 int requiredHistorySize = (SEGMENT_COUNT + 1) * SEGMENT_DELAY_STEP;
@@ -232,6 +234,8 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                 for (int i = 0; i < requiredHistorySize; i++) {
                     this.positionHistory.addLast(currentPos);
                 }
+            }
+            if (child == null) {
                 LivingEntity partParent = this;
                 int segments = SEGMENT_COUNT;
                 for (int i = 0; i < segments; i++) {
@@ -462,11 +466,19 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     protected void customServerAiStep() {
         if (this.isState(FairkeeperOurosState.AWAKENING)) this.enableBossBar();
         //this.cielingMovementCalculation();
+        this.findCaller();
         this.performContactDamage();
         this.abilityCooldown();
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
+    }
+
+    // NOTE: Searching for serpent caller on readAdditionalSaveData returns null, due to Serpent Caller not existing at that moment.
+    private void findCaller() {
+        if (this.fairkeeperSerpentCaller == null) {
+            this.fairkeeperSerpentCaller = (FairkeeperSerpentCallerEntity) ((ServerLevel) this.level()).getEntity(this.getCallerId());
+        }
     }
 
     private void performContactDamage() {
@@ -485,28 +497,17 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void blockDestructionTick() {
+        //System.out.println(this.canDestroyBlocks);
+
         if (!this.canDestroyBlocks) {
             return;
         }
 
-        int DESTRUCTION_RANGE = 2;
-        int y = 0;
-        if (this.getMoveControl().hasWanted()) {
-            y = (int) (Mth.floor(this.getMoveControl().getWantedY()) - this.getBoundingBox().maxY);
-        }
-        if (y < -1) {
-            this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 2, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
-            return;
-        }
+        int DESTRUCTION_RANGE = 3;
         if (this.getDeltaMovement().lengthSqr() > 0.01) {
             return;
         }
-        /*if (y > 1) {
-            this.setPos(this.getX(), this.getY() + 1, this.getZ());
-            this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 0, 4, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
-            return;
-        }*/
-        this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 2, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
+        this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
     }
 
     private void destroyContactBlocks(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
@@ -519,7 +520,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                     BlockPos blockPos = new BlockPos(dx, dy, dz);
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
-                        if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
+                        if (!blockState.is(BlockTags.WITHER_IMMUNE) && !blockState.is(DNLTags.TORCH_BLOCKS)) {
                             this.level().destroyBlock(blockPos, false, this);
                         }
                     }
@@ -529,6 +530,8 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void abilityCooldown() {
+
+        if (this.fairkeeperSerpentCaller == null) return;
 
         if (!this.isState(FairkeeperOurosState.IDLE)) {
             return;
@@ -758,8 +761,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     public UUID getCallerId() {
-        return this.fairkeeperSerpentCaller.getUUID();
+        return this.callerUUID;
     }
+
+    public void setCallerId(@Nullable UUID uniqueId) { this.callerUUID = uniqueId; }
+
 
     public Queue<Vec3> getPositionHistory() {
         return this.positionHistory;

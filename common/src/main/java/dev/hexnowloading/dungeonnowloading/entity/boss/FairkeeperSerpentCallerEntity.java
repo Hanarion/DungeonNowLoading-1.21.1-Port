@@ -63,6 +63,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     private static final int SPAWN_OFFSET_X = 20;
     private static final int SPAWN_OFFSET_Y = 15;
+    private final int BEHIND_BLOCK_SPAWN_OFFSET = 5;
     private final int ARENA_SIZE = 36;
     private final int MAX_SCUTTLE_COUNT = 6;
     private DamageSource lastDamageSource;
@@ -128,9 +129,11 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.entityData.set(ACTIVATED, compoundTag.getBoolean("Activated"));
         if (compoundTag.hasUUID("BorosUUID")) {
             this.setBorosId(compoundTag.getUUID("BorosUUID"));
+            this.boros = (FairkeeperBorosEntity) this.getBoros();
         }
         if (compoundTag.hasUUID("OurosUUID")) {
             this.setOurosId(compoundTag.getUUID("OurosUUID"));
+            this.ouros = (FairkeeperOurosEntity) this.getOuros();
         }
         this.entityData.set(HORIZONTAL_OFFSET, compoundTag.getInt("HorizontalOffset"));
         this.entityData.set(VERTICAL_OFFSET, compoundTag.getInt("VerticalOffset"));
@@ -745,7 +748,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         FairkeeperBorosEntity boros = new FairkeeperBorosEntity(this.level(), this);
         if (boros != null) {
-            boros.moveTo(centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y - boros.getBoundingBox().getYsize() / 2 + 5, centeredCounterClockWiseTargetPosition.z);
+            boros.moveTo(centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y - boros.getBoundingBox().getYsize() / 2 + BEHIND_BLOCK_SPAWN_OFFSET, centeredCounterClockWiseTargetPosition.z);
             boros.setState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING);
             boros.setYRot(clockWiseDirection.toYRot());
             boros.yBodyRot = boros.getYRot();
@@ -762,7 +765,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         FairkeeperOurosEntity ouros = new FairkeeperOurosEntity(this.level(), this);
         if (ouros != null) {
-            ouros.moveTo(centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y - ouros.getBoundingBox().getYsize() / 2 - 5, centeredClockWiseTargetPosition.z);
+            ouros.moveTo(centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y - ouros.getBoundingBox().getYsize() / 2 - BEHIND_BLOCK_SPAWN_OFFSET, centeredClockWiseTargetPosition.z);
             ouros.setState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING);
             ouros.setYRot(counterClockWiseDirection.toYRot());
             ouros.yBodyRot = ouros.getYRot();

@@ -25,7 +25,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return this.ouros.isState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING);
+        return this.ouros.isState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING) && this.ouros.getCaller() != null;
     }
 
     @Override
@@ -51,6 +51,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
                 if (this.ouros.noPhysics) {
                     this.ouros.noPhysics = false;
                 }
+                //this.ouros.move(MoverType.SELF, this.ouros.getDeltaMovement().add(this.ouros.getLookAngle().scale(0.05F)));
                 this.ouros.addDeltaMovement(this.ouros.getLookAngle().scale(0.05F));
             }
             if (ouros.onCieling()) {
