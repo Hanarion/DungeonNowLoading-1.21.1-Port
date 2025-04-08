@@ -222,6 +222,15 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         if (!this.level().isClientSide) {
             Entity child = getChild();
             if (child == null) {
+                this.positionHistory.clear();
+
+                Vec3 currentPos = this.position();
+
+                int requiredHistorySize = (SEGMENT_COUNT + 1) * SEGMENT_DELAY_STEP;
+
+                for (int i = 0; i < requiredHistorySize; i++) {
+                    this.positionHistory.addLast(currentPos);
+                }
                 LivingEntity partParent = this;
                 int segments = SEGMENT_COUNT;
                 for (int i = 0; i < segments; i++) {

@@ -47,7 +47,7 @@ public class FairkeeperBorosAwakenGoal extends Goal {
             double deltaY = this.fairkeeper.getY() - this.initialTarget.y;
             //BlockState blockState = this.fairkeeper.level().getBlockState(this.fairkeeper.blockPosition().below(2));
             if (deltaY * deltaY < 5.0F * 5.0F) {
-                this.fairkeeper.addDeltaMovement(this.fairkeeper.getLookAngle().scale(0.1F));
+                this.fairkeeper.addDeltaMovement(this.fairkeeper.getLookAngle().scale(0.05F));
             }
             if (fairkeeper.onGround()) {
                 movingHorizontally = true;

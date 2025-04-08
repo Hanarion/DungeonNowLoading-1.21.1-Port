@@ -47,7 +47,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
         if (!movingHorizontally) {
             double deltaY = this.ouros.getBoundingBox().maxY - initialTarget.y;
             if (deltaY * deltaY < 5.0F * 5.0F) {
-                this.ouros.addDeltaMovement(this.ouros.getLookAngle().scale(0.1F));
+                this.ouros.addDeltaMovement(this.ouros.getLookAngle().scale(0.05F));
             }
             if (ouros.onCieling()) {
                 movingHorizontally = true;

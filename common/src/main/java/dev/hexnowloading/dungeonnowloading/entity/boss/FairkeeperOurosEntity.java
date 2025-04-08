@@ -73,7 +73,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
-    public static int SEGMENT_DELAY_STEP = 11;
+    public static int SEGMENT_DELAY_STEP = 13;
 
     private int mouthOpenAnimationTimeOut;
     private static final int MOUTH_OPEN_ANIMATION_DURATION = 19;
@@ -223,6 +223,15 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         if (!this.level().isClientSide) {
             Entity child = getChild();
             if (child == null) {
+                this.positionHistory.clear();
+
+                Vec3 currentPos = this.position();
+
+                int requiredHistorySize = (SEGMENT_COUNT + 1) * SEGMENT_DELAY_STEP;
+
+                for (int i = 0; i < requiredHistorySize; i++) {
+                    this.positionHistory.addLast(currentPos);
+                }
                 LivingEntity partParent = this;
                 int segments = SEGMENT_COUNT;
                 for (int i = 0; i < segments; i++) {
