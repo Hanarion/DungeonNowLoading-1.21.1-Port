@@ -745,7 +745,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         FairkeeperBorosEntity boros = new FairkeeperBorosEntity(this.level(), this);
         if (boros != null) {
-            boros.moveTo(centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y - boros.getBoundingBox().getYsize() / 2, centeredCounterClockWiseTargetPosition.z);
+            boros.moveTo(centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y - boros.getBoundingBox().getYsize() / 2 + 5, centeredCounterClockWiseTargetPosition.z);
             boros.setState(FairkeeperBorosEntity.FairkeeperBorosState.AWAKENING);
             boros.setYRot(clockWiseDirection.toYRot());
             boros.yBodyRot = boros.getYRot();
@@ -762,7 +762,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         FairkeeperOurosEntity ouros = new FairkeeperOurosEntity(this.level(), this);
         if (ouros != null) {
-            ouros.moveTo(centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y - ouros.getBoundingBox().getYsize() / 2, centeredClockWiseTargetPosition.z);
+            ouros.moveTo(centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y - ouros.getBoundingBox().getYsize() / 2 - 5, centeredClockWiseTargetPosition.z);
             ouros.setState(FairkeeperOurosEntity.FairkeeperOurosState.AWAKENING);
             ouros.setYRot(counterClockWiseDirection.toYRot());
             ouros.yBodyRot = ouros.getYRot();
