@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Set;
 import java.util.UUID;
@@ -54,10 +55,14 @@ public class FairkeeperOurosShootVertexDomainGoal extends StoppableGoal {
             return;
         }
 
+        LivingEntity target = this.ouros.getTarget();
+
+        if (target == null) return;
+
         float maxHealth = (playerCount + 1) * 25F;
 
         VertexDomainProjectileEntity vertexDomainProjectileEntity = new VertexDomainProjectileEntity(this.ouros.level(), this.ouros, maxHealth);
-        vertexDomainProjectileEntity.shoot(this.ouros.getX(), this.ouros.getY() - 1, this.ouros.getZ(), this.caller.getX(), this.caller.getY() - this.caller.getArenaSize(), this.caller.getZ(), 0.3F, 0.5F);
+        vertexDomainProjectileEntity.shootTowardsTarget(this.ouros.getX(), this.ouros.getY() - 1, this.ouros.getZ(), target, 0.3F, 0.2F);
         this.ouros.level().addFreshEntity(vertexDomainProjectileEntity);
 
         this.caller.addMinion(vertexDomainProjectileEntity.getUUID());

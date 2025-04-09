@@ -10,6 +10,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
@@ -72,7 +76,7 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
             return;
         }
 
-        this.randomCurrentPart();
+        //this.randomCurrentPart();
 
         this.shootRandomPlayer();
 
@@ -97,16 +101,36 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
         WeightedRandomBag<UUID> bag = new WeightedRandomBag<>();
         this.ouros.getThreatScoreMap().forEach(bag::addEntry);
         UUID randomUUID = bag.getRandom();
-        Entity player = ((ServerLevel) this.ouros.level()).getEntity(randomUUID);
-        if (player != null) {
-            VertexOrbProjectileEntity vertexOrbProjectileEntity = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros, radius);
-            vertexOrbProjectileEntity.shootTowardsTarget(this.currentPart.getX(), this.currentPart.getY() - 1, this.currentPart.getZ(), (LivingEntity) player, 1.0F, this.inaccuracy);
-            this.ouros.level().addFreshEntity(vertexOrbProjectileEntity);
+        Entity entity = ((ServerLevel) this.ouros.level()).getEntity(randomUUID);
 
-            this.caller.addMinion(vertexOrbProjectileEntity.getUUID());
+        if (entity != null) {
+            for (int attempt = 0; attempt < 3; attempt++) {
+                this.randomCurrentPart();
+                if (this.currentPart == null) return;
 
-            this.ouros.level().playSound(null, this.currentPart.getX(), this.currentPart.getY() - 1, this.currentPart.getZ(), SoundEvents.WITHER_SHOOT, this.currentPart.getSoundSource(), 3.0F, 1.0F + (this.currentPart.getRandom().nextFloat() - this.currentPart.getRandom().nextFloat()) * 0.2F);
+                Vec3 start = new Vec3(this.currentPart.getX(), this.currentPart.getY() - 1, this.currentPart.getZ());
+                Vec3 end = entity.position().add(0.0, entity.getBbHeight() * 0.5, 0.0);
 
+                BlockHitResult hitResult = this.ouros.level().clip(new ClipContext(
+                        start,
+                        end,
+                        ClipContext.Block.COLLIDER,
+                        ClipContext.Fluid.NONE,
+                        this.currentPart
+                ));
+
+                if (hitResult.getType() == HitResult.Type.MISS) {
+                    // Clear path — shoot!
+                    VertexOrbProjectileEntity projectile = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros, radius);
+                    projectile.shootTowardsTarget(start.x, start.y, start.z, (LivingEntity) entity, 1.0F, this.inaccuracy);
+                    this.ouros.level().addFreshEntity(projectile);
+
+                    this.caller.addMinion(projectile.getUUID());
+
+                    this.ouros.level().playSound(null, start.x, start.y, start.z, SoundEvents.WITHER_SHOOT, this.currentPart.getSoundSource(), 3.0F, 1.0F + (this.currentPart.getRandom().nextFloat() - this.currentPart.getRandom().nextFloat()) * 0.2F);
+                    break; // Done shooting
+                }
+            }
         }
     }
 }

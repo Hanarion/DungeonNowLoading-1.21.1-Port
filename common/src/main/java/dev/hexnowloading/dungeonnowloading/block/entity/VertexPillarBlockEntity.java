@@ -36,7 +36,7 @@ public class VertexPillarBlockEntity extends BlockEntity {
     private static final int SLOWNESS_DURATION = 20;
     private static final int SLOWNESS_AMPLIFIER = 4;
 
-    private static final double BEAM_PARTICLE_SPACING = 0.1d;
+    private static final double BEAM_PARTICLE_SPACING = 0.4d;
     private static final float BEAM_PARTICLE_SCALE = 0.05f;
     private static final float MAX_RANDOM_PARTICLE_SCALE_MULTIPLIER = 3;
 
