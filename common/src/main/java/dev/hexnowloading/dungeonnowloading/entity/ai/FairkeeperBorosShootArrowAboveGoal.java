@@ -31,6 +31,7 @@ public class FairkeeperBorosShootArrowAboveGoal extends StoppableGoal {
     private double targetX, targetY, targetZ;
     private int arenaSize;
     private BlockPos arenaCenter;
+    private Vec3 targetPos;
     private FairkeeperBorosEntity.FairkeeperBorosState state;
 
     private ShootingPattern pattern;
@@ -129,7 +130,7 @@ public class FairkeeperBorosShootArrowAboveGoal extends StoppableGoal {
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.LEFT) {
-                        this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
+                        this.spawnRedstoneTrail(part, 0, 0, 0, 30, 30);
                     }
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.RIGHT) {
                         this.spawnRedstoneTrail(part, 0, 3, 0, 30, 30);
@@ -153,7 +154,7 @@ public class FairkeeperBorosShootArrowAboveGoal extends StoppableGoal {
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.LEFT) {
-                        this.shootArrow(part, 0, 3, 0);
+                        this.shootArrow(part, 0, 0, 0);
                     }
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.RIGHT) {
                         this.shootArrow(part, 0, 3, 0);
@@ -241,10 +242,6 @@ public class FairkeeperBorosShootArrowAboveGoal extends StoppableGoal {
     }
 
     private void shootArrow(FairkeeperBorosPartEntity partEntity, double rxOffset, double ryOffset, double rzOffset) {
-        LivingEntity target = this.boros.getTarget();
-        if (target == null) {
-            return; // No target, don't shoot
-        }
 
         // Calculate direction to target
         Vec3 startPos = new Vec3(
@@ -253,7 +250,7 @@ public class FairkeeperBorosShootArrowAboveGoal extends StoppableGoal {
                 partEntity.getZ() + rzOffset
         );
 
-        Vec3 targetPos = target.position().add(0, target.getBbHeight() / 2, 0); // Aim at player's center
+        //targetPos = target.position().add(0, target.getBbHeight() / 2, 0); // Aim at player's center
         Vec3 direction = targetPos.subtract(startPos).normalize(); // Normalize to get unit vector
 
         // Spawn arrow at calculated position
@@ -281,7 +278,7 @@ public class FairkeeperBorosShootArrowAboveGoal extends StoppableGoal {
         );
 
         // Calculate direction toward the target
-        Vec3 targetPos = target.position().add(0, target.getBbHeight() / 2, 0); // Aim at player's center
+        targetPos = target.position().add(0, target.getBbHeight() / 2, 0); // Aim at player's center
         Vec3 direction = targetPos.subtract(startPos).normalize(); // Normalize to get a unit vector
 
         // Calculate step size for particles
