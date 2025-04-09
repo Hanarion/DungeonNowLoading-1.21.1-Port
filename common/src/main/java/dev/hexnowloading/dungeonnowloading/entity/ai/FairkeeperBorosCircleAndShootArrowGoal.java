@@ -255,7 +255,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
 
         Vec3 startPos = new Vec3(
                 partEntity.getX() + rotatedRxOffset,
-                partEntity.getY() + partEntity.getBoundingBox().getYsize() / 2,
+                partEntity.getY() + partEntity.getBoundingBox().getYsize() * FairkeeperBorosEntity.SHOOT_ARROW_HEIGHT,
                 partEntity.getZ() + rotatedRzOffset
         );
 
@@ -285,7 +285,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
 
         Vec3 startPos = new Vec3(
                 partEntity.getX() + rotatedRxOffset,
-                partEntity.getY() + partEntity.getBoundingBox().getYsize() / 2,
+                partEntity.getY() + partEntity.getBoundingBox().getYsize() * FairkeeperBorosEntity.SHOOT_ARROW_HEIGHT,
                 partEntity.getZ() + rotatedRzOffset
         ).add(beamDirection.scale(viewDistance));
 
@@ -313,7 +313,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
     private static List<Integer> ALL_PARTS = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
 
     public static ShootingPattern PATTERN_SMALL_CIRLCE = new ShootingPattern(false, true, 21F/FULL_ARENA_SIZE, ImmutableList.of(
-            Triple.of(ShootingType.RIGHT, ALL_PARTS, 360F)
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 360F)
   /*          Triple.of(ShootingType.RIGHT, EVEN_PARTS, 360F),
             Triple.of(ShootingType.RIGHT, ODD_PARTS, 360F)*/
     ));
@@ -325,9 +325,9 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
     ));
 
     public static ShootingPattern PATTERN_PLAYER_LARGE_CIRCLE = new ShootingPattern(false, true, 44F/FULL_ARENA_SIZE, ImmutableList.of(
-            Triple.of(ShootingType.LEFT, ODD_PARTS, 120F),
-            Triple.of(ShootingType.LEFT, EVEN_PARTS, 240F),
-            Triple.of(ShootingType.LEFT, ODD_PARTS, 360F)
+            Triple.of(ShootingType.BOTH, ODD_PARTS, 120F),
+            Triple.of(ShootingType.BOTH, EVEN_PARTS, 240F),
+            Triple.of(ShootingType.BOTH, ODD_PARTS, 360F)
     ));
 
     public static ShootingPattern PATTERN_LARGE_CIRCLE_MORE_ARROWS = new ShootingPattern(false, true, 44F/FULL_ARENA_SIZE, ImmutableList.of(

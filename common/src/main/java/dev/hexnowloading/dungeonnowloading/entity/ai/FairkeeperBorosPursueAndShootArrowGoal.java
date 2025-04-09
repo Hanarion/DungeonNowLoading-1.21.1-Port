@@ -135,7 +135,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
 
         Vec3 startPos = new Vec3(
                 partEntity.getX() + rotatedRxOffset,
-                partEntity.getY() + partEntity.getBoundingBox().getYsize() / 2,
+                partEntity.getY() + partEntity.getBoundingBox().getYsize() * FairkeeperBorosEntity.SHOOT_ARROW_HEIGHT,
                 partEntity.getZ() + rotatedRzOffset
         );
 
@@ -163,7 +163,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
 
         Vec3 startPos = new Vec3(
                 partEntity.getX() + rotatedRxOffset,
-                partEntity.getY() + partEntity.getBoundingBox().getYsize() / 2,
+                partEntity.getY() + partEntity.getBoundingBox().getYsize() * FairkeeperBorosEntity.SHOOT_ARROW_HEIGHT,
                 partEntity.getZ() + rotatedRzOffset
         ).add(beamDirection.scale(viewDistance));
 

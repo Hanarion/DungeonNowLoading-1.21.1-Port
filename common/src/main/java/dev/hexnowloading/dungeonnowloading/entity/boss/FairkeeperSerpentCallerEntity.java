@@ -73,6 +73,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     private boolean borosWaitingForCommand;
     private boolean ourosWaitingForCommand;
+    private UUID pendingBorosUUID;
+    private UUID pendingOurosUUID;
     private int activationTick;
     private Set<UUID> playerUUIDs;
     private Set<UUID> minionUUIDs;
@@ -129,11 +131,11 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.entityData.set(ACTIVATED, compoundTag.getBoolean("Activated"));
         if (compoundTag.hasUUID("BorosUUID")) {
             this.setBorosId(compoundTag.getUUID("BorosUUID"));
-            this.boros = (FairkeeperBorosEntity) this.getBoros();
+            this.pendingBorosUUID = this.getBorosId();
         }
         if (compoundTag.hasUUID("OurosUUID")) {
             this.setOurosId(compoundTag.getUUID("OurosUUID"));
-            this.ouros = (FairkeeperOurosEntity) this.getOuros();
+            this.pendingOurosUUID = this.getOurosId();
         }
         this.entityData.set(HORIZONTAL_OFFSET, compoundTag.getInt("HorizontalOffset"));
         this.entityData.set(VERTICAL_OFFSET, compoundTag.getInt("VerticalOffset"));
@@ -162,6 +164,20 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        if (this.boros == null && this.pendingBorosUUID != null) {
+            Entity entity = ((ServerLevel) this.level()).getEntity(pendingBorosUUID);
+            if (entity instanceof FairkeeperBorosEntity borosEntity) {
+                this.boros = borosEntity;
+                this.pendingBorosUUID = null;
+            }
+        }
+        if (this.ouros == null && this.pendingOurosUUID != null) {
+            Entity entity = ((ServerLevel) this.level()).getEntity(pendingOurosUUID);
+            if (entity instanceof FairkeeperOurosEntity ourosEntity) {
+                this.ouros = ourosEntity;
+                this.pendingOurosUUID = null;
+            }
+        }
         if (this.isActivated() && !this.level().isClientSide) {
             switch (this.getPhase()) {
                 case 0:
