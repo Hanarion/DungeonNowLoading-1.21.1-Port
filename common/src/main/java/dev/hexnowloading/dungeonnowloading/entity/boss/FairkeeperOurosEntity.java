@@ -656,6 +656,11 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
+    public boolean canCollideWith(Entity entity) {
+        return !(entity instanceof VertexDomainProjectileEntity) && super.canCollideWith(entity);
+    }
+
+    @Override
     public void push(Entity entity) {
     }
 

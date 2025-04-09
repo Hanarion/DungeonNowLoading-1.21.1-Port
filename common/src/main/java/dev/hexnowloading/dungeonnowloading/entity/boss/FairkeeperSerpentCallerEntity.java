@@ -7,8 +7,6 @@ import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.BossTargetSelectorGoal;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
-import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
 import dev.hexnowloading.dungeonnowloading.entity.util.WeightBaseMoveSet;
@@ -478,7 +476,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             state = borosPursueMoveSet.selectMove();
         }
 
-        int halfSize = this.getArenaSize();
+        /*int halfSize = this.getArenaSize();
         AABB arenaAABB = new AABB(
                 this.getX() - halfSize, this.getY() - halfSize, this.getZ() - halfSize,
                 this.getX() + halfSize, this.getY() + halfSize, this.getZ() + halfSize
@@ -492,7 +490,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         if (targetProjectile.size() > 4 * (this.boros.getHealth() / this.boros.getMaxHealth()) && this.boros.getRandom().nextFloat() < 1.0F) {
             state = FairkeeperBorosEntity.FairkeeperBorosState.EAT_VERTEX_PROJECTILES;
-        }
+        }*/
 
         if (this.getPhase() > 2 && !this.hasAddedDesperateMove) {
             state = FairkeeperBorosEntity.FairkeeperBorosState.DESPERATE;
