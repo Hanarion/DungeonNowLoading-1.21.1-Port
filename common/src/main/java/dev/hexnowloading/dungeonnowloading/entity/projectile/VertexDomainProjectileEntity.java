@@ -75,7 +75,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     private int impactAnimationTimeOut;
     private int expansionTick;
     public static final int IMPACT_ANIMATION_DURATION = 5;
-    public static final int EXPANSION_DURATION = 40;
+    public static final int EXPANSION_DURATION = 20;
 
     public VertexDomainProjectileEntity(EntityType<? extends VertexDomainProjectileEntity> entityType, Level level) {
         super(entityType, level);
