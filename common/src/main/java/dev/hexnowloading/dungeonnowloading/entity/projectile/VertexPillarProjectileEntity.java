@@ -10,6 +10,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -33,9 +34,11 @@ public class VertexPillarProjectileEntity extends ModelledProjectileEntity {
     private static final int LIFETIME_AFTER_LANDING = 3;
 
     private int tickCount;
+    private int destroyCount;
     private boolean hasLanded;
     private boolean canSummonVertexOrb;
     private float damagePercentage;
+
 
     public VertexPillarProjectileEntity(EntityType<? extends VertexPillarProjectileEntity> entityType, Level level) {
         super(entityType, level);
@@ -76,8 +79,11 @@ public class VertexPillarProjectileEntity extends ModelledProjectileEntity {
                 return;
             }
 
-            if (!this.hasLanded && this.level().destroyBlock(this.blockPosition().below(), false, this)) {
-                return;
+            if (!this.hasLanded && !this.level().getBlockState(this.blockPosition().below()).is(BlockTags.WITHER_IMMUNE) && this.destroyCount < 5) {
+                if (this.level().destroyBlock(this.blockPosition().below(), false, this)) {
+                    this.destroyCount++;
+                    return;
+                }
             }
 
             if (!this.hasLanded) {

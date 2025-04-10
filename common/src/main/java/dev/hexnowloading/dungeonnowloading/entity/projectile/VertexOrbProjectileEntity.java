@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -41,6 +42,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     private static final EntityDataAccessor<Vector3f> VELOCITY = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> RADIUS = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DYING_TICK = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> GROUND_COLLISION = SynchedEntityData.defineId(VertexOrbProjectileEntity.class, EntityDataSerializers.BOOLEAN);
 
     private static final int BASE_DAMAGE = 6;
     private static final int SLOWNESS_DURATION = 20;
@@ -118,6 +120,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         this.entityData.define(VELOCITY, Vec3.ZERO.toVector3f());
         this.entityData.define(RADIUS, 0);
         this.entityData.define(DYING_TICK, 0);
+        this.entityData.define(GROUND_COLLISION, false);
     }
 
     @Override
@@ -158,13 +161,15 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
             this.level().addParticle(DustParticleOptions.REDSTONE, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
         }
 
-        if ((this.verticalCollision || this.horizontalCollision) || this.getDeltaMovement().lengthSqr() < 1.0E-7 && this.life <= 0) {
+        if ((this.onGround() || this.horizontalCollision) || this.getDeltaMovement().lengthSqr() < 1.0E-7 && this.life <= 0) {
             this.life = DURATION_ON_GROUND;
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 3.0F, 1.0F);
-            blockDestruction();
-            this.setDeltaMovement(Vec3.ZERO);
             spawnInitialRedstoneParticles();
             this.expansionTick = 40;
+            if (!this.level().isClientSide) {
+                this.entityData.set(GROUND_COLLISION, this.onGround());
+            }
+            blockDestruction();
         }
 
         if (this.life > 0) {
@@ -172,15 +177,23 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
             if (this.expansionTick > 0) {
                 this.expansionTick--;
             }
-            this.setDeltaMovement(Vec3.ZERO);
             applyEffect();
             if (this.life > 50) {
                 spawnRedstoneParticle();
             }
-            if (this.life <= 0) {
+            if (!this.level().isClientSide && (this.life <= 0 || !this.entityData.get(GROUND_COLLISION) || this.level().getBlockState(this.blockPosition().below()).isAir())) {
                 this.remove(RemovalReason.DISCARDED);
             }
         }
+    }
+
+    @Override
+    public void setDeltaMovement(Vec3 vec31) {
+        Vec3 vec3 = vec31;
+        if (this.entityData.get(GROUND_COLLISION)) {
+            vec3 = Vec3.ZERO;
+        };
+        super.setDeltaMovement(vec3);
     }
 
     private void blockDestruction() {
@@ -397,6 +410,14 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
     @Override
     public void push(double $$0, double $$1, double $$2) {
+    }
+
+    @Override
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        if (damageSource.is(DamageTypes.EXPLOSION)) {
+            return true;
+        }
+        return super.isInvulnerableTo(damageSource);
     }
 
     @Override

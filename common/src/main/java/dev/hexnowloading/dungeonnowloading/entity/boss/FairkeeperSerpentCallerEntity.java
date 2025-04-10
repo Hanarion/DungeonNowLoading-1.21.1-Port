@@ -74,6 +74,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private UUID pendingBorosUUID;
     private UUID pendingOurosUUID;
     private int activationTick;
+    private int bossDefeatVerificationTicks;
     private Set<UUID> playerUUIDs;
     private Set<UUID> minionUUIDs;
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> introMoveSet = new WeightBaseMoveSet<>();
@@ -251,10 +252,18 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                         break;
                     }
 
-                    if (this.getBoros() == null && this.getOuros() == null) {
-                        this.defeatedBosses();
-                        this.setPhase(4);
-                        break;
+                    if (this.getBoros() == null && this.getOuros() == null && this.bossDefeatVerificationTicks <= 0) {
+                        this.bossDefeatVerificationTicks = 10;
+                    }
+                    if (this.bossDefeatVerificationTicks-- > 0) {
+                        if (this.bossDefeatVerificationTicks <= 0) {
+                            this.defeatedBosses();
+                            this.setPhase(4);
+                            break;
+                        }
+                        if (this.getBoros() != null || this.getOuros() != null) {
+                            this.bossDefeatVerificationTicks = 0;
+                        }
                     }
 
                     if (this.isAllPlayersInBound()) {
@@ -634,6 +643,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     }
 
     private void spawnLootTableItems(DamageSource damageSource, boolean b, boolean multiplayer, @Nullable UUID uuid) {
+        if (damageSource == null) {
+            return;
+        }
         ResourceLocation resourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get());
         ResourceLocation lootTableResourceLocation = resourceLocation.withPrefix("entities/");
         LootTable lootTable = this.level().getServer().getLootData().getLootTable(lootTableResourceLocation);

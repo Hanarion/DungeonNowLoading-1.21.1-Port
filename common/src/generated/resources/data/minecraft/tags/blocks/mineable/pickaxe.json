@@ -50,8 +50,7 @@
     "dungeonnowloading:scuttle_statue",
     "dungeonnowloading:ballista_golem_statue",
     "dungeonnowloading:ballista_golem_statue_part",
-    "dungeonnowloading:stone_pillar",
-    "dungeonnowloading:shielding_stone_pillar",
+    "dungeonnowloading:vertex_pillar",
     "dungeonnowloading:stone_preserver"
   ]
 }

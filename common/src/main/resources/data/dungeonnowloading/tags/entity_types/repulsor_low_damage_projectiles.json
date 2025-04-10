@@ -8,7 +8,7 @@
     "minecraft:trident",
     "minecraft:wither_skull",
     "dungeonnowloading:chaos_spawner_projectile",
-    "dungeonnowloading:shielding_stone_pillar_projectile",
+    "dungeonnowloading:vertex_pillar_projectile",
     "dungeonnowloading:vertex_orb_projectile"
   ]
 }

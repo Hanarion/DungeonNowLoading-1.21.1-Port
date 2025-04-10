@@ -22,6 +22,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -44,6 +45,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     private static final EntityDataAccessor<Vector3f> VELOCITY = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<VertexDomainAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityStates.VERTEX_DOMAIN_ANIMATION_STATE);
     private static final EntityDataAccessor<Integer> DYING_TICK = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> GROUND_COLLISION = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.BOOLEAN);
 
 
     private final DynamicGameEventListener<BlockPlaceBreakListener> dynamicBlockPlaceBreakListener;
@@ -126,6 +128,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.entityData.define(VELOCITY, Vec3.ZERO.toVector3f());
         this.entityData.define(ANIMATION_STATE, VertexDomainAnimationState.IDLE);
         this.entityData.define(DYING_TICK, 0);
+        this.entityData.define(GROUND_COLLISION, false);
     }
 
     @Override
@@ -177,12 +180,14 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
             }
         }
 
-        if (this.verticalCollision || this.horizontalCollision) {
+        if ((this.onGround() || this.horizontalCollision) && this.life <= 0) {
             this.life = DURATION_ON_GROUND;
             this.transitionTo(VertexDomainAnimationState.IMPACT);
-            this.impactDamage();
             this.expansionTick = EXPANSION_DURATION;
-            this.setDeltaMovement(Vec3.ZERO);
+            if (!this.level().isClientSide) {
+                this.entityData.set(GROUND_COLLISION, this.onGround());
+            }
+            this.impactDamage();
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.END_GATEWAY_SPAWN, this.getSoundSource(), 3.0F, 2.0F);
         }
 
@@ -191,9 +196,8 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
             if (this.expansionTick > 0) {
                 this.expansionTick--;
             }
-            this.setDeltaMovement(Vec3.ZERO);
             spawnBoundaryParticles(RANGE);
-            if (this.life <= 0) {
+            if (!this.level().isClientSide && (this.life <= 0 || !this.entityData.get(GROUND_COLLISION) || this.level().getBlockState(this.blockPosition().below()).isAir())) {
                 this.remove(RemovalReason.DISCARDED);
             }
         }
@@ -203,6 +207,15 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
             int DESTRUCTION_RANGE = 2;
             this.blockDestructionTick(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
         }
+    }
+
+    @Override
+    public void setDeltaMovement(Vec3 vec31) {
+        Vec3 vec3 = vec31;
+        if (this.entityData.get(GROUND_COLLISION)) {
+            vec3 = Vec3.ZERO;
+        };
+        super.setDeltaMovement(vec3);
     }
 
     private void impactDamage() {
@@ -389,7 +402,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
 
     @Override
     public boolean canBeCollidedWith() {
-        return true;
+        return this.getDyingTick() <= 0;
     }
 
     @Override
@@ -403,6 +416,14 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
 
     @Override
     public void push(double $$0, double $$1, double $$2) {
+    }
+
+    @Override
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        if (damageSource.is(DamageTypes.EXPLOSION)) {
+            return true;
+        }
+        return super.isInvulnerableTo(damageSource);
     }
 
     @Override
