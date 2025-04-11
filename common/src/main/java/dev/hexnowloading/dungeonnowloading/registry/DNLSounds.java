@@ -63,6 +63,16 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> SCUTTLE_DEFLECT = registerSoundEvent("scuttle_deflect");
     public static final Supplier<SoundEvent> SCUTTLE_HURT = registerSoundEvent("scuttle_hurt");
     public static final Supplier<SoundEvent> SCUTTLE_DEATH = registerSoundEvent("scuttle_death");
+    public static final Supplier<SoundEvent> COPPER_CREEP_DEATH = registerSoundEvent("copper_creep_death");
+    public static final Supplier<SoundEvent> COPPER_CREEP_HIT = registerSoundEvent("copper_creep_hit");
+    public static final Supplier<SoundEvent> COPPER_CREEP_LAND = registerSoundEvent("copper_creep_land");
+    public static final Supplier<SoundEvent> COPPER_CREEP_PRIME = registerSoundEvent("copper_creep_prime");
+    public static final Supplier<SoundEvent> COPPER_CREEP_SIT_DOWN = registerSoundEvent("copper_creep_sit_down");
+    public static final Supplier<SoundEvent> COPPER_CREEP_SPAWN = registerSoundEvent("copper_creep_spawn");
+    public static final Supplier<SoundEvent> COPPER_CREEP_STAND_UP = registerSoundEvent("copper_creep_stand_up");
+    public static final Supplier<SoundEvent> COPPER_CREEP_STEP = registerSoundEvent("copper_creep_step");
+    public static final Supplier<SoundEvent> COPPER_DETONATOR_BEEP = registerSoundEvent("copper_detonator_beep");
+    public static final Supplier<SoundEvent> COPPER_DETONATOR_READY = registerSoundEvent("copper_detonator_ready");
     public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_BEAM = registerSoundEvent("fairkeeper_boros_beam");
     public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_HEAL = registerSoundEvent("fairkeeper_boros_heal");
 

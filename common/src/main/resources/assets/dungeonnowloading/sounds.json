@@ -374,6 +374,79 @@
         "dungeonnowloading:mob/scuttle/scuttle_death"
     ]
   },
+  "copper_creep_death": {
+    "subtitle": "sounds.dungeonnowloading.copper_creep_death",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_creep_death_0",
+      "dungeonnowloading:mob/copper_creep/copper_creep_death_1"
+    ]
+  },
+  "copper_creep_hit": {
+    "subtitle": "sounds.dungeonnowloading.copper_creep_hit",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_creep_hit_0",
+      "dungeonnowloading:mob/copper_creep/copper_creep_hit_1",
+      "dungeonnowloading:mob/copper_creep/copper_creep_hit_2"
+    ]
+  },
+  "copper_creep_land": {
+    "subtitle": "sounds.dungeonnowloading.copper_creep_land",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_creep_land_0",
+      "dungeonnowloading:mob/copper_creep/copper_creep_land_1"
+    ]
+  },
+  "copper_creep_prime": {
+    "subtitle": "sounds.dungeonnowloading.copper_creep_prime",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_creep_prime_0",
+      "dungeonnowloading:mob/copper_creep/copper_creep_prime_1"
+    ]
+  },
+  "copper_creep_sit_down": {
+    "subtitle": "sounds.dungeonnowloading.copper_creep_sit_down",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_creep_sit_down_0",
+      "dungeonnowloading:mob/copper_creep/copper_creep_sit_down_1"
+    ]
+  },
+  "copper_creep_spawn": {
+    "subtitle": "sounds.dungeonnowloading.copper_creep_spawn",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_creep_spawn_0",
+      "dungeonnowloading:mob/copper_creep/copper_creep_spawn_1"
+    ]
+  },
+  "copper_creep_stand_up": {
+    "subtitle": "sounds.dungeonnowloading.copper_creep_stand_up",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_creep_stand_up_0",
+      "dungeonnowloading:mob/copper_creep/copper_creep_stand_up_1"
+    ]
+  },
+  "copper_creep_step": {
+    "subtitle": "sounds.dungeonnowloading.copper_creep_step",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_creep_step_0",
+      "dungeonnowloading:mob/copper_creep/copper_creep_step_1",
+      "dungeonnowloading:mob/copper_creep/copper_creep_step_2"
+    ]
+  },
+  "copper_detonator_beep": {
+    "subtitle": "sounds.dungeonnowloading.copper_detonator_beep",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_detonator_beep_0",
+      "dungeonnowloading:mob/copper_creep/copper_detonator_beep_1",
+      "dungeonnowloading:mob/copper_creep/copper_detonator_beep_2"
+    ]
+  },
+  "copper_detonator_ready": {
+    "subtitle": "sounds.dungeonnowloading.copper_detonator_ready",
+    "sounds": [
+      "dungeonnowloading:mob/copper_creep/copper_detonator_ready_0",
+      "dungeonnowloading:mob/copper_creep/copper_detonator_ready_1"
+    ]
+  },
   "fairkeeper_boros_beam": {
     "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_beam",
     "sounds": [

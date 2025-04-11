@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.passive;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -29,7 +30,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -101,6 +104,20 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                 .add(Attributes.MAX_HEALTH, 10.0D)
                 .add(Attributes.FOLLOW_RANGE, 16.0F)
                 .add(Attributes.MOVEMENT_SPEED, 0.175F);
+    }
+
+    @Override
+    protected void registerGoals() {
+        super.registerGoals();
+        this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(2, new CopperCreepSittingGoal(this));
+        this.goalSelector.addGoal(3, new CopperCreepFollowSummoner(this));
+        this.goalSelector.addGoal(4, new CustomMeleeAttackGoal(this, 2.0f, false));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Monster.class, 8.0F));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, livingEntity -> livingEntity instanceof Player player && isPlayerOnDifferentTeam(player)));
     }
 
     public void ignite() {
@@ -208,9 +225,10 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                     if ((this.getState() == State.IDLE || this.getState() == State.FOLLOWING) && this.canSit()) {
                         this.triggerSitAnimation();
                         this.setState(State.SIT);
+                        this.playSound(DNLSounds.COPPER_CREEP_SIT_DOWN.get());
                         this.getNavigation().stop();
                         AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
-                        if (moveSpeedAttr != null) {
+                        if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER)) {
                             moveSpeedAttr.addTransientModifier(SPEED_MODIFIER);
                         }
                         this.sitAnimationTick = Mth.ceil(CopperCreepAnimation.SIT.lengthInSeconds() * 20);
@@ -218,6 +236,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                     if (this.getState() == State.SITTING) {
                         this.triggerStandAnimation();
                         this.setState(State.STAND);
+                        this.playSound(DNLSounds.COPPER_CREEP_STAND_UP.get());
                         this.getNavigation().stop();
                         AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
                         if (moveSpeedAttr != null) {
@@ -260,6 +279,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         if (this.aiTick == 0 && !this.isAlreadySummoned()) {
             this.setState(State.SUMMONING);
             this.triggerSummonAnimation();
+            this.playSound(DNLSounds.COPPER_CREEP_SPAWN.get());
             this.entityData.set(DATA_IS_ALREADY_SUMMONED, true);
         }
 
@@ -311,15 +331,14 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                     this.setState(State.SITTING_DETONATION);
                 } else {
                     AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
-                    if (moveSpeedAttr != null) {
+                    if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER)) {
                         moveSpeedAttr.addTransientModifier(SPEED_MODIFIER);
                     }
                     triggerDetonationAnimation();
                     this.setState(State.DETONATION);
                 }
 
-
-                this.playSound(SoundEvents.CREEPER_PRIMED, 1.0F, 1.0F);
+                this.playSound(DNLSounds.COPPER_CREEP_PRIME.get());
             }
 
             if (this.swell < this.MAX_SWELL) {
@@ -335,6 +354,22 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                 this.level().explode(this, source, null, this.getX(), this.getY(), this.getZ(), finalExplosionRadius, false, Level.ExplosionInteraction.NONE);
                 this.discard();
                 this.spawnLingeringCloud();
+            }
+        }
+
+        if (this.getState() == State.RUNNING_TOWARDS_PLAYER || this.getState() == State.FOLLOWING) {
+            float animPos = this.runningAnimationState.getAccumulatedTime() / 20.0f;
+            int animationTick = (int) (animPos * 10) % 10;
+            if (animationTick == 2 || animationTick == 7) {
+                this.playSound(DNLSounds.COPPER_CREEP_STEP.get(), 1.0F, 1.2F);
+            }
+        }
+
+        if (this.getState() == State.WALKING_TOWARDS_PLAYER || this.getState() == State.IDLE) {
+            float animPos = this.walkingAnimationState.getAccumulatedTime() / 20.0f;
+            int animationTick = (int) (animPos * 20) % 20;
+            if (animationTick == 5 || animationTick == 15) {
+                this.playSound(DNLSounds.COPPER_CREEP_STEP.get(), 0.8F, 1.0F);
             }
         }
 
@@ -445,20 +480,6 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         this.sittingDetonationAnimationState.stop();
     }
 
-    @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new CopperCreepSittingGoal(this));
-        this.goalSelector.addGoal(3, new CopperCreepFollowSummoner(this));
-        this.goalSelector.addGoal(4, new CustomMeleeAttackGoal(this, 2.0f, false));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
-        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Monster.class, 8.0F));
-        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, livingEntity -> livingEntity instanceof Player player && isPlayerOnDifferentTeam(player)));
-    }
-
     private boolean isPlayerOnDifferentTeam(Player player) {
 
         Player summoner = this.getSummoner();
@@ -501,6 +522,34 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             this.setState(State.IDLE);
         }
         return super.hurt(damageSource, amount);
+    }
+
+    @Override
+    protected float nextStep() {
+        return this.moveDist + 0.4F;
+    }
+
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState blockState) {
+        if (this.getState() == State.SITTING || this.getState() == State.SITTING_DETONATION) return;
+        this.playSound(DNLSounds.COPPER_CREEP_STEP.get(), 1.0F, 1.0F);
+    }
+
+    @Override
+    public Fallsounds getFallSounds() {
+        return new Fallsounds(SoundEvents.GENERIC_SMALL_FALL, DNLSounds.COPPER_CREEP_LAND.get());
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSource) {
+        return DNLSounds.COPPER_CREEP_HIT.get();
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getDeathSound() {
+        return DNLSounds.COPPER_CREEP_DEATH.get();
     }
 
     public State getState() {
