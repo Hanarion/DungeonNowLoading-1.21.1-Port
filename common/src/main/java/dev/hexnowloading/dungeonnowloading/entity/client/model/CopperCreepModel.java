@@ -72,7 +72,7 @@ public class CopperCreepModel<T extends CopperCreepEntity> extends HierarchicalM
 		this.animate(entity.summonAnimationState, CopperCreepAnimation.SUMMON, ageInTicks);
 		this.animate(entity.detonationAnimationState, CopperCreepAnimation.DETONATION, ageInTicks);
 		this.animate(entity.sitAnimationState, CopperCreepAnimation.SIT, ageInTicks);
-		this.animate(entity.standAniamtionState, CopperCreepAnimation.STAND, ageInTicks);
+		this.animate(entity.standAnimationState, CopperCreepAnimation.STAND, ageInTicks);
 		this.animate(entity.wrongOwnerAnimationState, CopperCreepAnimation.WRONG_OWNER, ageInTicks);
 		this.animate(entity.sittingAnimationState, CopperCreepAnimation.SITTING, ageInTicks);
 		this.animate(entity.sittingDetonationAnimationState, CopperCreepAnimation.DETONATION_SITTING, ageInTicks);
