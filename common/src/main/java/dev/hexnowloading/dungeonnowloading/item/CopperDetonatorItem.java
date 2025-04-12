@@ -21,7 +21,7 @@ public class CopperDetonatorItem extends Item {
     private static final double TRIGGER_RADIUS = 32.0;
     private static final int SUMMON_COOLDOWN = 5;
     private static final int IGNITE_COOLDOWN_PER_CREEP = 100;
-    private static final int MODE_SWITCH_TIMING = 10;
+    public static final int MODE_SWITCH_TIMING = 10;
 
     public CopperDetonatorItem(Properties properties) {
         super(properties);
@@ -39,9 +39,9 @@ public class CopperDetonatorItem extends Item {
         int usedTime = itemStack.getUseDuration() - remainingUseTick;
         if (usedTime == MODE_SWITCH_TIMING) {
             livingEntity.playSound(DNLSounds.COPPER_DETONATOR_READY.get());
-        } /*else if (usedTime > MODE_SWITCH_TIMING && (usedTime - MODE_SWITCH_TIMING) % 20 == 0) {
+        } else if (usedTime > MODE_SWITCH_TIMING && (usedTime - MODE_SWITCH_TIMING) % 20 == 0) {
             livingEntity.playSound(DNLSounds.COPPER_DETONATOR_BEEP.get());
-        }*/
+        }
         super.onUseTick(level, livingEntity, itemStack, remainingUseTick);
     }
 

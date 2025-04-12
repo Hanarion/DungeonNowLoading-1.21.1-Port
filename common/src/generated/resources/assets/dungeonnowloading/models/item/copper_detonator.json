@@ -1,5 +1,13 @@
 {
   "parent": "minecraft:item/generated",
+  "overrides": [
+    {
+      "model": "dungeonnowloading:item/copper_detonator_switched",
+      "predicate": {
+        "minecraft:mode_switch": 1.0
+      }
+    }
+  ],
   "textures": {
     "layer0": "dungeonnowloading:item/copper_detonator"
   }

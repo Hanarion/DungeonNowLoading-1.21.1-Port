@@ -6,6 +6,7 @@ import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkee
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.FairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
+import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
@@ -108,6 +109,11 @@ public class DNLForgeClientEvents {
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pulling"), (stack, level, entity, idk) ->
                 entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
 
+        ItemProperties.register(DNLItems.COPPER_DETONATOR.get(), new ResourceLocation("mode_switch"), (stack, BlockableEventLoop, entity, idk) -> {
+            if (entity == null) return 0.0F;
+            else
+                return entity.getUseItem() != stack && (stack.getUseDuration() - entity.getUseItemRemainingTicks()) > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
+        });
     }
 
     public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {

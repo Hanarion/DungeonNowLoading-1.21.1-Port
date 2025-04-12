@@ -552,7 +552,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     @Override
     public Fallsounds getFallSounds() {
-        return new Fallsounds(SoundEvents.GENERIC_SMALL_FALL, DNLSounds.COPPER_CREEP_LAND.get());
+        return new Fallsounds(DNLSounds.COPPER_CREEP_LAND.get(),DNLSounds.COPPER_CREEP_LAND.get());
     }
 
     @Nullable

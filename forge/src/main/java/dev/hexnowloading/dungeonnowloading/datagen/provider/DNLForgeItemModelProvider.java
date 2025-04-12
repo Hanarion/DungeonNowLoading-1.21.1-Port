@@ -32,7 +32,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.REDSTONE_CIRCUIT.get());
         simpleItem(DNLItems.REDSTONE_CATALYST.get());
         simpleItem(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
-        simpleItem(DNLItems.COPPER_DETONATOR.get());
+        //simpleItem(DNLItems.COPPER_DETONATOR.get());
         simpleItem(DNLItems.REPULSOR.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
@@ -40,6 +40,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         spawnEggItem(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.65f, 0.9f, 1.5f);
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.43f, 0.6f, 1.0f);
+        booleanPropertyItem(DNLItems.COPPER_DETONATOR.get(), "mode_switch", "copper_detonator", "copper_detonator_switched");
     }
 
     private void simpleItem(Item item) {
@@ -57,6 +58,22 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         singleTexture(name, mcLoc("item/generated"), "layer0", modLoc("item/" + name));
 
     }
+
+    private void booleanPropertyItem(Item item, String propertyName, String baseTexture, String overrideTexture) {
+        String itemName = ForgeRegistries.ITEMS.getKey(item.asItem()).getPath();
+
+        getBuilder(overrideTexture)
+                .parent(ITEM_GENERATED)
+                .texture("layer0", modLoc("item/" + overrideTexture));
+
+        getBuilder(itemName)
+                .parent(ITEM_GENERATED)
+                .texture("layer0", modLoc("item/" + baseTexture))
+                .override()
+                .predicate(new ResourceLocation(propertyName), 1.0F)
+                .model(getExistingFile(modLoc("item/" + overrideTexture)));
+    }
+
 
     private void fourStageBowItem(Item item, float pulling1, float pulling2, float pulling3) {
         String name = ForgeRegistries.ITEMS.getKey(item).getPath();
