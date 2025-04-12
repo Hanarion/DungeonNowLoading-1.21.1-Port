@@ -39,9 +39,9 @@ public class CopperDetonatorItem extends Item {
         int usedTime = itemStack.getUseDuration() - remainingUseTick;
         if (usedTime == MODE_SWITCH_TIMING) {
             livingEntity.playSound(DNLSounds.COPPER_DETONATOR_READY.get());
-        } else if (usedTime > MODE_SWITCH_TIMING && (usedTime - MODE_SWITCH_TIMING) % 20 == 0) {
+        } /*else if (usedTime > MODE_SWITCH_TIMING && (usedTime - MODE_SWITCH_TIMING) % 20 == 0) {
             livingEntity.playSound(DNLSounds.COPPER_DETONATOR_BEEP.get());
-        }
+        }*/
         super.onUseTick(level, livingEntity, itemStack, remainingUseTick);
     }
 
