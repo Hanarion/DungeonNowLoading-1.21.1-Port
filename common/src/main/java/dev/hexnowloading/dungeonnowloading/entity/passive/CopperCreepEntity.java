@@ -481,12 +481,40 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     }
 
     private boolean isPlayerOnDifferentTeam(Player player) {
+        // First check if player is summoner
+        Optional<UUID> summonerUUID = this.getSummonerUUID();
+        UUID playerUUID = player.getUUID();
+        
+        System.out.println("Summoner UUID: " + summonerUUID.orElse(null));
+        System.out.println("Player UUID: " + playerUUID);
+        
+        // If we have a summoner UUID and it matches the player, they're not an enemy
+        if (summonerUUID.isPresent() && summonerUUID.get().equals(playerUUID)) {
+            System.out.println("Player is summoner");
+            return false;
+        }
 
+        // Then check other conditions
+        if (player.isCreative() || player.isSpectator()) {
+            return false;
+        }
+
+        // If we don't have a summoner, no one is an enemy
+        if (!summonerUUID.isPresent()) {
+            System.out.println("No summoner UUID");
+            return false;
+        }
+
+        // Get the actual summoner player
         Player summoner = this.getSummoner();
+        if (summoner == null) {
+            return false;
+        }
 
-        if (player.isCreative() || player.isSpectator() || summoner == null || this.getSummonerUUID().equals(player.getUUID())) return false;
-
-        return !player.isAlliedTo(summoner);
+        // Check if players are allied
+        boolean isAllied = player.isAlliedTo(summoner);
+        System.out.println("Player allied to summoner: " + isAllied);
+        return !isAllied;
     }
 
     public boolean isDefused() {
@@ -532,7 +560,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     @Override
     protected void playStepSound(BlockPos pos, BlockState blockState) {
         if (this.getState() == State.SITTING || this.getState() == State.SITTING_DETONATION) return;
-        this.playSound(DNLSounds.COPPER_CREEP_STEP.get(), 1.0F, 1.0F);
+        this.playSound(DNLSounds.COPPER_CREEP_STEP.get(), 0.5F, 1.0F);
     }
 
     @Override
