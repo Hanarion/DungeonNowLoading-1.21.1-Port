@@ -30,6 +30,7 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
     private final int EXPIRY_DURATION = reducedTickDelay(300);
     private final int TOTAL_LOOP = 3;
     private final double SLOWDOWN_SPEED_BY = 0.5;
+    private static final float OFFSET_FROM_WALL = 1.5f;
 /*    private final double ACCELERATE_RANGE = 6.0;
     private final double ACCELERATE_SPEED_BY = 0.3;*/
 
@@ -75,7 +76,7 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
 
         if (this.totalDuration > 0) {
             this.totalDuration--;
-        } else {
+        } else if (this.tackleDuration <= 0) {
             //this.boros.setAnimationState(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
             this.stopGoal();
             return;
@@ -100,10 +101,10 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
             double viewDistance = 1.5F;
             Vec3 offset = this.boros.getViewVector(1.0F).scale(viewDistance);
             Vec3 potentialTargetPosition = this.boros.position().add(offset);
-            double minX = this.arenaCenter.getX() - this.arenaSize + 1;
-            double maxX = this.arenaCenter.getX() + this.arenaSize - 1;
-            double minZ = this.arenaCenter.getZ() - this.arenaSize + 1;
-            double maxZ = this.arenaCenter.getZ() + this.arenaSize - 1;
+            double minX = this.arenaCenter.getX() + 0.5F - this.arenaSize + OFFSET_FROM_WALL;
+            double maxX = this.arenaCenter.getX() + 0.5F + this.arenaSize - OFFSET_FROM_WALL;
+            double minZ = this.arenaCenter.getZ() + 0.5F - this.arenaSize + OFFSET_FROM_WALL;
+            double maxZ = this.arenaCenter.getZ() + 0.5F + this.arenaSize - OFFSET_FROM_WALL;
             boolean isInsideArena = potentialTargetPosition.x >= minX && potentialTargetPosition.x <= maxX && potentialTargetPosition.z >= minZ && potentialTargetPosition.z <= maxZ;
             if (isInsideArena) {
                 this.targetPosition = potentialTargetPosition;
@@ -115,7 +116,7 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
             }
             if (this.tackleDuration <= 0) {
                 if (loopCount == TOTAL_LOOP) {
-                    this.boros.stopAttacking(20);
+                    this.stopGoal();
                     return;
                 } else {
                     loopCount++;

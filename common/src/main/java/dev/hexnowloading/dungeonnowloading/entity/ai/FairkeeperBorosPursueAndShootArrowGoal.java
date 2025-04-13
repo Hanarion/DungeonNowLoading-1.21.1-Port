@@ -73,6 +73,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
                     this.spawnRedstoneTrail(this.boros, angle, 0, 0);
                 });
                 this.boros.playBeamSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
+                this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_OPEN_WITHOUT_OPENED);
             }
 
             if (stoppingTick == reducedTickDelay(SHOOT_ARROW_TICK)) {
@@ -83,6 +84,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
             }
 
             if (this.stoppingTick <= 0) {
+                this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
                 targetIndex++;
                 if (targetIndex >= pattern.arrowPattern.size()) {
                     this.stopGoal();

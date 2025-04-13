@@ -127,8 +127,8 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
         this.ouros_segment.xRot = entity.getPreviousTilt();
 
         this.animate(entity.idleAnimationState, FairkeeperOurosBodyAnimation.IDLE, ageInTicks);
-        this.animate(entity.dropScuttleAnimationState, FairkeeperOurosBodyAnimation.DROP_SCUTTLE, ageInTicks);
-        this.animate(entity.setupCannonAnimationState, FairkeeperOurosBodyAnimation.SETUP_CANNON, ageInTicks);
+        this.animate(entity.dropScuttleAnimationState, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN, ageInTicks);
+        this.animate(entity.setupCannonAnimationState, FairkeeperOurosBodyAnimation.CANNON_OPEN, ageInTicks);
     }
 
     @Override

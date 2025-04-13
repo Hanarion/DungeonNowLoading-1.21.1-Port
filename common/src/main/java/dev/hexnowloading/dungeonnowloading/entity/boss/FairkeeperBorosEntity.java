@@ -216,7 +216,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             }
         }
 
-        if (this.pursueOpenMouthAnimationState.isStarted() && this.mouthOpenAnimationTimeOut <= 0) {
+        if (this.pursueOpenMouthAnimationState.isStarted() && this.mouthOpenAnimationTimeOut <= 0 && this.getAnimationState() == FairkeeperBorosAnimationState.MOUTH_OPEN) {
             this.mouthOpenAnimationTimeOut = MOUTH_OPEN_ANIMATION_DURATION;
         }
     }
@@ -501,7 +501,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             this.resetAnimations();
             switch (animationState) {
                 case IDLE -> this.idleAnimationState.startIfStopped(this.tickCount);
-                case MOUTH_OPEN -> this.pursueOpenMouthAnimationState.startIfStopped(this.tickCount);
+                case MOUTH_OPEN, MOUTH_OPEN_WITHOUT_OPENED -> this.pursueOpenMouthAnimationState.startIfStopped(this.tickCount);
                 case MOUTH_OPENED -> this.pursueOpenedMouthAnimationState.startIfStopped(this.tickCount);
                 case MOUTH_CLOSE -> this.pursueCloseMouthAnimationState.startIfStopped(this.tickCount);
             }
@@ -529,6 +529,9 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 break;
             case MOUTH_CLOSE:
                 this.setAnimationState(FairkeeperBorosAnimationState.MOUTH_CLOSE);
+                break;
+            case MOUTH_OPEN_WITHOUT_OPENED:
+                this.setAnimationState(FairkeeperBorosAnimationState.MOUTH_OPEN_WITHOUT_OPENED);
                 break;
         }
 
@@ -704,6 +707,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public enum FairkeeperBorosAnimationState {
         IDLE,
+        MOUTH_OPEN_WITHOUT_OPENED,
         MOUTH_OPEN,
         MOUTH_OPENED,
         MOUTH_CLOSE
