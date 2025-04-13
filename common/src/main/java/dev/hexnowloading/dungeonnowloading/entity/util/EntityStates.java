@@ -1,9 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.util;
 
-import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
+import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
@@ -19,6 +16,8 @@ public class EntityStates {
     public static final EntityDataSerializer<FairkeeperBorosEntity.FairkeeperBorosAnimationState> FAIRKEEPER_BOROS_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperOurosEntity.FairkeeperOurosState> FAIRKEEPER_OUROS_STATE;
     public static final EntityDataSerializer<FairkeeperOurosEntity.FairkeeperOurosAnimationState> FAIRKEEPER_OUROS_ANIMATION_STATE;
+    public static final EntityDataSerializer<FairkeeperOurosPartEntity.FairkeeperOurosPartAnimationState> FAIRKEEPER_OUROS_PART_ANIMATION_STATE;
+    public static final EntityDataSerializer<FairkeeperOurosPartEntity.FairkeeperOurosPartState> FAIRKEEPER_OUROS_PART_STATE;
     public static final EntityDataSerializer<ScuttleEntity.ScuttleState> SCUTTLE_STATE;
     public static final EntityDataSerializer<BallistaGolemEntity.BallistaGolemState> BALLISTA_GOLEM_STATE;
     public static final EntityDataSerializer<CopperCreepEntity.State> COPPER_CREEP_STATE;
@@ -32,6 +31,8 @@ public class EntityStates {
         FAIRKEEPER_BOROS_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosAnimationState.class);
         FAIRKEEPER_OUROS_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosEntity.FairkeeperOurosState.class);
         FAIRKEEPER_OUROS_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosEntity.FairkeeperOurosAnimationState.class);
+        FAIRKEEPER_OUROS_PART_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosPartEntity.FairkeeperOurosPartState.class);
+        FAIRKEEPER_OUROS_PART_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosPartEntity.FairkeeperOurosPartAnimationState.class);
         SCUTTLE_STATE = EntityDataSerializer.simpleEnum(ScuttleEntity.ScuttleState.class);
         BALLISTA_GOLEM_STATE = EntityDataSerializer.simpleEnum(BallistaGolemEntity.BallistaGolemState.class);
         COPPER_CREEP_STATE = EntityDataSerializer.simpleEnum(CopperCreepEntity.State.class);
@@ -44,6 +45,8 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_PART_STATE);
+        EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_PART_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(SCUTTLE_STATE);
         EntityDataSerializers.registerSerializer(BALLISTA_GOLEM_STATE);
         EntityDataSerializers.registerSerializer(COPPER_CREEP_STATE);

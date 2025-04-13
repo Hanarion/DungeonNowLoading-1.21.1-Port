@@ -260,7 +260,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                         part.setTail(true);
                     }
                     this.level().addFreshEntity(part);
-                    part.triggerIdleAnimation();
                 }
             }
 

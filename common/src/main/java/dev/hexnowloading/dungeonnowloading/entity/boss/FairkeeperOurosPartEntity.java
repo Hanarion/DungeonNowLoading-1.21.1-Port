@@ -1,8 +1,12 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropVertexPillarGoal;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperOurosBodyAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
@@ -35,6 +39,8 @@ import java.util.UUID;
 
 public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity {
 
+    private static final EntityDataAccessor<FairkeeperOurosPartState> STATE = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityStates.FAIRKEEPER_OUROS_PART_STATE);
+    private static final EntityDataAccessor<FairkeeperOurosPartAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityStates.FAIRKEEPER_OUROS_PART_ANIMATION_STATE);
     private static final EntityDataAccessor<Optional<UUID>> PARENT_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     private static final EntityDataAccessor<Optional<UUID>> HEAD_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -47,14 +53,16 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     private static final EntityDataAccessor<Boolean> ROTATABLE = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
 
     public final AnimationState idleAnimationState = new AnimationState();
-    public final AnimationState dropScuttleAnimationState = new AnimationState();
-    public final AnimationState setupCannonAnimationState = new AnimationState();
-
-    private static final byte TRIGGER_IDLE_ANIMATION_BYTE = 70;
-    private static final byte TRIGGER_DROP_SCUTTLE_ANIMATION_BYTE = 71;
-    private static final byte TRIGGER_SETUP_CANNON_ANIMATION_BYTE = 72;
+    public final AnimationState cannonIdleAnimationState = new AnimationState();
+    public final AnimationState scuttleOpenAnimationState = new AnimationState();
+    public final AnimationState cannonOpenAnimationState = new AnimationState();
+    public final AnimationState scuttleCloseAnimationState = new AnimationState();
+    public final AnimationState cannonCloseAnimationState = new AnimationState();
 
     private float previousTilt = 0.0F;
+    private BlockPos dropPosition;
+    private final AnimationChainer<FairkeeperOurosPartAnimationState> animationChainer = new AnimationChainer<>();
+
 
     public FairkeeperOurosPartEntity(EntityType<? extends Monster> entityType, LivingEntity parent, LivingEntity head, int bodyIndex) {
         super(entityType, parent.level());
@@ -78,6 +86,12 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     }
 
     @Override
+    protected void registerGoals() {
+        super.registerGoals();
+        this.goalSelector.addGoal(1, new FairkeeperOurosBodyDropVertexPillarGoal(this, FairkeeperOurosPartState.DROP_PILLAR));
+    }
+
+    @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(PARENT_UUID, Optional.empty());
@@ -89,6 +103,8 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.define(HEAD_MOVING, false);
         this.entityData.define(MODEL_VISIBLE, true);
         this.entityData.define(ROTATABLE, true);
+        this.entityData.define(STATE, FairkeeperOurosPartState.IDLE);
+        this.entityData.define(ANIMATION_STATE, FairkeeperOurosPartAnimationState.NONE);
     }
 
     @Override
@@ -178,6 +194,17 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         super.tick();
     }
 
+    private void animationControl() {
+        if (this.level().isClientSide) return;
+
+        if (this.isState(FairkeeperOurosPartState.IDLE)) {
+            //System.out.println("IDLE");
+            //this.transitionTo(FairkeeperOurosPartAnimationState.IDLE);
+        }
+
+        animationChainer.tick(this::transitionTo);
+    }
+
     private double lerp(double start, double end, double factor) {
         return start + (end - start) * factor;
     }
@@ -191,6 +218,8 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
 
     @Override
     protected void customServerAiStep() {
+
+        this.animationControl();
 
         if (this.isHeadEntityMoving()) {
             this.performContactDamage();
@@ -258,31 +287,64 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         return super.canBeAffected(mobEffectInstance);
     }
 
-    @Override
-    public void handleEntityEvent(byte b) {
-        switch (b) {
-            case TRIGGER_IDLE_ANIMATION_BYTE:
-                this.idleAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_DROP_SCUTTLE_ANIMATION_BYTE:
-                this.dropScuttleAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_SETUP_CANNON_ANIMATION_BYTE:
-                this.setupCannonAnimationState.start(this.tickCount);
-                break;
-        }
-        super.handleEntityEvent(b);
-    }
-
-    private void stopAllAnimation() {
+    private void resetAnimations() {
         this.idleAnimationState.stop();
-        this.dropScuttleAnimationState.stop();
-        this.setupCannonAnimationState.stop();
+        this.scuttleOpenAnimationState.stop();
+        this.scuttleCloseAnimationState.stop();
+        this.cannonOpenAnimationState.stop();
+        this.cannonCloseAnimationState.stop();
+        this.cannonIdleAnimationState.stop();
     }
 
-    public void triggerIdleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_BYTE); }
-    public void triggerDropScuttleAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_DROP_SCUTTLE_ANIMATION_BYTE); }
-    public void triggerSetupCannonAnimation() { this.level().broadcastEntityEvent(this, TRIGGER_SETUP_CANNON_ANIMATION_BYTE); }
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            FairkeeperOurosPartAnimationState animationState = this.entityData.get(ANIMATION_STATE);
+            this.resetAnimations();
+            switch (animationState) {
+                case IDLE -> this.idleAnimationState.startIfStopped(this.tickCount);
+                case SCUTTLE_OPEN -> this.scuttleOpenAnimationState.startIfStopped(this.tickCount);
+                case SCUTTLE_CLOSE -> this.scuttleCloseAnimationState.startIfStopped(this.tickCount);
+                case CANNON_OPEN -> this.cannonOpenAnimationState.startIfStopped(this.tickCount);
+                case CANNON_CLOSE -> this.cannonCloseAnimationState.startIfStopped(this.tickCount);
+                case CANNON_IDLE -> this.cannonIdleAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    public FairkeeperOurosPartEntity transitionTo(FairkeeperOurosPartAnimationState state) {
+        this.entityData.set(ANIMATION_STATE, state);
+        return this;
+    }
+
+    public void playDoorOpenAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN.lengthInSeconds());
+        this.animationChainer.enqueue(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds());
+        this.animationChainer.enqueueHanging(FairkeeperOurosPartAnimationState.IDLE);
+    }
+
+    public boolean playDoorCloseAnimation() {
+        if (!this.animationChainer.isEmpty()) return false;
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds());
+        this.animationChainer.enqueue(FairkeeperOurosPartAnimationState.IDLE, 0);
+        return true;
+    }
+
+    public void dropVertexPillar(BlockPos dropPosition) {
+        this.setState(FairkeeperOurosPartState.DROP_PILLAR);
+        this.setDropPosition(dropPosition);
+    }
+
+    public BlockPos getDropPosition() {
+        return this.dropPosition;
+    }
+
+    public void setDropPosition(BlockPos dropPosition) {
+        this.dropPosition = dropPosition;
+    }
 
     @Override
     public boolean isInWall() {
@@ -442,5 +504,34 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     public void setRotatable(boolean enableRotation) { this.entityData.set(ROTATABLE, enableRotation); }
 
     public boolean isRotatable() { return this.entityData.get(ROTATABLE); }
+
+    public boolean isState(FairkeeperOurosPartState state) {
+        return this.entityData.get(STATE) == state;
+    }
+
+    public void setState(FairkeeperOurosPartState state) {
+        this.entityData.set(STATE, state);
+    }
+
+    public AnimationChainer<FairkeeperOurosPartAnimationState> getAnimationChainer() {
+        return this.animationChainer;
+    }
+
+    public enum FairkeeperOurosPartAnimationState {
+        NONE,
+        IDLE,
+        CANNON_IDLE,
+        CANNON_OPEN,
+        CANNON_CLOSE,
+        SCUTTLE_OPEN,
+        SCUTTLE_CLOSE
+    }
+
+    public enum FairkeeperOurosPartState {
+        IDLE,
+        DROP_SCUTTLE,
+        DROP_PILLAR,
+        SHOOT_ORB
+    }
 
 }

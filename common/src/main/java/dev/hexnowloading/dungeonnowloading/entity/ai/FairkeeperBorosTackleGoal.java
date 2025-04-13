@@ -88,7 +88,8 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
 
         if (this.tackleCooldown <= 0 && this.tackleDuration <= 0 && distanceSqr < this.tackleRange * this.tackleRange) {
             this.tackleDuration = TACKLE_DURATION + SLOWDOWN_DURATION;
-            this.boros.setAnimationState(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_OPEN);
+            this.boros.playMouthOpenAndClose();
+            //this.boros.setAnimationState(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_OPEN);
         }
 
         if (this.tackleDuration > 0) {
@@ -112,7 +113,7 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
                 this.tackleDuration = 0;
             }
             if (this.tackleDuration == 3) {
-                this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
+                //this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
             }
             if (this.tackleDuration <= 0) {
                 if (loopCount == TOTAL_LOOP) {

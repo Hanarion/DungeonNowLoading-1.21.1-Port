@@ -1,12 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperBorosAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
-import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.WeightedTargetProvider;
+import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -76,6 +74,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private boolean damageFromOtherSegment;
     private boolean canDestroyBlocks;
     private boolean changeTarget;
+    private AnimationChainer<FairkeeperBorosAnimationState> animationChainer = new AnimationChainer<>();
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
@@ -206,11 +205,13 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void animationControl() {
-        if (!this.level().isClientSide) {
+        if (this.level().isClientSide) {
             return;
         }
 
-        if (this.mouthOpenAnimationTimeOut-- > 0) {
+        animationChainer.tick(this::transitionTo);
+
+        /*if (this.mouthOpenAnimationTimeOut-- > 0) {
             if (this.mouthOpenAnimationTimeOut <= 0) {
                 this.transitionTo(FairkeeperBorosAnimationState.MOUTH_OPENED);
             }
@@ -218,7 +219,13 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
         if (this.pursueOpenMouthAnimationState.isStarted() && this.mouthOpenAnimationTimeOut <= 0 && this.getAnimationState() == FairkeeperBorosAnimationState.MOUTH_OPEN) {
             this.mouthOpenAnimationTimeOut = MOUTH_OPEN_ANIMATION_DURATION;
-        }
+        }*/
+    }
+
+    public void playMouthOpenAndClose() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds());
+        this.animationChainer.enqueue(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds());
     }
 
     private void segmentControl() {

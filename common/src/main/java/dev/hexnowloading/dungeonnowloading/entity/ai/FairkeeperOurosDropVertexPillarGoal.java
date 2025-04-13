@@ -4,14 +4,7 @@ import com.google.common.collect.ImmutableList;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
-import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexPillarProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.particle.type.ScalableAxisParticleType;
-import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
@@ -107,25 +100,14 @@ public class FairkeeperOurosDropVertexPillarGoal extends StoppableGoal {
 
         BlockPos dropTargetBlockPos = BlockPos.containing(dropTargetX, this.currentPart.getY(), dropTargetZ);
 
+        if (!this.currentPart.isState(FairkeeperOurosPartEntity.FairkeeperOurosPartState.DROP_PILLAR)) {
+            this.currentPart.dropVertexPillar(dropTargetBlockPos);
+        }
+
         double distanceSqChild = this.currentPart.position().distanceToSqr(dropTargetBlockPos.getX(), dropTargetBlockPos.getY(), dropTargetBlockPos.getZ());
 
         if (distanceSqChild < 1.5) {
             dropIndex++;
-            Level level = this.ouros.level();
-            VertexPillarProjectileEntity stonePillar = new VertexPillarProjectileEntity(this.ouros.level(), this.ouros, 0.8F, true);
-            stonePillar.setPos(dropTargetBlockPos.getX() + 0.5, this.currentPart.getBoundingBox().minY, dropTargetBlockPos.getZ() + 0.5);
-            level.addFreshEntity(stonePillar);
-
-            BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos(dropTargetBlockPos.getX(), this.currentPart.getY(), dropTargetBlockPos.getZ());
-
-            while (mutableBlockPos.getY() > level.getMinBuildHeight() && !level.getBlockState(mutableBlockPos).blocksMotion()) {
-                mutableBlockPos.move(Direction.DOWN);
-            }
-
-            BlockState blockState = level.getBlockState(mutableBlockPos);
-            if (blockState.blocksMotion()) {
-                ((ServerLevel) level).sendParticles(new ScalableAxisParticleType.ScalableAxisParticleData(DNLParticleTypes.REDSTONE_HAZARD_INDICATOR_PARTICLE.get(), 0, 90, 1.0F), mutableBlockPos.getX() + 0.5F, mutableBlockPos.getY() + 1.05F, mutableBlockPos.getZ() + 0.5F, 1, 0, 0, 0, 0);
-            }
 
             this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();
 
