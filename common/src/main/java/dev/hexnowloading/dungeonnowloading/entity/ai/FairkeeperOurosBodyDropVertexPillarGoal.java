@@ -48,14 +48,12 @@ public class FairkeeperOurosBodyDropVertexPillarGoal extends StoppableGoal {
             this.droppingLogic();
         } else if (this.progress == 2) {
             if (this.part.playDoorCloseAnimation()) {
-                System.out.println("CLOSE");
                 this.progress++;
             } else {
                 this.stopGoal();
             }
         } else if (this.progress == 3) {
             if (this.part.getAnimationChainer().isFinished()) {
-                System.out.println("STOP");
                 this.stopGoal();
             }
         }
@@ -67,7 +65,6 @@ public class FairkeeperOurosBodyDropVertexPillarGoal extends StoppableGoal {
 
         if (this.progress == 0 && distance < 3.0F) {
             this.part.transitionTo(FairkeeperOurosPartEntity.FairkeeperOurosPartAnimationState.SCUTTLE_OPEN);
-            System.out.println("OPEN");
             this.progress++;
         }
         if (this.progress <= 1 && distance < 1.0F) {

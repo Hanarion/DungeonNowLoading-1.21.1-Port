@@ -5,23 +5,49 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 public class AnimationChainer<T extends Enum<T>> {
-    private static class AnimationStep<T> {
+
+    public static class AnimationStep<T> {
         final T animation;
         final int durationTicks;
+        final boolean isLooping;
         final boolean isHanging;
+        final Runnable onStart;
+        final Runnable onComplete;
 
-        AnimationStep(T animation, float durationSeconds, boolean isHanging) {
+        private AnimationStep(T animation, float seconds, boolean looping, boolean hanging,
+                              Runnable onStart, Runnable onComplete) {
             this.animation = animation;
-            this.durationTicks = (int) (durationSeconds * 20);
-            this.isHanging = isHanging;
+            this.durationTicks = (int) (seconds * 20);
+            this.isLooping = looping;
+            this.isHanging = hanging;
+            this.onStart = onStart;
+            this.onComplete = onComplete;
         }
 
-        AnimationStep(T animation, float durationSeconds) {
-            this(animation, durationSeconds, false);
+        // --- Factory methods ---
+
+        public static <T> AnimationStep<T> of(T animation, float seconds) {
+            return new AnimationStep<>(animation, seconds, false, false, null, null);
         }
 
-        static <T> AnimationStep<T> hanging(T animation) {
-            return new AnimationStep<>(animation, 0, true);
+        public static <T> AnimationStep<T> of(T animation, float seconds, Runnable onStart, Runnable onEnd) {
+            return new AnimationStep<>(animation, seconds, false, false, onStart, onEnd);
+        }
+
+        public static <T> AnimationStep<T> looping(T animation, float seconds) {
+            return new AnimationStep<>(animation, seconds, true, false, null, null);
+        }
+
+        public static <T> AnimationStep<T> looping(T animation, float seconds, Runnable onStart, Runnable onEnd) {
+            return new AnimationStep<>(animation, seconds, true, false, onStart, onEnd);
+        }
+
+        public static <T> AnimationStep<T> hanging(T animation) {
+            return new AnimationStep<>(animation, 0, false, true, null, null);
+        }
+
+        public static <T> AnimationStep<T> hanging(T animation, Runnable onStart) {
+            return new AnimationStep<>(animation, 0, false, true, onStart, null);
         }
     }
 
@@ -30,24 +56,39 @@ public class AnimationChainer<T extends Enum<T>> {
     private int ticksRemaining = 0;
     private boolean started = false;
 
-    public void enqueue(T animation, float durationSeconds) {
-        animationQueue.add(new AnimationStep<>(animation, durationSeconds));
-    }
-
-    public void enqueueHanging(T animation) {
-        animationQueue.add(AnimationStep.hanging(animation));
+    public void enqueue(AnimationStep<T> step) {
+        animationQueue.add(step);
     }
 
     public void tick(Consumer<T> transitionFunction) {
         if (currentStep == null && !animationQueue.isEmpty()) {
             currentStep = animationQueue.poll();
             ticksRemaining = currentStep.durationTicks;
+            System.out.println("▶ Starting animation: " + currentStep.animation + " (" + ticksRemaining + " ticks)");
             transitionFunction.accept(currentStep.animation);
+            if (currentStep.onStart != null) currentStep.onStart.run();
             started = true;
         } else if (currentStep != null && !currentStep.isHanging) {
+            System.out.println("⏳ Ticking animation: " + currentStep.animation + " [" + ticksRemaining + "]");
             if (--ticksRemaining <= 0) {
-                currentStep = null;
+                System.out.println("✔ Animation done: " + currentStep.animation);
+                if (currentStep.onComplete != null) currentStep.onComplete.run();
+                if (currentStep.isLooping) {
+                    ticksRemaining = currentStep.durationTicks;
+                    transitionFunction.accept(currentStep.animation);
+                    if (currentStep.onStart != null) currentStep.onStart.run();
+                } else {
+                    currentStep = null;
+                }
             }
+        }
+    }
+
+    public void forceNext(Consumer<T> transitionFunction) {
+        if (currentStep != null && currentStep.isLooping) {
+            if (currentStep.onComplete != null) currentStep.onComplete.run();
+            currentStep = null;
+            tick(transitionFunction);
         }
     }
 
@@ -64,6 +105,14 @@ public class AnimationChainer<T extends Enum<T>> {
 
     public boolean isFinished() {
         return started && currentStep == null && animationQueue.isEmpty();
+    }
+
+    public boolean isLooping() {
+        return currentStep != null && currentStep.isLooping;
+    }
+
+    public boolean isHanging() {
+        return currentStep != null && currentStep.isHanging;
     }
 
     public boolean isEmpty() {

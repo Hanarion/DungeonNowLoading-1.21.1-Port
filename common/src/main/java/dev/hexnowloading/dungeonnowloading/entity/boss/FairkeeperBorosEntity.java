@@ -224,8 +224,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public void playMouthOpenAndClose() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds());
-        this.animationChainer.enqueue(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds());
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds()));
     }
 
     private void segmentControl() {

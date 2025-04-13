@@ -75,9 +75,8 @@ public class FairkeeperOurosDropScuttleGoal extends StoppableGoal {
             return;
         }
 
-        this.currentPart.playDoorOpenAnimation();
-
-        this.summonScuttle();
+        this.currentPart.dropScuttle();
+        //this.summonScuttle();
 
         loopCount--;
 

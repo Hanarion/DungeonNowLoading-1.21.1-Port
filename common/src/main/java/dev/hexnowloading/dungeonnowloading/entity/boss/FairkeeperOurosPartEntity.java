@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropScuttleGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropVertexPillarGoal;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperOurosBodyAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
@@ -89,6 +90,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(1, new FairkeeperOurosBodyDropVertexPillarGoal(this, FairkeeperOurosPartState.DROP_PILLAR));
+        this.goalSelector.addGoal(1, new FairkeeperOurosBodyDropScuttleGoal(this, FairkeeperOurosPartState.DROP_SCUTTLE));
     }
 
     @Override
@@ -197,9 +199,8 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     private void animationControl() {
         if (this.level().isClientSide) return;
 
-        if (this.isState(FairkeeperOurosPartState.IDLE)) {
-            //System.out.println("IDLE");
-            //this.transitionTo(FairkeeperOurosPartAnimationState.IDLE);
+        if (this.entityData.get(ANIMATION_STATE) == FairkeeperOurosPartAnimationState.NONE) {
+            this.transitionTo(FairkeeperOurosPartAnimationState.IDLE);
         }
 
         animationChainer.tick(this::transitionTo);
@@ -318,24 +319,32 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         return this;
     }
 
-    public void playDoorOpenAnimation() {
+    public void playScuttleDoorOpenAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN.lengthInSeconds());
-        this.animationChainer.enqueue(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds());
-        this.animationChainer.enqueueHanging(FairkeeperOurosPartAnimationState.IDLE);
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN.lengthInSeconds(), null, runnable));
+        //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds()));
+    }
+
+    public void playScuttleDoorCloseAnimation(Runnable runnable) {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), null, runnable));
     }
 
     public boolean playDoorCloseAnimation() {
         if (!this.animationChainer.isEmpty()) return false;
         this.animationChainer.reset();
-        this.animationChainer.enqueue(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds());
-        this.animationChainer.enqueue(FairkeeperOurosPartAnimationState.IDLE, 0);
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0F));
         return true;
     }
 
     public void dropVertexPillar(BlockPos dropPosition) {
         this.setState(FairkeeperOurosPartState.DROP_PILLAR);
         this.setDropPosition(dropPosition);
+    }
+
+    public void dropScuttle() {
+        this.setState(FairkeeperOurosPartState.DROP_SCUTTLE);
     }
 
     public BlockPos getDropPosition() {
