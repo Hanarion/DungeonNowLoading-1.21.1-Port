@@ -22,7 +22,7 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
     private int progress;
     private int attackTicks;
 
-    private final static int ATTACK_INTERVAL = 100;
+    private final static int ATTACK_INTERVAL = 60;
 
     public FairkeeperOurosBodyShootVertexOrbGoal(FairkeeperOurosPartEntity part, FairkeeperOurosPartEntity.FairkeeperOurosPartState state) {
         this.part = part;
@@ -98,7 +98,7 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
             return;
         }
 
-        Vec3 start = new Vec3(this.part.getX(), this.part.getY() - 1, this.part.getZ());
+        Vec3 start = new Vec3(this.part.getX(), this.part.getY() + entity.getBbHeight() * 0.5F, this.part.getZ());
         Vec3 end = entity.position().add(0.0, entity.getBbHeight() * 0.5, 0.0);
 
         BlockHitResult hitResult = this.ouros.level().clip(new ClipContext(
@@ -110,7 +110,7 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
         ));
 
         if (hitResult.getType() == HitResult.Type.MISS) {
-            // Clear path — shoot!
+
             VertexOrbProjectileEntity projectile = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros, 2);
             projectile.shootTowardsTarget(start.x, start.y, start.z, (LivingEntity) entity, 1.0F, this.part.getInaccuracy());
             this.ouros.level().addFreshEntity(projectile);

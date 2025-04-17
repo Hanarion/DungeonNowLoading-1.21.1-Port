@@ -100,7 +100,7 @@ public class FairkeeperOurosDropVertexPillarGoal extends StoppableGoal {
 
         BlockPos dropTargetBlockPos = BlockPos.containing(dropTargetX, this.currentPart.getY(), dropTargetZ);
 
-        if (!this.currentPart.isState(FairkeeperOurosPartEntity.FairkeeperOurosPartState.DROP_PILLAR)) {
+        if (this.currentPart.isState(FairkeeperOurosPartEntity.FairkeeperOurosPartState.IDLE)) {
             this.currentPart.dropVertexPillar(dropTargetBlockPos);
         }
 

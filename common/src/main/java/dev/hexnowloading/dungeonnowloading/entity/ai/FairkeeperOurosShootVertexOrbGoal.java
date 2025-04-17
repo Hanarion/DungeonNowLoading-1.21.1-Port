@@ -99,7 +99,6 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
         if (entity != null) {
             this.randomCurrentPart();
             if (this.currentPart == null) return;
-            System.out.println(this.currentPart.getBodyIndex());
             this.currentPart.shootVertexOrb(entity, this.inaccuracy);
             /*for (int attempt = 0; attempt < 3; attempt++) {
                 this.randomCurrentPart();

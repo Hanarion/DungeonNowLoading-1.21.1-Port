@@ -88,7 +88,7 @@ public class FairkeeperOurosDropScuttleGoal extends StoppableGoal {
         this.attackTicks = SUMMON_INTERVAL;
 
         for (int i = 0; i < 4; i++) {
-            if (this.currentPart.getChild() instanceof FairkeeperOurosPartEntity fairkeeperOurosPartEntity) {
+            if (this.currentPart.getChild() instanceof FairkeeperOurosPartEntity fairkeeperOurosPartEntity && fairkeeperOurosPartEntity.isState(FairkeeperOurosPartEntity.FairkeeperOurosPartState.IDLE)) {
                 this.currentPart = fairkeeperOurosPartEntity;
             } else {
                 this.stopGoal();

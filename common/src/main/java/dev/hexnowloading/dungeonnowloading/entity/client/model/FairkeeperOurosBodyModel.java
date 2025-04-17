@@ -114,6 +114,8 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
     public void setupAnim(FairkeeperOurosPartEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
 
+        float partialTicks = ageInTicks - entity.tickCount;
+
         this.tail.visible = entity.isTail();
         this.body.visible = !this.tail.visible;
 
@@ -133,13 +135,14 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
         this.animate(entity.cannonCloseAnimationState, FairkeeperOurosBodyAnimation.CANNON_CLOSE, ageInTicks);
         this.animate(entity.cannonIdleAnimationState, FairkeeperOurosBodyAnimation.CANNON_IDLE, ageInTicks);
 
-        float cannonYaw = entity.getCannonTargetYaw();
+        float cannonYaw = Mth.lerp(partialTicks, entity.prevCannonYaw, entity.cannonYaw);
+        float pitch = Mth.lerp(partialTicks, entity.prevCannonPitch, entity.cannonPitch);
+
         float bodyYaw = entity.getYRot();
         float relativeYaw = Mth.wrapDegrees(-cannonYaw + bodyYaw);
-        float pitch = Mth.wrapDegrees(entity.getCannonTargetPitch() + 90);
 
         this.cannon.yRot = (float) Math.toRadians(relativeYaw);
-        this.barrel.xRot = (float) Math.toRadians(pitch);
+        this.barrel.xRot = (float) Math.toRadians(pitch + 90);
     }
 
     @Override

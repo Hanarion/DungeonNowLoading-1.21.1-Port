@@ -17,6 +17,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
@@ -69,6 +70,10 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     private float inaccuracy;
     public float cannonTargetYaw = 0F;
     public float cannonTargetPitch = 0F;
+    public float prevCannonYaw = 0F;
+    public float cannonYaw = 0F;
+    public float prevCannonPitch = 0F;
+    public float cannonPitch = 0F;
     private final AnimationChainer<FairkeeperOurosPartAnimationState> animationChainer = new AnimationChainer<>();
 
 
@@ -203,6 +208,14 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         } else if (!this.level().isClientSide) {
             remove(RemovalReason.DISCARDED);
         }
+
+        if (this.level().isClientSide && this.isState(FairkeeperOurosPartState.SHOOT_ORB)) {
+            this.prevCannonYaw = this.cannonYaw;
+            this.prevCannonPitch = this.cannonPitch;
+
+            this.cannonYaw = this.entityData.get(CANNON_YAW);
+            this.cannonPitch = this.entityData.get(CANNON_PITCH);
+        }
         super.tick();
     }
 
@@ -299,32 +312,30 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     }
 
     public void aimCannonAtPlayer(Entity targetPlayer) {
-        Vec3 cannonPos = this.position().add(0, this.getBbHeight() * 0.5, 0); // cannon origin
-        Vec3 playerPos = targetPlayer.position().add(0, targetPlayer.getBbHeight() * 0.5, 0); // aim at center
+        Vec3 cannonPos = this.position().add(0, this.getBbHeight() * 0.5, 0);
+        Vec3 playerPos = targetPlayer.position().add(0, targetPlayer.getBbHeight() * 0.5, 0);
 
         Vec3 dir = playerPos.subtract(cannonPos);
 
-        float yaw = (float) Math.toDegrees(Math.atan2(dir.z, dir.x)) - 90.0F;
+        float targetYaw = (float) Math.toDegrees(Math.atan2(dir.z, dir.x)) - 90.0F;
         float horizontalDistance = (float) Math.sqrt(dir.x * dir.x + dir.z * dir.z);
-        float pitch = (float) Math.toDegrees(Math.atan2(dir.y, horizontalDistance));
+        float targetPitch = (float) Math.toDegrees(Math.atan2(dir.y, horizontalDistance));
 
+        // Get current values
+        float currentYaw = this.entityData.get(CANNON_YAW);
+        float currentPitch = this.entityData.get(CANNON_PITCH);
 
-        System.out.println(pitch);
+        // Lerp for smooth pitch
+        float smoothedPitch = Mth.lerp(0.2f, currentPitch, targetPitch);
 
-        this.entityData.set(CANNON_YAW, yaw);
-        this.entityData.set(CANNON_PITCH, pitch);
+        // For yaw, we wrap around so lerp still works across -180/+180 boundary
+        float deltaYaw = Mth.wrapDegrees(targetYaw - currentYaw);
+        float smoothedYaw = currentYaw + deltaYaw * 0.2f;
+
+        // Set updated values
+        this.entityData.set(CANNON_YAW, smoothedYaw);
+        this.entityData.set(CANNON_PITCH, smoothedPitch);
     }
-
-    private float cannonYaw = 0;
-    private float cannonPitch = 0;
-
-    public float getCannonYaw() { return this.cannonYaw; }
-    public float getCannonPitch() { return this.cannonPitch; }
-
-    public void setCannonYaw(float yaw) { this.cannonYaw = yaw; }
-    public void setCannonPitch(float pitch) { this.cannonPitch = pitch; }
-
-
 
     private void resetAnimations() {
         this.idleAnimationState.stop();
