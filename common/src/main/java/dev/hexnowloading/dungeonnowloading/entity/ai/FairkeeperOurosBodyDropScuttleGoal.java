@@ -22,7 +22,6 @@ public class FairkeeperOurosBodyDropScuttleGoal extends StoppableGoal{
     private final FairkeeperOurosPartEntity.FairkeeperOurosPartState state;
 
     private int progress;
-    private boolean animationEnded;
 
     public FairkeeperOurosBodyDropScuttleGoal(FairkeeperOurosPartEntity part, FairkeeperOurosPartEntity.FairkeeperOurosPartState state) {
         this.part = part;

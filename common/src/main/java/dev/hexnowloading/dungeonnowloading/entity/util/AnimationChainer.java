@@ -64,14 +64,11 @@ public class AnimationChainer<T extends Enum<T>> {
         if (currentStep == null && !animationQueue.isEmpty()) {
             currentStep = animationQueue.poll();
             ticksRemaining = currentStep.durationTicks;
-            System.out.println("▶ Starting animation: " + currentStep.animation + " (" + ticksRemaining + " ticks)");
             transitionFunction.accept(currentStep.animation);
             if (currentStep.onStart != null) currentStep.onStart.run();
             started = true;
         } else if (currentStep != null && !currentStep.isHanging) {
-            System.out.println("⏳ Ticking animation: " + currentStep.animation + " [" + ticksRemaining + "]");
             if (--ticksRemaining <= 0) {
-                System.out.println("✔ Animation done: " + currentStep.animation);
                 if (currentStep.onComplete != null) currentStep.onComplete.run();
                 if (currentStep.isLooping) {
                     ticksRemaining = currentStep.durationTicks;

@@ -3,17 +3,10 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
-import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
@@ -104,7 +97,11 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
         Entity entity = ((ServerLevel) this.ouros.level()).getEntity(randomUUID);
 
         if (entity != null) {
-            for (int attempt = 0; attempt < 3; attempt++) {
+            this.randomCurrentPart();
+            if (this.currentPart == null) return;
+            System.out.println(this.currentPart.getBodyIndex());
+            this.currentPart.shootVertexOrb(entity, this.inaccuracy);
+            /*for (int attempt = 0; attempt < 3; attempt++) {
                 this.randomCurrentPart();
                 if (this.currentPart == null) return;
 
@@ -130,7 +127,7 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
                     this.ouros.level().playSound(null, start.x, start.y, start.z, SoundEvents.WITHER_SHOOT, this.currentPart.getSoundSource(), 3.0F, 1.0F + (this.currentPart.getRandom().nextFloat() - this.currentPart.getRandom().nextFloat()) * 0.2F);
                     break; // Done shooting
                 }
-            }
+            }*/
         }
     }
 }

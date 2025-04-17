@@ -36,10 +36,10 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
 
     public FairkeeperOurosBodyModel(ModelPart root) {
         this.root = root;
+        this.cannon = root.getChild("cannon");
+        this.barrel = this.cannon.getChild("barrel");
         this.ouros_segment = root.getChild("ouros_segment");
         this.body = this.ouros_segment.getChild("body");
-        this.cannon = this.body.getChild("cannon");
-        this.barrel = this.cannon.getChild("barrel");
         this.trap_door_front = this.body.getChild("trap_door_front");
         this.trap_door_back = this.body.getChild("trap_door_back");
         this.horn2 = this.body.getChild("horn2");
@@ -55,6 +55,16 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 
+        PartDefinition cannon = partdefinition.addOrReplaceChild("cannon", CubeListBuilder.create().texOffs(118, 138).addBox(5.0F, -0.2F, -6.0F, 2.0F, 5.0F, 12.0F, new CubeDeformation(0.0F))
+                .texOffs(24, 144).mirror().addBox(-7.0F, -2.2F, -3.0F, 2.0F, 2.0F, 6.0F, new CubeDeformation(0.0F)).mirror(false)
+                .texOffs(118, 138).mirror().addBox(-7.0F, -0.2F, -6.0F, 2.0F, 5.0F, 12.0F, new CubeDeformation(0.0F)).mirror(false)
+                .texOffs(24, 144).addBox(5.0F, -2.2F, -3.0F, 2.0F, 2.0F, 6.0F, new CubeDeformation(0.0F))
+                .texOffs(78, 138).addBox(-8.0F, -4.2F, -2.0F, 16.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 18.2F, 0.0F));
+
+        PartDefinition barrel = cannon.addOrReplaceChild("barrel", CubeListBuilder.create().texOffs(80, 124).addBox(-4.0F, -9.0F, -4.0F, 8.0F, 4.0F, 8.0F, new CubeDeformation(0.0F))
+                .texOffs(40, 124).addBox(-5.0F, -13.0F, -5.0F, 10.0F, 4.0F, 10.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 124).addBox(-5.0F, -5.0F, -5.0F, 10.0F, 10.0F, 10.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -2.2F, 0.0F));
+
         PartDefinition ouros_segment = partdefinition.addOrReplaceChild("ouros_segment", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
 
         PartDefinition body = ouros_segment.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 58).addBox(-14.0F, -7.0F, -23.5F, 28.0F, 7.0F, 47.0F, new CubeDeformation(0.0F))
@@ -69,16 +79,6 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
                 .texOffs(146, 112).addBox(10.0F, -22.0F, -19.5F, 4.0F, 4.0F, 8.0F, new CubeDeformation(0.0F))
                 .texOffs(78, 146).addBox(-14.0F, -22.0F, 11.5F, 4.0F, 4.0F, 8.0F, new CubeDeformation(0.0F))
                 .texOffs(146, 124).addBox(-14.0F, -22.0F, -19.5F, 4.0F, 4.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
-
-        PartDefinition cannon = body.addOrReplaceChild("cannon", CubeListBuilder.create().texOffs(118, 138).addBox(5.0F, -0.2F, -6.0F, 2.0F, 5.0F, 12.0F, new CubeDeformation(0.0F))
-                .texOffs(24, 144).mirror().addBox(-7.0F, -2.2F, -3.0F, 2.0F, 2.0F, 6.0F, new CubeDeformation(0.0F)).mirror(false)
-                .texOffs(118, 138).mirror().addBox(-7.0F, -0.2F, -6.0F, 2.0F, 5.0F, 12.0F, new CubeDeformation(0.0F)).mirror(false)
-                .texOffs(24, 144).addBox(5.0F, -2.2F, -3.0F, 2.0F, 2.0F, 6.0F, new CubeDeformation(0.0F))
-                .texOffs(78, 138).addBox(-8.0F, -4.2F, -2.0F, 16.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -5.8F, 0.0F));
-
-        PartDefinition barrel = cannon.addOrReplaceChild("barrel", CubeListBuilder.create().texOffs(80, 124).addBox(-4.0F, -9.0F, -4.0F, 8.0F, 4.0F, 8.0F, new CubeDeformation(0.0F))
-                .texOffs(40, 124).addBox(-5.0F, -13.0F, -5.0F, 10.0F, 4.0F, 10.0F, new CubeDeformation(0.0F))
-                .texOffs(0, 124).addBox(-5.0F, -5.0F, -5.0F, 10.0F, 10.0F, 10.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -2.2F, 0.0F));
 
         PartDefinition trap_door_front = body.addOrReplaceChild("trap_door_front", CubeListBuilder.create(), PartPose.offset(0.0F, -18.0F, -10.0F));
 
@@ -132,11 +132,20 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
         this.animate(entity.cannonOpenAnimationState, FairkeeperOurosBodyAnimation.CANNON_OPEN, ageInTicks);
         this.animate(entity.cannonCloseAnimationState, FairkeeperOurosBodyAnimation.CANNON_CLOSE, ageInTicks);
         this.animate(entity.cannonIdleAnimationState, FairkeeperOurosBodyAnimation.CANNON_IDLE, ageInTicks);
+
+        float cannonYaw = entity.getCannonTargetYaw();
+        float bodyYaw = entity.getYRot();
+        float relativeYaw = Mth.wrapDegrees(-cannonYaw + bodyYaw);
+        float pitch = Mth.wrapDegrees(entity.getCannonTargetPitch() + 90);
+
+        this.cannon.yRot = (float) Math.toRadians(relativeYaw);
+        this.barrel.xRot = (float) Math.toRadians(pitch);
     }
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         ouros_segment.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        cannon.render(poseStack, vertexConsumer, 0xF000F0, packedOverlay, red, green, blue, alpha);
     }
 
     public float getTiltAngle(FairkeeperOurosPartEntity entity) {
@@ -156,4 +165,5 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
     public ModelPart root() {
         return root;
     }
+
 }

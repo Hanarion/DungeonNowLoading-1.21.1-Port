@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropScuttleGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropVertexPillarGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyShootVertexOrbGoal;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperOurosBodyAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
@@ -46,6 +47,8 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
 
     private static final EntityDataAccessor<Optional<UUID>> HEAD_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Float> CANNON_YAW = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> CANNON_PITCH = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> BODY_INDEX = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DROPPER = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> TAIL = SynchedEntityData.defineId(FairkeeperOurosPartEntity.class, EntityDataSerializers.BOOLEAN);
@@ -62,6 +65,10 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
 
     private float previousTilt = 0.0F;
     private BlockPos dropPosition;
+    private Entity shootingTarget;
+    private float inaccuracy;
+    public float cannonTargetYaw = 0F;
+    public float cannonTargetPitch = 0F;
     private final AnimationChainer<FairkeeperOurosPartAnimationState> animationChainer = new AnimationChainer<>();
 
 
@@ -91,6 +98,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         super.registerGoals();
         this.goalSelector.addGoal(1, new FairkeeperOurosBodyDropVertexPillarGoal(this, FairkeeperOurosPartState.DROP_PILLAR));
         this.goalSelector.addGoal(1, new FairkeeperOurosBodyDropScuttleGoal(this, FairkeeperOurosPartState.DROP_SCUTTLE));
+        this.goalSelector.addGoal(1, new FairkeeperOurosBodyShootVertexOrbGoal(this, FairkeeperOurosPartState.SHOOT_ORB));
     }
 
     @Override
@@ -105,6 +113,8 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         this.entityData.define(HEAD_MOVING, false);
         this.entityData.define(MODEL_VISIBLE, true);
         this.entityData.define(ROTATABLE, true);
+        this.entityData.define(CANNON_PITCH, 0F);
+        this.entityData.define(CANNON_YAW, 0F);
         this.entityData.define(STATE, FairkeeperOurosPartState.IDLE);
         this.entityData.define(ANIMATION_STATE, FairkeeperOurosPartAnimationState.NONE);
     }
@@ -288,6 +298,34 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         return super.canBeAffected(mobEffectInstance);
     }
 
+    public void aimCannonAtPlayer(Entity targetPlayer) {
+        Vec3 cannonPos = this.position().add(0, this.getBbHeight() * 0.5, 0); // cannon origin
+        Vec3 playerPos = targetPlayer.position().add(0, targetPlayer.getBbHeight() * 0.5, 0); // aim at center
+
+        Vec3 dir = playerPos.subtract(cannonPos);
+
+        float yaw = (float) Math.toDegrees(Math.atan2(dir.z, dir.x)) - 90.0F;
+        float horizontalDistance = (float) Math.sqrt(dir.x * dir.x + dir.z * dir.z);
+        float pitch = (float) Math.toDegrees(Math.atan2(dir.y, horizontalDistance));
+
+
+        System.out.println(pitch);
+
+        this.entityData.set(CANNON_YAW, yaw);
+        this.entityData.set(CANNON_PITCH, pitch);
+    }
+
+    private float cannonYaw = 0;
+    private float cannonPitch = 0;
+
+    public float getCannonYaw() { return this.cannonYaw; }
+    public float getCannonPitch() { return this.cannonPitch; }
+
+    public void setCannonYaw(float yaw) { this.cannonYaw = yaw; }
+    public void setCannonPitch(float pitch) { this.cannonPitch = pitch; }
+
+
+
     private void resetAnimations() {
         this.idleAnimationState.stop();
         this.scuttleOpenAnimationState.stop();
@@ -336,6 +374,40 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds()));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0F));
         return true;
+    }
+
+    public void playCannonSetupAnimation(Runnable runnable) {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_OPEN, FairkeeperOurosBodyAnimation.CANNON_OPEN.lengthInSeconds(), null, runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_IDLE, 0f));
+    }
+
+    public void playCannonPackAnimation(Runnable runnable) {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_CLOSE, FairkeeperOurosBodyAnimation.CANNON_CLOSE.lengthInSeconds(), null, runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0f));
+    }
+
+    public void shootVertexOrb(Entity target, float inaccuracy) {
+        this.setShootingTarget(target);
+        this.setInaccuracy(inaccuracy);
+        this.setState(FairkeeperOurosPartState.SHOOT_ORB);
+    }
+
+    public float getInaccuracy() {
+        return inaccuracy;
+    }
+
+    public void setInaccuracy(float inaccuracy) {
+        this.inaccuracy = inaccuracy;
+    }
+
+    public Entity getShootingTarget() {
+        return this.shootingTarget;
+    }
+
+    public void setShootingTarget(Entity target) {
+        this.shootingTarget = target;
     }
 
     public void dropVertexPillar(BlockPos dropPosition) {
@@ -513,6 +585,10 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     public void setRotatable(boolean enableRotation) { this.entityData.set(ROTATABLE, enableRotation); }
 
     public boolean isRotatable() { return this.entityData.get(ROTATABLE); }
+
+    public float getCannonTargetYaw() { return this.entityData.get(CANNON_YAW); }
+
+    public float getCannonTargetPitch() { return this.entityData.get(CANNON_PITCH); }
 
     public boolean isState(FairkeeperOurosPartState state) {
         return this.entityData.get(STATE) == state;
