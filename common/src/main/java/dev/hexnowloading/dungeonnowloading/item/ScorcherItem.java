@@ -250,7 +250,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
                 }*/
                 setHeatLevel(stack, heat, gameTime);
             }
-            if (!isSelected) {
+            if (!isSelected && !(player.getMainHandItem().is(stack.getItem()) && (player.isUsingItem() || ItemAnimationState.isAnimating(player.getMainHandItem(), ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime)))) {
                 stopScorcherLingeringSounds(stack, player);
             }
 

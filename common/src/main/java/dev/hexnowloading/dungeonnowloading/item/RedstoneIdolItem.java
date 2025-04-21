@@ -2,10 +2,8 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentCallerEntity;
-import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -35,7 +33,6 @@ public class RedstoneIdolItem extends BlockItem {
         List<FairkeeperSerpentCallerEntity> sleepingTargets = targets.stream().filter(entity -> !entity.isActivated()).toList();
         if (!sleepingTargets.isEmpty()) {
             player.startUsingItem(hand);
-            level.playSound(player, player, DNLSounds.CHAOS_SPAWNER_LAUGHTER.get(), SoundSource.RECORDS, 1.0F, 2.0F);
             player.getCooldowns().addCooldown(this, 7);
             player.awardStat(Stats.ITEM_USED.get(this));
             for (FairkeeperSerpentCallerEntity serpentCallerEntity : targets) {

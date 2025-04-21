@@ -13,6 +13,7 @@ import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
 import dev.hexnowloading.dungeonnowloading.entity.util.WeightBaseMoveSet;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -156,6 +157,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     public void startBossFight() {
         this.activationTick = 60;
+        this.playSound(DNLSounds.FAIRKEEPER_SERPENT_CALLER_ACTIVATED.get(), 3.0F, 1.0F);
         this.clearAllMoveSet();
         this.setActivated(true);
         this.setOffsets(SPAWN_OFFSET_X, SPAWN_OFFSET_Y);

@@ -104,6 +104,12 @@
       "dungeonnowloading:item/soul_scorcher/soul_scorcher_unstable"
     ]
   },
+  "fairkeeper_serpent_caller_activated": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_serpent_caller_activated",
+    "sounds": [
+      "dungeonnowloading:entity/fairkeeper_serpent_caller/fairkeeper_serpent_caller_activated"
+    ]
+  },
   "repulsor_barrier_build": {
     "subtitle": "sounds.dungeonnowloading.repulsor_barrier_build",
     "sounds": [

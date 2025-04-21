@@ -24,6 +24,7 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> SOUL_SCORCHER_START = registerSoundEvent("soul_scorcher_start");
     public static final Supplier<SoundEvent> SOUL_SCORCHER_STOP = registerSoundEvent("soul_scorcher_stop");
     public static final Supplier<SoundEvent> SOUL_SCORCHER_UNSTABLE = registerSoundEvent("soul_scorcher_unstable");
+    public static final Supplier<SoundEvent> FAIRKEEPER_SERPENT_CALLER_ACTIVATED = registerSoundEvent("fairkeeper_serpent_caller_activated");
     public static final Supplier<SoundEvent> REPULSOR_BARRIER_BUILD = registerSoundEvent("repulsor_barrier_build");
     public static final Supplier<SoundEvent> REPULSOR_FIZZLE = registerSoundEvent("repulsor_fizzle");
     public static final Supplier<SoundEvent> REPULSOR_ALERT = registerSoundEvent("repulsor_alert");

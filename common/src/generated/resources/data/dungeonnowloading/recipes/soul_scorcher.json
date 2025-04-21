@@ -3,22 +3,28 @@
   "category": "equipment",
   "key": {
     "b": {
-      "item": "minecraft:bone"
+      "item": "minecraft:blast_furnace"
+    },
+    "c": {
+      "item": "dungeonnowloading:combustion_cell"
+    },
+    "f": {
+      "item": "minecraft:soul_sand"
     },
     "l": {
       "item": "minecraft:lever"
     },
     "r": {
-      "item": "dungeonnowloading:redstone_core"
+      "item": "dungeonnowloading:redstone_suppressor"
     },
     "s": {
       "item": "minecraft:cobblestone"
     }
   },
   "pattern": [
-    "sbb",
-    " sr",
-    "sl "
+    "lrf",
+    "scr",
+    "bs "
   ],
   "result": {
     "item": "dungeonnowloading:soul_scorcher"
