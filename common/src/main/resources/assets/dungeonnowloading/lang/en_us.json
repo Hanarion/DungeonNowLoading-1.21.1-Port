@@ -25,6 +25,7 @@
   "item.dungeonnowloading.redstone_chip": "Redstone Chip",
   "item.dungeonnowloading.redstone_chip.tooltip": "A device rewarded for proving their wisdom",
   "item.dungeonnowloading.redstone_circuit": "Redstone Circuit",
+  "item.dungeonnowloading.combustion_cell": "Combustion Cell",
   "item.dungeonnowloading.vertex_bow": "Vertex Bow",
   "item.dungeonnowloading.vertex_bow.tooltip.ability_name": "Arrow Conversion",
   "item.dungeonnowloading.vertex_bow.tooltip.ability_description": "Can convert Arrow to Vertex Arrow upon fully charging",

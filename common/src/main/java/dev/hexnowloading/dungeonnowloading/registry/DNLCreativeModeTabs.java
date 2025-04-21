@@ -32,6 +32,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.REDSTONE_SUPPRESSOR.get());
                 output.accept(DNLItems.REDSTONE_CIRCUIT.get());
                 output.accept(DNLItems.REDSTONE_CORE.get());
+                output.accept(DNLItems.COMBUSTION_CELL.get());
                 // Items - Combat (Boss Item, then non-boss Item order)
                 output.accept(DNLItems.SCEPTER_OF_SEALED_CHAOS.get());
                 output.accept(DNLItems.LIFE_STEALER.get());

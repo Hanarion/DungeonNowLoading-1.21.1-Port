@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 public class RepulsorEntity extends Mob {
+
     public enum State {
         SETUP,
         IDLE,

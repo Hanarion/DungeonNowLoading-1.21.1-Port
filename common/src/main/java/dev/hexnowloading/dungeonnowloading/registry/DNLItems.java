@@ -27,9 +27,9 @@ public class DNLItems {
     public static final Supplier<Item> EYE_OF_THE_STORM = register("eye_of_the_storm", () -> new Item(new Item.Properties()));
     public static final Supplier<Item> REDSTONE_CHIP = register("redstone_chip", () -> new ToolTipItem(new Item.Properties(), "item.dungeonnowloading.redstone_chip.tooltip"));
     public static final Supplier<Item> REDSTONE_SUPPRESSOR = register("redstone_suppressor", () -> new ToolTipItem(new Item.Properties(), "item.dungeonnowloading.redstone_suppressor.tooltip"));
-    public static final Supplier<Item> REDSTONE_CIRCUIT = register("redstone_circuit", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-    public static final Supplier<Item> REDSTONE_CORE = register("redstone_core", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-
+    public static final Supplier<Item> REDSTONE_CIRCUIT = register("redstone_circuit", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final Supplier<Item> REDSTONE_CORE = register("redstone_core", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final Supplier<Item> COMBUSTION_CELL = register("combustion_cell", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
 
     // ITEMS - FUNCTIONAL
     public static final Supplier<Item> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> new GreatExperienceBottleItem(new Item.Properties().rarity(Rarity.RARE), 100));
