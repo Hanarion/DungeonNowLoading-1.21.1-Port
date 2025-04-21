@@ -121,6 +121,8 @@ public class RedstoneLaneBlock extends DirectionalBlock {
         if (blockState.getValue(REDSTONE_LANE_MODE) == RedstoneLaneMode.UNPOWERED) {
             if (level.getBlockState(neighbourBlock).is(Blocks.REDSTONE_BLOCK)) {
                 neighbourChangedRedstoneBlock(blockState, level, blockPos, block, neighbourBlock);
+            } else if (level.getBlockState(neighbourBlock).is(DNLBlocks.REDSTONE_IDOL.get())) {
+                neighbourChangedRedstoneIdolBlock(blockState, level, blockPos, block, neighbourBlock);
             } else if (level.getBlockState(neighbourBlock).is(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get())) {
                 neighbourChangedOverpoweredBlock(blockState, level, blockPos, block, neighbourBlock);
             } else if (
@@ -155,8 +157,7 @@ public class RedstoneLaneBlock extends DirectionalBlock {
 
         boolean hasMagmaBlock = !neighborLaneBlockPosList.stream().filter(b -> level.getBlockState(b).is(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get())).toList().isEmpty();
 
-
-        if (hasRedstoneBlock || level.getBlockState(blockPos.above()).is(Blocks.REDSTONE_BLOCK)) {
+        if (hasRedstoneBlock || level.getBlockState(blockPos.above()).is(Blocks.REDSTONE_BLOCK) || level.getBlockState(blockPos.above()).is(DNLBlocks.REDSTONE_IDOL.get())) {
 
             power = 150;
 
@@ -202,6 +203,30 @@ public class RedstoneLaneBlock extends DirectionalBlock {
     }
 
     private void neighbourChangedRedstoneBlock(BlockState blockState, Level level, BlockPos blockPos, Block block, BlockPos neighbourBlock) {
+
+        List<BlockPos> neighborBlockPosList = getConnectionBlockPos(blockPos, blockState);
+
+        neighborBlockPosList.add(blockPos.above());
+
+        boolean isRedstoneBlock = false;
+
+        for (BlockPos pos : neighborBlockPosList) {
+            isRedstoneBlock = pos.equals(neighbourBlock);
+            if (isRedstoneBlock) break;
+        }
+
+        if (!isRedstoneBlock) return;
+
+        level.setBlock(blockPos, blockState.setValue(DNLProperties.REDSTONE_LANE_MODE, RedstoneLaneMode.POWERED).setValue(DNLProperties.REDSTONE_LANE_POWER, 150), 2);
+
+        poweredParticle(level, blockState, blockPos);
+
+        level.neighborChanged(blockPos.above(), this, blockPos);
+
+        updateConnectedNeighborsWithExcluded(level, blockState, blockPos, neighbourBlock);
+    }
+
+    private void neighbourChangedRedstoneIdolBlock(BlockState blockState, Level level, BlockPos blockPos, Block block, BlockPos neighbourBlock) {
 
         List<BlockPos> neighborBlockPosList = getConnectionBlockPos(blockPos, blockState);
 

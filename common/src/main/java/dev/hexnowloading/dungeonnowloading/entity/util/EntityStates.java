@@ -11,7 +11,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 
 public class EntityStates {
     public static final EntityDataSerializer<ChaosSpawnerEntity.State> CHAOS_SPAWNER_STATE;
-    public static final EntityDataSerializer<FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerState> FAIRKEEPER_SERPENT_CALLER_STATE;
+    public static final EntityDataSerializer<FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState> FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperBorosEntity.FairkeeperBorosState> FAIRKEEPER_BOROS_STATE;
     public static final EntityDataSerializer<FairkeeperBorosEntity.FairkeeperBorosAnimationState> FAIRKEEPER_BOROS_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperOurosEntity.FairkeeperOurosState> FAIRKEEPER_OUROS_STATE;
@@ -26,7 +26,7 @@ public class EntityStates {
 
     static {
         CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
-        FAIRKEEPER_SERPENT_CALLER_STATE = EntityDataSerializer.simpleEnum(FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerState.class);
+        FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState.class);
         FAIRKEEPER_BOROS_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosState.class);
         FAIRKEEPER_BOROS_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosAnimationState.class);
         FAIRKEEPER_OUROS_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosEntity.FairkeeperOurosState.class);
@@ -40,7 +40,7 @@ public class EntityStates {
         COMMAND_PYLON_STATE = EntityDataSerializer.simpleEnum(RepulsorEntity.State.class);
 
         EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
-        EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_STATE);
+        EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_STATE);

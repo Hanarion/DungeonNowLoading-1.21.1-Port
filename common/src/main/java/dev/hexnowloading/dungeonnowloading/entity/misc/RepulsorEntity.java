@@ -24,9 +24,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ThrownPotion;
-import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.entity.projectile.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
@@ -232,7 +230,7 @@ public class RepulsorEntity extends Mob {
                     boolean discardEntity = false;
                     boolean aboveHalfHealth = this.entityData.get(DATA_SHIELD_HEALTH) > SHIELD_ALERT_THRESHOLD;
                     if (entity instanceof ThrownTrident thrownTrident) {
-                        if (!processedTridents.contains(thrownTrident)) {
+                        if (!processedTridents.contains(thrownTrident) && !thrownTrident.inGround) {
                             processedTridents.add(thrownTrident);
 
                             Vec3 motion = thrownTrident.getDeltaMovement();
@@ -262,6 +260,8 @@ public class RepulsorEntity extends Mob {
                         int i = potion.hasInstantEffects() ? 2007 : 2002;
                         this.level().levelEvent(i, thrownPotion.blockPosition(), PotionUtils.getColor(itemStack));
                         discardEntity = true;
+                    } else if (entity instanceof AbstractArrow arrow && arrow.inGround) {
+                        continue;
                     } else {
                         discardEntity = true;
                     }

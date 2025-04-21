@@ -8,6 +8,7 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.BossTargetSelectorGoal;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
 import dev.hexnowloading.dungeonnowloading.entity.util.WeightBaseMoveSet;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
@@ -28,6 +29,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -52,12 +54,16 @@ import java.util.stream.Collectors;
 
 public class FairkeeperSerpentCallerEntity extends Entity {
 
+    private static final EntityDataAccessor<FairkeeperSerpentCallerAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(FairkeeperSerpentCallerEntity.class, EntityStates.FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
     private static final EntityDataAccessor<Boolean> ACTIVATED = SynchedEntityData.defineId(FairkeeperSerpentCallerEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Optional<UUID>> BOROS_UUID = SynchedEntityData.defineId(FairkeeperSerpentCallerEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Optional<UUID>> OUROS_UUID = SynchedEntityData.defineId(FairkeeperSerpentCallerEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Integer> HORIZONTAL_OFFSET = SynchedEntityData.defineId(FairkeeperSerpentCallerEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> VERTICAL_OFFSET = SynchedEntityData.defineId(FairkeeperSerpentCallerEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> PHASE = SynchedEntityData.defineId(FairkeeperSerpentCallerEntity.class, EntityDataSerializers.INT);
+
+    public final AnimationState idleAnimationState = new AnimationState();
+    public final AnimationState activeAnimationState = new AnimationState();
 
     private static final int SPAWN_OFFSET_X = 20;
     private static final int SPAWN_OFFSET_Y = 15;
@@ -86,7 +92,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private WeightBaseMoveSet<FairkeeperBorosEntity.FairkeeperBorosState> borosArrowMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<FairkeeperBorosEntity.FairkeeperBorosState> borosPursueMoveSet = new WeightBaseMoveSet<>();
 
-
     public FairkeeperSerpentCallerEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.playerUUIDs = new HashSet<>();
@@ -95,6 +100,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     @Override
     protected void defineSynchedData() {
+        this.entityData.define(ANIMATION_STATE, FairkeeperSerpentCallerAnimationState.NONE);
         this.entityData.define(ACTIVATED, false);
         this.entityData.define(BOROS_UUID, Optional.empty());
         this.entityData.define(OUROS_UUID, Optional.empty());
@@ -153,6 +159,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.clearAllMoveSet();
         this.setActivated(true);
         this.setOffsets(SPAWN_OFFSET_X, SPAWN_OFFSET_Y);
+        this.transitionTo(FairkeeperSerpentCallerAnimationState.ACTIVE);
         AABB bossArena = new AABB(this.blockPosition()).inflate(ARENA_SIZE);
         List<ServerPlayer> players = this.level().getEntitiesOfClass(ServerPlayer.class, bossArena);
         for (ServerPlayer p : players) {
@@ -175,6 +182,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             if (entity instanceof FairkeeperOurosEntity ourosEntity) {
                 this.ouros = ourosEntity;
                 this.pendingOurosUUID = null;
+            }
+        }
+        if (!this.level().isClientSide) {
+            if (this.entityData.get(ANIMATION_STATE) == FairkeeperSerpentCallerAnimationState.NONE) {
+                this.transitionTo(FairkeeperSerpentCallerAnimationState.IDLE);
+                System.out.println("IDLE");
             }
         }
         if (this.isActivated() && !this.level().isClientSide) {
@@ -386,7 +399,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private void commandBorosPhase3() {
 
     }
-
 
     private void commandOurosPhase3() {
         if (this.ourosMoveSet.isEmpty()) {
@@ -675,7 +687,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         }
     }
 
-
     private void resetBosses() {
         FairkeeperBorosEntity boros = (FairkeeperBorosEntity) this.getBoros();
         FairkeeperOurosEntity ouros = (FairkeeperOurosEntity) this.getOuros();
@@ -686,6 +697,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ouros.resetBoss();
         }
         this.setActivated(false);
+        this.entityData.set(ANIMATION_STATE, FairkeeperSerpentCallerAnimationState.IDLE);
         this.setPhase(0);
         this.activationTick = 0;
         this.playerUUIDs.clear();
@@ -805,6 +817,25 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             EntityScale.scaleBossAttack(ouros, playerCount);
             this.ouros = ouros;
         }
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            FairkeeperSerpentCallerAnimationState animationState = this.entityData.get(ANIMATION_STATE);
+            switch (animationState) {
+                case IDLE -> this.idleAnimationState.startIfStopped(this.tickCount);
+                case ACTIVE -> {
+                    this.activeAnimationState.stop();
+                    this.activeAnimationState.start(this.tickCount);
+                }
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    public void transitionTo(FairkeeperSerpentCallerAnimationState state) {
+        this.entityData.set(ANIMATION_STATE, state);
     }
 
     @Override
@@ -929,9 +960,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 .collect(Collectors.toSet());
     }
 
-    public enum FairkeeperSerpentCallerState {
-        ;
-
-        private FairkeeperSerpentCallerState() {}
+    public enum FairkeeperSerpentCallerAnimationState {
+        NONE,
+        IDLE,
+        ACTIVE
     }
 }

@@ -71,7 +71,8 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.BALLISTA_GOLEM_STATUE.get(),
                 DNLBlocks.BALLISTA_GOLEM_STATUE_PART.get(),
                 DNLBlocks.VERTEX_PILLAR.get(),
-                DNLBlocks.STONE_PRESERVER.get()
+                DNLBlocks.STONE_PRESERVER.get(),
+                DNLBlocks.REDSTONE_IDOL.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(

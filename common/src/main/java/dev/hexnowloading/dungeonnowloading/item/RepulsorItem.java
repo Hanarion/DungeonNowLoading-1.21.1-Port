@@ -104,6 +104,8 @@ public class RepulsorItem extends Item{
             components.add(CommonComponents.EMPTY);
             components.add(Component.translatable("item.dungeonnowloading.repulsor.tooltip.right_click").withStyle(ChatFormatting.GRAY));
             components.add(Component.translatable("item.dungeonnowloading.repulsor.tooltip.right_click.description").withStyle(ChatFormatting.DARK_GREEN));
-        }
+            components.add(CommonComponents.EMPTY);
+            components.add(Component.translatable("item.dungeonnowloading.repulsor.tooltip.right_click_with_redstone_dust").withStyle(ChatFormatting.GRAY));
+            components.add(Component.translatable("item.dungeonnowloading.repulsor.tooltip.right_click_with_redstone_dust.description").withStyle(ChatFormatting.DARK_GREEN));}
     }
 }

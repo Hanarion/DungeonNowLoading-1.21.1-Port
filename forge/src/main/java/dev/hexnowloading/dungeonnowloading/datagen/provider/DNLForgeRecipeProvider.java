@@ -253,7 +253,7 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .define('r', DNLItems.REDSTONE_CORE.get())
                 .unlockedBy("has_redstone_circuit_or_core", has(DNLTags.REDSTONE_CIRCUIT_OR_CORE))
                 .save(consumer);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, DNLItems.REDSTONE_CATALYST.get(), 1)
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, DNLItems.REDSTONE_IDOL.get(), 1)
                 .pattern("ara")
                 .pattern("rrr")
                 .pattern("brb")

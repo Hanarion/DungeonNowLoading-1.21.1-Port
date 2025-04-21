@@ -87,6 +87,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.add(DNLBlocks.BALLISTA_GOLEM_STATUE.get(), createSilkTouchOnlyTable(DNLItems.BALLISTA_GOLEM_STATUE.get()));
         this.add(DNLBlocks.BALLISTA_GOLEM_STATUE_PART.get(), createSilkTouchOnlyTable(DNLItems.BALLISTA_GOLEM_STATUE.get()));
         this.add(DNLBlocks.SCUTTLE_STATUE.get(), createSilkTouchOnlyTable(DNLItems.SCUTTLE_STATUE.get()));
+        this.add(DNLBlocks.REDSTONE_IDOL.get(), block -> createSingleItemTable(DNLItems.REDSTONE_IDOL.get()));
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {

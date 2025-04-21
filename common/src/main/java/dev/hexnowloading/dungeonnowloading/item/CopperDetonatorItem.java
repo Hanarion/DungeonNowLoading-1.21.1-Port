@@ -137,6 +137,9 @@ public class CopperDetonatorItem extends Item {
             components.add(CommonComponents.EMPTY);
             components.add(Component.translatable("item.dungeonnowloading.copper_detonator.tooltip.right_click").withStyle(ChatFormatting.GRAY));
             components.add(Component.translatable("item.dungeonnowloading.copper_detonator.tooltip.right_click.description").withStyle(ChatFormatting.DARK_GREEN));
+            components.add(CommonComponents.EMPTY);
+            components.add(Component.translatable("item.dungeonnowloading.copper_detonator.tooltip.hold_right_mouse_button").withStyle(ChatFormatting.GRAY));
+            components.add(Component.translatable("item.dungeonnowloading.copper_detonator.tooltip.hold_right_mouse_button.description").withStyle(ChatFormatting.DARK_GREEN));
         }
     }
 }

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "dungeonnowloading:block/redstone_idol" },
+    "facing=south": { "model": "dungeonnowloading:block/redstone_idol", "y": 180 },
+    "facing=west": { "model": "dungeonnowloading:block/redstone_idol", "y": 270 },
+    "facing=east": { "model": "dungeonnowloading:block/redstone_idol", "y": 90 }
+  }
+}

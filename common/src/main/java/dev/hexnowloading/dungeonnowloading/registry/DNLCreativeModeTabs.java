@@ -49,7 +49,7 @@ public class DNLCreativeModeTabs {
                 // Items - Boss Related
                 output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
                 output.accept(DNLItems.SKULL_OF_CHAOS.get());
-                output.accept(DNLItems.REDSTONE_CATALYST.get());
+                output.accept(DNLItems.REDSTONE_IDOL.get());
                 output.accept(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
 
                 // Blocks
