@@ -453,6 +453,47 @@
       "dungeonnowloading:mob/copper_creep/copper_detonator_ready_1"
     ]
   },
+  "ballista_golem_death": {
+    "subtitle": "sounds.dungeonnowloading.ballista_golem_death",
+    "sounds": [
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_death_0",
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_death_1"
+    ]
+  },
+  "ballista_golem_hurt": {
+    "subtitle": "sounds.dungeonnowloading.ballista_golem_hurt",
+    "sounds": [
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_hurt_0",
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_hurt_1",
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_hurt_2"
+    ]
+  },
+  "ballista_golem_reload": {
+    "subtitle": "sounds.dungeonnowloading.ballista_golem_reload",
+    "sounds": [
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_reload"
+    ]
+  },
+  "ballista_golem_shoot": {
+    "subtitle": "sounds.dungeonnowloading.ballista_golem_shoot",
+    "sounds": [
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_shoot"
+    ]
+  },
+  "ballista_golem_step": {
+    "subtitle": "sounds.dungeonnowloading.ballista_golem_step",
+    "sounds": [
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_step_0",
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_step_1",
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_step_2"
+    ]
+  },
+  "ballista_golem_waking": {
+    "subtitle": "sounds.dungeonnowloading.ballista_golem_waking",
+    "sounds": [
+      "dungeonnowloading:mob/ballista_golem/ballista_golem_waking"
+    ]
+  },
   "fairkeeper_boros_beam": {
     "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_beam",
     "sounds": [

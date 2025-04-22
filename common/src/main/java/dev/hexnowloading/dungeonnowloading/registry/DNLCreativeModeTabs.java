@@ -33,6 +33,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.REDSTONE_CIRCUIT.get());
                 output.accept(DNLItems.REDSTONE_CORE.get());
                 output.accept(DNLItems.COMBUSTION_CELL.get());
+                output.accept(DNLItems.CATALYZED_REDSTONE.get());
                 // Items - Combat (Boss Item, then non-boss Item order)
                 output.accept(DNLItems.SCEPTER_OF_SEALED_CHAOS.get());
                 output.accept(DNLItems.LIFE_STEALER.get());
@@ -52,6 +53,11 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SKULL_OF_CHAOS.get());
                 output.accept(DNLItems.REDSTONE_IDOL.get());
                 output.accept(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
+                // Item - Music Disc
+                output.accept(DNLItems.MUSIC_DISC_OUROS.get());
+                output.accept(DNLItems.MUSIC_DISC_BORUS.get());
+                output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
+
 
                 // Blocks
 

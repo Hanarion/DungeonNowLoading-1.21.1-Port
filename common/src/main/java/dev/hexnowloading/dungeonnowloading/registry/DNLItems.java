@@ -30,6 +30,7 @@ public class DNLItems {
     public static final Supplier<Item> REDSTONE_CIRCUIT = register("redstone_circuit", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final Supplier<Item> REDSTONE_CORE = register("redstone_core", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final Supplier<Item> COMBUSTION_CELL = register("combustion_cell", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Supplier<Item> CATALYZED_REDSTONE = register("catalyzed_redstone", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
 
     // ITEMS - FUNCTIONAL
     public static final Supplier<Item> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> new GreatExperienceBottleItem(new Item.Properties().rarity(Rarity.RARE), 100));
@@ -48,6 +49,11 @@ public class DNLItems {
     public static final Supplier<Item> SCORCHER = register("scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
+
+    // ITEMS - MUSIC DISC
+    public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_ouros", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Supplier<Item> MUSIC_DISC_BORUS = register("music_disc_borus", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Supplier<Item> MUSIC_DISC_PYTHONIC_OVERDRIVE = register("music_disc_pythonic_overdrive", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
 
     // BLOCKS
     //public static final Supplier<Item> SKYLIGHT_STONE = register("skylight_stone", () -> new BlockItem(DNLBlocks.SKYLIGHT_STONE.get(), new Item.Properties()));

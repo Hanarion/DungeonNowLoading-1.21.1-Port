@@ -205,13 +205,14 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .save(consumer);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, DNLItems.VERTEX_BOW.get(), 1)
                 .pattern("cts")
-                .pattern("t r")
+                .pattern("a r")
                 .pattern("cts")
-                .define('c', DNLItems.REDSTONE_CIRCUIT.get())
+                .define('a', DNLItems.CATALYZED_REDSTONE.get())
+                .define('c', DNLItems.REDSTONE_CHIP.get())
                 .define('s', Items.STRING)
                 .define('t', Items.STICK)
                 .define('r', Items.REDSTONE)
-                .unlockedBy("has_redstone_circuit", has(DNLItems.REDSTONE_CIRCUIT.get()))
+                .unlockedBy("has_redstone_circuit", has(DNLItems.CATALYZED_REDSTONE.get()))
                 .save(consumer);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, DNLItems.SCORCHER.get(), 1)
                 .pattern("lrf")

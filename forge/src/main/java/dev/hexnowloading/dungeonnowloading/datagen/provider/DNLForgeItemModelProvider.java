@@ -31,8 +31,12 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.REDSTONE_CHIP.get());
         simpleItem(DNLItems.REDSTONE_CIRCUIT.get());
         simpleItem(DNLItems.COMBUSTION_CELL.get());
+        simpleItem(DNLItems.CATALYZED_REDSTONE.get());
         simpleItem(DNLItems.REDSTONE_IDOL.get());
         simpleItem(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
+        simpleItem(DNLItems.MUSIC_DISC_OUROS.get());
+        simpleItem(DNLItems.MUSIC_DISC_BORUS.get());
+        simpleItem(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
         //simpleItem(DNLItems.COPPER_DETONATOR.get());
         simpleItem(DNLItems.REPULSOR.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());

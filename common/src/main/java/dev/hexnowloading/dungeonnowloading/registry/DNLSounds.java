@@ -64,6 +64,12 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> SCUTTLE_DEFLECT = registerSoundEvent("scuttle_deflect");
     public static final Supplier<SoundEvent> SCUTTLE_HURT = registerSoundEvent("scuttle_hurt");
     public static final Supplier<SoundEvent> SCUTTLE_DEATH = registerSoundEvent("scuttle_death");
+    public static final Supplier<SoundEvent> BALLISTA_GOLEM_DEATH = registerSoundEvent("ballista_golem_death");
+    public static final Supplier<SoundEvent> BALLISTA_GOLEM_HURT = registerSoundEvent("ballista_golem_hurt");
+    public static final Supplier<SoundEvent> BALLISTA_GOLEM_SHOOT = registerSoundEvent("ballista_golem_shoot");
+    public static final Supplier<SoundEvent> BALLISTA_GOLEM_RELOAD = registerSoundEvent("ballista_golem_reload");
+    public static final Supplier<SoundEvent> BALLISTA_GOLEM_STEP = registerSoundEvent("ballista_golem_step");
+    public static final Supplier<SoundEvent> BALLISTA_GOLEM_WAKING = registerSoundEvent("ballista_golem_waking");
     public static final Supplier<SoundEvent> COPPER_CREEP_DEATH = registerSoundEvent("copper_creep_death");
     public static final Supplier<SoundEvent> COPPER_CREEP_HIT = registerSoundEvent("copper_creep_hit");
     public static final Supplier<SoundEvent> COPPER_CREEP_LAND = registerSoundEvent("copper_creep_land");

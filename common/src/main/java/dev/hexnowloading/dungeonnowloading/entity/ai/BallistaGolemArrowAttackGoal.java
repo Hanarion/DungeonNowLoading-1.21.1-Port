@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.BallistaArrowEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -52,6 +53,7 @@ public class BallistaGolemArrowAttackGoal extends Goal {
         this.ballistaGolemEntity.setState(BallistaGolemEntity.BallistaGolemState.SHOOT);
         this.ballistaGolemEntity.triggerShootAnimation();
         this.attackTicks = reducedTickDelay(69);
+        this.ballistaGolemEntity.playSound(DNLSounds.BALLISTA_GOLEM_SHOOT.get(), 1.5F, 1.0F);
     }
 
     @Override

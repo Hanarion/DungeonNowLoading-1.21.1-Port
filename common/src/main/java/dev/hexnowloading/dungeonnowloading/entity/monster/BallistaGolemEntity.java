@@ -8,11 +8,18 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.BallistaGolemM
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.pathfinding.BallistaGolemPathNavigation;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -28,6 +35,9 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.AABB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEntity {
 
@@ -114,6 +124,9 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
             this.aiTick = 153;
         }
         if (this.isState(BallistaGolemState.AWAKENING)) {
+            if (aiTick == 153 - 6) {
+                this.playBallsitaGolemSound(DNLSounds.BALLISTA_GOLEM_WAKING.get());
+            }
             if (aiTick > 0) {
                 aiTick--;
             } else {
@@ -183,12 +196,67 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
         }
     }
 
+    public void playBallsitaGolemSound(SoundEvent soundEvent) {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), soundEvent.getLocation(), true), player);
+        }
+    }
+
+    public void stopBallsitaGolemSounds() {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        List<ResourceLocation> soundsToStop = new ArrayList<>(List.of());
+        soundsToStop.add(DNLSounds.BALLISTA_GOLEM_WAKING.get().getLocation());
+        soundsToStop.add(DNLSounds.BALLISTA_GOLEM_RELOAD.get().getLocation());
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), soundsToStop), player);
+        }
+    }
+
+    @Override
+    protected float nextStep() {
+        return this.moveDist + 0.85F;
+    }
+
+    @Override
+    protected void playStepSound(BlockPos $$0, BlockState $$1) {
+        this.playSound(DNLSounds.BALLISTA_GOLEM_STEP.get(), 1.5F, 1.0F);
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return DNLSounds.BALLISTA_GOLEM_DEATH.get();
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource $$0) {
+        return DNLSounds.BALLISTA_GOLEM_HURT.get();
+    }
+
     @Override
     public boolean hurt(DamageSource damageSource, float amount) {
         if (damageSource.getDirectEntity() instanceof AbstractArrow) {
             return false;
         }
         return super.hurt(damageSource, amount);
+    }
+
+    @Override
+    public void die(DamageSource damageSource) {
+        super.die(damageSource);
+        if (!this.level().isClientSide) {
+            this.stopBallsitaGolemSounds();
+        }
     }
 
     @Override

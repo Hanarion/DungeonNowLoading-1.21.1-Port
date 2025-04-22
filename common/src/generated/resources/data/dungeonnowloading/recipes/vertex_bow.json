@@ -2,8 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
+    "a": {
+      "item": "dungeonnowloading:catalyzed_redstone"
+    },
     "c": {
-      "item": "dungeonnowloading:redstone_circuit"
+      "item": "dungeonnowloading:redstone_chip"
     },
     "r": {
       "item": "minecraft:redstone"
@@ -17,7 +20,7 @@
   },
   "pattern": [
     "cts",
-    "t r",
+    "a r",
     "cts"
   ],
   "result": {

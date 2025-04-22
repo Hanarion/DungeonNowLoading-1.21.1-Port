@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
@@ -34,8 +35,9 @@ public class BallistaGolemReloadGoal extends Goal {
     @Override
     public void start() {
         this.ballistaGolemEntity.setState(BallistaGolemEntity.BallistaGolemState.RELOAD);
-        this.ballistaGolemEntity.triggerReloadAnimation();
         this.attackTicks = reducedTickDelay(200);
+        this.ballistaGolemEntity.triggerReloadAnimation();
+        //this.ballistaGolemEntity.playSound(DNLSounds.BALLISTA_GOLEM_RELOAD.get(), 1.5F, 1.0F);
     }
 
     @Override
@@ -52,6 +54,9 @@ public class BallistaGolemReloadGoal extends Goal {
             this.ballistaGolemEntity.triggerIdleAnimation();
             this.nextScanTick = this.nextCooldownStartTick();
             return;
+        }
+        if (this.attackTicks == reducedTickDelay(200 - 10)) {
+            this.ballistaGolemEntity.playBallsitaGolemSound(DNLSounds.BALLISTA_GOLEM_RELOAD.get());
         }
         if (this.attackTicks == reducedTickDelay(200 - 180)) {
             this.ballistaGolemEntity.setBallistaArrowCount(6);
