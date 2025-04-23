@@ -79,7 +79,7 @@ public class FairkeeperOurosShootVertexOrbGoal extends StoppableGoal {
 
     private void randomCurrentPart() {
         RandomSource randomSource = this.ouros.getRandom();
-        int randomIndex = randomSource.nextInt(13) + 1;
+        int randomIndex = randomSource.nextInt(12) + 1;
         this.currentPart = (FairkeeperOurosPartEntity) this.ouros.getChild();
         for (int i = 0; i < randomIndex; i++) {
             this.currentPart = (FairkeeperOurosPartEntity) this.currentPart.getChild();

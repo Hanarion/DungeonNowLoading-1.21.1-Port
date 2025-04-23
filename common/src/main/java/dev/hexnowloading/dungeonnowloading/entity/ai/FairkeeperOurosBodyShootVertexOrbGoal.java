@@ -4,7 +4,10 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperOurosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -70,6 +73,7 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
     public void stop() {
         this.part.setState(FairkeeperOurosPartEntity.FairkeeperOurosPartState.IDLE);
         this.part.setInaccuracy(0.0F);
+        this.part.setCancelShooting(false);
         this.part.setShootingTarget(null);
     }
 
@@ -80,7 +84,12 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
             this.part.playCannonSetupAnimation(() -> this.progress++);
         } else if (this.progress == 2) {
             this.part.aimCannonAtPlayer(this.part.getShootingTarget());
-            if (this.attackTicks-- <= 0) {
+            if (this.part.isCancelShooting()) {
+                this.ouros.level().playSound(null, this.part.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.ouros.level().random.nextFloat() - this.ouros.level().random.nextFloat()) * 0.2f) * 0.7f);
+                ((ServerLevel) (this.ouros.level())).sendParticles(ParticleTypes.EXPLOSION, this.part.getX(), this.part.getY(), this.part.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+                this.part.playCannonCancelAnimation(this::stopGoal);
+                this.progress += 2;
+            } else if (this.attackTicks-- <= 0) {
                 shootRandomPlayer();
             }
         } else if (this.progress == 3) {

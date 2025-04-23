@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import com.mojang.logging.LogUtils;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperBorosAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
@@ -29,10 +30,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.AnimationState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
@@ -40,13 +38,16 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.*;
 
 public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, WeightedTargetProvider {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final EntityDataAccessor<FairkeeperBorosState> STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_BOROS_STATE);
     private static final EntityDataAccessor<FairkeeperBorosAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityStates.FAIRKEEPER_BOROS_ANIMATION_STATE);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperBorosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -68,12 +69,14 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private int attackTick;
     private int stuckTick;
+    private int partIndex;
     private float previousTilt = 0.0f;
     private float armorHealth;
     private boolean targetRandomPlayer;
     private boolean damageFromOtherSegment;
     private boolean canDestroyBlocks;
     private boolean changeTarget;
+    private DamageSource killedDamageSource;
     private AnimationChainer<FairkeeperBorosAnimationState> animationChainer = new AnimationChainer<>();
 
     private final ServerBossEvent bossEvent;
@@ -200,7 +203,6 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     public void tick() {
         super.tick();
-        this.segmentControl();
         this.animationControl();
     }
 
@@ -239,6 +241,11 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds()));
     }
 
+    private void playDeathAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.MOUTH_OPENED, 0));
+    }
+
     private void segmentControl() {
         if (!this.level().isClientSide) {
             Entity child = getChild();
@@ -251,7 +258,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                     this.positionHistory.addLast(currentPos);
                 }
             }
-            if (child == null) {
+            if (child == null && !this.isDeadOrDying()) {
                 LivingEntity partParent = this;
                 int segments = SEGMENT_COUNT;
                 for (int i = 0; i < segments; i++) {
@@ -337,6 +344,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void customServerAiStep() {
         if (this.isState(FairkeeperBorosState.AWAKENING)) this.enableBossBar();
+        this.segmentControl();
         this.findCaller();
         this.performContactDamage();
         this.abilityCooldown();
@@ -495,12 +503,94 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
+    protected void tickDeath() {
+        ++this.deathTime;
+        if (this.deathTime == 1) {
+            this.partIndex = 0;
+            if (!this.level().isClientSide) {
+                this.playDeathAnimation();
+                for (int i = 0; i <= 13; i++) {
+                    FairkeeperBorosPartEntity part = this.getPart(i);
+                    if (part != null) {
+                        part.setHealth(0.0F);
+                    }
+                }
+            }
+        }
+        if (this.deathTime % 10 == 0) {
+            if (partIndex <= 13) {
+                if (!this.level().isClientSide) {
+                    FairkeeperBorosPartEntity part = this.getPart(13 - this.partIndex);
+                    if (part != null) {
+                        this.level().playSound(null, part.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+                        ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, part.getX(), part.getY(), part.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+                        part.remove(RemovalReason.KILLED);
+                    }
+                }
+            } else {
+                if (!this.level().isClientSide) {
+                    this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+                    ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+                }
+                Level level = this.level();
+                Entity entity = killedDamageSource.getEntity();
+                LivingEntity livingEntity = this.getKillCredit();
+                if (this.deathScore >= 0 && livingEntity != null) {
+                    livingEntity.awardKillScore(this, this.deathScore, this.killedDamageSource);
+                }
+                if (level instanceof ServerLevel) {
+                    ServerLevel serverLevel = (ServerLevel)level;
+                    if (entity == null || entity.killedEntity(serverLevel, this)) {
+                        this.dropAllDeathLoot(killedDamageSource);
+                        this.createWitherRose(livingEntity);
+                    }
+                    this.level().broadcastEntityEvent(this, (byte)3);
+                }
+                this.level().broadcastEntityEvent(this, (byte)60);
+                this.remove(Entity.RemovalReason.KILLED);
+            }
+            this.partIndex++;
+        }
+    }
+
+    private FairkeeperBorosPartEntity getPart(int index) {
+        FairkeeperBorosPartEntity part = (FairkeeperBorosPartEntity) this.getChild();
+        if (part == null) return null;
+        for (int i = 0; i < index; i++) {
+            part = (FairkeeperBorosPartEntity) part.getChild();
+            if (part == null) return null;
+        }
+        return part;
+    }
+
+    @Override
     public void die(DamageSource damageSource) {
         FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.getCaller();
         if (caller != null) {
             caller.setLastDamageSource(damageSource);
         }
-        super.die(damageSource);
+        if (this.isRemoved() || this.dead) {
+            return;
+        }
+        this.killedDamageSource = damageSource;
+        Entity entity = this.killedDamageSource.getEntity();
+        if (this.isSleeping()) {
+            this.stopSleeping();
+        }
+        if (!this.level().isClientSide && this.hasCustomName()) {
+            LOGGER.info("Named entity {} died: {}", (Object)this, (Object)this.getCombatTracker().getDeathMessage().getString());
+        }
+        Level level = this.level();
+        if (level instanceof ServerLevel) {
+            ServerLevel serverLevel = (ServerLevel)level;
+            if (entity == null || entity.killedEntity(serverLevel, this)) {
+                this.gameEvent(GameEvent.ENTITY_DIE);
+            }
+            this.level().broadcastEntityEvent(this, (byte)3);
+        }
+        this.dead = true;
+        this.getCombatTracker().recheckStatus();
+        this.setPose(Pose.DYING);
     }
 
     @Override

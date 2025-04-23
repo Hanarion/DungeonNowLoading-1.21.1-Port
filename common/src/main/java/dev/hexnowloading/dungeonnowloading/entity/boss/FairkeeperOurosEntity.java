@@ -1,18 +1,18 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import com.mojang.logging.LogUtils;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.FairkeeperOurosMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperOurosAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
-import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.WeightedTargetProvider;
+import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import dev.hexnowloading.dungeonnowloading.util.NbtHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -22,6 +22,8 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
@@ -43,11 +45,13 @@ import net.minecraft.world.level.block.PowderSnowBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.*;
 
 public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, SlumberingEntity, FairkeeperSerpentEntity, WeightedTargetProvider {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final EntityDataAccessor<FairkeeperOurosState> STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_STATE);
     private static final EntityDataAccessor<FairkeeperOurosAnimationState> OUROS_ANIMATION_STATE = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityStates.FAIRKEEPER_OUROS_ANIMATION_STATE);
     private static final EntityDataAccessor<Optional<UUID>> CHILD_UUID = SynchedEntityData.defineId(FairkeeperOurosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -68,10 +72,13 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private UUID callerUUID;
 
     private int attackTick;
+    private int partIndex;
     private Vec3 awakenEndPos;
     private boolean targetRandomPlayer;
     private boolean canDestroyBlocks;
     private boolean changeTarget;
+    private DamageSource killedDamageSource;
+    private AnimationChainer<FairkeeperOurosEntity.FairkeeperOurosAnimationState> animationChainer = new AnimationChainer<>();
 
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
@@ -201,84 +208,88 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     public void tick() {
         super.tick();
-        this.segmentControl();
-        this.animationControl();
+        // Animation control needs to run after tick so it animates even when the entity is dying.
+        animationControl();
     }
 
     private void animationControl() {
-        if (!this.level().isClientSide) {
-            return;
-        }
+        if (this.level().isClientSide) return;
 
-        if (this.mouthOpenAnimationTimeOut-- > 0) {
-            if (this.mouthOpenAnimationTimeOut <= 0) {
-                this.transitionTo(FairkeeperOurosAnimationState.MOUTH_OPENED);
-            }
-        }
+        animationChainer.tick(this::transitionTo);
+    }
 
-        if (this.openMouthAnimationState.isStarted() && this.mouthOpenAnimationTimeOut <= 0) {
-            this.mouthOpenAnimationTimeOut = MOUTH_OPEN_ANIMATION_DURATION;
-        }
+    public void playMouthOpen() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPEN, FairkeeperOurosAnimation.MOUTH_OPEN.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPENED, FairkeeperOurosAnimation.MOUTH_OPENED.lengthInSeconds()));
+    }
+
+    public void playMouthClose() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_CLOSE, FairkeeperOurosAnimation.MOUTH_CLOSED.lengthInSeconds()));
+    }
+
+    public void playDeathAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPENED, FairkeeperOurosAnimation.MOUTH_OPENED.lengthInSeconds()));
     }
 
     private void segmentControl() {
-        if (!this.level().isClientSide) {
-            Entity child = getChild();
-            if (positionHistory.isEmpty()) {
-                Vec3 currentPos = this.position();
+        Entity child = getChild();
+        if (positionHistory.isEmpty()) {
+            Vec3 currentPos = this.position();
 
-                int requiredHistorySize = (SEGMENT_COUNT + 1) * SEGMENT_DELAY_STEP;
+            int requiredHistorySize = (SEGMENT_COUNT + 1) * SEGMENT_DELAY_STEP;
 
-                for (int i = 0; i < requiredHistorySize; i++) {
-                    this.positionHistory.addLast(currentPos);
-                }
+            for (int i = 0; i < requiredHistorySize; i++) {
+                this.positionHistory.addLast(currentPos);
             }
-            if (child == null) {
-                LivingEntity partParent = this;
-                int segments = SEGMENT_COUNT;
-                for (int i = 0; i < segments; i++) {
-                    FairkeeperOurosPartEntity part = new FairkeeperOurosPartEntity(DNLEntityTypes.FAIRKEEPER_OUROS_PART.get(), partParent, this, i);
-                    if (partParent == this) {
-                        this.setChildId(part.getUUID());
-                    } else if (partParent instanceof FairkeeperOurosPartEntity bodyPartParent && !bodyPartParent.isTail()) {
-                        if (!bodyPartParent.isTail()) {
-                            bodyPartParent.setChildId(part.getUUID());
-                        } else {
-                            bodyPartParent.setChildId(null);
-                        }
-                    }
-                    //double offsetX = partParent.getX() - (i + 1) * 1.0; // Offset by 3 blocks for each segment
-                    part.setPos(partParent.getX(), partParent.getY(), partParent.getZ());
-                    part.setYRot(partParent.getYRot());
-                    part.yBodyRot = partParent.getYRot();
-                    part.yHeadRot = partParent.getYRot();
-                    part.setRotatable(false);
-                    partParent = part;
-                    if (i == segments - 1) {
-                        part.setTail(true);
-                    }
-                    this.level().addFreshEntity(part);
-                }
-            }
-
-            if (this.getDeltaMovement().lengthSqr() > 0.01) {
-                synchronized (positionHistory) {
-                    positionHistory.addFirst(new Vec3(this.getX(), this.getY(), this.getZ()));
-
-                    int maxHistorySize = (SEGMENT_COUNT + 1) * SEGMENT_DELAY_STEP;
-                    if (positionHistory.size() > maxHistorySize) {
-                        positionHistory.pollLast();
+        }
+        if (child == null && !this.isDeadOrDying()) {
+            LivingEntity partParent = this;
+            int segments = SEGMENT_COUNT;
+            for (int i = 0; i < segments; i++) {
+                FairkeeperOurosPartEntity part = new FairkeeperOurosPartEntity(DNLEntityTypes.FAIRKEEPER_OUROS_PART.get(), partParent, this, i);
+                if (partParent == this) {
+                    this.setChildId(part.getUUID());
+                } else if (partParent instanceof FairkeeperOurosPartEntity bodyPartParent && !bodyPartParent.isTail()) {
+                    if (!bodyPartParent.isTail()) {
+                        bodyPartParent.setChildId(part.getUUID());
+                    } else {
+                        bodyPartParent.setChildId(null);
                     }
                 }
+                //double offsetX = partParent.getX() - (i + 1) * 1.0; // Offset by 3 blocks for each segment
+                part.setPos(partParent.getX(), partParent.getY(), partParent.getZ());
+                part.setYRot(partParent.getYRot());
+                part.yBodyRot = partParent.getYRot();
+                part.yHeadRot = partParent.getYRot();
+                part.setRotatable(false);
+                partParent = part;
+                if (i == segments - 1) {
+                    part.setTail(true);
+                }
+                this.level().addFreshEntity(part);
             }
+        }
 
-            if (!this.onCieling() && this.getDeltaMovement().y > 0.0) {
-                this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.8, 1.0));
-            }
+        if (this.getDeltaMovement().lengthSqr() > 0.01) {
+            synchronized (positionHistory) {
+                positionHistory.addFirst(new Vec3(this.getX(), this.getY(), this.getZ()));
 
-            if (!this.isState(FairkeeperOurosState.AWAKENING)) {
-                this.lookTowardTarget();
+                int maxHistorySize = (SEGMENT_COUNT + 1) * SEGMENT_DELAY_STEP;
+                if (positionHistory.size() > maxHistorySize) {
+                    positionHistory.pollLast();
+                }
             }
+        }
+
+        if (!this.onCieling() && this.getDeltaMovement().y > 0.0) {
+            this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.8, 1.0));
+        }
+
+        if (!this.isState(FairkeeperOurosState.AWAKENING)) {
+            this.lookTowardTarget();
         }
     }
 
@@ -462,7 +473,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void customServerAiStep() {
         if (this.isState(FairkeeperOurosState.AWAKENING)) this.enableBossBar();
-        //this.cielingMovementCalculation();
+        this.segmentControl();
         this.findCaller();
         this.performContactDamage();
         this.abilityCooldown();
@@ -572,6 +583,51 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
         return result;
     }
+
+    @Override
+    protected void tickDeath() {
+        ++this.deathTime;
+
+        if (this.level().isClientSide) return;
+
+        if (this.deathTime == 1) {
+            this.playDeathAnimation();
+            this.partIndex = 0;
+            for (int i = 0; i <= 13; i++) {
+                FairkeeperOurosPartEntity part = this.getPart(i);
+                if (part != null) {
+                    part.setHealth(0.0F);
+                }
+            }
+        }
+        if (this.deathTime % 10 == 0) {
+            if (partIndex <= 13) {
+                FairkeeperOurosPartEntity part = this.getPart(13 - this.partIndex);
+                if (part != null) {
+                    this.level().playSound(null, part.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+                    ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, part.getX(), part.getY(), part.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+                    part.remove(RemovalReason.KILLED);
+                }
+            } else if (!this.isRemoved()) {
+                this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+                ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+                this.level().broadcastEntityEvent(this, (byte)60);
+                this.remove(Entity.RemovalReason.KILLED);
+            }
+            this.partIndex++;
+        }
+    }
+
+    private FairkeeperOurosPartEntity getPart(int index) {
+        FairkeeperOurosPartEntity part = (FairkeeperOurosPartEntity) this.getChild();
+        if (part == null) return null;
+        for (int i = 0; i < index; i++) {
+            part = (FairkeeperOurosPartEntity) part.getChild();
+            if (part == null) return null;
+        }
+        return part;
+    }
+
 
     @Override
     public void die(DamageSource damageSource) {

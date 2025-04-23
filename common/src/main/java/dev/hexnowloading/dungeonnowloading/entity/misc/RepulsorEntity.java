@@ -202,19 +202,19 @@ public class RepulsorEntity extends Mob {
     @Override
     public void tick() {
         super.tick();
-        if (this.getAge() == 0) {
+        if (this.getAge() == 1) {
             this.setupAnimState.start(this.tickCount);
             this.entityData.set(DATA_STATE, State.SETUP);
             this.entityData.set(DATA_CAN_RENDER, true);
             this.playSound(DNLSounds.REPULSOR_PLACE.get());
-        } else if (this.getAge() == 35) {
+        } else if (this.getAge() == 36) {
             this.playSound(DNLSounds.REPULSOR_BARRIER_BUILD.get());
-        } else if (this.getAge() == (int) (RepulsorAnimation.SETUP.lengthInSeconds() * 20)) {
+        } else if (this.getAge() == (int) (RepulsorAnimation.SETUP.lengthInSeconds() * 20) + 1) {
             this.setupAnimState.stop();
             this.entityData.set(DATA_STATE, State.IDLE);
         }
 
-        if (this.getAge() >= RepulsorAnimation.SETUP.lengthInSeconds() * 20) {
+        if (this.getAge() >= RepulsorAnimation.SETUP.lengthInSeconds() * 20 + 1) {
             this.idleAnimState.startIfStopped(this.tickCount);
         }
 
@@ -226,7 +226,7 @@ public class RepulsorEntity extends Mob {
         }
 
         if (!this.level().isClientSide) {
-            if (this.getAge() >= 35) {
+            if (this.getAge() >= 36) {
                 for (Entity entity : this.getNearbyProjectiles()) {
                     boolean discardEntity = false;
                     boolean aboveHalfHealth = this.entityData.get(DATA_SHIELD_HEALTH) > SHIELD_ALERT_THRESHOLD;

@@ -25,6 +25,11 @@ public class FairkeeperBorosRenderer<T extends FairkeeperBorosEntity> extends Mo
     }
 
     @Override
+    protected float getFlipDegrees(T t) {
+        return 0.0f;
+    }
+
+    @Override
     public ResourceLocation getTextureLocation(FairkeeperBorosEntity fairkeeperEntity) {
         return TEXTURE;
     }

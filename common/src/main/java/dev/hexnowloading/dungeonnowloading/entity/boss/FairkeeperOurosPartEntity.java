@@ -67,9 +67,8 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     private float previousTilt = 0.0F;
     private BlockPos dropPosition;
     private Entity shootingTarget;
+    private boolean cancelShooting;
     private float inaccuracy;
-    public float cannonTargetYaw = 0F;
-    public float cannonTargetPitch = 0F;
     public float prevCannonYaw = 0F;
     public float cannonYaw = 0F;
     public float prevCannonPitch = 0F;
@@ -288,10 +287,21 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         }
 
         if (!this.hasArmor() || damageSource.isCreativePlayer()) {
+            float damage = damageAmount;
+
+            if (this.isTail()) {
+                damage = damageAmount * 2;
+            }
+
+            if (this.isState(FairkeeperOurosPartState.SHOOT_ORB)) {
+                this.setCancelShooting(true);
+            }
+
             FairkeeperOurosEntity head = (FairkeeperOurosEntity) this.getHead();
             if (head != null) {
-                head.hurt(damageSource, damageAmount);
+                head.hurt(damageSource, damage);
             }
+
             return super.hurt(damageSource, 0);
         }
 
@@ -300,6 +310,11 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         }
 
         return false;
+    }
+
+    @Override
+    protected void tickDeath() {
+        this.deathTime++;
     }
 
     @Override
@@ -396,6 +411,12 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     public void playCannonPackAnimation(Runnable runnable) {
         this.animationChainer.reset();
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_CLOSE, FairkeeperOurosBodyAnimation.CANNON_CLOSE.lengthInSeconds(), null, runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0f));
+    }
+
+    public void playCannonCancelAnimation(Runnable runnable) {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), null, runnable));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0f));
     }
 
@@ -600,6 +621,10 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     public float getCannonTargetYaw() { return this.entityData.get(CANNON_YAW); }
 
     public float getCannonTargetPitch() { return this.entityData.get(CANNON_PITCH); }
+
+    public boolean isCancelShooting() { return this.cancelShooting; }
+
+    public void setCancelShooting(boolean b) { this.cancelShooting = b; }
 
     public boolean isState(FairkeeperOurosPartState state) {
         return this.entityData.get(STATE) == state;

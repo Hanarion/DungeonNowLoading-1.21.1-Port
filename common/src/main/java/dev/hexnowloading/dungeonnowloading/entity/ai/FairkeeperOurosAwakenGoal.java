@@ -39,7 +39,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
         this.initialTarget = (new BlockPos(callerPos.relative(direction.getClockWise(), horizontalOffset).above(verticalOffset))).getCenter().add(0.0f, 0.5f, 0.0f);
         this.finalTarget = (new BlockPos(callerPos.relative(direction.getCounterClockWise(), horizontalOffset).above(verticalOffset))).getCenter().add(0.0f, 0.5f, 0.0f);
         this.ouros.setAwakenEndPos(this.initialTarget);
-        this.ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.MOUTH_OPEN);
+        this.ouros.playMouthOpen();
         this.ouros.noPhysics = true;
     }
 
@@ -67,7 +67,7 @@ public class FairkeeperOurosAwakenGoal extends Goal {
             double deltaZ = this.ouros.getZ() - finalTarget.z;
 
             if ((deltaX * deltaX + deltaZ * deltaZ) < THRESHOLD * THRESHOLD) {
-                this.ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.MOUTH_CLOSE);
+                this.ouros.playMouthClose();
                 this.ouros.stopAttacking(20);
             }
         }

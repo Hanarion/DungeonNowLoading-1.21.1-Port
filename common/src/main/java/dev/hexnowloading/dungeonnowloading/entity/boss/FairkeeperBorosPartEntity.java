@@ -245,10 +245,17 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
         }
 
         if (!this.hasArmor() || damageSource.isCreativePlayer() || damageSource.is(DNLTags.FAIRKEEPER_BOROS_BYPASS_ARMOR)) {
+
+            float damage = damageAmount;
+
+            if (this.isTail()) {
+                damage = damageAmount * 2;
+            }
+
             FairkeeperBorosEntity head = (FairkeeperBorosEntity) this.getHead();
             if (head != null) {
                 head.setDamageFromOtherSegment(true);
-                head.hurt(damageSource, damageAmount);
+                head.hurt(damageSource, damage);
             }
             return super.hurt(damageSource, 0);
         }
@@ -273,6 +280,11 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
         this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.HOSTILE, 1.0F, 1.0F);
         return false;
+    }
+
+    @Override
+    protected void tickDeath() {
+        this.deathTime++;
     }
 
     @Override
