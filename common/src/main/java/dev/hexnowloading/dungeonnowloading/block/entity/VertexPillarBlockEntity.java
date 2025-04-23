@@ -86,7 +86,7 @@ public class VertexPillarBlockEntity extends BlockEntity {
     }
 
     public boolean addLink(BlockPos pos) {
-        if (linkedPositions.size() < 2 && !linkedPositions.contains(pos)) {
+        if (!linkedPositions.contains(pos)) {
             linkedPositions.add(pos);
             setChanged();
             return true;

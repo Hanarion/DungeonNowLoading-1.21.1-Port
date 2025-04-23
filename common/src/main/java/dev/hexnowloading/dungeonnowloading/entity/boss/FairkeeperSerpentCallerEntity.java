@@ -335,7 +335,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         if (ourosPillarMoveSet.isEmpty()) {
             ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE), 1, 0, 0);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE), 1, 0, 1);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_CENTER), 1, 0, 1);
         }
 
         ourosBorosAssignState();
@@ -384,15 +384,13 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, 1, 0, 3);
             ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, 3, 2, 2);
             ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, 6, 4, 1);
-            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM, 3, 2, 0);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM, 3, 0, 0);
         }
 
         if (ourosPillarMoveSet.isEmpty()) {
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE), 1, 3, 3);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE), 1, 3, 3);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE), 1, 3, 1);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_CROSS), 1, 3, 0);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE), 1, 3, 1);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_CENTER), 1, 1, 0);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_INNER), 1, 1, 1);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_OUTER), 1, 1, 0);
         }
 
         ourosAssignState();
@@ -413,10 +411,10 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         if (ourosPillarMoveSet.isEmpty()) {
             ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE), 1, 0, 2);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SINGLE_LINE), 1, 0, 2);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_DOUBLE_LINE), 3, 0, 0);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_CENTER), 1, 0, 2);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_INNER), 3, 0, 0);
             ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_CROSS), 3, 0, 0);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LARGE_SQUARE), 3, 0, 0);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_OUTER), 3, 0, 0);
         }
 
         ourosAssignState();

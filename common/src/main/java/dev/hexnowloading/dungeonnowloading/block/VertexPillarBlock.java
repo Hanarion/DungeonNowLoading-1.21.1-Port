@@ -22,6 +22,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +39,7 @@ public class VertexPillarBlock extends BaseEntityBlock implements EntityBlock, S
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 16, 14);
-    private static final int RANGE = 23;
+    private static final int RANGE = 16;
 
     public VertexPillarBlock(Properties properties) {
         super(properties);
@@ -60,7 +62,12 @@ public class VertexPillarBlock extends BaseEntityBlock implements EntityBlock, S
     public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
         BlockPos blockPos = blockPlaceContext.getClickedPos();
         Level level = blockPlaceContext.getLevel();
-        return blockPos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(blockPos.above()).canBeReplaced(blockPlaceContext) ? this.defaultBlockState().setValue(HALF, DoubleBlockHalf.LOWER) : null;
+        return blockPos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(blockPos.above()).canBeReplaced(blockPlaceContext) ? this.defaultBlockState().setValue(HALF, DoubleBlockHalf.LOWER).setValue(WATERLOGGED, blockPlaceContext.getLevel().getFluidState(blockPlaceContext.getClickedPos()).getType() == Fluids.WATER) : null;
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
@@ -85,6 +92,9 @@ public class VertexPillarBlock extends BaseEntityBlock implements EntityBlock, S
         }
         if (doubleBlockHalf == DoubleBlockHalf.LOWER && topBlockState.hasProperty(HALF) && topBlockState.getValue(HALF) != DoubleBlockHalf.UPPER) {
             return Blocks.AIR.defaultBlockState();
+        }
+        if (blockState.getValue(WATERLOGGED)) {
+            levelAccessor.scheduleTick(blockPos, Fluids.WATER, Fluids.WATER.getTickDelay(levelAccessor));
         }
         return super.updateShape(blockState, direction, oldBlockState, levelAccessor, blockPos, oldBlockPos);
     }
@@ -150,13 +160,8 @@ public class VertexPillarBlock extends BaseEntityBlock implements EntityBlock, S
             for (BlockPos pos : blockPosList) {
                 BlockEntity linkingBE = level.getBlockEntity(pos);
                 if (linkingBE instanceof VertexPillarBlockEntity shieldingStonePillar) {
-                    if (thisBE.getLinkedPositions().size() < 2 && shieldingStonePillar.getLinkedPositions().size() < 2) {
-                        if (thisBE.addLink(pos) && shieldingStonePillar.addLink(blockPos)) {
-                            if (thisBE.getLinkedPositions().size() >= 2) {
-                                break;
-                            }
-                        }
-                    }
+                    thisBE.addLink(pos);
+                    shieldingStonePillar.addLink(blockPos);
                 }
             }
         }
