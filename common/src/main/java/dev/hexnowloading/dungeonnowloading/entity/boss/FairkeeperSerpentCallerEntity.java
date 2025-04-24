@@ -78,6 +78,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     private boolean borosWaitingForCommand;
     private boolean ourosWaitingForCommand;
+    private int isBorosDefeated;
+    private int isOurosDefeated;
     private UUID pendingBorosUUID;
     private UUID pendingOurosUUID;
     private int activationTick;
@@ -119,6 +121,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         if (this.getOurosId() != null) {
             compoundTag.putUUID("OurosUUID", this.getOurosId());
         }
+        compoundTag.putInt("IsBorosDefeated", this.isBorosDefeated);
+        compoundTag.putInt("IsOurosDefeated", this.isOurosDefeated);
         compoundTag.putInt("HorizontalOffset", this.getHorizontalOffset());
         compoundTag.putInt("VerticalOffset", this.getVerticalOffset());
         compoundTag.putInt("Phase", this.getPhase());
@@ -143,6 +147,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             this.setOurosId(compoundTag.getUUID("OurosUUID"));
             this.pendingOurosUUID = this.getOurosId();
         }
+        this.isOurosDefeated = compoundTag.getInt("IsOurosDefeated");
+        this.isBorosDefeated = compoundTag.getInt("IsBorosDefeated");
         this.entityData.set(HORIZONTAL_OFFSET, compoundTag.getInt("HorizontalOffset"));
         this.entityData.set(VERTICAL_OFFSET, compoundTag.getInt("VerticalOffset"));
         this.entityData.set(PHASE, compoundTag.getInt("Phase"));
@@ -157,6 +163,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     public void startBossFight() {
         this.activationTick = 60;
+        this.isBorosDefeated = 0;
+        this.isOurosDefeated = 0;
         this.playSound(DNLSounds.FAIRKEEPER_SERPENT_CALLER_ACTIVATED.get(), 3.0F, 1.0F);
         this.clearAllMoveSet();
         this.setActivated(true);
@@ -172,14 +180,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (this.boros == null && this.pendingBorosUUID != null) {
+        if (this.isBorosDefeated <= 0 && this.boros == null && this.pendingBorosUUID != null) {
             Entity entity = ((ServerLevel) this.level()).getEntity(pendingBorosUUID);
             if (entity instanceof FairkeeperBorosEntity borosEntity) {
                 this.boros = borosEntity;
                 this.pendingBorosUUID = null;
             }
         }
-        if (this.ouros == null && this.pendingOurosUUID != null) {
+        if (this.isOurosDefeated <= 0 && this.ouros == null && this.pendingOurosUUID != null) {
             Entity entity = ((ServerLevel) this.level()).getEntity(pendingOurosUUID);
             if (entity instanceof FairkeeperOurosEntity ourosEntity) {
                 this.ouros = ourosEntity;
@@ -240,7 +248,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                         break;
                     }
 
-                    if (this.getBoros() == null || this.getOuros() == null) {
+                    if (this.isOurosDefeated > 0 || this.isBorosDefeated > 0) {
                         this.setPhase(3);
                         this.clearAllMoveSet();
                         break;
@@ -267,18 +275,10 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                         break;
                     }
 
-                    if (this.getBoros() == null && this.getOuros() == null && this.bossDefeatVerificationTicks <= 0) {
-                        this.bossDefeatVerificationTicks = 10;
-                    }
-                    if (this.bossDefeatVerificationTicks-- > 0) {
-                        if (this.bossDefeatVerificationTicks <= 0) {
-                            this.defeatedBosses();
-                            this.setPhase(4);
-                            break;
-                        }
-                        if (this.getBoros() != null || this.getOuros() != null) {
-                            this.bossDefeatVerificationTicks = 0;
-                        }
+                    if (this.isBorosDefeated > 0 && this.isOurosDefeated > 0) {
+                        this.defeatedBosses();
+                        this.setPhase(4);
+                        break;
                     }
 
                     if (this.isAllPlayersInBound()) {
@@ -658,8 +658,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         if (damageSource == null) {
             return;
         }
-        ResourceLocation resourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get());
-        ResourceLocation lootTableResourceLocation = resourceLocation.withPrefix("entities/");
+        ResourceLocation baseResourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get()).withPrefix("entities/");
+        ResourceLocation lootTableResourceLocation = this.isBorosDefeated > this.isOurosDefeated ? baseResourceLocation.withSuffix("/boros") : baseResourceLocation.withSuffix("/ouros");
+        System.out.println(lootTableResourceLocation);
         LootTable lootTable = this.level().getServer().getLootData().getLootTable(lootTableResourceLocation);
         LootParams.Builder builder = (new LootParams.Builder((ServerLevel) this.level()))
                 .withParameter(LootContextParams.THIS_ENTITY, this)
@@ -948,6 +949,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     public Set<UUID> getMinionUUIDs() {
         return this.minionUUIDs;
+    }
+
+    public void defeatedBoros() {
+        this.isBorosDefeated = this.isOurosDefeated > 0 ? 2 : 1;
+    }
+
+    public void defeatedOuros() {
+        this.isOurosDefeated = this.isBorosDefeated > 0 ? 2 : 1;
     }
 
     public void cleanMinionList() {

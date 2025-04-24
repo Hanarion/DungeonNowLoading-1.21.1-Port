@@ -609,6 +609,10 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                     part.remove(RemovalReason.KILLED);
                 }
             } else if (!this.isRemoved()) {
+                FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.getCaller();
+                if (caller != null) {
+                    caller.defeatedOuros();
+                }
                 this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
                 ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
                 this.level().broadcastEntityEvent(this, (byte)60);
