@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.mixin.client;
 
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStructureDetectionPacket;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMusics;
+import dev.hexnowloading.dungeonnowloading.sound.BackgroundMusicHandler;
 import net.minecraft.Optionull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -25,8 +26,22 @@ public abstract class SituationalMusicMixin {
     @Inject(method = "getSituationalMusic", at = @At("HEAD"), cancellable = true)
     private void injectStructureMusic(CallbackInfoReturnable<Music> cir) {
 
-        Music music = (Music) Optionull.map(screen, Screen::getBackgroundMusic);
+        /**
+         * For preventing the background music from playing when the boss theme or other music source
+         * is playing.
+         */
+        if (BackgroundMusicHandler.isBackgroundMusicBlocked()) {
+            cir.setReturnValue(null);
+            return;
+        }
 
+        /**
+         * Manages the music that is played in the structure.
+         */
+
+        //TODO: Needs rewrite once more structure musics are added.
+
+        Music music = (Music) Optionull.map(screen, Screen::getBackgroundMusic);
 
         if (music == null && player != null) {
             if (S2CStructureDetectionPacket.isClientInStructure()) {

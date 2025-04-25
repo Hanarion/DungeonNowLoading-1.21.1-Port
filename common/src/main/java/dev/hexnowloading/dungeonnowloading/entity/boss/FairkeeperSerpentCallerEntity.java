@@ -12,6 +12,7 @@ import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
 import dev.hexnowloading.dungeonnowloading.entity.util.WeightBaseMoveSet;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeInTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeOutBackgroundMusicSoundPacket;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
@@ -905,6 +906,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), sound, 0, 1.0f, false, ARENA_SIZE), player);
             }
             Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 60), player);
+            Services.NETWORK.sendToPlayer(new S2CFadeOutBackgroundMusicSoundPacket(60), player);
         }
     }
 

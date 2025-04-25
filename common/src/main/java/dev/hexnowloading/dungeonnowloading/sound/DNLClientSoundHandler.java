@@ -108,4 +108,21 @@ public class DNLClientSoundHandler {
             case ALL -> throw new IllegalStateException("ALL is not a valid target for resolveTagId");
         };
     }
+
+    public static boolean isTickingSoundActive(ResourceLocation soundId) {
+        Map<Integer, Map<Integer, List<AbstractTickableSoundInstance>>> entityMap = activeSounds.get(soundId);
+        if (entityMap == null || entityMap.isEmpty()) {
+            return false;
+        }
+        for (Map<Integer, List<AbstractTickableSoundInstance>> tagMap : entityMap.values()) {
+            for (List<AbstractTickableSoundInstance> instances : tagMap.values()) {
+                for (AbstractTickableSoundInstance instance : instances) {
+                    if (!instance.isStopped()) {
+                        return true; // Found an active ticking sound
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }

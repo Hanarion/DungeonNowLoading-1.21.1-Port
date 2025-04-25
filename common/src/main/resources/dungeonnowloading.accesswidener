@@ -9,3 +9,6 @@ accessible method net/minecraft/world/entity/projectile/ThrownPotion applyWater 
 accessible method net/minecraft/world/entity/projectile/ThrownPotion makeAreaOfEffectCloud (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)V
 accessible field net/minecraft/world/level/pathfinder/WalkNodeEvaluator collisionCache Lit/unimi/dsi/fastutil/objects/Object2BooleanMap;
 accessible field net/minecraft/world/entity/projectile/AbstractArrow inGround Z
+accessible field net/minecraft/client/sounds/MusicManager currentMusic Lnet/minecraft/client/resources/sounds/SoundInstance;
+accessible field net/minecraft/client/sounds/SoundManager soundEngine Lnet/minecraft/client/sounds/SoundEngine;
+accessible field net/minecraft/client/sounds/SoundEngine instanceToChannel Ljava/util/Map;

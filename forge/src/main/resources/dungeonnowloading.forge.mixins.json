@@ -38,6 +38,8 @@
         "client.PlayerRendererMixin",
         "client.AbstractClientPlayerMixin",
         "client.SituationalMusicMixin",
+        "client.MinecraftClientTickMixin",
+        "client.MusicManagerMixin",
         "MixinTitleScreen",
         "MaxHealthAttributeMixin"
     ],
