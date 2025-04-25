@@ -15,15 +15,22 @@ public class S2CStopTickingSoundPacket implements DNLPacket {
 
     private final int entityId;
     private final List<ResourceLocation> soundIds;
+    private final boolean shouldStop;
+    private final int fadeTicks;
 
     public S2CStopTickingSoundPacket(int entityId, ResourceLocation singleSoundId) {
-        this.entityId = entityId;
-        this.soundIds = List.of(singleSoundId);
+        this(entityId, List.of(singleSoundId));
     }
 
     public S2CStopTickingSoundPacket(int entityId, List<ResourceLocation> soundIds) {
+        this(entityId, soundIds, 20, true);
+    }
+
+    public S2CStopTickingSoundPacket(int entityId, List<ResourceLocation> soundIds, int fadeTicks, boolean shouldStop) {
         this.entityId = entityId;
         this.soundIds = soundIds;
+        this.shouldStop = shouldStop;
+        this.fadeTicks = fadeTicks;
     }
 
     public S2CStopTickingSoundPacket(FriendlyByteBuf buf) {
@@ -33,6 +40,8 @@ public class S2CStopTickingSoundPacket implements DNLPacket {
         for (int i = 0; i < count; i++) {
             this.soundIds.add(buf.readResourceLocation());
         }
+        this.fadeTicks = buf.readInt();
+        this.shouldStop = buf.readBoolean();
     }
 
     @Override
@@ -42,6 +51,8 @@ public class S2CStopTickingSoundPacket implements DNLPacket {
         for (ResourceLocation id : soundIds) {
             buf.writeResourceLocation(id);
         }
+        buf.writeInt(fadeTicks);
+        buf.writeBoolean(shouldStop);
     }
 
     public static S2CStopTickingSoundPacket decode(FriendlyByteBuf buf) {
@@ -52,7 +63,7 @@ public class S2CStopTickingSoundPacket implements DNLPacket {
     public void handle(@Nullable ServerPlayer sender) {
         Minecraft.getInstance().execute(() -> {
             for (ResourceLocation soundId : soundIds) {
-                DNLClientSoundHandler.fadeOutLoopingSound(soundId, entityId);
+                DNLClientSoundHandler.fadeOutTickingSound(soundId, entityId, fadeTicks, shouldStop);
             }
         });
     }

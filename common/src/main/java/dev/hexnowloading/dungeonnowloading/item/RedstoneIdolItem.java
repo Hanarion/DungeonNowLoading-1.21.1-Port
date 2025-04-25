@@ -36,7 +36,9 @@ public class RedstoneIdolItem extends BlockItem {
             player.getCooldowns().addCooldown(this, 7);
             player.awardStat(Stats.ITEM_USED.get(this));
             for (FairkeeperSerpentCallerEntity serpentCallerEntity : targets) {
-                serpentCallerEntity.startBossFight();
+                if (!level.isClientSide) {
+                    serpentCallerEntity.startBossFight();
+                }
             }
             /*if (player instanceof ServerPlayer) {
                 itemStack.hurtAndBreak(1, player, (player1 -> player1.broadcastBreakEvent(hand)));

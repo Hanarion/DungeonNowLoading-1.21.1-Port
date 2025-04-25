@@ -11,6 +11,10 @@ import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
 import dev.hexnowloading.dungeonnowloading.entity.util.WeightBaseMoveSet;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeInTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -168,6 +172,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.playSound(DNLSounds.FAIRKEEPER_SERPENT_CALLER_ACTIVATED.get(), 3.0F, 1.0F);
         this.clearAllMoveSet();
         this.setActivated(true);
+        this.playBossMusic();
         this.setOffsets(SPAWN_OFFSET_X, SPAWN_OFFSET_Y);
         this.transitionTo(FairkeeperSerpentCallerAnimationState.ACTIVE);
         AABB bossArena = new AABB(this.blockPosition()).inflate(ARENA_SIZE);
@@ -248,7 +253,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                         break;
                     }
 
-                    if (this.isOurosDefeated > 0 || this.isBorosDefeated > 0) {
+                    if (this.isOurosDefeated > 2 || this.isBorosDefeated > 2) {
+                        if (this.isBorosDefeated > 2) {
+                            fadeInOurosMusic();
+                        } else {
+                            fadeInBorosMusic();
+                        }
                         this.setPhase(3);
                         this.clearAllMoveSet();
                         break;
@@ -275,7 +285,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                         break;
                     }
 
-                    if (this.isBorosDefeated > 0 && this.isOurosDefeated > 0) {
+                    if (this.isBorosDefeated > 2 && this.isOurosDefeated > 2) {
                         this.defeatedBosses();
                         this.setPhase(4);
                         break;
@@ -704,6 +714,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.playerUUIDs.clear();
         this.removeAllMinions();
         this.removePillars();
+        this.stopBossMusic();
     }
 
     public void removePillars() {
@@ -868,6 +879,67 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         return super.hurt(damageSource, v);
     }
 
+    private void playBossMusic() {
+        float radius = ARENA_SIZE;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        List<ResourceLocation> soundsToStart = new ArrayList<>(List.of());
+        soundsToStart.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation());
+        soundsToStart.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation());
+        soundsToStart.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation());
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), soundsToStart, true, 0, 1.0f, false, ARENA_SIZE), player);
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation(), 1.0F), player);
+        }
+    }
+
+    public void stopBossMusic() {
+        float radius = ARENA_SIZE * 2;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+
+        List<ResourceLocation> soundsToStop = new ArrayList<>(List.of());
+        soundsToStop.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation());
+        soundsToStop.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation());
+        soundsToStop.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation());
+
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), soundsToStop, 60, true), otherPlayer);
+        }
+    }
+
+    private void fadeInBorosMusic() {
+        float radius = ARENA_SIZE;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation(), 1.0F), otherPlayer);
+        }
+    }
+
+    private void fadeInOurosMusic() {
+        float radius = ARENA_SIZE;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), 1.0F), otherPlayer);
+        }
+    }
+
     public Entity getBoros() {
         UUID id = getBorosId();
         if (id != null && !this.level().isClientSide) {
@@ -951,12 +1023,28 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         return this.minionUUIDs;
     }
 
-    public void defeatedBoros() {
+    public boolean isBorosDefeated() {
+        return this.isBorosDefeated > 0;
+    }
+
+    public boolean isOurosDefeated() {
+        return this.isOurosDefeated > 0;
+    }
+
+    public void dyingBoros() {
         this.isBorosDefeated = this.isOurosDefeated > 0 ? 2 : 1;
     }
 
-    public void defeatedOuros() {
+    public void dyingOuros() {
         this.isOurosDefeated = this.isBorosDefeated > 0 ? 2 : 1;
+    }
+
+    public void defeatedBoros() {
+        this.isBorosDefeated = this.isBorosDefeated == 2 ? 4 : 3;
+    }
+
+    public void defeatedOuros() {
+        this.isOurosDefeated = this.isOurosDefeated == 2 ? 4 : 3;
     }
 
     public void cleanMinionList() {

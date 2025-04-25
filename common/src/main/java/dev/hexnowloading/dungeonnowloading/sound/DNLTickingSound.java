@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.sound;
 
 public interface DNLTickingSound {
-    void startFadingOut();
+    void startFadingOut(boolean shouldStop, int fadeTicks);
+    void startFadingIn(float maxVolume);
     void stopExternally();
 }

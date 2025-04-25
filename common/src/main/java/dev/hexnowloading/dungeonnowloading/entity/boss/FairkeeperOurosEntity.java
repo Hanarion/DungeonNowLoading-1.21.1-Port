@@ -638,6 +638,10 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         FairkeeperSerpentCallerEntity caller = (FairkeeperSerpentCallerEntity) this.getCaller();
         if (caller != null) {
             caller.setLastDamageSource(damageSource);
+            caller.dyingOuros();
+            if (caller.isBorosDefeated()) {
+                caller.stopBossMusic();
+            }
         }
         super.die(damageSource);
     }

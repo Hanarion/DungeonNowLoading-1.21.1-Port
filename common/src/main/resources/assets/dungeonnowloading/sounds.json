@@ -1,4 +1,31 @@
 {
+  "music_clash_of_duality_base" : {
+    "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_base",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/clash_of_duality_base",
+        "stream": true
+      }
+    ]
+  },
+  "music_clash_of_duality_boros" : {
+    "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_boros",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/clash_of_duality_boros",
+        "stream": true
+      }
+    ]
+  },
+  "music_clash_of_duality_ouros" : {
+    "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_ouros",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/clash_of_duality_ouros",
+        "stream": true
+      }
+    ]
+  },
   "music_temple_of_duality" : {
     "subtitle": "sounds.dungeonnowloading.music_temple_of_duality",
     "sounds": [
