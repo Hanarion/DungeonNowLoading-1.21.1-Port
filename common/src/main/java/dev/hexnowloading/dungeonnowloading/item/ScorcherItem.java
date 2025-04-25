@@ -347,7 +347,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             sound = scorcher.getLocation();
         }
         for (ServerPlayer otherPlayer : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(player.getId(), sound, true), otherPlayer);
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(player.getId(), sound), otherPlayer);
         }
     }
 
@@ -369,7 +369,9 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             soundsToStop.add(DNLSounds.SCORCHER_OVERHEAT.get().getLocation());
         }
         for (ServerPlayer otherPlayer : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(player.getId(), soundsToStop), otherPlayer);
+            for (ResourceLocation sound : soundsToStop) {
+                Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(player.getId(), sound, 20, true), otherPlayer);
+            }
         }
     }
 
@@ -387,7 +389,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             sound = scorcher.getLocation();
         }
         for (ServerPlayer otherPlayer : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(player.getId(), sound), otherPlayer);
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(player.getId(), sound, 20, true), otherPlayer);
         }
     }
 

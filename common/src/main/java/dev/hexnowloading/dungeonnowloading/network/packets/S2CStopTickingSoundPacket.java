@@ -2,56 +2,67 @@ package dev.hexnowloading.dungeonnowloading.network.packets;
 
 import dev.hexnowloading.dungeonnowloading.network.DNLPacket;
 import dev.hexnowloading.dungeonnowloading.sound.DNLClientSoundHandler;
+import dev.hexnowloading.dungeonnowloading.sound.TickingSoundTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class S2CStopTickingSoundPacket implements DNLPacket {
 
     private final int entityId;
-    private final List<ResourceLocation> soundIds;
-    private final boolean shouldStop;
+    private final ResourceLocation soundId;
+    private final TickingSoundTarget target;
+    private final int tagId;
     private final int fadeTicks;
+    private final boolean shouldStop;
 
-    public S2CStopTickingSoundPacket(int entityId, ResourceLocation singleSoundId) {
-        this(entityId, List.of(singleSoundId));
+    // === Constructors ===
+
+    // OLDEST (default)
+    public S2CStopTickingSoundPacket(int entityId, ResourceLocation soundId, int fadeTicks, boolean shouldStop) {
+        this(entityId, soundId, TickingSoundTarget.OLDEST, -1, fadeTicks, shouldStop);
     }
 
-    public S2CStopTickingSoundPacket(int entityId, List<ResourceLocation> soundIds) {
-        this(entityId, soundIds, 20, true);
+    public S2CStopTickingSoundPacket(int entityId, ResourceLocation soundId, TickingSoundTarget target,  int fadeTicks, boolean shouldStop) {
+        this(entityId, soundId, target, -1, fadeTicks, shouldStop);
     }
 
-    public S2CStopTickingSoundPacket(int entityId, List<ResourceLocation> soundIds, int fadeTicks, boolean shouldStop) {
+    // SPECIFIC tagId
+    public S2CStopTickingSoundPacket(int entityId, ResourceLocation soundId, int tagId, int fadeTicks, boolean shouldStop) {
+        this(entityId, soundId, TickingSoundTarget.SPECIFIC, tagId, fadeTicks, shouldStop);
+    }
+
+    // Explicit target
+    public S2CStopTickingSoundPacket(int entityId, ResourceLocation soundId, TickingSoundTarget target, int tagId, int fadeTicks, boolean shouldStop) {
         this.entityId = entityId;
-        this.soundIds = soundIds;
-        this.shouldStop = shouldStop;
+        this.soundId = soundId;
+        this.target = target;
+        this.tagId = tagId;
         this.fadeTicks = fadeTicks;
+        this.shouldStop = shouldStop;
     }
+
+    // === Encoding / Decoding ===
 
     public S2CStopTickingSoundPacket(FriendlyByteBuf buf) {
         this.entityId = buf.readVarInt();
-        int count = buf.readVarInt();
-        this.soundIds = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) {
-            this.soundIds.add(buf.readResourceLocation());
-        }
-        this.fadeTicks = buf.readInt();
+        this.soundId = buf.readResourceLocation();
+        this.target = buf.readEnum(TickingSoundTarget.class);
+        this.tagId = buf.readVarInt();
+        this.fadeTicks = buf.readVarInt();
         this.shouldStop = buf.readBoolean();
     }
 
     @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(entityId);
-        buf.writeVarInt(soundIds.size());
-        for (ResourceLocation id : soundIds) {
-            buf.writeResourceLocation(id);
-        }
-        buf.writeInt(fadeTicks);
+        buf.writeResourceLocation(soundId);
+        buf.writeEnum(target);
+        buf.writeVarInt(tagId);
+        buf.writeVarInt(fadeTicks);
         buf.writeBoolean(shouldStop);
     }
 
@@ -59,12 +70,12 @@ public class S2CStopTickingSoundPacket implements DNLPacket {
         return new S2CStopTickingSoundPacket(buf);
     }
 
+    // === Handler ===
+
     @Override
     public void handle(@Nullable ServerPlayer sender) {
         Minecraft.getInstance().execute(() -> {
-            for (ResourceLocation soundId : soundIds) {
-                DNLClientSoundHandler.fadeOutTickingSound(soundId, entityId, fadeTicks, shouldStop);
-            }
+            DNLClientSoundHandler.fadeOutTickingSound(soundId, entityId, target, tagId, fadeTicks, shouldStop);
         });
     }
 }

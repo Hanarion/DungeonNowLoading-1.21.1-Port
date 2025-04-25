@@ -94,15 +94,20 @@ public class EntityTickingSound extends AbstractTickableSoundInstance implements
         }
     }
 
+    @Override
     public void startFadingOut(boolean shouldStop, int fadeTicks) {
         this.fadingOut = true;
         this.shouldStop = shouldStop;
         this.fadeTicks = fadeTicks;
+        this.currentFade = 0; // ✅ Required
     }
 
-    public void startFadingIn(float maxVolume) {
+    @Override
+    public void startFadingIn(float maxVolume, int fadeTicks) {
         this.fadingIn = true;
         this.maxVolume = maxVolume;
+        this.fadeTicks = fadeTicks;
+        this.currentFade = 0; // ✅ Required
     }
 
     @Override

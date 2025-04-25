@@ -18,6 +18,7 @@ import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.sound.TickingSoundTarget;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -87,9 +88,11 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private UUID pendingBorosUUID;
     private UUID pendingOurosUUID;
     private int activationTick;
-    private int bossDefeatVerificationTicks;
+    private int musicTick;
     private Set<UUID> playerUUIDs;
     private Set<UUID> minionUUIDs;
+
+
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> introMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> comboMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> directMoveSet = new WeightBaseMoveSet<>();
@@ -170,9 +173,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.isBorosDefeated = 0;
         this.isOurosDefeated = 0;
         this.playSound(DNLSounds.FAIRKEEPER_SERPENT_CALLER_ACTIVATED.get(), 3.0F, 1.0F);
+        this.playBossMusic();
         this.clearAllMoveSet();
         this.setActivated(true);
-        this.playBossMusic();
         this.setOffsets(SPAWN_OFFSET_X, SPAWN_OFFSET_Y);
         this.transitionTo(FairkeeperSerpentCallerAnimationState.ACTIVE);
         AABB bossArena = new AABB(this.blockPosition()).inflate(ARENA_SIZE);
@@ -206,6 +209,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             }
         }
         if (this.isActivated() && !this.level().isClientSide) {
+            musicTick++;
+            if (this.musicTick >= 3242) {
+                System.out.println("Replayed");
+                this.musicTick = 0;
+                this.playLoopMusic();
+            }
             switch (this.getPhase()) {
                 case 0:
                     if (this.activationTick > 0) {
@@ -711,10 +720,11 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.entityData.set(ANIMATION_STATE, FairkeeperSerpentCallerAnimationState.IDLE);
         this.setPhase(0);
         this.activationTick = 0;
+        this.musicTick = 0;
         this.playerUUIDs.clear();
         this.removeAllMinions();
         this.removePillars();
-        this.stopBossMusic();
+        this.stopAllBossMusic();
     }
 
     public void removePillars() {
@@ -891,8 +901,47 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         soundsToStart.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation());
         soundsToStart.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation());
         for (ServerPlayer player : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), soundsToStart, true, 0, 1.0f, false, ARENA_SIZE), player);
-            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation(), 1.0F), player);
+            for (ResourceLocation sound : soundsToStart) {
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), sound, 0, 1.0f, false, ARENA_SIZE), player);
+            }
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 60), player);
+        }
+    }
+
+    private void playLoopMusic() {
+        float radius = ARENA_SIZE;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation(), 1, 1.0f, false, ARENA_SIZE), player);
+            if (this.isBorosDefeated > 2) {
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), 1, 1.0f, false, ARENA_SIZE), player);
+            } else if (this.isOurosDefeated > 2) {
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation(), 1, 1.0f, false, ARENA_SIZE), player);
+            }
+        }
+    }
+
+    public void stopAllBossMusic() {
+        float radius = ARENA_SIZE * 2;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+
+        List<ResourceLocation> soundsToStop = new ArrayList<>(List.of());
+        soundsToStop.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation());
+        soundsToStop.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation());
+        soundsToStop.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation());
+
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            for (ResourceLocation sound : soundsToStop) {
+                Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), sound, TickingSoundTarget.ALL, 60, true), otherPlayer);
+            }
         }
     }
 
@@ -910,7 +959,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         soundsToStop.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation());
 
         for (ServerPlayer otherPlayer : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), soundsToStop, 60, true), otherPlayer);
+            for (ResourceLocation sound : soundsToStop) {
+                Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), sound, 60, true), otherPlayer);
+            }
         }
     }
 
@@ -923,7 +974,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         );
 
         for (ServerPlayer otherPlayer : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation(), 1.0F), otherPlayer);
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 20), otherPlayer);
         }
     }
 
@@ -936,7 +987,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         );
 
         for (ServerPlayer otherPlayer : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), 1.0F), otherPlayer);
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 20), otherPlayer);
         }
     }
 
@@ -1061,5 +1112,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         NONE,
         IDLE,
         ACTIVE
+    }
+
+    private enum FairkeeperSound {
+        CLASH_OF_DUALITY_BASE,
+        CLASH_OF_DUALITY_BOROS,
+        CLASH_OF_DUALITY_OUROS,
+        CLASH_OF_DUALITY_BASE_2,
+        CLASH_OF_DUALITY_BOROS_2,
+        CLASH_OF_DUALITY_OUROS_2
     }
 }

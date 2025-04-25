@@ -8,39 +8,26 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class C2SStopTickingSoundPacket implements DNLPacket {
 
-    private final List<ResourceLocation> soundIds;
+    private final ResourceLocation soundId;
     private final double radius;
 
-    public C2SStopTickingSoundPacket(ResourceLocation singleSoundId, double radius) {
-        this.soundIds = List.of(singleSoundId);
-        this.radius = radius;
-    }
-
-    public C2SStopTickingSoundPacket(List<ResourceLocation> soundIds, double radius) {
-        this.soundIds = soundIds;
+    public C2SStopTickingSoundPacket(ResourceLocation soundId, double radius) {
+        this.soundId = soundId;
         this.radius = radius;
     }
 
     public C2SStopTickingSoundPacket(FriendlyByteBuf buf) {
-        int size = buf.readVarInt();
-        this.soundIds = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            this.soundIds.add(buf.readResourceLocation());
-        }
+        this.soundId = buf.readResourceLocation();
         this.radius = buf.readDouble();
     }
 
     @Override
     public void encode(FriendlyByteBuf buf) {
-        buf.writeVarInt(soundIds.size());
-        for (ResourceLocation id : soundIds) {
-            buf.writeResourceLocation(id);
-        }
+        buf.writeResourceLocation(soundId);
         buf.writeDouble(radius);
     }
 
@@ -55,11 +42,11 @@ public class C2SStopTickingSoundPacket implements DNLPacket {
         AABB area = sender.getBoundingBox().inflate(radius);
         List<ServerPlayer> nearbyPlayers = sender.level().getEntitiesOfClass(ServerPlayer.class, area);
 
-        for (ResourceLocation soundId : soundIds) {
-            S2CStopTickingSoundPacket packet = new S2CStopTickingSoundPacket(sender.getId(), soundId);
-            for (ServerPlayer player : nearbyPlayers) {
-                Services.NETWORK.sendToPlayer(packet, player);
-            }
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(
+                    new S2CStopTickingSoundPacket(sender.getId(), soundId, 20, true),
+                    player
+            );
         }
     }
 }

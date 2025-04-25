@@ -10,45 +10,38 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class S2CStartTickingSoundPacket implements DNLPacket {
 
     private final int entityId;
-    private final List<ResourceLocation> soundIds;
-    private final boolean stopOnRecall;
+    private final ResourceLocation soundId;
+    private final int tagId;
     private final float maxVolume;
     private final float pitch;
     private final boolean stopWhenOutOfRange;
     private final float range;
 
-    public S2CStartTickingSoundPacket(int entityId, ResourceLocation singleSoundId, boolean stopOnRecall) {
-        this(entityId, List.of(singleSoundId), stopOnRecall, 1, 1, true, 32);
-    }
-
-    public S2CStartTickingSoundPacket(int entityId, List<ResourceLocation> soundIds, boolean stopOnRecall) {
-        this(entityId, soundIds, stopOnRecall, 1, 1, true, 32);
-    }
-
-    public S2CStartTickingSoundPacket(int entityId, List<ResourceLocation> soundIds, boolean stopOnRecall, float maxVolume, float pitch, boolean stopWhenOutOfRange, float range) {
+    public S2CStartTickingSoundPacket(int entityId, ResourceLocation soundId, int tagId, float maxVolume, float pitch, boolean stopWhenOutOfRange, float range) {
         this.entityId = entityId;
-        this.soundIds = soundIds;
-        this.stopOnRecall = stopOnRecall;
+        this.soundId = soundId;
+        this.tagId = tagId;
         this.maxVolume = maxVolume;
         this.pitch = pitch;
         this.stopWhenOutOfRange = stopWhenOutOfRange;
         this.range = range;
     }
 
+    public S2CStartTickingSoundPacket(int entityId, ResourceLocation soundId) {
+        this(entityId, soundId, -1, 1.0f, 1.0f, true, 32f);
+    }
+
+    public S2CStartTickingSoundPacket(int entityId, ResourceLocation soundId, float maxVolume, float pitch, boolean stopWhenOutOfRange, float range) {
+        this(entityId, soundId, -1, maxVolume, pitch, stopWhenOutOfRange, range);
+    }
+
     public S2CStartTickingSoundPacket(FriendlyByteBuf buf) {
         this.entityId = buf.readVarInt();
-        int count = buf.readVarInt();
-        this.soundIds = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) {
-            this.soundIds.add(buf.readResourceLocation());
-        }
-        this.stopOnRecall = buf.readBoolean();
+        this.soundId = buf.readResourceLocation();
+        this.tagId = buf.readInt();
         this.maxVolume = buf.readFloat();
         this.pitch = buf.readFloat();
         this.stopWhenOutOfRange = buf.readBoolean();
@@ -58,11 +51,8 @@ public class S2CStartTickingSoundPacket implements DNLPacket {
     @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(entityId);
-        buf.writeVarInt(soundIds.size());
-        for (ResourceLocation id : soundIds) {
-            buf.writeResourceLocation(id);
-        }
-        buf.writeBoolean(stopOnRecall);
+        buf.writeResourceLocation(soundId);
+        buf.writeInt(tagId);
         buf.writeFloat(maxVolume);
         buf.writeFloat(pitch);
         buf.writeBoolean(stopWhenOutOfRange);
@@ -73,17 +63,15 @@ public class S2CStartTickingSoundPacket implements DNLPacket {
         return new S2CStartTickingSoundPacket(buf);
     }
 
-
     @Override
     public void handle(@Nullable ServerPlayer sender) {
         Minecraft mc = Minecraft.getInstance();
         Level level = mc.level;
-        if (mc.level == null) return;
+        if (level == null) return;
 
         Entity entity = level.getEntity(entityId);
+        if (entity == null) return;
 
-        for (ResourceLocation soundId : soundIds) {
-            DNLClientSoundHandler.playTickingSound(soundId, entity, stopOnRecall, maxVolume, pitch, stopWhenOutOfRange, range);
-        }
+        DNLClientSoundHandler.playTickingSound(soundId, entity, tagId, maxVolume, pitch, stopWhenOutOfRange, range);
     }
 }

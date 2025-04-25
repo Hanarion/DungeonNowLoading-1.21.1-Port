@@ -559,7 +559,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             caller.dyingBoros();
             caller.setLastDamageSource(damageSource);
             if (caller.isOurosDefeated()) {
-                caller.stopBossMusic();
+                caller.stopAllBossMusic();
             }
         }
         super.die(damageSource);
