@@ -80,8 +80,8 @@ public class WhiteShockwaveParticle extends TextureSheetParticle {
         this.gCol = 1.0f;
         this.renderRotatedParticle(vertexConsumer, camera, partialTick, this.axis, this.degree);
 
-        this.rCol = 0.1f;
-        this.gCol = 0.1f;
+        this.rCol = 1.0f;
+        this.gCol = 1.0f;
         this.renderRotatedParticle(vertexConsumer, camera, partialTick, this.axis, this.degree + 180F);
     }
 

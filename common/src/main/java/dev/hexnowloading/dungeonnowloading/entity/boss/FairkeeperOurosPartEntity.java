@@ -12,11 +12,14 @@ import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -248,6 +251,13 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
             this.performContactDamage();
         }
 
+        if (!this.isState(FairkeeperOurosPartState.SHOOT_ORB) && this.isCancelShooting()) {
+            this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+            ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+            this.playCannonCancelAnimation(null);
+            this.setCancelShooting(false);
+        }
+
         super.customServerAiStep();
     }
 
@@ -293,7 +303,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
                 damage = damageAmount * 2;
             }
 
-            if (this.isState(FairkeeperOurosPartState.SHOOT_ORB)) {
+            if (damage >= 5 && (this.getAnimationState().equals(FairkeeperOurosPartAnimationState.CANNON_IDLE) || this.getAnimationState().equals(FairkeeperOurosPartAnimationState.CANNON_OPEN) || this.getAnimationState().equals(FairkeeperOurosPartAnimationState.CANNON_CLOSE))) {
                 this.setCancelShooting(true);
             }
 
@@ -637,6 +647,8 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     public AnimationChainer<FairkeeperOurosPartAnimationState> getAnimationChainer() {
         return this.animationChainer;
     }
+
+    public FairkeeperOurosPartEntity.FairkeeperOurosPartAnimationState getAnimationState() { return this.entityData.get(ANIMATION_STATE); }
 
     public enum FairkeeperOurosPartAnimationState {
         NONE,

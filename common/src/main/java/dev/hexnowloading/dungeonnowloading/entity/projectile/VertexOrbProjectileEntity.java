@@ -47,7 +47,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     private static final int BASE_DAMAGE = 6;
     private static final int SLOWNESS_DURATION = 20;
     private static final int SLOWNESS_AMPLIFIER = 4;
-    private static final float HEALTH = 10;
+    private static final float HEALTH = 5;
 
     private static final double BEAM_INITIAL_PARTICLE_SPACING = 0.5d;
     private static final float BEAM_INITIAL_PARTICLE_SCALE_MIN = 0.2f;

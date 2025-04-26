@@ -128,8 +128,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_SMALL_CIRLCE));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_LARGE_CIRCLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_PLAYER_LARGE_CIRCLE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, this, 1.3f, 3.0F, 60, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_TRIPLE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_SINGLE_ARROW, this, 1.3f, 3.0F, 60, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_SINGLE));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, this, 1.3f, 3.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_TRIPLE));
+        this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_SINGLE_ARROW, this, 1.3f, 5.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_SINGLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowAboveGoal(FairkeeperBorosState.SHOOT_ARROW_ABOVE, this, 1.5f, FairkeeperBorosShootArrowAboveGoal.PATTERN_PLAYER_LARGE_CIRCLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.DESPERATE, this, 20, false));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.DESPERATE, this, 1.5F, 2.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_DESPERATE));
@@ -230,6 +230,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.animationChainer.reset();
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds()));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.IDLE, FairkeeperBorosAnimation.IDLE.lengthInSeconds()));
     }
 
     public void playMouthOpen() {
@@ -238,9 +239,16 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.MOUTH_OPENED, FairkeeperBorosAnimation.PURSUE_OPENED_MOUTH.lengthInSeconds()));
     }
 
+    public void playMouthOpenForShootingArrow() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, 1.75f));
+    }
+
     public void playMouthClose() {
         this.animationChainer.reset();
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.IDLE, FairkeeperBorosAnimation.IDLE.lengthInSeconds()));
+
     }
 
     private void playDeathAnimation() {
@@ -459,6 +467,10 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 arrow.remove(RemovalReason.DISCARDED);
             }
             return false;
+        }
+
+        if (this.hasArmor() && (this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_OPEN) || this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_OPENED) || this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_CLOSE))) {
+            return hurtAndTrackAttackers(damageSource, amount);
         }
 
         if (this.isDamageFromOtherSegment()) {

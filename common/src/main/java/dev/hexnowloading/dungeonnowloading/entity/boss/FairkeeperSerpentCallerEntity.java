@@ -354,7 +354,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         }
 
         if (ourosPillarMoveSet.isEmpty()) {
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE), 1, 0, 0);
+            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_OUTER), 1, 0, 0);
             ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_CENTER), 1, 0, 1);
         }
 

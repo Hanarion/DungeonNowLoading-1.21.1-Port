@@ -26,9 +26,10 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
     private int totalDuration;
 
     private static final int EXPIRY_DURATION = 300;
-    private static final int STOP_DURATION = 32;
-    private static final int SHOOT_ARROW_TICK = 15;
-    private static final int BEAM_TICK = 30;
+    private static final int STOP_DURATION = 42;
+    private static final int BEAM_TICK = 40;
+    private static final int SHOOT_ARROW_TICK = 25;
+    private static final int CLOSE_MOUTH_TICK = 18;
     private static final int DEFAULT_SHOOTING_COOLDOWN = 60;
     private static final float ADDED_SPEED = 0.2F;
 
@@ -73,6 +74,7 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
                     this.spawnRedstoneTrail(this.boros, angle, 0, 0);
                 });
                 this.boros.playBeamSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
+                this.boros.playMouthOpenForShootingArrow();
                 this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_OPEN_WITHOUT_OPENED);
             }
 
@@ -83,8 +85,11 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
                 this.boros.playArrowSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
             }
 
+            if (stoppingTick == reducedTickDelay(CLOSE_MOUTH_TICK)) {
+                this.boros.playMouthClose();
+            }
+
             if (this.stoppingTick <= 0) {
-                this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
                 targetIndex++;
                 if (targetIndex >= pattern.arrowPattern.size()) {
                     this.stopGoal();
