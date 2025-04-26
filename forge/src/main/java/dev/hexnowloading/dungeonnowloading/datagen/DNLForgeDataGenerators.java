@@ -6,11 +6,9 @@ import dev.hexnowloading.dungeonnowloading.datagen.provider.DNLForgeItemModelPro
 import dev.hexnowloading.dungeonnowloading.datagen.provider.DNLForgeLootTableProvider;
 import dev.hexnowloading.dungeonnowloading.datagen.provider.DNLForgeRecipeProvider;
 import dev.hexnowloading.dungeonnowloading.datagen.tag.DNLForgeBlockTagGenerator;
+import dev.hexnowloading.dungeonnowloading.datagen.tag.DNLForgetItemTagGenerator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,6 +26,7 @@ public class DNLForgeDataGenerators {
 
         DNLForgeBlockTagGenerator blockTagGenerator = new DNLForgeBlockTagGenerator(generator, lookupProvider, existingFileHelper);
         generator.addProvider(true, blockTagGenerator);
+        generator.addProvider(true, new DNLForgetItemTagGenerator(generator.getPackOutput(), lookupProvider, existingFileHelper, blockTagGenerator.contentsGetter()));
         generator.addProvider(true, new DNLForgeBlockStateProvider(generator, existingFileHelper));
         generator.addProvider(true, new DNLForgeItemModelProvider(generator, existingFileHelper));
         generator.addProvider(true, new DNLForgeRecipeProvider(generator.getPackOutput()));

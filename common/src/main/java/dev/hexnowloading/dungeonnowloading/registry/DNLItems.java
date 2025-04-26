@@ -51,9 +51,9 @@ public class DNLItems {
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
 
     // ITEMS - MUSIC DISC
-    public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_ouros", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-    public static final Supplier<Item> MUSIC_DISC_BORUS = register("music_disc_borus", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-    public static final Supplier<Item> MUSIC_DISC_PYTHONIC_OVERDRIVE = register("music_disc_pythonic_overdrive", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_clash_of_duality_ouros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_OUROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
+    public static final Supplier<Item> MUSIC_DISC_BOROS = register("music_disc_clash_of_duality_boros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_BOROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
+    public static final Supplier<Item> MUSIC_DISC_PYTHONIC_OVERDRIVE = register("music_disc_clash_of_duality_pythonic_overdrive", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_PYTHONIC_OVERDRIVE.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
 
     // BLOCKS
     //public static final Supplier<Item> SKYLIGHT_STONE = register("skylight_stone", () -> new BlockItem(DNLBlocks.SKYLIGHT_STONE.get(), new Item.Properties()));

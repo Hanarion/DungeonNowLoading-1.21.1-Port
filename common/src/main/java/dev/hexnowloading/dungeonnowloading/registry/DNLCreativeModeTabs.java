@@ -55,7 +55,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
                 // Item - Music Disc
                 output.accept(DNLItems.MUSIC_DISC_OUROS.get());
-                output.accept(DNLItems.MUSIC_DISC_BORUS.get());
+                output.accept(DNLItems.MUSIC_DISC_BOROS.get());
                 output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
 
 

@@ -15,6 +15,15 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "name": "dungeonnowloading:music_disc_clash_of_duality_ouros"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
           "name": "dungeonnowloading:redstone_chip",
           "functions": [
             {

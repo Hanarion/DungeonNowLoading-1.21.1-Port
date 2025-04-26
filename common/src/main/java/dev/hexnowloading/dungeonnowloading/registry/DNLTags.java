@@ -23,6 +23,7 @@ public class DNLTags {
     public static final TagKey<EntityType<?>> REPULSOR_LOW_DAMAGE_PROJECTILES = registerEntityTypeTag("repulsor_low_damage_projectiles");
     public static final TagKey<Item> STONE_NOTCH_MATERIAL = registerItemTag("stone_notch_material");
     public static final TagKey<Item> REDSTONE_CIRCUIT_OR_CORE = registerItemTag("redstone_circuit_or_core");
+    public static final TagKey<Item> OUROS_BOROS_MUSIC_DISC = registerItemTag("ouros_boros_music_disc");
     public static final TagKey<Block> FAIRKEEPER_CHEST_IGNORE = registerBlockTag("fairkeeper_chest_ignore");
     public static final TagKey<Block> OVERCHARGED_REDSTONE_BLOCK_NEIGHBOUR_EXPLOSIVE = registerBlockTag("ovecharged_redstone_block_neighbour_explosive");
     public static final TagKey<Block> PRESERVER_IGNORE = registerBlockTag("preserver_ignore");

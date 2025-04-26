@@ -14,6 +14,9 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> MUSIC_CLASH_OF_DUALITY_BASE = registerSoundEvent("music_clash_of_duality_base");
     public static final Supplier<SoundEvent> MUSIC_CLASH_OF_DUALITY_BOROS = registerSoundEvent("music_clash_of_duality_boros");
     public static final Supplier<SoundEvent> MUSIC_CLASH_OF_DUALITY_OUROS = registerSoundEvent("music_clash_of_duality_ouros");
+    public static final Supplier<SoundEvent> DISC_CLASH_OF_DUALITY_BOROS = registerSoundEvent("disc_clash_of_duality_boros");
+    public static final Supplier<SoundEvent> DISC_CLASH_OF_DUALITY_OUROS = registerSoundEvent("disc_clash_of_duality_ouros");
+    public static final Supplier<SoundEvent> DISC_CLASH_OF_DUALITY_PYTHONIC_OVERDRIVE = registerSoundEvent("disc_clash_of_duality_pythonic_overdrive");
     public static final Supplier<SoundEvent> HIKE = registerSoundEvent("hike");
     public static final Supplier<SoundEvent> SCORCHER_OVERHEAT = registerSoundEvent("scorcher_overheat");
     public static final Supplier<SoundEvent> SCORCHER_SHOOT = registerSoundEvent("scorcher_shoot");

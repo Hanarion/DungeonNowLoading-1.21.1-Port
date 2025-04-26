@@ -3,10 +3,7 @@ package dev.hexnowloading.dungeonnowloading.datagen.provider;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 
 import java.util.function.Consumer;
@@ -267,6 +264,11 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .define('b', DNLItems.REDSTONE_CORE.get())
                 .define('r', Items.REDSTONE_BLOCK)
                 .unlockedBy("has_redstone_circuit_or_core", has(DNLTags.REDSTONE_CIRCUIT_OR_CORE))
+                .save(consumer);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get(), 1)
+                .requires(DNLItems.MUSIC_DISC_BOROS.get())
+                .requires(DNLItems.MUSIC_DISC_OUROS.get())
+                .unlockedBy("has_ouros_boros_music_disc", has(DNLTags.OUROS_BOROS_MUSIC_DISC))
                 .save(consumer);
     }
 

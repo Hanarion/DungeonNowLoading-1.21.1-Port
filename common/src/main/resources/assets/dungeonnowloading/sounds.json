@@ -3,7 +3,7 @@
     "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_base",
     "sounds": [
       {
-        "name": "dungeonnowloading:music/clash_of_duality_base",
+        "name": "dungeonnowloading:music/clash_of_duality_base_callister_corvus",
         "stream": true
       }
     ]
@@ -12,7 +12,7 @@
     "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_boros",
     "sounds": [
       {
-        "name": "dungeonnowloading:music/clash_of_duality_boros",
+        "name": "dungeonnowloading:music/clash_of_duality_boros_callister_corvus",
         "stream": true
       }
     ]
@@ -21,7 +21,7 @@
     "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_ouros",
     "sounds": [
       {
-        "name": "dungeonnowloading:music/clash_of_duality_ouros",
+        "name": "dungeonnowloading:music/clash_of_duality_ouros_callister_corvus",
         "stream": true
       }
     ]
@@ -30,11 +30,38 @@
     "subtitle": "sounds.dungeonnowloading.music_temple_of_duality",
     "sounds": [
       {
-        "name": "dungeonnowloading:music/hike",
+        "name": "dungeonnowloading:music/hike_callister_corvus",
         "stream": true
       },
       {
-        "name": "dungeonnowloading:music/nightstride",
+        "name": "dungeonnowloading:music/nightstride_callister_corvus",
+        "stream": true
+      }
+    ]
+  },
+  "disc_clash_of_duality_boros" : {
+    "subtitle": "sounds.dungeonnowloading.disc_clash_of_duality_boros",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/disc_clash_of_duality_boros_callister_corvus",
+        "stream": true
+      }
+    ]
+  },
+  "disc_clash_of_duality_ouros" : {
+    "subtitle": "sounds.dungeonnowloading.disc_clash_of_duality_ouros",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/disc_clash_of_duality_ouros_callister_corvus",
+        "stream": true
+      }
+    ]
+  },
+  "disc_clash_of_duality_pythonic_overdrive" : {
+    "subtitle": "sounds.dungeonnowloading.disc_clash_of_duality_pythonic_overdrive",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/disc_clash_of_duality_pythonic_overdrive_callister_corvus",
         "stream": true
       }
     ]
