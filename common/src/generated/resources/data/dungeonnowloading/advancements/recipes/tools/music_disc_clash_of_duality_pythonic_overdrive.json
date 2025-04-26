@@ -1,0 +1,33 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_ouros_boros_music_disc": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "dungeonnowloading:ouros_boros_music_disc"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "dungeonnowloading:music_disc_clash_of_duality_pythonic_overdrive"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_ouros_boros_music_disc",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "dungeonnowloading:music_disc_clash_of_duality_pythonic_overdrive"
+    ]
+  },
+  "sends_telemetry_event": false
+}
