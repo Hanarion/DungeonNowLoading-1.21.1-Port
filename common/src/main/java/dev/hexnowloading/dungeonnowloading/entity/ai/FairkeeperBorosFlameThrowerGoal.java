@@ -9,17 +9,15 @@ public class FairkeeperBorosFlameThrowerGoal extends StoppableGoal {
 
     private final FairkeeperBorosEntity boros;
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
-    private int shootingInterval;
-    private int startUpDelay;
-    private boolean isMain;
+    private final int startUpDelay;
+    private int startUpDelayTick;
     private FairkeeperBorosPartEntity currentPart;
 
     private static final int DURATION = 200;
 
-    public FairkeeperBorosFlameThrowerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, int startUpDelay, boolean isMain) {
+    public FairkeeperBorosFlameThrowerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, int startUpDelay) {
         this.boros = boros;
         this.state = state;
-        this.isMain = isMain;
         this.startUpDelay = reducedTickDelay(startUpDelay);
     }
 
@@ -30,39 +28,19 @@ public class FairkeeperBorosFlameThrowerGoal extends StoppableGoal {
 
     @Override
     public void start() {
-        this.shootingInterval = reducedTickDelay(DURATION);
-    }
-
-    @Override
-    public void stop() {
-        this.boros.stopAttacking(20);
+        this.startUpDelayTick = startUpDelay;
     }
 
     @Override
     public void tick() {
-        if (this.startUpDelay > 0) {
-            this.startUpDelay--;
+        if (this.startUpDelayTick > 0) {
+            this.startUpDelayTick--;
             return;
         }
 
-        if (isMain) {
-            if (this.shootingInterval > 0) {
-                this.shootingInterval--;
-            } else {
-                this.stopGoal();
-                return;
-            }
-
-            if (this.shootingInterval % reducedTickDelay(2) == 0) {
-                this.boros.playFlameShootingSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
-                this.shootFlame(90);
-                this.shootFlame(-90);
-            }
-        } else {
-            this.boros.playFlameShootingSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
-            this.shootFlame(90);
-            this.shootFlame(-90);
-        }
+        this.boros.playFlameShootingSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
+        this.shootFlame(90);
+        this.shootFlame(-90);
 
     }
 

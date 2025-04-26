@@ -309,6 +309,13 @@ public class FairkeeperBorosShootArrowGoal extends StoppableGoal {
             Triple.of(ShootingType.BOTH, ODD_PARTS, new Vec3(0, 0, -1))
     ));
 
+    public static ShootingPattern PATTERN_LINE_FAST = new ShootingPattern(true, 39F/FULL_ARENA_SIZE, ImmutableList.of(
+            Triple.of(ShootingType.NONE, List.of(), new Vec3(0, 0, 1)),
+            Triple.of(ShootingType.TRIPLE_BOTH, ODD_PARTS, new Vec3(0, 0, -1)),
+            Triple.of(ShootingType.TRIPLE_BOTH, EVEN_PARTS, new Vec3(0, 0, -1)),
+            Triple.of(ShootingType.TRIPLE_BOTH, ODD_PARTS, new Vec3(0, 0, -1))
+    ));
+
     public static ShootingPattern PATTERN_SLITHER = new ShootingPattern(true, 39F/FULL_ARENA_SIZE, ImmutableList.of(
             Triple.of(ShootingType.NONE, List.of(), new Vec3(1, 0, 1)),
             Triple.of(ShootingType.RIGHT, ALL_PARTS, new Vec3(-1, 0, 1))

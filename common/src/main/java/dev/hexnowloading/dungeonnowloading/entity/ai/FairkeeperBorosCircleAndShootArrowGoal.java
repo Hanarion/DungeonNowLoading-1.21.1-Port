@@ -313,15 +313,15 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
     private static List<Integer> ALL_PARTS = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
 
     public static ShootingPattern PATTERN_SMALL_CIRLCE = new ShootingPattern(false, true, 21F/FULL_ARENA_SIZE, ImmutableList.of(
-            Triple.of(ShootingType.BOTH, ALL_PARTS, 360F)
-  /*          Triple.of(ShootingType.RIGHT, EVEN_PARTS, 360F),
-            Triple.of(ShootingType.RIGHT, ODD_PARTS, 360F)*/
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 360F),
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 400F),
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 440F)
     ));
 
     public static ShootingPattern PATTERN_LARGE_CIRCLE = new ShootingPattern(false, true, 44F/FULL_ARENA_SIZE, ImmutableList.of(
-            Triple.of(ShootingType.BOTH, ODD_PARTS, 360F),
-            Triple.of(ShootingType.BOTH, EVEN_PARTS, 480F),
-            Triple.of(ShootingType.BOTH, ODD_PARTS, 600F)
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 120F),
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 240F),
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 360F)
     ));
 
     public static ShootingPattern PATTERN_PLAYER_LARGE_CIRCLE = new ShootingPattern(false, true, 44F/FULL_ARENA_SIZE, ImmutableList.of(
@@ -332,7 +332,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
 
     public static ShootingPattern PATTERN_LARGE_CIRCLE_MORE_ARROWS = new ShootingPattern(false, true, 44F/FULL_ARENA_SIZE, ImmutableList.of(
             Triple.of(ShootingType.BOTH, ALL_PARTS, 180F),
-            Triple.of(ShootingType.BOTH, ALL_PARTS, 3000F),
+            Triple.of(ShootingType.BOTH, ALL_PARTS, 300F),
             Triple.of(ShootingType.BOTH, ALL_PARTS, 420F)
     ));
 }

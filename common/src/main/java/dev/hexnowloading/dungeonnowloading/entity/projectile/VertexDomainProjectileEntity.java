@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.AxisParticleType;
@@ -18,7 +19,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,12 +30,13 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.*;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
-import java.util.function.BiConsumer;
+import java.util.List;
 
 public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
 
@@ -46,9 +47,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     private static final EntityDataAccessor<VertexDomainAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityStates.VERTEX_DOMAIN_ANIMATION_STATE);
     private static final EntityDataAccessor<Integer> DYING_TICK = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> GROUND_COLLISION = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.BOOLEAN);
-
-
-    private final DynamicGameEventListener<BlockPlaceBreakListener> dynamicBlockPlaceBreakListener;
+    private static final EntityDataAccessor<Integer> RADIUS = SynchedEntityData.defineId(VertexDomainProjectileEntity.class, EntityDataSerializers.INT);
 
     public final AnimationState spinAnimationState = new AnimationState();
     public final AnimationState impactAnimationState = new AnimationState();
@@ -81,15 +80,14 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
 
     public VertexDomainProjectileEntity(EntityType<? extends VertexDomainProjectileEntity> entityType, Level level) {
         super(entityType, level);
-        this.dynamicBlockPlaceBreakListener = new DynamicGameEventListener<>(new BlockPlaceBreakListener(new EntityPositionSource(this, 1.0F), RANGE));
         this.health = BASE_HEALTH;
     }
 
     public VertexDomainProjectileEntity(Level level, LivingEntity owner, float health) {
-        super(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), level);
-        this.dynamicBlockPlaceBreakListener = new DynamicGameEventListener<>(new BlockPlaceBreakListener(new EntityPositionSource(this, 1.0F), RANGE));
+        this(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), level);
         this.setOwner(owner);
         this.health = health;
+        this.setRadius(RANGE);
         this.setDyingTick(0);
     }
 
@@ -129,6 +127,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         this.entityData.define(ANIMATION_STATE, VertexDomainAnimationState.IDLE);
         this.entityData.define(DYING_TICK, 0);
         this.entityData.define(GROUND_COLLISION, false);
+        this.entityData.define(RADIUS, 0);
     }
 
     @Override
@@ -196,7 +195,11 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
             if (this.expansionTick > 0) {
                 this.expansionTick--;
             }
-            spawnBoundaryParticles(RANGE);
+            //spawnBoundaryParticles(RANGE);
+            applyEffect();
+            if (this.life > 50) {
+                spawnRedstoneParticle();
+            }
             if (!this.level().isClientSide && (this.life <= 0 || !this.entityData.get(GROUND_COLLISION) || this.level().getBlockState(this.blockPosition().below()).isAir())) {
                 this.remove(RemovalReason.DISCARDED);
             }
@@ -207,6 +210,97 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
             int DESTRUCTION_RANGE = 2;
             this.blockDestructionTick(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
         }
+    }
+
+    private void applyEffect() {
+        Level level = this.level();
+        if (level.isClientSide) {
+            return;
+        }
+
+        int r = this.getRadius();
+
+        AABB effectBox = new AABB(
+                this.getX() - r, this.getY() - r, this.getZ() - r,
+                this.getX() + r, this.getY() + r, this.getZ() + r
+        );
+        List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, effectBox);
+        for (LivingEntity entity : entities) {
+            if (entity instanceof FairkeeperSerpentEntity) {
+                continue;
+            }
+            if (applyDamage(entity, BASE_DAMAGE, 0.6F)) {
+                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER)); // Slowness V (4 = level 5)
+                spawnRedstoneBeamParticle((ServerLevel) level, entity);
+            }
+        }
+    }
+
+    private void spawnInitialRedstoneParticles() {
+        float particleScale = BEAM_INITIAL_PARTICLE_SCALE_MIN + (float) Math.random() * (BEAM_INITIAL_PARTICLE_SCALE_MAX - BEAM_INITIAL_PARTICLE_SCALE_MIN);
+        ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(
+                DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
+                particleScale
+        );
+        for (int i = 0; i < 10; i++) {
+            this.level().addParticle(particleData, this.getX() + 2 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()), this.getY()  + 2 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()),this.getZ()  + 2 * (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()), 0, 0, 0);
+        }
+        this.level().addParticle(ParticleTypes.EXPLOSION, this.getX() ,this.getY() ,this.getZ(), 0, 0, 0);
+
+
+
+        //spawnParticleOnAllPlanes(particleData, this.position(), this.getRadius());
+    }
+
+    private void spawnRedstoneParticle() {
+        if (!(this.level() instanceof ServerLevel serverLevel)) return;
+
+        if (this.level().getRandom().nextFloat() > 0.3F) return; // 10% spawn chance
+
+        int radius = this.getRadius();
+        Vec3 center = this.position();
+        double centerX = center.x;
+        double centerY = center.y - 0.5;
+        double centerZ = center.z;
+
+        int side = this.level().getRandom().nextInt(4);
+        double x = centerX;
+        double z = centerZ;
+        float angleToSide = 0F;
+
+        switch (side) {
+            case 0: // +X Side
+                x = centerX + radius + 0.49;
+                z = centerZ - radius + this.level().getRandom().nextDouble() * (radius * 2);
+                angleToSide = 90F + 180F; // Flipped
+                break;
+            case 1: // -X Side
+                x = centerX - radius - 0.49;
+                z = centerZ - radius + this.level().getRandom().nextDouble() * (radius * 2);
+                angleToSide = -90F + 180F; // Flipped
+                break;
+            case 2: // +Z Side
+                z = centerZ + radius + 0.49;
+                x = centerX - radius + this.level().getRandom().nextDouble() * (radius * 2);
+                angleToSide = 0F + 180F; // Flipped
+                break;
+            case 3: // -Z Side
+                z = centerZ - radius - 0.49;
+                x = centerX - radius + this.level().getRandom().nextDouble() * (radius * 2);
+                angleToSide = 180F + 180F; // Flipped
+                break;
+        }
+
+        // Ensure the angle remains within 0-360°
+        angleToSide = (angleToSide + 360F) % 360F;
+
+        // Spawn the particle moving upwards, aligned with the side of the boundary
+        serverLevel.sendParticles(
+                new AxisParticleType.AxisParticleData(DNLParticleTypes.VERTEX_BOUNDARY_PARTICLE.get(), 1, angleToSide),
+                x, centerY, z, 1, // Position at ground level
+                0.0, 0.02, 0.0, // Motion: Only moving up
+                0.0
+        );
     }
 
     @Override
@@ -269,14 +363,6 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
 
         if (this.impactAnimationState.isStarted() && this.impactAnimationTimeOut <= 0) {
             this.impactAnimationTimeOut = IMPACT_ANIMATION_DURATION;
-        }
-    }
-
-    @Override
-    public void updateDynamicGameEventListener(BiConsumer<DynamicGameEventListener<?>, ServerLevel> eventListener) {
-        Level level = this.level();
-        if (level instanceof ServerLevel serverLevel) {
-            eventListener.accept(this.dynamicBlockPlaceBreakListener, serverLevel);
         }
     }
 
@@ -503,15 +589,6 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     }
 
     @Override
-    public void remove(RemovalReason removalReason) {
-        super.remove(removalReason);
-
-        if (this.level() instanceof ServerLevel serverLevel) {
-            this.dynamicBlockPlaceBreakListener.remove(serverLevel);
-        }
-    }
-
-    @Override
     public EntityDimensions getDimensions(Pose pose) {
         if (this.getDyingTick() > 0) {
             return EntityDimensions.fixed(0.0F, 0.0F);
@@ -611,6 +688,14 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
 
     public int getExpansionTick() { return this.expansionTick; }
 
+    public void setRadius (int radius) {
+        this.entityData.set(RADIUS, radius);
+    }
+
+    public int getRadius() {
+        return this.entityData.get(RADIUS);
+    }
+
     public VertexDomainAnimationState getAnimationState() { return this.entityData.get(ANIMATION_STATE); }
 
     public void setAnimationState(VertexDomainAnimationState state) { this.entityData.set(ANIMATION_STATE, state); }
@@ -619,49 +704,5 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         IDLE,
         SPIN,
         IMPACT
-    }
-
-    class BlockPlaceBreakListener implements GameEventListener {
-        private final PositionSource listenerSource;
-        private final int listenerRadius;
-
-        public BlockPlaceBreakListener(PositionSource positionSource, int radius) {
-            this.listenerSource = positionSource;
-            this.listenerRadius = radius - 1;
-        }
-
-        @Override
-        public PositionSource getListenerSource() {
-            return this.listenerSource;
-        }
-
-        @Override
-        public int getListenerRadius() {
-            return (int) Math.ceil(this.listenerRadius * Math.sqrt(3));
-        }
-
-        @Override
-        public boolean handleGameEvent(ServerLevel serverLevel, GameEvent gameEvent, GameEvent.Context context, Vec3 pos) {
-            if (VertexDomainProjectileEntity.this.life <= 0) {
-                return false;
-            }
-
-            BlockPos eventBlockPos = new BlockPos((int) Math.floor(pos.x), (int) Math.floor(pos.y), (int) Math.floor(pos.z));
-
-            Vec3 centerPos = this.getListenerSource().getPosition(serverLevel).orElseThrow();
-            BlockPos centerBlockPos = new BlockPos((int) Math.floor(centerPos.x), (int) Math.floor(centerPos.y) - 1, (int) Math.floor(centerPos.z));
-            if (Math.abs(eventBlockPos.getX() - centerBlockPos.getX()) <= this.listenerRadius && Math.abs(eventBlockPos.getY() - centerBlockPos.getY()) <= this.listenerRadius && Math.abs(eventBlockPos.getZ() - centerBlockPos.getZ()) <= this.listenerRadius) {
-                if (gameEvent == GameEvent.BLOCK_PLACE || gameEvent == GameEvent.BLOCK_DESTROY) {
-                    if (context.sourceEntity() instanceof Player player && !player.getAbilities().instabuild && applyDamage(player, BASE_DAMAGE, 1.0F)) {
-                        spawnRedstoneBeamParticle(serverLevel, player);
-                        serverLevel.playSound((Entity) null, centerBlockPos, SoundEvents.WITHER_SHOOT, SoundSource.BLOCKS, 3.0F, 1.0F);
-                        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER));
-                        outlineCauseBlock(serverLevel, eventBlockPos);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 }

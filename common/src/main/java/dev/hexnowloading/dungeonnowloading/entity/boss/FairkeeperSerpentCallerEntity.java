@@ -371,21 +371,21 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         if (this.borosMoveSet.isEmpty()) {
             borosMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_RANDOM, 1, 0, 1);
-            borosMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_RANDOM, 1, 0, 0);
+            borosMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_RANDOM, 2, 0, 0);
         }
 
         if (this.borosArrowMoveSet.isEmpty()) {
-            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LINE, 1, 3, 3);
-            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, 1, 3, 3);
-            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, 1, 3, 0);
-            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SLITHER, 1, 3, 0);
-            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, 1, 3, 0);
+            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LINE_FAST, 1, 1, 2);
+            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, 1, 1, 0);
+            borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, 1, 1, 0);
+            //borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SLITHER, 1, 3, 0);
+            //borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, 1, 2, 0);
         }
 
         if (this.borosPursueMoveSet.isEmpty()) {
-            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, 1, 2, 2);
-            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_PURSUING, 1, 1, 0);
-            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, 1, 1, 1);
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE_FAST, 1, 1, 1);
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_TACKLE, 1, 1, 0);
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, 1, 0, 1);
         }
 
         borosAssignState();
@@ -411,30 +411,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_CENTER), 1, 1, 0);
             ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_INNER), 1, 1, 1);
             ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_OUTER), 1, 1, 0);
-        }
-
-        ourosAssignState();
-    }
-
-    private void commandBorosPhase3() {
-
-    }
-
-    private void commandOurosPhase3() {
-        if (this.ourosMoveSet.isEmpty()) {
-            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SUMMON_SCUTTLE, 3, 2, 1);
-            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, 1, 0, 1);
-            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, 3, 2, 1);
-            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, 6, 4, 0);
-            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM, 3, 2, 1);
-        }
-
-        if (ourosPillarMoveSet.isEmpty()) {
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_SMALL_SQUARE), 1, 0, 2);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_CENTER), 1, 0, 2);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_INNER), 3, 0, 0);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_CROSS), 3, 0, 0);
-            ourosPillarMoveSet.addMove((FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_OUTER), 3, 0, 0);
         }
 
         ourosAssignState();

@@ -120,18 +120,20 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FairkeeperBorosAwakenGoal(this));
-        this.goalSelector.addGoal(3, new FairkeeperBorosPursuePlayerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 1.3));
-        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_PURSUING, this, 20, true));
+        this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.TACKLE_FAST, this, 1.5, 10.0F, 0.7F));
+        this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.FLAME_TACKLE, this, 1.3, 6.0F, 0.5F));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_TACKLE, this, 20));
         this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.TACKLE, this, 1.3, 6.0F, 0.5F));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LINE, this, 1.5, FairkeeperBorosShootArrowGoal.PATTERN_LINE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SLITHER, this, 1.5, FairkeeperBorosShootArrowGoal.PATTERN_SLITHER));
+        //this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SLITHER, this, 1.5, FairkeeperBorosShootArrowGoal.PATTERN_SLITHER));
+        this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LINE_FAST, this, 1.7f, FairkeeperBorosShootArrowGoal.PATTERN_LINE_FAST));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_SMALL_CIRLCE));
         this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_LARGE_CIRCLE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_PLAYER_LARGE_CIRCLE));
+        //this.goalSelector.addGoal(3, new FairkeeperBorosCircleAndShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, this, 1.7f, FairkeeperBorosCircleAndShootArrowGoal.PATTERN_PLAYER_LARGE_CIRCLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, this, 1.3f, 3.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_TRIPLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_SINGLE_ARROW, this, 1.3f, 5.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_SINGLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowAboveGoal(FairkeeperBorosState.SHOOT_ARROW_ABOVE, this, 1.5f, FairkeeperBorosShootArrowAboveGoal.PATTERN_PLAYER_LARGE_CIRCLE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.DESPERATE, this, 20, false));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.DESPERATE, this, 20));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.DESPERATE, this, 1.5F, 2.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_DESPERATE));
         this.goalSelector.addGoal(3, new FairkeeperBorosEatVertexProjectilesGoal(FairkeeperBorosState.EAT_VERTEX_PROJECTILES, this, 1.5f));
         this.goalSelector.addGoal(4, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true, true));
@@ -809,10 +811,12 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         AWAKENING,
         IDLE,
         TACKLE,
+        TACKLE_FAST,
         PURSUE_RANDOM,
-        FLAME_PURSUING,
+        FLAME_TACKLE,
         SHOOT_ARROW_RANDOM,
         SHOOT_ARROW_LINE,
+        SHOOT_ARROW_LINE_FAST,
         SHOOT_ARROW_SLITHER,
         SHOOT_ARROW_SMALL_CIRCLE,
         SHOOT_ARROW_LARGE_CIRCLE,
