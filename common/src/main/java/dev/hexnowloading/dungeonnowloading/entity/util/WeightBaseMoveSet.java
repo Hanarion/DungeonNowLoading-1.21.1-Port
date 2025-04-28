@@ -9,7 +9,7 @@ public class WeightBaseMoveSet<T extends Object> {
 
     List<Move> moveSet = new ArrayList<>();
 
-    private class Move {
+    protected class Move {
         T object;
         int weight;
         int cooldown;

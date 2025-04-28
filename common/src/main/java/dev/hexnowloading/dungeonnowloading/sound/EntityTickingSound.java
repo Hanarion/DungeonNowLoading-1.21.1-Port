@@ -87,8 +87,6 @@ public class EntityTickingSound extends AbstractTickableSoundInstance implements
         // -- Final volume combines both effects --
         this.volume = maxVolume * fadeVolume * distanceVolume;
 
-        System.out.println("Volume: " + this.volume);
-
         if (!entity.isAlive()) {
             this.stop();
         }

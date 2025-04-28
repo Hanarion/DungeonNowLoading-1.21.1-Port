@@ -10,6 +10,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
+import dev.hexnowloading.dungeonnowloading.util.DNLLevelUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -419,6 +420,9 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void destroyContactBlocks(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+
+        DNLLevelUtil.beginMultiDestroy();
+
         for (int ix = minX; ix <= maxX; ix++) {
             for (int iz = minZ; iz <= maxZ; iz++) {
                 for (int iy = minY; iy <= maxY; iy++) {
@@ -429,12 +433,14 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
                         if (!blockState.is(BlockTags.WITHER_IMMUNE) && !blockState.is(DNLTags.TORCH_BLOCKS)) {
-                            this.level().destroyBlock(blockPos, false, this);
+                            DNLLevelUtil.destroyBlockMulti(this.level(), blockPos, false, this, 3);
                         }
                     }
                 }
             }
         }
+
+        DNLLevelUtil.endMultiDestroy(this.level(), this);
     }
 
     private void abilityCooldown() {
@@ -825,6 +831,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         PURSUE_AND_SHOOT_SINGLE_ARROW,
         SHOOT_ARROW_ABOVE,
         EAT_VERTEX_PROJECTILES,
+        EXHAUSTED,
         DESPERATE,
         DYING;
 

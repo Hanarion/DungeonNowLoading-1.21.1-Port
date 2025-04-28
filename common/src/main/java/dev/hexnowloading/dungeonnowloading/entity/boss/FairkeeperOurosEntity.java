@@ -10,6 +10,7 @@ import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
+import dev.hexnowloading.dungeonnowloading.util.DNLLevelUtil;
 import dev.hexnowloading.dungeonnowloading.util.NbtHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -505,7 +506,6 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void blockDestructionTick() {
-        //System.out.println(this.canDestroyBlocks);
 
         if (!this.canDestroyBlocks) {
             return;
@@ -519,6 +519,9 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void destroyContactBlocks(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+
+        DNLLevelUtil.beginMultiDestroy();
+
         for (int ix = minX; ix <= maxX; ix++) {
             for (int iz = minZ; iz <= maxZ; iz++) {
                 for (int iy = minY; iy <= maxY; iy++) {
@@ -529,12 +532,14 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
                         if (!blockState.is(BlockTags.WITHER_IMMUNE) && !blockState.is(DNLTags.TORCH_BLOCKS)) {
-                            this.level().destroyBlock(blockPos, false, this);
+                            DNLLevelUtil.destroyBlockMulti(this.level(), blockPos, false, this, 3);
                         }
                     }
                 }
             }
         }
+
+        DNLLevelUtil.endMultiDestroy(this.level(), this);
     }
 
     private void abilityCooldown() {
@@ -915,6 +920,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         SHOOT_SINGLE_VERTEX_ORB,
         SHOOT_TRIPLE_VERTEX_ORB,
         SHOOT_VERTEX_DOMAIN,
+        EXHAUSTED,
         DESPERATE,
         DYING;
 

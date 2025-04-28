@@ -22,12 +22,14 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
     private int arenaSize;
     private int loopCount;
     private int totalDuration;
+    private int crashDuration;
     private BlockPos arenaCenter;
 
     private final int TACKLE_DURATION = reducedTickDelay(40);
     private final int SLOWDOWN_DURATION = reducedTickDelay(10);
     private final int TACKLE_COOLDOWN = reducedTickDelay(40);
     private final int EXPIRY_DURATION = reducedTickDelay(300);
+    private final int CRASH_DURATION = reducedTickDelay(40);
     private final int TOTAL_LOOP = 3;
     private final double SLOWDOWN_SPEED_BY = 0.5;
     private static final float OFFSET_FROM_WALL = 1.5f;
@@ -110,10 +112,8 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
             if (isInsideArena) {
                 this.targetPosition = potentialTargetPosition;
             } else {
+                this.crashDuration = CRASH_DURATION;
                 this.tackleDuration = 0;
-            }
-            if (this.tackleDuration == 3) {
-                //this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_CLOSE);
             }
             if (this.tackleDuration <= 0) {
                 if (loopCount == TOTAL_LOOP) {
@@ -124,6 +124,11 @@ public class FairkeeperBorosTackleGoal extends StoppableGoal {
                     this.tackleCooldown = TACKLE_COOLDOWN;
                 }
             }
+        }
+
+        if (this.crashDuration > 0) {
+            this.crashDuration--;
+            updatedSpeed = this.speed - SLOWDOWN_SPEED_BY;
         }
 
         this.boros.getMoveControl().setWantedPosition(this.targetPosition.x, this.targetPosition.y, this.targetPosition.z, updatedSpeed);

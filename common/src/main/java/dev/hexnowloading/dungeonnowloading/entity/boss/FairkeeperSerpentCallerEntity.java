@@ -7,10 +7,7 @@ import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.BossTargetSelectorGoal;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
-import dev.hexnowloading.dungeonnowloading.entity.util.SpawnMobUtil;
-import dev.hexnowloading.dungeonnowloading.entity.util.WeightBaseMoveSet;
+import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeInTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeOutBackgroundMusicSoundPacket;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
@@ -93,7 +90,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private Set<UUID> playerUUIDs;
     private Set<UUID> minionUUIDs;
 
-
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> introMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> comboMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> directMoveSet = new WeightBaseMoveSet<>();
@@ -102,6 +98,32 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private WeightBaseMoveSet<FairkeeperBorosEntity.FairkeeperBorosState> borosMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<FairkeeperBorosEntity.FairkeeperBorosState> borosArrowMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<FairkeeperBorosEntity.FairkeeperBorosState> borosPursueMoveSet = new WeightBaseMoveSet<>();
+
+    private ExhaustionTracker ourosExhaustion = new ExhaustionTracker(10F);
+    private ExhaustionTracker borosExhaustion = new ExhaustionTracker(10F);
+
+    private static final Map<FairkeeperOurosEntity.FairkeeperOurosState, Float> OUROS_EXHAUSTION_MAP = Map.of(
+            FairkeeperOurosEntity.FairkeeperOurosState.SUMMON_SCUTTLE, 2F,
+            FairkeeperOurosEntity.FairkeeperOurosState.SUMMON_MORE_SCUTTLES, 2F,
+            FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, 1F,
+            FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, 2F,
+            FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, 5F,
+            FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_CENTER, 2F,
+            FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_INNER, 2F,
+            FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_LINE_OUTER, 2F,
+            FairkeeperOurosEntity.FairkeeperOurosState.DESPERATE, 8F
+    );
+
+    private static final Map<FairkeeperBorosEntity.FairkeeperBorosState, Float> BOROS_EXHAUSTION_MAP = Map.of(
+            FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LINE_FAST, 2F,
+            FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, 2F,
+            FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, 2F,
+            FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, 2F,
+            FairkeeperBorosEntity.FairkeeperBorosState.TACKLE_FAST, 2F,
+            FairkeeperBorosEntity.FairkeeperBorosState.FLAME_TACKLE, 4F,
+            FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, 2F,
+            FairkeeperBorosEntity.FairkeeperBorosState.DESPERATE, 8F
+    );
 
     public FairkeeperSerpentCallerEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -173,6 +195,8 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.activationTick = 60;
         this.isBorosDefeated = 0;
         this.isOurosDefeated = 0;
+        this.ourosExhaustion.resetExhaustion();
+        this.borosExhaustion.resetExhaustion();
         this.playSound(DNLSounds.FAIRKEEPER_SERPENT_CALLER_ACTIVATED.get(), 3.0F, 1.0F);
         this.playBossMusic();
         this.clearAllMoveSet();
@@ -206,13 +230,11 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         if (!this.level().isClientSide) {
             if (this.entityData.get(ANIMATION_STATE) == FairkeeperSerpentCallerAnimationState.NONE) {
                 this.transitionTo(FairkeeperSerpentCallerAnimationState.IDLE);
-                System.out.println("IDLE");
             }
         }
         if (this.isActivated() && !this.level().isClientSide) {
             musicTick++;
             if (this.musicTick >= 3242) {
-                System.out.println("Replayed");
                 this.musicTick = 0;
                 this.playLoopMusic();
             }
@@ -383,9 +405,9 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         }
 
         if (this.borosPursueMoveSet.isEmpty()) {
-            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE_FAST, 1, 1, 1);
-            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_TACKLE, 1, 1, 0);
-            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, 1, 0, 1);
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE, 3, 1, 1);
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.FLAME_TACKLE, 2, 1, 0);
+            borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, 3 , 0, 1);
         }
 
         borosAssignState();
@@ -404,7 +426,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB, 1, 0, 3);
             ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_TRIPLE_VERTEX_ORB, 3, 2, 2);
             ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_VERTEX_DOMAIN, 6, 4, 1);
-            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM, 3, 0, 0);
+            ourosMoveSet.addMove(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM, 3, 0);
         }
 
         if (ourosPillarMoveSet.isEmpty()) {
@@ -479,8 +501,16 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         cleanMinionList();
 
+        float exhaustionPercent = this.borosExhaustion.getExhaustionPercent();
+        float random = this.random.nextFloat();
+
         if (isAboveBoros()) {
             state = FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_ABOVE;
+        } else if (exhaustionPercent > 0.5F && exhaustionPercent > random) {
+            System.out.println("exhausted: " + this.borosExhaustion.getExhaustionPercent() * 200);
+            System.out.println("exhaustionPercent: " + exhaustionPercent);
+            System.out.println("random: " + random);
+            state = FairkeeperBorosEntity.FairkeeperBorosState.EXHAUSTED;
         } else {
             state = borosMoveSet.selectMove();
         }
@@ -493,26 +523,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             state = borosPursueMoveSet.selectMove();
         }
 
-        /*int halfSize = this.getArenaSize();
-        AABB arenaAABB = new AABB(
-                this.getX() - halfSize, this.getY() - halfSize, this.getZ() - halfSize,
-                this.getX() + halfSize, this.getY() + halfSize, this.getZ() + halfSize
-        );
-
-        List<Entity> targetProjectile = boros.level().getEntities((Entity) null, arenaAABB, entity ->
-                        entity instanceof VertexOrbProjectileEntity || entity instanceof VertexDomainProjectileEntity
-                ).stream()
-                .filter(entity -> entity.getY() < boros.getY() + 3) // Filter out unreachable projectiles
-                .toList();
-
-        if (targetProjectile.size() > 4 * (this.boros.getHealth() / this.boros.getMaxHealth()) && this.boros.getRandom().nextFloat() < 1.0F) {
-            state = FairkeeperBorosEntity.FairkeeperBorosState.EAT_VERTEX_PROJECTILES;
-        }*/
-
         if (this.getPhase() > 2 && !this.hasAddedDesperateMove) {
             state = FairkeeperBorosEntity.FairkeeperBorosState.DESPERATE;
             this.hasAddedDesperateMove = true;
-            this.borosMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.DESPERATE, borosMoveSet.getTotalWeight() * 2, 3);
+            this.borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.DESPERATE, 2, 3, 3);
+            this.borosPursueMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE_FAST, 3, 1, 1);
+            this.borosPursueMoveSet.removeMove(FairkeeperBorosEntity.FairkeeperBorosState.TACKLE);
         }
 
         Entity boros = this.getBoros();
@@ -521,8 +537,15 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 borosEntity.setState(FairkeeperBorosEntity.FairkeeperBorosState.IDLE);
                 borosEntity.setAttackTick(60);
                 this.ourosMoveSet.reduceAllCooldown();
+            } else if (state == FairkeeperBorosEntity.FairkeeperBorosState.EXHAUSTED) {
+                borosEntity.setState(FairkeeperBorosEntity.FairkeeperBorosState.IDLE);
+                borosEntity.setAttackTick((int) (this.borosExhaustion.getExhaustionPercent() * 200));
+                this.borosExhaustion.resetExhaustion();
             } else {
                 ((FairkeeperBorosEntity) boros).setState(state);
+                float exhaustionCost = BOROS_EXHAUSTION_MAP.getOrDefault(state, 0F);
+                System.out.println("exhaustion cost: " + this.borosExhaustion.getExhaustion());
+                this.borosExhaustion.addExhaustion(exhaustionCost);
             }
         }
         this.setBorosWaitingForCommand(false);
@@ -537,8 +560,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         cleanMinionList();
 
+        float exhaustionPercent = this.ourosExhaustion.getExhaustionPercent();
+
         if (isAboveBoros()) {
             state = FairkeeperOurosEntity.FairkeeperOurosState.SHOOT_SINGLE_VERTEX_ORB;
+        } else if (exhaustionPercent > 0.5F && exhaustionPercent > this.random.nextFloat()) {
+            state = FairkeeperOurosEntity.FairkeeperOurosState.EXHAUSTED;
         } else {
             state = ourosMoveSet.selectMove();
         }
@@ -576,8 +603,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 ourosEntity.setState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
                 ourosEntity.setAttackTick(60);
                 this.ourosMoveSet.reduceAllCooldown();
+            } else if (state == FairkeeperOurosEntity.FairkeeperOurosState.EXHAUSTED) {
+                ourosEntity.setState(FairkeeperOurosEntity.FairkeeperOurosState.IDLE);
+                ourosEntity.setAttackTick((int) (this.ourosExhaustion.getExhaustionPercent() * 200));
+                this.ourosExhaustion.resetExhaustion();
             } else {
                 ((FairkeeperOurosEntity) ouros).setState(state);
+                float exhaustionCost = OUROS_EXHAUSTION_MAP.getOrDefault(state, 0F);
+                this.ourosExhaustion.addExhaustion(exhaustionCost);
             }
         }
         this.setOurosWaitingForCommand(false);
@@ -600,6 +633,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     }
 
     private void defeatedBosses() {
+        this.level().explode(null, this.getX(), this.getY(), this.getZ(), 1.0F, Level.ExplosionInteraction.BLOCK);
         if (BossConfig.TOGGLE_MULTIPLAYER_LOOT.get() && !this.playerUUIDs.isEmpty()) {
             for (UUID playerUUID : this.playerUUIDs) {
                 this.spawnLootTableItems(this.lastDamageSource, true, true, playerUUID);
@@ -656,7 +690,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         }
         ResourceLocation baseResourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get()).withPrefix("entities/");
         ResourceLocation lootTableResourceLocation = this.isBorosDefeated > this.isOurosDefeated ? baseResourceLocation.withSuffix("/boros") : baseResourceLocation.withSuffix("/ouros");
-        System.out.println(lootTableResourceLocation);
         LootTable lootTable = this.level().getServer().getLootData().getLootTable(lootTableResourceLocation);
         LootParams.Builder builder = (new LootParams.Builder((ServerLevel) this.level()))
                 .withParameter(LootContextParams.THIS_ENTITY, this)
@@ -1090,14 +1123,5 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         NONE,
         IDLE,
         ACTIVE
-    }
-
-    private enum FairkeeperSound {
-        CLASH_OF_DUALITY_BASE,
-        CLASH_OF_DUALITY_BOROS,
-        CLASH_OF_DUALITY_OUROS,
-        CLASH_OF_DUALITY_BASE_2,
-        CLASH_OF_DUALITY_BOROS_2,
-        CLASH_OF_DUALITY_OUROS_2
     }
 }
