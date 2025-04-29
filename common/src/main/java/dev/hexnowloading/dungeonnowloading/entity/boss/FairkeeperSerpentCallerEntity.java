@@ -30,6 +30,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -918,7 +919,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         soundsToStart.add(DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation());
         for (ServerPlayer player : nearbyPlayers) {
             for (ResourceLocation sound : soundsToStart) {
-                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), sound, 0, 1.0f, false, ARENA_SIZE), player);
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), sound, SoundSource.MUSIC, 0, 1.0f, false, ARENA_SIZE, ARENA_SIZE), player);
             }
             Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 60), player);
             Services.NETWORK.sendToPlayer(new S2CFadeOutBackgroundMusicSoundPacket(60), player);
@@ -933,11 +934,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 detectionBox
         );
         for (ServerPlayer player : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation(), 1, 1.0f, false, ARENA_SIZE), player);
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation(), SoundSource.MUSIC, 1, 1.0f, false, ARENA_SIZE, ARENA_SIZE), player);
             if (this.isBorosDefeated > 2) {
-                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), 1, 1.0f, false, ARENA_SIZE), player);
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), SoundSource.MUSIC, 1, 1.0f, false, ARENA_SIZE, ARENA_SIZE), player);
             } else if (this.isOurosDefeated > 2) {
-                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation(), 1, 1.0f, false, ARENA_SIZE), player);
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation(), SoundSource.MUSIC, 1, 1.0f, false, ARENA_SIZE, ARENA_SIZE), player);
+            } else {
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), SoundSource.MUSIC, 0, 1.0f, false, ARENA_SIZE, ARENA_SIZE), player);
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_BOROS.get().getLocation(), SoundSource.MUSIC, 0, 1.0f, false, ARENA_SIZE, ARENA_SIZE), player);
             }
         }
     }

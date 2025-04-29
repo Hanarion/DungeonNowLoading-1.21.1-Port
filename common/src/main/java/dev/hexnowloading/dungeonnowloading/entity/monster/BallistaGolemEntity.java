@@ -20,6 +20,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -204,7 +205,7 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
                 detectionBox
         );
         for (ServerPlayer player : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), soundEvent.getLocation()), player);
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), soundEvent.getLocation(), SoundSource.HOSTILE), player);
         }
     }
 

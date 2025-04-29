@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.structures;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -13,7 +14,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.GeodeFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.BlockStateConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.GeodeConfiguration;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,98 +24,91 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
-import static dev.hexnowloading.dungeonnowloading.registry.DNLTags.NO_GEODES_TAG;
+/*
+ * This code is adapted from the RepurposedStructures project
+ * (https://github.com/TelepathicGrunt/RepurposedStructures),
+ * licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0).
+ *
+ * Portions of this code are based on:
+ * - NoGeodesInStructuresMixin.java:
+ *   https://github.com/TelepathicGrunt/RepurposedStructures/blob/1.21.5-MDG/common/src/main/java/com/telepathicgrunt/repurposedstructures/mixins/features/NoGeodesInStructuresMixin.java
+ * - GeneralUtils.java:
+ *   https://github.com/TelepathicGrunt/RepurposedStructures/blob/1.21.5-MDG/common/src/main/java/com/telepathicgrunt/repurposedstructures/utils/GeneralUtils.java
+ *
+ * Changes have been made to better fit Dungeon Now Loading's structure generation system.
+ *
+ * A copy of the LGPL-3.0 license can be found at:
+ * https://www.gnu.org/licenses/lgpl-3.0.html
+ */
+
 
 @Mixin(GeodeFeature.class)
 public class NoGeodesInStructuresMixin {
 
     @Inject(
             method = "place(Lnet/minecraft/world/level/levelgen/feature/FeaturePlaceContext;)Z",
-            at = @At(value = "HEAD"),
+            at = @At("HEAD"),
             cancellable = true
     )
-    private void preventGeodeInStructures(FeaturePlaceContext<BlockStateConfiguration> context, CallbackInfoReturnable<Boolean> cir) {
+    private void dungeonnowloading_noGeodesInStructures(FeaturePlaceContext<GeodeConfiguration> context, CallbackInfoReturnable<Boolean> cir) {
         if (!(context.level() instanceof WorldGenRegion worldGenRegion)) {
             return;
         }
 
-        StructureManager structureManager = worldGenRegion.getLevel().structureManager();
-        Registry<Structure> structureRegistry = worldGenRegion.registryAccess().registry(Registries.STRUCTURE).get();
+        Registry<Structure> structureRegistry = worldGenRegion.registryAccess().registryOrThrow(Registries.STRUCTURE);
 
-        // Get all structure starts at the geode position
-        List<StructureStart> structureStarts = getValidStructureStarts(
+        List<StructureStart> starts = getValidStructureStarts(
                 worldGenRegion,
-                structureManager,
-                structureRegistry,
-                context.origin()
+                context.origin(),
+                structure -> structureRegistry.getHolder(structureRegistry.getResourceKey(structure).get())
+                        .map(holder -> holder.is(DNLTags.NO_GEODES_TAG))
+                        .orElse(false)
         );
 
-        // Check if any structure at this location is tagged as "NO_GEODES" and is too close
-        boolean isBlockedByStructure = structureStarts.stream()
-                .anyMatch(structureStart ->
-                        structureRegistry.getHolder(structureRegistry.getResourceKey(structureStart.getStructure()).get())
-                                .map(holder -> holder.is(NO_GEODES_TAG))
-                                .orElse(false)
-                                && isTooCloseToStructure(structureStart, context.origin())
-                );
-
-        if (isBlockedByStructure) {
-            cir.setReturnValue(false);
+        if (!starts.isEmpty()) {
+            cir.setReturnValue(false); // Cancel geode generation if any NO_GEODES-tagged structure is present
         }
     }
 
-    /**
-     * Retrieves all valid structure starts at a given position in the world.
-     */
-    private static List<StructureStart> getValidStructureStarts(
-            LevelReader world,
-            StructureManager structureManager,
-            Registry<Structure> structureRegistry,
-            BlockPos pos) {
+    private static List<StructureStart> getValidStructureStarts(WorldGenRegion level, BlockPos pos, Predicate<Structure> structureMatch) {
+        StructureManager structureManager = level.getLevel().structureManager();
+        SectionPos sectionPos = SectionPos.of(pos);
 
-        ChunkPos chunkPos = new ChunkPos(pos);
-        SectionPos sectionPos = SectionPos.of(chunkPos, world.getMinSection());
-
-        if (!world.hasChunk(sectionPos.x(), sectionPos.z())) {
-            return List.of(); // Avoid checking unloaded chunks
+        ChunkAccess chunk = level.getChunk(sectionPos.x(), sectionPos.z(), ChunkStatus.STRUCTURE_REFERENCES);
+        if (!chunk.getHighestGeneratedStatus().isOrAfter(ChunkStatus.STRUCTURE_REFERENCES)) {
+            return List.of();
         }
 
-        ChunkAccess chunk = world.getChunk(sectionPos.x(), sectionPos.z(), ChunkStatus.STRUCTURE_STARTS);
-        var structureReferences = chunk.getAllReferences(); // Map<Structure, LongSet>
+        Map<Structure, LongSet> references = chunk.getAllReferences();
+        List<StructureStart> list = new ArrayList<>();
 
-        List<StructureStart> validStructures = new ArrayList<>();
-
-        for (var entry : structureReferences.entrySet()) {
+        for (var entry : references.entrySet()) {
             Structure structure = entry.getKey();
-            LongSet references = entry.getValue();
+            LongSet refs = entry.getValue();
 
-            for (long ref : references) {
-                SectionPos refSection = SectionPos.of(new ChunkPos(ref), world.getMinSection());
-                StructureStart structureStart = structureManager.getStartForStructure(refSection, structure, chunk);
-
-                if (structureStart != null && structureStart.isValid()) {
-                    validStructures.add(structureStart);
-                }
+            if (structureMatch.test(structure)) {
+                fillStartsForStructure(level, structureManager, structure, refs, pos, list::add);
             }
         }
 
-        return validStructures;
+        return list;
     }
 
-    /**
-     * Checks if a geode is too close to a structure using a fixed 16-block exclusion zone.
-     */
-    private static boolean isTooCloseToStructure(StructureStart structureStart, BlockPos pos) {
-        return isInsideExpandedBoundingBox(structureStart.getBoundingBox(), pos, 16);
-    }
+    private static void fillStartsForStructure(LevelReader level, StructureManager structureManager, Structure structure, LongSet references, BlockPos pos, Consumer<StructureStart> consumer) {
+        for (long ref : references) {
+            SectionPos sectionPos = SectionPos.of(new ChunkPos(ref), level.getMinSection());
+            if (!level.hasChunk(sectionPos.x(), sectionPos.z())) {
+                continue;
+            }
 
-    /**
-     * Checks if a block position is inside an expanded bounding box.
-     */
-    private static boolean isInsideExpandedBoundingBox(net.minecraft.world.level.levelgen.structure.BoundingBox boundingBox, BlockPos pos, int expansion) {
-        return pos.getX() >= (boundingBox.minX() - expansion) && pos.getX() <= (boundingBox.maxX() + expansion)
-                && pos.getY() >= (boundingBox.minY() - expansion) && pos.getY() <= (boundingBox.maxY() + expansion)
-                && pos.getZ() >= (boundingBox.minZ() - expansion) && pos.getZ() <= (boundingBox.maxZ() + expansion);
+            StructureStart start = structureManager.getStartForStructure(sectionPos, structure, level.getChunk(sectionPos.x(), sectionPos.z(), ChunkStatus.STRUCTURE_STARTS));
+            if (start != null && start.isValid() && start.getBoundingBox().isInside(pos)) {
+                consumer.accept(start);
+            }
+        }
     }
 }

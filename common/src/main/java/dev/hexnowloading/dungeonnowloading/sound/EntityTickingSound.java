@@ -16,6 +16,7 @@ public class EntityTickingSound extends AbstractTickableSoundInstance implements
 
     private boolean fadingOut = false;
     private boolean fadingIn = false;
+    private final float fadeStartDistance;
     private boolean stopWhenOutOfRange = true;
     private boolean shouldStop = false;
     private int fadeTicks = 20;
@@ -23,14 +24,18 @@ public class EntityTickingSound extends AbstractTickableSoundInstance implements
     private final float range;
     private float maxVolume;
 
-    public EntityTickingSound(SoundEvent sound, Entity entity, float maxVolume, float pitch, boolean stopWhenOutOfRange, float range) {
-        super(sound, SoundSource.PLAYERS, SoundInstance.createUnseededRandom());
+    private float fadeVolume = 1.0f;
+    private float distanceVolume = 1.0f;
+
+    public EntityTickingSound(SoundEvent sound, SoundSource soundSource, Entity entity, float maxVolume, float pitch, boolean stopWhenOutOfRange, float range, float fadeStartDistance) {
+        super(sound, soundSource, SoundInstance.createUnseededRandom());
         this.entity = entity;
         this.looping = false;
         this.maxVolume = maxVolume;
         this.pitch = pitch;
         this.stopWhenOutOfRange = stopWhenOutOfRange;
         this.range = range;
+        this.fadeStartDistance = fadeStartDistance;
 
         this.x = entity.getX();
         this.y = entity.getY();
@@ -39,8 +44,9 @@ public class EntityTickingSound extends AbstractTickableSoundInstance implements
         this.volume = (this.maxVolume == 0f) ? MINIMUM_AUDIBLE_VOLUME : this.maxVolume;
     }
 
-    private float fadeVolume = 1.0f;
-    private float distanceVolume = 1.0f;
+    public EntityTickingSound(SoundEvent sound, SoundSource soundSource, Entity entity, float maxVolume, float pitch, boolean stopWhenOutOfRange, float range) {
+        this(sound, soundSource, entity, maxVolume, pitch, stopWhenOutOfRange, range, 0);
+    }
 
     @Override
     public void tick() {
@@ -53,12 +59,18 @@ public class EntityTickingSound extends AbstractTickableSoundInstance implements
         // -- Distance Volume Logic --
         if (localPlayer != null && !localPlayer.equals(entity)) {
             float distance = localPlayer.distanceTo(entity);
-            float maxDistance = 2.0f * range;
-            distanceVolume = Math.max(0f, 1.0f - (distance / maxDistance));
 
             if (stopWhenOutOfRange && distance > range) {
                 this.stop();
                 return;
+            }
+
+            if (distance <= fadeStartDistance) {
+                distanceVolume = 1.0f; // Full volume inside fadeStartDistance
+            } else {
+                float maxFadeDistance = 2.0f * range - fadeStartDistance;
+                float fadeDistance = Math.min(distance - fadeStartDistance, maxFadeDistance);
+                distanceVolume = Math.max(0f, 1.0f - (fadeDistance / maxFadeDistance));
             }
         } else {
             distanceVolume = 1.0f;

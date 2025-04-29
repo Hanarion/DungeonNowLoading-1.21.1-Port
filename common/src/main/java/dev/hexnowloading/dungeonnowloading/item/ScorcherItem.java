@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -347,7 +348,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             sound = scorcher.getLocation();
         }
         for (ServerPlayer otherPlayer : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(player.getId(), sound), otherPlayer);
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(player.getId(), sound, SoundSource.PLAYERS), otherPlayer);
         }
     }
 

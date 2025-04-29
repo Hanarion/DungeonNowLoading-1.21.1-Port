@@ -5,6 +5,7 @@ import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class DNLClientSoundHandler {
 
     private static final Map<ResourceLocation, Map<Integer, Map<Integer, List<AbstractTickableSoundInstance>>>> activeSounds = new HashMap<>();
 
-    public static void playTickingSound(ResourceLocation soundId, Entity entity, int tagId, float volume, float pitch, boolean stopWhenOutOfRange, float range) {
+    public static void playTickingSound(ResourceLocation soundId, SoundSource soundSource, Entity entity, int tagId, float volume, float pitch, boolean stopWhenOutOfRange, float range, float fadeStartDistance) {
         SoundEvent sound = BuiltInRegistries.SOUND_EVENT.get(soundId);
         if (sound == null) return;
 
@@ -28,7 +29,7 @@ public class DNLClientSoundHandler {
             tagId = tagMap.keySet().stream().mapToInt(i -> i).max().orElse(-1) + 1;
         }
 
-        AbstractTickableSoundInstance instance = new EntityTickingSound(sound, entity, volume, pitch, stopWhenOutOfRange, range);
+        AbstractTickableSoundInstance instance = new EntityTickingSound(sound, soundSource, entity, volume, pitch, stopWhenOutOfRange, range, fadeStartDistance);
         Minecraft.getInstance().getSoundManager().play(instance);
         tagMap.computeIfAbsent(tagId, k -> new ArrayList<>()).add(instance);
     }
