@@ -16,7 +16,7 @@ public class S2CFadeInTickingSoundPacket implements DNLPacket {
     private final TickingSoundTarget target;
     private final int tagId;
     private final float maxVolume;
-    private final int fadeInTicks; // 🔥 NEW!
+    private final int fadeInTicks;
 
     // === Constructors ===
 
@@ -49,7 +49,7 @@ public class S2CFadeInTickingSoundPacket implements DNLPacket {
         this.target = buf.readEnum(TickingSoundTarget.class);
         this.tagId = buf.readVarInt();
         this.maxVolume = buf.readFloat();
-        this.fadeInTicks = buf.readVarInt(); // 🔥 NEW
+        this.fadeInTicks = buf.readVarInt();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class S2CFadeInTickingSoundPacket implements DNLPacket {
         buf.writeEnum(target);
         buf.writeVarInt(tagId);
         buf.writeFloat(maxVolume);
-        buf.writeVarInt(fadeInTicks); // 🔥 NEW
+        buf.writeVarInt(fadeInTicks);
     }
 
     public static S2CFadeInTickingSoundPacket decode(FriendlyByteBuf buf) {
