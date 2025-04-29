@@ -128,20 +128,24 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.LEFT) {
-                        this.spawnRedstoneTrail(part, 90, 0, 0);
+                        if (pattern.equals(PATTERN_SMALL_CIRLCE)) {
+                            this.spawnRedstoneTrail(part, 90, 0, 0, 15);
+                        } else {
+                            this.spawnRedstoneTrail(part, 90, 0, 0, 30);
+                        }
                     }
                     if (shootingType == ShootingType.BOTH || shootingType == ShootingType.RIGHT) {
-                        this.spawnRedstoneTrail(part, -90, 0, 0);
+                        this.spawnRedstoneTrail(part, -90, 0, 0, 30);
                     }
                     if (shootingType == ShootingType.TRIPLE_BOTH || shootingType == ShootingType.TRIPLE_LEFT) {
-                        this.spawnRedstoneTrail(part, 90, -1.5, 0);
-                        this.spawnRedstoneTrail(part, 90, 0, 0);
-                        this.spawnRedstoneTrail(part, 90, 1.5, 0);
+                        this.spawnRedstoneTrail(part, 90, -1.5, 0, 30);
+                        this.spawnRedstoneTrail(part, 90, 0, 0, 30);
+                        this.spawnRedstoneTrail(part, 90, 1.5, 0, 30);
                     }
                     if (shootingType == ShootingType.TRIPLE_BOTH || shootingType == ShootingType.TRIPLE_RIGHT) {
-                        this.spawnRedstoneTrail(part, -90, -1.5, 0);
-                        this.spawnRedstoneTrail(part, -90, 0, 0);
-                        this.spawnRedstoneTrail(part, -90, 1.5, 0);
+                        this.spawnRedstoneTrail(part, -90, -1.5, 0, 30);
+                        this.spawnRedstoneTrail(part, -90, 0, 0, 30);
+                        this.spawnRedstoneTrail(part, -90, 1.5, 0, 30);
                     }
                     this.boros.playBeamSound(part.getX(), part.getY(), part.getZ());
                 });
@@ -269,7 +273,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
 
 
 
-    private void spawnRedstoneTrail(FairkeeperBorosPartEntity partEntity, float angleOffset, double rxOffset, double rzOffset) {
+    private void spawnRedstoneTrail(FairkeeperBorosPartEntity partEntity, float angleOffset, double rxOffset, double rzOffset, int length) {
         double viewDistance = 2.0F;
 
         float borosFacingYaw = partEntity.getYRot();
@@ -289,7 +293,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
                 partEntity.getZ() + rotatedRzOffset
         ).add(beamDirection.scale(viewDistance));
 
-        for (int i = 0; i <= 30; i++) {
+        for (int i = 0; i <= length; i++) {
             Vec3 particlePos = startPos.add(beamDirection.scale(i));
             ScalableParticleType.ScalableParticleData particleData = new ScalableParticleType.ScalableParticleData(DNLParticleTypes.ARROW_HAZARD_INDICATOR.get(), 0.5F);
             ((ServerLevel) partEntity.level()).sendParticles(particleData, particlePos.x, particlePos.y, particlePos.z, 1, 0, 0, 0, 0);

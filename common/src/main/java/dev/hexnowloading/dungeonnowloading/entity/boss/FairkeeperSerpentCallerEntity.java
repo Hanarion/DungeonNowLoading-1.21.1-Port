@@ -400,8 +400,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LINE_FAST, 1, 1, 2);
             borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SMALL_CIRCLE, 1, 1, 0);
             borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_LARGE_CIRCLE, 1, 1, 0);
-            //borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_SLITHER, 1, 3, 0);
-            //borosArrowMoveSet.addMove(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_PLAYER_LARGE_CRICLE, 1, 2, 0);
         }
 
         if (this.borosPursueMoveSet.isEmpty()) {
@@ -515,6 +513,10 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             state = borosMoveSet.selectMove();
         }
 
+        if (state == null) {
+            state = FairkeeperBorosEntity.FairkeeperBorosState.IDLE;
+        }
+
         if (state.equals(FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_RANDOM)) {
             state = borosArrowMoveSet.selectMove();
         }
@@ -568,6 +570,10 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             state = FairkeeperOurosEntity.FairkeeperOurosState.EXHAUSTED;
         } else {
             state = ourosMoveSet.selectMove();
+        }
+
+        if (state == null) {
+            state = FairkeeperOurosEntity.FairkeeperOurosState.IDLE;
         }
 
         if (state.equals(FairkeeperOurosEntity.FairkeeperOurosState.DROP_PILLAR_RANDOM)) {
