@@ -39,7 +39,7 @@ public class VertexPillarBlock extends BaseEntityBlock implements EntityBlock, S
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 16, 14);
-    private static final int RANGE = 16;
+    private static final int RANGE = 19;
 
     public VertexPillarBlock(Properties properties) {
         super(properties);

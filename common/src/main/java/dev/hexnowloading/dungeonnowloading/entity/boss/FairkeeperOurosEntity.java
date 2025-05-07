@@ -73,6 +73,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     private UUID callerUUID;
 
     private int attackTick;
+    private int destructionTick;
     private int partIndex;
     private Vec3 awakenEndPos;
     private boolean targetRandomPlayer;
@@ -511,10 +512,18 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             return;
         }
 
-        int DESTRUCTION_RANGE = 3;
+        int DESTRUCTION_RANGE = 4;
+
         if (this.getDeltaMovement().lengthSqr() > 0.01) {
             return;
         }
+
+        if (this.destructionTick-- > 0) {
+            return;
+        }
+
+        this.destructionTick = 2;
+
         this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, -1, 3, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
     }
 

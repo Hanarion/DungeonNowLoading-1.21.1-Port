@@ -146,23 +146,23 @@ public class FairkeeperOurosDropVertexPillarGoal extends StoppableGoal {
 
     public static ImmutablePair<Float, List<Vec3>> PATTERN_LINE_CENTER = ImmutablePair.of(30F/FULL_ARENA_SIZE, ImmutableList.of(
             new Vec3(0, 0, 1),
-            new Vec3(0, 0, 1/2F),
+            new Vec3(0, 0, 9/15F),
             new Vec3(0, 0, 0),
-            new Vec3(0, 0, -1/2F),
+            new Vec3(0, 0, -9/15F),
             new Vec3(0, 0, -1)
     ));
 
     public static ImmutablePair<Float, List<Vec3>> PATTERN_LINE_OUTER = ImmutablePair.of(30F/FULL_ARENA_SIZE, ImmutableList.of(
             new Vec3(1, 0, 1),
-            new Vec3(1, 0, 1/2F),
+            new Vec3(1, 0, 9/15F),
             new Vec3(1, 0, 0),
-            new Vec3(1, 0, -1/2F),
+            new Vec3(1, 0, -9/15F),
             new Vec3(1, 0, -1)
     ));
 
     public static ImmutablePair<Float, List<Vec3>> PATTERN_LINE_INNER = ImmutablePair.of(30F/FULL_ARENA_SIZE, ImmutableList.of(
-            new Vec3(1/2F, 0, 1/2F),
-            new Vec3(1/2F, 0, 0),
-            new Vec3(1/2F, 0, -1/2F)
+            new Vec3(9/15F, 0, 9/15F),
+            new Vec3(9/15F, 0, 0),
+            new Vec3(9/15F, 0, -9/15F)
     ));
 }

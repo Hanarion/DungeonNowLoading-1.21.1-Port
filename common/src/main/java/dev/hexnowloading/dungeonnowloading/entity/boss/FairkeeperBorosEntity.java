@@ -71,6 +71,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private UUID callerUUID;
 
     private int attackTick;
+    private int destructionTick;
     private int stuckTick;
     private int partIndex;
     private float previousTilt = 0.0f;
@@ -409,13 +410,21 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private void blockDestructionTick() {
+
         if (!this.canDestroyBlocks) {
             return;
         }
-        int DESTRUCTION_RANGE = 3;
+        int DESTRUCTION_RANGE = 4;
         if (this.getDeltaMovement().lengthSqr() > 0.01) {
             return;
         }
+
+        if (this.destructionTick-- > 0) {
+            return;
+        }
+
+        this.destructionTick = 2;
+
         this.destroyContactBlocks(-DESTRUCTION_RANGE, DESTRUCTION_RANGE, 0, 4, -DESTRUCTION_RANGE, DESTRUCTION_RANGE);
     }
 

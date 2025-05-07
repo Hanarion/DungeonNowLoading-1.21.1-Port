@@ -16,4 +16,4 @@ public class DNLStructures {
     }
 
     public static void init() {}
-}
+}   
