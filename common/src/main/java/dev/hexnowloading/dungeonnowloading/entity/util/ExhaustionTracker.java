@@ -3,7 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.util;
 public class ExhaustionTracker {
 
     private float exhaustion = 0.0F;
-    private final float maxExhaustion;
+    private float maxExhaustion;
 
     public ExhaustionTracker(float maxExhaustion) {
         this.maxExhaustion = maxExhaustion;
@@ -26,11 +26,19 @@ public class ExhaustionTracker {
         return exhaustion;
     }
 
+    public float getMaxExhaustion() {
+        return maxExhaustion;
+    }
+
     public float getExhaustionPercent() {
         return exhaustion / maxExhaustion;
     }
 
     public boolean isExhausted() {
         return exhaustion >= maxExhaustion;
+    }
+
+    public void setMaxExhaustion(float maxExhaustion) {
+        this.maxExhaustion = maxExhaustion;
     }
 }

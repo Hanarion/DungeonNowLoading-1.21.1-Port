@@ -506,9 +506,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         if (isAboveBoros()) {
             state = FairkeeperBorosEntity.FairkeeperBorosState.SHOOT_ARROW_ABOVE;
         } else if (exhaustionPercent > 0.5F && exhaustionPercent > random) {
-            System.out.println("exhausted: " + this.borosExhaustion.getExhaustionPercent() * 200);
-            System.out.println("exhaustionPercent: " + exhaustionPercent);
-            System.out.println("random: " + random);
             state = FairkeeperBorosEntity.FairkeeperBorosState.EXHAUSTED;
         } else {
             state = borosMoveSet.selectMove();
@@ -547,7 +544,6 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             } else {
                 ((FairkeeperBorosEntity) boros).setState(state);
                 float exhaustionCost = BOROS_EXHAUSTION_MAP.getOrDefault(state, 0F);
-                System.out.println("exhaustion cost: " + this.borosExhaustion.getExhaustion());
                 this.borosExhaustion.addExhaustion(exhaustionCost);
             }
         }
@@ -837,6 +833,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             this.setBorosWaitingForCommand(false);
             EntityScale.scaleBossHealth(boros, playerCount);
             EntityScale.scaleBossAttack(boros, playerCount);
+            EntityScale.scaleBossExhaustion(boros, playerCount, this.borosExhaustion);
             this.boros = boros;
         }
 
@@ -854,6 +851,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             this.setOurosWaitingForCommand(false);
             EntityScale.scaleBossHealth(ouros, playerCount);
             EntityScale.scaleBossAttack(ouros, playerCount);
+            EntityScale.scaleBossExhaustion(ouros, playerCount, this.ourosExhaustion);
             this.ouros = ouros;
         }
     }

@@ -11,12 +11,14 @@ public class BossConfig {
     public static ForgeConfigSpec.DoubleValue BOSS_DAMAGE_MODIFIER;
     public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_HEALTH_SCALE;
     public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_ATTACK_SCALE;
+    public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_EXHAUSTION_SCALE;
 
     public static void registerServerConfig(ForgeConfigSpec.Builder builder) {
         builder.push("multiplayer-boss-scaling");
         TOGGLE_MULTIPLAYER_SCALING = builder.comment("Whether the boss scales with number of players.").translation("toggle_multiplayer_scaling").define("toggle_multiplayer_scaling", true);
         MULTIPLAYER_BOSS_HEALTH_SCALE = builder.comment("Multiplies the boss health by this value per additional player.").translation("multiplayer_boss_health_scale").defineInRange("multiplayer_boss_health_scale", 0.5D, 0.0D, Double.MAX_VALUE);
         MULTIPLAYER_BOSS_ATTACK_SCALE = builder.comment("Multiplies the boss attack by this value per additional player.").translation("multiplayer_boss_attack_scale").defineInRange("multiplayer_boss_attack_scale", 0.0D, 0.0D, Double.MAX_VALUE);
+        MULTIPLAYER_BOSS_EXHAUSTION_SCALE = builder.comment("Multiplies the boss exhaustion (frequency of attack) by this value per additional player.").translation("multiplayer_boss_exhaustion_scale").defineInRange("multiplayer_boss_exhaustion_scale", 0.5D, 0.0D, Double.MAX_VALUE);
         TOGGLE_MULTIPLAYER_LOOT = builder.comment("Whether the boss drops loot for all the players that fought the boss.").translation("toggle_multiplayer_boss_loot").define("toggle_multiplayer_boss_loot", true);
         builder.pop();
         builder.push("boss-scaling");

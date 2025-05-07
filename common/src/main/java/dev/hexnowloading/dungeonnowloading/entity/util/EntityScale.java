@@ -17,6 +17,7 @@ public class EntityScale {
     private static final double bossAttackDamageScale = BossConfig.BOSS_DAMAGE_MODIFIER.get();
     private static final double multiplayerBossHealthScale = BossConfig.TOGGLE_MULTIPLAYER_SCALING.get() ? BossConfig.MULTIPLAYER_BOSS_HEALTH_SCALE.get() : 0;
     private static final double multiplayerBossAttackScale = BossConfig.TOGGLE_MULTIPLAYER_SCALING.get() ? BossConfig.MULTIPLAYER_BOSS_ATTACK_SCALE.get() : 0;
+    private static final double multiplayerBossExhaustionScale = BossConfig.TOGGLE_MULTIPLAYER_SCALING.get() ? BossConfig.MULTIPLAYER_BOSS_EXHAUSTION_SCALE.get() : 0;
 
     public static void scaleBossHealth(LivingEntity entityType, int playerCount) {
         double healthMultiplier = bossHealthScale * (1 + (playerCount - 1) * multiplayerBossHealthScale) - 1;
@@ -31,6 +32,11 @@ public class EntityScale {
         AttributeModifier SCALED_ATTACK_MODIFIER = new AttributeModifier(SCALED_ATTACK_MODIFIER_UUID, "Scaled attack", attackMultiplier, AttributeModifier.Operation.MULTIPLY_BASE);
         Objects.requireNonNull(entityType.getAttribute(Attributes.ATTACK_DAMAGE)).removeModifier(SCALED_ATTACK_MODIFIER);
         Objects.requireNonNull(entityType.getAttribute(Attributes.ATTACK_DAMAGE)).addPermanentModifier(SCALED_ATTACK_MODIFIER);
+    }
+
+    public static void scaleBossExhaustion(LivingEntity entityType, int playerCount, ExhaustionTracker exhaustionTracker) {
+        double exhaustionMultiplier = (1 + (playerCount - 1) * multiplayerBossExhaustionScale) - 1;
+        exhaustionTracker.setMaxExhaustion((float) (exhaustionTracker.getMaxExhaustion() * (1 + exhaustionMultiplier)));
     }
 
     public static void scaleMobAttributes(LivingEntity entity) {
