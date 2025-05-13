@@ -8,6 +8,8 @@ import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
+import dev.hexnowloading.dungeonnowloading.util.DNLLevelUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -332,6 +334,8 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         if (this.level().isClientSide) {
             return;
         }
+        DNLLevelUtil.beginMultiDestroy();
+
         for (int ix = minX; ix <= maxX; ix++) {
             for (int iz = minZ; iz <= maxZ; iz++) {
                 for (int iy = minY; iy <= maxY; iy++) {
@@ -341,13 +345,15 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
                     BlockPos blockPos = new BlockPos(dx, dy, dz);
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
-                        if (!blockState.is(BlockTags.WITHER_IMMUNE)) {
-                            this.level().destroyBlock(blockPos, false, this);
+                        if (!blockState.is(BlockTags.WITHER_IMMUNE) && !blockState.is(DNLTags.TORCH_BLOCKS)) {
+                            DNLLevelUtil.destroyBlockMulti(this.level(), blockPos, false, this, 3);
                         }
                     }
                 }
             }
         }
+
+        DNLLevelUtil.endMultiDestroy(this.level(), this);
     }
 
     private void animationControl() {

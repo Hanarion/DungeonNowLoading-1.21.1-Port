@@ -95,6 +95,7 @@ public class VertexPillarProjectileEntity extends ModelledProjectileEntity {
                 if (this.level().getBlockState(this.blockPosition().below()).is(this.getPillarBlock())) {
                     this.breakLogic();
                     this.discard();
+                    return;
                 } else {
                     this.placePillarBlock();
                 }
@@ -105,6 +106,7 @@ public class VertexPillarProjectileEntity extends ModelledProjectileEntity {
 
             if (this.tickCount <= 0) {
                 this.discard();
+                return;
             }
             this.tickCount--;
         } else {

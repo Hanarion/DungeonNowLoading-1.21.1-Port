@@ -200,6 +200,7 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 if (serverLevel.getBlockState(eventBlockPos).getBlock() instanceof MendingAuraBlock) {
+                    BlockDestructionManager.cancel();
                     return false;
                 }
 
@@ -222,10 +223,13 @@ public interface PreserverBlockDestructionSystem {
                     compoundTag = originalBlockEntity.saveWithFullMetadata();
                 }
 
-                BlockDestructionManager.cancel();
+                //BlockDestructionManager.cancel();
                 ContainerDropManager.cancel(eventBlockPos);
 
                 placeMendingBlock(serverLevel, originalBlockState, eventBlockPos, gameEvent);
+
+                //Note: Block Destruction cancel must be placed after placeMendingBlock to avoid the blockDestruction being reset before placing the mendstone block. Doesn't cause the bug when the player destroys the block, but located here just in case.
+                BlockDestructionManager.cancel();
 
                 if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
                     blockEntity.setStoredBlock(originalBlockState, compoundTag);
@@ -249,6 +253,7 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 if (serverLevel.getBlockState(eventBlockPos).getBlock() instanceof MendingAuraBlock) {
+                    BlockDestructionManager.cancel();
                     return false;
                 }
 
@@ -271,10 +276,12 @@ public interface PreserverBlockDestructionSystem {
                     compoundTag = originalBlockEntity.saveWithFullMetadata();
                 }
 
-                BlockDestructionManager.cancel();
                 ContainerDropManager.cancel(eventBlockPos);
 
                 placeMendingBlock(serverLevel, originalBlockState, eventBlockPos, gameEvent);
+
+                //Note: Block Destruction cancel must be placed after placeMendingBlock to avoid the blockDestruction being reset before placing the mendstone block.
+                BlockDestructionManager.cancel();
 
                 if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
                     blockEntity.setStoredBlock(originalBlockState, compoundTag);
@@ -293,6 +300,7 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 if (serverLevel.getBlockState(eventBlockPos).getBlock() instanceof MendingAuraBlock) {
+                    BlockDestructionManager.cancel();
                     return false;
                 }
 
@@ -438,6 +446,7 @@ public interface PreserverBlockDestructionSystem {
         }
 
         private void placeMendingBlock(ServerLevel serverLevel, BlockState originalBlockState, BlockPos eventBlockPos, GameEvent gameEvent) {
+            //Note: For some reason, this setblock resets the BlockDestructionManager when the event block has attachable blocks like torches and vines, so the BlockDestructionManager.cancel need to be ran after this setblock.
             serverLevel.setBlock(eventBlockPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
 
             BlockState mendingAuraState;
@@ -483,7 +492,7 @@ public interface PreserverBlockDestructionSystem {
                         .setValue(BlockStateProperties.WATERLOGGED, originalBlockState.getValue(BlockStateProperties.WATERLOGGED));
 
             } else if (originalBlockState.is(DNLTags.NEAR_FULL_HEIGHT_BLOCKS)) {
-              mendingAuraState = DNLBlocks.MENDING_AURA_PATH.get().defaultBlockState();
+                mendingAuraState = DNLBlocks.MENDING_AURA_PATH.get().defaultBlockState();
             } else {
                 mendingAuraState = DNLBlocks.MENDING_AURA.get().defaultBlockState();
 
@@ -494,7 +503,6 @@ public interface PreserverBlockDestructionSystem {
             if (block instanceof MendingAuraBlock mendingAuraBlock) {
                 mendingAuraBlock.startRestoration(serverLevel, eventBlockPos);
             }
-
         }
     }
 }

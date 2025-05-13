@@ -6,6 +6,9 @@ import dev.hexnowloading.dungeonnowloading.particle.type.AxisParticleType;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
+import dev.hexnowloading.dungeonnowloading.util.DNLLevelUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,6 +20,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -26,6 +30,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -198,21 +203,30 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
     private void blockDestruction() {
         if (this.level().isClientSide) return;
-        this.explosionImmune = true;
+        /*this.explosionImmune = true;
         this.level().explode(null, this.getX(), this.getY(), this.getZ(), 3.0F, Level.ExplosionInteraction.BLOCK);
-        this.explosionImmune = false;
-        /*BlockPos pos = this.blockPosition();
+        this.explosionImmune = false;*/
+
+        DNLLevelUtil.beginMultiDestroy();
+
+        BlockPos pos = this.blockPosition();
         int r = this.getRadius();
         for (int x = -r; x <= r; x++) {
             for (int z = -r; z <= r; z++) {
                 for (int y = -r; y <= r; y++) {
                     BlockPos targetPos = new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-                    if (!this.level().getBlockState(targetPos).is(BlockTags.WITHER_IMMUNE)) {
-                        //this.level().destroyBlock(targetPos, false, this, 0);
+                    BlockState blockState = this.level().getBlockState(targetPos);
+                    if (!blockState.isAir()) {
+                        if (!blockState.is(BlockTags.WITHER_IMMUNE) && !blockState.is(DNLTags.TORCH_BLOCKS)) {
+                            DNLLevelUtil.destroyBlockMulti(this.level(), targetPos, false, this, 3);
+                        }
                     }
                 }
             }
-        }*/
+        }
+
+        DNLLevelUtil.endMultiDestroy(this.level(), this);
+
     }
 
 
