@@ -1,33 +1,31 @@
 package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.client.model.CopperCreepModel;
-import dev.hexnowloading.dungeonnowloading.entity.client.model.SealedChaosModel;
+import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
+import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepModel;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
-import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.entity.TntMinecartRenderer;
 //import net.minecraft.client.renderer.entity.layers.CopperCreepPowerLayer;
-import net.minecraft.client.renderer.entity.layers.CreeperPowerLayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.PrimedTnt;
-import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.level.block.Blocks;
 
-public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, CopperCreepModel<CopperCreepEntity>> {
+public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, HierarchicalModel<CopperCreepEntity>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep.png");
+    //private final CopperCreepModel<CopperCreepEntity> defaultModel;
+    private final CopperCreepButlerModel<CopperCreepEntity> butlerModel;
+
+    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep.png");
+    private static final ResourceLocation TEXTURE_BUTLER = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep_butler.png");
 
     public CopperCreepRenderer(EntityRendererProvider.Context context) {
         super(context, new CopperCreepModel<>(context.bakeLayer(CopperCreepModel.LAYER_LOCATION)), 0.5F);
         // Match type parameters exactly here
-        this.addLayer(new CopperCreepPowerLayer<>(this, getModel()));
+        this.addLayer(new CopperCreepPowerLayer<>(this, (CopperCreepModel<CopperCreepEntity>) getModel()));
+        butlerModel = new CopperCreepButlerModel<>(context.bakeLayer(CopperCreepButlerModel.LAYER_LOCATION));
     }
 
     @Override
@@ -44,6 +42,9 @@ public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, CopperCr
 
     @Override
     public void render(CopperCreepEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+        if (entity.getHealth() < entity.getMaxHealth()) {
+            this.model = butlerModel;
+        }
         if (entity.isAlreadySummoned()) {
             super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
         }
@@ -57,6 +58,6 @@ public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, CopperCr
 
     @Override
     public ResourceLocation getTextureLocation(CopperCreepEntity entity) {
-        return TEXTURE;
+        return entity.getHealth() < entity.getMaxHealth() ? TEXTURE_BUTLER : TEXTURE;
     }
 }

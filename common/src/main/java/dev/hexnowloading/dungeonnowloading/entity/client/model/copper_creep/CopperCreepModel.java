@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.entity.client.model;// Made with Blockbench 4.11.2
+package dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep;// Made with Blockbench 4.11.2
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
 
@@ -6,7 +6,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.model;// Made with Blo
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.copper_creep.CopperCreepAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;

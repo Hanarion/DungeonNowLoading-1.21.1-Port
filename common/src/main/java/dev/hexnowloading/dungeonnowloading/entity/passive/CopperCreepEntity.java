@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.passive;
 
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.CopperCreepAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.copper_creep.CopperCreepAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;

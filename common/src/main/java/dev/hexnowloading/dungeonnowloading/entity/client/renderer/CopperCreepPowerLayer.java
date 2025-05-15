@@ -8,28 +8,21 @@ package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
-import dev.hexnowloading.dungeonnowloading.entity.client.model.ChaosSpawnerModel;
-import dev.hexnowloading.dungeonnowloading.entity.client.model.CopperCreepModel;
+import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepModel;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
-import net.minecraft.client.model.CreeperModel;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.EnergySwirlLayer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.PowerableMob;
-import net.minecraft.world.entity.monster.Creeper;
 
 //public class ChaosSpawnerLayer<T extends ChaosSpawnerEntity, M extends ChaosSpawnerModel<T>> extends RenderLayer<T, M> {
-public class CopperCreepPowerLayer<T extends CopperCreepEntity, M extends CopperCreepModel<T>> extends RenderLayer<T, M> {
-    private static final ResourceLocation POWER_LOCATION = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep_armor.png");
+public class CopperCreepPowerLayer<T extends CopperCreepEntity, M extends HierarchicalModel<T>> extends RenderLayer<T, M> {
+    private static final ResourceLocation POWER_LOCATION = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep_armor.png");
     private final CopperCreepModel<CopperCreepEntity> model;
     private final float OFFSET_Y_BY_PIXEL = 0.75F;
 
