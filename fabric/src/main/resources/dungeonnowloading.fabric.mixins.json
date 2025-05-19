@@ -20,6 +20,7 @@
     "items.ItemInHandRendererMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
+    "entities.SummonCommandMixin",
     "entities.PlayerMixin",
     "fabric.block.BlockPlaceMixin",
     "fabric.block.BucketItemMixin",

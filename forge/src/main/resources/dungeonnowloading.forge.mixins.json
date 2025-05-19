@@ -20,6 +20,7 @@
       "entities.EntityAvoidBlockMixin",
       "entities.ServerPlayerMixin",
       "entities.PlayerMixin",
+      "entities.SummonCommandMixin",
       "structures.StructureProcessorAccessor",
       "structures.StructureTemplateMixin",
       "structures.NoGeodesInStructuresMixin",

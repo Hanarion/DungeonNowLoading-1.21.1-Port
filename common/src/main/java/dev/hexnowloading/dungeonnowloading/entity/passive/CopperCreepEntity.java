@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.entity.client.animation.copper_creep.
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.SummonFlag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -37,12 +38,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterEntity, PowerableMob {
+
     public enum State {
         SUMMONING,
         IDLE,
         RUNNING_TOWARDS_PLAYER,
         WALKING_TOWARDS_PLAYER,
         FOLLOWING,
+        WANDERING,
         DETONATION,
         SITTING_DETONATION,
         SITTING,
@@ -50,6 +53,32 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         STAND,
         WRONG_OWNER
     }
+
+    public enum Skin {
+
+        DEFAULT("default"),
+        BUTLER("butler");
+
+        public final String name;
+
+        Skin(String name) {
+            this.name = name;
+        }
+
+        public String getId() {
+            return this.name;
+        }
+
+        public static Skin fromId(String id) {
+            for (Skin skin : values()) {
+                if (skin.name.equalsIgnoreCase(id)) {
+                    return skin;
+                }
+            }
+            return DEFAULT;
+        }
+    }
+
     private static final String DEFUSED_CUSTOM_NAME = "Defused";
     private static final float EXPLOSION_RADIUS = 3.0f;
     private static final float POWERED_EXPLOSION_RADIUS = 5.0f;
@@ -60,6 +89,8 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_ALREADY_SUMMONED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<State> STATE = SynchedEntityData.defineId(CopperCreepEntity.class, EntityStates.COPPER_CREEP_STATE);
+    private static final EntityDataAccessor<Skin> SKIN = SynchedEntityData.defineId(CopperCreepEntity.class, EntityStates.COPPER_CREEP_SKIN);
+    private static final EntityDataAccessor<Boolean> SKIN_VALIDATION = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final byte TRIGGER_IDLE_ANIMATION_STATE = 70;
     private static final byte TRIGGER_WALKING_ANIMATION_STATE = 71;
     private static final byte TRIGGER_RUNNING_ANIMATION_STATE = 72;
@@ -152,13 +183,13 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         this.entityData.define(DATA_IS_IGNITED, false);
         this.entityData.define(DATA_IS_ALREADY_SUMMONED, false);
         this.entityData.define(STATE, State.SUMMONING);
+        this.entityData.define(SKIN, Skin.DEFAULT);
+        this.entityData.define(SKIN_VALIDATION, false);
     }
 
-    // Add custom save data (write the UUID to NBT)
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
-        // Save the UUID to NBT
         this.getSummonerUUID().ifPresent(uuid -> compoundTag.putUUID("summonerUUID", uuid));
 
         if ((Boolean) this.entityData.get(DATA_IS_POWERED)) {
@@ -168,15 +199,14 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         compoundTag.putBoolean("ignited", this.isIgnited());
         compoundTag.putBoolean("isAlreadySummoned", this.isAlreadySummoned());
         compoundTag.putBoolean("isSitting", this.isState(State.SITTING));
+        compoundTag.putString("skin", getSkin().getId());
     }
 
-    // Read custom save data (read the UUID from NBT)
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
 
         if (compoundTag.contains("summonerUUID")) {
-            // Read the UUID and set it
             UUID summonerUUID = compoundTag.getUUID("summonerUUID");
             this.setSummonerUUID(summonerUUID);
         }
@@ -191,9 +221,16 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         if (compoundTag.getBoolean("isSitting")) {
             this.setState(State.SITTING);
         }
+        if (SummonFlag.isSummoning()) {
+            this.setSkinValidation(true);
+        }
+        if (compoundTag.contains("skin") && !this.entityData.get(SKIN_VALIDATION)) {
+            this.entityData.set(SKIN, Skin.fromId(compoundTag.getString("skin")));
+        }
+        this.setSkinValidation(true);
     }
 
-//    @Override
+    //    @Override
 //    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor $$0, DifficultyInstance $$1, MobSpawnType $$2, @Nullable SpawnGroupData $$3, @Nullable CompoundTag $$4) {
 ////        triggerIdleAnimation();
 ////        triggerSummonAnimation();
@@ -270,7 +307,6 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     @Override
     public void customServerAiStep() {
-        System.out.println(this.getState());
 
         if (this.aiTick == 0 && !this.isAlreadySummoned()) {
             this.setState(State.SUMMONING);
@@ -618,6 +654,22 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     private void setState(State state) {
         this.currentState = state;
         this.entityData.set(STATE, state);
+    }
+
+    public Skin getSkin() {
+        return this.entityData.get(SKIN);
+    }
+
+    public void setSkin(Skin skin) {
+        this.entityData.set(SKIN, skin);
+    }
+
+    public void setCosmeticMode(String id) {
+        setSkin(Skin.fromId(id));
+    }
+
+    public void setSkinValidation(boolean skinValidation) {
+        this.entityData.set(SKIN_VALIDATION, skinValidation);
     }
 
     private class CopperCreepInWaterGoal extends Goal {

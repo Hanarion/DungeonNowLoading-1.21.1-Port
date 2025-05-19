@@ -42,7 +42,7 @@ public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, Hierarch
 
     @Override
     public void render(CopperCreepEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-        if (entity.getHealth() < entity.getMaxHealth()) {
+        if (entity.getSkin() == CopperCreepEntity.Skin.BUTLER) {
             this.model = butlerModel;
         }
         if (entity.isAlreadySummoned()) {
@@ -58,6 +58,6 @@ public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, Hierarch
 
     @Override
     public ResourceLocation getTextureLocation(CopperCreepEntity entity) {
-        return entity.getHealth() < entity.getMaxHealth() ? TEXTURE_BUTLER : TEXTURE;
+        return entity.getSkin() == CopperCreepEntity.Skin.BUTLER ? TEXTURE_BUTLER : TEXTURE;
     }
 }

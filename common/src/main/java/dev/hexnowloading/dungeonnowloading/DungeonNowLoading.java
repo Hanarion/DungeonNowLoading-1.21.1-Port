@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading;
 import dev.hexnowloading.dungeonnowloading.config.DNLClientConfig;
 import dev.hexnowloading.dungeonnowloading.config.DNLServerConfig;
 import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.supporter.DNLSupporters;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ public class DungeonNowLoading {
         DNLProcessors.init();
         DNLCreativeModeTabs.init();
         DNLGameEvents.init();
+        DNLSupporters.loadSupporters();
     }
 
     private static void registerConfigs() {
