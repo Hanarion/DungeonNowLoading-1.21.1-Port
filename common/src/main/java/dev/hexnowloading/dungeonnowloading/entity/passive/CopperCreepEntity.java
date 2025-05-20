@@ -7,6 +7,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.util.SummonFlag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -199,6 +200,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         compoundTag.putBoolean("ignited", this.isIgnited());
         compoundTag.putBoolean("isAlreadySummoned", this.isAlreadySummoned());
         compoundTag.putBoolean("isSitting", this.isState(State.SITTING));
+        compoundTag.putBoolean("isWandering", this.isState(State.WANDERING));
         compoundTag.putString("skin", getSkin().getId());
     }
 
@@ -220,6 +222,9 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         this.entityData.set(DATA_IS_ALREADY_SUMMONED, compoundTag.getBoolean("isAlreadySummoned"));
         if (compoundTag.getBoolean("isSitting")) {
             this.setState(State.SITTING);
+        }
+        if (compoundTag.getBoolean("isWandering")) {
+            this.setState(State.WANDERING);
         }
         if (SummonFlag.isSummoning()) {
             this.setSkinValidation(true);
@@ -261,7 +266,11 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             if (!this.level().isClientSide) {
                 Optional<UUID> summonerUUID = this.getSummonerUUID();
                 if (summonerUUID.isPresent() && summonerUUID.get().equals(player.getUUID())) {
-                    if ((this.getState() == State.IDLE || this.getState() == State.FOLLOWING) && this.canSit() && this.sitAnimationTick <= 0) {
+                    if (this.getState() == State.IDLE || this.getState() == State.FOLLOWING) {
+                        player.displayClientMessage(Component.translatable("entity.dungeonnowloading.copper_creep.state_wander"), true);
+                        this.setState(State.WANDERING);
+                    } else if (this.getState() == State.WANDERING && this.canSit() && this.sitAnimationTick <= 0) {
+                        player.displayClientMessage(Component.translatable("entity.dungeonnowloading.copper_creep.state_sit"), true);
                         this.triggerSitAnimation();
                         this.setState(State.SIT);
                         this.playSound(DNLSounds.COPPER_CREEP_SIT_DOWN.get());
@@ -272,6 +281,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                         }
                         this.sitAnimationTick = Mth.ceil(CopperCreepAnimation.SIT.lengthInSeconds() * 20);
                     } else if (this.getState() == State.SITTING && this.sitAnimationTick <= 0) {
+                        player.displayClientMessage(Component.translatable("entity.dungeonnowloading.copper_creep.state_follow"), true);
                         this.standUp();
                     }
                 } else {
@@ -319,7 +329,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             this.setState(State.IDLE);
         }
 
-        if (this.getState() != State.SIT && this.getState() != State.SITTING && this.getState() != State.STAND) {
+        if (this.getState() != State.SIT && this.getState() != State.SITTING && this.getState() != State.STAND && this.getState() != State.WANDERING) {
             if (this.getTarget() == null) {
                 this.setState(State.IDLE);
             } else {
@@ -393,7 +403,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
         if (!this.level().isClientSide) return;
 
-        if (this.getState() == State.IDLE) {
+        if (this.getState() == State.IDLE || this.getState() == State.WANDERING) {
             this.standAnimationState.stop();
             this.idleAnimationState.startIfStopped(this.tickCount);
         }
@@ -709,7 +719,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
         @Override
         public boolean canContinueToUse() {
-            return copperCreep.getTarget() == null && this.copperCreep.getSummoner() != null;
+            return copperCreep.getState() != State.WANDERING && copperCreep.getTarget() == null && this.copperCreep.getSummoner() != null;
         }
 
         @Override
@@ -771,6 +781,11 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             super(mob, v, b);
             copperCreep = mob;
             setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            return copperCreep.getState() != State.WANDERING && super.canUse();
         }
 
         @Override

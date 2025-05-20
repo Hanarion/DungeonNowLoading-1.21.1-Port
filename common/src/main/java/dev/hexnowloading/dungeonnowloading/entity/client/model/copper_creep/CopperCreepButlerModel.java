@@ -104,7 +104,7 @@ public class CopperCreepButlerModel<T extends CopperCreepEntity> extends Hierarc
         this.animate(entity.sittingAnimationState, CopperCreepButlerAnimation.SITTING, ageInTicks);
         this.animate(entity.sittingDetonationAnimationState, CopperCreepButlerAnimation.DETONATION_SITTING, ageInTicks);
 
-        if (entity.getState() == CopperCreepEntity.State.IDLE || entity.getState() == CopperCreepEntity.State.WALKING_TOWARDS_PLAYER) {
+        if (entity.getState() == CopperCreepEntity.State.IDLE || entity.getState() == CopperCreepEntity.State.WALKING_TOWARDS_PLAYER || entity.getState() == CopperCreepEntity.State.WANDERING) {
             this.animateWalk(CopperCreepButlerAnimation.WALKING, limbSwing, limbSwingAmount, 4.0f, 4.5f);
         } else if (entity.getState() == CopperCreepEntity.State.FOLLOWING || entity.getState() == CopperCreepEntity.State.RUNNING_TOWARDS_PLAYER) {
             this.animateWalk(CopperCreepButlerAnimation.RUNNING, limbSwing, limbSwingAmount, 2f, 2.25f);
