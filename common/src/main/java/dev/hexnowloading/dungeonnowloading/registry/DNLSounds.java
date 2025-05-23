@@ -86,8 +86,37 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> COPPER_CREEP_STEP = registerSoundEvent("copper_creep_step");
     public static final Supplier<SoundEvent> COPPER_DETONATOR_BEEP = registerSoundEvent("copper_detonator_beep");
     public static final Supplier<SoundEvent> COPPER_DETONATOR_READY = registerSoundEvent("copper_detonator_ready");
-    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_BEAM = registerSoundEvent("fairkeeper_boros_beam");
     public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_HEAL = registerSoundEvent("fairkeeper_boros_heal");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_BEAM = registerSoundEvent("fairkeeper_boros_beam");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_ARMOR_BREAK = registerSoundEvent("fairkeeper_boros_armor_break");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_ARMOR_HIT = registerSoundEvent("fairkeeper_boros_armor_hit");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_ARROW_SHOOT = registerSoundEvent("fairkeeper_boros_arrow_shoot");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_ARROW_WARNING = registerSoundEvent("fairkeeper_boros_arrow_warning");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_DEATH = registerSoundEvent("fairkeeper_boros_death");
+    public static final Supplier<SoundEvent> FAIRKEEPER_BOROS_FIRE_ATTACK = registerSoundEvent("fairkeeper_boros_fire_attack");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_CANNON_BREAK = registerSoundEvent("fairkeeper_ouros_cannon_break");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_SHOOT_VERTEX_DOMAIN = registerSoundEvent("fairkeeper_ouros_shoot_vertex_domain");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_DEATH = registerSoundEvent("fairkeeper_ouros_death");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_CANNON_DOOR_OPEN = registerSoundEvent("fairkeeper_ouros_door_cannon_spawn");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_DOOR_CLOSE = registerSoundEvent("fairkeeper_ouros_door_close");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_PILLAR_DOOR_OPEN = registerSoundEvent("fairkeeper_ouros_door_pillar_spawn");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_SCUTTLE_DOOR_OPEN = registerSoundEvent("fairkeeper_ouros_door_scuttle_spawn");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_CANNON_SHOOT = registerSoundEvent("fairkeeper_ouros_cannon_shoot");
+    public static final Supplier<SoundEvent> FAIRKEEPER_OUROS_PILLAR_LAND = registerSoundEvent("fairkeeper_ouros_pillar_land");
+    public static final Supplier<SoundEvent> FAIRKEEPER_HURT = registerSoundEvent("fairkeeper_hurt");
+    public static final Supplier<SoundEvent> FAIRKEEPER_MOUTH_CLOSE = registerSoundEvent("fairkeeper_mouth_close");
+    public static final Supplier<SoundEvent> FAIRKEEPER_MOUTH_OPEN = registerSoundEvent("fairkeeper_mouth_open");
+
+
+
+
+
+
+
+
+
+
+
 
 
     private static <T extends SoundEvent> Supplier<SoundEvent> registerSoundEvent(String string) {

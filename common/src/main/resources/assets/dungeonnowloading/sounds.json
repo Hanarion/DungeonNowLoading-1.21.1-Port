@@ -559,5 +559,124 @@
     "sounds": [
       "dungeonnowloading:mob/fairkeeper_boros/fairkeeper_boros_heal"
     ]
+  },
+  "fairkeeper_boros_armor_break": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_armor_break",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/boros/boros_armor_break_0",
+      "dungeonnowloading:mob/fairkeeper/boros/boros_armor_break_1"
+    ]
+  },
+  "fairkeeper_boros_armor_hit": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_armor_hit",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/boros/boros_armor_hit_0",
+      "dungeonnowloading:mob/fairkeeper/boros/boros_armor_hit_1",
+      "dungeonnowloading:mob/fairkeeper/boros/boros_armor_hit_2"
+    ]
+  },
+  "fairkeeper_boros_arrow_shoot": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_arrow_shoot",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/boros/boros_arrow_shoot"
+    ]
+  },
+  "fairkeeper_boros_arrow_warning": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_arrow_warning",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/boros/boros_arrow_warning"
+    ]
+  },
+  "fairkeeper_boros_death": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_death",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/boros/boros_death"
+    ]
+  },
+  "fairkeeper_boros_fire_attack": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_fire_attack",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/boros/boros_fire_attack"
+    ]
+  },
+  "fairkeeper_ouros_cannon_break": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_cannon_break",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_cannon_break_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_cannon_break_1"
+    ]
+  },
+  "fairkeeper_ouros_cannon_shoot": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_cannon_shoot",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_cannon_shoot_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_cannon_shoot_1"
+    ]
+  },
+  "fairkeeper_ouros_death": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_death",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_death"
+    ]
+  },
+  "fairkeeper_ouros_door_cannon_spawn": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_door_cannon_spawn",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_cannon_spawn"
+    ]
+  },
+  "fairkeeper_ouros_door_close": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_door_close",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_close_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_close_1"
+    ]
+  },
+  "fairkeeper_ouros_door_pillar_spawn": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_door_pillar_spawn",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_pillar_spawn_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_pillar_spawn_1"
+    ]
+  },
+  "fairkeeper_ouros_door_scuttle_spawn": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_door_scuttle_spawn",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_scuttle_spawn"
+    ]
+  },
+  "fairkeeper_ouros_shoot_vertex_domain": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_shoot_vertex_domain",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_shoot_vertex_domain_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_shoot_vertex_domain_1"
+    ]
+  },
+  "fairkeeper_ouros_pillar_land": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_pillar_land",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_pillar_land_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_pillar_land_1"
+    ]
+  },
+  "fairkeeper_hurt": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_hurt",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/fairkeeper_hurt_0",
+      "dungeonnowloading:mob/fairkeeper/fairkeeper_hurt_1",
+      "dungeonnowloading:mob/fairkeeper/fairkeeper_hurt_2"
+    ]
+  },
+  "fairkeeper_mouth_close": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_mouth_close",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/fairkeeper_mouth_close"
+    ]
+  },
+  "fairkeeper_mouth_open": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_mouth_open",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/fairkeeper_mouth_open"
+    ]
   }
 }

@@ -24,8 +24,19 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
     private FairkeeperOurosEntity ouros;
     private int progress;
     private int attackTicks;
+    private int cannonChargeUpTicks;
+    private boolean beginShooting;
 
     private final static int ATTACK_INTERVAL = 60;
+    private final static int CANNON_CHARGE_UP_DURATION = 20;
+
+    private final static int PHASE_START = 0;
+    private final static int PHASE_SETUP = 1;
+    //NOTE: Phase 1 is handled by the setup animation.
+    private final static int PHASE_AIM = 2;
+    //private final static int PHASE_CHARGE_UP = 3;
+    private final static int PHASE_PACK = 3;
+    private final static int PHASE_FINISH = 4;
 
     public FairkeeperOurosBodyShootVertexOrbGoal(FairkeeperOurosPartEntity part, FairkeeperOurosPartEntity.FairkeeperOurosPartState state) {
         this.part = part;
@@ -40,8 +51,10 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
     public void start() {
         super.start();
         this.ouros = (FairkeeperOurosEntity) this.part.getHead();
-        this.progress = 0;
-        this.attackTicks = ATTACK_INTERVAL;
+        this.progress = PHASE_START;
+        this.attackTicks = reducedTickDelay(ATTACK_INTERVAL);
+        this.cannonChargeUpTicks = reducedTickDelay(CANNON_CHARGE_UP_DURATION);
+        this.beginShooting = false;
     }
 
     @Override
@@ -79,20 +92,20 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
 
     @Override
     public void tick() {
-        if (this.progress == 0) {
-            this.progress++;
-            this.part.playCannonSetupAnimation(() -> this.progress++);
-        } else if (this.progress == 2) {
+        if (this.progress == PHASE_START) {
+            this.progress = PHASE_SETUP;
+            this.part.playCannonSetupAnimation(() -> this.progress = PHASE_AIM);
+        } else if (this.progress == PHASE_AIM) {
             this.part.aimCannonAtPlayer(this.part.getShootingTarget());
             if (this.part.isCancelShooting()) {
                 this.ouros.level().playSound(null, this.part.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.ouros.level().random.nextFloat() - this.ouros.level().random.nextFloat()) * 0.2f) * 0.7f);
                 ((ServerLevel) (this.ouros.level())).sendParticles(ParticleTypes.EXPLOSION, this.part.getX(), this.part.getY(), this.part.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
                 this.part.playCannonCancelAnimation(this::stopGoal);
-                this.progress += 2;
+                this.progress = PHASE_FINISH;
             } else if (this.attackTicks-- <= 0) {
                 shootRandomPlayer();
             }
-        } else if (this.progress == 3) {
+        } else if (this.progress == PHASE_PACK) {
             this.part.playCannonPackAnimation(this::stopGoal);
             this.progress++;
         }
@@ -118,15 +131,18 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
                 this.part
         ));
 
-        if (hitResult.getType() == HitResult.Type.MISS) {
-
+        if (!this.beginShooting && hitResult.getType() == HitResult.Type.MISS) {
+            this.beginShooting = true;
+            this.part.playVertexOrbShootSound();
+        }
+        if (this.beginShooting && this.cannonChargeUpTicks-- <= 0) {
             VertexOrbProjectileEntity projectile = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros, 2);
             projectile.shootTowardsTarget(start.x, start.y, start.z, (LivingEntity) entity, 1.0F, this.part.getInaccuracy());
             this.ouros.level().addFreshEntity(projectile);
 
             this.ouros.getCaller().addMinion(projectile.getUUID());
 
-            this.ouros.level().playSound(null, start.x, start.y, start.z, SoundEvents.WITHER_SHOOT, this.part.getSoundSource(), 3.0F, 1.0F + (this.part.getRandom().nextFloat() - this.part.getRandom().nextFloat()) * 0.2F);
+            //this.ouros.level().playSound(null, start.x, start.y, start.z, SoundEvents.WITHER_SHOOT, this.part.getSoundSource(), 3.0F, 1.0F + (this.part.getRandom().nextFloat() - this.part.getRandom().nextFloat()) * 0.2F);
             this.progress++;
         }
     }

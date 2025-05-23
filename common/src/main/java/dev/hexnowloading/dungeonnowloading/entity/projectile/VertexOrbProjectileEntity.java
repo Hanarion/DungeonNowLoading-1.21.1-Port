@@ -20,6 +20,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -207,7 +208,9 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
         this.level().explode(null, this.getX(), this.getY(), this.getZ(), 3.0F, Level.ExplosionInteraction.BLOCK);
         this.explosionImmune = false;*/
 
-        DNLLevelUtil.beginMultiDestroy();
+        //DNLLevelUtil.beginMultiDestroySoundPending();
+
+        this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
 
         BlockPos pos = this.blockPosition();
         int r = this.getRadius();
@@ -225,7 +228,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
             }
         }
 
-        DNLLevelUtil.endMultiDestroy(this.level(), this);
+        //DNLLevelUtil.endMultiDestroySoundPending(this.level(), this);
 
     }
 

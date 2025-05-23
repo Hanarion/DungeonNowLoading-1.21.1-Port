@@ -8,8 +8,8 @@ import dev.hexnowloading.dungeonnowloading.particle.type.ScalableAxisParticleTyp
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -160,6 +160,6 @@ public class VertexPillarProjectileEntity extends ModelledProjectileEntity {
         this.level().setBlock(this.blockPosition().above(), DNLBlocks.VERTEX_PILLAR.get().defaultBlockState().setValue(BlockStateProperties.DOUBLE_BLOCK_HALF , DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
         VertexPillarBlock.linkOnPlaced(this.level(), this.blockPosition());
         ((ServerLevel) this.level()).sendParticles(new ScalableAxisParticleType.ScalableAxisParticleData(DNLParticleTypes.WHITE_SHOCKWAVE_PARTICLE.get(), 0, 90, 5.0F), this.blockPosition().getX() + 0.5F, this.blockPosition().getY() + 0.01F, this.blockPosition().getZ() + 0.5F, 1, 0, 0, 0, 0);
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ANVIL_LAND, this.getSoundSource(), 3.0F, 1.0F);
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.FAIRKEEPER_OUROS_PILLAR_LAND.get(), this.getSoundSource(), 3.0F, 1.0F);
     }
 }

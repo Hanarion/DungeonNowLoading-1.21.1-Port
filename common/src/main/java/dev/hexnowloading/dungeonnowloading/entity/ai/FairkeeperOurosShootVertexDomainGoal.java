@@ -19,7 +19,7 @@ public class FairkeeperOurosShootVertexDomainGoal extends StoppableGoal {
     private int attackTicks;
     private int playerCount;
 
-    private final int START_UP_DELAY = 40;
+    private final int START_UP_DELAY = 20;
 
     public FairkeeperOurosShootVertexDomainGoal(FairkeeperOurosEntity.FairkeeperOurosState state, FairkeeperOurosEntity ouros) {
         this.ouros = ouros;
@@ -41,6 +41,7 @@ public class FairkeeperOurosShootVertexDomainGoal extends StoppableGoal {
             this.playerCount = caller.getParticipatingPlayerCount();
             this.playerUUIDs = caller.getParticipatingPlayerUUIDs();
         }
+        this.ouros.playVertexDomainShootSound(this.ouros.getX(), this.ouros.getY(), this.ouros.getZ());
     }
 
     @Override

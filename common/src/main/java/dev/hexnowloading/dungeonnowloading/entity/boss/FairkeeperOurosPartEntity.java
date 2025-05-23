@@ -10,7 +10,11 @@ import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +22,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -37,9 +42,11 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -393,41 +400,94 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         return this;
     }
 
+    public void playVertexPillarDoorOpenAnimation(Runnable runnable) {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN.lengthInSeconds(), () -> this.playVertexPillarDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
+        //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds()));
+    }
+
     public void playScuttleDoorOpenAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN.lengthInSeconds(), null, runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN.lengthInSeconds(), () -> this.playScuttleDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
         //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds()));
     }
 
     public void playScuttleDoorCloseAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), null, runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), runnable));
     }
 
     public boolean playDoorCloseAnimation() {
         if (!this.animationChainer.isEmpty()) return false;
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), null));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0F));
         return true;
     }
 
     public void playCannonSetupAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_OPEN, FairkeeperOurosBodyAnimation.CANNON_OPEN.lengthInSeconds(), null, runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_OPEN, FairkeeperOurosBodyAnimation.CANNON_OPEN.lengthInSeconds(), () -> this.playCannonDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_IDLE, 0f));
     }
 
     public void playCannonPackAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_CLOSE, FairkeeperOurosBodyAnimation.CANNON_CLOSE.lengthInSeconds(), null, runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_CLOSE, FairkeeperOurosBodyAnimation.CANNON_CLOSE.lengthInSeconds(), () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), runnable));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0f));
     }
 
     public void playCannonCancelAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), null, runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), () -> {
+            this.playCannonBreakSound(this.getX(), this.getY(), this.getZ());
+            this.stopVertexOrbShootSound();
+        }, runnable));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0f));
+    }
+
+    public void playCannonDoorOpenSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_CANNON_DOOR_OPEN.get(), this.getSoundSource(), 3.0F, 1.0F);
+    }
+
+    public void playCannonBreakSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_CANNON_BREAK.get(), this.getSoundSource(), 3.0F, 1.0F);
+    }
+
+    public void playDoorCloseSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_DOOR_CLOSE.get(), this.getSoundSource(), 3.0F, 1.0F);
+    }
+
+    public void playVertexPillarDoorOpenSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_PILLAR_DOOR_OPEN.get(), this.getSoundSource(), 3.0F, 1.0F);
+    }
+
+    public void playScuttleDoorOpenSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_SCUTTLE_DOOR_OPEN.get(), this.getSoundSource(), 3.0F, 1.0F);
+    }
+
+    public void playVertexOrbShootSound() {
+        float radius = 64.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.FAIRKEEPER_OUROS_CANNON_SHOOT.get().getLocation(), SoundSource.HOSTILE, 4.0F, 1.0F, true, 64f, 0f), player);
+        }
+    }
+
+    public void stopVertexOrbShootSound() {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), DNLSounds.FAIRKEEPER_OUROS_CANNON_SHOOT.get().getLocation(), 20, true), player);
+        }
     }
 
     public void shootVertexOrb(Entity target, float inaccuracy) {

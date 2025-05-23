@@ -1,7 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosEntity;
-import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperBorosPartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -11,9 +10,9 @@ public class FairkeeperBorosFlameThrowerGoal extends StoppableGoal {
     private final FairkeeperBorosEntity.FairkeeperBorosState state;
     private final int startUpDelay;
     private int startUpDelayTick;
-    private FairkeeperBorosPartEntity currentPart;
+    private int durationTick;
 
-    private static final int DURATION = 200;
+    private static final int DURATION = reducedTickDelay(200);
 
     public FairkeeperBorosFlameThrowerGoal(FairkeeperBorosEntity.FairkeeperBorosState state, FairkeeperBorosEntity boros, int startUpDelay) {
         this.boros = boros;
@@ -29,6 +28,8 @@ public class FairkeeperBorosFlameThrowerGoal extends StoppableGoal {
     @Override
     public void start() {
         this.startUpDelayTick = startUpDelay;
+        this.durationTick = DURATION;
+        this.boros.playFlameShootingSound();
     }
 
     @Override
@@ -38,9 +39,11 @@ public class FairkeeperBorosFlameThrowerGoal extends StoppableGoal {
             return;
         }
 
-        this.boros.playFlameShootingSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
-        this.shootFlame(90);
-        this.shootFlame(-90);
+        if (this.durationTick > 0) {
+            this.durationTick--;
+            this.shootFlame(90);
+            this.shootFlame(-90);
+        }
 
     }
 

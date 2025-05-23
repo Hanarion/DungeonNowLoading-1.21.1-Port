@@ -27,7 +27,7 @@ public class DNLLevelUtil {
 
     private static Set<SoundType> pendingBlockBreakSounds = null;
 
-    public static void beginMultiDestroy() {
+    public static void beginMultiDestroySoundPending() {
         pendingBlockBreakSounds = new HashSet<>();
     }
 
@@ -65,7 +65,7 @@ public class DNLLevelUtil {
         return success;
     }
 
-    public static void endMultiDestroy(Level level, @Nullable Entity soundSourceEntity) {
+    public static void endMultiDestroySoundPending(Level level, @Nullable Entity soundSourceEntity) {
         if (pendingBlockBreakSounds != null) {
             for (SoundType soundType : pendingBlockBreakSounds) {
                 playBreakSound(level, soundSourceEntity, soundType);

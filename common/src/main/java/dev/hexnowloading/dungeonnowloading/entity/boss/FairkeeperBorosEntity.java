@@ -6,6 +6,9 @@ import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperBor
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -21,7 +24,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -42,6 +44,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -124,7 +127,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(1, new FairkeeperBorosAwakenGoal(this));
         this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.TACKLE_FAST, this, 1.5, 10.0F, 0.7F));
         this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.FLAME_TACKLE, this, 1.3, 6.0F, 0.5F));
-        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_TACKLE, this, 20));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.FLAME_TACKLE, this, 40));
         this.goalSelector.addGoal(3, new FairkeeperBorosTackleGoal(FairkeeperBorosState.TACKLE, this, 1.3, 6.0F, 0.5F));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_LINE, this, 1.5, FairkeeperBorosShootArrowGoal.PATTERN_LINE));
         //this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowGoal(FairkeeperBorosState.SHOOT_ARROW_SLITHER, this, 1.5, FairkeeperBorosShootArrowGoal.PATTERN_SLITHER));
@@ -135,7 +138,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_TRIPLE_ARROW, this, 1.3f, 3.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_TRIPLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.PURSUE_AND_SHOOT_SINGLE_ARROW, this, 1.3f, 5.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_SINGLE));
         this.goalSelector.addGoal(3, new FairkeeperBorosShootArrowAboveGoal(FairkeeperBorosState.SHOOT_ARROW_ABOVE, this, 1.5f, FairkeeperBorosShootArrowAboveGoal.PATTERN_PLAYER_LARGE_CIRCLE));
-        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.DESPERATE, this, 20));
+        this.goalSelector.addGoal(3, new FairkeeperBorosFlameThrowerGoal(FairkeeperBorosState.DESPERATE, this, 40));
         this.goalSelector.addGoal(3, new FairkeeperBorosPursueAndShootArrowGoal(FairkeeperBorosState.DESPERATE, this, 1.5F, 2.0F, 30, FairkeeperBorosPursueAndShootArrowGoal.PATTERN_DESPERATE));
         this.goalSelector.addGoal(3, new FairkeeperBorosEatVertexProjectilesGoal(FairkeeperBorosState.EAT_VERTEX_PROJECTILES, this, 1.5f));
         this.goalSelector.addGoal(4, new FairkeeperBorosCircleAroundPlayerGoal(FairkeeperBorosState.IDLE, this, 20.0, 1.5, true, true));
@@ -232,25 +235,25 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public void playMouthOpenAndClose() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds()));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds(), () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds(), () -> this.playMouthCloseSound(this.getX(), this.getY(), this.getZ()), null));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.IDLE, FairkeeperBorosAnimation.IDLE.lengthInSeconds()));
     }
 
     public void playMouthOpen() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds(), () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), null));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.MOUTH_OPENED, FairkeeperBorosAnimation.PURSUE_OPENED_MOUTH.lengthInSeconds()));
     }
 
     public void playMouthOpenForShootingArrow() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, 1.75f));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, 1.75f, () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), () -> this.playArrowSound(this.getX(), this.getY(), this.getZ())));
     }
 
     public void playMouthClose() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds(), () -> this.playMouthCloseSound(this.getX(), this.getY(), this.getZ()), null));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.IDLE, FairkeeperBorosAnimation.IDLE.lengthInSeconds()));
 
     }
@@ -430,7 +433,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     private void destroyContactBlocks(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
 
-        DNLLevelUtil.beginMultiDestroy();
+        DNLLevelUtil.beginMultiDestroySoundPending();
 
         for (int ix = minX; ix <= maxX; ix++) {
             for (int iz = minZ; iz <= maxZ; iz++) {
@@ -449,7 +452,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             }
         }
 
-        DNLLevelUtil.endMultiDestroy(this.level(), this);
+        DNLLevelUtil.endMultiDestroySoundPending(this.level(), this);
     }
 
     private void abilityCooldown() {
@@ -486,16 +489,19 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             return false;
         }
 
-        if (this.hasArmor() && (this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_OPEN) || this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_OPENED) || this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_CLOSE))) {
+        if (!this.isDamageFromOtherSegment() && this.hasArmor() && (this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_OPEN) || this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_OPENED) || this.getAnimationState().equals(FairkeeperBorosAnimationState.MOUTH_CLOSE))) {
+            this.playHurtSound(this.getX(), this.getY(), this.getZ());
             return hurtAndTrackAttackers(damageSource, amount);
         }
 
         if (this.isDamageFromOtherSegment()) {
             this.setDamageFromOtherSegment(false);
+            this.playHurtSound(this.getX(), this.getY(), this.getZ());
             return hurtAndTrackAttackers(damageSource, amount);
         }
 
         if (!this.hasArmor() || damageSource.isCreativePlayer() || damageSource.is(DNLTags.FAIRKEEPER_BOROS_BYPASS_ARMOR)) {
+            this.playHurtSound(this.getX(), this.getY(), this.getZ());
             return hurtAndTrackAttackers(damageSource, amount);
         }
 
@@ -510,7 +516,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 1.0F, 1.0F);
                 return hurtAndTrackAttackers(damageSource, 0);
             } else {
-                this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.HOSTILE, 1.0F, 1.0F);
+                //this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.HOSTILE, 1.0F, 1.0F);
+                this.level().playSound(null, this.blockPosition(), DNLSounds.FAIRKEEPER_BOROS_ARMOR_BREAK.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
                 this.setArmorHealth(this.getArmorHealth() - nonKillableDamage);
                 return hurtAndTrackAttackers(damageSource, 0);
             }
@@ -518,7 +525,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
         if (damageSource.is(DamageTypes.IN_FIRE) || damageSource.is(DamageTypes.ON_FIRE)) return false;
 
-        this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.HOSTILE, 1.0F, 1.0F);
+        //this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.HOSTILE, 1.0F, 1.0F);
+        this.level().playSound(null, this.blockPosition(), DNLSounds.FAIRKEEPER_BOROS_ARMOR_HIT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
         return false;
     }
 
@@ -542,6 +550,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         if (this.deathTime == 1) {
             this.partIndex = 0;
             this.playDeathAnimation();
+            this.playDeathSound(this.getX(), this.getY(), this.getZ());
+            this.stopFlameShootingSound();
             for (int i = 0; i <= 13; i++) {
                 FairkeeperBorosPartEntity part = this.getPart(i);
                 if (part != null) {
@@ -705,25 +715,62 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         return false;
     }
 
-    public void playFlameShootingSound(double x, double y, double z) {
-        this.level().playSound(null, x, y, z, DNLSounds.SCUTTLE_SHOOTING_FLAME.get(), this.getSoundSource(), 3.0F, 1.0F);
+    public void playFlameShootingSound() {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.FAIRKEEPER_BOROS_FIRE_ATTACK.get().getLocation(), SoundSource.HOSTILE, 3.0F, 1.0F, false, 32f, 0f), player);
+        }
+    }
+
+    public void stopFlameShootingSound() {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), DNLSounds.FAIRKEEPER_BOROS_FIRE_ATTACK.get().getLocation(), 20, true), player);
+        }
+    }
+
+    public void playMouthOpenSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_MOUTH_OPEN.get(), this.getSoundSource(), 3.0F, 1.0F);
+    }
+
+    public void playMouthCloseSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_MOUTH_CLOSE.get(), this.getSoundSource(), 3.0F, 1.0F);
     }
 
     public void playBeamSound(double x, double y, double z) {
-        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_BOROS_BEAM.get(), this.getSoundSource(), 3.0F, 2.0F);
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_BOROS_ARROW_WARNING.get(), this.getSoundSource(), 3.0F, 1.0F);
     }
 
     public void playArrowSound(double x, double y, double z) {
-        this.level().playSound(null, x, y, z, SoundEvents.FIREWORK_ROCKET_BLAST_FAR, this.getSoundSource(), 3.0F, 0.1F);
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_BOROS_ARROW_SHOOT.get(), this.getSoundSource(), 3.0F, 1.0F);
     }
 
     public void playHealSound(double x, double y, double z) {
         this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_BOROS_HEAL.get(), this.getSoundSource(), 3.0F, 1.0F);
     }
-    @Override
-    protected SoundEvent getDeathSound() {
-        return super.getDeathSound();
+
+    public void playDeathSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_BOROS_DEATH.get(), this.getSoundSource(), 3.0F, 1.0F);
     }
+
+    public void playHurtSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_HURT.get(), this.getSoundSource(), 3.0F, 1.0F);
+    }
+
+    /*@Override
+    protected SoundEvent getDeathSound() {
+        return DNLSounds.FAIRKEEPER_BOROS_DEATH.get();
+    }*/
 
     public Entity getChild() {
         UUID id = getChildId();

@@ -334,7 +334,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
         if (this.level().isClientSide) {
             return;
         }
-        DNLLevelUtil.beginMultiDestroy();
+        //DNLLevelUtil.beginMultiDestroySoundPending();
 
         for (int ix = minX; ix <= maxX; ix++) {
             for (int iz = minZ; iz <= maxZ; iz++) {
@@ -353,7 +353,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
             }
         }
 
-        DNLLevelUtil.endMultiDestroy(this.level(), this);
+        //DNLLevelUtil.endMultiDestroySoundPending(this.level(), this);
     }
 
     private void animationControl() {

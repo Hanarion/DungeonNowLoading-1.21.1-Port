@@ -73,7 +73,9 @@ public class FairkeeperBorosPursueAndShootArrowGoal extends StoppableGoal {
                 pattern.arrowPattern.get(targetIndex).stream().forEach(angle -> {
                     this.spawnRedstoneTrail(this.boros, angle, 0, 0);
                 });
+                //this.boros.playBeamSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
                 this.boros.playBeamSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
+                this.boros.playMouthOpenSound(this.boros.getX(), this.boros.getY(), this.boros.getZ());
                 this.boros.playMouthOpenForShootingArrow();
                 this.boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.MOUTH_OPEN_WITHOUT_OPENED);
             }

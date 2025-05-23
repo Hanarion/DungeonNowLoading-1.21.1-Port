@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectile
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
 import dev.hexnowloading.dungeonnowloading.entity.util.SlumberingEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -271,14 +272,17 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
                 this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 1.0F, 1.0F);
                 return super.hurt(damageSource, 0);
             } else {
-                this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.HOSTILE, 1.0F, 1.0F);
+                //this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.HOSTILE, 1.0F, 1.0F);
+                this.level().playSound(null, this.blockPosition(), DNLSounds.FAIRKEEPER_BOROS_ARMOR_BREAK.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
                 return super.hurt(damageSource, nonKillableDamage);
             }
         }
 
         if (damageSource.is(DamageTypes.IN_FIRE) || damageSource.is(DamageTypes.ON_FIRE)) return false;
 
-        this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.HOSTILE, 1.0F, 1.0F);
+        //this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.HOSTILE, 1.0F, 1.0F);
+        this.level().playSound(null, this.blockPosition(), DNLSounds.FAIRKEEPER_BOROS_ARMOR_HIT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
+
         return false;
     }
 
