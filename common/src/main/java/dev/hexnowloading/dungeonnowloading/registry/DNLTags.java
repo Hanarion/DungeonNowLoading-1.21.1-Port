@@ -32,6 +32,7 @@ public class DNLTags {
     public static final TagKey<Block> MENDING_AURAS = registerBlockTag("mending_auras");
     public static final TagKey<Structure> NO_GEODES_TAG = registerStructureTag("no_geodes");
     public static final TagKey<Structure> TEMPLE_OF_DUALITY = registerStructureTag("temple_of_duality");
+    public static final TagKey<Structure> LABYRINTH = registerStructureTag("labyrinth");
 
     private static TagKey<Block> registerBlockTag(String string) {
         return TagKey.create(Registries.BLOCK, new ResourceLocation(DungeonNowLoading.MOD_ID, string));

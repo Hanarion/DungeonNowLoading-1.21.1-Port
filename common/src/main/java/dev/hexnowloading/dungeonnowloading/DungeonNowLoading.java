@@ -36,6 +36,7 @@ public class DungeonNowLoading {
         DNLProcessors.init();
         DNLCreativeModeTabs.init();
         DNLGameEvents.init();
+        DNLLootInjections.setup();
         DNLSupporters.loadSupporters();
     }
 
