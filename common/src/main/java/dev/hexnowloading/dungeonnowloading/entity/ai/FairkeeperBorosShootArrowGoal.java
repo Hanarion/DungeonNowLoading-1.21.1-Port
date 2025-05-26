@@ -28,6 +28,7 @@ public class FairkeeperBorosShootArrowGoal extends StoppableGoal {
     private final double speed;
     private List<FairkeeperBorosPartEntity> partList = new ArrayList<>();
     private int stoppingTick;
+    private int playSoundForPart;
     private boolean forceStop;
 
     private static final float FULL_ARENA_SIZE = 49F;
@@ -90,6 +91,7 @@ public class FairkeeperBorosShootArrowGoal extends StoppableGoal {
             this.stoppingTick--;
 
             if (stoppingTick == reducedTickDelay(BEAM_TICK)) {
+                playSoundForPart = 0;
                 pattern.positionList().get(targetIndex).getMiddle().stream().forEach(partIndex ->{
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
@@ -109,11 +111,15 @@ public class FairkeeperBorosShootArrowGoal extends StoppableGoal {
                         this.spawnRedstoneTrail(part, -90, 0, 0);
                         this.spawnRedstoneTrail(part, -90, 1.5, 0);
                     }
-                    this.boros.playBeamSound(part.getX(), part.getY(), part.getZ());
+                    if (this.playSoundForPart % 3 == 0) {
+                        this.boros.playBeamSound(part.getX(), part.getY(), part.getZ(), 3.0F);
+                    }
+                    this.playSoundForPart++;
                 });
             }
 
             if (stoppingTick == reducedTickDelay(SHOOT_ARROW_TICK)) {
+                this.playSoundForPart = 0;
                 pattern.positionList().get(targetIndex).getMiddle().stream().forEach(partIndex -> {
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
@@ -133,7 +139,10 @@ public class FairkeeperBorosShootArrowGoal extends StoppableGoal {
                         this.shootArrow(part, -90, 0, 0);
                         this.shootArrow(part, -90, 1.5, 0);
                     }
-                    this.boros.playArrowSound(part.getX(), part.getY(), part.getZ());
+                    if (this.playSoundForPart % 3 == 0) {
+                        this.boros.playArrowSound(part.getX(), part.getY(), part.getZ(), 3.0F);
+                    }
+                    this.playSoundForPart++;
                 });
             }
 

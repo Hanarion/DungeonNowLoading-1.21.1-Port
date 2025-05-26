@@ -36,6 +36,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
     private List<FairkeeperBorosPartEntity> partList = new ArrayList<>();
     private int stoppingTick;
     private int targetIndex = 0;
+    private int playSoundForPart = 0;
 
     private static final double THRESHOLD = 2.0;
     private static final int STOP_DURATION = 32;
@@ -124,6 +125,7 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
             this.stoppingTick--;
 
             if (stoppingTick == reducedTickDelay(BEAM_TICK)) {
+                playSoundForPart = 0;
                 pattern.positionList().get(targetIndex).getMiddle().stream().forEach(partIndex -> {
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
@@ -147,11 +149,15 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
                         this.spawnRedstoneTrail(part, -90, 0, 0, 30);
                         this.spawnRedstoneTrail(part, -90, 1.5, 0, 30);
                     }
-                    this.boros.playBeamSound(part.getX(), part.getY(), part.getZ());
+                    if (playSoundForPart % 3 == 0) {
+                        this.boros.playBeamSound(part.getX(), part.getY(), part.getZ(), 3.0F);
+                    }
+                    playSoundForPart++;
                 });
             }
 
             if (stoppingTick == reducedTickDelay(SHOOT_ARROW_TICK)) {
+                playSoundForPart = 0;
                 pattern.positionList().get(targetIndex).getMiddle().stream().forEach(partIndex -> {
                     ShootingType shootingType = pattern.positionList().get(targetIndex).getLeft();
                     FairkeeperBorosPartEntity part = this.partList.get(partIndex);
@@ -171,7 +177,10 @@ public class FairkeeperBorosCircleAndShootArrowGoal extends StoppableGoal {
                         this.shootArrow(part, -90, 0, 0);
                         this.shootArrow(part, -90, 1.5, 0);
                     }
-                    this.boros.playArrowSound(part.getX(), part.getY(), part.getZ());
+                    if (playSoundForPart % 3 == 0) {
+                        this.boros.playArrowSound(part.getX(), part.getY(), part.getZ(), 3.0F);
+                    }
+                    playSoundForPart++;
                 });
             }
 

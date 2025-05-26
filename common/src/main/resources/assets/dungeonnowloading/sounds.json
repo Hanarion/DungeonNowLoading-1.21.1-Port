@@ -599,6 +599,23 @@
       "dungeonnowloading:mob/fairkeeper/boros/boros_fire_attack"
     ]
   },
+  "fairkeeper_boros_hurt": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_hurt",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/boros/boros_hurt_0",
+      "dungeonnowloading:mob/fairkeeper/boros/boros_hurt_1",
+      "dungeonnowloading:mob/fairkeeper/boros/boros_hurt_2"
+    ]
+  },
+  "fairkeeper_boros_slither": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_boros_slither",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/boros/boros_slither_0",
+      "dungeonnowloading:mob/fairkeeper/boros/boros_slither_1",
+      "dungeonnowloading:mob/fairkeeper/boros/boros_slither_2",
+      "dungeonnowloading:mob/fairkeeper/boros/boros_slither_3"
+    ]
+  },
   "fairkeeper_ouros_cannon_break": {
     "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_cannon_break",
     "sounds": [
@@ -622,7 +639,9 @@
   "fairkeeper_ouros_door_cannon_spawn": {
     "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_door_cannon_spawn",
     "sounds": [
-      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_cannon_spawn"
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_cannon_spawn_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_cannon_spawn_1",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_door_cannon_spawn_2"
     ]
   },
   "fairkeeper_ouros_door_close": {
@@ -659,12 +678,27 @@
       "dungeonnowloading:mob/fairkeeper/ouros/ouros_pillar_land_1"
     ]
   },
-  "fairkeeper_hurt": {
-    "subtitle": "sounds.dungeonnowloading.fairkeeper_hurt",
+  "fairkeeper_ouros_hurt": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_hurt",
     "sounds": [
-      "dungeonnowloading:mob/fairkeeper/fairkeeper_hurt_0",
-      "dungeonnowloading:mob/fairkeeper/fairkeeper_hurt_1",
-      "dungeonnowloading:mob/fairkeeper/fairkeeper_hurt_2"
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_hurt_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_hurt_1",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_hurt_2"
+    ]
+  },
+  "fairkeeper_ouros_slither": {
+    "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_slither",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_slither_0",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_slither_1",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_slither_2",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_slither_3"
+    ]
+  },
+  "fairkeepers_intro": {
+    "subtitle": "sounds.dungeonnowloading.fairkeepers_intro",
+    "sounds": [
+      "dungeonnowloading:mob/fairkeeper/fairkeepers_intro"
     ]
   },
   "fairkeeper_mouth_close": {

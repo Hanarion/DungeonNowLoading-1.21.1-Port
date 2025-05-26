@@ -7,6 +7,9 @@ import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperOur
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMobEffects;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -45,6 +48,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.PowderSnowBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -75,6 +79,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     private int attackTick;
     private int destructionTick;
+    private int slitheringSoundTick;
     private int partIndex;
     private Vec3 awakenEndPos;
     private boolean targetRandomPlayer;
@@ -89,6 +94,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     private int mouthOpenAnimationTimeOut;
     private static final int MOUTH_OPEN_ANIMATION_DURATION = 19;
+    private static final int SLITHERING_SOUND_INTERVAL = 140;
     
     public FairkeeperOurosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -477,12 +483,20 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     protected void customServerAiStep() {
         if (this.isState(FairkeeperOurosState.AWAKENING)) this.enableBossBar();
         this.segmentControl();
+        this.slitheringSoundControl();
         this.findCaller();
         this.performContactDamage();
         this.abilityCooldown();
         this.blockDestructionTick();
         super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
+    }
+
+    private void slitheringSoundControl() {
+        if (this.slitheringSoundTick-- <= 0) {
+            this.playSlitheringSound();
+            this.slitheringSoundTick = SLITHERING_SOUND_INTERVAL;
+        }
     }
 
     // NOTE: Searching for serpent caller on readAdditionalSaveData returns null, due to Serpent Caller not existing at that moment.
@@ -530,7 +544,9 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     private void destroyContactBlocks(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
 
-        DNLLevelUtil.beginMultiDestroySoundPending();
+        //DNLLevelUtil.beginMultiDestroySoundPending();
+
+        boolean blockBroken = false;
 
         for (int ix = minX; ix <= maxX; ix++) {
             for (int iz = minZ; iz <= maxZ; iz++) {
@@ -542,14 +558,18 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                     BlockState blockState = this.level().getBlockState(blockPos);
                     if (!blockState.isAir()) {
                         if (!blockState.is(BlockTags.WITHER_IMMUNE) && !blockState.is(DNLTags.TORCH_BLOCKS)) {
-                            DNLLevelUtil.destroyBlockMulti(this.level(), blockPos, false, this, 3);
+                            blockBroken = DNLLevelUtil.destroyBlockMulti(this.level(), blockPos, false, this, 3);
                         }
                     }
                 }
             }
         }
 
-        DNLLevelUtil.endMultiDestroySoundPending(this.level(), this);
+        if (blockBroken) {
+            playSound(SoundEvents.STONE_BREAK);
+        }
+
+        //DNLLevelUtil.endMultiDestroySoundPending(this.level(), this);
     }
 
     private void abilityCooldown() {
@@ -585,6 +605,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
             }
             return false;
         }
+        this.playHurtSound(this.getX(), this.getY(), this.getZ());
         return hurtAndTrackAttackers(damageSource, amount);
     }
 
@@ -607,6 +628,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
         if (this.deathTime == 1) {
             this.playDeathAnimation();
+            this.stopSlitheringSound();
             this.playDeathSound(this.getX(), this.getY(), this.getZ());
             this.partIndex = 0;
             for (int i = 0; i <= 13; i++) {
@@ -712,20 +734,48 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         return this;
     }
 
+    public void playSlitheringSound() {
+        float radius = 64.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.FAIRKEEPER_OUROS_SLITHER.get().getLocation(), SoundSource.HOSTILE, 4.0F, 1.0F, false, 64f, 0f), player);
+        }
+    }
+
+    public void stopSlitheringSound() {
+        float radius =  64.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), DNLSounds.FAIRKEEPER_OUROS_SLITHER.get().getLocation(), 20, false), player);
+        }
+    }
+
     public void playMouthOpenSound(double x, double y, double z) {
-        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_MOUTH_OPEN.get(), this.getSoundSource(), 3.0F, 1.0F);
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_MOUTH_OPEN.get(), this.getSoundSource(), 4.0F, 1.0F);
     }
 
     public void playMouthCloseSound(double x, double y, double z) {
-        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_MOUTH_CLOSE.get(), this.getSoundSource(), 3.0F, 1.0F);
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_MOUTH_CLOSE.get(), this.getSoundSource(), 4.0F, 1.0F);
     }
 
     public void playVertexDomainShootSound(double x, double y, double z) {
-        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_SHOOT_VERTEX_DOMAIN.get(), this.getSoundSource(), 3.0F, 1.0F);
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_SHOOT_VERTEX_DOMAIN.get(), this.getSoundSource(), 4.0F, 1.0F);
+    }
+
+    public void playHurtSound(double x, double y, double z) {
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_HURT.get(), this.getSoundSource(), 4.0F, 1.0F);
     }
 
     public void playDeathSound(double x, double y, double z) {
-        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_DEATH.get(), this.getSoundSource(), 3.0F, 1.0F);
+        this.level().playSound(null, x, y, z, DNLSounds.FAIRKEEPER_OUROS_DEATH.get(), this.getSoundSource(), 4.0F, 1.0F);
     }
 
     @Override

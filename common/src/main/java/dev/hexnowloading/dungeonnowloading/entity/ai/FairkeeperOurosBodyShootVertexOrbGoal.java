@@ -133,7 +133,6 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
 
         if (!this.beginShooting && hitResult.getType() == HitResult.Type.MISS) {
             this.beginShooting = true;
-            this.part.playVertexOrbShootSound();
         }
         if (this.beginShooting && this.cannonChargeUpTicks-- <= 0) {
             VertexOrbProjectileEntity projectile = new VertexOrbProjectileEntity(this.ouros.level(), this.ouros, 2);
@@ -142,6 +141,7 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
 
             this.ouros.getCaller().addMinion(projectile.getUUID());
 
+            this.part.playVertexOrbShootSound(this.part.getX(), this.part.getY(), this.part.getZ());
             //this.ouros.level().playSound(null, start.x, start.y, start.z, SoundEvents.WITHER_SHOOT, this.part.getSoundSource(), 3.0F, 1.0F + (this.part.getRandom().nextFloat() - this.part.getRandom().nextFloat()) * 0.2F);
             this.progress++;
         }

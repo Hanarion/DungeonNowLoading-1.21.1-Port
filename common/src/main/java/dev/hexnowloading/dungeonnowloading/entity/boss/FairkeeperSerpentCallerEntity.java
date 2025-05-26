@@ -20,6 +20,8 @@ import dev.hexnowloading.dungeonnowloading.sound.TickingSoundTarget;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -44,6 +46,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -80,6 +83,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private FairkeeperOurosEntity ouros;
     private boolean hasAddedDesperateMove;
 
+    private boolean burrowing;
     private boolean borosWaitingForCommand;
     private boolean ourosWaitingForCommand;
     private int isBorosDefeated;
@@ -200,6 +204,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         this.borosExhaustion.resetExhaustion();
         this.playSound(DNLSounds.FAIRKEEPER_SERPENT_CALLER_ACTIVATED.get(), 3.0F, 1.0F);
         this.playBossMusic();
+        this.playSound(DNLSounds.FAIRKEEPERS_INTRO.get(), 3.0F, 1.0F);
         this.clearAllMoveSet();
         this.setActivated(true);
         this.setOffsets(SPAWN_OFFSET_X, SPAWN_OFFSET_Y);
@@ -247,11 +252,17 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                     }
                     this.summonBosses();
                     this.setPhase(1);
+                    this.burrowing = true;
+                    spawnEmergingParticles();
                     //this.activationTick = 60;
                     break;
                 case 1:
+                    if (burrowing) {
+                        spawnBurrowingParticles();
+                    }
                     if (this.isBorosWaitingForCommand() && this.isOurosWaitingForCommand()) {
                         this.introMoveSet();
+                        this.burrowing = false;
                     }
 
                     if (this.activationTick > 0) {
@@ -797,6 +808,76 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         List<Player> list = this.level().getEntitiesOfClass(Player.class, aabb);
         list.removeIf(player -> !player.isAlive());
         return !list.isEmpty();
+    }
+
+    private void spawnEmergingParticles() {
+        BlockPos currentPosition = new BlockPos(this.getBlockX(), this.getBlockY(), this.getBlockZ());
+        Direction direction = Direction.fromYRot(this.getYRot());
+        Direction clockWiseDirection = direction.getClockWise();
+        Direction counterClockWiseDirection = direction.getCounterClockWise();
+
+        BlockPos clockWiseTargetPosition = currentPosition
+                .relative(clockWiseDirection, this.getHorizontalOffset())
+                .below(this.getVerticalOffset());
+
+        BlockPos counterClockWiseTargetPosition = currentPosition
+                .relative(counterClockWiseDirection, this.getHorizontalOffset())
+                .above(this.getVerticalOffset());
+
+        Vec3 centeredClockWiseTargetPosition = clockWiseTargetPosition.getCenter();
+
+        Vec3 centeredCounterClockWiseTargetPosition = counterClockWiseTargetPosition.getCenter();
+
+        ((ServerLevel) this.level()).sendParticles(
+                ParticleTypes.EXPLOSION,
+                centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y, centeredCounterClockWiseTargetPosition.z,
+                5,
+                3.0, 0.0, 3.0, // offset (for spread)
+                0 // speed
+        );
+        ((ServerLevel) this.level()).sendParticles(
+                ParticleTypes.EXPLOSION,
+                centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y, centeredClockWiseTargetPosition.z,
+                5,
+                3.0, 0.0, 3.0, // offset (for spread)
+                0 // speed
+        );
+    }
+
+    private void spawnBurrowingParticles() {
+        BlockPos currentPosition = new BlockPos(this.getBlockX(), this.getBlockY(), this.getBlockZ());
+        Direction direction = Direction.fromYRot(this.getYRot());
+        Direction clockWiseDirection = direction.getClockWise();
+        Direction counterClockWiseDirection = direction.getCounterClockWise();
+
+        BlockPos clockWiseTargetPosition = currentPosition
+                .relative(clockWiseDirection, this.getHorizontalOffset())
+                .below(this.getVerticalOffset());
+
+        BlockPos counterClockWiseTargetPosition = currentPosition
+                .relative(counterClockWiseDirection, this.getHorizontalOffset())
+                .above(this.getVerticalOffset());
+
+        Vec3 centeredClockWiseTargetPosition = clockWiseTargetPosition.getCenter();
+
+        Vec3 centeredCounterClockWiseTargetPosition = counterClockWiseTargetPosition.getCenter();
+
+        BlockState stoneBricks = Blocks.STONE_BRICKS.defaultBlockState();
+        ((ServerLevel) this.level()).sendParticles(
+                new BlockParticleOption(ParticleTypes.BLOCK, stoneBricks),
+                centeredCounterClockWiseTargetPosition.x, centeredCounterClockWiseTargetPosition.y, centeredCounterClockWiseTargetPosition.z,
+                10,
+                3.0, 3.0, 3.0, // offset (for spread)
+                0.05 // speed
+        );
+        ((ServerLevel) this.level()).sendParticles(
+                new BlockParticleOption(ParticleTypes.BLOCK, stoneBricks),
+                centeredClockWiseTargetPosition.x, centeredClockWiseTargetPosition.y, centeredClockWiseTargetPosition.z,
+                10,
+                3.0, 3.0, 3.0, // offset (for spread)
+                0.05 // speed
+        );
+
     }
 
     private void summonBosses() {
