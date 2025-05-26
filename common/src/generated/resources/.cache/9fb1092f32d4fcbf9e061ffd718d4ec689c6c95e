@@ -1,4 +1,4 @@
-// 1.20.1	2025-04-25T17:20:12.8821124	Recipes
+// 1.20.1	2025-05-25T18:00:28.4275646	Recipes
 c55d4fc25e96d7a86cbd8a810d3d01276f7ff16c data/dungeonnowloading/advancements/recipes/building_blocks/bordered_stone.json
 810a1df90bdfe3497ffbb8817e7a6080bcba5d0a data/dungeonnowloading/advancements/recipes/building_blocks/chiseled_coiling_stone_pillar.json
 22c5b94fee80c37d3aef2a9de383d93119b48d02 data/dungeonnowloading/advancements/recipes/building_blocks/coiling_stone_pillar.json
@@ -47,7 +47,7 @@ c0e6dd1736aa5c3e469cd91b17dc9f9e310fafa6 data/dungeonnowloading/recipes/polished
 457496f5a1e4c6564aeb766355b0e84b69664ef5 data/dungeonnowloading/recipes/puzzling_stone_emblem.json
 7e23fafb77dde480ca8c550252cd4e95ebc93edd data/dungeonnowloading/recipes/redstone_circuit.json
 7666bf5371bdf7b17b77cd3a0a6ec655ebd25150 data/dungeonnowloading/recipes/redstone_core.json
-3a143dfe1092018d3215d742db6d4a80115e54bc data/dungeonnowloading/recipes/redstone_idol.json
+5b59e1735c294411d86f979c186f8527a65f79ef data/dungeonnowloading/recipes/redstone_idol.json
 94f43a7c6ca5d41cd8af1f1184435cb5e9e32694 data/dungeonnowloading/recipes/redstone_lane_i.json
 b16adbbf218e24a0c9611fd9f92368ab41302c2a data/dungeonnowloading/recipes/redstone_lane_l.json
 da4fac1c26a039d10fbb3e745969aee701ae795c data/dungeonnowloading/recipes/redstone_lane_t.json

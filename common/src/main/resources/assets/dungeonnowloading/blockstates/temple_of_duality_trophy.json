@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "dungeonnowloading:block/temple_of_duality_trophy" },
+    "facing=south": { "model": "dungeonnowloading:block/temple_of_duality_trophy", "y": 180 },
+    "facing=west": { "model": "dungeonnowloading:block/temple_of_duality_trophy", "y": 270 },
+    "facing=east": { "model": "dungeonnowloading:block/temple_of_duality_trophy", "y": 90 }
+  }
+}

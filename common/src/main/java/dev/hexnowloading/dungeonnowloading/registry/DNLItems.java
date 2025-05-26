@@ -142,6 +142,8 @@ public class DNLItems {
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> LABYRINTH_TROPHY = register("labyrinth_trophy", () -> new BlockItem(DNLBlocks.LABYRINTH_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));
+    public static final Supplier<Item> TEMPLE_OF_DUALITY_TROPHY = register("temple_of_duality_trophy", () -> new BlockItem(DNLBlocks.TEMPLE_OF_DUALITY_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));
+
 
     //public static final Supplier<Item> WIND_ALTER = register("wind_alter", () -> new BlockItem(SkyislandBlocks.WIND_ALTER.get(), new Item.Properties()));
 

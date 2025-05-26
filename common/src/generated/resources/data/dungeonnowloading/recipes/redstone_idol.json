@@ -13,9 +13,9 @@
     }
   },
   "pattern": [
-    "ara",
-    "rrr",
-    "brb"
+    "rar",
+    "brb",
+    "rar"
   ],
   "result": {
     "item": "dungeonnowloading:redstone_idol"

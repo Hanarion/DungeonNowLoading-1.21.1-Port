@@ -1,7 +1,8 @@
 {
   "variants": {
-    "": [
-      { "model": "dungeonnowloading:block/labyrinth_trophy" }
-    ]
+    "facing=north": { "model": "dungeonnowloading:block/labyrinth_trophy", "y": 180 },
+    "facing=south": { "model": "dungeonnowloading:block/labyrinth_trophy"},
+    "facing=west": { "model": "dungeonnowloading:block/labyrinth_trophy", "y": 90},
+    "facing=east": { "model": "dungeonnowloading:block/labyrinth_trophy", "y": 270 }
   }
 }

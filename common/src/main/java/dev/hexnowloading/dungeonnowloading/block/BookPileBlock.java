@@ -16,7 +16,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 
-public class BookPileBlock extends PileBlock{
+public class BookPileBlock extends PileBlock {
     protected static final VoxelShape ONE_AABB = Block.box(0, 0, 0, 16, 3,16);
     protected static final VoxelShape TWO_AABB = Block.box(0, 0, 0, 16, 8,16);
     protected static final VoxelShape THREE_AABB = Block.box(0, 0, 0, 16, 10,16);
