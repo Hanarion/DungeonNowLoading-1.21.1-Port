@@ -1,0 +1,35 @@
+{
+  "display": {
+    "icon": {
+      "item": "dungeonnowloading:redstone_idol"
+    },
+    "title": {
+      "translate": "advancements.dungeonnowloading.awaken_fairkeepers.title"
+    },
+    "description": {
+      "translate": "advancements.dungeonnowloading.awaken_fairkeepers.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "dungeonnowloading:story/temple_of_duality/find_temple_of_duality",
+  "criteria": {
+    "awaken_fairkeepers": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "dungeonnowloading:redstone_idol"
+          ]
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "awaken_fairkeepers"
+    ]
+  ]
+}

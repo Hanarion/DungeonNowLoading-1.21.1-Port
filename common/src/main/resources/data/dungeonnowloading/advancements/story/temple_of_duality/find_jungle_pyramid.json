@@ -1,0 +1,41 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:mossy_cobblestone"
+    },
+    "title": {
+      "translate": "advancements.dungeonnowloading.find_jungle_pyramid.title"
+    },
+    "description": {
+      "translate": "advancements.dungeonnowloading.find_jungle_pyramid.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "dungeonnowloading:story/root",
+  "criteria": {
+    "find_jungle_pyramid": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "minecraft:jungle_pyramid"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "find_jungle_pyramid"
+    ]
+  ]
+}

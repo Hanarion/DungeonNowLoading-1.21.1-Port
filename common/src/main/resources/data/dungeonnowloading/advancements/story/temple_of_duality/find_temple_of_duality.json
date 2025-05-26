@@ -1,0 +1,41 @@
+{
+  "display": {
+    "icon": {
+      "item": "dungeonnowloading:temple_of_duality_trophy"
+    },
+    "title": {
+      "translate": "advancements.dungeonnowloading.find_temple_of_duality.title"
+    },
+    "description": {
+      "translate": "advancements.dungeonnowloading.find_temple_of_duality.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "dungeonnowloading:story/temple_of_duality/find_jungle_pyramid",
+  "criteria": {
+    "find_temple_of_duality": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "dungeonnowloading:temple_of_duality"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "find_temple_of_duality"
+    ]
+  ]
+}

@@ -17,7 +17,7 @@
   "parent": "dungeonnowloading:story/labyrinth/find_labyrinth",
   "criteria": {
     "awaken_chaos_spawner": {
-      "trigger": "minecraft:item_durability_changed",
+      "trigger": "minecraft:using_item",
       "conditions": {
         "item": {
           "items": [

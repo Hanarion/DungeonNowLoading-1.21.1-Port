@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "item": "dungeonnowloading:combustion_cell"
+    },
+    "title": {
+      "translate": "advancements.dungeonnowloading.obtain_combustion_cell.title"
+    },
+    "description": {
+      "translate": "advancements.dungeonnowloading.obtain_combustion_cell.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "dungeonnowloading:story/temple_of_duality/awaken_fairkeepers",
+  "criteria": {
+    "obtain_combustion_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dungeonnowloading:combustion_cell"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtain_combustion_cell"
+    ]
+  ]
+}

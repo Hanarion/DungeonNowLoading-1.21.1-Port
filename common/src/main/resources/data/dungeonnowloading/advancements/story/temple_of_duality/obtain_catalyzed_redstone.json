@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "item": "dungeonnowloading:catalyzed_redstone"
+    },
+    "title": {
+      "translate": "advancements.dungeonnowloading.obtain_catalyzed_redstone.title"
+    },
+    "description": {
+      "translate": "advancements.dungeonnowloading.obtain_catalyzed_redstone.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "dungeonnowloading:story/temple_of_duality/awaken_fairkeepers",
+  "criteria": {
+    "obtain_catalyzed_redstone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dungeonnowloading:catalyzed_redstone"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtain_catalyzed_redstone"
+    ]
+  ]
+}
