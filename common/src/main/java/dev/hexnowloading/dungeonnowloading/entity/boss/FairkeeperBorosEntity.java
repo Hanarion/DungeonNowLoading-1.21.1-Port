@@ -411,7 +411,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     private float getContactDamage() {
-        return (float) (this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (this.isState(FairkeeperBorosState.TACKLE) ? 1.0F : 0.5F));
+        return (float) (this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (this.isState(FairkeeperBorosState.TACKLE) ? 1.5F : 0.5F));
     }
 
     private boolean canPerformContactDamageTo(Entity entity) {

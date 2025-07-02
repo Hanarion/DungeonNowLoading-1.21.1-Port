@@ -91,7 +91,7 @@ public class MendingAuraBlockEntity extends BlockEntity {
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null && this.storedBlockNbt != null) {
-            blockEntity.load(this.storedBlockNbt);
+                blockEntity.load(this.storedBlockNbt);
         }
     }
 }
