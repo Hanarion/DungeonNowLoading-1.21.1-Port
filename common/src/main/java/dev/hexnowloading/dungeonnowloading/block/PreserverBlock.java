@@ -113,7 +113,7 @@ public class PreserverBlock extends BaseEntityBlock {
     public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
         if (!serverLevel.getBlockTicks().hasScheduledTick(blockPos, this)) {
             Direction direction = serverLevel.getBlockState(blockPos).getValue(FACING);
-            serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, false).setValue(FACING, direction), Block.UPDATE_CLIENTS);
+            serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, false).setValue(FACING, direction), Block.UPDATE_ALL);
         }
     }
 
@@ -130,7 +130,7 @@ public class PreserverBlock extends BaseEntityBlock {
 
     public void setLitPreserverBlock(ServerLevel serverLevel, BlockPos blockPos) {
         Direction direction = serverLevel.getBlockState(blockPos).getValue(FACING);
-        serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true).setValue(FACING, direction), Block.UPDATE_CLIENTS);
+        serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true).setValue(FACING, direction), Block.UPDATE_ALL);
         serverLevel.scheduleTick(blockPos, this, 20);
     }
 }

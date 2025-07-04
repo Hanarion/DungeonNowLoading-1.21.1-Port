@@ -2,17 +2,16 @@ package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -32,6 +31,7 @@ import java.util.List;
 public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    private static final SoundType SOUND_TYPE = new SoundType(1.0F, 1.0F, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP, DNLSounds.MENDING_AURA_POP.get(), SoundEvents.STONE_HIT, SoundEvents.STONE_FALL);
 
     public MendingAuraBlock(Properties $$0) {
         super($$0);
@@ -111,6 +111,11 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
             MendingAuraBlockEntity.tick(serverLevel, blockPos, blockState, mendingAuraBlockEntity);
         }
     }*/
+
+    @Override
+    public SoundType getSoundType(BlockState blockState) {
+        return SOUND_TYPE;
+    }
 
     @Override
     public void animateTick(BlockState blockState, Level level, BlockPos blockPos, RandomSource randomSource) {

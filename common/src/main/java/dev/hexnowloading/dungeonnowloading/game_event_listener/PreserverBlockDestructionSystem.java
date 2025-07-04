@@ -300,7 +300,7 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 if (serverLevel.getBlockState(eventBlockPos).getBlock() instanceof MendingAuraBlock) {
-                    BlockDestructionManager.cancel();
+                    ExplosionDestructionManager.cancel();
                     return false;
                 }
 
@@ -330,10 +330,12 @@ public interface PreserverBlockDestructionSystem {
                     compoundTag = originalBlockEntity.saveWithFullMetadata();
                 }
 
-                ExplosionDestructionManager.cancel();
                 ContainerDropManager.cancel(eventBlockPos);
 
                 placeMendingBlock(serverLevel, originalBlockState, eventBlockPos, gameEvent);
+
+                //Note: Block Destruction cancel must be placed after placeMendingBlock to avoid the blockDestruction being reset before placing the mendstone block.
+                ExplosionDestructionManager.cancel();
 
                 if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
                     blockEntity.setStoredBlock(originalBlockState, compoundTag);

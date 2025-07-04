@@ -33,13 +33,14 @@ public abstract class ExplosionMixin {
     @Redirect(method = "finalizeExplosion",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/block/state/BlockState;isAir()Z"))
-    private boolean redirectIsAir(BlockState instance) {
-        ExplosionDestructionManager.reset();
+    private boolean redirectIsAir(BlockState blockstate) {
 
         if (level instanceof ServerLevel serverLevel) {
+            //Note: The ExplosionDestructionManager.reset() need to run only on the serverside and not on the clientside since the shouldCancelDestruction boolean is shared between client and server due to being a static variable.
+            ExplosionDestructionManager.reset();
             serverLevel.gameEvent(null, DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION.get(), Vec3.atCenterOf(targetBlockPos));
         }
-        // Return the original result
-        return instance.isAir() || ExplosionDestructionManager.shouldCancel();
+
+        return blockstate.isAir() || (level instanceof ServerLevel && ExplosionDestructionManager.shouldCancel());
     }
 }
