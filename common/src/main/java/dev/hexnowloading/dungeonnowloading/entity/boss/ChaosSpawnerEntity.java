@@ -13,7 +13,7 @@ import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.UniqueDeathAnimationEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
-import dev.hexnowloading.dungeonnowloading.util.*;
+import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +42,8 @@ import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -556,7 +557,11 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         }
         if (this.deathTime >= 160 && !this.level().isClientSide() && !this.isRemoved()) {
             Level level = this.level();
+            if (this.killedDamageSource == null) {
+                this.killedDamageSource = this.level().damageSources().generic();
+            }
             Entity entity = killedDamageSource.getEntity();
+            System.out.println(entity + " killed by " + killedDamageSource);
             LivingEntity livingEntity = this.getKillCredit();
             if (this.deathScore >= 0 && livingEntity != null) {
                 livingEntity.awardKillScore(this, this.deathScore, this.killedDamageSource);
