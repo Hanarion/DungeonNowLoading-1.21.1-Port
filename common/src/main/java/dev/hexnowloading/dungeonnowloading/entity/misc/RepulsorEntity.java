@@ -48,7 +48,7 @@ public class RepulsorEntity extends Mob {
         IDLE,
     }
 
-    public static final float SHIELD_MAX_HEALTH = 100.0f;
+    public static final int SHIELD_MAX_HEALTH = 100;
     public static final float SHIELD_ALERT_THRESHOLD = SHIELD_MAX_HEALTH * 0.5F;
     private static final double BEAM_INITIAL_PARTICLE_SPACING = 0.5d;
     private static final float BEAM_INITIAL_PARTICLE_SCALE_MIN = 0.1f;
@@ -56,7 +56,7 @@ public class RepulsorEntity extends Mob {
     private static final int SHIELD_HEAL_AMOUNT = 5;
     private static final EntityDataAccessor<Boolean> DATA_CAN_RENDER = SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_AGE = SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Float> DATA_SHIELD_HEALTH = SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> DATA_SHIELD_HEALTH = SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<State> DATA_STATE = SynchedEntityData.defineId(RepulsorEntity.class, EntityStates.COMMAND_PYLON_STATE);
 
     public AnimationState setupAnimState = new AnimationState();
@@ -89,7 +89,7 @@ public class RepulsorEntity extends Mob {
         super.readAdditionalSaveData(compoundTag);
         this.entityData.set(DATA_CAN_RENDER, compoundTag.getBoolean("canRender"));
         this.entityData.set(DATA_AGE, compoundTag.getInt("age"));
-        this.entityData.set(DATA_SHIELD_HEALTH, compoundTag.getFloat("shieldHealth"));
+        this.entityData.set(DATA_SHIELD_HEALTH, compoundTag.getInt("shieldHealth"));
     }
 
     @Override
@@ -97,7 +97,7 @@ public class RepulsorEntity extends Mob {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.putBoolean("canRender", this.canRender());
         compoundTag.putInt("age", this.getAge());
-        compoundTag.putFloat("shieldHealth", this.entityData.get(DATA_SHIELD_HEALTH));
+        compoundTag.putInt("shieldHealth", this.entityData.get(DATA_SHIELD_HEALTH));
     }
 
     @Override
@@ -270,7 +270,7 @@ public class RepulsorEntity extends Mob {
                     spawnRedstoneBeamParticle((ServerLevel) this.level(), entity);
                     playSound(DNLSounds.REPULSOR_FIZZLE.get());
 
-                    float shieldDamage = 1;
+                    int shieldDamage = 1;
 
                     if (entity.getType().is(DNLTags.REPULSOR_HIGH_DAMAGE_PROJECTILES)) {
                         shieldDamage = 20;
@@ -278,11 +278,15 @@ public class RepulsorEntity extends Mob {
                         shieldDamage = 5;
                     }
 
-                    float updatedShieldHealth = this.entityData.get(DATA_SHIELD_HEALTH) - shieldDamage;
+                    int updatedShieldHealth = this.entityData.get(DATA_SHIELD_HEALTH) - shieldDamage;
                     this.entityData.set(DATA_SHIELD_HEALTH, updatedShieldHealth);
 
                     if (aboveHalfHealth && this.getShieldHealth() <= SHIELD_MAX_HEALTH * 0.5F) {
                         this.playSound(DNLSounds.REPULSOR_ALERT.get());
+                    }
+
+                    if (discardEntity) {
+                        entity.discard();
                     }
 
                     if (updatedShieldHealth <= 0.0f) {
@@ -293,10 +297,7 @@ public class RepulsorEntity extends Mob {
                         this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 1.0F, 2.0F);
                         ((ServerLevel) this.level()).sendParticles(particleData, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0.0f);
                         this.discard();
-                    }
-
-                    if (discardEntity) {
-                        entity.discard();
+                        return;
                     }
                 }
                 if (this.getShieldHealth() <= RepulsorEntity.SHIELD_MAX_HEALTH * 0.5F) {
@@ -389,11 +390,11 @@ public class RepulsorEntity extends Mob {
         return this.entityData.get(DATA_STATE);
     }
 
-    public float getShieldHealth() {
+    public int getShieldHealth() {
         return this.entityData.get(DATA_SHIELD_HEALTH);
     }
 
-    public void setShieldHealth(float health) {
+    public void setShieldHealth(int health) {
         this.entityData.set(DATA_SHIELD_HEALTH, health);
     }
 

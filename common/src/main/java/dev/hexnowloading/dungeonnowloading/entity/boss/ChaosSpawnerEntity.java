@@ -561,7 +561,6 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 this.killedDamageSource = this.level().damageSources().generic();
             }
             Entity entity = killedDamageSource.getEntity();
-            System.out.println(entity + " killed by " + killedDamageSource);
             LivingEntity livingEntity = this.getKillCredit();
             if (this.deathScore >= 0 && livingEntity != null) {
                 livingEntity.awardKillScore(this, this.deathScore, this.killedDamageSource);
