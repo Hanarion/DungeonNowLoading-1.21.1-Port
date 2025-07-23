@@ -189,10 +189,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         ResourceLocation degree_180 = extend(blockTexture(block), "_180");
         ResourceLocation degree_270 = extend(blockTexture(block), "_270");
 
-        ModelFile model_0 = models().cubeAll(name(block) + "_0", degree_0);
-        ModelFile model_90 = models().cubeAll(name(block) + "_90", degree_90);
-        ModelFile model_180 = models().cubeAll(name(block) + "_180", degree_180);
-        ModelFile model_270 = models().cubeAll(name(block) + "_270", degree_270);
+        ModelFile model_0 = models().cubeAll(name(block) + "_0", degree_0).renderType("cutout");;
+        ModelFile model_90 = models().cubeAll(name(block) + "_90", degree_90).renderType("cutout");;
+        ModelFile model_180 = models().cubeAll(name(block) + "_180", degree_180).renderType("cutout");;
+        ModelFile model_270 = models().cubeAll(name(block) + "_270", degree_270).renderType("cutout");
 
         getVariantBuilder(block)
                 .partialState().addModels(ConfiguredModel.builder().modelFile(model_0).build())
@@ -209,20 +209,20 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
         ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
 
-        ModelFile stairs_model_0 = models().stairs(name(block) + "_0", degree_0, degree_0, degree_0);
-        ModelFile stairs_model_90 = models().stairs(name(block) + "_90", degree_90, degree_90, degree_90);
-        ModelFile stairs_model_180 = models().stairs(name(block) + "_180", degree_180, degree_180, degree_180);
-        ModelFile stairs_model_270 = models().stairs(name(block) + "_270", degree_270, degree_270, degree_270);
+        ModelFile stairs_model_0 = models().stairs(name(block) + "_0", degree_0, degree_0, degree_0).renderType("cutout");;
+        ModelFile stairs_model_90 = models().stairs(name(block) + "_90", degree_90, degree_90, degree_90).renderType("cutout");;
+        ModelFile stairs_model_180 = models().stairs(name(block) + "_180", degree_180, degree_180, degree_180).renderType("cutout");;
+        ModelFile stairs_model_270 = models().stairs(name(block) + "_270", degree_270, degree_270, degree_270).renderType("cutout");;
 
-        ModelFile stairsInner_model_0 = models().stairsInner(name(block) + "_inner_0", degree_0, degree_0, degree_0);
-        ModelFile stairsInner_model_90 = models().stairsInner(name(block) + "_inner_90", degree_90, degree_90, degree_90);
-        ModelFile stairsInner_model_180 = models().stairsInner(name(block) + "_inner_180", degree_180, degree_180, degree_180);
-        ModelFile stairsInner_model_270 = models().stairsInner(name(block) + "_inner_270", degree_270, degree_270, degree_270);
+        ModelFile stairsInner_model_0 = models().stairsInner(name(block) + "_inner_0", degree_0, degree_0, degree_0).renderType("cutout");;
+        ModelFile stairsInner_model_90 = models().stairsInner(name(block) + "_inner_90", degree_90, degree_90, degree_90).renderType("cutout");;
+        ModelFile stairsInner_model_180 = models().stairsInner(name(block) + "_inner_180", degree_180, degree_180, degree_180).renderType("cutout");;
+        ModelFile stairsInner_model_270 = models().stairsInner(name(block) + "_inner_270", degree_270, degree_270, degree_270).renderType("cutout");;
 
-        ModelFile stairsOuter_model_0 = models().stairsOuter(name(block) + "_outer_0", degree_0, degree_0, degree_0);
-        ModelFile stairsOuter_model_90 = models().stairsOuter(name(block) + "_outer_90", degree_90, degree_90, degree_90);
-        ModelFile stairsOuter_model_180 = models().stairsOuter(name(block) + "_outer_180", degree_180, degree_180, degree_180);
-        ModelFile stairsOuter_model_270 = models().stairsOuter(name(block) + "_outer_270", degree_270, degree_270, degree_270);
+        ModelFile stairsOuter_model_0 = models().stairsOuter(name(block) + "_outer_0", degree_0, degree_0, degree_0).renderType("cutout");;
+        ModelFile stairsOuter_model_90 = models().stairsOuter(name(block) + "_outer_90", degree_90, degree_90, degree_90).renderType("cutout");;
+        ModelFile stairsOuter_model_180 = models().stairsOuter(name(block) + "_outer_180", degree_180, degree_180, degree_180).renderType("cutout");;
+        ModelFile stairsOuter_model_270 = models().stairsOuter(name(block) + "_outer_270", degree_270, degree_270, degree_270).renderType("cutout");;
 
         this.getVariantBuilder(block).forAllStatesExcept((state) -> {
             Direction facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING); // Use your block’s FACING property
@@ -288,20 +288,20 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
         ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
 
-        ModelFile slabBottom_0 = models().slab(name(block) + "_0", degree_0, degree_0, degree_0);
-        ModelFile slabBottom_90 = models().slab(name(block) + "_90", degree_90, degree_90, degree_90);
-        ModelFile slabBottom_180 = models().slab(name(block) + "_180", degree_180, degree_180, degree_180);
-        ModelFile slabBottom_270 = models().slab(name(block) + "_270", degree_270, degree_270, degree_270);
+        ModelFile slabBottom_0 = models().slab(name(block) + "_0", degree_0, degree_0, degree_0).renderType("cutout");;
+        ModelFile slabBottom_90 = models().slab(name(block) + "_90", degree_90, degree_90, degree_90).renderType("cutout");;
+        ModelFile slabBottom_180 = models().slab(name(block) + "_180", degree_180, degree_180, degree_180).renderType("cutout");;
+        ModelFile slabBottom_270 = models().slab(name(block) + "_270", degree_270, degree_270, degree_270).renderType("cutout");;
 
-        ModelFile slabTop_0 = models().slabTop(name(block) + "_top_0", degree_0, degree_0, degree_0);
-        ModelFile slabTop_90 = models().slabTop(name(block) + "_top_90", degree_90, degree_90, degree_90);
-        ModelFile slabTop_180 = models().slabTop(name(block) + "_top_180", degree_180, degree_180, degree_180);
-        ModelFile slabTop_270 = models().slabTop(name(block) + "_top_270", degree_270, degree_270, degree_270);
+        ModelFile slabTop_0 = models().slabTop(name(block) + "_top_0", degree_0, degree_0, degree_0).renderType("cutout");;
+        ModelFile slabTop_90 = models().slabTop(name(block) + "_top_90", degree_90, degree_90, degree_90).renderType("cutout");;
+        ModelFile slabTop_180 = models().slabTop(name(block) + "_top_180", degree_180, degree_180, degree_180).renderType("cutout");;
+        ModelFile slabTop_270 = models().slabTop(name(block) + "_top_270", degree_270, degree_270, degree_270).renderType("cutout");;
 
-        ModelFile slabDouble_0 = models().cubeAll(name(block) + "_double_0", blockTexture(parent));
-        ModelFile slabDouble_90 = models().cubeAll(name(block) + "_double_90", blockTexture(parent));
-        ModelFile slabDouble_180 = models().cubeAll(name(block) + "_double_180", blockTexture(parent));
-        ModelFile slabDouble_270 = models().cubeAll(name(block) + "_double_270", blockTexture(parent));
+        ModelFile slabDouble_0 = models().cubeAll(name(block) + "_double_0", blockTexture(parent)).renderType("cutout");;
+        ModelFile slabDouble_90 = models().cubeAll(name(block) + "_double_90", blockTexture(parent)).renderType("cutout");;
+        ModelFile slabDouble_180 = models().cubeAll(name(block) + "_double_180", blockTexture(parent)).renderType("cutout");;
+        ModelFile slabDouble_270 = models().cubeAll(name(block) + "_double_270", blockTexture(parent)).renderType("cutout");;
 
         this.getVariantBuilder(block).forAllStatesExcept((state) -> {
             SlabType slabType = state.getValue(SlabBlock.TYPE);
@@ -346,15 +346,15 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
         ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
 
-        ModelFile post_0 = models().fencePost(name(block) + "_post_0", degree_0);
-        ModelFile post_90 = models().fencePost(name(block) + "_post_90", degree_90);
-        ModelFile post_180 = models().fencePost(name(block) + "_post_180", degree_180);
-        ModelFile post_270 = models().fencePost(name(block) + "_post_270", degree_270);
+        ModelFile post_0 = models().fencePost(name(block) + "_post_0", degree_0).renderType("cutout");;
+        ModelFile post_90 = models().fencePost(name(block) + "_post_90", degree_90).renderType("cutout");;
+        ModelFile post_180 = models().fencePost(name(block) + "_post_180", degree_180).renderType("cutout");;
+        ModelFile post_270 = models().fencePost(name(block) + "_post_270", degree_270).renderType("cutout");;
 
-        ModelFile side_0 = models().fenceSide(name(block) + "_side_0", degree_0);
-        ModelFile side_90 = models().fenceSide(name(block) + "_side_90", degree_90);
-        ModelFile side_180 = models().fenceSide(name(block) + "_side_180", degree_180);
-        ModelFile side_270 = models().fenceSide(name(block) + "_side_270", degree_270);
+        ModelFile side_0 = models().fenceSide(name(block) + "_side_0", degree_0).renderType("cutout");;
+        ModelFile side_90 = models().fenceSide(name(block) + "_side_90", degree_90).renderType("cutout");;
+        ModelFile side_180 = models().fenceSide(name(block) + "_side_180", degree_180).renderType("cutout");;
+        ModelFile side_270 = models().fenceSide(name(block) + "_side_270", degree_270).renderType("cutout");;
 
         MultiPartBlockStateBuilder builder = ((MultiPartBlockStateBuilder.PartBuilder)this.getMultipartBuilder(block).part().modelFile(post_0).addModel()).end();
         PipeBlock.PROPERTY_BY_DIRECTION.entrySet().forEach((e) -> {
@@ -375,20 +375,20 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
         ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
 
-        ModelFile post_0 = models().wallPost(name(block) + "_post_0", degree_0);
-        ModelFile post_90 = models().wallPost(name(block) + "_post_90", degree_90);
-        ModelFile post_180 = models().wallPost(name(block) + "_post_180", degree_180);
-        ModelFile post_270 = models().wallPost(name(block) + "_post_270", degree_270);
+        ModelFile post_0 = models().wallPost(name(block) + "_post_0", degree_0).renderType("cutout");;
+        ModelFile post_90 = models().wallPost(name(block) + "_post_90", degree_90).renderType("cutout");;
+        ModelFile post_180 = models().wallPost(name(block) + "_post_180", degree_180).renderType("cutout");;
+        ModelFile post_270 = models().wallPost(name(block) + "_post_270", degree_270).renderType("cutout");;
 
-        ModelFile side_0 = models().wallSide(name(block) + "_side_0", degree_0);
-        ModelFile side_90 = models().wallSide(name(block) + "_side_90", degree_90);
-        ModelFile side_180 = models().wallSide(name(block) + "_side_180", degree_180);
-        ModelFile side_270 = models().wallSide(name(block) + "_side_270", degree_270);
+        ModelFile side_0 = models().wallSide(name(block) + "_side_0", degree_0).renderType("cutout");;
+        ModelFile side_90 = models().wallSide(name(block) + "_side_90", degree_90).renderType("cutout");;
+        ModelFile side_180 = models().wallSide(name(block) + "_side_180", degree_180).renderType("cutout");;
+        ModelFile side_270 = models().wallSide(name(block) + "_side_270", degree_270).renderType("cutout");;
 
-        ModelFile side_tall_0 = models().wallSideTall(name(block) + "_side_tall_0", degree_0);
-        ModelFile side_tall_90 = models().wallSideTall(name(block) + "_side_tall_90", degree_90);
-        ModelFile side_tall_180 = models().wallSideTall(name(block) + "_side_tall_180", degree_180);
-        ModelFile side_tall_270 = models().wallSideTall(name(block) + "_side_tall_270", degree_270);
+        ModelFile side_tall_0 = models().wallSideTall(name(block) + "_side_tall_0", degree_0).renderType("cutout");;
+        ModelFile side_tall_90 = models().wallSideTall(name(block) + "_side_tall_90", degree_90).renderType("cutout");;
+        ModelFile side_tall_180 = models().wallSideTall(name(block) + "_side_tall_180", degree_180).renderType("cutout");;
+        ModelFile side_tall_270 = models().wallSideTall(name(block) + "_side_tall_270", degree_270).renderType("cutout");;
 
         MultiPartBlockStateBuilder builder = ((MultiPartBlockStateBuilder.PartBuilder)this.getMultipartBuilder(block).part().modelFile(post_0).addModel()).condition(WallBlock.UP, new Boolean[]{true}).end();
         WALL_PROPS.entrySet().stream().filter((e) -> {
@@ -414,16 +414,16 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         ModelFile model_0 = models().withExistingParent(name(block) + "_crop_0", mcLoc("block/template_farmland"))
                 .texture("dirt", degree_0)
-                .texture("top", degree_0);
+                .texture("top", degree_0).renderType("cutout");;
         ModelFile model_90 = models().withExistingParent(name(block) + "_crop_90", mcLoc("block/template_farmland"))
                 .texture("dirt", degree_90)
-                .texture("top", degree_90);
+                .texture("top", degree_90).renderType("cutout");;
         ModelFile model_180 = models().withExistingParent(name(block) + "_crop_180", mcLoc("block/template_farmland"))
                 .texture("dirt", degree_180)
-                .texture("top", degree_180);
+                .texture("top", degree_180).renderType("cutout");;
         ModelFile model_270 = models().withExistingParent(name(block) + "_crop_270", mcLoc("block/template_farmland"))
                 .texture("dirt", degree_270)
-                .texture("top", degree_270);
+                .texture("top", degree_270).renderType("cutout");;
 
         getVariantBuilder(block)
                 .partialState().addModels(ConfiguredModel.builder().modelFile(model_0).build())
@@ -441,30 +441,30 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         ResourceLocation degree_180 = extend(blockTexture(parent), "_180");
         ResourceLocation degree_270 = extend(blockTexture(parent), "_270");
 
-        ModelFile post_0 = models().panePost(name(block) + "_post_0", degree_0, degree_0);
-        ModelFile post_90 = models().panePost(name(block) + "_post_90", degree_90, degree_90);
-        ModelFile post_180 = models().panePost(name(block) + "_post_180", degree_180, degree_180);
-        ModelFile post_270 = models().panePost(name(block) + "_post_270", degree_270, degree_270);
+        ModelFile post_0 = models().panePost(name(block) + "_post_0", degree_0, degree_0).renderType("cutout");;
+        ModelFile post_90 = models().panePost(name(block) + "_post_90", degree_90, degree_90).renderType("cutout");;
+        ModelFile post_180 = models().panePost(name(block) + "_post_180", degree_180, degree_180).renderType("cutout");;
+        ModelFile post_270 = models().panePost(name(block) + "_post_270", degree_270, degree_270).renderType("cutout");;
 
-        ModelFile side_0 = models().paneSide(name(block) + "_side_0", degree_0, degree_0);
-        ModelFile side_90 = models().paneSide(name(block) + "_side_90", degree_90, degree_90);
-        ModelFile side_180 = models().paneSide(name(block) + "_side_180", degree_180, degree_180);
-        ModelFile side_270 = models().paneSide(name(block) + "_side_270", degree_270, degree_270);
+        ModelFile side_0 = models().paneSide(name(block) + "_side_0", degree_0, degree_0).renderType("cutout");;
+        ModelFile side_90 = models().paneSide(name(block) + "_side_90", degree_90, degree_90).renderType("cutout");;
+        ModelFile side_180 = models().paneSide(name(block) + "_side_180", degree_180, degree_180).renderType("cutout");;
+        ModelFile side_270 = models().paneSide(name(block) + "_side_270", degree_270, degree_270).renderType("cutout");;
 
-        ModelFile no_side_0 = models().paneNoSide(name(block) + "_no_side_0", degree_0);
-        ModelFile no_side_90 = models().paneNoSide(name(block) + "_no_side_90", degree_90);
-        ModelFile no_side_180 = models().paneNoSide(name(block) + "_no_side_180", degree_180);
-        ModelFile no_side_270 = models().paneNoSide(name(block) + "_no_side_270", degree_270);
+        ModelFile no_side_0 = models().paneNoSide(name(block) + "_no_side_0", degree_0).renderType("cutout");;
+        ModelFile no_side_90 = models().paneNoSide(name(block) + "_no_side_90", degree_90).renderType("cutout");;
+        ModelFile no_side_180 = models().paneNoSide(name(block) + "_no_side_180", degree_180).renderType("cutout");;
+        ModelFile no_side_270 = models().paneNoSide(name(block) + "_no_side_270", degree_270).renderType("cutout");;
 
-        ModelFile side_alt_0 = models().paneSideAlt(name(block) + "_side_alt_0", degree_0, degree_0);
-        ModelFile side_alt_90 = models().paneSideAlt(name(block) + "_side_alt_90", degree_90, degree_90);
-        ModelFile side_alt_180 = models().paneSideAlt(name(block) + "_side_alt_180", degree_180, degree_180);
-        ModelFile side_alt_270 = models().paneSideAlt(name(block) + "_side_alt_270", degree_270, degree_270);
+        ModelFile side_alt_0 = models().paneSideAlt(name(block) + "_side_alt_0", degree_0, degree_0).renderType("cutout");;
+        ModelFile side_alt_90 = models().paneSideAlt(name(block) + "_side_alt_90", degree_90, degree_90).renderType("cutout");;
+        ModelFile side_alt_180 = models().paneSideAlt(name(block) + "_side_alt_180", degree_180, degree_180).renderType("cutout");;
+        ModelFile side_alt_270 = models().paneSideAlt(name(block) + "_side_alt_270", degree_270, degree_270).renderType("cutout");;
 
-        ModelFile no_side_alt_0 = models().paneNoSideAlt(name(block) + "_no_side_alt_0", degree_0);
-        ModelFile no_side_alt_90 = models().paneNoSideAlt(name(block) + "_no_side_alt_90", degree_90);
-        ModelFile no_side_alt_180 = models().paneNoSideAlt(name(block) + "_no_side_alt_180", degree_180);
-        ModelFile no_side_alt_270 = models().paneNoSideAlt(name(block) + "_no_side_alt_270", degree_270);
+        ModelFile no_side_alt_0 = models().paneNoSideAlt(name(block) + "_no_side_alt_0", degree_0).renderType("cutout");;
+        ModelFile no_side_alt_90 = models().paneNoSideAlt(name(block) + "_no_side_alt_90", degree_90).renderType("cutout");;
+        ModelFile no_side_alt_180 = models().paneNoSideAlt(name(block) + "_no_side_alt_180", degree_180).renderType("cutout");;
+        ModelFile no_side_alt_270 = models().paneNoSideAlt(name(block) + "_no_side_alt_270", degree_270).renderType("cutout");;
 
         MultiPartBlockStateBuilder builder = ((MultiPartBlockStateBuilder.PartBuilder)this.getMultipartBuilder(block).part().modelFile(post_0).addModel()).end();
         PipeBlock.PROPERTY_BY_DIRECTION.entrySet().forEach((e) -> {

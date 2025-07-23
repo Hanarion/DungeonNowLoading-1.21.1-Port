@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/fence_side",
+  "render_type": "minecraft:cutout",
   "textures": {
     "texture": "dungeonnowloading:block/mending_aura_180"
   }

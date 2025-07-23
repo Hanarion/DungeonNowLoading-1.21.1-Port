@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/inner_stairs",
+  "render_type": "minecraft:cutout",
   "textures": {
     "bottom": "dungeonnowloading:block/mending_aura_270",
     "side": "dungeonnowloading:block/mending_aura_270",
