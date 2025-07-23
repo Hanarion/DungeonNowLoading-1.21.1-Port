@@ -22,6 +22,7 @@ public class EntityStates {
     public static final EntityDataSerializer<BallistaGolemEntity.BallistaGolemState> BALLISTA_GOLEM_STATE;
     public static final EntityDataSerializer<CopperCreepEntity.State> COPPER_CREEP_STATE;
     public static final EntityDataSerializer<CopperCreepEntity.Skin> COPPER_CREEP_SKIN;
+    public static final EntityDataSerializer<CopperCreepEntity.CopperCreepAnimationState> COPPER_CREEP_ANIMATION_STATE;
     public static final EntityDataSerializer<VertexDomainProjectileEntity.VertexDomainAnimationState> VERTEX_DOMAIN_ANIMATION_STATE;
     public static final EntityDataSerializer<RepulsorEntity.State> COMMAND_PYLON_STATE;
 
@@ -38,6 +39,7 @@ public class EntityStates {
         BALLISTA_GOLEM_STATE = EntityDataSerializer.simpleEnum(BallistaGolemEntity.BallistaGolemState.class);
         COPPER_CREEP_STATE = EntityDataSerializer.simpleEnum(CopperCreepEntity.State.class);
         COPPER_CREEP_SKIN = EntityDataSerializer.simpleEnum(CopperCreepEntity.Skin.class);
+        COPPER_CREEP_ANIMATION_STATE = EntityDataSerializer.simpleEnum(CopperCreepEntity.CopperCreepAnimationState.class);
         VERTEX_DOMAIN_ANIMATION_STATE = EntityDataSerializer.simpleEnum(VertexDomainProjectileEntity.VertexDomainAnimationState.class);
         COMMAND_PYLON_STATE = EntityDataSerializer.simpleEnum(RepulsorEntity.State.class);
 
@@ -53,6 +55,7 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(BALLISTA_GOLEM_STATE);
         EntityDataSerializers.registerSerializer(COPPER_CREEP_STATE);
         EntityDataSerializers.registerSerializer(COPPER_CREEP_SKIN);
+        EntityDataSerializers.registerSerializer(COPPER_CREEP_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(VERTEX_DOMAIN_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(COMMAND_PYLON_STATE);
     }

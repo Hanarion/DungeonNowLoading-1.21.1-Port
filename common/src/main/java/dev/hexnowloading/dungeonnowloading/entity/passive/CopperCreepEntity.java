@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.passive;
 
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.copper_creep.CopperCreepAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -91,6 +92,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     private static final EntityDataAccessor<Boolean> DATA_IS_ALREADY_SUMMONED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<State> STATE = SynchedEntityData.defineId(CopperCreepEntity.class, EntityStates.COPPER_CREEP_STATE);
     private static final EntityDataAccessor<Skin> SKIN = SynchedEntityData.defineId(CopperCreepEntity.class, EntityStates.COPPER_CREEP_SKIN);
+    private static final EntityDataAccessor<CopperCreepAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(CopperCreepEntity.class, EntityStates.COPPER_CREEP_ANIMATION_STATE);
     private static final EntityDataAccessor<Boolean> SKIN_VALIDATION = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final byte TRIGGER_IDLE_ANIMATION_STATE = 70;
     private static final byte TRIGGER_WALKING_ANIMATION_STATE = 71;
@@ -121,6 +123,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     private int sitAnimationTick;
     private int standAnimationTick;
 
+    private AnimationChainer<CopperCreepAnimationState> animationChainer = new AnimationChainer<>();
     public State currentState;
 
     public CopperCreepEntity(EntityType<? extends CopperCreepEntity> entityType, Level level) {
@@ -178,7 +181,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-
+        this.entityData.define(ANIMATION_STATE, CopperCreepAnimationState.IDLE);
         this.entityData.define(SUMMONER_UUID, Optional.empty()); // Initially, no UUID is set
         this.entityData.define(DATA_IS_POWERED, false);
         this.entityData.define(DATA_IS_IGNITED, false);
@@ -267,30 +270,38 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
                 Optional<UUID> summonerUUID = this.getSummonerUUID();
                 if (summonerUUID.isPresent() && summonerUUID.get().equals(player.getUUID())) {
                     if (this.getState() == State.IDLE || this.getState() == State.FOLLOWING) {
-                        player.displayClientMessage(Component.translatable("entity.dungeonnowloading.copper_creep.state_wander"), true);
-                        this.setState(State.WANDERING);
-                    } else if (this.getState() == State.WANDERING && this.canSit() && this.sitAnimationTick <= 0) {
-                        player.displayClientMessage(Component.translatable("entity.dungeonnowloading.copper_creep.state_sit"), true);
-                        this.triggerSitAnimation();
-                        this.setState(State.SIT);
-                        this.playSound(DNLSounds.COPPER_CREEP_SIT_DOWN.get());
-                        this.getNavigation().stop();
-                        AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
-                        if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER)) {
-                            moveSpeedAttr.addTransientModifier(SPEED_MODIFIER);
+                        if (this.isDefused() && this.canSit() && this.sitAnimationTick <= 0) {
+                            player.displayClientMessage(Component.translatable("entity.dungeonnowloading.copper_creep.state_wander"), true);
+                            this.setState(State.WANDERING);
+                        } else {
+                            this.rightClickToSit(player);
                         }
-                        this.sitAnimationTick = Mth.ceil(CopperCreepAnimation.SIT.lengthInSeconds() * 20);
+                    } else if (this.getState() == State.WANDERING && this.canSit() && this.sitAnimationTick <= 0) {
+                        this.rightClickToSit(player);
                     } else if (this.getState() == State.SITTING && this.sitAnimationTick <= 0) {
                         player.displayClientMessage(Component.translatable("entity.dungeonnowloading.copper_creep.state_follow"), true);
                         this.standUp();
                     }
                 } else {
-                    this.triggerWrongOwnerAnimation();
+                    this.playWrongOwnerAnimation();
                 }
             }
         }
 
         return InteractionResult.sidedSuccess(this.level().isClientSide);
+    }
+
+    private void rightClickToSit(Player player) {
+        player.displayClientMessage(Component.translatable("entity.dungeonnowloading.copper_creep.state_sit"), true);
+        this.triggerSitAnimation();
+        this.setState(State.SIT);
+        this.playSound(DNLSounds.COPPER_CREEP_SIT_DOWN.get());
+        this.getNavigation().stop();
+        AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER)) {
+            moveSpeedAttr.addTransientModifier(SPEED_MODIFIER);
+        }
+        this.sitAnimationTick = Mth.ceil(CopperCreepAnimation.SIT.lengthInSeconds() * 20);
     }
 
     private boolean canSit() {
@@ -401,6 +412,10 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
         super.tick();
 
+        if (!this.level().isClientSide) {
+            animationChainer.tick(this::transitionTo);
+        }
+
         if (!this.level().isClientSide) return;
 
         if (this.getState() == State.IDLE || this.getState() == State.WANDERING) {
@@ -444,67 +459,6 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 //        this.hurt(this.damageSources().lightningBolt(), 5.0F);
 
         this.entityData.set(DATA_IS_POWERED, true);
-    }
-
-    @Override
-    public void handleEntityEvent(byte event) {
-        switch (event) {
-            case TRIGGER_IDLE_ANIMATION_STATE:
-                this.sittingAnimationState.stop();
-                this.idleAnimationState.startIfStopped(this.tickCount);
-                break;
-            case TRIGGER_WALKING_ANIMATION_STATE:
-                this.resetAnimations();
-                this.walkingAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_RUNNING_ANIMATION_STATE:
-                this.resetAnimations();
-                this.runningAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_SUMMON_ANIMATION_STATE:
-                this.resetAnimations();
-                this.summonAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_DETONATION_ANIMATION_STATE:
-                this.resetAnimations();
-                this.detonationAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_SIT_ANIMATION_STATE:
-                this.resetAnimations();
-                this.sitAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_SITTING_ANIMATION_STATE:
-                this.idleAnimationState.stop();
-                this.sittingAnimationState.startIfStopped(this.tickCount);
-                break;
-            case TRIGGER_STAND_ANIMATION_STATE:
-                this.resetAnimations();
-                this.standAnimationState.start(this.tickCount);
-                break;
-            case TRIGGER_WRONG_OWNER_ANIMATION_STATE:
-                this.wrongOwnerAnimationState.stop();
-                this.wrongOwnerAnimationState.startIfStopped(this.tickCount);
-                break;
-            case TRIGGER_SITTING_DETONATION_STATE:
-                this.resetAnimations();
-                this.sittingDetonationAnimationState.start(this.tickCount);
-                break;
-        }
-
-        super.handleEntityEvent(event);
-    }
-
-    private void resetAnimations() {
-        this.idleAnimationState.stop();
-        this.walkingAnimationState.stop();
-        this.runningAnimationState.stop();
-        this.summonAnimationState.stop();
-        this.detonationAnimationState.stop();
-        this.sitAnimationState.stop();
-        this.sittingAnimationState.stop();
-        this.standAnimationState.stop();
-        this.wrongOwnerAnimationState.stop();
-        this.sittingDetonationAnimationState.stop();
     }
 
     private boolean isPlayerOnDifferentTeam(Player player) {
@@ -578,7 +532,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     public boolean hurt(DamageSource damageSource, float amount) {
         boolean hurt = super.hurt(damageSource, amount);
         if (hurt && !this.level().isClientSide) {
-            if (this.getState() == State.SITTING && this.sitAnimationTick <= 0) {
+            if (this.getState() == State.SITTING) {
                 this.standUp();
             }
         }
@@ -621,44 +575,40 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         return this.getState().equals(state);
     }
 
-    private void triggerIdleAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_IDLE_ANIMATION_STATE);
-    }
-
-    private void triggerWalkingAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_WALKING_ANIMATION_STATE);
-    }
-
-    private void triggerRunningAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_RUNNING_ANIMATION_STATE);
+    private void playWrongOwnerAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(CopperCreepAnimationState.WRONG_OWNER, CopperCreepAnimation.WRONG_OWNER.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(CopperCreepAnimationState.IDLE, CopperCreepAnimation.IDLE.lengthInSeconds()));
     }
 
     private void triggerSummonAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_SUMMON_ANIMATION_STATE);
+        transitionTo(CopperCreepAnimationState.SUMMON);
+        //this.level().broadcastEntityEvent(this, TRIGGER_SUMMON_ANIMATION_STATE);
     }
 
     private void triggerDetonationAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_DETONATION_ANIMATION_STATE);
+        transitionTo(CopperCreepAnimationState.DETONATION);
+        //this.level().broadcastEntityEvent(this, TRIGGER_DETONATION_ANIMATION_STATE);
     }
 
     private void triggerSitAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_SIT_ANIMATION_STATE);
-    }
-
-    private void triggerSittingAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_SITTING_ANIMATION_STATE);
+        transitionTo(CopperCreepAnimationState.SIT);
+        //this.level().broadcastEntityEvent(this, TRIGGER_SIT_ANIMATION_STATE);
     }
 
     private void triggerStandAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_STAND_ANIMATION_STATE);
+        transitionTo(CopperCreepAnimationState.STAND);
+        //this.level().broadcastEntityEvent(this, TRIGGER_STAND_ANIMATION_STATE);
     }
 
     private void triggerWrongOwnerAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_WRONG_OWNER_ANIMATION_STATE);
+        transitionTo(CopperCreepAnimationState.WRONG_OWNER);
+        //this.level().broadcastEntityEvent(this, TRIGGER_WRONG_OWNER_ANIMATION_STATE);
     }
 
     private void triggerSittingDetonationAnimation() {
-        this.level().broadcastEntityEvent(this, TRIGGER_SITTING_DETONATION_STATE);
+        transitionTo(CopperCreepAnimationState.SITTING_DETONATION);
+        //this.level().broadcastEntityEvent(this, TRIGGER_SITTING_DETONATION_STATE);
     }
 
     private void setState(State state) {
@@ -680,6 +630,85 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     public void setSkinValidation(boolean skinValidation) {
         this.entityData.set(SKIN_VALIDATION, skinValidation);
+    }
+
+    public CopperCreepAnimationState getAnimationState() {
+        return this.entityData.get(ANIMATION_STATE);
+    }
+
+    public void setAnimationState(CopperCreepAnimationState animationState) { this.entityData.set(ANIMATION_STATE, animationState); }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            CopperCreepAnimationState animationState = this.getAnimationState();
+            this.resetAnimations();
+            switch(animationState) {
+                case IDLE -> this.idleAnimationState.startIfStopped(this.tickCount);
+                case SUMMON -> this.summonAnimationState.startIfStopped(this.tickCount);
+                case DETONATION -> this.detonationAnimationState.startIfStopped(this.tickCount);
+                case SIT -> this.sitAnimationState.startIfStopped(this.tickCount);
+                case STAND -> this.standAnimationState.startIfStopped(this.tickCount);
+                case WRONG_OWNER -> this.wrongOwnerAnimationState.startIfStopped(this.tickCount);
+                case SITTING -> this.sittingAnimationState.startIfStopped(this.tickCount);
+                case SITTING_DETONATION -> this.sittingDetonationAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    public CopperCreepEntity transitionTo(CopperCreepAnimationState animationState) {
+        switch (animationState) {
+            case IDLE:
+                this.setAnimationState(CopperCreepAnimationState.IDLE);
+                break;
+            case SUMMON:
+                this.setAnimationState(CopperCreepAnimationState.SUMMON);
+                break;
+            case DETONATION:
+                this.setAnimationState(CopperCreepAnimationState.DETONATION);
+                break;
+            case SIT:
+                this.setAnimationState(CopperCreepAnimationState.SIT);
+                break;
+            case STAND:
+                this.setAnimationState(CopperCreepAnimationState.STAND);
+                break;
+            case WRONG_OWNER:
+                this.setAnimationState(CopperCreepAnimationState.WRONG_OWNER);
+                break;
+            case SITTING:
+                this.setAnimationState(CopperCreepAnimationState.SITTING);
+                break;
+            case SITTING_DETONATION:
+                this.setAnimationState(CopperCreepAnimationState.SITTING_DETONATION);
+                break;
+        }
+        return this;
+    }
+
+    private void resetAnimations() {
+        this.idleAnimationState.stop();
+        this.walkingAnimationState.stop();
+        this.runningAnimationState.stop();
+        this.summonAnimationState.stop();
+        this.detonationAnimationState.stop();
+        this.sitAnimationState.stop();
+        this.sittingAnimationState.stop();
+        this.standAnimationState.stop();
+        this.wrongOwnerAnimationState.stop();
+        this.sittingDetonationAnimationState.stop();
+    }
+
+    public enum CopperCreepAnimationState {
+        IDLE,
+        SUMMON,
+        DETONATION,
+        SIT,
+        STAND,
+        WRONG_OWNER,
+        SITTING,
+        SITTING_DETONATION
     }
 
     private class CopperCreepInWaterGoal extends Goal {

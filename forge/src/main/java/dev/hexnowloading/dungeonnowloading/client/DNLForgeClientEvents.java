@@ -113,9 +113,10 @@ public class DNLForgeClientEvents {
                 entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
 
         ItemProperties.register(DNLItems.COPPER_DETONATOR.get(), new ResourceLocation("mode_switch"), (stack, BlockableEventLoop, entity, idk) -> {
-            if (entity == null) return 0.0F;
-            else
-                return entity.getUseItem() != stack && (stack.getUseDuration() - entity.getUseItemRemainingTicks()) > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
+            if (entity == null || entity.getUseItem() != stack) return 0.0F;
+
+            int useTime = stack.getUseDuration() - entity.getUseItemRemainingTicks();
+            return useTime > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
         });
     }
 
