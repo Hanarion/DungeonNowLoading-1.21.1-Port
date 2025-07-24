@@ -1,9 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.ScuttleStatueBlockEntity;
-import dev.hexnowloading.dungeonnowloading.block.property.TripleBlock;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,15 +11,15 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.*;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
@@ -30,7 +27,8 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
 
-    private boolean playerDestroyedWithSilkTouch;
+    private boolean playerDestroyed;
+    private boolean hasBeenSummoned;
 
     public ScuttleStatueBlock(Properties properties) {
         super(properties);
@@ -77,20 +75,22 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
         return !blockState.getCollisionShape(blockGetter, blockPos).getFaceShape(Direction.UP).isEmpty() || blockState.isFaceSturdy(blockGetter, blockPos, Direction.UP);
     }
 
-    public BlockState updateShape(BlockState blockState, Direction direction, BlockState oldBlockState, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos oldBlockPos) {
+    /*public BlockState updateShape(BlockState blockState, Direction direction, BlockState oldBlockState, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos oldBlockPos) {
         DoubleBlockHalf doubleBlockHalf = blockState.getValue(HALF);
         BlockState topBlockState = levelAccessor.getBlockState(blockPos.above());
         if (!blockState.canSurvive(levelAccessor, blockPos)) {
             return Blocks.AIR.defaultBlockState();
         }
         if (doubleBlockHalf == DoubleBlockHalf.LOWER && !topBlockState.hasProperty(HALF)) {
+            System.out.println("Missing Head");
             return Blocks.AIR.defaultBlockState();
         }
         if (doubleBlockHalf == DoubleBlockHalf.LOWER && topBlockState.hasProperty(HALF) && topBlockState.getValue(HALF) != DoubleBlockHalf.UPPER) {
+            System.out.println("Wrong Head");
             return Blocks.AIR.defaultBlockState();
         }
         return super.updateShape(blockState, direction, oldBlockState, levelAccessor, blockPos, oldBlockPos);
-    }
+    }*/
 
     /*@Override
     public BlockState updateShape(BlockState blockState, Direction direction, BlockState oldBlockState, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos oldBlockPos) {
@@ -107,15 +107,25 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
         if (level.isClientSide) {
             return;
         }
-        if (blockState.getValue(HALF) == DoubleBlockHalf.UPPER) {
+        /*if (blockState.getValue(HALF) == DoubleBlockHalf.UPPER) {
             return;
-        }
+        }*/
         if (!level.hasNeighborSignal(blockPos)) {
             return;
         }
         ScuttleStatueBlockEntity blockEntity = (ScuttleStatueBlockEntity) level.getBlockEntity(blockPos);
         if (blockEntity != null) {
-            blockEntity.alert(blockPos, blockEntity);
+            BlockPos summonPos = blockPos;
+            if (blockState.getValue(HALF) == DoubleBlockHalf.UPPER) {
+                summonPos = blockPos.below();
+            }
+            blockEntity.alert(summonPos, blockEntity);
+        }
+        if (blockState.getValue(HALF) == DoubleBlockHalf.UPPER) {
+            level.destroyBlock(blockPos.below(), false);
+        }
+        if (blockState.getValue(HALF) == DoubleBlockHalf.LOWER) {
+            level.destroyBlock(blockPos.above(), true);
         }
     }
 
@@ -124,9 +134,10 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
         BlockPos upperBlockPos = blockPos.above();
         Direction direction = blockState.getValue(FACING);
         level.setBlock(upperBlockPos, this.defaultBlockState().setValue(FACING, direction).setValue(HALF, DoubleBlockHalf.UPPER), 3);
+        level.neighborChanged(upperBlockPos, this, upperBlockPos);
     }
 
-    @Override
+    /*@Override
     public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
         if (!level.isClientSide) {
             boolean playerDestroyed = !player.getAbilities().instabuild;
@@ -140,6 +151,44 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
             }
         }
         super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
+    }*/
+
+    @Override
+    public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
+        if (!level.isClientSide) {
+            this.playerDestroyed = !player.getAbilities().instabuild;
+            if (playerDestroyed) {
+                ItemStack heldItem = player.getMainHandItem();
+                this.playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, heldItem) < 1;
+            }
+        }
+        super.playerWillDestroy(level, blockPos, blockState, player);
+    }
+
+    @Override
+    public void onRemove(BlockState blockState, Level level, BlockPos blockPos, BlockState newState, boolean isMoving) {
+
+        if (!level.isClientSide && blockState.getBlock() != newState.getBlock()) {
+            if (blockState.getValue(HALF) == DoubleBlockHalf.UPPER) {
+                level.destroyBlock(blockPos.below(), false);
+            }
+            if (blockState.getValue(HALF) == DoubleBlockHalf.LOWER) {
+                level.destroyBlock(blockPos.above(), true);
+            }
+
+            if (playerDestroyed && blockState.getValue(HALF) == DoubleBlockHalf.LOWER) {
+                if (blockState.getBlock() instanceof ScuttleStatueBlock) {
+                    ScuttleStatueBlockEntity blockEntity = (ScuttleStatueBlockEntity) level.getBlockEntity(blockPos);
+                    if (blockEntity != null) {
+                        BlockPos summonPos = blockPos;
+                        blockEntity.alert(summonPos, blockEntity);
+                    }
+                }
+            }
+
+        }
+
+        super.onRemove(blockState, level, blockPos, newState, isMoving);
     }
 
     @Nullable
