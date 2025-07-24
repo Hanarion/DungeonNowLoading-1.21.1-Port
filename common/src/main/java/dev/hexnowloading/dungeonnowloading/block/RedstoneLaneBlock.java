@@ -155,13 +155,25 @@ public class RedstoneLaneBlock extends DirectionalBlock {
 
         boolean hasRedstoneBlock = !neighborLaneBlockPosList.stream().filter(b -> level.getBlockState(b).is(Blocks.REDSTONE_BLOCK)).toList().isEmpty();
 
-        boolean hasMagmaBlock = !neighborLaneBlockPosList.stream().filter(b -> level.getBlockState(b).is(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get())).toList().isEmpty();
+        boolean hasOverchargedRedstoneBlock = !neighborLaneBlockPosList.stream().filter(b -> level.getBlockState(b).is(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get())).toList().isEmpty();
 
         if (hasRedstoneBlock || level.getBlockState(blockPos.above()).is(Blocks.REDSTONE_BLOCK) || level.getBlockState(blockPos.above()).is(DNLBlocks.REDSTONE_IDOL.get())) {
 
+            if (hasOverchargedRedstoneBlock || level.getBlockState(blockPos.above()).is(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get())) {
+                level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                level.explode(null, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 3, true, Level.ExplosionInteraction.BLOCK);
+                return;
+            }
+
             power = 150;
 
-        } else if (hasMagmaBlock || level.getBlockState(blockPos.above()).is(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get())) {
+        } else if (hasOverchargedRedstoneBlock || level.getBlockState(blockPos.above()).is(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get())) {
+
+            if (hasRedstoneBlock || level.getBlockState(blockPos.above()).is(Blocks.REDSTONE_BLOCK) || level.getBlockState(blockPos.above()).is(DNLBlocks.REDSTONE_IDOL.get())) {
+                level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                level.explode(null, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 3, true, Level.ExplosionInteraction.BLOCK);
+                return;
+            }
 
             power = 150;
             overpowered = true;
@@ -191,9 +203,19 @@ public class RedstoneLaneBlock extends DirectionalBlock {
             level.setBlock(blockPos, blockState.setValue(DNLProperties.REDSTONE_LANE_MODE, RedstoneLaneMode.UNPOWERED).setValue(DNLProperties.REDSTONE_LANE_POWER, 0), 2);
         } else {
             if (overpowered) {
-                level.setBlock(blockPos, blockState.setValue(DNLProperties.REDSTONE_LANE_MODE, RedstoneLaneMode.OVERPOWERED).setValue(DNLProperties.REDSTONE_LANE_POWER, power), 2);
+                if (blockState.getValue(DNLProperties.REDSTONE_LANE_MODE) == RedstoneLaneMode.POWERED) {
+                    level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                    level.explode(null, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 3, true, Level.ExplosionInteraction.BLOCK);
+                } else {
+                    level.setBlock(blockPos, blockState.setValue(DNLProperties.REDSTONE_LANE_MODE, RedstoneLaneMode.OVERPOWERED).setValue(DNLProperties.REDSTONE_LANE_POWER, power), 2);
+                }
             } else {
-                level.setBlock(blockPos, blockState.setValue(DNLProperties.REDSTONE_LANE_MODE, RedstoneLaneMode.POWERED).setValue(DNLProperties.REDSTONE_LANE_POWER, power), 2);
+                if (blockState.getValue(DNLProperties.REDSTONE_LANE_MODE) == RedstoneLaneMode.OVERPOWERED) {
+                    level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                    level.explode(null, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 3, true, Level.ExplosionInteraction.BLOCK);
+                } else {
+                    level.setBlock(blockPos, blockState.setValue(DNLProperties.REDSTONE_LANE_MODE, RedstoneLaneMode.POWERED).setValue(DNLProperties.REDSTONE_LANE_POWER, power), 2);
+                }
             }
         }
 
