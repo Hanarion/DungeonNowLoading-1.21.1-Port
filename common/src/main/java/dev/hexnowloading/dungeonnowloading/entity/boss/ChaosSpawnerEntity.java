@@ -9,8 +9,8 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
-import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.UniqueDeathAnimationEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.WeightedTargetProvider;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
@@ -39,8 +39,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
@@ -62,7 +60,7 @@ import org.slf4j.Logger;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAnimationEntity {
+public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAnimationEntity, WeightedTargetProvider {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final EntityDataAccessor<Boolean> DATA_FLAGS_ID = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.BOOLEAN);
@@ -108,6 +106,9 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     private final ServerBossEvent bossEvent;
     private DamageSource killedDamageSource;
+    private final Map<UUID, Double> damageMap = new HashMap<>();
+    private final Map<UUID, LivingEntity> attackers = new HashMap<>();
+    private final Map<UUID, Double> threatScores = new HashMap<>();
 
     public ChaosSpawnerEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -135,13 +136,9 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.goalSelector.addGoal(2, new ChaosSpawnerSummonMobGoal(this));
         this.goalSelector.addGoal(2, new ChaosSpawnerShootGhostBulletGoal(this));
         this.goalSelector.addGoal(2, new ChaosSpawnerPushGoal(this));
-        this.goalSelector.addGoal(2, new ChaosSpawnerLookAtPlayerGoal(this, Player.class, 30.0F, 1.0F, false));
+        this.goalSelector.addGoal(2, new ChaosSpawnerLookAtPlayerGoal(this, LivingEntity.class, 30.0F, 1.0F, false));
         this.goalSelector.addGoal(8, new ChaosSpawnerRandomLookAroundGoal(this));
-        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new ChaosSpawnerPlayerTargetGoal(this, this.getFollowDistance()));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Mob.class, 5, false, false, (c) -> {
-            return c instanceof PlayerSupporterEntity;
-        }));
+        this.targetSelector.addGoal(1, new BossTargetSelectorGoal(this));
     }
 
     @Override
@@ -372,6 +369,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 --this.attackTickCount;
             } else {
                 if (this.entityData.get(DATA_STATE) == State.IDLE) {
+                    BossTargetSelectorGoal.changeTarget(this);
                     WeightedRandomBag<State> attackPool = new WeightedRandomBag<>();
                     AABB aabb = (new AABB(this.blockPosition())).inflate(10);
                     pushTargets = this.level().getEntitiesOfClass(Player.class, aabb);
@@ -546,7 +544,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         if (!damageSource.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !damageSource.isCreativePlayer() && (this.entityData.get(DATA_STATE) == State.SLEEPING || this.entityData.get(DATA_STATE) == State.AWAKENING)) {
             return false;
         }
-        return super.hurt(damageSource, damage);
+        return hurtAndTrackAttackers(damageSource, damage);
     }
 
     @Override
@@ -781,6 +779,42 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     static {
         DATA_STATE = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityStates.CHAOS_SPAWNER_STATE);
+    }
+
+    private boolean hurtAndTrackAttackers(DamageSource source, float amount) {
+        boolean result = super.hurt(source, amount);
+        Entity attacker = source.getEntity();
+
+        if (attacker instanceof LivingEntity livingEntity) {
+            this.recordDamage(livingEntity, amount);
+        }
+
+        return result;
+    }
+
+    @Override
+    public Map<UUID, Double> getDamageMap() {
+        return damageMap;
+    }
+
+    @Override
+    public Map<UUID, LivingEntity> getAttackers() {
+        return attackers;
+    }
+
+    @Override
+    public Map<UUID, Double> getThreatScoreMap() {
+        return threatScores;
+    }
+
+    @Override
+    public BlockPos getArenaCenter() {
+        return this.blockPosition();
+    }
+
+    @Override
+    public int getArenaSize() {
+        return (int) this.getFollowDistance();
     }
 
     public enum State {

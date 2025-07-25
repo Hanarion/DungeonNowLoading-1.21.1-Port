@@ -142,14 +142,14 @@ public class ChaosSpawnerProjectileEntity extends Entity {
             Entity target = entityHitResult.getEntity();
             Entity owner = this.getOwner();
             if (owner instanceof ChaosSpawnerEntity) {
-                if (target instanceof Player) {
+                if (target instanceof LivingEntity) {
                     int damageAmount = 1;
                     if (this.getOwner() instanceof ChaosSpawnerEntity) {
                         damageAmount = (int) (((ChaosSpawnerEntity) owner).getAttackDamage() * 0.5F);
                     }
                     boolean entityHurted = target.hurt(this.damageSources().mobProjectile(this, (LivingEntity) owner), (float) damageAmount);
-                    if (((Player) target).isBlocking()) {
-                        ((Player) target).disableShield(true);
+                    if (target instanceof Player player) {
+                        player.disableShield(player.isBlocking());
                     }
                     if (entityHurted && target.isAlive()) {
                         this.doEnchantDamageEffects((LivingEntity) owner, target);
@@ -165,7 +165,7 @@ public class ChaosSpawnerProjectileEntity extends Entity {
                             this.doEnchantDamageEffects((LivingEntity) owner, target);
                         }
                     }
-                } else if (target instanceof Player) {
+                } else if (target instanceof LivingEntity) {
                     if (!(((SealedChaosEntity) owner).getOwnerUUID() == (target.getUUID()))) {
                         int damageAmount = (int) (((SealedChaosEntity) owner).getAttributeValue(Attributes.ATTACK_DAMAGE));
                         boolean entityHurted = target.hurt(this.damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), (float) damageAmount);
