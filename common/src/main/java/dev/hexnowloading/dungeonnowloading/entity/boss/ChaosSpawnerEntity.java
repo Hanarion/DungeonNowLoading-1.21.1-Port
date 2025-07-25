@@ -326,7 +326,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         }
         if (this.getPhase() > 0 && !this.getState().equals(State.DEATH)) {
             this.abilitySelectionTick();
-            this.damageContactPlayer();
+            this.damageContactEntity();
             this.checkBarrierTick();
             this.phaseUpdateTick();
         }
@@ -350,15 +350,18 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         }
     }
 
-    private void damageContactPlayer() {
+    private void damageContactEntity() {
         if (contactAttackTickCount > 0) {
             this.contactAttackTickCount--;
         } else {
             this.contactAttackTickCount = 20;
             AABB aabb = (new AABB(this.blockPosition())).inflate(2);
-            List<Player> targets = this.level().getEntitiesOfClass(Player.class, aabb);
-            for (Player player : targets) {
-                this.doHurtTarget(player);
+            List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, aabb);
+            for (LivingEntity livingEntity : targets) {
+                if (livingEntity == this) {
+                    continue;
+                }
+                this.doHurtTarget(livingEntity);
             }
         }
     }

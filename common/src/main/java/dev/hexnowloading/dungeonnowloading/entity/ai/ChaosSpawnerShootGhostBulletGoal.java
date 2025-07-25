@@ -127,7 +127,7 @@ public class ChaosSpawnerShootGhostBulletGoal extends Goal {
 
     private void performBurstShot(float angle) {
         float offset = (float) Math.toRadians(angle);
-        Vec3 vec3 = chaosSpawnerEntity.getViewVector(1.0F);
+        Vec3 vec3 = chaosSpawnerEntity.getViewVector(0.5F);
         vec3 = vec3.yRot(offset);
         chaosSpawnerEntity.level().playSound(null, chaosSpawnerEntity.getX(), chaosSpawnerEntity.getY(), chaosSpawnerEntity.getZ(), SoundEvents.WITHER_SHOOT, chaosSpawnerEntity.getSoundSource(), 3.0F, 1.0F + (chaosSpawnerEntity.getRandom().nextFloat() - chaosSpawnerEntity.getRandom().nextFloat()) * 0.2F);
         for (int i = 0; i < 8; i++) {
@@ -140,7 +140,7 @@ public class ChaosSpawnerShootGhostBulletGoal extends Goal {
 
     private void performStrongBurstShot(float angle) {
         float offset = (float) Math.toRadians(angle);
-        Vec3 vec3 = chaosSpawnerEntity.getViewVector(1.0F);
+        Vec3 vec3 = chaosSpawnerEntity.getViewVector(0.5F);
         vec3 = vec3.yRot(offset);
         chaosSpawnerEntity.level().playSound(null, chaosSpawnerEntity.getX(), chaosSpawnerEntity.getY(), chaosSpawnerEntity.getZ(), SoundEvents.WITHER_SHOOT, chaosSpawnerEntity.getSoundSource(), 3.0F, 1.0F + (chaosSpawnerEntity.getRandom().nextFloat() - chaosSpawnerEntity.getRandom().nextFloat()) * 0.2F);
         for (int i = 0; i < 16; i++) {
@@ -153,7 +153,7 @@ public class ChaosSpawnerShootGhostBulletGoal extends Goal {
 
     private void vecFromCenterToFrontOfFace(float angle) {
         double viewDistance = 2.0F;
-        Vec3 viewVector = chaosSpawnerEntity.getViewVector(1.0F);
+        Vec3 viewVector = chaosSpawnerEntity.getViewVector(0.5F);
         if (angle != 0.0F) {
             float offset = (float) Math.toRadians(angle);
             viewVector = viewVector.yRot(offset);
