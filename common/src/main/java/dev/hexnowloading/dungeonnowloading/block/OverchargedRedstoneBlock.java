@@ -169,7 +169,7 @@ public class OverchargedRedstoneBlock extends Block {
 
                     if (west) {
                         if (currentState.getValue(BlockStateProperties.WEST_REDSTONE) == RedstoneSide.UP) {
-                            System.out.println("UP");
+
                             if (!checked.contains(currentPos.relative(Direction.WEST).relative(Direction.UP))) {
                                 toCheck.add(currentPos.relative(Direction.WEST).relative(Direction.UP));
                             }

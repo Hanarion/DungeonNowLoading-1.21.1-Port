@@ -117,10 +117,6 @@ public class DisabledFairkeeperChestBlockEntity extends RandomizableContainerBlo
                 }
             }
         }
-        /*System.out.println(blockEntity);
-        level.addParticle(new AxisParticleType.AxisParticleData(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), 1, 90), pos.getX() + 2, pos.getY() + 0.5F, pos.getZ() + 0.5F, 1, 90F, 0.0F);
-        level.addParticle(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), pos.getX() + 0.5F, pos.getY() + 2, pos.getZ() + 0.5F, 0, 90F, 0.0F);
-        level.addParticle(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 2, 1, 0F, 0.0F);*/
     }
 
     public static void playSound(Level level, BlockPos blockPos, SoundEvent soundEvent) {

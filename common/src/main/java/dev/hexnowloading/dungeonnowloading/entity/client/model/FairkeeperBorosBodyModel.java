@@ -86,7 +86,6 @@ public class FairkeeperBorosBodyModel<T extends FairkeeperBorosPartEntity> exten
 
         float targetTilt = (float) Math.toRadians(90.0F);
         if (entity.isRotatable()) {
-            //System.out.println("ROTATE ENABLED");
             targetTilt = (float) Math.toRadians(this.getTiltAngle(entity));
         }
         entity.setPreviousTilt(Mth.lerp(this.TILT_SPEED, entity.getPreviousTilt(), targetTilt));

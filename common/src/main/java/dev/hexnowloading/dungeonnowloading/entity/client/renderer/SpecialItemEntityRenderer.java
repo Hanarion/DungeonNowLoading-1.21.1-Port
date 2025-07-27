@@ -12,16 +12,4 @@ public class SpecialItemEntityRenderer extends ItemEntityRenderer {
         super(context);
         this.itemRenderer = context.getItemRenderer();
     }
-
-    /*@Override
-    public boolean shouldRender(ItemEntity itemEntity, Frustum $$1, double $$2, double $$3, double $$4) {
-        SpecialItemEntity specialItemEntity = (SpecialItemEntity) itemEntity;
-        //System.out.println(this.entityRenderDispatcher.camera.getEntity().getUUID());
-        //System.out.println(specialItemEntity.getPickerUUID());
-        //System.out.println(specialItemEntity.getX());
-        if (!this.entityRenderDispatcher.camera.getEntity().getUUID().toString().equals(specialItemEntity.getPickerUUID())) {
-            return false;
-        }
-        return super.shouldRender(itemEntity, $$1, $$2, $$3, $$4);
-    }*/
 }

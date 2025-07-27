@@ -328,9 +328,6 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
 
     private static void rotationalSetRegion(Level level, BlockPos pos, BlockState state, FairkeeperChestBlockEntity blockEntity) {
 
-        //System.out.println(blockEntity.maxRegion.getX() + " " + blockEntity.maxRegion.getY() + " " + blockEntity.maxRegion.getZ());
-        //System.out.println(" / " + blockEntity.minRegion.getX() + " " + blockEntity.minRegion.getY() + " " + blockEntity.minRegion.getZ());
-
         BlockPos actualMax = new BlockPos(
                 Math.max(blockEntity.maxRegion.getX(), blockEntity.minRegion.getX()) + 1,
                 Math.max(blockEntity.maxRegion.getY(), blockEntity.minRegion.getY()) + 1,
@@ -370,41 +367,6 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
 
         }
 
-
-        /*switch (state.getValue(FairkeeperChestBlock.FACING)) {
-            case NORTH:
-            default:
-                tempRegion1 = actualMax.rotate(Rotation.CLOCKWISE_90).east();
-                tempRegion2 = actualMin.rotate(Rotation.CLOCKWISE_90).east();
-                System.out.println("NORTH");
-                //tempRegion1 = DNLMath.rotateVector(actualMax, Direction.Axis.Y, Math.toRadians(-90)).south();
-                //tempRegion2 = DNLMath.rotateVector(actualMin, Direction.Axis.Y, Math.toRadians(-90)).south();
-                break;
-            case EAST:
-                tempRegion1 = actualMax.rotate(Rotation.CLOCKWISE_180).south().east();
-                tempRegion2 = actualMin.rotate(Rotation.CLOCKWISE_180).south().east();
-                System.out.println("EAST");
-                //tempRegion1 = DNLMath.rotateVector(actualMax, Direction.Axis.Y, Math.toRadians(180)).south().east();
-                //tempRegion2 = DNLMath.rotateVector(actualMin, Direction.Axis.Y, Math.toRadians(180)).south().east();
-                break;
-            case SOUTH:
-                //tempRegion1 = blockEntity.region1.rotate(Rotation.CLOCKWISE_90);
-                //tempRegion2 = blockEntity.region2.rotate(Rotation.CLOCKWISE_90);
-                tempRegion1 = actualMax.rotate(Rotation.COUNTERCLOCKWISE_90).south();
-                tempRegion2 = actualMin.rotate(Rotation.COUNTERCLOCKWISE_90).south();
-                System.out.println("SOUTH");
-                //tempRegion1 = DNLMath.rotateVector(actualMax, Direction.Axis.Y, Math.toRadians(90)).east();
-                //tempRegion2 = DNLMath.rotateVector(actualMin, Direction.Axis.Y, Math.toRadians(90)).east();
-                break;
-            case WEST:
-                //tempRegion1 = blockEntity.region1.rotate(Rotation.CLOCKWISE_180);
-                //tempRegion2 = blockEntity.region2.rotate(Rotation.CLOCKWISE_180);
-                tempRegion1 = actualMax;
-                tempRegion2 = actualMin;
-                System.out.println("WEST");
-                break;
-        }*/
-
         int tempActualRegion1X = pos.getX() + tempRegion1.getX();
         int tempActualRegion1Y = pos.getY() + tempRegion1.getY();
         int tempActualRegion1Z = pos.getZ() + tempRegion1.getZ();
@@ -418,9 +380,6 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
         blockEntity.actualRegion2X = Math.min(tempActualRegion1X, tempActualRegion2X);
         blockEntity.actualRegion2Y = Math.min(tempActualRegion1Y, tempActualRegion2Y);
         blockEntity.actualRegion2Z = Math.min(tempActualRegion1Z, tempActualRegion2Z);
-
-        //System.out.println(blockEntity.maxRegion.getX() + " " + blockEntity.maxRegion.getY() + " " + blockEntity.maxRegion.getZ());
-        //System.out.println(" / " + blockEntity.minRegion.getX() + " " + blockEntity.minRegion.getY() + " " + blockEntity.minRegion.getZ());
     }
 
     private static void updateActualRegion(Level level, BlockPos pos, BlockState state, FairkeeperChestBlockEntity blockEntity) {
@@ -511,10 +470,6 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
                 blockEntity.openCloseAnimationProgress--;
             }
         }
-        /*System.out.println(blockEntity);
-        level.addParticle(new AxisParticleType.AxisParticleData(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), 1, 90), pos.getX() + 2, pos.getY() + 0.5F, pos.getZ() + 0.5F, 1, 90F, 0.0F);
-        level.addParticle(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), pos.getX() + 0.5F, pos.getY() + 2, pos.getZ() + 0.5F, 0, 90F, 0.0F);
-        level.addParticle(DNLParticleTypes.FAIRKEEPER_BOUNDARY_PARTICLE.get(), pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 2, 1, 0F, 0.0F);*/
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, FairkeeperChestBlockEntity blockEntity) {

@@ -59,7 +59,6 @@ public class FairkeeperOurosBodyDropScuttleGoal extends StoppableGoal{
 
     private void printAndAdd() {
         this.progress++;
-        //System.out.println("Progress Inside: " + this.progress);
     }
 
     private void droppingLogic() {

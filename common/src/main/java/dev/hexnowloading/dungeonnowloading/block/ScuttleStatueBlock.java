@@ -35,11 +35,6 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(HALF, DoubleBlockHalf.LOWER));
     }
 
-    /*@Override
-    public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState1, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos1) {
-        return super.updateShape(blockState, direction, blockState1, levelAccessor, blockPos, blockPos1);
-    }*/
-
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
@@ -75,41 +70,11 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
         return !blockState.getCollisionShape(blockGetter, blockPos).getFaceShape(Direction.UP).isEmpty() || blockState.isFaceSturdy(blockGetter, blockPos, Direction.UP);
     }
 
-    /*public BlockState updateShape(BlockState blockState, Direction direction, BlockState oldBlockState, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos oldBlockPos) {
-        DoubleBlockHalf doubleBlockHalf = blockState.getValue(HALF);
-        BlockState topBlockState = levelAccessor.getBlockState(blockPos.above());
-        if (!blockState.canSurvive(levelAccessor, blockPos)) {
-            return Blocks.AIR.defaultBlockState();
-        }
-        if (doubleBlockHalf == DoubleBlockHalf.LOWER && !topBlockState.hasProperty(HALF)) {
-            System.out.println("Missing Head");
-            return Blocks.AIR.defaultBlockState();
-        }
-        if (doubleBlockHalf == DoubleBlockHalf.LOWER && topBlockState.hasProperty(HALF) && topBlockState.getValue(HALF) != DoubleBlockHalf.UPPER) {
-            System.out.println("Wrong Head");
-            return Blocks.AIR.defaultBlockState();
-        }
-        return super.updateShape(blockState, direction, oldBlockState, levelAccessor, blockPos, oldBlockPos);
-    }*/
-
-    /*@Override
-    public BlockState updateShape(BlockState blockState, Direction direction, BlockState oldBlockState, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos oldBlockPos) {
-        DoubleBlockHalf doubleBlockHalf = blockState.getValue(HALF);
-        if (direction.getAxis() != Direction.Axis.Y || doubleBlockHalf == DoubleBlockHalf.LOWER != (direction == Direction.UP) || oldBlockState.is(this) && oldBlockState.getValue(HALF) != doubleBlockHalf) {
-            return doubleBlockHalf == DoubleBlockHalf.LOWER && direction == Direction.DOWN ? Blocks.AIR.defaultBlockState() : super.updateShape(blockState, direction, oldBlockState, levelAccessor, blockPos, oldBlockPos);
-        } else {
-            return Blocks.AIR.defaultBlockState();
-        }
-    }*/
-
     @Override
     public void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block, BlockPos blockPos1, boolean b) {
         if (level.isClientSide) {
             return;
         }
-        /*if (blockState.getValue(HALF) == DoubleBlockHalf.UPPER) {
-            return;
-        }*/
         if (!level.hasNeighborSignal(blockPos)) {
             return;
         }
@@ -136,22 +101,6 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
         level.setBlock(upperBlockPos, this.defaultBlockState().setValue(FACING, direction).setValue(HALF, DoubleBlockHalf.UPPER), 3);
         level.neighborChanged(upperBlockPos, this, upperBlockPos);
     }
-
-    /*@Override
-    public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
-        if (!level.isClientSide) {
-            boolean playerDestroyed = !player.getAbilities().instabuild;
-            if (playerDestroyed) {
-                ItemStack heldItem = player.getMainHandItem();
-                playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, heldItem) < 1;
-            }
-            if (playerDestroyed && blockEntity instanceof ScuttleStatueBlockEntity scuttleStatueBlockEntity) {
-                BlockPos alertPos = blockState.getValue(HALF) == DoubleBlockHalf.UPPER ? blockPos.below() : blockPos;
-                scuttleStatueBlockEntity.alert(alertPos, scuttleStatueBlockEntity);
-            }
-        }
-        super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
-    }*/
 
     @Override
     public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
@@ -201,15 +150,4 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
     public RenderShape getRenderShape(BlockState $blockState0) {
         return RenderShape.MODEL;
     }
-
-    /* @Override
-    public boolean canSurvive(BlockState blockState, LevelReader levelReader, BlockPos blockPos) {
-        BlockState blockStateAbove = levelReader.getBlockState(blockPos.above());
-        BlockState blockStateBelow = levelReader.getBlockState(blockPos.below());
-        return switch (blockState.getValue(TRIPLE_BLOCK)) {
-            case UPPER -> blockStateBelow.is(this) && blockStateBelow.getValue(TRIPLE_BLOCK) == TripleBlock.MIDDLE;
-            case MIDDLE -> blockStateBelow.is(this) && blockStateBelow.getValue(TRIPLE_BLOCK) == TripleBlock.LOWER && blockStateAbove.is(this) && blockStateAbove.getValue(TRIPLE_BLOCK) == TripleBlock.UPPER;
-            case LOWER -> blockStateAbove.is(this) && blockStateAbove.getValue(TRIPLE_BLOCK) == TripleBlock.UPPER;
-        };
-    }*/
 }

@@ -104,19 +104,7 @@ public class StoneNotchBlock extends Block {
             if (!level.getBlockState(blockPos.east()).isFaceSturdy(level, blockPos.east(), Direction.EAST)) { offsetPos.add(OffsetPos.EAST); }
             if (!level.getBlockState(blockPos.south()).isFaceSturdy(level, blockPos.south(), Direction.SOUTH)) { offsetPos.add(OffsetPos.SOUTH); }
             if (!level.getBlockState(blockPos.west()).isFaceSturdy(level, blockPos.west(), Direction.WEST)) { offsetPos.add(OffsetPos.WEST); }
-            /*if (Block.isFaceFull(blockState.getCollisionShape(level, blockPos.above()), Direction.UP)) { offsetPos.add(OffsetPos.UP); System.out.println("UP"); }
-            if (Block.isFaceFull(blockState.getCollisionShape(level, blockPos.below()), Direction.DOWN)) { offsetPos.add(OffsetPos.DOWN); System.out.println("DOWN"); }
-            if (Block.isFaceFull(blockState.getCollisionShape(level, blockPos.north()), Direction.NORTH)) { offsetPos.add(OffsetPos.NORTH); System.out.println("NORTH"); }
-            if (Block.isFaceFull(blockState.getCollisionShape(level, blockPos.east()), Direction.EAST)) { offsetPos.add(OffsetPos.EAST); System.out.println("EAST"); }
-            if (Block.isFaceFull(blockState.getCollisionShape(level, blockPos.south()), Direction.SOUTH)) { offsetPos.add(OffsetPos.SOUTH); System.out.println("SOUTH"); }
-            if (Block.isFaceFull(blockState.getCollisionShape(level, blockPos.west()), Direction.WEST)) { offsetPos.add(OffsetPos.WEST); System.out.println("WEST"); }*/
-            /*if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, Direction.UP, SupportType.FULL)) { offsetPos.add(OffsetPos.UP); }
-            if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, Direction.DOWN, SupportType.FULL)) { offsetPos.add(OffsetPos.DOWN); }
-            if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, Direction.NORTH, SupportType.FULL)) { offsetPos.add(OffsetPos.NORTH); }
-            if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, Direction.EAST, SupportType.FULL)) { offsetPos.add(OffsetPos.EAST); }
-            if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, Direction.SOUTH, SupportType.FULL)) { offsetPos.add(OffsetPos.SOUTH); }
-            if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, Direction.WEST, SupportType.FULL)) { offsetPos.add(OffsetPos.WEST); }
-            */if (offsetPos.isEmpty()) {
+            if (offsetPos.isEmpty()) {
                 return false;
             }
             int randomPos = level.random.nextInt(offsetPos.size());
