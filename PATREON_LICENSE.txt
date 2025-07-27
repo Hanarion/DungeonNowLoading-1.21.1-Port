@@ -1,0 +1,11 @@
+- You may not develop, distribute, or assist in the creation of any software, modification, plugin, utility, or script that enables access to Patreon-exclusive content without proper authorization.
+
+- Patreon-exclusive content includes but is not limited to: cosmetic skins, pet appearances, early-access features, and any content gated behind Patreon-based reward systems.
+
+- Any attempt to bypass, spoof, or reverse-engineer Patreon content gating mechanisms is strictly prohibited.
+
+- You may not distribute modified versions of this mod with Patreon content unlocked or made available without authorization.
+
+- Violations of these terms may result in the revocation of your license to use this mod and, if applicable, legal action.
+
+Patreon-exclusive content exists to help fund the ongoing development of Dungeon Now Loading mod and to support the expansion of our development team. Please respect these boundaries to ensure the continued growth and sustainability of the project.
