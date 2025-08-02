@@ -1,10 +1,13 @@
 package dev.hexnowloading.dungeonnowloading;
 
+import dev.hexnowloading.dungeonnowloading.client.DNLForgeClient;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClientEvents;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
 import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -25,6 +28,8 @@ public class DNLForge {
         //MinecraftForge.EVENT_BUS.register(this);
         addModListeners(bus);
         if (FMLEnvironment.dist.isClient()) addModClientListeners(bus);
+
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DNLForgeClient::init);
 
         addForgeListeners();
 

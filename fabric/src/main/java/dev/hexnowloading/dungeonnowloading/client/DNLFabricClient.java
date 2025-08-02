@@ -27,6 +27,7 @@ import net.minecraft.resources.ResourceLocation;
 public class DNLFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        DNLPackets.registerClientbound();
         registerItemModelLayers();
         registerItemRenderers();
         registerBlockRenderers();

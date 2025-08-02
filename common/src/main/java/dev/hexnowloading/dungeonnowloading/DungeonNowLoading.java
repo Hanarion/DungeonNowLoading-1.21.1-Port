@@ -15,7 +15,7 @@ public class DungeonNowLoading {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
     public static void init() {
-        DNLPackets.register();
+        DNLPackets.registerServerbound();
         initRegistries();
         registerConfigs();
     }
