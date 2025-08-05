@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.platform.services;
 
+import dev.hexnowloading.dungeonnowloading.network.EnvironmentSide;
+
 public interface PlatformHelper {
 
     /**
@@ -33,4 +35,7 @@ public interface PlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    EnvironmentSide getEnvironmentSide();
+
 }

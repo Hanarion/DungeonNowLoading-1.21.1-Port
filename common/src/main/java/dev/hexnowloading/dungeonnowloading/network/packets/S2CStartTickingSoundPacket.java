@@ -1,8 +1,8 @@
 package dev.hexnowloading.dungeonnowloading.network.packets;
 
+import dev.hexnowloading.dungeonnowloading.network.ClientUtil;
 import dev.hexnowloading.dungeonnowloading.network.DNLPacket;
 import dev.hexnowloading.dungeonnowloading.sound.DNLClientSoundHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -78,13 +78,26 @@ public class S2CStartTickingSoundPacket implements DNLPacket {
 
     @Override
     public void handle(@Nullable ServerPlayer sender) {
-        Minecraft mc = Minecraft.getInstance();
-        Level level = mc.level;
-        if (level == null) return;
+        if (sender != null) return; // sender is always null on clientbound packets
 
-        Entity entity = level.getEntity(entityId);
-        if (entity == null) return;
+        if (ClientUtil.onClient()) {
+            Level level = ClientUtil.getClientLevel();
+            if (level == null) return;
 
-        DNLClientSoundHandler.playTickingSound(soundId, soundSource, entity, tagId, maxVolume, pitch, stopWhenOutOfRange, range, fadeStartDistance);
+            Entity entity = level.getEntity(entityId);
+            if (entity == null) return;
+
+            DNLClientSoundHandler.playTickingSound(
+                    soundId,
+                    soundSource,
+                    entity,
+                    tagId,
+                    maxVolume,
+                    pitch,
+                    stopWhenOutOfRange,
+                    range,
+                    fadeStartDistance
+            );
+        }
     }
 }

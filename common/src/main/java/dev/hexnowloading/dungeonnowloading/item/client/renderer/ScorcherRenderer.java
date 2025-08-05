@@ -7,8 +7,8 @@ import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
 import dev.hexnowloading.dungeonnowloading.item.client.ItemAnimationState;
 import dev.hexnowloading.dungeonnowloading.item.client.animation.ScorcherAnimation;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
+import dev.hexnowloading.dungeonnowloading.network.ClientUtil;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -33,7 +33,7 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
     private ScorcherModel model;
 
     public ScorcherRenderer() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        super(ClientUtil.getClient().getBlockEntityRenderDispatcher(), ClientUtil.getClient().getEntityModels());
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
         poseStack.pushPose();
 
         if (this.model == null) {
-            this.model = new ScorcherModel(Minecraft.getInstance().getEntityModels().bakeLayer(ScorcherModel.LAYER_LOCATION));
+            this.model = new ScorcherModel(ClientUtil.getClient().getEntityModels().bakeLayer(ScorcherModel.LAYER_LOCATION));
         }
 
         poseStack.translate(0.5, 1.5, 0.5);
@@ -58,7 +58,7 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
         }
 
         if (itemStack.getItem() instanceof ScorcherItem scorcherItem) {
-            Player player = Minecraft.getInstance().player;
+            Player player = ClientUtil.getClientPlayer();
             if (player == null) return;
             animateOutsideInventory(player, itemStack, itemDisplayContext);
             this.model.setUpAnim(scorcherItem, player, itemStack, getPartialTick());
@@ -148,8 +148,7 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
     }
 
     private float getPartialTick() {
-        Minecraft minecraft = Minecraft.getInstance();
-        return (minecraft.level != null) ? minecraft.getFrameTime() : 0;
+        return (ClientUtil.getClientLevel() != null) ? ClientUtil.getClient().getFrameTime() : 0;
     }
 
     public static ScorcherRenderer getInstance() {

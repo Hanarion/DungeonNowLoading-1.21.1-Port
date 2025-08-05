@@ -3,7 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import com.mojang.logging.LogUtils;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.FairkeeperOurosMoveControl;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperOurosAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.FairkeeperOurosAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
@@ -229,18 +229,18 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     public void playMouthOpen() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPEN, FairkeeperOurosAnimation.MOUTH_OPEN.lengthInSeconds(), () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), null));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPENED, FairkeeperOurosAnimation.MOUTH_OPENED.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPEN, FairkeeperOurosAnimationDuration.MOUTH_OPEN, () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPENED, FairkeeperOurosAnimationDuration.MOUTH_OPENED));
     }
 
     public void playMouthClose() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_CLOSE, FairkeeperOurosAnimation.MOUTH_CLOSED.lengthInSeconds(), () -> this.playMouthCloseSound(this.getX(), this.getY(), this.getZ()), null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_CLOSE, FairkeeperOurosAnimationDuration.MOUTH_CLOSED, () -> this.playMouthCloseSound(this.getX(), this.getY(), this.getZ()), null));
     }
 
     public void playDeathAnimation() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPENED, FairkeeperOurosAnimation.MOUTH_OPENED.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosAnimationState.MOUTH_OPENED, FairkeeperOurosAnimationDuration.MOUTH_OPENED));
     }
 
     private void segmentControl() {

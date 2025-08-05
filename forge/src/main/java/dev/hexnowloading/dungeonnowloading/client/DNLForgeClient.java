@@ -5,5 +5,6 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLPackets;
 public class DNLForgeClient {
     public static void init() {
         DNLPackets.registerClientbound();
+        DNLPackets.registerServerbound();
     }
 }

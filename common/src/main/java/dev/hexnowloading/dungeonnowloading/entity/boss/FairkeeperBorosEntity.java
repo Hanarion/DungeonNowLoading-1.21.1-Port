@@ -2,7 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import com.mojang.logging.LogUtils;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperBorosAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.FairkeeperBorosAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
@@ -237,15 +237,15 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public void playMouthOpenAndClose() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds(), () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), null));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds(), () -> this.playMouthCloseSound(this.getX(), this.getY(), this.getZ()), null));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.IDLE, FairkeeperBorosAnimation.IDLE.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimationDuration.PURSUE_OPEN_MOUTH, () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimationDuration.PURSUE_CLOSE_MOUTH, () -> this.playMouthCloseSound(this.getX(), this.getY(), this.getZ()), null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.IDLE, FairkeeperBorosAnimationDuration.IDLE));
     }
 
     public void playMouthOpen() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimation.PURSUE_OPEN_MOUTH.lengthInSeconds(), () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), null));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.MOUTH_OPENED, FairkeeperBorosAnimation.PURSUE_OPENED_MOUTH.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_OPEN, FairkeeperBorosAnimationDuration.PURSUE_OPEN_MOUTH, () -> this.playMouthOpenSound(this.getX(), this.getY(), this.getZ()), null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.MOUTH_OPENED, FairkeeperBorosAnimationDuration.PURSUE_OPENED_MOUTH));
     }
 
     public void playMouthOpenForShootingArrow() {
@@ -255,8 +255,8 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public void playMouthClose() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimation.PURSUE_CLOSE_MOUTH.lengthInSeconds(), () -> this.playMouthCloseSound(this.getX(), this.getY(), this.getZ()), null));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.IDLE, FairkeeperBorosAnimation.IDLE.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperBorosAnimationState.MOUTH_CLOSE, FairkeeperBorosAnimationDuration.PURSUE_CLOSE_MOUTH, () -> this.playMouthCloseSound(this.getX(), this.getY(), this.getZ()), null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(FairkeeperBorosAnimationState.IDLE, FairkeeperBorosAnimationDuration.IDLE));
 
     }
 

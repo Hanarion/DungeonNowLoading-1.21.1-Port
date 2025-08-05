@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.passive;
 
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.copper_creep.CopperCreepAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.CopperCreepAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
@@ -117,7 +117,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
     public AnimationState sittingDetonationAnimationState = new AnimationState();
     private int lightningAttractTimer = 0;
     private int swell = 0;
-    private final int MAX_SWELL = Mth.ceil(CopperCreepAnimation.DETONATION.lengthInSeconds() * 20);
+    private final int MAX_SWELL = Mth.ceil(CopperCreepAnimationDuration.DETONATION * 20);
     private Player summoner;
     private int aiTick;
     private int sitAnimationTick;
@@ -301,7 +301,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER)) {
             moveSpeedAttr.addTransientModifier(SPEED_MODIFIER);
         }
-        this.sitAnimationTick = Mth.ceil(CopperCreepAnimation.SIT.lengthInSeconds() * 20);
+        this.sitAnimationTick = Mth.ceil(CopperCreepAnimationDuration.SIT * 20);
     }
 
     private boolean canSit() {
@@ -336,7 +336,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
             this.entityData.set(DATA_IS_ALREADY_SUMMONED, true);
         }
 
-        if (this.isState(State.SUMMONING) && this.aiTick == (int) (CopperCreepAnimation.SUMMON.lengthInSeconds() * 20)) {
+        if (this.isState(State.SUMMONING) && this.aiTick == (int) (CopperCreepAnimationDuration.SUMMON * 20)) {
             this.setState(State.IDLE);
         }
 
@@ -525,7 +525,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         if (moveSpeedAttr != null) {
             moveSpeedAttr.removeModifier(SPEED_MODIFIER);
         }
-        this.standAnimationTick = Mth.ceil(CopperCreepAnimation.STAND.lengthInSeconds() * 20);
+        this.standAnimationTick = Mth.ceil(CopperCreepAnimationDuration.STAND * 20);
     }
 
     @Override
@@ -577,8 +577,8 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
 
     private void playWrongOwnerAnimation() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(CopperCreepAnimationState.WRONG_OWNER, CopperCreepAnimation.WRONG_OWNER.lengthInSeconds()));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(CopperCreepAnimationState.IDLE, CopperCreepAnimation.IDLE.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(CopperCreepAnimationState.WRONG_OWNER, CopperCreepAnimationDuration.WRONG_OWNER));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(CopperCreepAnimationState.IDLE, CopperCreepAnimationDuration.IDLE));
     }
 
     private void triggerSummonAnimation() {
@@ -798,7 +798,7 @@ public class CopperCreepEntity extends PathfinderMob implements PlayerSupporterE
         /*@Override
         public void stop() {
             this.copperCreep.setState(State.STAND);
-            this.copperCreep.standAnimationTick = Mth.ceil(CopperCreepAnimation.STAND.lengthInSeconds() * 20);
+            this.copperCreep.standAnimationTick = Mth.ceil(CopperCreepAnimationDuration.STAND() * 20);
         }*/
     }
 

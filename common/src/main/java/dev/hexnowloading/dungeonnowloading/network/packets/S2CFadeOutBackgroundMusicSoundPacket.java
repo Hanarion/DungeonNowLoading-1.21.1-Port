@@ -1,8 +1,8 @@
 package dev.hexnowloading.dungeonnowloading.network.packets;
 
+import dev.hexnowloading.dungeonnowloading.network.ClientUtil;
 import dev.hexnowloading.dungeonnowloading.network.DNLPacket;
 import dev.hexnowloading.dungeonnowloading.sound.BackgroundMusicHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
@@ -30,8 +30,10 @@ public class S2CFadeOutBackgroundMusicSoundPacket implements DNLPacket {
 
     @Override
     public void handle(@Nullable ServerPlayer sender) {
-        Minecraft.getInstance().execute(() -> {
+        if (sender != null) return;
+
+        if (ClientUtil.onClient()) {
             BackgroundMusicHandler.fadeOutCurrentMusic(fadeOutDurationTicks);
-        });
+        }
     }
 }

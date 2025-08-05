@@ -3,7 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropScuttleGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropVertexPillarGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyShootVertexOrbGoal;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.FairkeeperOurosBodyAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.FairkeeperOurosBodyAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
@@ -396,44 +396,44 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
 
     public void playVertexPillarDoorOpenAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN.lengthInSeconds(), () -> this.playVertexPillarDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
-        //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimationDuration.SCUTTLE_OPEN, () -> this.playVertexPillarDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
+        //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimationDuration.SCUTTLE_CLOSE.lengthInSeconds()));
     }
 
     public void playScuttleDoorOpenAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimation.SCUTTLE_OPEN.lengthInSeconds(), () -> this.playScuttleDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
-        //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_OPEN, FairkeeperOurosBodyAnimationDuration.SCUTTLE_OPEN, () -> this.playScuttleDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
+        //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimationDuration.SCUTTLE_CLOSE.lengthInSeconds()));
     }
 
     public void playScuttleDoorCloseAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimationDuration.SCUTTLE_CLOSE, () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), runnable));
     }
 
     public boolean playDoorCloseAnimation() {
         if (!this.animationChainer.isEmpty()) return false;
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimationDuration.SCUTTLE_CLOSE, () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), null));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0F));
         return true;
     }
 
     public void playCannonSetupAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_OPEN, FairkeeperOurosBodyAnimation.CANNON_OPEN.lengthInSeconds(), () -> this.playCannonDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_OPEN, FairkeeperOurosBodyAnimationDuration.CANNON_OPEN, () -> this.playCannonDoorOpenSound(this.getX(), this.getY(), this.getZ()), runnable));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_IDLE, 0f));
     }
 
     public void playCannonPackAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_CLOSE, FairkeeperOurosBodyAnimation.CANNON_CLOSE.lengthInSeconds(), () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), runnable));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.CANNON_CLOSE, FairkeeperOurosBodyAnimationDuration.CANNON_CLOSE, () -> this.playDoorCloseSound(this.getX(), this.getY(), this.getZ()), runnable));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0f));
     }
 
     public void playCannonCancelAnimation(Runnable runnable) {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimation.SCUTTLE_CLOSE.lengthInSeconds(), () -> {
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.SCUTTLE_CLOSE, FairkeeperOurosBodyAnimationDuration.SCUTTLE_CLOSE, () -> {
             this.playCannonBreakSound(this.getX(), this.getY(), this.getZ());
         }, runnable));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(FairkeeperOurosPartAnimationState.IDLE, 0f));

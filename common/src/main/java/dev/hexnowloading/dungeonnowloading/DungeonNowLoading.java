@@ -16,6 +16,7 @@ public class DungeonNowLoading {
 
     public static void init() {
         DNLPackets.registerServerbound();
+        DNLPackets.registerClientbound();
         initRegistries();
         registerConfigs();
     }

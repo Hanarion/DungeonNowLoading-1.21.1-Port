@@ -1,9 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.network.packets;
 
+import dev.hexnowloading.dungeonnowloading.network.ClientUtil;
 import dev.hexnowloading.dungeonnowloading.network.DNLPacket;
 import dev.hexnowloading.dungeonnowloading.sound.DNLClientSoundHandler;
 import dev.hexnowloading.dungeonnowloading.sound.TickingSoundTarget;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -74,8 +74,10 @@ public class S2CStopTickingSoundPacket implements DNLPacket {
 
     @Override
     public void handle(@Nullable ServerPlayer sender) {
-        Minecraft.getInstance().execute(() -> {
+        if (sender != null) return;
+
+        if (ClientUtil.onClient()) {
             DNLClientSoundHandler.fadeOutTickingSound(soundId, entityId, target, tagId, fadeTicks, shouldStop);
-        });
+        }
     }
 }

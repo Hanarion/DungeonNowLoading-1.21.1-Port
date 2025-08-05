@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.network.packets;
 
+import dev.hexnowloading.dungeonnowloading.network.ClientUtil;
 import dev.hexnowloading.dungeonnowloading.network.DNLPacket;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -36,22 +36,23 @@ public class S2CStructureDetectionPacket implements DNLPacket {
 
     @Override
     public void handle(@Nullable ServerPlayer sender) {
-        if (sender != null) return;
+        if (sender != null) return; // Only run client-side
 
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
+        if (ClientUtil.onClient()) {
+            if (ClientUtil.getClientLevel() == null) return;
 
-        Entity entity = mc.level.getEntity(playerId);
-        if (entity != null) {
-            playerStructureStatus.put(entity.getUUID(), insideStructure);
+            Entity entity = ClientUtil.getClientLevel().getEntity(playerId);
+            if (entity != null) {
+                playerStructureStatus.put(entity.getUUID(), insideStructure);
+            }
         }
     }
 
     public static boolean isClientInStructure() {
-        if (Minecraft.getInstance() == null || Minecraft.getInstance().player == null) {
+        if (ClientUtil.getClientPlayer() == null) {
             return false;
         }
-        UUID clientUUID = Minecraft.getInstance().player.getUUID();
+        UUID clientUUID = ClientUtil.getClientPlayer().getUUID();
         return playerStructureStatus.getOrDefault(clientUUID, false);
     }
 }

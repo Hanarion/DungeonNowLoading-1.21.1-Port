@@ -3,7 +3,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.item.client.ItemAnimationState;
-import dev.hexnowloading.dungeonnowloading.item.client.animation.ScorcherAnimation;
+import dev.hexnowloading.dungeonnowloading.item.client.animation_duration.ScorcherAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
@@ -69,7 +69,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
         if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime())) {
             if (!level.isClientSide) {
-                ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STALLING.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_STALLING.lengthInSeconds() * 20L), false, false);
+                ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STALLING.getName(), level.getGameTime(), (long) (ScorcherAnimationDuration.SCORCHER_STALLING * 20L), false, false);
                 playScorcherSounds(stack, player, DNLSounds.SCORCHER_STALL.get(), DNLSounds.SOUL_SCORCHER_STALL.get());
             }
 
@@ -119,10 +119,10 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
         int chargeTime = getUseDuration(itemStack) - remainingUseDuration;
         long gameTime = player.level().getGameTime();
-        float overHeatedDuration = ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() / ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds();
+        float overHeatedDuration = ScorcherAnimationDuration.SCORCHER_OVERHEAT / ScorcherAnimationDuration.SCORCHER_SHOOT;
 
-        int activeAnimDuration = (int) (ScorcherAnimation.SCORCHER_ACTIVATE.lengthInSeconds() * 20);
-        int shootAnimDuration = (int) (ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20 + activeAnimDuration);
+        int activeAnimDuration = (int) (ScorcherAnimationDuration.SCORCHER_ACTIVATE * 20);
+        int shootAnimDuration = (int) (ScorcherAnimationDuration.SCORCHER_SHOOT * 20 + activeAnimDuration);
 
 
         if (ItemAnimationState.isAnimating(itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), level.getGameTime())) {
@@ -130,18 +130,18 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
         }
 
         if (chargeTime == 0) {
-            ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_ACTIVATE.lengthInSeconds() * 20L), false, true);
+            ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime, (long) (ScorcherAnimationDuration.SCORCHER_ACTIVATE * 20L), false, true);
             playScorcherSounds(itemStack, player, DNLSounds.SCORCHER_START.get(), DNLSounds.SOUL_SCORCHER_START.get());
         }
 
         if (chargeTime == activeAnimDuration) {
-            ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20L), false, true);
+            ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime, (long) (ScorcherAnimationDuration.SCORCHER_SHOOT * 20L), false, true);
             playScorcherSounds(itemStack, player, DNLSounds.SCORCHER_SHOOT.get(), DNLSounds.SOUL_SCORCHER_SHOOT.get());
 
         }
 
         if (chargeTime == shootAnimDuration) {
-            ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() * 20L), false, true);
+            ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime, (long) (ScorcherAnimationDuration.SCORCHER_OVERHEAT * 20L), false, true);
             playScorcherSounds(itemStack, player, DNLSounds.SCORCHER_OVERHEAT.get(), DNLSounds.SOUL_SCORCHER_OVERHEAT.get());
             setHeatLevel(itemStack, overHeatedDuration, gameTime);
             //((Player) player).getCooldowns().addCooldown(this, 160);
@@ -149,7 +149,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             return;
         }
 
-        float maxHeatDuration = ScorcherAnimation.SCORCHER_SHOOT.lengthInSeconds() * 20;
+        float maxHeatDuration = ScorcherAnimationDuration.SCORCHER_SHOOT * 20;
         float heatIncreasePerTick = 1.0f / maxHeatDuration;
 
         if (ItemAnimationState.isAnimating(itemStack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime)) {
@@ -191,7 +191,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             setHeatLevel(itemStack, heat, gameTime);
 
             if (heat >= 1.0F) {
-                ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_OVERHEAT.lengthInSeconds() * 20L), false, true);
+                ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime, (long) (ScorcherAnimationDuration.SCORCHER_OVERHEAT * 20L), false, true);
                 playScorcherSounds(itemStack, player, DNLSounds.SCORCHER_OVERHEAT.get(), DNLSounds.SOUL_SCORCHER_OVERHEAT.get());
                 stopScorcherSounds(itemStack, player, DNLSounds.SCORCHER_SHOOT.get(), DNLSounds.SOUL_SCORCHER_SHOOT.get());
                 setHeatLevel(itemStack, overHeatedDuration, gameTime);
@@ -257,7 +257,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
             if (!isSelected && !ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_OVERHEAT.getName(), gameTime)) {
                 if (ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime)) {
-                    ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_STOP.lengthInSeconds() * 20L), false, true);
+                    ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime, (long) (ScorcherAnimationDuration.SCORCHER_STOP * 20L), false, true);
                 } else if (!ItemAnimationState.isAnimating(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime)) {
                     ItemAnimationState.stopAll(stack);
                 }
@@ -269,7 +269,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     public void playDroppedAnimation(Player player, ItemStack itemStack) {
         long gameTime = player.level().getGameTime();
         stopScorcherLingeringSounds(itemStack, player);
-        ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime, (long) (ScorcherAnimation.SCORCHER_STOP.lengthInSeconds() * 20L), false, true);
+        ItemAnimationState.start(itemStack, ScorcherAnimationState.SCORCHER_STOP.getName(), gameTime, (long) (ScorcherAnimationDuration.SCORCHER_STOP * 20L), false, true);
     }
 
     private void shootFlame(Level level, LivingEntity player, ItemStack itemStack, Item fuelItem) {
@@ -329,7 +329,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             return;
         }
 
-        ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), level.getGameTime(), (long) (ScorcherAnimation.SCORCHER_STOP.lengthInSeconds() * 20L), false, true);
+        ItemAnimationState.start(stack, ScorcherAnimationState.SCORCHER_STOP.getName(), level.getGameTime(), (long) (ScorcherAnimationDuration.SCORCHER_STOP * 20L), false, true);
         playScorcherSounds(stack, (Player) entity, DNLSounds.SCORCHER_STOP.get(), DNLSounds.SOUL_SCORCHER_STOP.get());
         stopScorcherSounds(stack, (Player) entity, DNLSounds.SCORCHER_SHOOT.get(), DNLSounds.SOUL_SCORCHER_SHOOT.get());
     }

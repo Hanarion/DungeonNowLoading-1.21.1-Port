@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.misc;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.RepulsorAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.RepulsorAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
@@ -24,7 +24,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.*;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
@@ -136,7 +139,7 @@ public class RepulsorEntity extends Mob {
             } else {
                 this.playSound(DNLSounds.REPULSOR_RECHARGE.get(), 0.5f, 1f);
             }
-            this.rechargeAnimDuration = (int) (RepulsorAnimation.RECHARGE.lengthInSeconds() * 20);
+            this.rechargeAnimDuration = (int) (RepulsorAnimationDuration.RECHARGE * 20);
             if (!this.level().isClientSide) {
                 itemStack.shrink(1);
                 this.setShieldHealth(this.getShieldHealth() + SHIELD_HEAL_AMOUNT);
@@ -209,12 +212,12 @@ public class RepulsorEntity extends Mob {
             this.playSound(DNLSounds.REPULSOR_PLACE.get());
         } else if (this.getAge() == 36) {
             this.playSound(DNLSounds.REPULSOR_BARRIER_BUILD.get());
-        } else if (this.getAge() == (int) (RepulsorAnimation.SETUP.lengthInSeconds() * 20) + 1) {
+        } else if (this.getAge() == (int) (RepulsorAnimationDuration.SETUP * 20) + 1) {
             this.setupAnimState.stop();
             this.entityData.set(DATA_STATE, State.IDLE);
         }
 
-        if (this.getAge() >= RepulsorAnimation.SETUP.lengthInSeconds() * 20 + 1) {
+        if (this.getAge() >= RepulsorAnimationDuration.SETUP * 20 + 1) {
             this.idleAnimState.startIfStopped(this.tickCount);
         }
 

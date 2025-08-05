@@ -1,6 +1,8 @@
 package dev.hexnowloading.dungeonnowloading.platform;
 
+import dev.hexnowloading.dungeonnowloading.network.EnvironmentSide;
 import dev.hexnowloading.dungeonnowloading.platform.services.PlatformHelper;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class FabricPlatformHelper implements PlatformHelper {
@@ -18,7 +20,11 @@ public class FabricPlatformHelper implements PlatformHelper {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-
         return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
+
+    @Override
+    public EnvironmentSide getEnvironmentSide() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? EnvironmentSide.CLIENT : EnvironmentSide.DEDICATED_SERVER;
     }
 }
