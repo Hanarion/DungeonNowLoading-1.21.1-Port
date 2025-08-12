@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "waterlogged=false": { "model": "dungeonnowloading:block/mending_table" },
+    "waterlogged=true":  { "model": "dungeonnowloading:block/mending_table" }
+  }
+}

@@ -31,6 +31,8 @@ public class DNLItems {
     public static final Supplier<Item> REDSTONE_CORE = register("redstone_core", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final Supplier<Item> COMBUSTION_CELL = register("combustion_cell", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
     public static final Supplier<Item> CATALYZED_REDSTONE = register("catalyzed_redstone", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Supplier<Item> DURITE = register("durite", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final Supplier<Item> MENDSTONE = register("mendstone", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
 
     // ITEMS - FUNCTIONAL
     public static final Supplier<Item> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> new GreatExperienceBottleItem(new Item.Properties().rarity(Rarity.RARE), 100));
@@ -49,6 +51,8 @@ public class DNLItems {
     public static final Supplier<Item> SCORCHER = register("scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
+
+
 
     // ITEMS - MUSIC DISC
     public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_clash_of_duality_ouros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_OUROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
@@ -149,7 +153,7 @@ public class DNLItems {
 
     // SPAWN EGG
     //public static final Supplier<Item> WINDSTONE_SPAWNEGG = ITEMS.register("windstone_spawn_egg", () -> new SpawnEggItem(SkyislandEntityTypes.WINDSTONE.get(), 0xF6B201, 0xA80E0E, new Item.Properties()));
-    public static final Supplier<Item> CHAOS_SPAWNER_SPAWNEGG = register("spawn_egg_chaos_spawner", Services.ITEM.makeSpawnEgg(DNLEntityTypes.CHAOS_SPAWNER::get, 0x182c39, 0x9abdd6, new Item.Properties().rarity(Rarity.EPIC)));
+    public static final Supplier<Item> CHAOS_SPAWNER_SPAWNEGG = register("spawn_egg_chaos_sponder", Services.ITEM.makeSpawnEgg(DNLEntityTypes.CHAOS_SPAWNER::get, 0x182c39, 0x9abdd6, new Item.Properties().rarity(Rarity.EPIC)));
     //public static final Supplier<Item> FAIRKEEPER_SPAWNEGG = register("spawn_egg_fairkeeper", Services.ITEM.makeSpawnEgg(DNLEntityTypes.FAIRKEEPER_BOROS::get, 0x6a6d68, 0xff8800, new Item.Properties().rarity(Rarity.EPIC)));
     //public static final Supplier<Item> FAIRKEEPER_OUROS_SPAWNEGG = register("spawn_egg_fairkeeper_ouros", Services.ITEM.makeSpawnEgg(DNLEntityTypes.FAIRKEEPER_OUROS::get, 0x6a6d68, 0xff8800, new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> HOLLOW_SPAWNEGG = register("spawn_egg_hollow", Services.ITEM.makeSpawnEgg(DNLEntityTypes.HOLLOW::get, 0x53455a, 0xf5d5e0, new Item.Properties().rarity(Rarity.COMMON)));

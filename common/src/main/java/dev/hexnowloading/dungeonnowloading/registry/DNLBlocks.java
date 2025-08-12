@@ -40,7 +40,7 @@ public class DNLBlocks {
 
     public static Supplier<Block> MOSS;
 
-    // MECHANCIAL BLOCKS
+    // MECHANICAL BLOCKS
     public static Supplier<Block> BOOK_PILE;// = registerBlock("book_pile", () -> new BookPileBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOL)));
     public static Supplier<Block> EXPLOSIVE_BARREL;// = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.GRASS)));
     public static Supplier<Block> COBBLESTONE_PEBBLES;// = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
@@ -102,6 +102,7 @@ public class DNLBlocks {
     public static Supplier<Block> MENDING_AURA_PANE;
     public static Supplier<Block> STONE_PRESERVER;
     public static Supplier<Block> REDSTONE_IDOL;
+    public static Supplier<Block> MENDING_TABLE;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -129,7 +130,7 @@ public class DNLBlocks {
         POLISHED_STONE = registerBlock("polished_stone", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         BORDERED_STONE = registerBlock("bordered_stone", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
 
-        // MECHANCIAL BLOCKS
+        // MECHANICAL BLOCKS
         BOOK_PILE = registerBlock("book_pile", () -> new BookPileBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOL)));
         EXPLOSIVE_BARREL = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.GRASS)));
         COBBLESTONE_PEBBLES = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
@@ -191,6 +192,7 @@ public class DNLBlocks {
         MENDING_AURA_PANE = registerBlock("mending_aura_pane", () -> new MendingAuraPaneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
         STONE_PRESERVER = registerBlock("stone_preserver", () -> new PreserverBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().sound(SoundType.STONE).emissiveRendering(DNLBlocks::always)));
         REDSTONE_IDOL = registerBlock("redstone_idol", () -> new RedstoneIdolBlock(BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).strength(5.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().isRedstoneConductor(DNLBlocks::never).noOcclusion()));
+        MENDING_TABLE = registerBlock("mending_table", () -> new MendingTableBlock(BlockBehaviour.Properties.of().strength(5.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
 
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
