@@ -60,6 +60,7 @@ public class DNLForgeClientEvents {
 
         // Item
         event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
+
     }
     public static void onRegisterRenderer(EntityRenderersEvent.RegisterRenderers event) {
         // Bosses
@@ -101,7 +102,6 @@ public class DNLForgeClientEvents {
         // Block Entities
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
-
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
             if (entity == null) return 0.0F;

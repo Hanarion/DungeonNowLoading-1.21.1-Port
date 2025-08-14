@@ -143,6 +143,7 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_AURA_PATH = register("mending_aura_path", () -> new BlockItem(DNLBlocks.MENDING_AURA_PATH.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA_PANE = register("mending_aura_pane", () -> new BlockItem(DNLBlocks.MENDING_AURA_PANE.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
+    public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> LABYRINTH_TROPHY = register("labyrinth_trophy", () -> new BlockItem(DNLBlocks.LABYRINTH_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));

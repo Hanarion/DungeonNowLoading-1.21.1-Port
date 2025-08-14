@@ -1,6 +1,13 @@
 {
   "variants": {
-    "waterlogged=false": { "model": "dungeonnowloading:block/mending_table" },
-    "waterlogged=true":  { "model": "dungeonnowloading:block/mending_table" }
+    "facing=north,waterlogged=false": { "model": "dungeonnowloading:block/mending_table" },
+    "facing=east,waterlogged=false":  { "model": "dungeonnowloading:block/mending_table", "y": 90 },
+    "facing=south,waterlogged=false": { "model": "dungeonnowloading:block/mending_table", "y": 180 },
+    "facing=west,waterlogged=false":  { "model": "dungeonnowloading:block/mending_table", "y": 270 },
+
+    "facing=north,waterlogged=true": { "model": "dungeonnowloading:block/mending_table" },
+    "facing=east,waterlogged=true":  { "model": "dungeonnowloading:block/mending_table", "y": 90 },
+    "facing=south,waterlogged=true": { "model": "dungeonnowloading:block/mending_table", "y": 180 },
+    "facing=west,waterlogged=true":  { "model": "dungeonnowloading:block/mending_table", "y": 270 }
   }
 }
