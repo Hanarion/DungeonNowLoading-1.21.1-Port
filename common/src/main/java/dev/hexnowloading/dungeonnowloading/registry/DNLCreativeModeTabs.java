@@ -142,6 +142,23 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());
                 output.accept(DNLItems.TEMPLE_OF_DUALITY_TROPHY.get());
+
+                output.accept(DNLItems.MENDING_TABLE.get());
+
+                // Azuro Set
+                output.accept(DNLItems.AZURO_OAK_LOG.get());
+                output.accept(DNLItems.STRIPPED_AZURO_OAK_LOG.get());
+                output.accept(DNLItems.AZURO_OAK_PLANKS.get());
+                output.accept(DNLItems.AZURO_LEAVES.get());
+                output.accept(DNLItems.AZURO_HANGING_LEAVES.get());
+                output.accept(DNLItems.AZURO_HANGING_LEAVES_TIP.get());
+                output.accept(DNLItems.AZURO_OAK_PLANK_STAIRS.get());
+                output.accept(DNLItems.AZURO_OAK_PLANK_SLAB.get());
+                output.accept(DNLItems.AZURO_OAK_PLANK_FENCE.get());
+                output.accept(DNLItems.AZURO_OAK_PLANK_FENCE_GATE.get());
+                output.accept(DNLItems.AZURO_OAK_BUTTON.get());
+                output.accept(DNLItems.AZURO_OAK_PRESSURE_PLATE.get());
+                output.accept(DNLItems.AZURO_OAK_DOOR.get());
             });
 
     public static Supplier<CreativeModeTab> register(String name, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {

@@ -11,17 +11,32 @@ import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.particle.*;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
-import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import dev.hexnowloading.dungeonnowloading.registry.*;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
+@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DNLForgeClientEvents {
+
+    @SubscribeEvent
+    public static void onClientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.AZURO_HANGING_LEAVES.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.AZURO_OAK_DOOR.get(), RenderType.cutout());
+
+        });
+    }
+
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         // Bosses
         event.registerLayerDefinition(ChaosSpawnerModel.LAYER_LOCATION, ChaosSpawnerModel::createBodyLayer);

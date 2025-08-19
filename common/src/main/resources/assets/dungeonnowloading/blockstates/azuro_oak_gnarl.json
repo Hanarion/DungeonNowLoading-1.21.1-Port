@@ -1,0 +1,44 @@
+{
+  "format_version": "1.21.6",
+  "credit": "Made with Blockbench",
+  "textures": {
+    "0": "block/azuro_oak_log_top",
+    "1": "block/pasted",
+    "21": "block/pasted",
+    "particle": "block/pasted"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": {"uv": [0, 0, 16, 16], "texture": "#1"},
+        "east": {"uv": [0, 0, 16, 16], "texture": "#1"},
+        "south": {"uv": [0, 0, 16, 16], "texture": "#1"},
+        "west": {"uv": [0, 0, 16, 16], "texture": "#1"},
+        "up": {"uv": [0, 0, 16, 16], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 16], "texture": "#0"}
+      }
+    },
+    {
+      "from": [0.5, 0.5, 0.5],
+      "to": [15.5, 15.5, 15.5],
+      "faces": {
+        "north": {"uv": [0, 0, 16, 16], "texture": "#21"},
+        "east": {"uv": [0, 0, 16, 16], "texture": "#21"},
+        "south": {"uv": [0, 0, 16, 16], "texture": "#21"},
+        "west": {"uv": [0, 0, 16, 16], "texture": "#21"},
+        "up": {"uv": [0, 0, 16, 16], "texture": "#21"},
+        "down": {"uv": [0, 0, 16, 16], "texture": "#21"}
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "group",
+      "origin": [8, 8, 8],
+      "color": 0,
+      "children": [0, 1]
+    }
+  ]
+}

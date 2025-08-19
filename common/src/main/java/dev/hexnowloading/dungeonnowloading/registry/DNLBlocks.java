@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 
@@ -108,21 +109,37 @@ public class DNLBlocks {
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
     public static Supplier<Block> TEMPLE_OF_DUALITY_TROPHY;
 
+    public static Supplier<Block> AZURO_OAK_LOG;
+    public static Supplier<Block> STRIPPED_AZURO_OAK_LOG;
+    public static Supplier<Block> AZURO_LEAVES;
+    public static Supplier<Block> AZURO_HANGING_LEAVES;
+    public static Supplier<Block> AZURO_HANGING_LEAVES_TIP;
+
+    public static Supplier<Block> AZURO_OAK_PLANKS;
+    public static Supplier<Block> AZURO_OAK_PLANK_SLAB;
+    public static Supplier<Block> AZURO_OAK_PLANK_STAIRS;
+    public static Supplier<Block> AZURO_OAK_PLANK_FENCE;
+    public static Supplier<Block> AZURO_OAK_PLANK_FENCE_GATE;
+    public static Supplier<Block> AZURO_OAK_BUTTON;
+    public static Supplier<Block> AZURO_OAK_PRESSURE_PLATE;
+    public static Supplier<Block> AZURO_OAK_DOOR;
+
+
     public static boolean blocksRegistered = false;
 
     public static void init() {
         // DESIGN BLOCKS
         MOSS = registerBlock("moss", () -> new MossMultifaceBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GREEN).strength(0.1F).noOcclusion().noCollission().replaceable().sound(SoundType.MOSS_CARPET).pushReaction(PushReaction.DESTROY)));
-        COILING_STONE_PILLAR = registerBlock("coiling_stone_pillar", () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F,6.0F)));
-        COILING_STONE_PILLAR_CAPITAL = registerBlock("coiling_stone_pillar_capital", () -> new PillarCapBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F,6.0F)));
+        COILING_STONE_PILLAR = registerBlock("coiling_stone_pillar", () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
+        COILING_STONE_PILLAR_CAPITAL = registerBlock("coiling_stone_pillar_capital", () -> new PillarCapBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         COILING_STONE_PILLAR_STAIRS = registerBlock("coiling_stone_pillar_stairs", () -> new StairBlock(COILING_STONE_PILLAR.get().defaultBlockState(), BlockBehaviour.Properties.copy(COILING_STONE_PILLAR.get())));
-        COILING_STONE_PILLAR_SLAB = registerBlock("coiling_stone_pillar_slab", () -> new SlabBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F,6.0F)));
+        COILING_STONE_PILLAR_SLAB = registerBlock("coiling_stone_pillar_slab", () -> new SlabBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)));
         COILING_STONE_PILLAR_WALL = registerBlock("coiling_stone_pillar_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(COILING_STONE_PILLAR.get()).forceSolidOn()));
-        CHISELED_COILING_STONE_PILLAR = registerBlock("chiseled_coiling_stone_pillar", () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F,6.0F)));
+        CHISELED_COILING_STONE_PILLAR = registerBlock("chiseled_coiling_stone_pillar", () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         STONE_TILES = registerBlock("stone_tiles", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         CRACKED_STONE_TILES = registerBlock("cracked_stone_tiles", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         STONE_TILE_STAIRS = registerBlock("stone_tile_stairs", () -> new StairBlock(STONE_TILES.get().defaultBlockState(), BlockBehaviour.Properties.copy(STONE_TILES.get())));
-        STONE_TILE_SLAB = registerBlock("stone_tile_slab", () -> new SlabBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F,6.0F)));
+        STONE_TILE_SLAB = registerBlock("stone_tile_slab", () -> new SlabBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)));
         STONE_TILE_WALL = registerBlock("stone_tile_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(STONE_TILES.get()).forceSolidOn()));
         SIGNALING_STONE_EMBLEM = registerBlock("signaling_stone_emblem", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         DUELING_STONE_EMBLEM = registerBlock("dueling_stone_emblem", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
@@ -148,9 +165,15 @@ public class DNLBlocks {
         CHAOS_SPAWNER_BROKEN_EDGE = registerBlock("chaos_spawner_broken_edge", () -> new ChaosSpawnerEdgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noLootTable()));
         CHAOS_SPAWNER_BROKEN_DIAMOND_VERTEX = registerBlock("chaos_spawner_broken_diamond_vertex", () -> new ChaosSpawnerVertexBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noLootTable()));
         CHAOS_SPAWNER_BROKEN_DIAMOND_EDGE = registerBlock("chaos_spawner_broken_diamond_edge", () -> new ChaosSpawnerEdgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noLootTable()));
-        CHAOS_SPAWNER_BARRIER_CENTER = registerBlock("chaos_spawner_barrier_center", () -> new ChaosSpawnerBarrierCenterBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.AMETHYST).lightLevel((lightLevel) -> {return 15;}).noOcclusion().noLootTable()));
-        CHAOS_SPAWNER_BARRIER_EDGE = registerBlock("chaos_spawner_barrier_edge", () -> new ChaosSpawnerBarrierEdgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.AMETHYST).lightLevel((lightLevel) -> {return 15;}).noOcclusion().noLootTable()));
-        CHAOS_SPAWNER_BARRIER_VERTEX = registerBlock("chaos_spawner_barrier_vertex", () -> new ChaosSpawnerBarrierVertexBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).lightLevel((lightLevel) -> {return 15;}).noOcclusion().noLootTable()));
+        CHAOS_SPAWNER_BARRIER_CENTER = registerBlock("chaos_spawner_barrier_center", () -> new ChaosSpawnerBarrierCenterBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.AMETHYST).lightLevel((lightLevel) -> {
+            return 15;
+        }).noOcclusion().noLootTable()));
+        CHAOS_SPAWNER_BARRIER_EDGE = registerBlock("chaos_spawner_barrier_edge", () -> new ChaosSpawnerBarrierEdgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.AMETHYST).lightLevel((lightLevel) -> {
+            return 15;
+        }).noOcclusion().noLootTable()));
+        CHAOS_SPAWNER_BARRIER_VERTEX = registerBlock("chaos_spawner_barrier_vertex", () -> new ChaosSpawnerBarrierVertexBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).lightLevel((lightLevel) -> {
+            return 15;
+        }).noOcclusion().noLootTable()));
         //public static final Supplier<Block> WIND_ALTER = registerBlock("wind_alter", () -> new WindAlterBlock(BlockBehaviour.Properties.copy(Blocks.CHISELED_STONE_BRICKS).strength(4.0f).requiresCorrectToolForDrops()));
 
         FAIRKEEPER_CHEST = registerBlock("fairkeeper_chest", () -> new FairkeeperChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.5F, 2.5F).noOcclusion().sound(SoundType.WOOD).lightLevel((lightLevel) -> 7)));
@@ -197,6 +220,25 @@ public class DNLBlocks {
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
         TEMPLE_OF_DUALITY_TROPHY = registerBlock("temple_of_duality_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
+
+        AZURO_LEAVES = registerBlock("azuro_leaves", () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
+        AZURO_HANGING_LEAVES = registerBlock("azuro_hanging_leaves", () -> new HangingAzuroLeavesBlock(BlockBehaviour.Properties.copy(Blocks.WEEPING_VINES_PLANT)));
+        AZURO_HANGING_LEAVES_TIP = registerBlock("azuro_hanging_leaves_tip", () -> new HangingAzuroLeavesTipBlock(BlockBehaviour.Properties.copy(Blocks.WEEPING_VINES)));
+
+        AZURO_OAK_LOG = registerBlock("azuro_oak_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
+        STRIPPED_AZURO_OAK_LOG = registerBlock("stripped_azuro_oak_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
+
+
+        AZURO_OAK_PLANKS = registerBlock("azuro_oak_planks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+        AZURO_OAK_PLANK_STAIRS = registerBlock("azuro_oak_plank_stairs", () -> new StairBlock(AZURO_OAK_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+        AZURO_OAK_PLANK_SLAB = registerBlock("azuro_oak_plank_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+        AZURO_OAK_PLANK_FENCE = registerBlock("azuro_oak_plank_fence", () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+        AZURO_OAK_PLANK_FENCE_GATE = registerBlock("azuro_oak_plank_fence_gate", () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS), WoodType.OAK));
+
+        AZURO_OAK_DOOR = registerBlock("azuro_oak_door", () -> new DNLDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR), BlockSetType.OAK));
+        AZURO_OAK_BUTTON = registerBlock("azuro_oak_button", () -> new DNLButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON), BlockSetType.OAK, 30, true));
+        AZURO_OAK_PRESSURE_PLATE = registerBlock("azuro_oak_pressure_plate", () -> new DNLPressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE), BlockSetType.OAK));
+//        AZURO_OAK_TRAPDOOR = registerBlock(, () -> new )
 
         blocksRegistered = true;
     }

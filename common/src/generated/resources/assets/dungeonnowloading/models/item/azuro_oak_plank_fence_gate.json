@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_fence_gate",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "texture": "dungeonnowloading:block/azuro_oak_planks"
+  }
+}

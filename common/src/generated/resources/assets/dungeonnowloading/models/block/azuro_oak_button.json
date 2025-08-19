@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button",
+  "textures": {
+    "texture": "dungeonnowloading:block/azuro_oak_planks"
+  }
+}
