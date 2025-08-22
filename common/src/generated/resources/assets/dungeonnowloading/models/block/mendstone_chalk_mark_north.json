@@ -1,0 +1,36 @@
+{
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "faces": {
+        "north": {
+          "texture": "#tex",
+          "uv": [
+            16.0,
+            0.0,
+            0.0,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#tex"
+        }
+      },
+      "from": [
+        0,
+        0,
+        0.001
+      ],
+      "to": [
+        16,
+        16,
+        0.003
+      ]
+    }
+  ],
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "dungeonnowloading:block/mendstone_chalk_mark",
+    "tex": "dungeonnowloading:block/mendstone_chalk_mark"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "dungeonnowloading:block/mendstone_chalk_mark_up"
+    },
+    "facing=east": {
+      "model": "dungeonnowloading:block/mendstone_chalk_mark_west"
+    },
+    "facing=north": {
+      "model": "dungeonnowloading:block/mendstone_chalk_mark_south"
+    },
+    "facing=south": {
+      "model": "dungeonnowloading:block/mendstone_chalk_mark_north"
+    },
+    "facing=up": {
+      "model": "dungeonnowloading:block/mendstone_chalk_mark_down"
+    },
+    "facing=west": {
+      "model": "dungeonnowloading:block/mendstone_chalk_mark_east"
+    }
+  }
+}
