@@ -51,8 +51,7 @@ public class DNLItems {
     public static final Supplier<Item> SCORCHER = register("scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
-
-
+    public static final Supplier<Item> MENDSTONE_CHALK = register("mendstone_chalk", () -> new MendstoneChalkItem(new Item.Properties().rarity(Rarity.COMMON).durability(3), DNLBlocks.MENDSTONE_CHALK_MARK.get()));
 
     // ITEMS - MUSIC DISC
     public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_clash_of_duality_ouros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_OUROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
@@ -144,6 +143,8 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_AURA_PANE = register("mending_aura_pane", () -> new BlockItem(DNLBlocks.MENDING_AURA_PANE.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
+    public static final Supplier<Item> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> new BlockItem(DNLBlocks.MENDSTONE_CHALK_MARK.get(), new Item.Properties()));
+
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> LABYRINTH_TROPHY = register("labyrinth_trophy", () -> new BlockItem(DNLBlocks.LABYRINTH_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));

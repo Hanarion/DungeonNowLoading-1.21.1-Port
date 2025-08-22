@@ -43,6 +43,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SOUL_SCORCHER.get());
                 output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.REPULSOR.get());
+                output.accept(DNLItems.MENDSTONE_CHALK.get());
                 // Items - Armors
                 output.accept(DNLItems.SPAWNER_HELMET.get());
                 output.accept(DNLItems.SPAWNER_CHESTPLATE.get());

@@ -4,10 +4,12 @@ import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.block.property.RedstoneLaneMode;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.*;
@@ -72,6 +74,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         redstoneLaneWithItem((RedstoneLaneBlock) DNLBlocks.REDSTONE_LANE_T.get());
         signalGateWithItem((SignalGateBlock) DNLBlocks.SIGNAL_GATE.get());
         preserverWithItem((PreserverBlock) DNLBlocks.STONE_PRESERVER.get());
+        faceBlockWithItem((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK.get());
 
         //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());
         //simpleRandomBlockWithItem(DNLBlocks.MOSS.get(), 5);
@@ -709,6 +712,74 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         //simpleBlockItem(block, models().getExistingFile(blockTexture(block)));
         itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/wall_inventory"))
                 .texture("wall",  new ResourceLocation(DungeonNowLoading.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(block).getPath()));
+    }
+
+    private void faceBlockWithItem(DirectionalBlock block, Item item) {
+        ResourceLocation tex = blockTexture(block);
+        String base = name(block);
+        String itemBase = ForgeRegistries.ITEMS.getKey(item).getPath();
+
+        // Build six thin face models (slightly offset to avoid z-fighting)0f, 0.001f, 0f, 16f, 1.001f, 16f);0f, 0f, 0.001f, 16f, 16f, 1.001f);
+        ModelFile north = singleFaceModel(base + "_north", tex, Direction.NORTH, 0f, 0f, 14.999f, 16f, 16f, 15.999f);
+        ModelFile south = singleFaceModel(base + "_south", tex, Direction.SOUTH, 0f, 0f, 0.001f, 16f, 16f, 1.001f);
+        ModelFile west  = singleFaceModel(base + "_west",  tex, Direction.WEST,  14.999f, 0f, 0f, 15.999f, 16f, 16f);
+        ModelFile east  = singleFaceModel(base + "_east",  tex, Direction.EAST,  0.001f, 0f, 0f, 1.001f, 16f, 16f);
+        ModelFile down  = singleFaceModel(base + "_down",  tex, Direction.DOWN,  0f, 14.999f, 0f, 16f, 15.999f, 16f);
+        ModelFile up    = singleFaceModel(base + "_up",    tex, Direction.UP,    0f, 0.001f, 0f, 16f, 1.001f, 16f);
+
+        getVariantBuilder(block)
+                .partialState().with(BlockStateProperties.FACING, Direction.NORTH).modelForState().modelFile(south).addModel()
+                .partialState().with(BlockStateProperties.FACING, Direction.EAST ).modelForState().modelFile(west ).addModel()
+                .partialState().with(BlockStateProperties.FACING, Direction.SOUTH).modelForState().modelFile(north).addModel()
+                .partialState().with(BlockStateProperties.FACING, Direction.WEST ).modelForState().modelFile(east ).addModel()
+                .partialState().with(BlockStateProperties.FACING, Direction.UP   ).modelForState().modelFile(down ).addModel()
+                .partialState().with(BlockStateProperties.FACING, Direction.DOWN ).modelForState().modelFile(up   ).addModel();
+
+        // Inventory item: use a flat 2D sprite (like vines/glow lichen do)
+        itemModels().withExistingParent(base, mcLoc("item/generated"))
+                .texture("layer0", modLoc("block/" + base));
+    }
+
+    private BlockModelBuilder singleFaceModel(String modelName, ResourceLocation texture, Direction facing,
+                                              float fx, float fy, float fz, float tx, float ty, float tz) {
+        // Make the element a *tiny* slab so both faces are offset from neighbor geometry
+        final float eps   = 0.001f; // inset from neighbor
+        final float thick = 0.002f; // slab thickness
+
+        // Nudge the coords so the element sits just inside your block with a tiny thickness
+        switch (facing) {
+            case NORTH -> { fz = eps;        tz = eps + thick; } // outward face is SOUTH
+            case SOUTH -> { fz = 16 - eps - thick; tz = 16 - eps; } // outward face is NORTH
+            case WEST  -> { fx = eps;        tx = eps + thick; } // outward face is EAST
+            case EAST  -> { fx = 16 - eps - thick; tx = 16 - eps; } // outward face is WEST
+            case DOWN  -> { fy = eps;        ty = eps + thick; } // outward face is UP
+            case UP    -> { fy = 16 - eps - thick; ty = 16 - eps; } // outward face is DOWN
+        }
+
+        BlockModelBuilder b = models().getBuilder(modelName)
+                .ao(false)                 // like vines/glow lichen
+                .renderType("cutout")
+                .texture("tex", texture)
+                .texture("particle", texture);
+
+        Direction outward = facing.getOpposite(); // show texture on the room-facing side
+        var elem = b.element().from(fx, fy, fz).to(tx, ty, tz);
+
+        // Front (outward) face: normal UVs
+        elem.face(outward).uvs(0, 0, 16, 16).texture("#tex").end();
+
+// Back (inward) face: fix the flip so it lines up horizontally with the front
+        var back = elem.face(outward.getOpposite()).texture("#tex");
+        switch (outward) {
+            // Vertical faces (N/S/E/W): mirror U so left/right line up
+            case NORTH, SOUTH, EAST, WEST -> back.uvs(16, 0, 0, 16);
+            // Top/Bottom faces (UP/DOWN): rotate 180° so edges line up in X/Z
+            case UP, DOWN -> back.uvs(16, 16, 0, 0);
+        }
+        back.end();
+
+        elem.end();
+        return b;
     }
 
     private void fairkeeperSpawnerWithItem(FairkeeperSpawnerBlock block) {

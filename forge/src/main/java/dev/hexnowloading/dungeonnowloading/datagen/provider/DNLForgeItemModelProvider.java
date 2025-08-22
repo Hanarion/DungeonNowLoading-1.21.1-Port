@@ -39,6 +39,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
         //simpleItem(DNLItems.COPPER_DETONATOR.get());
         simpleItem(DNLItems.REPULSOR.get());
+        simpleItem(DNLItems.MENDSTONE_CHALK.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());

@@ -270,6 +270,14 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .requires(DNLItems.MUSIC_DISC_OUROS.get())
                 .unlockedBy("has_ouros_boros_music_disc", has(DNLTags.OUROS_BOROS_MUSIC_DISC))
                 .save(consumer);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, DNLItems.MENDSTONE_CHALK.get(), 1)
+                .pattern(" cm")
+                .pattern("cmc")
+                .pattern("mc ")
+                .define('m', DNLItems.MENDSTONE.get())
+                .define('c', Items.CALCITE)
+                .unlockedBy("has_mendstone", has(DNLItems.MENDSTONE.get()))
+                .save(consumer);
     }
 
     private void buildStoneCutterRecipes(Consumer<FinishedRecipe> consumer) {
