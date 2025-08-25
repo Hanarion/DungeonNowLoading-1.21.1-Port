@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:chest",
+    "minecraft:ender_chest",
+    "dungeonnowloading:fairkeeper_chest",
+    "dungeonnowloading:wise_fairkeeper_chest",
+    "dungeonnowloading:fierce_fairkeeper_chest"
+  ]
+}

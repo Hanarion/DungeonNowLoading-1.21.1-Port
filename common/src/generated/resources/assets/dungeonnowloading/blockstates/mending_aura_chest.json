@@ -1,0 +1,208 @@
+{
+  "variants": {
+    "facing=east,type=left": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_0",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_90",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_180",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_270",
+        "y": 90
+      }
+    ],
+    "facing=east,type=right": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_0",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_90",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_180",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_270",
+        "y": 90
+      }
+    ],
+    "facing=east,type=single": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_0",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_90",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_180",
+        "y": 90
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_270",
+        "y": 90
+      }
+    ],
+    "facing=north,type=left": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_0"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_90"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_180"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_270"
+      }
+    ],
+    "facing=north,type=right": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_0"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_90"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_180"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_270"
+      }
+    ],
+    "facing=north,type=single": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_0"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_90"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_180"
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_270"
+      }
+    ],
+    "facing=south,type=left": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_0",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_90",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_180",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_270",
+        "y": 180
+      }
+    ],
+    "facing=south,type=right": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_0",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_90",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_180",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_270",
+        "y": 180
+      }
+    ],
+    "facing=south,type=single": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_0",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_90",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_180",
+        "y": 180
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_270",
+        "y": 180
+      }
+    ],
+    "facing=west,type=left": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_0",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_90",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_180",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_left_270",
+        "y": 270
+      }
+    ],
+    "facing=west,type=right": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_0",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_90",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_180",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_right_270",
+        "y": 270
+      }
+    ],
+    "facing=west,type=single": [
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_0",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_90",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_180",
+        "y": 270
+      },
+      {
+        "model": "dungeonnowloading:block/mending_aura_chest_single_270",
+        "y": 270
+      }
+    ]
+  }
+}
