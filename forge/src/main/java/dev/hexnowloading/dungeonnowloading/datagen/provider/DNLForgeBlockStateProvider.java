@@ -17,6 +17,7 @@ import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         fullyRotatedVarientWallLikeBlockWithItem(DNLBlocks.MENDING_AURA_WALL.get(), DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientPathLikeBlockWithItem(DNLBlocks.MENDING_AURA_PATH.get(), DNLBlocks.MENDING_AURA.get());
         fullyRotatedPaneLikeBlockWithItem(DNLBlocks.MENDING_AURA_PANE.get(), DNLBlocks.MENDING_AURA.get());
+        chestLikeRandomTexturedBlock(DNLBlocks.MENDING_AURA_CHEST.get(), DNLBlocks.MENDING_AURA.get(), MendingAuraChestBlock.FACING, MendingAuraChestBlock.CHEST_TYPE, BlockStateProperties.WATERLOGGED);
         stairsBlockWithItem((StairBlock) DNLBlocks.STONE_TILE_STAIRS.get(), DNLBlocks.STONE_TILES.get());
         slabBlockWithItems((SlabBlock) DNLBlocks.STONE_TILE_SLAB.get(), DNLBlocks.STONE_TILES.get());
         wallBlockWithItem((WallBlock) DNLBlocks.STONE_TILE_WALL.get(), DNLBlocks.STONE_TILES.get());
@@ -74,7 +76,8 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         redstoneLaneWithItem((RedstoneLaneBlock) DNLBlocks.REDSTONE_LANE_T.get());
         signalGateWithItem((SignalGateBlock) DNLBlocks.SIGNAL_GATE.get());
         preserverWithItem((PreserverBlock) DNLBlocks.STONE_PRESERVER.get());
-        faceBlockWithItem((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK.get());
+        generateMendstoneChalkMarkModels((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK_MARK.get(), MendstoneChalkMarkBlock.OUTLINE);
+        //faceBlockWithItem((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK.get());
 
         //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());
         //simpleRandomBlockWithItem(DNLBlocks.MOSS.get(), 5);
@@ -484,7 +487,103 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                 .texture("layer0", modLoc("block/" + this.key(parent).getPath() + "_0"));
     }
 
+    private void chestLikeRandomTexturedBlock(
+            Block block,
+            Block textureParent,                          // where mending_aura_* textures come from
+            DirectionProperty facingProp,                 // e.g., MendingAuraChestBlock.FACING
+            EnumProperty<ChestType> typeProp,             // e.g., MendingAuraChestBlock.CHEST_TYPE
+            @Nullable BooleanProperty waterloggedProp) {
 
+        // 4 texture variants taken from the "parent" block's base name
+        ResourceLocation tex0   = extend(blockTexture(textureParent), "_0");
+        ResourceLocation tex90  = extend(blockTexture(textureParent), "_90");
+        ResourceLocation tex180 = extend(blockTexture(textureParent), "_180");
+        ResourceLocation tex270 = extend(blockTexture(textureParent), "_270");
+
+        // We’ll just use simple cubes (your block’s voxel shape is handled in code)
+        ModelFile single_0   = chestBoxModel(name(block) + "_single_0",  tex0);
+        ModelFile single_90  = chestBoxModel(name(block) + "_single_90", tex90);
+        ModelFile single_180 = chestBoxModel(name(block) + "_single_180",tex180);
+        ModelFile single_270 = chestBoxModel(name(block) + "_single_270",tex270);
+
+        ModelFile left_0     = chestBoxModel(name(block) + "_left_0",    tex0);
+        ModelFile left_90    = chestBoxModel(name(block) + "_left_90",   tex90);
+        ModelFile left_180   = chestBoxModel(name(block) + "_left_180",  tex180);
+        ModelFile left_270   = chestBoxModel(name(block) + "_left_270",  tex270);
+
+        ModelFile right_0    = chestBoxModel(name(block) + "_right_0",   tex0);
+        ModelFile right_90   = chestBoxModel(name(block) + "_right_90",  tex90);
+        ModelFile right_180  = chestBoxModel(name(block) + "_right_180", tex180);
+        ModelFile right_270  = chestBoxModel(name(block) + "_right_270", tex270);
+
+        var builder = getVariantBuilder(block);
+
+        java.util.function.Function<BlockState, ConfiguredModel[]> states = state -> {
+            Direction facing = state.getValue(facingProp);
+            ChestType type   = state.getValue(typeProp);
+
+            // Rotation only cares about horizontal facings
+            int y = switch (facing) {
+                case NORTH -> 0;
+                case EAST  -> 90;
+                case SOUTH -> 180;
+                case WEST  -> 270;
+                default    -> 0;
+            };
+
+            ModelFile[] pool = switch (type) {
+                case SINGLE -> new ModelFile[] { single_0, single_90, single_180, single_270 };
+                case LEFT   -> new ModelFile[] { left_0, left_90, left_180, left_270 };
+                case RIGHT  -> new ModelFile[] { right_0, right_90, right_180, right_270 };
+            };
+
+            // Return all 4 as random-weighted variants
+            return new ConfiguredModel[] {
+                    new ConfiguredModel(pool[0], 0, y, false, 1),
+                    new ConfiguredModel(pool[1], 0, y, false, 1),
+                    new ConfiguredModel(pool[2], 0, y, false, 1),
+                    new ConfiguredModel(pool[3], 0, y, false, 1)
+            };
+        };
+
+        if (waterloggedProp != null && block.defaultBlockState().hasProperty(waterloggedProp)) {
+            builder.forAllStatesExcept(states, waterloggedProp);
+        } else {
+            builder.forAllStates(states);
+        }
+
+        // Item model: pick one of the variants (or make your own layered item if you prefer)
+        simpleBlockItem(block, single_0);
+    }
+
+    private ModelFile chestBoxModel(String modelName, ResourceLocation tex) {
+        BlockModelBuilder b = models().getBuilder(modelName)
+                .renderType("cutout")
+                .texture("all", tex)
+                .texture("particle", tex);
+
+        // geometry matches your MendingAuraChestBlock SHAPE
+        b.element().from(1, 0, 1).to(15, 14, 15)
+                .face(Direction.NORTH).texture("#all").end()
+                .face(Direction.SOUTH).texture("#all").end()
+                .face(Direction.WEST ).texture("#all").end()
+                .face(Direction.EAST ).texture("#all").end()
+                .face(Direction.UP   ).texture("#all").end()
+                .face(Direction.DOWN ).texture("#all").end()
+                .end();
+
+        // hinge: from(7,7,0) to(9,11,1)
+        b.element().from(7, 7, 0).to(9, 11, 1)
+                .face(Direction.NORTH).texture("#all").end()
+                .face(Direction.SOUTH).texture("#all").end()
+                .face(Direction.WEST ).texture("#all").end()
+                .face(Direction.EAST ).texture("#all").end()
+                .face(Direction.UP   ).texture("#all").end()
+                .face(Direction.DOWN ).texture("#all").end()
+                .end();
+
+        return b;
+    }
 
     public static boolean always(BlockState blockState) {
         return true;
@@ -714,72 +813,130 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                 .texture("wall",  new ResourceLocation(DungeonNowLoading.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(block).getPath()));
     }
 
-    private void faceBlockWithItem(DirectionalBlock block, Item item) {
-        ResourceLocation tex = blockTexture(block);
-        String base = name(block);
-        String itemBase = ForgeRegistries.ITEMS.getKey(item).getPath();
-
-        // Build six thin face models (slightly offset to avoid z-fighting)0f, 0.001f, 0f, 16f, 1.001f, 16f);0f, 0f, 0.001f, 16f, 16f, 1.001f);
-        ModelFile north = singleFaceModel(base + "_north", tex, Direction.NORTH, 0f, 0f, 14.999f, 16f, 16f, 15.999f);
-        ModelFile south = singleFaceModel(base + "_south", tex, Direction.SOUTH, 0f, 0f, 0.001f, 16f, 16f, 1.001f);
-        ModelFile west  = singleFaceModel(base + "_west",  tex, Direction.WEST,  14.999f, 0f, 0f, 15.999f, 16f, 16f);
-        ModelFile east  = singleFaceModel(base + "_east",  tex, Direction.EAST,  0.001f, 0f, 0f, 1.001f, 16f, 16f);
-        ModelFile down  = singleFaceModel(base + "_down",  tex, Direction.DOWN,  0f, 14.999f, 0f, 16f, 15.999f, 16f);
-        ModelFile up    = singleFaceModel(base + "_up",    tex, Direction.UP,    0f, 0.001f, 0f, 16f, 1.001f, 16f);
-
-        getVariantBuilder(block)
-                .partialState().with(BlockStateProperties.FACING, Direction.NORTH).modelForState().modelFile(south).addModel()
-                .partialState().with(BlockStateProperties.FACING, Direction.EAST ).modelForState().modelFile(west ).addModel()
-                .partialState().with(BlockStateProperties.FACING, Direction.SOUTH).modelForState().modelFile(north).addModel()
-                .partialState().with(BlockStateProperties.FACING, Direction.WEST ).modelForState().modelFile(east ).addModel()
-                .partialState().with(BlockStateProperties.FACING, Direction.UP   ).modelForState().modelFile(down ).addModel()
-                .partialState().with(BlockStateProperties.FACING, Direction.DOWN ).modelForState().modelFile(up   ).addModel();
-
-        // Inventory item: use a flat 2D sprite (like vines/glow lichen do)
-        itemModels().withExistingParent(base, mcLoc("item/generated"))
-                .texture("layer0", modLoc("block/" + base));
+    // --- Helpers: rotations for 6-way FACING
+    private static int xRotFor(Direction f) {
+        return switch (f) {
+            case SOUTH, WEST, NORTH, EAST -> 0;
+            case UP -> 270;
+            case DOWN -> 90;
+        };
+    }
+    private static int yRotFor(Direction f) {
+        return switch (f) {
+            case NORTH -> 0;
+            case EAST  -> 90;
+            case SOUTH -> 180;
+            case WEST  -> 270;
+            case UP, DOWN -> 0;
+        };
     }
 
-    private BlockModelBuilder singleFaceModel(String modelName, ResourceLocation texture, Direction facing,
-                                              float fx, float fy, float fz, float tx, float ty, float tz) {
-        // Make the element a *tiny* slab so both faces are offset from neighbor geometry
-        final float eps   = 0.001f; // inset from neighbor
-        final float thick = 0.002f; // slab thickness
+    // --- Texture resolver for base (randomized 0..5)
+    private ResourceLocation baseTex(String baseName, int variant, boolean lit) {
+        // e.g. block/mendstone_chalk_mark_base_3[_lit].png
+        return modLoc("block/" + baseName + "_base_" + variant + (lit ? "_lit" : ""));
+    }
 
-        // Nudge the coords so the element sits just inside your block with a tiny thickness
-        switch (facing) {
-            case NORTH -> { fz = eps;        tz = eps + thick; } // outward face is SOUTH
-            case SOUTH -> { fz = 16 - eps - thick; tz = 16 - eps; } // outward face is NORTH
-            case WEST  -> { fx = eps;        tx = eps + thick; } // outward face is EAST
-            case EAST  -> { fx = 16 - eps - thick; tx = 16 - eps; } // outward face is WEST
-            case DOWN  -> { fy = eps;        ty = eps + thick; } // outward face is UP
-            case UP    -> { fy = 16 - eps - thick; ty = 16 - eps; } // outward face is DOWN
-        }
+    // --- Texture resolver for outline stage (0..3 only)
+    private ResourceLocation outlineTex(String baseName, int outlineStage, boolean lit) {
+        // e.g. block/mendstone_chalk_mark_outline_2[_lit].png
+        return modLoc("block/" + baseName + "_outline_" + outlineStage + (lit ? "_lit" : ""));
+    }
+
+    /**
+     * Build a composite thin-slab model:
+     *  - base = randomized variant texture
+     *  - if outlineStage in [0..3], render exactly one overlay "outline_<stage>"
+     *  - if outlineStage == 4, render no overlay
+     */
+    private BlockModelBuilder mendingChalkMarkCompositeExact(String modelName,
+                                                             ResourceLocation base,
+                                                             @Nullable ResourceLocation outline /* null => none */) {
+
+        final float eps   = 0.001f;
+        final float thick = 0.002f;
+
+        // Base slab hugging SOUTH face
+        float fx = 0, fy = 0, fz = 16 - eps - thick, tx = 16, ty = 16, tz = 16 - eps;
 
         BlockModelBuilder b = models().getBuilder(modelName)
-                .ao(false)                 // like vines/glow lichen
+                .ao(false)
                 .renderType("cutout")
-                .texture("tex", texture)
-                .texture("particle", texture);
+                .texture("particle", base)
+                .texture("base", base);
 
-        Direction outward = facing.getOpposite(); // show texture on the room-facing side
-        var elem = b.element().from(fx, fy, fz).to(tx, ty, tz);
-
-        // Front (outward) face: normal UVs
-        elem.face(outward).uvs(0, 0, 16, 16).texture("#tex").end();
-
-// Back (inward) face: fix the flip so it lines up horizontally with the front
-        var back = elem.face(outward.getOpposite()).texture("#tex");
-        switch (outward) {
-            // Vertical faces (N/S/E/W): mirror U so left/right line up
-            case NORTH, SOUTH, EAST, WEST -> back.uvs(16, 0, 0, 16);
-            // Top/Bottom faces (UP/DOWN): rotate 180° so edges line up in X/Z
-            case UP, DOWN -> back.uvs(16, 16, 0, 0);
+        // 1) Base element (front=SOUTH, back=NORTH mirrored)
+        {
+            var elem = b.element().from(fx, fy, fz).to(tx, ty, tz);
+            // Flip horizontally on the outward SOUTH face: (U1=16 → U2=0)
+            elem.face(Direction.SOUTH).uvs(16, 0, 0, 16).texture("#base").end();
+            // Back face now uses normal mapping so it aligns after the front flip
+            elem.face(Direction.NORTH).uvs(0, 0, 16, 16).texture("#base").end();
+            elem.end();
         }
-        back.end();
 
-        elem.end();
+        // 2) Single outline overlay (if provided)
+        if (outline != null) {
+            b.texture("outline", outline);
+            float z = (16 - eps - thick) + 0.00025f;
+            var elem = b.element().from(0, 0, z).to(16, 16, z);
+            // Flip horizontally on SOUTH
+            elem.face(Direction.SOUTH).uvs(16, 0, 0, 16).texture("#outline").end();
+            // Back face normal to match
+            elem.face(Direction.NORTH).uvs(0, 0, 16, 16).texture("#outline").end();
+            elem.end();
+        }
+
         return b;
+    }
+
+    /**
+     * Datagen for: MendstoneChalkMarkBlock
+     * - Base randomized across 6 variants (0..5), lit-aware
+     * - OUTLINE: 0..3 => use that outline stage; 4 => no overlay
+     * Block has: FACING (6), LIT (bool), OUTLINE (0..4)
+     */
+    private void generateMendstoneChalkMarkModels(MendstoneChalkMarkBlock block, Item item, IntegerProperty OUTLINE) {
+        final String baseName = name(block); // e.g., "mendstone_chalk_mark"
+        final String itemName = ForgeRegistries.ITEMS.getKey(item).getPath();
+
+        var vb = getVariantBuilder(block);
+
+        for (Direction f : Direction.values()) {
+            int xr = xRotFor(f), yr = yRotFor(f);
+
+            for (boolean lit : new boolean[]{false, true}) {
+                for (int outline = 0; outline <= 4; outline++) { // 0..3 => overlay, 4 => none
+
+                    ConfiguredModel[] variants = new ConfiguredModel[6];
+
+                    for (int v = 0; v < 6; v++) {
+                        ResourceLocation base = baseTex(baseName, v, lit);
+                        ResourceLocation outlineTex =
+                                (outline <= 3) ? outlineTex(baseName, outline, lit) : null;
+
+                        String modelId = baseName
+                                + "_lit" + (lit ? "1" : "0")
+                                + "_outline" + outline
+                                + "_base_" + v;
+
+                        ModelFile mf = mendingChalkMarkCompositeExact(modelId, base, outlineTex);
+                        variants[v] = new ConfiguredModel(mf, xr, yr, false, 1); // equal weight
+                    }
+
+                    vb.partialState()
+                            .with(BlockStateProperties.FACING, f)
+                            .with(BlockStateProperties.LIT, lit)
+                            .with(OUTLINE, outline)
+                            .addModels(variants);
+                }
+            }
+        }
+
+        // Item: base_0 + a fixed outline_2 overlay
+        itemModels().withExistingParent(itemName, mcLoc("item/generated"))
+                .texture("layer0", baseTex(baseName, 0, false))                 // base
+                .texture("layer1", outlineTex(baseName, /*stage*/ 0, false));   // overlay
     }
 
     private void fairkeeperSpawnerWithItem(FairkeeperSpawnerBlock block) {

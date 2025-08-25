@@ -259,17 +259,17 @@
   "mendstone_chalk_mark_break": {
     "subtitle": "sounds.dungeonnowloading.mendstone_chalk_mark_break",
     "sounds": [
-      "dungeonnowloading:item/mendstone_chalk_mark/mendstone_chalk_mark_break_0",
-      "dungeonnowloading:item/mendstone_chalk_mark/mendstone_chalk_mark_break_1",
-      "dungeonnowloading:item/mendstone_chalk_mark/mendstone_chalk_mark_break_2"
+      "dungeonnowloading:block/mendstone_chalk_mark/mendstone_chalk_mark_break_0",
+      "dungeonnowloading:block/mendstone_chalk_mark/mendstone_chalk_mark_break_1",
+      "dungeonnowloading:block/mendstone_chalk_mark/mendstone_chalk_mark_break_2"
     ]
   },
   "mendstone_chalk_mark_crack": {
     "subtitle": "sounds.dungeonnowloading.mendstone_chalk_mark_crack",
     "sounds": [
-      "dungeonnowloading:item/mendstone_chalk_mark/mendstone_chalk_mark_crack_0",
-      "dungeonnowloading:item/mendstone_chalk_mark/mendstone_chalk_mark_crack_1",
-      "dungeonnowloading:item/mendstone_chalk_mark/mendstone_chalk_mark_crack_2"
+      "dungeonnowloading:block/mendstone_chalk_mark/mendstone_chalk_mark_crack_0",
+      "dungeonnowloading:block/mendstone_chalk_mark/mendstone_chalk_mark_crack_1",
+      "dungeonnowloading:block/mendstone_chalk_mark/mendstone_chalk_mark_crack_2"
     ]
   },
   "signal_gate_click": {
@@ -302,9 +302,12 @@
   "mending_aura_pop": {
     "subtitle": "sounds.dungeonnowloading.mending_aura_pop",
     "sounds": [
-      "dungeonnowloading:block/mending_aura/durite_break_0",
-      "dungeonnowloading:block/mending_aura/durite_break_1",
-      "dungeonnowloading:block/mending_aura/durite_break_2"
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_0",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_1",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_2",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_3",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_4",
+      "dungeonnowloading:block/mending_aura/mending_aura_pop_5"
     ]
   },
   "chaos_spawner_laughter": {

@@ -208,6 +208,7 @@
   "item.dungeonnowloading.vertex_bow.tooltip.ability_name": "Arrow Conversion",
   "item.dungeonnowloading.wind_jade": "Wind Jade",
   "item.dungeonnowloading.mendstone_chalk": "Mendstone Chalk",
+  "block.dungeonnowloading.mendstone_chalk_mark": "Mendstone Chalk Mark",
   "sounds.dungeonnowloading.ballista_arrow_waking": "Ballista Arrow awakens",
   "sounds.dungeonnowloading.ballista_golem_death": "Ballista Golem dies",
   "sounds.dungeonnowloading.ballista_golem_hurt": "Ballista Golem hurts",
@@ -287,6 +288,8 @@
   "sounds.dungeonnowloading.whimper_death": "Whimper dies",
   "sounds.dungeonnowloading.whimper_hurt": "Whimper hurts",
   "sounds.dungeonnowloading.mendstone_chalk_draw": "Mendstone Chalk draws",
+  "sounds.dungeonnowloading.mendstone_chalk_mark_break": "Mendstone Chalk Mark breaks",
+  "sounds.dungeonnowloading.mendstone_chalk_mark_crack": "Mendstone Chalk Mark cracks",
   "tab.dungeonnowloading.main": "Dungeon Now Loading",
   "warning.dungeonnowloading.cannot_open_fairkeeper_chest": "All enemies in the room must be defeated first!"
 }
