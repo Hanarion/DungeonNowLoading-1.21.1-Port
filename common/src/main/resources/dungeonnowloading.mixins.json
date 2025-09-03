@@ -5,6 +5,7 @@
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "FireBlockAccessor"
   ],
   "client": [
     "MixinMinecraft"
@@ -15,4 +16,3 @@
     "defaultRequire": 1
   }
 }
-

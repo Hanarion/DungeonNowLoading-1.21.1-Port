@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.client;
 import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
+import dev.hexnowloading.dungeonnowloading.client.screen.MendingTableScreen;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepModel;
@@ -18,6 +19,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -29,6 +31,8 @@ public class DNLFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         DNLPackets.registerServerbound();
         DNLPackets.registerClientbound();
+
+        MenuScreens.register(DNLMenuTypes.MENDING_TABLE.get(), MendingTableScreen::new);
         registerItemModelLayers();
         registerItemRenderers();
         registerBlockRenderers();
@@ -82,7 +86,12 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_WALL.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_PATH.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_PANE.get(), RenderType.translucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_HANGING_LEAVES.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_OAK_DOOR.get(), RenderType.translucent());
     }
+
+
 
     private void registerRenderers() {
         // Bosses

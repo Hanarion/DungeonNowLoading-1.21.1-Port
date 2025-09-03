@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(FireBlock.class)
 public abstract class DNLFireBlockMixin {
 
-
     @Redirect(method = "tryCatchFire",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/util/RandomSource;nextInt(I)I",

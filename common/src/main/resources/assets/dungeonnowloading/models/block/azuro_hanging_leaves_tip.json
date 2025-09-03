@@ -2,6 +2,7 @@
 	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
+	"render_type": "cutout",
 	"textures": {
 		"1": "dungeonnowloading:block/azuro_hanging_leaves_tip",
 		"particle": "dungeonnowloading:block/azuro_hanging_leaves_tip"

@@ -1,8 +1,8 @@
-// 1.20.1	2025-08-19T17:16:33.3788322	Loot Tables
+// 1.20.1	2025-08-19T21:51:19.5868783	Loot Tables
 8de5512c6e498fd7a4e162f42dd356b7cb01701f data/dungeonnowloading/loot_tables/blocks/amethyst_stone_notch.json
 aee384cfe4e67aeb143699641353b85775ccf71a data/dungeonnowloading/loot_tables/blocks/azuro_hanging_leaves.json
 dafe28258e6c5e7f76cc6eb1403b2baa3d1300df data/dungeonnowloading/loot_tables/blocks/azuro_hanging_leaves_tip.json
-2d8515048c6dcd15c22378fc860a287f1b7a0e1c data/dungeonnowloading/loot_tables/blocks/azuro_leaves.json
+2b4e3726e06d2739fa51c9385f43137d20bc7c57 data/dungeonnowloading/loot_tables/blocks/azuro_leaves.json
 5743d0c3091058cf3e924458478c695b93fabc3e data/dungeonnowloading/loot_tables/blocks/azuro_oak_button.json
 070948a2ca7fd4de4883e346a8f9fd729a31571e data/dungeonnowloading/loot_tables/blocks/azuro_oak_door.json
 a2fffdd4c6ada8200a3ffc5f64cd7bc68cc943f0 data/dungeonnowloading/loot_tables/blocks/azuro_oak_log.json

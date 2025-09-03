@@ -91,8 +91,8 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         simplePressurePlateBlockWithItem((PressurePlateBlock) DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
 
-        doorBlock((DoorBlock) DNLBlocks.AZURO_OAK_DOOR.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_bottom"),
-                new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_top"));
+        doorBlockWithRenderType((DoorBlock) DNLBlocks.AZURO_OAK_DOOR.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_bottom"),
+                new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_top"), "cutout");
 
 
         //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());

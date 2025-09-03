@@ -4,20 +4,13 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.GrowingPlantHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import java.util.Collections;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class HangingAzuroLeavesTipBlock extends GrowingPlantHeadBlock {
     protected static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
@@ -41,17 +34,12 @@ public class HangingAzuroLeavesTipBlock extends GrowingPlantHeadBlock {
     }
 
     @Override
-    protected int getBlocksToGrowWhenBonemealed(RandomSource random) {
-        return 1;
-    }
+    protected int getBlocksToGrowWhenBonemealed(RandomSource random) { return 1; }
 
     @Override
-    protected boolean canGrowInto(BlockState blockState) {
-        return blockState.isAir();
-    }
+    protected boolean canGrowInto(BlockState blockState) { return blockState.isAir(); }
 
     @Override
-    protected Block getBodyBlock() {
-        return DNLBlocks.AZURO_HANGING_LEAVES.get();
-    }
+    protected @NotNull Block getBodyBlock() { return DNLBlocks.AZURO_HANGING_LEAVES.get(); }
+
 }
