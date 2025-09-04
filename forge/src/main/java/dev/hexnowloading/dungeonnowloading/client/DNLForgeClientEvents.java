@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkeeperChestBlockRenderer;
@@ -110,6 +111,7 @@ public class DNLForgeClientEvents {
         // Block Entities
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
+
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
             if (entity == null) return 0.0F;
@@ -126,6 +128,13 @@ public class DNLForgeClientEvents {
             int useTime = stack.getUseDuration() - entity.getUseItemRemainingTicks();
             return useTime > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
         });
+
+        // register here to avoid race issues
+        try {
+            MenuScreens.register(DNLMenuTypes.MENDING_TABLE.get(), MendingTableScreen::new);
+        } catch (Exception e) {
+            DungeonNowLoading.LOGGER.warn("Failed to register mending table MenuScreen in onRegisterRenderer", e);
+        }
     }
 
     public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {

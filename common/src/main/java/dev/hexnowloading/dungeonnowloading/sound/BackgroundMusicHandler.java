@@ -1,8 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.sound;
 
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.ChannelAccess;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,7 +14,10 @@ public class BackgroundMusicHandler {
     private static final List<FadingChannel> fadingChannels = new ArrayList<>();
 
     public static boolean isBackgroundMusicBlocked() {
-        return DNLClientSoundHandler.isTickingSoundActive(DNLSounds.MUSIC_CLASH_OF_DUALITY_BASE.get().getLocation());
+        // Avoid calling RegistryObject.get() here since this can run very early on Forge.
+        // Use the raw resource location to check active ticking sounds instead.
+        ResourceLocation id = new ResourceLocation(DungeonNowLoading.MOD_ID, "music_clash_of_duality_base");
+        return DNLClientSoundHandler.isTickingSoundActive(id);
     }
 
 

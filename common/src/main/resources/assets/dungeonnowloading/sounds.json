@@ -144,6 +144,17 @@
       "dungeonnowloading:item/soul_scorcher/soul_scorcher_start_2"
     ]
   },
+  "mending_table_mend" : {
+    "subtitle": "sounds.dungeonnowloading.mending_table_mend",
+    "sounds": [
+      "dungeonnowloading:block/mending_table/mending_table_mend_0",
+      "dungeonnowloading:block/mending_table/mending_table_mend_1",
+      "dungeonnowloading:block/mending_table/mending_table_mend_2",
+      "dungeonnowloading:block/mending_table/mending_table_mend_3",
+      "dungeonnowloading:block/mending_table/mending_table_mend_4",
+      "dungeonnowloading:block/mending_table/mending_table_mend_5"
+    ]
+  },
   "soul_scorcher_stop": {
     "subtitle": "sounds.dungeonnowloading.soul_scorcher_stop",
     "sounds": [

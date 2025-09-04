@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 public class DNLSounds {
     public static final Supplier<Holder<SoundEvent>> MUSIC_TEMPLE_OF_DUALITY = registerSoundEventHolder("music_temple_of_duality");
     public static final Supplier<SoundEvent> MUSIC_CLASH_OF_DUALITY_BASE = registerSoundEvent("music_clash_of_duality_base");
+    public static final Supplier<SoundEvent> MENDING_TABLE_MEND = registerSoundEvent("mending_table_mend");
     public static final Supplier<SoundEvent> MUSIC_CLASH_OF_DUALITY_BOROS = registerSoundEvent("music_clash_of_duality_boros");
     public static final Supplier<SoundEvent> MUSIC_CLASH_OF_DUALITY_OUROS = registerSoundEvent("music_clash_of_duality_ouros");
     public static final Supplier<SoundEvent> DISC_CLASH_OF_DUALITY_BOROS = registerSoundEvent("disc_clash_of_duality_boros");

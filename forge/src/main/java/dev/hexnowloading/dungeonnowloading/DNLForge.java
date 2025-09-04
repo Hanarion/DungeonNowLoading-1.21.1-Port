@@ -21,6 +21,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod(DungeonNowLoading.MOD_ID)
 public class DNLForge {
@@ -41,9 +42,12 @@ public class DNLForge {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         //MinecraftForge.EVENT_BUS.register(this);
         addModListeners(bus);
-        if (FMLEnvironment.dist.isClient()) addModClientListeners(bus);
-
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DNLForgeClient::init);
+        if (FMLEnvironment.dist.isClient()) {
+            // register client-only listeners
+            addModClientListeners(bus);
+            // run init when registries are ready
+            bus.addListener((FMLClientSetupEvent event) -> DNLForgeClient.init());
+        }
 
         addForgeListeners();
 

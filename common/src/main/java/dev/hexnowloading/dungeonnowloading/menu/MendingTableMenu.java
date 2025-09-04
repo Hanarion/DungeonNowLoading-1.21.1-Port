@@ -4,7 +4,7 @@ import dev.hexnowloading.dungeonnowloading.block.entity.MendingTableBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
-import net.minecraft.sounds.SoundEvents;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -59,18 +59,18 @@ public class MendingTableMenu extends AbstractContainerMenu {
         });
 
         this.addSlot(new Slot(container, OUTPUT_SLOT, 124, 45) {
-            @Override public boolean mayPlace(@NotNull ItemStack stack) { return false; }
-            @Override public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
+            @Override public boolean mayPlace(ItemStack stack) { return false; }
+            @Override public void onTake (Player player, ItemStack stack) {
                 super.onTake(player, stack);
                 consumeInputs();
                 access.execute((level, pos) -> {
                     level.playSound(
-                            null,                     // null = broadcast to nearby players
+                            null,
                             pos,
-                            SoundEvents.EXPERIENCE_ORB_PICKUP, // or your custom sound
+                            DNLSounds.MENDING_TABLE_MEND.get(),
                             SoundSource.BLOCKS,
                             1.0F,
-                            1.0F); // play anvil sound
+                            1.0F);
                 });
             }
         });
