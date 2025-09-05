@@ -18,6 +18,7 @@ public class DNLItems {
     private static final HashMap<ResourceKey<CreativeModeTab>, ArrayList<ResourceLocation>> ITEM_TABS = new HashMap<>();
 
     // ITEMS - INGREDIENTS
+    public static final Supplier<Item> MENDSTONE_PICKAXE = register("mendstone_pickaxe", () -> new MendstonePickaxeItem(new Item.Properties()));
     public static final Supplier<Item> SPAWNER_FRAGMENT = register("spawner_fragment", () -> new Item(new Item.Properties()));
     public static final Supplier<Item> SPAWNER_FRAME = register("spawner_frame", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final Supplier<Item> SPAWNER_BLADE = register("spawner_blade", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));

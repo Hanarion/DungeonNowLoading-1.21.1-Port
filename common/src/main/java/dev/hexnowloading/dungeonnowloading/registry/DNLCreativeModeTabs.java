@@ -59,7 +59,8 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.MUSIC_DISC_OUROS.get());
                 output.accept(DNLItems.MUSIC_DISC_BOROS.get());
                 output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
-
+                // Items - Tools
+                output.accept(DNLItems.MENDSTONE_PICKAXE.get());
 
                 // Blocks
 

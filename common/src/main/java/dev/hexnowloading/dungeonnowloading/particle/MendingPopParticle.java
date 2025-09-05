@@ -44,7 +44,7 @@ public class MendingPopParticle extends TextureSheetParticle {
 
         if (this.age == this.lifetime - EARLY_SPAWN_TICK) {
             int tickMultiplier = EARLY_SPAWN_TICK - 2;
-            level.addParticle(DNLParticleTypes.MENDING_RUNE_PARITCLE.get(), this.x + this.initialXSpeed * tickMultiplier, this.y + this.initialYSpeed * tickMultiplier, this.z + this.initialZSpeed * tickMultiplier, this.xd, this.yd, this.zd);
+            level.addParticle(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), this.x + this.initialXSpeed * tickMultiplier, this.y + this.initialYSpeed * tickMultiplier, this.z + this.initialZSpeed * tickMultiplier, this.xd, this.yd, this.zd);
         }
 
         if (this.age++ >= this.lifetime) {

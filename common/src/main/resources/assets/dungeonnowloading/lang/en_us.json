@@ -316,5 +316,8 @@
   "item.dungeonnowloading.azuro_oak_plank_fence_gate": "Azuro Oak Fence Gate",
   "item.dungeonnowloading.azuro_oak_door": "Azuro Oak Door",
   "item.dungeonnowloading.azuro_oak_button": "Azuro Oak Button",
-  "item.dungeonnowloading.azuro_oak_pressure_plate": "Azuro Oak Pressure Plate"
+  "item.dungeonnowloading.azuro_oak_pressure_plate": "Azuro Oak Pressure Plate",
+  "item.dungeonnowloading.mendstone_pickaxe": "Mendstone Pickaxe",
+  "item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_name": "Durite Conversion",
+  "item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description": "Mining Diamond ore drops Durite instead of Diamonds. Drop Count affected by Fortune."
 }

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DMD",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "D": { "item": "dungeonnowloading:durite" },
+    "M": { "item": "dungeonnowloading:mendstone" },
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": {
+    "item": "dungeonnowloading:mendstone_pickaxe",
+    "count": 1
+  }
+}
+

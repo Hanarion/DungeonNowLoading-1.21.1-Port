@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "dungeonnowloading:azuro_oak_planks"
+    }
+  ],
+  "result": {
+    "item": "dungeonnowloading:azuro_oak_button"
+  }
+}

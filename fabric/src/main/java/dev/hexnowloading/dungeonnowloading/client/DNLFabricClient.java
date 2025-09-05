@@ -39,6 +39,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registerRenderers();
         registerModelLayers();
         registerParticleFactories();
+        MendstonePickaxeParticleHandlerFabric.register();
     }
 
     private void registerItemModelLayers() {
@@ -203,6 +204,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.WHITE_SHOCKWAVE_PARTICLE.get(), WhiteShockwaveParticle.Factory::new);
         registry.register(DNLParticleTypes.ARROW_HAZARD_INDICATOR.get(), ArrowHazardIndicatorParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
-        registry.register(DNLParticleTypes.MENDING_RUNE_PARITCLE.get(), MendingRuneParticle.Factory::new);
+        registry.register(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
+        registry.register(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
     }
 }

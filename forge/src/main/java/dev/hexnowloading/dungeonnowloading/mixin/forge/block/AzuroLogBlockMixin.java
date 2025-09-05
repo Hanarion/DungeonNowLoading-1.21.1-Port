@@ -10,12 +10,11 @@ import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(AzuroLogBlock.class)
 public abstract class AzuroLogBlockMixin extends RotatedPillarBlock {
 
-    @Shadow public abstract RotatedPillarBlock getStripped();
+    public abstract RotatedPillarBlock getStripped();
 
     public AzuroLogBlockMixin(Properties properties) { super(properties); }
 
