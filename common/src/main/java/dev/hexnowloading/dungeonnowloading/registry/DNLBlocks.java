@@ -107,6 +107,8 @@ public class DNLBlocks {
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
     public static Supplier<Block> TEMPLE_OF_DUALITY_TROPHY;
 
+    public static Supplier<Block> PLAYER_STATUE;
+
     public static boolean blocksRegistered = false;
 
     public static void init() {
@@ -195,6 +197,9 @@ public class DNLBlocks {
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
         TEMPLE_OF_DUALITY_TROPHY = registerBlock("temple_of_duality_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
+
+        // Patron
+        PLAYER_STATUE = registerBlock("player_statue", () -> new PlayerStatueBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.5f, 6.0f).noOcclusion().pushReaction(PushReaction.IGNORE)));
 
         blocksRegistered = true;
     }

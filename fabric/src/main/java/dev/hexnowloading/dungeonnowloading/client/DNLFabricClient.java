@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
+import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatueModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
@@ -32,8 +33,8 @@ public class DNLFabricClient implements ClientModInitializer {
         registerItemModelLayers();
         registerItemRenderers();
         registerBlockRenderers();
-        registerRenderers();
         registerModelLayers();
+        registerRenderers();
         registerParticleFactories();
     }
 
@@ -82,6 +83,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_WALL.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_PATH.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_PANE.get(), RenderType.translucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.PLAYER_STATUE.get(), RenderType.cutout());
     }
 
     private void registerRenderers() {
@@ -125,6 +127,7 @@ public class DNLFabricClient implements ClientModInitializer {
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
+        BlockEntityRenderers.register(DNLBlockEntityTypes.PLAYER_STATUE.get(), PlayerStatueRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
@@ -179,6 +182,7 @@ public class DNLFabricClient implements ClientModInitializer {
         // Block Entities
         EntityModelLayerRegistry.registerModelLayer(FairkeeperChestModel.LAYER_LOCATION, FairkeeperChestModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(DisabledFairkeeperChestModel.LAYER_LOCATION, DisabledFairkeeperChestModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(PlayerStatueModel.LAYER_LOCATION, PlayerStatueModel::createBodyLayer);
     }
 
     private static void registerParticleFactories() {
