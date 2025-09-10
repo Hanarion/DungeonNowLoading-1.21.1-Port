@@ -27,10 +27,10 @@ import java.util.concurrent.Executors;
 public final class StatueSkinCache {
 
     private static final boolean LOG = true;
-
-    private static final ResourceLocation DEFAULT_STONE = new ResourceLocation("minecraft", "textures/block/stone.png");
+    public record StatueSkin(ResourceLocation texture, boolean slim) {}
+    private static final ResourceLocation DEFAULT_STONE = new ResourceLocation("dungeonnowloading", "textures/block/player_statue_stone.png");
     private static final float DEFAULT_OVERLAY_ALPHA = 0.35f;
-    private static final Map<String, ResourceLocation> READY = new ConcurrentHashMap<>();
+    private static final Map<String, StatueSkin> READY = new ConcurrentHashMap<>();
     private static final Set<String> INFLIGHT = ConcurrentHashMap.newKeySet();
     private static final ExecutorService EXEC = Executors.newFixedThreadPool(2, r -> {
         Thread t = new Thread(r, "DNL-StatueSkin"); t.setDaemon(true); return t;
@@ -50,102 +50,149 @@ public final class StatueSkinCache {
         return "uuid:" + (p.getId() != null ? p.getId().toString() : "unknown");
     }
 
-    public static ResourceLocation get(GameProfile profile) {
+    public static StatueSkin get(GameProfile profile) {
         return get(profile, DEFAULT_OVERLAY_ALPHA, DEFAULT_STONE);
     }
 
-    public static ResourceLocation get(GameProfile profile, float overlayAlpha, ResourceLocation stoneTex) {
+    public static StatueSkin get(GameProfile profile, float overlayAlpha, ResourceLocation stoneTex) {
         final String k1 = primaryKey(profile);
         final String k2 = (k1 != null && k1.startsWith("name:")) ? uuidKey(profile) : nameKey(profile);
 
-        // if ready under either key, use it
-        ResourceLocation ready = (k1 != null ? READY.get(k1) : null);
-        if (LOG) System.out.println("[DNL][Statue] k1=" + k1 + " k2=" + k2 + " ready? " + (ready != null));
-
+        StatueSkin ready = (k1 != null ? READY.get(k1) : null);
         if (ready == null && k2 != null) ready = READY.get(k2);
         if (ready != null) return ready;
 
-        // kick off async once per primary key
         if (k1 != null && INFLIGHT.add(k1)) {
             startAsyncBuild(profile, k1, overlayAlpha, stoneTex);
         }
 
-        // Placeholder: default Steve/Alex (derived UUID) grayscaled + stone overlay
+        // Placeholder: default (Steve/Alex) + correct slim flag from UUID heuristic
         try {
-            var derived = UUIDUtil.getOrCreatePlayerUUID(profile);
-            var def = DefaultPlayerSkin.getDefaultSkin(derived);
-            var img = readResource(def);
+            UUID derived = UUIDUtil.getOrCreatePlayerUUID(profile);
+            ResourceLocation def = DefaultPlayerSkin.getDefaultSkin(derived);
+            boolean slim = "slim".equals(DefaultPlayerSkin.getSkinModelName(derived)); // ✅ correct polarity
+
+            NativeImage img = readResource(def);
             if (img != null) {
                 grayscale(img);
-                var stone = readResource(stoneTex);
+                NativeImage stone = readResource(stoneTex);
                 if (stone != null) { blendOverlay(img, stone, overlayAlpha); stone.close(); }
                 DynamicTexture dyn = new DynamicTexture(img);
 
-                String seed = (k1 != null ? k1 : "unknown") + "|ph|" +
-                        String.format(Locale.ROOT,"%.2f", overlayAlpha) + "|" + stoneTex;
-                String digest = com.google.common.hash.Hashing.sha1()
-                        .hashString(seed, StandardCharsets.UTF_8).toString();
+                String seed = (k1 != null ? k1 : "unknown") + "|ph|" + String.format(Locale.ROOT,"%.2f", overlayAlpha) + "|" + stoneTex;
+                String digest = com.google.common.hash.Hashing.sha1().hashString(seed, StandardCharsets.UTF_8).toString();
                 ResourceLocation loc = new ResourceLocation("dungeonnowloading", "statue/" + digest);
 
                 Minecraft.getInstance().getTextureManager().register(loc, dyn);
-                return loc;
-            } else {
-                // ✅ Don’t fall back to stone: show default skin immediately
-                return def;
+                return new StatueSkin(loc, slim);
             }
         } catch (Exception ignored) {}
 
-// Absolute last resort (should rarely hit)
-        return stoneTex;
+        // Last resort
+        return new StatueSkin(stoneTex, false);
     }
 
     private static void startAsyncBuild(GameProfile profile, String key, float overlayAlpha, ResourceLocation stoneTex) {
         EXEC.submit(() -> {
             try {
-                // Try to get a fully decoded skin image (handles SkinManager, Mojang, Crafatar)
-                NativeImage img = resolveSkinImage(profile);
-
-                // Fallback: default Steve/Alex derived from name if needed
-                if (img == null) {
-                    var derived = UUIDUtil.getOrCreatePlayerUUID(profile);
-                    var def = DefaultPlayerSkin.getDefaultSkin(derived);
-                    img = readResource(def);
-                    if (LOG) System.out.println("[DNL][Statue] async fallback default skin: " + def);
+                SkinImg s = resolveSkinImageAndModel(profile); // img + slim
+                if (s == null || s.img == null) {
+                    // fallback to UUID default (same as placeholder)
+                    UUID derived = UUIDUtil.getOrCreatePlayerUUID(profile);
+                    ResourceLocation def = DefaultPlayerSkin.getDefaultSkin(derived);
+                    boolean slim = "slim".equals(DefaultPlayerSkin.getSkinModelName(derived));
+                    NativeImage img = readResource(def);
+                    if (img == null) return;
+                    s = new SkinImg(img, slim);
                 }
-                if (img == null) return; // nothing to register
 
-                // Process then overlay stone
-                grayscale(img);
+                grayscale(s.img);
                 NativeImage stone = readResource(stoneTex);
-                if (stone != null) { blendOverlay(img, stone, overlayAlpha); stone.close(); }
+                if (stone != null) { blendOverlay(s.img, stone, overlayAlpha); stone.close(); }
 
-                // Register on main thread and mark READY
-                NativeImage finalImg = img;
-                String seed   = key + "|" + String.format(Locale.ROOT, "%.2f", overlayAlpha) + "|" + stoneTex;
+                NativeImage finalImg = s.img;
+                String seed = key + "|" + String.format(Locale.ROOT, "%.2f", overlayAlpha) + "|" + stoneTex;
                 String digest = Hashing.sha1().hashString(seed, StandardCharsets.UTF_8).toString();
                 ResourceLocation loc = new ResourceLocation("dungeonnowloading", "statue/" + digest);
 
+                boolean isSlim = s.slim;
                 Minecraft.getInstance().execute(() -> {
                     Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(finalImg));
 
-                    // index under both keys so later key flips still hit
+                    // index under both keys so name/uuid swaps still hit
                     String nk = nameKey(profile), uk = uuidKey(profile);
-                    if (nk != null) READY.put(nk, loc);
-                    if (uk != null) READY.put(uk, loc);
-
-                    if (LOG) System.out.println("[DNL][Statue] READY for " + (nk != null ? nk : uk) + " -> " + loc);
-                    INFLIGHT.remove(key); // keep your finally{} too, this is just extra safety
+                    StatueSkin ss = new StatueSkin(loc, isSlim);
+                    if (nk != null) READY.put(nk, ss);
+                    if (uk != null) READY.put(uk, ss);
                 });
             } catch (Exception e) {
                 if (LOG) e.printStackTrace();
             } finally {
-                // ✅ always clear, even on early returns
                 INFLIGHT.remove(key);
             }
         });
     }
 
+    private static final class SkinImg {
+        final NativeImage img; final boolean slim;
+        SkinImg(NativeImage img, boolean slim) { this.img = img; this.slim = slim; }
+    }
 
+    private static SkinImg resolveSkinImageAndModel(GameProfile profile) {
+        // A) SkinManager (has MinecraftProfileTexture with metadata)
+        try {
+            SkinManager sm = Minecraft.getInstance().getSkinManager();
+            Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = sm.getInsecureSkinInformation(profile);
+            MinecraftProfileTexture skin = map.get(MinecraftProfileTexture.Type.SKIN);
+            if (skin != null) {
+                String model = skin.getMetadata("model"); // returns "slim" for Alex-type skins
+                boolean slim = "slim".equals(model);
+                NativeImage img = downloadPng(skin.getUrl());
+                if (img != null) return new SkinImg(img, slim);
+            }
+        } catch (Exception ignored) {}
+
+        // Determine UUID (for sessionserver and fallback)
+        String uuidNoDash = (profile.getId() != null)
+                ? profile.getId().toString().replace("-", "")
+                : (profile.getName() != null ? lookupUuidByName(profile.getName()) : null);
+        if (uuidNoDash == null) return null;
+
+        // B) Mojang sessionserver (metadata.model)
+        try {
+            JsonObject prof = httpJson("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidNoDash);
+            if (prof != null && prof.has("properties")) {
+                JsonArray props = prof.getAsJsonArray("properties");
+                for (int i = 0; i < props.size(); i++) {
+                    JsonObject p = props.get(i).getAsJsonObject();
+                    if (!"textures".equals(p.get("name").getAsString())) continue;
+                    String val = p.get("value").getAsString();
+                    String decoded = new String(Base64.getDecoder().decode(val), StandardCharsets.UTF_8);
+                    JsonObject textures = JsonParser.parseString(decoded).getAsJsonObject().getAsJsonObject("textures");
+                    if (textures != null && textures.has("SKIN")) {
+                        JsonObject skin = textures.getAsJsonObject("SKIN");
+                        String url = skin.get("url").getAsString();
+                        boolean slim = false;
+                        if (skin.has("metadata")) {
+                            JsonObject md = skin.getAsJsonObject("metadata");
+                            if (md.has("model")) slim = "slim".equals(md.get("model").getAsString());
+                        }
+                        NativeImage img = downloadPng(url);
+                        if (img != null) return new SkinImg(img, slim);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // C) Crafatar fallback: no metadata → derive from UUID parity
+        boolean slim = "slim".equals(DefaultPlayerSkin.getSkinModelName(UUID.fromString(
+                uuidNoDash.replaceFirst(
+                        "(........)(....)(....)(....)(............)",
+                        "$1-$2-$3-$4-$5"
+                ))));
+        NativeImage img = downloadPng("https://crafatar.com/skins/" + uuidNoDash);
+        return (img != null) ? new SkinImg(img, slim) : null;
+    }
 
     // === Resolution paths ====================================================
 

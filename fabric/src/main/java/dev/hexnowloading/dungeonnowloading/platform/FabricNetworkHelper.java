@@ -32,15 +32,13 @@ public class FabricNetworkHelper implements NetworkHelper {
         ResourceLocation id = DungeonNowLoading.id(name);
         ids.put(clazz, id);
 
-        // Register serverbound (only if we're on a server)
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handler, buffer, sender) -> {
-                DNLPacket packet = constructor.apply(buffer);
-                server.execute(() -> packet.handle(player));
-            });
-        }
+        // ✅ Register serverbound on BOTH envs (needed for singleplayer)
+        ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handler, buf, responseSender) -> {
+            T packet = constructor.apply(buf);
+            server.execute(() -> packet.handle(player)); // hop to server thread
+        });
 
-        // Register clientbound (only if we're on a client)
+        // ✅ Register clientbound only on client
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientProxy.register(id, constructor);
         }

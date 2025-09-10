@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.client;
 import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatueModel;
+import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatuePedestalModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
@@ -19,6 +20,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -36,6 +38,13 @@ public class DNLFabricClient implements ClientModInitializer {
         registerModelLayers();
         registerRenderers();
         registerParticleFactories();
+
+        final var ID = new ResourceLocation("dungeonnowloading","serverbound_pedestal_update");
+        ServerPlayNetworking.registerGlobalReceiver(ID, (server, player, handler, buf, responseSender) -> {
+            System.out.println("[Server] registered receiver hit for " + ID);
+            var pkt = dev.hexnowloading.dungeonnowloading.network.packets.C2SPedestalUpdatePacket.decode(buf);
+            server.execute(() -> pkt.handle(player));  // hop to main thread, then call your handle()
+        });
     }
 
     private void registerItemModelLayers() {
@@ -183,6 +192,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(FairkeeperChestModel.LAYER_LOCATION, FairkeeperChestModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(DisabledFairkeeperChestModel.LAYER_LOCATION, DisabledFairkeeperChestModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(PlayerStatueModel.LAYER_LOCATION, PlayerStatueModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
     }
 
     private static void registerParticleFactories() {

@@ -39,22 +39,7 @@ public class PlayerStatueModel extends Model {
         PartDefinition partdefinition = meshdefinition.getRoot();
 
         PartDefinition Body = partdefinition.addOrReplaceChild("Body", CubeListBuilder.create().texOffs(16, 16).addBox(-4.0F, -22.3636F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
-                .texOffs(16, 32).addBox(-4.0F, -22.3636F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.25F))
-                .texOffs(24, 0).addBox(-6.0F, 1.6364F, 2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F))
-                .texOffs(24, 0).addBox(-2.0F, 1.6364F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F))
-                .texOffs(24, 0).addBox(2.0F, 1.6364F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 18.3636F, 0.0F));
-
-        PartDefinition cube_r1 = Body.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(24, 0).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-4.0F, 3.6364F, -4.0F, 0.0F, -1.5708F, 0.0F));
-
-        PartDefinition cube_r2 = Body.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(24, 0).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(4.0F, 3.6364F, -4.0F, 0.0F, 3.1416F, 0.0F));
-
-        PartDefinition cube_r3 = Body.addOrReplaceChild("cube_r3", CubeListBuilder.create().texOffs(24, 0).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 3.6364F, -4.0F, 0.0F, 1.5708F, 0.0F));
-
-        PartDefinition cube_r4 = Body.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(24, 0).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-4.0F, 3.6364F, 0.0F, 0.0F, 1.5708F, 0.0F));
-
-        PartDefinition cube_r5 = Body.addOrReplaceChild("cube_r5", CubeListBuilder.create().texOffs(24, 0).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 3.6364F, 4.0F, 0.0F, -1.5708F, 0.0F));
-
-        PartDefinition cube_r6 = Body.addOrReplaceChild("cube_r6", CubeListBuilder.create().texOffs(24, 0).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(4.0F, 3.6364F, 4.0F, 0.0F, 1.5708F, 0.0F));
+                .texOffs(16, 32).addBox(-4.0F, -22.3636F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(0.0F, 18.3636F, 0.0F));
 
         PartDefinition Head = Body.addOrReplaceChild("Head", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F))
                 .texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.5F)), PartPose.offsetAndRotation(0.0F, -22.3636F, 0.0F, -0.1047F, 0.0873F, 0.0F));

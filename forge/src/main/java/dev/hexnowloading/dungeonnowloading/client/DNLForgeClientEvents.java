@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.client;
 import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatueModel;
+import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatuePedestalModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.FairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.PlayerStatueRenderer;
@@ -60,6 +61,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(FairkeeperChestModel.LAYER_LOCATION, FairkeeperChestModel::createBodyLayer);
         event.registerLayerDefinition(DisabledFairkeeperChestModel.LAYER_LOCATION, DisabledFairkeeperChestModel::createBodyLayer);
         event.registerLayerDefinition(PlayerStatueModel.LAYER_LOCATION, PlayerStatueModel::createBodyLayer);
+        event.registerLayerDefinition(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
 
         // Item
         event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
@@ -104,7 +106,7 @@ public class DNLForgeClientEvents {
         // Block Entities
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
-        event.registerBlockEntityRenderer(DNLBlockEntityTypes.PLAYER_STATUE.get(), PlayerStatueRenderer::new);
+        event.registerBlockEntityRenderer(DNLBlockEntityTypes.PLAYER_STATUE.get(), PlayerStatueRenderer::new);;
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
