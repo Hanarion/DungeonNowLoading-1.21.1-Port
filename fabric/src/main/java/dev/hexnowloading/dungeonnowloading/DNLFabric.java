@@ -3,7 +3,9 @@ package dev.hexnowloading.dungeonnowloading;
 import dev.hexnowloading.dungeonnowloading.events.DNLFabricBlockEvents;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.server.entity.DNLFabricEntities;
+import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,6 +18,12 @@ public class DNLFabric implements ModInitializer {
         registerEntityAttributes();
         registerPackets();
         DNLFabricEntities.registerSpawnPlacements();
+
+        ServerLifecycleEvents.SERVER_STARTING.register(PatronRegistry::initOrReload);
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, rm, success) -> {
+            PatronRegistry.initOrReload(server);
+        });
+
         DungeonNowLoading.LOGGER.info("Hello Fabric world!");
     }
 

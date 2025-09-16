@@ -1,4 +1,4 @@
-// 1.20.1	2025-05-25T18:05:30.9519167	Loot Tables
+// 1.20.1	2025-09-12T15:55:22.5630418	Loot Tables
 8de5512c6e498fd7a4e162f42dd356b7cb01701f data/dungeonnowloading/loot_tables/blocks/amethyst_stone_notch.json
 3a4cff0ea1f46917b0ecd1ee8161664741c8d995 data/dungeonnowloading/loot_tables/blocks/ballista_golem_statue.json
 9396ac882f14f31584971bf8ef799e213b09e68a data/dungeonnowloading/loot_tables/blocks/ballista_golem_statue_part.json
@@ -34,6 +34,7 @@ d12025bd10b6366712516160404557c7f0b9ad82 data/dungeonnowloading/loot_tables/bloc
 50b6c2a13bb2fb0213ebb91ca191dd526ebbe269 data/dungeonnowloading/loot_tables/blocks/mossy_cobblestone_pebbles.json
 3584c928a7c0a536b2fdd31e5d36cf464c036871 data/dungeonnowloading/loot_tables/blocks/netherite_stone_notch.json
 cb8c2b7a79ac9e2adee9d10c93d5fd3ce1157895 data/dungeonnowloading/loot_tables/blocks/overcharged_redstone_block.json
+8ab35450f842ab9e72b5c907707cc22a9a839516 data/dungeonnowloading/loot_tables/blocks/player_statue.json
 8b83a39e0b89f5a597e17ca28629deb69e27b2ff data/dungeonnowloading/loot_tables/blocks/polished_stone.json
 b1a90d64767a8e9cf839908bc0a5b837283ff059 data/dungeonnowloading/loot_tables/blocks/prismarine_stone_notch.json
 b295850eccaa82e59a1fec29c9c4e80931e1d6d7 data/dungeonnowloading/loot_tables/blocks/puzzling_stone_emblem.json

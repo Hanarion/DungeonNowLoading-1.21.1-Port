@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.block.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.client.StatueSkinCache;
 import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatueModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatuePedestalModel;
@@ -17,6 +18,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlockEntity> {
     private final PlayerStatueModel statue;
@@ -24,9 +26,19 @@ public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlo
     private final Font font; // 🔹 add
 
     private static final ResourceLocation PEDESTAL_TEX =
-            new ResourceLocation("dungeonnowloading", "textures/block/player_statue_pedestal.png");
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal.png");
+    private static final ResourceLocation PEDESTAL_TEX_COPPER_NOTCH =
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_copper_notch.png");
+    private static final ResourceLocation PEDESTAL_TEX_IRON_NOTCH =
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_iron_notch.png");
+    private static final ResourceLocation PEDESTAL_TEX_GOLD_NOTCH =
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_gold_notch.png");
+    private static final ResourceLocation PEDESTAL_TEX_DIAMOND_NOTCH =
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_diamond_notch.png");
+
     private static final ResourceLocation STONE_OVERLAY_TEX =
-            new ResourceLocation("dungeonnowloading", "textures/block/player_statue_stone.png");
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_stone.png");
+
 
     public PlayerStatueRenderer(BlockEntityRendererProvider.Context ctx) {
         this.statue   = new PlayerStatueModel(ctx.bakeLayer(PlayerStatueModel.LAYER_LOCATION));
@@ -39,30 +51,59 @@ public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlo
         pose.pushPose();
         pose.translate(0.5, 0.0, 0.5);
 
-        // rotate whole thing to block facing (so statue & pedestal align)
-        Direction facing = be.getBlockState().getValue(HorizontalDirectionalBlock.FACING);
-        pose.mulPose(Axis.YP.rotationDegrees(180.0f - facing.toYRot()));
+        var state = be.getBlockState();
 
-        // --- pedestal ---
+// statue yaw: 16-step
+        int rot16 = state.hasProperty(BlockStateProperties.ROTATION_16)
+                ? state.getValue(BlockStateProperties.ROTATION_16)
+                : 0;
+        float statueYaw = 180.0f - (rot16 * 22.5f);
+
+// pedestal yaw: use FACING if present; else snap rot16 to 0/4/8/12
+        float pedestalYaw;
+        if (state.hasProperty(HorizontalDirectionalBlock.FACING)) {
+            Direction f = state.getValue(HorizontalDirectionalBlock.FACING);
+            pedestalYaw = 180.0f - f.toYRot();
+        } else {
+            int cardinal = ((rot16 + 2) / 4) * 4; // nearest of {0,4,8,12}
+            pedestalYaw = 180.0f - (cardinal * 22.5f);
+        }
+
+        // --- pedestal (rotates with 4-way facing) ---
         pose.pushPose();
-        pose.translate(0f, 1.5f, 0f);
-        pose.scale(-1f, -1f, 1f);
+        pose.mulPose(Axis.YP.rotationDegrees(pedestalYaw));
+        pose.translate(0f, 1.5005f, 0f);
+        pose.mulPose(Axis.YP.rotationDegrees(180f));
+        pose.mulPose(Axis.XP.rotationDegrees(180f));
+
         var pedVx = buf.getBuffer(RenderType.entityCutoutNoCull(PEDESTAL_TEX));
         pedestal.renderPedestal(pose, pedVx, light, overlay);
+
+        var notchTex = notchOverlayTex(be);
+        if (notchTex != null) {
+            pose.pushPose();
+            pose.scale(1.001f, 1.001f, 1.001f); // avoid z-fighting
+            var overlayVx = buf.getBuffer(RenderType.entityCutoutNoCull(notchTex));
+            pedestal.renderPedestal(pose, overlayVx, light, overlay);
+            pose.popPose();
+        }
         pose.popPose();
 
-        // --- statue ---
+        // --- statue (rotates with 16-step rotation) ---
         pose.pushPose();
+        pose.mulPose(Axis.YP.rotationDegrees(statueYaw));
         pose.translate(0f, 1.75f, 0f);
-        pose.scale(-1f, -1f, 1f);
+        pose.mulPose(Axis.YP.rotationDegrees(180f));
+        pose.mulPose(Axis.XP.rotationDegrees(180f));
         var skin = StatueSkinCache.get(be.getOwner(), 0.60f, STONE_OVERLAY_TEX);
         statue.useSlimArms(skin.slim());
-        var statVx = buf.getBuffer(RenderType.entityTranslucent(skin.texture()));
+        //var statVx = buf.getBuffer(RenderType.entityTranslucent(skin.texture()));
+        var statVx = buf.getBuffer(RenderType.armorCutoutNoCull(skin.texture()));
         statue.renderToBuffer(pose, statVx, light, overlay, 1f, 1f, 1f, 1f);
         pose.popPose();
 
-        // --- text (do this in block space, not in the flipped model space) ---
-        renderPedestalText(be, pose, buf, light);
+        // --- text (aligns with pedestal orientation) ---
+        renderPedestalText(be, pose, buf, light, pedestalYaw);
 
         pose.popPose();
     }
@@ -80,8 +121,7 @@ public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlo
     private static final float TEXT_Y = 4f / 16f;   // tweak to taste
     private static final float TEXT_Z = 0.5005f;  // just in front of face
 
-    private void renderPedestalText(PlayerStatueBlockEntity be, PoseStack pose, MultiBufferSource buf, int worldLight) {
-        // we’ll use ONLY the first line for the pedestal text
+    private void renderPedestalText(PlayerStatueBlockEntity be, PoseStack pose, MultiBufferSource buf, int worldLight, float pedestalYaw) {
         var lineComp = be.getLine(0);
         if (lineComp == null) return;
 
@@ -89,7 +129,6 @@ public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlo
         if (seqs.isEmpty()) return;
         var seq = seqs.get(0);
 
-        // colors & lighting (same logic as before)
         boolean glowing = be.isGlowingText();
         int baseRGB = (be.getTextColor() != null ? be.getTextColor().getTextColor() : 0x000000);
         int darkColor = getDarkColorLikeSigns(baseRGB, glowing);
@@ -101,34 +140,33 @@ public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlo
             packedLight = 0x00F000F0;
             outlineVisible = isOutlineVisibleLikeSigns(be.getBlockPos(), baseRGB);
         } else {
-            // ⬅️ was: argbText = darkColor;  (alpha = 0 → invisible)
             argbText = 0xFF000000 | darkColor;
             packedLight = worldLight;
             outlineVisible = false;
         }
 
-        // ---- position to the SOUTH face, centered between 4th & 5th pixels (like earlier answer) ----
         pose.pushPose();
         {
-            // We already rotated the whole block so its “front” is +Z.
-            // SOUTH face is -Z. Move there first…
+            // rotate to the pedestal's "front"
+            pose.mulPose(Axis.YP.rotationDegrees(pedestalYaw));
+
+            // SOUTH face (front), slight z nudge forward
             pose.translate(0.0f, TEXT_Y, -TEXT_Z);
-            // …then rotate so glyphs face outward
             pose.mulPose(Axis.YP.rotationDegrees(180f));
 
             pose.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
 
-            int w = this.font.width(seq);
+            int w = this.font.width(seqs.get(0));
             float fit = (w > PEDESTAL_TEXT_MAX_PX) ? (float) PEDESTAL_TEXT_MAX_PX / (float) w : 1.0f;
             pose.scale(fit, fit, fit);
 
-            float x = -this.font.width(seq) / 2f;
+            float x = -this.font.width(seqs.get(0)) / 2f;
             float y = -this.font.lineHeight / 2f;
 
             if (outlineVisible) {
-                this.font.drawInBatch8xOutline(seq, x, y, argbText, darkColor, pose.last().pose(), buf, packedLight);
+                this.font.drawInBatch8xOutline(seqs.get(0), x, y, argbText, darkColor, pose.last().pose(), buf, packedLight);
             } else {
-                this.font.drawInBatch(seq, x, y, argbText, false, pose.last().pose(), buf,
+                this.font.drawInBatch(seqs.get(0), x, y, argbText, false, pose.last().pose(), buf,
                         Font.DisplayMode.POLYGON_OFFSET, 0, packedLight);
             }
         }
@@ -161,6 +199,13 @@ public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlo
     public static final int PEDESTAL_TEXT_MAX_PX = 100; // safe pixel budget for one line
     public static int pedestalMaxTextPixels(Font font) { return PEDESTAL_TEXT_MAX_PX; }
 
-    @Override
-    public boolean shouldRenderOffScreen(PlayerStatueBlockEntity be) { return true; }
+    private ResourceLocation notchOverlayTex(PlayerStatueBlockEntity be) {
+        return switch (be.getNotchTier()) {
+            case COPPER  -> PEDESTAL_TEX_COPPER_NOTCH;
+            case IRON    -> PEDESTAL_TEX_IRON_NOTCH;
+            case GOLD    -> PEDESTAL_TEX_GOLD_NOTCH;
+            case DIAMOND -> PEDESTAL_TEX_DIAMOND_NOTCH;
+            case NONE    -> null;
+        };
+    }
 }

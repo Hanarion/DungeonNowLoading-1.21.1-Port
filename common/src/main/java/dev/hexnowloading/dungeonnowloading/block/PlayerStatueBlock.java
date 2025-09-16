@@ -5,13 +5,16 @@ import dev.hexnowloading.dungeonnowloading.block.entity.PlayerStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CPedestalOpenEditorPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,7 +33,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -42,19 +46,21 @@ import java.util.Arrays;
 
 public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, SimpleWaterloggedBlock {
 
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    public static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    //public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     // Slim pedestal footprint (entities won’t get stuck as easily); render can extend higher.
     private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0); // 10x10, 1 block tall
 
     // Match this to however many poses your Blockbench export supports (or make it configurable)
     public static final int MAX_POSES = 4;
+    public static final boolean ENABLE_SIGN_EDIT = false;
 
     public PlayerStatueBlock(Properties props) {
         super(props);
         registerDefaultState(this.stateDefinition.any()
-                .setValue(FACING, Direction.NORTH)
+                .setValue(ROTATION, 0)
                 .setValue(WATERLOGGED, false));
     }
 
@@ -63,24 +69,25 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         FluidState fluid = ctx.getLevel().getFluidState(ctx.getClickedPos());
+        int rot = (Mth.floor((ctx.getRotation() * 16.0F / 360.0F) + 0.5F)) & 15;
         return this.defaultBlockState()
-                .setValue(FACING, ctx.getHorizontalDirection().getOpposite())
+                .setValue(ROTATION, rot)
                 .setValue(WATERLOGGED, fluid.getType() == Fluids.WATER);
     }
 
     @Override
     public BlockState rotate(BlockState state, net.minecraft.world.level.block.Rotation rot) {
-        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
+        return state.setValue(ROTATION, rot.rotate(state.getValue(ROTATION), 16));
     }
 
     @Override
     public BlockState mirror(BlockState state, net.minecraft.world.level.block.Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+        return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), 16));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
-        b.add(FACING, WATERLOGGED);
+        b.add(ROTATION, WATERLOGGED);
     }
 
     @Override
@@ -102,9 +109,9 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
     }
 
     @Override
-    public net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         // Use BER (BlockEntityRenderer) to draw the full-body model
-        return net.minecraft.world.level.block.RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     // ---- block entity ----
@@ -123,22 +130,40 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
         if (level.isClientSide) return;
 
         var be = level.getBlockEntity(pos);
-        if (be instanceof PlayerStatueBlockEntity statue) {
-            GameProfile gp = null;
+        if (!(be instanceof PlayerStatueBlockEntity statue)) return;
 
-            // Prefer Owner from item NBT if present
-            CompoundTag tag = stack.getTag();
-            if (tag != null && tag.contains("Owner", 10)) {
+        GameProfile gp = null;
+        CompoundTag tag = stack.getTag();
+
+        if (tag != null) {
+            if (tag.contains("Owner", 10)) gp = NbtUtils.readGameProfile(tag.getCompound("Owner"));
+            else if (tag.contains("SkullOwner", 10)) gp = NbtUtils.readGameProfile(tag.getCompound("SkullOwner"));
+            else if (tag.contains("SkullOwner", 8))  gp = new GameProfile(null, tag.getString("SkullOwner"));
+        }
+
+        // Owner / SkullOwner
+        /*if (tag != null) {
+            if (tag.contains("Owner", 10)) {
                 gp = NbtUtils.readGameProfile(tag.getCompound("Owner"));
+            } else if (tag.contains("SkullOwner", 10)) {
+                gp = NbtUtils.readGameProfile(tag.getCompound("SkullOwner"));
+            } else if (tag.contains("SkullOwner", 8)) {
+                gp = new GameProfile(null, tag.getString("SkullOwner"));
             }
+        }*/
+        if (gp == null) gp = new GameProfile(null, "MHF_Alex");
+        statue.setOwner(gp);
 
-            // Otherwise use the placer’s profile
-            if (gp == null && placer instanceof Player p) {
-                gp = p.getGameProfile();
-            }
-
-            if (gp != null) {
-                statue.setOwner(gp); // calls sendBlockUpdated
+        // Restore offering if present in the item NBT
+        if (tag != null && tag.contains("Offering", 10)) {
+            ItemStack off = ItemStack.of(tag.getCompound("Offering"));
+            if (!off.isEmpty()) statue.placeOffering(off);
+        } else if (tag != null && tag.contains("DNL_Notch", 8)) {
+            // Rebuild offering from tier if item only stored the tier
+            var tier = PlayerStatueBlockEntity.NotchTier.fromString(tag.getString("DNL_Notch"));
+            if (tier != PlayerStatueBlockEntity.NotchTier.NONE && !statue.hasOffering()) {
+                ItemStack off = PlayerStatueBlockEntity.defaultItemForTier(tier);
+                if (!off.isEmpty()) statue.placeOffering(off);
             }
         }
     }
@@ -147,9 +172,64 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+
         ItemStack held = player.getItemInHand(hand);
         var be = level.getBlockEntity(pos);
         if (!(be instanceof PlayerStatueBlockEntity statue)) return InteractionResult.PASS;
+
+        // ---- PEDESTAL MATERIAL INTERACTION (server) ----
+        if (!level.isClientSide) {
+            // Waxed statues block material edits
+            if (statue.isWaxed()) {
+                level.playSound(null, pos, SoundEvents.WAXED_SIGN_INTERACT_FAIL, SoundSource.BLOCKS, 1.0f, 1.0f);
+                return InteractionResult.PASS;
+            }
+
+            // (A) TAKE offering: allowed even if the player's hand is NOT empty
+            if (statue.hasOffering()) {
+                ItemStack out = statue.takeOffering();
+                if (!out.isEmpty()) {
+                    boolean added = player.addItem(out);
+                    if (!added) player.drop(out, false);
+                    level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.5f, 1.0f);
+
+                    // "In the Name of (Player Name)"
+                    String ownerName = "Someone";
+                    var gp = statue.getOwner();
+                    if (gp != null && gp.getName() != null && !gp.getName().isEmpty()) ownerName = gp.getName();
+                    Component msg = Component.translatable(
+                            "block.dungeonnowloading.player_statue.message",
+                            Component.literal(ownerName).withStyle(ChatFormatting.GOLD)
+                    );
+                    player.displayClientMessage(msg, true);
+                }
+                return InteractionResult.CONSUME;
+            }
+
+            // (B) PLACE offering: only when empty; don't consume in Creative
+            var tier = PlayerStatueBlockEntity.NotchTier.NONE;
+            tier = PlayerStatueBlockEntity.tierFromItem(held);
+            if (tier != PlayerStatueBlockEntity.NotchTier.NONE) {
+                // give BE a single copy
+                ItemStack one = held.copy();
+                one.setCount(1);
+                if (statue.placeOffering(one)) {
+                    if (!player.getAbilities().instabuild) { // survival/adventure only
+                        held.shrink(1);
+                    }
+                    level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.6f, 1.2f);
+                    return InteractionResult.CONSUME;
+                }
+            }
+        } else {
+            // client: optimistic success for either take or place
+            if (statue.hasOffering() || PlayerStatueBlockEntity.tierFromItem(held) != PlayerStatueBlockEntity.NotchTier.NONE) {
+                return InteractionResult.SUCCESS;
+            }
+        }
+
+        // Keep your sign-editing behind the flag, unchanged
+        if (!ENABLE_SIGN_EDIT) return InteractionResult.PASS;
 
         // --- BRUSH: cycle pose (like you had) ---
         if (held.is(Items.BRUSH)) {
@@ -274,6 +354,7 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
                 stack.getOrCreateTag().put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gp));
             }
             stack.getOrCreateTag().putInt("DNL_Pose", statue.getPoseVariant());
+            stack.getOrCreateTag().putString("DNL_Notch", statue.getNotchTier().name());
         }
         return stack;
     }

@@ -72,6 +72,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         redstoneLaneWithItem((RedstoneLaneBlock) DNLBlocks.REDSTONE_LANE_T.get());
         signalGateWithItem((SignalGateBlock) DNLBlocks.SIGNAL_GATE.get());
         preserverWithItem((PreserverBlock) DNLBlocks.STONE_PRESERVER.get());
+        particleOnlyModel(DNLBlocks.PLAYER_STATUE.get());
 
         //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());
         //simpleRandomBlockWithItem(DNLBlocks.MOSS.get(), 5);
@@ -724,6 +725,19 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                 .partialState().with(DNLProperties.FAIRKEEPER_ALERT, Boolean.FALSE).modelForState().modelFile(off).addModel();
 
         simpleBlockItem(block, models().getExistingFile(extend(blockTexture(block), "_off")));
+    }
+
+    private void particleOnlyModel(Block block) {
+        String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
+        String ns   = ForgeRegistries.BLOCKS.getKey(block).getNamespace();
+
+        // models/block/<name>_particle.json → parent builtin/entity + particle tex
+        ModelFile model = models().getBuilder(name + "_particle")
+                .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"))
+                .texture("particle", new ResourceLocation(ns, "block/" + name + "_particle"));
+
+        // blockstates/<name>.json → map every state (rotation_16, waterlogged, …) to that model
+        getVariantBuilder(block).forAllStates(s -> new ConfiguredModel[]{new ConfiguredModel(model)});
     }
 
     private ResourceLocation key(Block block) {

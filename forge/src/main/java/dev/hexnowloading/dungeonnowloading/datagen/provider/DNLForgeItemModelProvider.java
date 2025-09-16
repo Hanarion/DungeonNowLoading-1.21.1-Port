@@ -46,6 +46,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.65f, 0.9f, 1.5f);
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.43f, 0.6f, 1.0f);
         booleanPropertyItem(DNLItems.COPPER_DETONATOR.get(), "mode_switch", "copper_detonator", "copper_detonator_switched");
+        PlayerStatueItemWithDisplay(DNLItems.PLAYER_STATUE.get());
     }
 
     private void simpleItem(Item item) {
@@ -199,4 +200,55 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
                 new ResourceLocation("item/generated")).texture("layer0",
                 new ResourceLocation(DungeonNowLoading.MOD_ID,"item/" + item.getId().getPath()));
     }
+
+    private void builtinEntityItem(Item item) {
+        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        // Don’t validate parent; builtin/entity is a virtual model
+        getBuilder(ITEM_FOLDER + "/" + name)
+                .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"));
+    }
+
+    private void PlayerStatueItemWithDisplay(Item item) {
+        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+
+        ItemModelBuilder b = getBuilder(ITEM_FOLDER + "/" + name)
+                // builtin/entity is virtual → UncheckedModelFile
+                .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"));
+
+        b.transforms()
+                .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)
+                .rotation(75, 135, 0)
+                .translation(0f, 2.0f, 0f)
+                .scale(0.375f, 0.375f, 0.375f)
+                .end()
+                .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND)
+                .rotation(75, 135, 0)
+                .translation(0f, 2.0f, 0f)
+                .scale(0.375f, 0.375f, 0.375f)
+                .end()
+                .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
+                .rotation(0, 135, 0)
+                .scale(0.38f, 0.38f, 0.38f)
+                .end()
+                .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND)
+                .rotation(0, 135, 0)
+                .scale(0.38f, 0.38f, 0.38f)
+                .end()
+                .transform(ItemDisplayContext.GROUND)
+                .translation(0f, 2.0f, 0f)
+                .scale(0.22f, 0.22f, 0.22f)
+                .end()
+                .transform(ItemDisplayContext.GUI)
+                .rotation(30, 225, 0)   // classic block angle
+                .translation(0.0f, -3.0f, 0f) // slight lift to center vertically
+                .scale(0.35f, 0.35f, 0.35f) // fits cleanly in the slot
+                .end()
+                .transform(ItemDisplayContext.FIXED)
+                .rotation(-90, 180, 0)
+                .translation(0.0f, 0.0f, -6f)
+                .scale(1f, 1f, 1f)
+                .end()
+                .end();
+    }
+
 }

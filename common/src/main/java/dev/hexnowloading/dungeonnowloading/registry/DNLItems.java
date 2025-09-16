@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.registry;
 import dev.hexnowloading.dungeonnowloading.item.*;
 import dev.hexnowloading.dungeonnowloading.item.blockitem.FairkeeperChestBlockItem;
 import dev.hexnowloading.dungeonnowloading.item.blockitem.FierceFairkeeperChestBlockItem;
+import dev.hexnowloading.dungeonnowloading.item.blockitem.PlayerStatueBlockItem;
 import dev.hexnowloading.dungeonnowloading.item.blockitem.WiseFairkeeperChestBlockItem;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -139,11 +140,11 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_AURA_PATH = register("mending_aura_path", () -> new BlockItem(DNLBlocks.MENDING_AURA_PATH.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA_PANE = register("mending_aura_pane", () -> new BlockItem(DNLBlocks.MENDING_AURA_PANE.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
+    public static final Supplier<Item> PLAYER_STATUE = register("player_statue", PlayerStatueBlockItem::new);
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> LABYRINTH_TROPHY = register("labyrinth_trophy", () -> new BlockItem(DNLBlocks.LABYRINTH_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));
     public static final Supplier<Item> TEMPLE_OF_DUALITY_TROPHY = register("temple_of_duality_trophy", () -> new BlockItem(DNLBlocks.TEMPLE_OF_DUALITY_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));
-
 
     //public static final Supplier<Item> WIND_ALTER = register("wind_alter", () -> new BlockItem(SkyislandBlocks.WIND_ALTER.get(), new Item.Properties()));
 

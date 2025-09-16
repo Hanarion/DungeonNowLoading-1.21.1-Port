@@ -344,6 +344,10 @@
     },
     {
       "processor_type": "dungeonnowloading:waterlogging_fix_processor"
+    },
+    {
+      "processor_type": "dungeonnowloading:statue_processor",
+      "campaign": "temple_of_duality"
     }
   ]
 }

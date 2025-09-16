@@ -19,6 +19,7 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.functions.EnchantRandomlyFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
@@ -92,7 +93,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.add(DNLBlocks.REDSTONE_IDOL.get(), block -> createSingleItemTable(DNLItems.REDSTONE_IDOL.get()));
         this.dropSelf(DNLBlocks.LABYRINTH_TROPHY.get());
         this.dropSelf(DNLBlocks.TEMPLE_OF_DUALITY_TROPHY.get());
-        this.addPlayerStatue(DNLBlocks.PLAYER_STATUE.get());
+        this.addPlayerStatueDrop(DNLBlocks.PLAYER_STATUE.get());
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {
@@ -174,7 +175,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                         )));
     }
 
-    private void addPlayerStatue(Block block) {
+    /*private void addPlayerStatue(Block block) {
         LootTable.Builder table = LootTable.lootTable().withPool(
                 LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1))
@@ -189,7 +190,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                         )
         );
         this.add(block, table);
-    }
+    }*/
 
     @Override
     protected Iterable<Block> getKnownBlocks() {
@@ -197,5 +198,23 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                 .stream()
                 .flatMap(RegistryObject::stream)
                 ::iterator;
+    }
+
+    private void addPlayerStatueDrop(Block block) {
+        LootTable.Builder table = LootTable.lootTable().withPool(
+                LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1))
+                        .when(ExplosionCondition.survivesExplosion())
+                        .add(LootItem.lootTableItem(DNLBlocks.PLAYER_STATUE.get())
+                                .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
+                                        .copy("Owner", "Owner")
+                                        .copy("Owner.Name", "SkullOwner")
+                                        .copy("PoseVariant", "DNL_Pose")
+                                        .copy("NotchTier", "DNL_Notch")
+                                        .copy("Offering", "Offering")
+                                )
+                        )
+        );
+        this.add(block, table);
     }
 }

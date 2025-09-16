@@ -10,6 +10,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -43,6 +45,13 @@ public class PlayerStatueBlockEntity extends BlockEntity {
     public PlayerStatueBlockEntity(BlockPos pos, BlockState state) {
         super(DNLBlockEntityTypes.PLAYER_STATUE.get(), pos, state);
     }
+
+
+    // --- offering slot (single item) ---
+    private ItemStack offering = ItemStack.EMPTY;
+
+    public boolean hasOffering() { return !offering.isEmpty(); }
+    public ItemStack getOfferingCopy() { return offering.copy(); }
 
     // ===== basic getters/setters ============================================
 
@@ -154,6 +163,9 @@ public class PlayerStatueBlockEntity extends BlockEntity {
         // sign-like extras
         if (allowedEditor != null) tag.putUUID("AllowedEditor", allowedEditor);
         tag.putBoolean("Waxed", waxed);
+
+        tag.putString("NotchTier", notchTier.name());
+        if (!offering.isEmpty()) tag.put("Offering", offering.save(new CompoundTag()));
     }
 
     @Override
@@ -184,6 +196,9 @@ public class PlayerStatueBlockEntity extends BlockEntity {
         allowedEditor = tag.contains("AllowedEditor", 11) || tag.contains("AllowedEditor", 12) // MC versions differ
                 ? tag.getUUID("AllowedEditor") : null;
         waxed = tag.getBoolean("Waxed");
+
+        this.notchTier = NotchTier.fromString(tag.getString("NotchTier"));
+        offering = tag.contains("Offering", 10) ? ItemStack.of(tag.getCompound("Offering")) : ItemStack.EMPTY;
     }
 
     // client sync
@@ -194,6 +209,64 @@ public class PlayerStatueBlockEntity extends BlockEntity {
     public void sync() {
         if (level != null && !level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    public static NotchTier tierFromItem(ItemStack s) {
+        if (s.is(Items.COPPER_INGOT))  return NotchTier.COPPER;
+        if (s.is(Items.IRON_INGOT))    return NotchTier.IRON;
+        if (s.is(Items.GOLD_INGOT))    return NotchTier.GOLD;
+        if (s.is(Items.DIAMOND))       return NotchTier.DIAMOND;
+        return NotchTier.NONE;
+    }
+
+    public static ItemStack defaultItemForTier(NotchTier t) {
+        return switch (t) {
+            case COPPER  -> new ItemStack(Items.COPPER_INGOT);
+            case IRON    -> new ItemStack(Items.IRON_INGOT);
+            case GOLD    -> new ItemStack(Items.GOLD_INGOT);
+            case DIAMOND -> new ItemStack(Items.DIAMOND);
+            default      -> ItemStack.EMPTY;
+        };
+    }
+
+    public boolean placeOffering(ItemStack oneItem) {
+        if (hasOffering()) return false;
+        NotchTier t = tierFromItem(oneItem);
+        if (t == NotchTier.NONE) return false;
+
+        this.offering = oneItem.copy(); this.offering.setCount(1);
+        setNotchTier(t);     // will setChanged() + sync()
+        setChanged(); sync();
+        return true;
+    }
+
+    public ItemStack takeOffering() {
+        if (!hasOffering()) return ItemStack.EMPTY;
+        ItemStack out = offering.copy(); out.setCount(1);
+        offering = ItemStack.EMPTY;
+        setNotchTier(NotchTier.NONE);  // will setChanged() + sync()
+        setChanged(); sync();
+        return out;
+    }
+
+    private NotchTier notchTier = NotchTier.NONE;
+
+    public NotchTier getNotchTier() { return notchTier; }
+    public void setNotchTier(NotchTier tier) {
+        if (tier == null) tier = NotchTier.NONE;
+        if (tier != this.notchTier) {
+            this.notchTier = tier;
+            setChanged(); sync(); // make sure clients update
+        }
+    }
+
+    public enum NotchTier {
+        NONE, COPPER, IRON, GOLD, DIAMOND;
+
+        public static NotchTier fromString(String s) {
+            if (s == null) return NONE;
+            try { return valueOf(s.toUpperCase()); } catch (Exception e) { return NONE; }
         }
     }
 }

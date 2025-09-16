@@ -32,6 +32,7 @@
       "forge.blockentities.FairkeeperChestBlockItemMixin",
       "forge.blockentities.WiseFairkeeperChestBlockItemMixin",
       "forge.blockentities.FierceFairkeeperChestBlockItemMixin",
+      "forge.blockentities.PlayerStatueBlockItemMixin",
       "forge.item.ScorcherItemMixin"
     ],
     "client": [
