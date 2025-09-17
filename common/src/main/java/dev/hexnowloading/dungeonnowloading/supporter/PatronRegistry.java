@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.supporter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import dev.hexnowloading.dungeonnowloading.block.entity.PlayerStatueBlockEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
@@ -29,15 +30,21 @@ public final class PatronRegistry {
         try {
             Map<String, Campaign> fresh = fetch(remoteUrl);
             if (!fresh.isEmpty()) {
+                // Fill names from server cache if some are missing (no network)
+                enrichNamesFromProfileCache(server, fresh);
                 DATA = fresh;
                 cacheToDisk(server, fresh);
                 return;
             }
         } catch (Exception ignored) {}
-        // Fallback to cache on disk if HTTP failed
+
         Map<String, Campaign> cached = readCache(server);
-        if (!cached.isEmpty()) DATA = cached;
+        if (!cached.isEmpty()) {
+            enrichNamesFromProfileCache(server, cached);
+            DATA = cached;
+        }
     }
+
 
     /** Pick a random patron for a campaign (or null if none). */
     public static @Nullable Patron pickPatron(String campaignId, RandomSource rand) {
@@ -69,11 +76,19 @@ public final class PatronRegistry {
     public static final class Campaign {
         public List<Patron> patrons = new ArrayList<>();
     }
+
     public static final class Patron {
         public java.util.UUID uuid;
+
+        // accept either "username" (your JSON) or "name" (future-proof)
+        @SerializedName(value = "name", alternate = {"username"})
+        public @Nullable String name;
+
         public int months;
         public String tier;
     }
+
+
 
 
     // ======= impl ===========================================================
@@ -119,4 +134,26 @@ public final class PatronRegistry {
         // config/dnl/patrons.json
         return server.getFile("config/dnl/patrons.json");
     }
+
+    private static void enrichNamesFromProfileCache(MinecraftServer server, Map<String, Campaign> data) {
+        if (server == null || data == null) return;
+        var cache = server.getProfileCache();
+        if (cache == null) return;
+
+        for (var entry : data.entrySet()) {
+            Campaign c = entry.getValue();
+            if (c == null || c.patrons == null) continue;
+            for (Patron p : c.patrons) {
+                if (p == null || p.uuid == null) continue;
+                if (p.name != null && !p.name.isBlank()) continue;
+
+                cache.get(p.uuid).ifPresent(gp -> {
+                    if (gp.getName() != null && !gp.getName().isBlank()) {
+                        p.name = gp.getName();
+                    }
+                });
+            }
+        }
+    }
+
 }

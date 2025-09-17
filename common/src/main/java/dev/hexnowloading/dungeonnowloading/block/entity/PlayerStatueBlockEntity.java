@@ -153,7 +153,7 @@ public class PlayerStatueBlockEntity extends BlockEntity {
         // pose
         tag.putInt("PoseVariant", poseVariant);
 
-        // text (Text1..Text4 as JSON)
+        // text
         for (int i = 0; i < LINES; i++) {
             tag.putString("Text" + (i + 1), Component.Serializer.toJson(text[i]));
         }
@@ -164,8 +164,8 @@ public class PlayerStatueBlockEntity extends BlockEntity {
         if (allowedEditor != null) tag.putUUID("AllowedEditor", allowedEditor);
         tag.putBoolean("Waxed", waxed);
 
+        // tier only (no Offering tag)
         tag.putString("NotchTier", notchTier.name());
-        if (!offering.isEmpty()) tag.put("Offering", offering.save(new CompoundTag()));
     }
 
     @Override
@@ -193,12 +193,19 @@ public class PlayerStatueBlockEntity extends BlockEntity {
         glowingText = tag.getBoolean("TextGlowing");
 
         // sign-like extras
-        allowedEditor = tag.contains("AllowedEditor", 11) || tag.contains("AllowedEditor", 12) // MC versions differ
+        allowedEditor = (tag.contains("AllowedEditor", 11) || tag.contains("AllowedEditor", 12))
                 ? tag.getUUID("AllowedEditor") : null;
         waxed = tag.getBoolean("Waxed");
 
+        // tier
         this.notchTier = NotchTier.fromString(tag.getString("NotchTier"));
-        offering = tag.contains("Offering", 10) ? ItemStack.of(tag.getCompound("Offering")) : ItemStack.EMPTY;
+
+        // 🔁 Back-compat: if a legacy "Offering" tag exists, derive the tier once.
+        if (this.notchTier == NotchTier.NONE && tag.contains("Offering", 10)) {
+            ItemStack legacy = ItemStack.of(tag.getCompound("Offering"));
+            NotchTier legacyTier = tierFromItem(legacy);
+            if (legacyTier != NotchTier.NONE) this.notchTier = legacyTier;
+        }
     }
 
     // client sync
@@ -230,23 +237,46 @@ public class PlayerStatueBlockEntity extends BlockEntity {
         };
     }
 
-    public boolean placeOffering(ItemStack oneItem) {
-        if (hasOffering()) return false;
+    @Nullable
+    public String ensureServerSideOwnerName() {
+        if (owner == null) return null;
+        if (owner.getName() != null && !owner.getName().isEmpty()) return owner.getName();
+        if (!(level instanceof net.minecraft.server.level.ServerLevel sl)) return null;
+        java.util.UUID id = owner.getId();
+        if (id == null) return null;
+
+        var cache = sl.getServer().getProfileCache();
+        if (cache != null) {
+            var opt = cache.get(id); // Optional<GameProfile>
+            if (opt.isPresent()) {
+                this.owner = opt.get();    // update BE with the named profile
+                setChanged();
+                return this.owner.getName();
+            }
+        }
+        return null;
+    }
+
+    /** Short hint like 8 chars of UUID when name is unknown. */
+    public static String shortUuid(@Nullable java.util.UUID id) {
+        return (id == null) ? "Someone" : id.toString().substring(0, 8);
+    }
+
+    public boolean isOccupied() {
+        return notchTier != NotchTier.NONE;
+    }
+
+    public boolean placeMaterial(ItemStack oneItem) {
         NotchTier t = tierFromItem(oneItem);
         if (t == NotchTier.NONE) return false;
-
-        this.offering = oneItem.copy(); this.offering.setCount(1);
-        setNotchTier(t);     // will setChanged() + sync()
-        setChanged(); sync();
+        setNotchTier(t); // will setChanged() + sync()
         return true;
     }
 
-    public ItemStack takeOffering() {
-        if (!hasOffering()) return ItemStack.EMPTY;
-        ItemStack out = offering.copy(); out.setCount(1);
-        offering = ItemStack.EMPTY;
-        setNotchTier(NotchTier.NONE);  // will setChanged() + sync()
-        setChanged(); sync();
+    public ItemStack takeMaterial() {
+        if (!isOccupied()) return ItemStack.EMPTY;
+        ItemStack out = defaultItemForTier(notchTier);
+        setNotchTier(NotchTier.NONE); // will setChanged() + sync()
         return out;
     }
 

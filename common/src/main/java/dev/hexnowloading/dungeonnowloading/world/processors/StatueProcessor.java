@@ -41,24 +41,26 @@ public class StatueProcessor extends StructureProcessor {
         var beTag = current.nbt() == null ? new CompoundTag() : current.nbt().copy();
 
         RandomSource rand = settings.getRandom(current.pos());
-        var patron = PatronRegistry.pickPatron(this.campaign, rand);
 
-        // Always override any existing owner
+        /// Always override any existing owner
         beTag.remove("Owner");
         beTag.remove("SkullOwner");
 
-        if (patron != null && patron.uuid != null) { // if your Patron is a record, use patron.uuid()
-            // Store UUID-only: Owner: { Id: <uuid> }
+        var patron = PatronRegistry.pickPatron(this.campaign, rand);
+        if (patron != null && patron.uuid != null) {
             CompoundTag owner = new CompoundTag();
             owner.putUUID("Id", patron.uuid);
+            if (patron.name != null && !patron.name.isBlank()) {
+                owner.putString("Name", patron.name);   // <-- add Name
+            }
             beTag.put("Owner", owner);
 
-            PlayerStatueBlockEntity.NotchTier tier = PatronRegistry.tierFor(patron);
+            var tier = PatronRegistry.tierFor(patron);
             beTag.putString("NotchTier", tier.name());
         } else {
-            // No patron available -> leave tier NONE
             beTag.putString("NotchTier", PlayerStatueBlockEntity.NotchTier.NONE.name());
         }
+
 
         // Fill PoseVariant if missing
         if (!beTag.contains("PoseVariant", Tag.TAG_INT)) {

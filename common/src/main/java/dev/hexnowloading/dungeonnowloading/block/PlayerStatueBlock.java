@@ -155,15 +155,14 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
         statue.setOwner(gp);
 
         // Restore offering if present in the item NBT
-        if (tag != null && tag.contains("Offering", 10)) {
-            ItemStack off = ItemStack.of(tag.getCompound("Offering"));
-            if (!off.isEmpty()) statue.placeOffering(off);
-        } else if (tag != null && tag.contains("DNL_Notch", 8)) {
-            // Rebuild offering from tier if item only stored the tier
-            var tier = PlayerStatueBlockEntity.NotchTier.fromString(tag.getString("DNL_Notch"));
-            if (tier != PlayerStatueBlockEntity.NotchTier.NONE && !statue.hasOffering()) {
-                ItemStack off = PlayerStatueBlockEntity.defaultItemForTier(tier);
-                if (!off.isEmpty()) statue.placeOffering(off);
+        if (tag != null) {
+            if (tag.contains("DNL_Notch", 8)) {
+                var tier = PlayerStatueBlockEntity.NotchTier.fromString(tag.getString("DNL_Notch"));
+                if (tier != PlayerStatueBlockEntity.NotchTier.NONE) statue.setNotchTier(tier);
+            } else if (tag.contains("Offering", 10)) { // legacy item NBT
+                ItemStack off = ItemStack.of(tag.getCompound("Offering"));
+                var tier = PlayerStatueBlockEntity.tierFromItem(off);
+                if (tier != PlayerStatueBlockEntity.NotchTier.NONE) statue.setNotchTier(tier);
             }
         }
     }
@@ -186,17 +185,26 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
             }
 
             // (A) TAKE offering: allowed even if the player's hand is NOT empty
-            if (statue.hasOffering()) {
-                ItemStack out = statue.takeOffering();
+            if (statue.isOccupied()) {
+                ItemStack out = statue.takeMaterial();
                 if (!out.isEmpty()) {
                     boolean added = player.addItem(out);
                     if (!added) player.drop(out, false);
                     level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.5f, 1.0f);
 
-                    // "In the Name of (Player Name)"
                     String ownerName = "Someone";
                     var gp = statue.getOwner();
-                    if (gp != null && gp.getName() != null && !gp.getName().isEmpty()) ownerName = gp.getName();
+                    if (gp != null && gp.getName() != null && !gp.getName().isEmpty()) {
+                        ownerName = gp.getName();
+                    } else {
+                        // Try to hydrate from server cache (fast if known; no render-thread issues)
+                        String resolved = statue.ensureServerSideOwnerName();
+                        if (resolved != null && !resolved.isEmpty()) {
+                            ownerName = resolved;
+                        } else if (gp != null) {
+                            ownerName = PlayerStatueBlockEntity.shortUuid(gp.getId());
+                        }
+                    }
                     Component msg = Component.translatable(
                             "block.dungeonnowloading.player_statue.message",
                             Component.literal(ownerName).withStyle(ChatFormatting.GOLD)
@@ -207,14 +215,12 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
             }
 
             // (B) PLACE offering: only when empty; don't consume in Creative
-            var tier = PlayerStatueBlockEntity.NotchTier.NONE;
-            tier = PlayerStatueBlockEntity.tierFromItem(held);
+            var tier = PlayerStatueBlockEntity.tierFromItem(held);
             if (tier != PlayerStatueBlockEntity.NotchTier.NONE) {
-                // give BE a single copy
                 ItemStack one = held.copy();
                 one.setCount(1);
-                if (statue.placeOffering(one)) {
-                    if (!player.getAbilities().instabuild) { // survival/adventure only
+                if (statue.placeMaterial(one)) {
+                    if (!player.getAbilities().instabuild) {
                         held.shrink(1);
                     }
                     level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.6f, 1.2f);
@@ -222,8 +228,7 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
                 }
             }
         } else {
-            // client: optimistic success for either take or place
-            if (statue.hasOffering() || PlayerStatueBlockEntity.tierFromItem(held) != PlayerStatueBlockEntity.NotchTier.NONE) {
+            if (statue.isOccupied() || PlayerStatueBlockEntity.tierFromItem(held) != PlayerStatueBlockEntity.NotchTier.NONE) {
                 return InteractionResult.SUCCESS;
             }
         }
