@@ -10,6 +10,7 @@ import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.Copp
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
+import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.PlayerStatueItemRenderer;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.ScorcherRenderer;
@@ -156,6 +157,9 @@ public class DNLFabricClient implements ClientModInitializer {
             int useTime = stack.getUseDuration() - entity.getUseItemRemainingTicks();
             return useTime > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
         });
+
+        ItemProperties.register(DNLItems.REPULSOR.get(), new ResourceLocation("golden_mode"),
+                (stack, level, entity, seed) -> RepulsorItem.isGoldenMode(stack) ? 1.0F : 0.0F);
     }
 
     private void registerModelLayers() {

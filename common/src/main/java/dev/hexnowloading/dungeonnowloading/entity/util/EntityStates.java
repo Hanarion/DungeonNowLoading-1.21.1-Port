@@ -25,6 +25,7 @@ public class EntityStates {
     public static final EntityDataSerializer<CopperCreepEntity.CopperCreepAnimationState> COPPER_CREEP_ANIMATION_STATE;
     public static final EntityDataSerializer<VertexDomainProjectileEntity.VertexDomainAnimationState> VERTEX_DOMAIN_ANIMATION_STATE;
     public static final EntityDataSerializer<RepulsorEntity.State> COMMAND_PYLON_STATE;
+    public static final EntityDataSerializer<RepulsorEntity.Skin> REPULSOR_SKIN;
 
     static {
         CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
@@ -42,6 +43,7 @@ public class EntityStates {
         COPPER_CREEP_ANIMATION_STATE = EntityDataSerializer.simpleEnum(CopperCreepEntity.CopperCreepAnimationState.class);
         VERTEX_DOMAIN_ANIMATION_STATE = EntityDataSerializer.simpleEnum(VertexDomainProjectileEntity.VertexDomainAnimationState.class);
         COMMAND_PYLON_STATE = EntityDataSerializer.simpleEnum(RepulsorEntity.State.class);
+        REPULSOR_SKIN = EntityDataSerializer.simpleEnum(RepulsorEntity.Skin.class);
 
         EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
@@ -58,5 +60,6 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(COPPER_CREEP_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(VERTEX_DOMAIN_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(COMMAND_PYLON_STATE);
+        EntityDataSerializers.registerSerializer(REPULSOR_SKIN);
     }
 }

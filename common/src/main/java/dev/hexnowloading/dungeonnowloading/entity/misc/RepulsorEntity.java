@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.misc;
 import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.RepulsorAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
@@ -51,6 +52,20 @@ public class RepulsorEntity extends Mob {
         IDLE,
     }
 
+    public enum Skin {
+        DEFAULT("default"),
+        GOLDEN("golden");
+
+        public final String id;
+        Skin(String id) { this.id = id; }
+        public String getId() { return id; }
+
+        public static Skin fromId(String id) {
+            for (Skin s : values()) if (s.id.equalsIgnoreCase(id)) return s;
+            return DEFAULT;
+        }
+    }
+
     public static final int SHIELD_MAX_HEALTH = 100;
     public static final float SHIELD_ALERT_THRESHOLD = SHIELD_MAX_HEALTH * 0.5F;
     private static final double BEAM_INITIAL_PARTICLE_SPACING = 0.5d;
@@ -61,6 +76,11 @@ public class RepulsorEntity extends Mob {
     private static final EntityDataAccessor<Integer> DATA_AGE = SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_SHIELD_HEALTH = SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<State> DATA_STATE = SynchedEntityData.defineId(RepulsorEntity.class, EntityStates.COMMAND_PYLON_STATE);
+    private static final EntityDataAccessor<Skin> DATA_SKIN =
+            SynchedEntityData.defineId(RepulsorEntity.class, EntityStates.REPULSOR_SKIN); // same serializer enum you already use
+    private static final EntityDataAccessor<Boolean> DATA_SKIN_VALIDATION =
+            SynchedEntityData.defineId(RepulsorEntity.class, EntityDataSerializers.BOOLEAN);
+
 
     public AnimationState setupAnimState = new AnimationState();
     public AnimationState idleAnimState = new AnimationState();
@@ -85,6 +105,8 @@ public class RepulsorEntity extends Mob {
         this.entityData.define(DATA_AGE, 0);
         this.entityData.define(DATA_SHIELD_HEALTH, SHIELD_MAX_HEALTH);
         this.entityData.define(DATA_STATE, State.SETUP);
+        this.entityData.define(DATA_SKIN, Skin.DEFAULT);
+        this.entityData.define(DATA_SKIN_VALIDATION, false);
     }
 
     @Override
@@ -93,6 +115,10 @@ public class RepulsorEntity extends Mob {
         this.entityData.set(DATA_CAN_RENDER, compoundTag.getBoolean("canRender"));
         this.entityData.set(DATA_AGE, compoundTag.getInt("age"));
         this.entityData.set(DATA_SHIELD_HEALTH, compoundTag.getInt("shieldHealth"));
+        if (compoundTag.contains("skin") && !this.getSkinValidation()) {
+            this.entityData.set(DATA_SKIN, Skin.fromId(compoundTag.getString("skin")));
+        }
+        this.setSkinValidation(true);
     }
 
     @Override
@@ -101,6 +127,7 @@ public class RepulsorEntity extends Mob {
         compoundTag.putBoolean("canRender", this.canRender());
         compoundTag.putInt("age", this.getAge());
         compoundTag.putInt("shieldHealth", this.entityData.get(DATA_SHIELD_HEALTH));
+        compoundTag.putString("skin", getSkin().getId());
     }
 
     @Override
@@ -186,17 +213,17 @@ public class RepulsorEntity extends Mob {
     public void dropItem(@Nullable Entity entity) {
         if (this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
             this.playSound(DNLSounds.REPULSOR_BREAK.get());
-            if (entity instanceof Player) {
-                Player player = (Player) entity;
-                if (player.getAbilities().instabuild) {
-                    return;
-                }
-            }
+            if (entity instanceof Player player && player.getAbilities().instabuild) return;
 
             ItemStack itemStack = new ItemStack(DNLItems.REPULSOR.get());
 
-            int damage = (int) (SHIELD_MAX_HEALTH - this.entityData.get(DATA_SHIELD_HEALTH));
+            int damage = SHIELD_MAX_HEALTH - this.entityData.get(DATA_SHIELD_HEALTH);
             itemStack.setDamageValue(damage);
+
+            // If this repulsor is golden, make the dropped item golden too
+            if (this.getSkin() == RepulsorEntity.Skin.GOLDEN) {
+                RepulsorItem.setGolden(itemStack); // writes CosmeticMode="golden"
+            }
 
             this.spawnAtLocation(itemStack);
         }
@@ -400,5 +427,11 @@ public class RepulsorEntity extends Mob {
     public void setShieldHealth(int health) {
         this.entityData.set(DATA_SHIELD_HEALTH, health);
     }
+
+    public Skin getSkin() { return this.entityData.get(DATA_SKIN); }
+    public void setSkin(Skin skin) { this.entityData.set(DATA_SKIN, skin); }
+    public void setCosmeticMode(String id) { setSkin(Skin.fromId(id)); } // parity helper
+    public boolean getSkinValidation() { return this.entityData.get(DATA_SKIN_VALIDATION); }
+    public void setSkinValidation(boolean v) { this.entityData.set(DATA_SKIN_VALIDATION, v); }
 
 }

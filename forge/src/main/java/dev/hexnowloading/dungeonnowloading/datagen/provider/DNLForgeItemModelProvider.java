@@ -38,7 +38,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.MUSIC_DISC_BOROS.get());
         simpleItem(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
         //simpleItem(DNLItems.COPPER_DETONATOR.get());
-        simpleItem(DNLItems.REPULSOR.get());
+        //simpleItem(DNLItems.REPULSOR.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
@@ -46,6 +46,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.65f, 0.9f, 1.5f);
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.43f, 0.6f, 1.0f);
         booleanPropertyItem(DNLItems.COPPER_DETONATOR.get(), "mode_switch", "copper_detonator", "copper_detonator_switched");
+        booleanPropertyItem(DNLItems.REPULSOR.get(), "golden_mode", "repulsor", "repulsor_golden");
         PlayerStatueItemWithDisplay(DNLItems.PLAYER_STATUE.get());
     }
 
