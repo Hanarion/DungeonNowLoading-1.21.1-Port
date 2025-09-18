@@ -347,7 +347,9 @@
     },
     {
       "processor_type": "dungeonnowloading:statue_processor",
-      "campaign": "temple_of_duality"
+      "campaign": "temple_of_duality",
+      "chance": 0.1,
+      "fallback_block": "minecraft:air"
     }
   ]
 }
