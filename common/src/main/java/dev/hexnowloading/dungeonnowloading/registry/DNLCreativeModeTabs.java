@@ -162,6 +162,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.AZURO_OAK_BUTTON.get());
                 output.accept(DNLItems.AZURO_OAK_PRESSURE_PLATE.get());
                 output.accept(DNLItems.AZURO_OAK_DOOR.get());
+                output.accept(DNLItems.PLAYER_STATUE.get());
             });
 
     public static Supplier<CreativeModeTab> register(String name, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {

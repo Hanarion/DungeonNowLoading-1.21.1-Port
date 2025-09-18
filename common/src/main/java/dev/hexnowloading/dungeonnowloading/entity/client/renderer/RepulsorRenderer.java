@@ -11,7 +11,9 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public class RepulsorRenderer<T extends RepulsorEntity> extends MobRenderer<T, RepulsorModel<T>> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/repulsor/repulsor.png");
+    private static final ResourceLocation BASE_DEFAULT = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/repulsor/repulsor.png");
+    private static final ResourceLocation BASE_GOLDEN  =
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/repulsor/repulsor_golden.png");
 
     public RepulsorRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new RepulsorModel<>(renderManager.bakeLayer(RepulsorModel.LAYER_LOCATION)), 0.5F);
@@ -27,6 +29,6 @@ public class RepulsorRenderer<T extends RepulsorEntity> extends MobRenderer<T, R
 
     @Override
     public ResourceLocation getTextureLocation(RepulsorEntity entity) {
-        return TEXTURE;
+        return entity.getSkin() == RepulsorEntity.Skin.GOLDEN ? BASE_GOLDEN : BASE_DEFAULT;
     }
 }

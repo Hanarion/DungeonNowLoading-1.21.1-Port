@@ -18,10 +18,13 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.functions.EnchantRandomlyFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
+import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraftforge.registries.RegistryObject;
@@ -112,6 +115,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.AZURO_OAK_BUTTON.get());
         this.dropSelf(DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get());
 //        this.dropSelf(DNLBlocks.AZURO_OAK_TRAPDOOR.get());
+        this.addPlayerStatueDrop(DNLBlocks.PLAYER_STATUE.get());
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {
@@ -193,11 +197,46 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                         )));
     }
 
+    /*private void addPlayerStatue(Block block) {
+        LootTable.Builder table = LootTable.lootTable().withPool(
+                LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1))
+                        .add(LootItem.lootTableItem(block)
+                                .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
+                                        // Copies BE "Owner" (compound GameProfile) to item "SkullOwner"
+                                        // and BE "Pose" (int) to item "DNL_Pose".
+                                        // NOTE: the 2-arg .copy(source, target) defaults to REPLACE on modern mappings.
+                                        .copy("Owner", "SkullOwner")
+                                        .copy("Pose", "DNL_Pose")
+                                )
+                        )
+        );
+        this.add(block, table);
+    }*/
+
     @Override
     protected Iterable<Block> getKnownBlocks() {
         return ForgeCommonRegistryHelper.getRegistryMap().getDeferred(BuiltInRegistries.BLOCK).getEntries()
                 .stream()
                 .flatMap(RegistryObject::stream)
                 ::iterator;
+    }
+
+    private void addPlayerStatueDrop(Block block) {
+        LootTable.Builder table = LootTable.lootTable().withPool(
+                LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1))
+                        .when(ExplosionCondition.survivesExplosion())
+                        .add(LootItem.lootTableItem(DNLBlocks.PLAYER_STATUE.get())
+                                .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
+                                        .copy("Owner", "Owner")
+                                        .copy("Owner.Name", "SkullOwner")
+                                        .copy("PoseVariant", "DNL_Pose")
+                                        .copy("NotchTier", "DNL_Notch")
+                                        .copy("Offering", "Offering")
+                                )
+                        )
+        );
+        this.add(block, table);
     }
 }

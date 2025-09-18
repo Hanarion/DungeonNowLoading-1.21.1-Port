@@ -12,12 +12,21 @@
       }
     },
     {
-      "weight": 20,
+      "weight": 10,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:temple_of_duality/chamber/end/torch",
         "processors": "dungeonnowloading:temple_of_duality/generic_degradation"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:temple_of_duality/chamber/end/statue",
+        "processors": "dungeonnowloading:temple_of_duality/end_statue"
       }
     },
     {

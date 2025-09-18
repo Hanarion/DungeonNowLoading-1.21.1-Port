@@ -1,0 +1,100 @@
+{
+  "variants": {
+    "rotation=0,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=0,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=1,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=1,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=10,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=10,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=11,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=11,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=12,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=12,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=13,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=13,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=14,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=14,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=15,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=15,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=2,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=2,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=3,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=3,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=4,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=4,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=5,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=5,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=6,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=6,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=7,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=7,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=8,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=8,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=9,waterlogged=false": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    },
+    "rotation=9,waterlogged=true": {
+      "model": "dungeonnowloading:block/player_statue_particle"
+    }
+  }
+}

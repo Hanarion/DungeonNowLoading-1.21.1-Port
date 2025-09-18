@@ -5,9 +5,11 @@ import dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
 import dev.hexnowloading.dungeonnowloading.server.entity.DNLFabricEntities;
+import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
@@ -58,6 +60,12 @@ public class DNLFabric implements ModInitializer {
         registerEntityAttributes();
         registerPackets();
         DNLFabricEntities.registerSpawnPlacements();
+
+        ServerLifecycleEvents.SERVER_STARTING.register(PatronRegistry::initOrReload);
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, rm, success) -> {
+            PatronRegistry.initOrReload(server);
+        });
+
         DungeonNowLoading.LOGGER.info("Hello Fabric world!");
     }
 
