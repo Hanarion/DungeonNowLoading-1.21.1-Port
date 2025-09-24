@@ -73,7 +73,8 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.VERTEX_PILLAR.get(),
                 DNLBlocks.STONE_PRESERVER.get(),
                 DNLBlocks.REDSTONE_IDOL.get(),
-                DNLBlocks.PLAYER_STATUE.get()
+                DNLBlocks.PLAYER_STATUE.get(),
+                DNLBlocks.MENDING_TABLE.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(
@@ -83,7 +84,6 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.WISE_FAIRKEEPER_CHEST.get(),
                 DNLBlocks.FIERCE_FAIRKEEPER_CHEST.get(),
                 DNLBlocks.FAIRKEEEPER_SPAWNER.get(),
-                DNLBlocks.MENDING_TABLE.get(),
 
                 DNLBlocks.AZURO_OAK_LOG.get(),
                 DNLBlocks.STRIPPED_AZURO_OAK_LOG.get(),

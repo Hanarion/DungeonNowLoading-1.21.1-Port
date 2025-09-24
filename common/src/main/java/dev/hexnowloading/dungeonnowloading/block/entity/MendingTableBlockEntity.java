@@ -3,25 +3,24 @@ package dev.hexnowloading.dungeonnowloading.block.entity;
 import dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.item.ScrapItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.ContainerHelper;
 import org.jetbrains.annotations.Nullable;
 
 public class MendingTableBlockEntity extends BlockEntity implements MenuProvider, Container {
-    private static final int INVENTORY_SIZE = 4; // 0: pickaxe, 1-2: durite, 3: output
+    private static final int INVENTORY_SIZE = 4; // 0: pickaxe/scrap, 1-2: mats, 3: output
     private NonNullList<ItemStack> items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
     public MendingTableBlockEntity(BlockPos pos, BlockState state) {
@@ -130,7 +129,7 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
     }
 
     private void recalc() {
-        ItemStack tool = items.get(PICKAXE_SLOT);
+        ItemStack input = items.get(PICKAXE_SLOT);
         ItemStack mat1 = items.get(MAT_SLOT_1);
         ItemStack mat2 = items.get(MAT_SLOT_2);
         items.set(OUTPUT_SLOT, ItemStack.EMPTY);
@@ -141,19 +140,51 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
         cachedPotentialBonusPercent = 0;
         cachedNeededPercent = 0;
 
-        if (tool.isEmpty() || !isTool(tool)) { setChanged(); return; }
-        int damage = tool.getDamageValue();
+        // Special handling: Item Scraps -> restore original using Mendstone(s) only
+        if (input.is(DNLItems.ITEM_SCRAPS.get())) {
+            ItemStack original = ScrapItem.getOriginal(input);
+            if (original.isEmpty() || !original.isDamageableItem()) { setChanged(); return; }
+            int damage = original.getDamageValue();
+            int max = original.getMaxDamage();
+            if (damage <= 0) { setChanged(); return; }
+
+            int neededPercent = (damage * 100 + max - 1) / max;
+            cachedNeededPercent = Math.min(neededPercent, 100);
+
+            int potentialBase = 0;
+            if (!mat1.isEmpty() && mat1.is(DNLItems.MENDSTONE.get())) potentialBase += MENDSTONE_PERCENT;
+            if (!mat2.isEmpty() && mat2.is(DNLItems.MENDSTONE.get())) potentialBase += MENDSTONE_PERCENT;
+            if (potentialBase <= 0) { setChanged(); return; }
+
+            cachedPotentialBasePercent = Math.min(potentialBase, 100);
+            cachedPotentialBonusPercent = 0; // no combo bonus for scraps
+
+            int appliedBase = Math.min(potentialBase, neededPercent);
+            int repairAmount = (appliedBase * max + 99) / 100; // ceil
+            int newDamage = Math.max(0, damage - repairAmount);
+            ItemStack result = original.copy();
+            result.setDamageValue(newDamage);
+            items.set(OUTPUT_SLOT, result);
+            cachedBasePercent = appliedBase;
+            cachedBonusPercent = 0;
+            cachedRepairPercent = Math.min(appliedBase, 100);
+            setChanged();
+            return;
+        }
+
+        // Regular damaged tools flow
+        if (input.isEmpty() || !isTool(input)) { setChanged(); return; }
+        int damage = input.getDamageValue();
         if (damage <= 0) { setChanged(); return; }
-        int max = tool.getMaxDamage();
+        int max = input.getMaxDamage();
 
         int neededPercent = (damage * 100 + max - 1) / max;
         cachedNeededPercent = Math.min(neededPercent, 100);
 
-        int potentialBase = percentPerItem(tool, mat1) + percentPerItem(tool, mat2);
+        int potentialBase = percentPerItem(input, mat1) + percentPerItem(input, mat2);
         if (potentialBase <= 0) { setChanged(); return; }
 
-        boolean hasToolMat = (!mat1.isEmpty() && isToolRepairIngredient(tool, mat1)) || (!mat2.isEmpty() && isToolRepairIngredient(tool, mat2));
-
+        boolean hasToolMat = (!mat1.isEmpty() && isToolRepairIngredient(input, mat1)) || (!mat2.isEmpty() && isToolRepairIngredient(input, mat2));
         boolean hasDuriteOrMendstone = (!mat1.isEmpty() && (mat1.is(DNLItems.DURITE.get()) || mat1.is(DNLItems.MENDSTONE.get()))) || (!mat2.isEmpty() && (mat2.is(DNLItems.DURITE.get()) || mat2.is(DNLItems.MENDSTONE.get())));
 
         int potentialBonus = (hasToolMat && hasDuriteOrMendstone) ? BONUS_PERCENT : 0;
@@ -165,7 +196,7 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
         int appliedTotal = appliedBase + appliedBonus;
         int repairAmount = (appliedTotal * max + 99) / 100; // ceil
         int newDamage = Math.max(0, damage - repairAmount);
-        ItemStack result = tool.copy();
+        ItemStack result = input.copy();
         result.setDamageValue(newDamage);
         items.set(OUTPUT_SLOT, result);
         cachedBasePercent = appliedBase;
@@ -178,9 +209,12 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
         ItemStack tool = items.get(PICKAXE_SLOT);
         if (tool.isEmpty() || cachedRepairPercent <= 0) return; // no need to check output slot anymore
         // Consume inputs and clear output
+        for(int slot: new int[]{MAT_SLOT_1, MAT_SLOT_2}) {
+            ItemStack mat = items.get(slot);
+            mat.shrink(1);
+            if (mat.getCount() <= 0) items.set(slot, ItemStack.EMPTY);
+        }
         items.set(PICKAXE_SLOT, ItemStack.EMPTY);
-        items.set(MAT_SLOT_1, ItemStack.EMPTY);
-        items.set(MAT_SLOT_2, ItemStack.EMPTY);
         items.set(OUTPUT_SLOT, ItemStack.EMPTY);
         recalc();
     }

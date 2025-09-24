@@ -53,6 +53,7 @@
     "dungeonnowloading:vertex_pillar",
     "dungeonnowloading:stone_preserver",
     "dungeonnowloading:redstone_idol",
-    "dungeonnowloading:player_statue"
+    "dungeonnowloading:player_statue",
+    "dungeonnowloading:mending_table"
   ]
 }

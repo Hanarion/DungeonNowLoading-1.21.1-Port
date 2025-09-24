@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.client.screen;
+package dev.hexnowloading.dungeonnowloading.screen;
 
 import dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu;
 import net.minecraft.client.gui.GuiGraphics;

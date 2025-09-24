@@ -36,6 +36,7 @@ public class DNLItems {
     public static final Supplier<Item> CATALYZED_REDSTONE = register("catalyzed_redstone", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
     public static final Supplier<Item> DURITE = register("durite", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final Supplier<Item> MENDSTONE = register("mendstone", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final Supplier<Item> ITEM_SCRAPS = register("item_scraps", () -> new ScrapItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
 
     // ITEMS - FUNCTIONAL
     public static final Supplier<Item> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> new GreatExperienceBottleItem(new Item.Properties().rarity(Rarity.RARE), 100));

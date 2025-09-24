@@ -3,6 +3,8 @@ package dev.hexnowloading.dungeonnowloading.registry;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 
 import java.util.function.Supplier;
 
@@ -50,6 +52,8 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SPAWNER_CHESTPLATE.get());
                 output.accept(DNLItems.SPAWNER_LEGGINGS.get());
                 output.accept(DNLItems.SPAWNER_BOOTS.get());
+                // Enchantments - Books
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.BREAK_PROTECTION.get(), 1)));
                 // Items - Boss Related
                 output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
                 output.accept(DNLItems.SKULL_OF_CHAOS.get());

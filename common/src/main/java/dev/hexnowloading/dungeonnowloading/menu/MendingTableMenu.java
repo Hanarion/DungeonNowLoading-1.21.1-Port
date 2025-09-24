@@ -10,9 +10,11 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
 import org.jetbrains.annotations.NotNull;
 
 public class MendingTableMenu extends AbstractContainerMenu {
@@ -40,21 +42,19 @@ public class MendingTableMenu extends AbstractContainerMenu {
         container.startOpen(playerInv.player);
 
         this.addSlot(new Slot(container, PICKAXE_SLOT, 30, 45) {
-            @Override public boolean mayPlace(@NotNull ItemStack stack) { return stack.isDamageableItem(); }
+            @Override public boolean mayPlace(@NotNull ItemStack stack) { return stack.isDamageableItem() || stack.is(DNLItems.ITEM_SCRAPS.get()); }
             @Override public void setChanged() { super.setChanged(); broadcastChanges(); }
         });
         this.addSlot(new Slot(container, DURITE_SLOT_1, 56, 33) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
-                return isAllowedMaterial(stack);
+                return true;
             }
-            @Override public int getMaxStackSize() { return 1; }
             @Override public void setChanged() { super.setChanged(); broadcastChanges(); }
         });
         this.addSlot(new Slot(container, DURITE_SLOT_2, 56, 57) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
-                return isAllowedMaterial(stack);
+                return true;
             }
-            @Override public int getMaxStackSize() { return 1; }
             @Override public void setChanged() { super.setChanged(); broadcastChanges(); }
         });
 
@@ -74,15 +74,15 @@ public class MendingTableMenu extends AbstractContainerMenu {
                 });
             }
         });
-        // Player inventory (standard layout) start at y = 105 (was 102)
+
         int invX = 8;
-        int invY = 105; // shifted +3
+        int invY = 105;
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
                 this.addSlot(new Slot(playerInv, col + row * 9 + 9, invX + col * 18, invY + row * 18));
             }
         }
-        int hotbarY = invY + 58; // now 163 (was 160)
+        int hotbarY = invY + 58;
         for (int col = 0; col < 9; ++col) {
             this.addSlot(new Slot(playerInv, col, invX + col * 18, hotbarY));
         }
@@ -114,10 +114,14 @@ public class MendingTableMenu extends AbstractContainerMenu {
 
     private boolean isAllowedMaterial(ItemStack stack) {
         if (stack.isEmpty()) return false;
+        ItemStack inputItem = this.getSlot(PICKAXE_SLOT).getItem();
+        boolean isScrap = inputItem.is(DNLItems.ITEM_SCRAPS.get());
+        if (isScrap) {
+            return stack.is(DNLItems.MENDSTONE.get());
+        }
         if (stack.is(DNLItems.DURITE.get()) || stack.is(DNLItems.MENDSTONE.get())) return true;
-        ItemStack tool = this.getSlot(PICKAXE_SLOT).getItem();
-        if (!tool.isEmpty()) {
-            return tool.getItem().isValidRepairItem(tool, stack);
+        if (!inputItem.isEmpty()) {
+            return inputItem.getItem().isValidRepairItem(inputItem, stack);
         }
         return false;
     }
@@ -158,16 +162,13 @@ public class MendingTableMenu extends AbstractContainerMenu {
                     return ItemStack.EMPTY;
                 }
             } else { // from player inventory
-                if (stack.getItem() instanceof PickaxeItem || stack.isDamageableItem()) {
+                if (stack.isDamageableItem() || stack.is(DNLItems.ITEM_SCRAPS.get())) {
                     if (!this.moveItemStackTo(stack, PICKAXE_SLOT, PICKAXE_SLOT + 1, false)) return ItemStack.EMPTY;
                 } else if (isAllowedMaterial(stack)) {
                     if (!this.moveItemStackTo(stack, DURITE_SLOT_1, DURITE_SLOT_2 + 1, false)) return ItemStack.EMPTY;
                 } else {
                     return ItemStack.EMPTY;
                 }
-            }
-            if (stack.getCount() > 1 && (slot.index == DURITE_SLOT_1 || slot.index == DURITE_SLOT_2)) {
-                stack.setCount(1);
             }
             if (stack.isEmpty()) slot.set(ItemStack.EMPTY); else slot.setChanged();
         }

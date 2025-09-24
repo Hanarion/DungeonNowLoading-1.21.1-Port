@@ -18,6 +18,7 @@
     "block.WallMixin",
     "block.IronBarsMixin",
     "items.ItemInHandRendererMixin",
+    "items.ItemStackBreakProtectionMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",
@@ -48,4 +49,3 @@
     "defaultRequire": 1
   }
   }
-  

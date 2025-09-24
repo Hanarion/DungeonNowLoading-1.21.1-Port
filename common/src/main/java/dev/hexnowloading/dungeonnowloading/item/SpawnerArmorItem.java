@@ -1,6 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
-import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
@@ -13,8 +12,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
@@ -24,12 +21,9 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class SpawnerArmorItem extends ArmorItem {
 
@@ -39,6 +33,8 @@ public class SpawnerArmorItem extends ArmorItem {
     public SpawnerArmorItem(ArmorMaterial armorMaterial, Type slot) {
         super(armorMaterial, slot, new Properties());
     }
+
+
 
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int slot, boolean selected) {

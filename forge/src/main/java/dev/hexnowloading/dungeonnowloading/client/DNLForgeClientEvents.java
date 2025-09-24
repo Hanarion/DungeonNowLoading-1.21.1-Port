@@ -7,7 +7,7 @@ import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatueModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatuePedestalModel;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.FairkeeperChestBlockRenderer;
-import dev.hexnowloading.dungeonnowloading.client.screen.MendingTableScreen;
+import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.PlayerStatueRenderer;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
