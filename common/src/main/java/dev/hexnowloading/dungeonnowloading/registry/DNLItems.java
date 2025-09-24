@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.item.*;
+import dev.hexnowloading.dungeonnowloading.item.GauntletBlockItem;
 import dev.hexnowloading.dungeonnowloading.item.blockitem.FairkeeperChestBlockItem;
 import dev.hexnowloading.dungeonnowloading.item.blockitem.FierceFairkeeperChestBlockItem;
 import dev.hexnowloading.dungeonnowloading.item.blockitem.PlayerStatueBlockItem;
@@ -147,6 +148,7 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_AURA_PANE = register("mending_aura_pane", () -> new BlockItem(DNLBlocks.MENDING_AURA_PANE.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
     public static final Supplier<Item> PLAYER_STATUE = register("player_statue", PlayerStatueBlockItem::new);
+    public static final Supplier<Item> GAUNTLET = register("gauntlet", GauntletBlockItem::new);
 
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
     public static final Supplier<Item> AZURO_OAK_LOG = register("azuro_oak_log", () -> new BlockItem(DNLBlocks.AZURO_OAK_LOG.get(), new Item.Properties()));
