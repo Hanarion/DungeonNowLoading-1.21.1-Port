@@ -4,11 +4,9 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.RepulsorAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
+import dev.hexnowloading.dungeonnowloading.item.ScrapItem;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
-import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
-import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
-import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
+import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -34,6 +32,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.PushReaction;
@@ -89,6 +88,8 @@ public class RepulsorEntity extends Mob {
 
     private int rechargeAnimDuration;
 
+    private ItemStack sourceStack = ItemStack.EMPTY;
+
     public RepulsorEntity(EntityType<? extends Mob> $$0, Level $$1) {
         super($$0, $$1);
     }
@@ -118,6 +119,11 @@ public class RepulsorEntity extends Mob {
         if (compoundTag.contains("skin") && !this.getSkinValidation()) {
             this.entityData.set(DATA_SKIN, Skin.fromId(compoundTag.getString("skin")));
         }
+        if (compoundTag.contains("SourceStack", 10)) { // 10 = compound
+            this.sourceStack = ItemStack.of(compoundTag.getCompound("SourceStack"));
+        } else {
+            this.sourceStack = ItemStack.EMPTY;
+        }
         this.setSkinValidation(true);
     }
 
@@ -128,6 +134,11 @@ public class RepulsorEntity extends Mob {
         compoundTag.putInt("age", this.getAge());
         compoundTag.putInt("shieldHealth", this.entityData.get(DATA_SHIELD_HEALTH));
         compoundTag.putString("skin", getSkin().getId());
+        if (!this.sourceStack.isEmpty()) {
+            CompoundTag s = new CompoundTag();
+            this.sourceStack.save(s);
+            compoundTag.put("SourceStack", s);
+        }
     }
 
     @Override
@@ -215,14 +226,16 @@ public class RepulsorEntity extends Mob {
             this.playSound(DNLSounds.REPULSOR_BREAK.get());
             if (entity instanceof Player player && player.getAbilities().instabuild) return;
 
-            ItemStack itemStack = new ItemStack(DNLItems.REPULSOR.get());
+            // Start from original placed stack to preserve enchants/NBT if available
+            ItemStack itemStack = this.sourceStack.isEmpty() ? new ItemStack(DNLItems.REPULSOR.get()) : this.sourceStack.copy();
+            itemStack.setCount(1);
 
             int damage = SHIELD_MAX_HEALTH - this.entityData.get(DATA_SHIELD_HEALTH);
             itemStack.setDamageValue(damage);
 
-            // If this repulsor is golden, make the dropped item golden too
+            // Ensure cosmetic matches entity skin (in case original lacked tag but entity was golden)
             if (this.getSkin() == RepulsorEntity.Skin.GOLDEN) {
-                RepulsorItem.setGolden(itemStack); // writes CosmeticMode="golden"
+                RepulsorItem.setGolden(itemStack);
             }
 
             this.spawnAtLocation(itemStack);
@@ -326,6 +339,10 @@ public class RepulsorEntity extends Mob {
                         );
                         this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 1.0F, 2.0F);
                         ((ServerLevel) this.level()).sendParticles(particleData, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0.0f);
+
+                        // Uses itself up: if original had Break Protection, drop Item Scraps keeping enchants
+                        maybeDropScrapOnUsedUp();
+
                         this.discard();
                         return;
                     }
@@ -433,5 +450,25 @@ public class RepulsorEntity extends Mob {
     public void setCosmeticMode(String id) { setSkin(Skin.fromId(id)); } // parity helper
     public boolean getSkinValidation() { return this.entityData.get(DATA_SKIN_VALIDATION); }
     public void setSkinValidation(boolean v) { this.entityData.set(DATA_SKIN_VALIDATION, v); }
+
+    public void setSourceStack(ItemStack stack) {
+        this.sourceStack = stack.copy();
+    }
+    public ItemStack getSourceStack() { return sourceStack; }
+
+    private void maybeDropScrapOnUsedUp() {
+        if (!this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) return;
+        if (this.level().isClientSide) return;
+        if (this.sourceStack.isEmpty()) return;
+        // Only convert to scrap if the original item had Break Protection
+        if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.BREAK_PROTECTION.get(), this.sourceStack) <= 0) return;
+
+        ItemStack original = this.sourceStack.copy();
+        // Mark as fully broken so reconstruction math is straightforward; NBT (incl. enchants) is preserved
+        original.setDamageValue(original.getMaxDamage());
+
+        ItemStack scrap = ScrapItem.ofOriginal(original);
+        this.spawnAtLocation(scrap);
+    }
 
 }

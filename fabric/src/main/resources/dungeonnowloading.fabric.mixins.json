@@ -31,7 +31,8 @@
     "fabric.structures.StructurePoolMixin",
     "structures.StructureProcessorAccessor",
     "structures.StructureTemplateMixin",
-    "structures.NoGeodesInStructuresMixin"
+    "structures.NoGeodesInStructuresMixin",
+    "inventory.AnvilMenuMixin"
   ],
   "client": [
     "client.HumanoidModelMixin",

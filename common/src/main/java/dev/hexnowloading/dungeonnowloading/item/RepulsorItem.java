@@ -17,9 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -89,6 +87,9 @@ public class RepulsorItem extends Item {
             // init health from item durability
             rep.setShieldHealth(this.getMaxDamage() - stack.getDamageValue());
 
+            // Attach full source stack so enchants/NBT can be preserved when used up
+            rep.setSourceStack(stack);
+
             // cosmetic gating
             boolean canGolden = player != null && (DNLSupporters.hasSkin(player.getUUID(), "repulsor_golden")
                     || DNLSupporters.isSupporter(player.getUUID()));
@@ -144,4 +145,9 @@ public class RepulsorItem extends Item {
     }
     public static void setGolden(ItemStack stack)  { setCosmeticMode(stack, MODE_GOLDEN); }
     public static void setDefault(ItemStack stack) { setCosmeticMode(stack, MODE_DEFAULT); }
+
+    @Override
+    public boolean isValidRepairItem(ItemStack stack, ItemStack repairItem) {
+        return repairItem.is(Items.REDSTONE) || super.isValidRepairItem(stack, repairItem);
+    }
 }

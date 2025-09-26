@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public class MendingTableBlockEntity extends BlockEntity implements MenuProvider, Container {
     private static final int INVENTORY_SIZE = 4; // 0: pickaxe/scrap, 1-2: mats, 3: output
@@ -28,24 +29,24 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
     }
 
     @Override
-    public Component getDisplayName() {
+    public @NotNull Component getDisplayName() {
         return Component.translatable("container.dungeonnowloading.mending_table");
     }
 
     @Override
-    public @Nullable AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+    public @Nullable AbstractContainerMenu createMenu(int id, @NotNull Inventory inventory, @NotNull Player player) {
         return new MendingTableMenu(id, inventory, this);
     }
 
     // Persistence
     @Override
-    protected void saveAdditional(CompoundTag tag) {
+    protected void saveAdditional(@NotNull CompoundTag tag) {
         super.saveAdditional(tag);
         ContainerHelper.saveAllItems(tag, items);
     }
 
     @Override
-    public void load(CompoundTag tag) {
+    public void load(@NotNull CompoundTag tag) {
         super.load(tag);
         items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, items);
@@ -60,17 +61,17 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
     }
 
     @Override
-    public ItemStack getItem(int index) { return items.get(index); }
+    public @NotNull ItemStack getItem(int index) { return items.get(index); }
 
     @Override
-    public ItemStack removeItem(int index, int count) {
+    public @NotNull ItemStack removeItem(int index, int count) {
         ItemStack result = ContainerHelper.removeItem(items, index, count);
         if (!result.isEmpty()) recalc();
         return result;
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int index) {
+    public @NotNull ItemStack removeItemNoUpdate(int index) {
         ItemStack stack = items.get(index);
         if (stack.isEmpty()) return ItemStack.EMPTY;
         items.set(index, ItemStack.EMPTY);
@@ -79,14 +80,14 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
     }
 
     @Override
-    public void setItem(int index, ItemStack stack) {
+    public void setItem(int index, @NotNull ItemStack stack) {
         items.set(index, stack);
         if (stack.getCount() > getMaxStackSize()) stack.setCount(getMaxStackSize());
         recalc();
     }
 
     @Override
-    public boolean stillValid(Player player) {
+    public boolean stillValid(@NotNull Player player) {
         if (level == null) return false;
         if (level.getBlockEntity(worldPosition) != this) return false;
         return player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5) <= 64.0;
@@ -100,7 +101,6 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
     int cachedBonusPercent = 0;  // applied bonus
     private int cachedPotentialBasePercent = 0; // potential base (uncapped by need)
     private int cachedPotentialBonusPercent = 0; // potential bonus (0 or 10)
-    private int cachedNeededPercent = 0; // percent needed to fully repair
     private static final int PICKAXE_SLOT = 0;
     private static final int MAT_SLOT_1 = 1;
     private static final int MAT_SLOT_2 = 2;
@@ -138,65 +138,41 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
         cachedBonusPercent = 0;
         cachedPotentialBasePercent = 0;
         cachedPotentialBonusPercent = 0;
-        cachedNeededPercent = 0;
 
-        // Special handling: Item Scraps -> restore original using Mendstone(s) only
-        if (input.is(DNLItems.ITEM_SCRAPS.get())) {
-            ItemStack original = ScrapItem.getOriginal(input);
-            if (original.isEmpty() || !original.isDamageableItem()) { setChanged(); return; }
-            int damage = original.getDamageValue();
-            int max = original.getMaxDamage();
-            if (damage <= 0) { setChanged(); return; }
+        // Determine tool we are repairing
+        boolean isScrap = input.is(DNLItems.ITEM_SCRAPS.get());
+        ItemStack inputTool = isScrap ? ScrapItem.getOriginal(input) : input;
 
-            int neededPercent = (damage * 100 + max - 1) / max;
-            cachedNeededPercent = Math.min(neededPercent, 100);
+        // If it's not a valid tool or has no damage, abort
+        if (inputTool.isEmpty() || !isTool(inputTool)) { setChanged(); return; }
+        // Special case: Mendstone Pickaxe cannot be repaired at the table
+        if (inputTool.is(DNLItems.MENDSTONE_PICKAXE.get())) { setChanged(); return; }
 
-            int potentialBase = 0;
-            if (!mat1.isEmpty() && mat1.is(DNLItems.MENDSTONE.get())) potentialBase += MENDSTONE_PERCENT;
-            if (!mat2.isEmpty() && mat2.is(DNLItems.MENDSTONE.get())) potentialBase += MENDSTONE_PERCENT;
-            if (potentialBase <= 0) { setChanged(); return; }
-
-            cachedPotentialBasePercent = Math.min(potentialBase, 100);
-            cachedPotentialBonusPercent = 0; // no combo bonus for scraps
-
-            int appliedBase = Math.min(potentialBase, neededPercent);
-            int repairAmount = (appliedBase * max + 99) / 100; // ceil
-            int newDamage = Math.max(0, damage - repairAmount);
-            ItemStack result = original.copy();
-            result.setDamageValue(newDamage);
-            items.set(OUTPUT_SLOT, result);
-            cachedBasePercent = appliedBase;
-            cachedBonusPercent = 0;
-            cachedRepairPercent = Math.min(appliedBase, 100);
-            setChanged();
-            return;
-        }
-
-        // Regular damaged tools flow
-        if (input.isEmpty() || !isTool(input)) { setChanged(); return; }
-        int damage = input.getDamageValue();
+        int damage = inputTool.getDamageValue();
         if (damage <= 0) { setChanged(); return; }
-        int max = input.getMaxDamage();
+        int max = inputTool.getMaxDamage();
 
         int neededPercent = (damage * 100 + max - 1) / max;
-        cachedNeededPercent = Math.min(neededPercent, 100);
 
-        int potentialBase = percentPerItem(input, mat1) + percentPerItem(input, mat2);
+        int p1 = percentPerItem(inputTool, mat1);
+        int p2 = percentPerItem(inputTool, mat2);
+        int potentialBase = p1 + p2;
         if (potentialBase <= 0) { setChanged(); return; }
 
-        boolean hasToolMat = (!mat1.isEmpty() && isToolRepairIngredient(input, mat1)) || (!mat2.isEmpty() && isToolRepairIngredient(input, mat2));
+        boolean hasToolMat = (!mat1.isEmpty() && isToolRepairIngredient(inputTool, mat1)) || (!mat2.isEmpty() && isToolRepairIngredient(inputTool, mat2));
         boolean hasDuriteOrMendstone = (!mat1.isEmpty() && (mat1.is(DNLItems.DURITE.get()) || mat1.is(DNLItems.MENDSTONE.get()))) || (!mat2.isEmpty() && (mat2.is(DNLItems.DURITE.get()) || mat2.is(DNLItems.MENDSTONE.get())));
-
         int potentialBonus = (hasToolMat && hasDuriteOrMendstone) ? BONUS_PERCENT : 0;
 
         cachedPotentialBasePercent = Math.min(potentialBase, 100);
-        cachedPotentialBonusPercent = potentialBonus; // keep full potential bonus (0 or 10)
+        cachedPotentialBonusPercent = potentialBonus;
+
         int appliedBase = Math.min(potentialBase, neededPercent);
         int appliedBonus = Math.min(potentialBonus, Math.max(0, neededPercent - appliedBase));
         int appliedTotal = appliedBase + appliedBonus;
-        int repairAmount = (appliedTotal * max + 99) / 100; // ceil
+        int repairAmount = (appliedTotal * max + 99) / 100;
         int newDamage = Math.max(0, damage - repairAmount);
-        ItemStack result = input.copy();
+
+        ItemStack result = inputTool.copy();
         result.setDamageValue(newDamage);
         items.set(OUTPUT_SLOT, result);
         cachedBasePercent = appliedBase;
@@ -206,14 +182,46 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
     }
 
     public void applyRepair() {
-        ItemStack tool = items.get(PICKAXE_SLOT);
-        if (tool.isEmpty() || cachedRepairPercent <= 0) return; // no need to check output slot anymore
-        // Consume inputs and clear output
-        for(int slot: new int[]{MAT_SLOT_1, MAT_SLOT_2}) {
-            ItemStack mat = items.get(slot);
-            mat.shrink(1);
-            if (mat.getCount() <= 0) items.set(slot, ItemStack.EMPTY);
+        ItemStack input = items.get(PICKAXE_SLOT);
+        if (input.isEmpty() || cachedRepairPercent <= 0) return;
+
+        // Reconstruct tool from scraps if needed
+        boolean isScrap = input.is(DNLItems.ITEM_SCRAPS.get());
+        ItemStack inputTool = isScrap ? ScrapItem.getOriginal(input) : input;
+        if (inputTool.isEmpty()) return;
+
+        ItemStack mat1 = items.get(MAT_SLOT_1);
+        ItemStack mat2 = items.get(MAT_SLOT_2);
+
+        int p1 = percentPerItem(inputTool, mat1);
+        int p2 = percentPerItem(inputTool, mat2);
+        boolean s1ToolMat = !mat1.isEmpty() && isToolRepairIngredient(inputTool, mat1);
+        boolean s1DuriteOrMendstone = !mat1.isEmpty() && (mat1.is(DNLItems.DURITE.get()) || mat1.is(DNLItems.MENDSTONE.get()));
+        boolean s2ToolMat = !mat2.isEmpty() && isToolRepairIngredient(inputTool, mat2);
+        boolean s2DuriteOrMendstone = !mat2.isEmpty() && (mat2.is(DNLItems.DURITE.get()) || mat2.is(DNLItems.MENDSTONE.get()));
+
+        // Minimal base consumption in slot order
+        int remaining = cachedBasePercent;
+        boolean c1 = false, c2 = false;
+        if (remaining > 0 && p1 > 0) { c1 = true; remaining = Math.max(0, remaining - p1); }
+        if (remaining > 0 && p2 > 0) { c2 = true; }
+
+
+        if (cachedBonusPercent > 0) {
+            boolean haveToolMat = (c1 && s1ToolMat) || (c2 && s2ToolMat);
+            if (!haveToolMat) {
+                if (!c1 && p1 > 0 && s1ToolMat) c1 = true; else if (!c2 && p2 > 0 && s2ToolMat) c2 = true;
+            }
+            // Compute durite/mendstone coverage after possibly adding tool-mat
+            boolean haveDurite = (c1 && s1DuriteOrMendstone) || (c2 && s2DuriteOrMendstone);
+            if (!haveDurite) {
+                if (!c1 && p1 > 0 && s1DuriteOrMendstone) c1 = true; else if (!c2 && p2 > 0 && s2DuriteOrMendstone) c2 = true;
+            }
         }
+
+        if (c1) mat1.shrink(1);
+        if (c2) mat2.shrink(1);
+
         items.set(PICKAXE_SLOT, ItemStack.EMPTY);
         items.set(OUTPUT_SLOT, ItemStack.EMPTY);
         recalc();

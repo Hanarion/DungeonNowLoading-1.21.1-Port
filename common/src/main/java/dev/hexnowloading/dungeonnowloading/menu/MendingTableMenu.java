@@ -16,6 +16,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import dev.hexnowloading.dungeonnowloading.item.ScrapItem;
 
 public class MendingTableMenu extends AbstractContainerMenu {
     public static final int PICKAXE_SLOT = 0;
@@ -117,7 +118,12 @@ public class MendingTableMenu extends AbstractContainerMenu {
         ItemStack inputItem = this.getSlot(PICKAXE_SLOT).getItem();
         boolean isScrap = inputItem.is(DNLItems.ITEM_SCRAPS.get());
         if (isScrap) {
-            return stack.is(DNLItems.MENDSTONE.get());
+            ItemStack original = ScrapItem.getOriginal(inputItem);
+            if (!original.isEmpty()) {
+                if (stack.is(DNLItems.DURITE.get()) || stack.is(DNLItems.MENDSTONE.get())) return true;
+                return original.getItem().isValidRepairItem(original, stack);
+            }
+            return stack.is(DNLItems.DURITE.get()) || stack.is(DNLItems.MENDSTONE.get());
         }
         if (stack.is(DNLItems.DURITE.get()) || stack.is(DNLItems.MENDSTONE.get())) return true;
         if (!inputItem.isEmpty()) {

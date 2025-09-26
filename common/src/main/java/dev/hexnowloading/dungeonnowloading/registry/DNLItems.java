@@ -36,7 +36,7 @@ public class DNLItems {
     public static final Supplier<Item> CATALYZED_REDSTONE = register("catalyzed_redstone", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
     public static final Supplier<Item> DURITE = register("durite", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final Supplier<Item> MENDSTONE = register("mendstone", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
-    public static final Supplier<Item> ITEM_SCRAPS = register("item_scraps", () -> new ScrapItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final Supplier<Item> ITEM_SCRAPS = register("item_scraps", () -> new ScrapItem(new Item.Properties().rarity(Rarity.RARE)));
 
     // ITEMS - FUNCTIONAL
     public static final Supplier<Item> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> new GreatExperienceBottleItem(new Item.Properties().rarity(Rarity.RARE), 100));
@@ -154,7 +154,6 @@ public class DNLItems {
     public static final Supplier<Item> STRIPPED_AZURO_OAK_LOG = register("stripped_azuro_oak_log", () -> new BlockItem(DNLBlocks.STRIPPED_AZURO_OAK_LOG.get(), new Item.Properties()));
 
     public static final Supplier<Item> AZURO_LEAVES = register("azuro_leaves", () -> new BlockItem(DNLBlocks.AZURO_LEAVES.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_HANGING_LEAVES = register("azuro_hanging_leaves", () -> new BlockItem(DNLBlocks.AZURO_HANGING_LEAVES.get(), new Item.Properties()));
     public static final Supplier<Item> AZURO_HANGING_LEAVES_TIP = register("azuro_hanging_leaves_tip", () -> new BlockItem(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get(), new Item.Properties()));
 
     public static final Supplier<Item> AZURO_OAK_PLANKS = register("azuro_oak_planks", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANKS.get(), new Item.Properties()));

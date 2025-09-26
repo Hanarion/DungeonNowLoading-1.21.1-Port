@@ -23,11 +23,17 @@ public class MendstonePickaxeItem extends PickaxeItem {
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
         components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_name").withStyle(ChatFormatting.BLUE));
-        components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
     }
 
     @Override
     public Rarity getRarity(ItemStack stack) {
         return Rarity.RARE;
+    }
+
+    // Disallow repairing this item with any material in an anvil or similar systems
+    @Override
+    public boolean isValidRepairItem(ItemStack itemStack, ItemStack repairItem) {
+        return false;
     }
 }

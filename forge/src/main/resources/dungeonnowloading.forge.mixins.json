@@ -35,7 +35,8 @@
       "forge.blockentities.PlayerStatueBlockItemMixin",
       "forge.item.ScorcherItemMixin",
       "forge.item.ScorcherItemMixin",
-      "forge.block.AzuroLogBlockMixin"
+      "forge.block.AzuroLogBlockMixin",
+      "inventory.AnvilMenuMixin"
     ],
     "client": [
         "client.HumanoidModelMixin",

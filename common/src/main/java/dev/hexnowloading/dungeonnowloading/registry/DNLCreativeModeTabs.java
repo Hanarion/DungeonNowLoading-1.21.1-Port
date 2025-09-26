@@ -157,7 +157,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.STRIPPED_AZURO_OAK_LOG.get());
                 output.accept(DNLItems.AZURO_OAK_PLANKS.get());
                 output.accept(DNLItems.AZURO_LEAVES.get());
-                output.accept(DNLItems.AZURO_HANGING_LEAVES.get());
                 output.accept(DNLItems.AZURO_HANGING_LEAVES_TIP.get());
                 output.accept(DNLItems.AZURO_OAK_PLANK_STAIRS.get());
                 output.accept(DNLItems.AZURO_OAK_PLANK_SLAB.get());
