@@ -74,6 +74,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         preserverWithItem((PreserverBlock) DNLBlocks.STONE_PRESERVER.get());
         particleOnlyModel(DNLBlocks.PLAYER_STATUE.get());
         particleOnlyModel(DNLBlocks.GAUNTLET.get());
+        particleOnlyModel(DNLBlocks.GAUNTLET_VAULT.get());
 
         rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.AZURO_OAK_LOG.get());
         rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.STRIPPED_AZURO_OAK_LOG.get());

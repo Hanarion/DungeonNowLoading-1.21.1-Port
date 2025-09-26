@@ -49,6 +49,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         booleanPropertyItem(DNLItems.REPULSOR.get(), "golden_mode", "repulsor", "repulsor_golden");
         PlayerStatueItemWithDisplay(DNLItems.PLAYER_STATUE.get());
         GauntletItemWithDisplay(DNLItems.GAUNTLET.get());
+        builtinEntityItem(DNLItems.GAUNTLET_VAULT.get());
     }
 
     private void simpleItem(Item item) {

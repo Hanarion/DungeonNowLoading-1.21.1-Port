@@ -105,6 +105,7 @@ public class DNLBlocks {
     public static Supplier<Block> REDSTONE_IDOL;
     public static Supplier<Block> MENDING_TABLE;
     public static Supplier<Block> GAUNTLET;
+    public static Supplier<Block> GAUNTLET_VAULT;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -220,6 +221,7 @@ public class DNLBlocks {
         REDSTONE_IDOL = registerBlock("redstone_idol", () -> new RedstoneIdolBlock(BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).strength(5.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().isRedstoneConductor(DNLBlocks::never).noOcclusion()));
         MENDING_TABLE = registerBlock("mending_table", () -> new MendingTableBlock(BlockBehaviour.Properties.of().strength(5.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
         GAUNTLET = registerBlock("gauntlet", () -> new GauntletBlock(BlockBehaviour.Properties.of().strength(50.0F, 50.0F).sound(SoundType.METAL).noOcclusion().noLootTable()));
+        GAUNTLET_VAULT = registerBlock("gauntlet_vault", () -> new GauntletVaultBlock(BlockBehaviour.Properties.of().strength(50.0F, 50.0F).sound(SoundType.METAL).noOcclusion().noLootTable()));
 
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));

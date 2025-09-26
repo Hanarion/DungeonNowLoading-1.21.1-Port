@@ -63,6 +63,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.FIERCE_FAIRKEEPER_CHEST.get(), FierceFairkeeperChestItemRenderer.getInstance()::renderByItem);
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.PLAYER_STATUE.get(), PlayerStatueItemRenderer.getInstance()::renderByItem);
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.GAUNTLET.get(), GauntletItemRenderer.getInstance()::renderByItem);
+        BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.GAUNTLET_VAULT.get(), GauntletVaultItemRenderer.getInstance()::renderByItem);
 
         // Item
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
@@ -150,6 +151,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockEntityRenderers.register(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.PLAYER_STATUE.get(), PlayerStatueRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.GAUNTLET.get(), GauntletRenderer::new);
+        BlockEntityRenderers.register(DNLBlockEntityTypes.GAUNTLET_VAULT.get(), GauntletVaultRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
@@ -210,6 +212,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(PlayerStatueModel.LAYER_LOCATION, PlayerStatueModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(GauntletModel.LAYER_LOCATION, GauntletModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(GauntletVaultModel.LAYER_LOCATION, GauntletVaultModel::createBodyLayer);
     }
 
     private static void registerParticleFactories() {
