@@ -23,7 +23,7 @@ public class MendstonePickaxeItem extends PickaxeItem {
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
         components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_name").withStyle(ChatFormatting.BLUE));
-        components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+        components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY));
     }
 
     @Override

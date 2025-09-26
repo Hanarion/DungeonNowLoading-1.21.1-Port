@@ -5,6 +5,7 @@ import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.EquipmentSlot;
 import dev.hexnowloading.dungeonnowloading.item.MendstonePickaxeItem;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 public class ScrapEnchantment extends Enchantment {
     public ScrapEnchantment(Rarity rarity, EquipmentSlot... slots) {
@@ -17,5 +18,13 @@ public class ScrapEnchantment extends Enchantment {
             return false;
         }
         return stack.isDamageableItem();
+    }
+
+    @Override
+    public boolean checkCompatibility(Enchantment other) {
+        if (other == Enchantments.MENDING) {
+            return false;
+        }
+        return super.checkCompatibility(other);
     }
 }
