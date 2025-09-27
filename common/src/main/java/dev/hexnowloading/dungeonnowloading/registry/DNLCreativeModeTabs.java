@@ -144,6 +144,10 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.MENDING_AURA_PATH.get());
                 output.accept(DNLItems.MENDING_AURA_PANE.get());
                 output.accept(DNLItems.STONE_PRESERVER.get());
+                output.accept(DNLItems.DURITE_CLUSTER.get());
+                output.accept(DNLItems.LARGE_DURITE_BUD.get());
+                output.accept(DNLItems.MEDIUM_DURITE_BUD.get());
+                output.accept(DNLItems.SMALL_DURITE_BUD.get());
 
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());

@@ -50,7 +50,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         PlayerStatueItemWithDisplay(DNLItems.PLAYER_STATUE.get());
     }
 
-    private void simpleItem(Item item) {
+    public void simpleItem(Item item) {
         String name = ForgeRegistries.ITEMS.getKey(item).getPath();
         withExistingParent(ITEM_FOLDER + "/" + name, mcLoc(ITEM_FOLDER + "/generated")).texture("layer0", ITEM_FOLDER + "/" + name);
     }

@@ -11,6 +11,7 @@ import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
@@ -18,9 +19,11 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.functions.EnchantRandomlyFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
@@ -106,16 +109,15 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_SLAB.get());
         this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_FENCE.get());
         this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_FENCE_GATE.get());
-        this.add(DNLBlocks.AZURO_OAK_DOOR.get(), block -> LootTable.lootTable()
-                .withPool(LootPool.lootPool()
-                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
-                                .setProperties(StatePropertiesPredicate.Builder.properties()
-                                        .hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER)))
-                        .add(LootItem.lootTableItem(block))));
+        this.add(DNLBlocks.AZURO_OAK_DOOR.get(), block -> LootTable.lootTable().withPool(LootPool.lootPool().when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))).add(LootItem.lootTableItem(block))));
         this.dropSelf(DNLBlocks.AZURO_OAK_BUTTON.get());
         this.dropSelf(DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get());
 //        this.dropSelf(DNLBlocks.AZURO_OAK_TRAPDOOR.get());
         this.addPlayerStatueDrop(DNLBlocks.PLAYER_STATUE.get());
+        this.add(DNLBlocks.DURITE_CLUSTER.get(), b -> duriteClusterWithOverflow(b, DNLItems.DURITE.get()));
+        this.add(DNLBlocks.LARGE_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.75f));
+        this.add(DNLBlocks.MEDIUM_DURITE_BUD.get(), b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.50f));
+        this.add(DNLBlocks.SMALL_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.25f));
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {
@@ -197,22 +199,84 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                         )));
     }
 
-    /*private void addPlayerStatue(Block block) {
-        LootTable.Builder table = LootTable.lootTable().withPool(
-                LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1))
-                        .add(LootItem.lootTableItem(block)
-                                .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
-                                        // Copies BE "Owner" (compound GameProfile) to item "SkullOwner"
-                                        // and BE "Pose" (int) to item "DNL_Pose".
-                                        // NOTE: the 2-arg .copy(source, target) defaults to REPLACE on modern mappings.
-                                        .copy("Owner", "SkullOwner")
-                                        .copy("Pose", "DNL_Pose")
-                                )
-                        )
-        );
-        this.add(block, table);
-    }*/
+    private LootTable.Builder duriteClusterWithOverflow(Block clusterBlock, Item duriteItem) {
+        // first drop: always 100% regardless of fortune
+        float[] first = new float[] { 1f, 1f, 1f, 1f };
+        // overflow for the second: F0=0, F1=0.50, F2=0.75, F3=1.00
+        float[] extra = new float[] { 0f, 0.50f, 0.75f, 1.00f };
+
+        return LootTable.lootTable()
+                // Silk Touch → drop the cluster block
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(HAS_SILK_TOUCH)
+                        .add(LootItem.lootTableItem(clusterBlock)))
+
+                // First Durite (guaranteed 1 on no-silk)
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(HAS_NO_SILK_TOUCH)
+                        .add(LootItem.lootTableItem(duriteItem)
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, first))
+                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
+                                .apply(ApplyExplosionDecay.explosionDecay())))
+
+                // Second Durite (overflow chance by Fortune level)
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(HAS_NO_SILK_TOUCH)
+                        .add(LootItem.lootTableItem(duriteItem)
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, extra))
+                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
+                                .apply(ApplyExplosionDecay.explosionDecay())));
+    }
+
+    private LootTable.Builder duriteBudWithChanceOverflow(Block budBlock, Item duriteItem, float baseChance /*0..1*/) {
+        // +25% per level
+        float[] first = new float[] {
+                clamp01(baseChance + 0.25f * 0), // no fortune
+                clamp01(baseChance + 0.25f * 1), // F1
+                clamp01(baseChance + 0.25f * 2), // F2
+                clamp01(baseChance + 0.25f * 3), // F3
+        };
+        float[] extra = new float[] {
+                overflow(baseChance + 0.25f * 0), // max(0, chance-1)
+                overflow(baseChance + 0.25f * 1),
+                overflow(baseChance + 0.25f * 2),
+                overflow(baseChance + 0.25f * 3),
+        };
+
+        return LootTable.lootTable()
+                // Silk Touch → drop bud block
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(HAS_SILK_TOUCH)
+                        .add(LootItem.lootTableItem(budBlock)))
+
+                // First Durite (capped at 100%)
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(HAS_NO_SILK_TOUCH)
+                        .add(LootItem.lootTableItem(duriteItem)
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, first))
+                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
+                                .apply(ApplyExplosionDecay.explosionDecay())))
+
+                // Overflow → second Durite (chance = max(0, chance-1))
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(HAS_NO_SILK_TOUCH)
+                        .add(LootItem.lootTableItem(duriteItem)
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, extra))
+                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
+                                .apply(ApplyExplosionDecay.explosionDecay())));
+    }
+
+    private static float clamp01(float f) { return f < 0f ? 0f : (f > 1f ? 1f : f); }
+    private static float overflow(float f) {
+        float over = f - 1f;
+        return over <= 0f ? 0f : (over >= 1f ? 1f : over);
+    }
 
     @Override
     protected Iterable<Block> getKnownBlocks() {

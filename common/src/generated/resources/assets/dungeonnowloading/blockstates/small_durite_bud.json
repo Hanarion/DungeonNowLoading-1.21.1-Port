@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "dungeonnowloading:block/small_durite_bud",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "dungeonnowloading:block/small_durite_bud",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "dungeonnowloading:block/small_durite_bud",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "dungeonnowloading:block/small_durite_bud",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "dungeonnowloading:block/small_durite_bud"
+    },
+    "facing=west": {
+      "model": "dungeonnowloading:block/small_durite_bud",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

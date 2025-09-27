@@ -73,6 +73,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         signalGateWithItem((SignalGateBlock) DNLBlocks.SIGNAL_GATE.get());
         preserverWithItem((PreserverBlock) DNLBlocks.STONE_PRESERVER.get());
         particleOnlyModel(DNLBlocks.PLAYER_STATUE.get());
+        facingSixWayWithExistingModel(DNLBlocks.DURITE_CLUSTER.get(), "durite_cluster");
+        facingSixWayWithExistingModel(DNLBlocks.LARGE_DURITE_BUD.get(), "large_durite_bud");
+        facingSixWayWithExistingModel(DNLBlocks.MEDIUM_DURITE_BUD.get(), "medium_durite_bud");
+        facingSixWayWithExistingModel(DNLBlocks.SMALL_DURITE_BUD.get(), "small_durite_bud");
 
         rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.AZURO_OAK_LOG.get());
         rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.STRIPPED_AZURO_OAK_LOG.get());
@@ -857,6 +861,33 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, models().getExistingFile(extend(blockTexture(block), "_off")));
     }
 
+    private void facingSixWayWithExistingModel(Block block, String modelName) {
+        ModelFile model = models().getExistingFile(modLoc("block/" + modelName));
+
+        getVariantBuilder(block).forAllStatesExcept(state -> {
+            Direction f = state.getValue(BlockStateProperties.FACING);
+            int x = 0, y = 0;
+
+            switch (f) {
+                case UP    -> { x = 0;   y = 0;   }
+                case DOWN  -> { x = 180; y = 0;   }
+                case NORTH -> { x = 90;  y = 0;   }
+                case SOUTH -> { x = 90;  y = 180; }
+                case WEST  -> { x = 90;  y = 270; }
+                case EAST  -> { x = 90;  y = 90;  }
+            }
+
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationX(x)
+                    .rotationY(y)
+                    .build();
+        }, BlockStateProperties.WATERLOGGED);
+
+        simpleItem(block);
+    }
+
+
     private void particleOnlyModel(Block block) {
         String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
         String ns   = ForgeRegistries.BLOCKS.getKey(block).getNamespace();
@@ -869,6 +900,8 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         // blockstates/<name>.json → map every state (rotation_16, waterlogged, …) to that model
         getVariantBuilder(block).forAllStates(s -> new ConfiguredModel[]{new ConfiguredModel(model)});
     }
+
+
 
     private ResourceLocation key(Block block) {
         return ForgeRegistries.BLOCKS.getKey(block);

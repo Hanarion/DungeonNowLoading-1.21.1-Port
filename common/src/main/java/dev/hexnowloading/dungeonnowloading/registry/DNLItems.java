@@ -148,6 +148,10 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_AURA_PANE = register("mending_aura_pane", () -> new BlockItem(DNLBlocks.MENDING_AURA_PANE.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
     public static final Supplier<Item> PLAYER_STATUE = register("player_statue", PlayerStatueBlockItem::new);
+    public static final Supplier<Item> DURITE_CLUSTER = register("durite_cluster", () -> new BlockItem(DNLBlocks.DURITE_CLUSTER.get(), new Item.Properties()));
+    public static final Supplier<Item> LARGE_DURITE_BUD = register("large_durite_bud", () -> new BlockItem(DNLBlocks.LARGE_DURITE_BUD.get(), new Item.Properties()));
+    public static final Supplier<Item> MEDIUM_DURITE_BUD = register("medium_durite_bud", () -> new BlockItem(DNLBlocks.MEDIUM_DURITE_BUD.get(), new Item.Properties()));
+    public static final Supplier<Item> SMALL_DURITE_BUD = register("small_durite_bud", () -> new BlockItem(DNLBlocks.SMALL_DURITE_BUD.get(), new Item.Properties()));
 
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
     public static final Supplier<Item> AZURO_OAK_LOG = register("azuro_oak_log", () -> new BlockItem(DNLBlocks.AZURO_OAK_LOG.get(), new Item.Properties()));

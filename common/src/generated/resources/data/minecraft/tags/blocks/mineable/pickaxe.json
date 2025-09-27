@@ -54,6 +54,10 @@
     "dungeonnowloading:stone_preserver",
     "dungeonnowloading:redstone_idol",
     "dungeonnowloading:player_statue",
-    "dungeonnowloading:mending_table"
+    "dungeonnowloading:mending_table",
+    "dungeonnowloading:durite_cluster",
+    "dungeonnowloading:small_durite_bud",
+    "dungeonnowloading:medium_durite_bud",
+    "dungeonnowloading:large_durite_bud"
   ]
 }
