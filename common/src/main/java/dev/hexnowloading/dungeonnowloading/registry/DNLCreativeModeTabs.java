@@ -47,6 +47,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SOUL_SCORCHER.get());
                 output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.REPULSOR.get());
+                output.accept(DNLItems.MENDSTONE_CHALK.get());
                 // Items - Armors
                 output.accept(DNLItems.SPAWNER_HELMET.get());
                 output.accept(DNLItems.SPAWNER_CHESTPLATE.get());
@@ -148,6 +149,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.LARGE_DURITE_BUD.get());
                 output.accept(DNLItems.MEDIUM_DURITE_BUD.get());
                 output.accept(DNLItems.SMALL_DURITE_BUD.get());
+                output.accept(DNLItems.MENDSTONE_CHALK_MARK.get());
 
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());

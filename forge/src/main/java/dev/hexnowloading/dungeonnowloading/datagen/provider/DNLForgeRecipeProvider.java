@@ -350,6 +350,14 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .define('p', DNLItems.AZURO_OAK_PLANKS.get())
                 .unlockedBy("has_azuro_planks", has(DNLItems.AZURO_OAK_PLANKS.get()))
                 .save(consumer);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, DNLItems.MENDSTONE_CHALK.get(), 1)
+                .pattern(" cm")
+                .pattern("cmc")
+                .pattern("mc ")
+                .define('m', DNLItems.MENDSTONE.get())
+                .define('c', Items.CALCITE)
+                .unlockedBy("has_mendstone", has(DNLItems.MENDSTONE.get()))
+                .save(consumer);
     }
 
     private void buildStoneCutterRecipes(Consumer<FinishedRecipe> consumer) {

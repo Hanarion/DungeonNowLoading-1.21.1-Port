@@ -17,6 +17,9 @@ public class DNLTags {
     public static final TagKey<DamageType> FAIRKEEPER_HURTABLE = registerDamageTypeTag("fairkeeper_hurtable");
     public static final TagKey<DamageType> FAIRKEEPER_BOROS_ARMOR_HURTABLE = registerDamageTypeTag("fairkeeper_boros_armor_hurtable");
     public static final TagKey<DamageType> FAIRKEEPER_BOROS_BYPASS_ARMOR = registerDamageTypeTag("fairkeeper_boros_bypass_armor");
+    public static final TagKey<EntityType<?>> BOSSES = registerEntityTypeTag("bosses");
+    public static final TagKey<EntityType<?>> BOSS_RELATED_DESTRUCTIVES = registerEntityTypeTag("boss_related_destructives");
+    public static final TagKey<EntityType<?>> BOSSES_AND_RELATED_DESTRUCTIVES = registerEntityTypeTag("bosses_and_related_destructives");
     public static final TagKey<EntityType<?>> PROJECTILES = registerEntityTypeTag("projectiles");
     public static final TagKey<EntityType<?>> REPULSOR_OMITTED_PROJECTILES = registerEntityTypeTag("repulsor_omitted_projectiles");
     public static final TagKey<EntityType<?>> REPULSOR_HIGH_DAMAGE_PROJECTILES = registerEntityTypeTag("repulsor_high_damage_projectiles");
@@ -30,6 +33,7 @@ public class DNLTags {
     public static final TagKey<Block> NEAR_FULL_HEIGHT_BLOCKS = registerBlockTag("near_full_height_blocks");
     public static final TagKey<Block> TORCH_BLOCKS = registerBlockTag("torch_blocks");
     public static final TagKey<Block> MENDING_AURAS = registerBlockTag("mending_auras");
+    public static final TagKey<Block> CHESTS = registerBlockTag("chests");
     public static final TagKey<Structure> NO_GEODES_TAG = registerStructureTag("no_geodes");
     public static final TagKey<Structure> TEMPLE_OF_DUALITY = registerStructureTag("temple_of_duality");
     public static final TagKey<Structure> LABYRINTH = registerStructureTag("labyrinth");

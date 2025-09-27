@@ -11,7 +11,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 
-
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -55,8 +54,7 @@ public class DNLItems {
     public static final Supplier<Item> SCORCHER = register("scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
-
-
+    public static final Supplier<Item> MENDSTONE_CHALK = register("mendstone_chalk", () -> new MendstoneChalkItem(new Item.Properties().rarity(Rarity.COMMON).durability(15), DNLBlocks.MENDSTONE_CHALK_MARK.get()));
 
     // ITEMS - MUSIC DISC
     public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_clash_of_duality_ouros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_OUROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
@@ -146,6 +144,7 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_AURA_WALL = register("mending_aura_wall", () -> new BlockItem(DNLBlocks.MENDING_AURA_WALL.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA_PATH = register("mending_aura_path", () -> new BlockItem(DNLBlocks.MENDING_AURA_PATH.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA_PANE = register("mending_aura_pane", () -> new BlockItem(DNLBlocks.MENDING_AURA_PANE.get(), new Item.Properties()));
+    public static final Supplier<Item> MENDING_AURA_CHEST = register("mending_aura_chest", () -> new BlockItem(DNLBlocks.MENDING_AURA_CHEST.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
     public static final Supplier<Item> PLAYER_STATUE = register("player_statue", PlayerStatueBlockItem::new);
     public static final Supplier<Item> DURITE_CLUSTER = register("durite_cluster", () -> new BlockItem(DNLBlocks.DURITE_CLUSTER.get(), new Item.Properties()));
@@ -170,10 +169,13 @@ public class DNLItems {
     public static final Supplier<Item> AZURO_OAK_PRESSURE_PLATE = register("azuro_oak_pressure_plate", () -> new BlockItem(DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get(), new Item.Properties()));
     public static final Supplier<Item> AZURO_OAK_DOOR = register("azuro_oak_door", () -> new DoubleHighBlockItem(DNLBlocks.AZURO_OAK_DOOR.get(), new Item.Properties()));
 
+    public static final Supplier<Item> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> new BlockItem(DNLBlocks.MENDSTONE_CHALK_MARK.get(), new Item.Properties()));
+
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> LABYRINTH_TROPHY = register("labyrinth_trophy", () -> new BlockItem(DNLBlocks.LABYRINTH_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));
     public static final Supplier<Item> TEMPLE_OF_DUALITY_TROPHY = register("temple_of_duality_trophy", () -> new BlockItem(DNLBlocks.TEMPLE_OF_DUALITY_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));
+
 
     //public static final Supplier<Item> WIND_ALTER = register("wind_alter", () -> new BlockItem(SkyislandBlocks.WIND_ALTER.get(), new Item.Properties()));
 

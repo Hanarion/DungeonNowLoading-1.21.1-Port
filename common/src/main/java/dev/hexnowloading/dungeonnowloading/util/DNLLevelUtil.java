@@ -27,8 +27,6 @@ public class DNLLevelUtil {
 
     private static Set<SoundType> pendingBlockBreakSounds = null;
 
-
-    //FIXME: playing multiple block breaking sound might be the cause candidate of bug that stops some of the sound from playing during the boss fight.
     public static void beginMultiDestroySoundPending() {
         pendingBlockBreakSounds = new HashSet<>();
     }

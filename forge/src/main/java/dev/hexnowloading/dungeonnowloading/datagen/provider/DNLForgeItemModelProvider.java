@@ -38,7 +38,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.MUSIC_DISC_BOROS.get());
         simpleItem(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
         //simpleItem(DNLItems.COPPER_DETONATOR.get());
-        //simpleItem(DNLItems.REPULSOR.get());
+        simpleItem(DNLItems.MENDSTONE_CHALK.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
@@ -50,7 +50,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         PlayerStatueItemWithDisplay(DNLItems.PLAYER_STATUE.get());
     }
 
-    public void simpleItem(Item item) {
+    private void simpleItem(Item item) {
         String name = ForgeRegistries.ITEMS.getKey(item).getPath();
         withExistingParent(ITEM_FOLDER + "/" + name, mcLoc(ITEM_FOLDER + "/generated")).texture("layer0", ITEM_FOLDER + "/" + name);
     }

@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -26,7 +27,7 @@ public class PreserverBlock extends BaseEntityBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
-    private final Block blockType;
+    protected final Block blockType;
     private CompoundTag transferData;
 
     public PreserverBlock(Properties $$0) {
@@ -67,7 +68,7 @@ public class PreserverBlock extends BaseEntityBlock {
     }
     @Override
     public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
-        if (!level.isClientSide && !player.getAbilities().instabuild) {
+        if (!this.canPlayerDestroy() && !level.isClientSide && !player.getAbilities().instabuild) {
             BlockEntity blockEntityOld = level.getBlockEntity(blockPos);
 
             if (blockEntityOld instanceof PreserverBlockEntity preserverBlockEntity) {
@@ -80,7 +81,7 @@ public class PreserverBlock extends BaseEntityBlock {
     @Override
     public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState state, BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, blockPos, state, blockEntity, tool);
-        if (!level.isClientSide && !player.getAbilities().instabuild) {
+        if (!this.canPlayerDestroy() && !level.isClientSide && !player.getAbilities().instabuild) {
             Direction direction = state.getValue(FACING);
             level.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true).setValue(FACING, direction), Block.UPDATE_CLIENTS);
 
@@ -92,8 +93,10 @@ public class PreserverBlock extends BaseEntityBlock {
 
             level.scheduleTick(blockPos, this, 20);
         }
+    }
 
-
+    protected boolean canPlayerDestroy() {
+        return false;
     }
 
     @Override
@@ -120,7 +123,7 @@ public class PreserverBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new PreserverBlockEntity(blockPos, blockState);
+        return new PreserverBlockEntity(DNLBlockEntityTypes.PRESERVER_BLOCK.get(), blockPos, blockState);
     }
 
     @Override

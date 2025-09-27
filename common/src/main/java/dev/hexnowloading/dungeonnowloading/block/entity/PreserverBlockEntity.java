@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import org.slf4j.Logger;
@@ -24,9 +25,12 @@ public class PreserverBlockEntity extends BlockEntity implements GameEventListen
 
     private final Set<BlockPos> playerPlacedBlocks = new HashSet<>();
 
+    public PreserverBlockEntity(BlockPos pos, BlockState state) {
+        this(DNLBlockEntityTypes.PRESERVER_BLOCK.get(), pos, state);
+    }
 
-    public PreserverBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(DNLBlockEntityTypes.PRESERVER_BLOCK.get(), blockPos, blockState);
+    public PreserverBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
         this.user = new PreserverBlockDestructionSystem.User(this.getBlockPos(), new BlockPos(10, 10, 10), new BlockPos(-10, -10, -10), Direction.NORTH);
         this.gameEventListener = new PreserverBlockDestructionSystem.Listener(this);
     }

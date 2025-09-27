@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.hexnowloading.dungeonnowloading.block.MendingAuraBlock;
 import dev.hexnowloading.dungeonnowloading.block.PreserverBlock;
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
+import dev.hexnowloading.dungeonnowloading.block.entity.MendstoneChalkMarkBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLGameEvents;
@@ -252,6 +253,10 @@ public interface PreserverBlockDestructionSystem {
                     return false;
                 }
 
+                if (serverLevel.getBlockEntity(centerBlockPos) instanceof MendstoneChalkMarkBlockEntity && context.sourceEntity() != null && context.sourceEntity().getType().is(DNLTags.BOSSES_AND_RELATED_DESTRUCTIVES)) {
+                    return false;
+                }
+
                 if (serverLevel.getBlockState(eventBlockPos).getBlock() instanceof MendingAuraBlock) {
                     BlockDestructionManager.cancel();
                     return false;
@@ -440,6 +445,7 @@ public interface PreserverBlockDestructionSystem {
             Block block = blockState.getBlock();
             return blockState.isCollisionShapeFullBlock(serverLevel, eventBlockPos) ||
                     blockState.is(DNLTags.NEAR_FULL_HEIGHT_BLOCKS) ||
+                    blockState.is(DNLTags.CHESTS) ||
                     block instanceof IronBarsBlock ||
                     block instanceof SlabBlock ||
                     block instanceof StairBlock ||
@@ -495,6 +501,13 @@ public interface PreserverBlockDestructionSystem {
 
             } else if (originalBlockState.is(DNLTags.NEAR_FULL_HEIGHT_BLOCKS)) {
                 mendingAuraState = DNLBlocks.MENDING_AURA_PATH.get().defaultBlockState();
+            } else if (originalBlockState.is(DNLTags.CHESTS)) {
+                mendingAuraState = DNLBlocks.MENDING_AURA_CHEST.get().defaultBlockState()
+                        .setValue(BlockStateProperties.HORIZONTAL_FACING, originalBlockState.getValue(BlockStateProperties.HORIZONTAL_FACING))
+                        .setValue(BlockStateProperties.WATERLOGGED, originalBlockState.getValue(BlockStateProperties.WATERLOGGED));
+                if (originalBlockState.is(Blocks.CHEST)) {
+                    mendingAuraState = mendingAuraState.setValue(BlockStateProperties.CHEST_TYPE, originalBlockState.getValue(BlockStateProperties.CHEST_TYPE));
+                }
             } else {
                 mendingAuraState = DNLBlocks.MENDING_AURA.get().defaultBlockState();
 
