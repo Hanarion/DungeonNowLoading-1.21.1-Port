@@ -334,5 +334,5 @@
   "item.dungeonnowloading.item_scraps.tooltip.reconstruct.detail1": "To repair, Use on Mending Table with:",
   "item.dungeonnowloading.item_scraps.tooltip.reconstruct.detail2": "Mendstone/Durite or %s",
   "enchantment.dungeonnowloading.break_protection": "Break Protection",
-  "enchantment.dungeonnowloading.break_protection.desc": "Prevents the item from vanishing when it would break, turning it into Item Scraps instead."
+  "enchantment.dungeonnowloading.break_protection.desc": "Upon item breaking, turns into repairable Item Scraps"
 }
