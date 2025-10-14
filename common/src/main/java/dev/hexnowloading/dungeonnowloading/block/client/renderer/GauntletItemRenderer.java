@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
@@ -24,8 +25,18 @@ public class GauntletItemRenderer extends BlockEntityWithoutLevelRenderer {
             blockEntity = new GauntletBlockEntity(BlockPos.ZERO, DNLBlocks.GAUNTLET.get().defaultBlockState());
         }
 
-        // Handheld/GUI default look: 3 total, 0 lit, inactive
-        blockEntity.setWaves(3, 0, false);
+        // Default values
+        int wavesTotal = 3;
+        int wavesCurrent = 0;
+        boolean active = false;
+
+        CompoundTag bet = stack.getTagElement("BlockEntityTag");
+        if (bet != null) {
+            if (bet.contains("wavesTotal")) wavesTotal = Math.max(1, Math.min(5, bet.getInt("wavesTotal")));
+            if (bet.contains("wavesCurrent")) wavesCurrent = Math.max(0, Math.min(wavesTotal, bet.getInt("wavesCurrent")));
+            if (bet.contains("active")) active = bet.getBoolean("active");
+        }
+        blockEntity.setWaves(wavesTotal, wavesCurrent, active);
 
         ps.pushPose();
 

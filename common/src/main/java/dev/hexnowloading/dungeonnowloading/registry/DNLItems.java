@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.item.*;
-import dev.hexnowloading.dungeonnowloading.item.GauntletBlockItem;
+import dev.hexnowloading.dungeonnowloading.item.blockitem.GauntletBlockItem;
 import dev.hexnowloading.dungeonnowloading.item.blockitem.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;

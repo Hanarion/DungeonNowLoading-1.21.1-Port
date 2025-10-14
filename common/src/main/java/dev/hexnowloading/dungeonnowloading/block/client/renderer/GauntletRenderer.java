@@ -29,20 +29,13 @@ public class GauntletRenderer implements BlockEntityRenderer<GauntletBlockEntity
     }
 
     enum Horn { CENTER, FL, FR, BL, BR }
-    private static final Horn[] ORDER_5 = {Horn.FL, Horn.FR, Horn.CENTER, Horn.BL, Horn.BR};
-    private static final Horn[] ORDER_4 = {Horn.FL, Horn.FR, Horn.BL, Horn.BR};
-    private static final Horn[] ORDER_3 = {Horn.FL, Horn.CENTER, Horn.FR};
-    private static final Horn[] ORDER_2 = {Horn.FL, Horn.FR};
-    private static final Horn[] ORDER_1 = {Horn.CENTER};
+    private static final Horn[] SEQUENCE = {Horn.CENTER, Horn.FL, Horn.FR, Horn.BL, Horn.BR};
 
     private Horn[] orderFor(int total) {
-        return switch (total) {
-            case 1 -> ORDER_1;
-            case 2 -> ORDER_2;
-            case 3 -> ORDER_3; // FL, CENTER, FR
-            case 4 -> ORDER_4; // all but CENTER
-            default -> ORDER_5; // all 5
-        };
+        int n = Math.max(1, Math.min(5, total));
+        Horn[] arr = new Horn[n];
+        System.arraycopy(SEQUENCE, 0, arr, 0, n);
+        return arr;
     }
 
     private ModelPart partFor(Horn h) {
