@@ -101,6 +101,16 @@
           "weight": 1
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "name": "dungeonnowloading:chests/temple_of_duality/book/hard_puzzle",
+          "weight": 1
+        }
+      ]
     }
   ]
 }

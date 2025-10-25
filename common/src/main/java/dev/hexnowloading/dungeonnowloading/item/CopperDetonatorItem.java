@@ -112,7 +112,7 @@ public class CopperDetonatorItem extends Item {
         List<CopperCreepEntity> creepsInRange = findNearbyCreeps(player, TRIGGER_RADIUS);
 
         if (usedTime <= MODE_SWITCH_TIMING) {
-            if (consumeCopperBlockIfAvailable(player) && creepsInRange.size() < 3) {
+            if (creepsInRange.size() < 3 && consumeCopperBlockIfAvailable(player)) {
                 launchCreep(level, player);
                 player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
                 itemStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(player1.getUsedItemHand()));

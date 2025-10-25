@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
+import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
@@ -12,7 +13,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -34,28 +34,49 @@ public class SpawnerArmorItem extends ArmorItem {
         super(armorMaterial, slot, new Properties());
     }
 
-
-
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int slot, boolean selected) {
-        if (!level.isClientSide) {
-            if (entity instanceof Player player && hasFullSuitOfArmorOn(player) && itemStack.is(DNLItems.SPAWNER_HELMET.get())) {
-                if (summonTick > 0) {
-                    summonTick--;
-                } else {
-                    BlockPos entityPos = player.getOnPos();
-                    if (player.level().getNearestEntity(Monster.class, TargetingConditions.DEFAULT, player, entityPos.getX(), entityPos.getY(), entityPos.getZ(), player.getBoundingBox().inflate(5.0)) != null) {
-                        if (hasCorrectArmorOn(player)) {
-                            summonMob(level, entityPos);
-                        }
-                        summonTick = 200;
-                    } else {
-                        summonTick = 40;
-                    }
-                }
-            }
-        }
         super.inventoryTick(itemStack, level, entity, slot, selected);
+
+        if (level.isClientSide) return;
+        if (!(entity instanceof Player player)) return;
+        if (!itemStack.is(DNLItems.SPAWNER_HELMET.get())) return;
+        if (!hasFullSuitOfArmorOn(player)) return;
+
+        if (summonTick > 0) {
+            summonTick--;
+            return;
+        }
+
+        BlockPos pos = player.getOnPos();
+        double r = 5.0;
+
+        // Check for monsters
+        boolean hostileMobNearby = !level.getEntitiesOfClass(
+                Monster.class,
+                player.getBoundingBox().inflate(r),
+                mob -> mob.isAlive()
+        ).isEmpty();
+
+        // Check for opposing players if PvP is enabled
+        boolean opposingPlayerNearby = PvpConfig.TOGGLE_PVP_MODE.get() && !level.getEntitiesOfClass(
+                Player.class,
+                player.getBoundingBox().inflate(r),
+                other -> other != player
+                        && !player.isAlliedTo(other) // different team
+                        && !other.isSpectator()
+                        && !other.isCreative()
+                        && other.isAlive()
+        ).isEmpty();
+
+        if (hostileMobNearby || opposingPlayerNearby) {
+            if (hasCorrectArmorOn(player)) {
+                summonMob(level, pos, player);
+            }
+            summonTick = 200; // long delay after summon
+        } else {
+            summonTick = 40; // shorter delay when idle
+        }
     }
 
     /*@Override
@@ -111,7 +132,7 @@ public class SpawnerArmorItem extends ArmorItem {
         super.inventoryTick(itemStack, level, entity, slot, selected);
     }*/
 
-    private void summonMob(Level level, BlockPos entityPos) {
+    private void summonMob(Level level, BlockPos entityPos, Player owner) {
         RandomSource randomSource = level.getRandom();
         EntityType<Zombie> spawningEntity = EntityType.ZOMBIE;
         double x = entityPos.getX() + (randomSource.nextDouble() - randomSource.nextDouble()) * (double)this.spawnRange + 0.5;
@@ -123,7 +144,7 @@ public class SpawnerArmorItem extends ArmorItem {
             WhimperEntity whimper = DNLEntityTypes.WHIMPER.get().create(level);
             if (whimper != null) {
                 whimper.moveTo(x, y, z, 0.0F, 0.0F);
-                //setOwner
+                whimper.setOwnerUUID(owner.getUUID());
                 level.addFreshEntity(whimper);
             }
         }

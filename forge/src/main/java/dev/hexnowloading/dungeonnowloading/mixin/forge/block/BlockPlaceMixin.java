@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +30,7 @@ public abstract class BlockPlaceMixin {
 
         if (level.isClientSide) return;
 
-        if (player.isCreative() || player.isSpectator()) return;
+        if (player == null || player.isCreative() || player.isSpectator()) return;
 
         if (level.getBlockState(placedBlockPos).is(DNLTags.FAIRKEEPER_CHEST_IGNORE)) return;
 

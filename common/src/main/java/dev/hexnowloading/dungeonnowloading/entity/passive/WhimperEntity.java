@@ -4,7 +4,6 @@ import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperChargeAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperRandomMoveGoal;
-import dev.hexnowloading.dungeonnowloading.entity.util.PlayerSupporterEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class WhimperEntity extends PathfinderMob implements PlayerSupporterEntity {
+public class WhimperEntity extends PathfinderMob implements OwnableEntity {
 
     private static final EntityDataAccessor<Integer> DESPAWN_TICK = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -66,15 +65,41 @@ public class WhimperEntity extends PathfinderMob implements PlayerSupporterEntit
         this.goalSelector.addGoal(6, new WhimperRandomMoveGoal(this));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 3.0F, 1.0F));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Mob.class, 8.0F));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Mob.class, 5, false, false, (c) -> {
-            return !c.getUUID().equals(this.getOwnerUUID()) && PvpConfig.TOGGLE_PVP_MODE.get() && c instanceof PlayerSupporterEntity;
-        }));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 5, true, false, (c) -> {
-            return !c.getUUID().equals(this.getOwnerUUID()) && PvpConfig.TOGGLE_PVP_MODE.get();
-        }));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Mob.class, 5, false, false, (c) -> {
-            return c instanceof Enemy;
-        }));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(
+                this, Mob.class, 5, false, false,
+                mob -> PvpConfig.TOGGLE_PVP_MODE.get()
+                        && mob instanceof OwnableEntity
+                        && !isAlliedTo(mob)
+        ));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(
+                this, Player.class, 5, true, false,
+                player -> PvpConfig.TOGGLE_PVP_MODE.get()
+                        && !isOwner((Player) player)
+        ));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(
+                this, Mob.class, 5, false, false,
+                mob -> mob instanceof Enemy && !isAlliedTo(mob)
+        ));
+    }
+
+    private boolean isOwner(Player player) {
+        UUID owner = this.getOwnerUUID();
+        return owner != null && owner.equals(player.getUUID());
+    }
+
+    @Override
+    public boolean isAlliedTo(Entity other) {
+        UUID myOwner = this.getOwnerUUID();
+        if (myOwner == null) return false; // or true to be ultra-conservative during first ticks
+
+        if (other instanceof Player p) {
+            return myOwner.equals(p.getUUID());
+        }
+        if (other instanceof OwnableEntity ownable) {
+            UUID theirOwner = ownable.getOwnerUUID();
+            return theirOwner != null && myOwner.equals(theirOwner);
+        }
+        return super.isAlliedTo(other);
     }
 
     @Override

@@ -154,17 +154,21 @@ public class VertexNode {
                     if (!entityHasEffect) {
                         livingEntity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), vertexTransDurationTicks, vertexTransAmplifier));
                     } else if (entity.tickCount % 10 == 0) {
-                        livingEntity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), vertexTransDurationTicks, vertexTransAmplifier));
-                        VertexTransmissionEffect vertexTransmissionEffect = (VertexTransmissionEffect) livingEntity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get()).getEffect();
-                        vertexTransmissionEffect.markAsReconnectionCase(livingEntity.getUUID());
+                        livingEntity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(),
+                                vertexTransDurationTicks, vertexTransAmplifier));
+                        MobEffectInstance inst = livingEntity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+                        if (inst != null && inst.getEffect() instanceof VertexTransmissionEffect vtx) {
+                            vtx.markAsReconnectionCase(livingEntity.getUUID());
+                        }
                     }
 
                     // No connections damage case
-                    VertexTransmissionEffect vertexTransmissionEffect = (VertexTransmissionEffect) livingEntity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get()).getEffect();
-                    VertexNode entityInBeamVertexNode = vertexTransmissionEffect.getVertexNode(livingEntity.getUUID());
-
-                    if (entityInBeamVertexNode != null && entityInBeamVertexNode.getConnectionCount() == 0) {
-                        vertexTransmissionEffect.setNoConnectionBeamDamageCase(livingEntity.getUUID(), true);
+                    MobEffectInstance inst = livingEntity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+                    if (inst != null && inst.getEffect() instanceof VertexTransmissionEffect vtx) {
+                        VertexNode entityInBeamVertexNode = vtx.getVertexNode(livingEntity.getUUID());
+                        if (entityInBeamVertexNode != null && entityInBeamVertexNode.getConnectionCount() == 0) {
+                            vtx.setNoConnectionBeamDamageCase(livingEntity.getUUID(), true);
+                        }
                     }
                 }
             }

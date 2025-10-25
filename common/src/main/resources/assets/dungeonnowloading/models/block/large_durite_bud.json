@@ -5,6 +5,7 @@
 		"1": "dungeonnowloading:block/large_durite_bud",
 		"particle": "dungeonnowloading:block/durite_cluster"
 	},
+	"render_type": "cutout",
 	"elements": [
 		{
 			"from": [0, 0, 8],

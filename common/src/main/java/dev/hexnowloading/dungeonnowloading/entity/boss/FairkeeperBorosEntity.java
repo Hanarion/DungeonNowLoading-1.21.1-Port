@@ -42,6 +42,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -90,7 +91,6 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     private final ServerBossEvent bossEvent;
     public static final int SEGMENT_COUNT = 14;
     public static int SEGMENT_DELAY_STEP = 13;
-    private static final float MAX_ARMOR_HEALTH = 150F;
     public static final float SHOOT_ARROW_HEIGHT = 0.3F;
 
     private int mouthOpenAnimationTimeOut;
@@ -103,7 +103,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
         this.setMaxUpStep(1.0f);
         this.setPersistenceRequired();
         this.setArmor(true);
-        this.setArmorHealth(150f);
+        this.setArmorHealth(75.0F);
         this.xpReward = 0;
         this.bossEvent = (ServerBossEvent)(new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS)).setDarkenScreen(true);
     }
@@ -521,7 +521,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             return hurtAndTrackAttackers(damageSource, amount);
         }
 
-        if (damageSource.is(DNLTags.FAIRKEEPER_BOROS_ARMOR_HURTABLE) || (damageSource.getDirectEntity() instanceof LivingEntity livingEntity && livingEntity.canDisableShield() && amount > 6)) {
+        if (damageSource.is(DNLTags.FAIRKEEPER_BOROS_ARMOR_HURTABLE) || (damageSource.getDirectEntity() instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() instanceof PickaxeItem)) {
             boolean penetratesArmor = this.getArmorHealth() - amount <= 0;
             float nonKillableDamage = penetratesArmor ? 0 : amount;
             if (penetratesArmor) {

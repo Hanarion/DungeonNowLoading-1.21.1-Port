@@ -126,7 +126,7 @@ public class MendstoneChalkItem extends Item {
             if (!stack.isDamageableItem()) {
                 // fallback: require one item; if not enough, fail
                 if (stack.getCount() <= 0) return InteractionResult.FAIL;
-                consume = 1; // treat as “enough” for fresh
+                consume = 1;
             } else {
                 int max = stack.getMaxDamage();
                 int cur = stack.getDamageValue();
@@ -181,11 +181,6 @@ public class MendstoneChalkItem extends Item {
         return InteractionResult.sidedSuccess(level.isClientSide);
 
     }
-
-
-
-
-    // Optional: keep it strictly “3 uses” (no repair, no enchants)
 
     @Override
     public boolean isValidRepairItem(ItemStack $$0, ItemStack $$1) {

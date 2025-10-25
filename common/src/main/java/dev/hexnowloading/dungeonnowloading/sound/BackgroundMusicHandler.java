@@ -1,6 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.sound;
 
-import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.ChannelAccess;

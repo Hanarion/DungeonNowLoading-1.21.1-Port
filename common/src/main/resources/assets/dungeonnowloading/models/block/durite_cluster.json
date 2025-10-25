@@ -1,6 +1,7 @@
 {
 	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
+	"render_type": "cutout",
 	"textures": {
 		"0": "dungeonnowloading:block/durite_cluster",
 		"particle": "dungeonnowloading:block/durite_cluster"

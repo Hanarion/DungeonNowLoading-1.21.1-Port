@@ -47,7 +47,9 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SOUL_SCORCHER.get());
                 output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.REPULSOR.get());
+                // Items - Tools
                 output.accept(DNLItems.MENDSTONE_CHALK.get());
+                output.accept(DNLItems.MENDSTONE_PICKAXE.get());
                 // Items - Armors
                 output.accept(DNLItems.SPAWNER_HELMET.get());
                 output.accept(DNLItems.SPAWNER_CHESTPLATE.get());
@@ -64,8 +66,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.MUSIC_DISC_OUROS.get());
                 output.accept(DNLItems.MUSIC_DISC_BOROS.get());
                 output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
-                // Items - Tools
-                output.accept(DNLItems.MENDSTONE_PICKAXE.get());
 
                 // Blocks
 
@@ -150,16 +150,16 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.MEDIUM_DURITE_BUD.get());
                 output.accept(DNLItems.SMALL_DURITE_BUD.get());
                 output.accept(DNLItems.MENDSTONE_CHALK_MARK.get());
+                output.accept(DNLItems.MENDING_TABLE.get());
 
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());
                 output.accept(DNLItems.TEMPLE_OF_DUALITY_TROPHY.get());
 
-                output.accept(DNLItems.MENDING_TABLE.get());
 
                 // Azuro Set
-                output.accept(DNLItems.AZURO_OAK_LOG.get());
+                /*output.accept(DNLItems.AZURO_OAK_LOG.get());
                 output.accept(DNLItems.STRIPPED_AZURO_OAK_LOG.get());
                 output.accept(DNLItems.AZURO_OAK_PLANKS.get());
                 output.accept(DNLItems.AZURO_LEAVES.get());
@@ -170,7 +170,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.AZURO_OAK_PLANK_FENCE_GATE.get());
                 output.accept(DNLItems.AZURO_OAK_BUTTON.get());
                 output.accept(DNLItems.AZURO_OAK_PRESSURE_PLATE.get());
-                output.accept(DNLItems.AZURO_OAK_DOOR.get());
+                output.accept(DNLItems.AZURO_OAK_DOOR.get());*/
                 output.accept(DNLItems.PLAYER_STATUE.get());
             });
 
