@@ -81,7 +81,19 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         facingSixWayWithExistingModel(DNLBlocks.LARGE_DURITE_BUD.get(), "large_durite_bud");
         facingSixWayWithExistingModel(DNLBlocks.MEDIUM_DURITE_BUD.get(), "medium_durite_bud");
         facingSixWayWithExistingModel(DNLBlocks.SMALL_DURITE_BUD.get(), "small_durite_bud");
-
+        horizontalModelFromParent(DNLBlocks.ACACIA_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/acacia_wooden_board"),    modLoc("item/acacia_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.AZURO_OAK_WOODEN_BOARD.get(), "wooden_board", "wooden_board", modLoc("block/azuro_oak_wooden_board"), modLoc("item/azuro_oak_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.BAMBOO_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/bamboo_wooden_board"),    modLoc("item/bamboo_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.BIRCH_WOODEN_BOARD.get(),     "wooden_board", "wooden_board", modLoc("block/birch_wooden_board"),     modLoc("item/birch_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.CHERRY_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/cherry_wooden_board"),    modLoc("item/cherry_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.CRIMSON_WOODEN_BOARD.get(),   "wooden_board", "wooden_board", modLoc("block/crimson_wooden_board"),   modLoc("item/crimson_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.DARK_OAK_WOODEN_BOARD.get(),  "wooden_board", "wooden_board", modLoc("block/dark_oak_wooden_board"),  modLoc("item/dark_oak_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.JUNGLE_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/jungle_wooden_board"),    modLoc("item/jungle_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.MANGROVE_WOODEN_BOARD.get(),  "wooden_board", "wooden_board", modLoc("block/mangrove_wooden_board"),  modLoc("item/mangrove_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.OAK_WOODEN_BOARD.get(),       "wooden_board", "wooden_board", modLoc("block/oak_wooden_board"),       modLoc("item/oak_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.PALE_OAK_WOODEN_BOARD.get(),  "wooden_board", "wooden_board", modLoc("block/pale_oak_wooden_board"),  modLoc("item/pale_oak_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.SPRUCE_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/spruce_wooden_board"),    modLoc("item/spruce_wooden_board"));
+        horizontalModelFromParent(DNLBlocks.WARPED_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/warped_wooden_board"),    modLoc("item/warped_wooden_board"));
         rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.AZURO_OAK_LOG.get());
         rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.STRIPPED_AZURO_OAK_LOG.get());
         simpleBlockWithItem(DNLBlocks.AZURO_LEAVES.get());
@@ -1045,6 +1057,73 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleItem(block);
     }
 
+    private void modelFromParent(Block block, String parentModelName, String textureKey, ResourceLocation texture) {
+        String n = name(block);
+
+        // models/block/<blockname>.json with parent and texture override
+        ModelFile mf = models()
+                .withExistingParent(n, modLoc("block/" + parentModelName))
+                .texture(textureKey, texture)
+                .texture("particle", texture);
+
+        // blockstate uses that model
+        simpleBlock(block, mf);
+
+        // item model just points to the block model
+        itemModels().withExistingParent(n, modLoc("block/" + n));
+    }
+
+    private void modelFromParent(Block block, String parentModelName, Map<String, ResourceLocation> textures) {
+        String n = name(block);
+
+        BlockModelBuilder b = models()
+                .withExistingParent(n, modLoc("block/" + parentModelName));
+
+        // Apply all provided key → texture overrides
+        textures.forEach(b::texture);
+
+        // Choose a decent particle if present; else fall back to any entry
+        ResourceLocation particle = textures.getOrDefault("all",
+                textures.values().stream().findFirst().orElseGet(() -> blockTexture(block)));
+        b.texture("particle", particle);
+
+        simpleBlock(block, b);
+        itemModels().withExistingParent(n, modLoc("block/" + n));
+    }
+
+    private void horizontalModelFromParent(Block block, String parentModelName, String textureKey, ResourceLocation blockTexture) {
+        horizontalModelFromParent(block, parentModelName, textureKey, blockTexture, (ResourceLocation[]) null);
+    }
+
+    private void horizontalModelFromParent(Block block,
+                                           String parentModelName,
+                                           String textureKey,
+                                           ResourceLocation blockTexture,
+                                           @Nullable ResourceLocation... itemTextures) {
+        String n = name(block);
+
+        // Block model
+        ModelFile mf = models()
+                .withExistingParent(n, modLoc("block/" + parentModelName))
+                .texture(textureKey, blockTexture)
+                .texture("particle", blockTexture);
+
+        // Blockstate: rotate by Horizontal FACING
+        horizontalBlock(block, mf);
+
+        // Item model:
+        if (itemTextures != null && itemTextures.length > 0) {
+            // Build a fresh item model with custom layers
+            ItemModelBuilder ib = itemModels()
+                    .withExistingParent(n, mcLoc("item/generated"));
+            for (int i = 0; i < itemTextures.length; i++) {
+                ib = ib.texture("layer" + i, itemTextures[i]);
+            }
+        } else {
+            // Fallback to the block model
+            simpleBlockItem(block, mf);
+        }
+    }
 
     private void particleOnlyModel(Block block) {
         String name = ForgeRegistries.BLOCKS.getKey(block).getPath();

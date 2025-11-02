@@ -64,6 +64,19 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.REDSTONE_LANE_L.get());
         this.dropSelf(DNLBlocks.REDSTONE_LANE_T.get());
         this.dropSelf(DNLBlocks.ROTATOR_PRESSURE_PLATE.get());
+        this.dropSelf(DNLBlocks.ACACIA_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.AZURO_OAK_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.BAMBOO_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.BIRCH_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.CHERRY_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.CRIMSON_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.DARK_OAK_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.JUNGLE_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.MANGROVE_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.OAK_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.PALE_OAK_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.SPRUCE_WOODEN_BOARD.get());
+        this.dropSelf(DNLBlocks.WARPED_WOODEN_BOARD.get());
         this.add(DNLBlocks.COAL_STONE_NOTCH.get(), block -> notchBlock(block, Items.COAL));
         this.add(DNLBlocks.COPPER_STONE_NOTCH.get(), block -> notchBlock(block, Items.COPPER_INGOT));
         this.add(DNLBlocks.IRON_STONE_NOTCH.get(), block -> notchBlock(block, Items.IRON_INGOT));
@@ -109,7 +122,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_SLAB.get());
         this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_FENCE.get());
         this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_FENCE_GATE.get());
-        this.add(DNLBlocks.AZURO_OAK_DOOR.get(), block -> LootTable.lootTable().withPool(LootPool.lootPool().when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))).add(LootItem.lootTableItem(block))));
+        this.add(DNLBlocks.AZURO_OAK_DOOR.     get(), block -> LootTable.lootTable().withPool(LootPool.lootPool().when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))).add(LootItem.lootTableItem(block))));
         this.dropSelf(DNLBlocks.AZURO_OAK_BUTTON.get());
         this.dropSelf(DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get());
 //        this.dropSelf(DNLBlocks.AZURO_OAK_TRAPDOOR.get());

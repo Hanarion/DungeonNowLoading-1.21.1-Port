@@ -123,6 +123,20 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MEDIUM_DURITE_BUD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SMALL_DURITE_BUD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_CHEST.get(), RenderType.translucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.ACACIA_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_OAK_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BAMBOO_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BIRCH_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHERRY_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CRIMSON_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DARK_OAK_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.JUNGLE_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MANGROVE_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.OAK_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.PALE_OAK_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPRUCE_WOODEN_BOARD.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WARPED_WOODEN_BOARD.get(), RenderType.cutout());
+
     }
 
     private void registerRenderers() {

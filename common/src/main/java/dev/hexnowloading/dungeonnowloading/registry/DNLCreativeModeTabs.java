@@ -87,6 +87,19 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.POLISHED_STONE.get());
                 output.accept(DNLItems.BORDERED_STONE.get());
                 output.accept(DNLItems.MOSS.get());
+                output.accept(DNLItems.ACACIA_WOODEN_BOARD.get());
+                output.accept(DNLItems.AZURO_OAK_WOODEN_BOARD.get());
+                output.accept(DNLItems.BAMBOO_WOODEN_BOARD.get());
+                output.accept(DNLItems.BIRCH_WOODEN_BOARD.get());
+                output.accept(DNLItems.CHERRY_WOODEN_BOARD.get());
+                output.accept(DNLItems.CRIMSON_WOODEN_BOARD.get());
+                output.accept(DNLItems.DARK_OAK_WOODEN_BOARD.get());
+                output.accept(DNLItems.JUNGLE_WOODEN_BOARD.get());
+                output.accept(DNLItems.MANGROVE_WOODEN_BOARD.get());
+                output.accept(DNLItems.OAK_WOODEN_BOARD.get());
+                output.accept(DNLItems.PALE_OAK_WOODEN_BOARD.get());
+                output.accept(DNLItems.SPRUCE_WOODEN_BOARD.get());
+                output.accept(DNLItems.WARPED_WOODEN_BOARD.get());
 
                 // Blocks - Mechanical
                 output.accept(DNLItems.DUNGEON_WALL_TORCH.get());

@@ -38,6 +38,19 @@ public class DNLBlocks {
     public static Supplier<Block> PUZZLING_STONE_EMBLEM;
     public static Supplier<Block> POLISHED_STONE;
     public static Supplier<Block> BORDERED_STONE;
+    public static Supplier<Block> ACACIA_WOODEN_BOARD;
+    public static Supplier<Block> AZURO_OAK_WOODEN_BOARD;
+    public static Supplier<Block> BAMBOO_WOODEN_BOARD;
+    public static Supplier<Block> BIRCH_WOODEN_BOARD;
+    public static Supplier<Block> CHERRY_WOODEN_BOARD;
+    public static Supplier<Block> CRIMSON_WOODEN_BOARD;
+    public static Supplier<Block> DARK_OAK_WOODEN_BOARD;
+    public static Supplier<Block> JUNGLE_WOODEN_BOARD;
+    public static Supplier<Block> MANGROVE_WOODEN_BOARD;
+    public static Supplier<Block> OAK_WOODEN_BOARD;
+    public static Supplier<Block> PALE_OAK_WOODEN_BOARD;
+    public static Supplier<Block> SPRUCE_WOODEN_BOARD;
+    public static Supplier<Block> WARPED_WOODEN_BOARD;
 
     public static Supplier<Block> MOSS;
 
@@ -154,6 +167,20 @@ public class DNLBlocks {
         PUZZLING_STONE_EMBLEM = registerBlock("puzzling_stone_emblem", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         POLISHED_STONE = registerBlock("polished_stone", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         BORDERED_STONE = registerBlock("bordered_stone", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
+        ACACIA_WOODEN_BOARD = registerBlock("acacia_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        AZURO_OAK_WOODEN_BOARD = registerBlock("azuro_oak_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        BAMBOO_WOODEN_BOARD = registerBlock("bamboo_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        BIRCH_WOODEN_BOARD = registerBlock("birch_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        CHERRY_WOODEN_BOARD = registerBlock("cherry_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        CRIMSON_WOODEN_BOARD = registerBlock("crimson_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        DARK_OAK_WOODEN_BOARD = registerBlock("dark_oak_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        JUNGLE_WOODEN_BOARD = registerBlock("jungle_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        MANGROVE_WOODEN_BOARD = registerBlock("mangrove_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        OAK_WOODEN_BOARD = registerBlock("oak_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        PALE_OAK_WOODEN_BOARD = registerBlock("pale_oak_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        SPRUCE_WOODEN_BOARD = registerBlock("spruce_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+        WARPED_WOODEN_BOARD = registerBlock("warped_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
+
 
         // MECHANICAL BLOCKS
         BOOK_PILE = registerBlock("book_pile", () -> new BookPileBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOL)));

@@ -84,6 +84,19 @@ public class DNLItems {
     public static final Supplier<Item> PUZZLING_STONE_EMBLEM = register("puzzling_stone_emblem", () -> new BlockItem(DNLBlocks.PUZZLING_STONE_EMBLEM.get(), new Item.Properties()));
     public static final Supplier<Item> POLISHED_STONE = register("polished_stone", () -> new BlockItem(DNLBlocks.POLISHED_STONE.get(), new Item.Properties()));
     public static final Supplier<Item> BORDERED_STONE = register("bordered_stone", () -> new BlockItem(DNLBlocks.BORDERED_STONE.get(), new Item.Properties()));
+    public static final Supplier<Item> ACACIA_WOODEN_BOARD      = register("acacia_wooden_board",      () -> new BlockItem(DNLBlocks.ACACIA_WOODEN_BOARD.get(),      new Item.Properties()));
+    public static final Supplier<Item> AZURO_OAK_WOODEN_BOARD   = register("azuro_oak_wooden_board",   () -> new BlockItem(DNLBlocks.AZURO_OAK_WOODEN_BOARD.get(),   new Item.Properties()));
+    public static final Supplier<Item> BAMBOO_WOODEN_BOARD      = register("bamboo_wooden_board",      () -> new BlockItem(DNLBlocks.BAMBOO_WOODEN_BOARD.get(),      new Item.Properties()));
+    public static final Supplier<Item> BIRCH_WOODEN_BOARD       = register("birch_wooden_board",       () -> new BlockItem(DNLBlocks.BIRCH_WOODEN_BOARD.get(),       new Item.Properties()));
+    public static final Supplier<Item> CHERRY_WOODEN_BOARD      = register("cherry_wooden_board",      () -> new BlockItem(DNLBlocks.CHERRY_WOODEN_BOARD.get(),      new Item.Properties()));
+    public static final Supplier<Item> CRIMSON_WOODEN_BOARD     = register("crimson_wooden_board",     () -> new BlockItem(DNLBlocks.CRIMSON_WOODEN_BOARD.get(),     new Item.Properties()));
+    public static final Supplier<Item> DARK_OAK_WOODEN_BOARD    = register("dark_oak_wooden_board",    () -> new BlockItem(DNLBlocks.DARK_OAK_WOODEN_BOARD.get(),    new Item.Properties()));
+    public static final Supplier<Item> JUNGLE_WOODEN_BOARD      = register("jungle_wooden_board",      () -> new BlockItem(DNLBlocks.JUNGLE_WOODEN_BOARD.get(),      new Item.Properties()));
+    public static final Supplier<Item> MANGROVE_WOODEN_BOARD    = register("mangrove_wooden_board",    () -> new BlockItem(DNLBlocks.MANGROVE_WOODEN_BOARD.get(),    new Item.Properties()));
+    public static final Supplier<Item> OAK_WOODEN_BOARD         = register("oak_wooden_board",         () -> new BlockItem(DNLBlocks.OAK_WOODEN_BOARD.get(),         new Item.Properties()));
+    public static final Supplier<Item> PALE_OAK_WOODEN_BOARD    = register("pale_oak_wooden_board",    () -> new BlockItem(DNLBlocks.PALE_OAK_WOODEN_BOARD.get(),    new Item.Properties()));
+    public static final Supplier<Item> SPRUCE_WOODEN_BOARD      = register("spruce_wooden_board",      () -> new BlockItem(DNLBlocks.SPRUCE_WOODEN_BOARD.get(),      new Item.Properties()));
+    public static final Supplier<Item> WARPED_WOODEN_BOARD      = register("warped_wooden_board",      () -> new BlockItem(DNLBlocks.WARPED_WOODEN_BOARD.get(),      new Item.Properties()));
 
     // MECHANICAL BLOCKS
     public static final Supplier<Item> DUNGEON_WALL_TORCH = register("dungeon_wall_torch", () -> new BlockItem(DNLBlocks.DUNGEON_WALL_TORCH.get(), new Item.Properties()));
