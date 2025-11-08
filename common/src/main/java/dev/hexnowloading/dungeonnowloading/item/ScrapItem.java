@@ -47,7 +47,7 @@ public class ScrapItem extends Item {
         if (hasOriginal(stack)) {
             ItemStack original = getOriginal(stack);
             // Format: "{ItemName} Scrap"
-            return Component.empty().append(original.getHoverName()).append(Component.literal(" Scrap"));
+            return Component.empty().append(original.getHoverName()).append(Component.translatable("item.dungeonnowloading.item_scraps.scrap"));
         }
         return super.getName(stack);
     }
