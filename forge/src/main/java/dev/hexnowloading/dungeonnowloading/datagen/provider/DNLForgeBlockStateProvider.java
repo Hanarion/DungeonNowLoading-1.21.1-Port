@@ -53,6 +53,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.DIAMOND_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
+        simpleBlockWithItem(DNLBlocks.SOUL_EXTRACTOR.get());
 
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientStairsLikeBlockWithItem(DNLBlocks.MENDING_AURA_STAIRS.get(), DNLBlocks.MENDING_AURA.get());

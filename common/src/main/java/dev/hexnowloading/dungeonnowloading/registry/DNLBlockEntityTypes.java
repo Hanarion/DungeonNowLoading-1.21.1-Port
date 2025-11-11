@@ -1,6 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
-import dev.hexnowloading.dungeonnowloading.block.MendingTableBlock;
 import dev.hexnowloading.dungeonnowloading.block.entity.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,6 +18,7 @@ public class DNLBlockEntityTypes {
     public static final Supplier<BlockEntityType<PreserverBlockEntity>> PRESERVER_BLOCK = register("preserver", () -> BlockEntityType.Builder.of(PreserverBlockEntity::new, DNLBlocks.STONE_PRESERVER.get()).build(null));
     public static final Supplier<BlockEntityType<MendingAuraBlockEntity>> MENDING_AURA = register("mending_aura", () -> BlockEntityType.Builder.of(MendingAuraBlockEntity::new, DNLBlocks.MENDING_AURA.get(), DNLBlocks.MENDING_AURA_STAIRS.get(), DNLBlocks.MENDING_AURA_SLAB.get(), DNLBlocks.MENDING_AURA_FENCE.get(), DNLBlocks.MENDING_AURA_WALL.get(), DNLBlocks.MENDING_AURA_PATH.get(), DNLBlocks.MENDING_AURA_PANE.get(), DNLBlocks.MENDING_AURA_CHEST.get()).build(null));
     public static final Supplier<BlockEntityType<MendingTableBlockEntity>> MENDING_TABLE = register("mending_table", () -> BlockEntityType.Builder.of(MendingTableBlockEntity::new, DNLBlocks.MENDING_TABLE.get()).build(null));
+    public static final Supplier<BlockEntityType<SoulExtractorBlockEntity>> SOUL_EXTRACTOR = register("soul_extractor", () -> BlockEntityType.Builder.of(SoulExtractorBlockEntity::new, DNLBlocks.SOUL_EXTRACTOR.get()).build(null));
 
     public static final Supplier<BlockEntityType<PlayerStatueBlockEntity>> PLAYER_STATUE = register("player_statue", () -> BlockEntityType.Builder.of(PlayerStatueBlockEntity::new, DNLBlocks.PLAYER_STATUE.get()).build(null));
     public static final Supplier<BlockEntityType<MendstoneChalkMarkBlockEntity>> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> BlockEntityType.Builder.of(MendstoneChalkMarkBlockEntity::new, DNLBlocks.MENDSTONE_CHALK_MARK.get()).build(null));

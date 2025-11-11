@@ -164,6 +164,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SMALL_DURITE_BUD.get());
                 output.accept(DNLItems.MENDSTONE_CHALK_MARK.get());
                 output.accept(DNLItems.MENDING_TABLE.get());
+                output.accept(DNLItems.SOUL_EXTRACTOR.get());
 
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());

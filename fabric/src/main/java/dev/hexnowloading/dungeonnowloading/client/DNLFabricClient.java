@@ -153,6 +153,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.SPAWNER_CARRIER.get(), SpawnerCarrierRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SCUTTLE.get(), ScuttleRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BALLISTA_GOLEM.get(), BallistaGolemRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.WISP.get(), WispRenderer::new);
 
         // Passive
         EntityRendererRegistry.register(DNLEntityTypes.SEALED_CHAOS.get(), SealedChaosRenderer::new);
@@ -215,6 +216,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(SpawnerCarrierModel.LAYER_LOCATION, SpawnerCarrierModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ScuttleModel.LAYER_LOCATION, ScuttleModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BallistaGolemModel.LAYER_LOCATION, BallistaGolemModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(WispModel.LAYER_LOCATION, WispModel::createBodyLayer);
 
         // Passive
         EntityModelLayerRegistry.registerModelLayer(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);

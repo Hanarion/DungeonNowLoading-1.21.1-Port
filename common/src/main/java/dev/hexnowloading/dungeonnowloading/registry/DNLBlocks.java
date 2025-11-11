@@ -123,6 +123,7 @@ public class DNLBlocks {
     public static Supplier<Block> MEDIUM_DURITE_BUD;
     public static Supplier<Block> SMALL_DURITE_BUD;
     public static Supplier<Block> MENDSTONE_CHALK_MARK;
+    public static Supplier<Block> SOUL_EXTRACTOR;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -252,6 +253,8 @@ public class DNLBlocks {
         MEDIUM_DURITE_BUD = registerBlock("medium_durite_bud", () -> new DuriteClusterBlock(DuriteClusterBlock.HitboxPreset.MEDIUM, BlockBehaviour.Properties.of().strength(1.5f, 1.5f).mapColor(MapColor.COLOR_BLUE).forceSolidOn().forceSolidOn().lightLevel(blockState -> 2).pushReaction(PushReaction.DESTROY)));
         SMALL_DURITE_BUD = registerBlock("small_durite_bud", () -> new DuriteClusterBlock(DuriteClusterBlock.HitboxPreset.SMALL, BlockBehaviour.Properties.of().strength(1.5f, 1.5f).mapColor(MapColor.COLOR_BLUE).forceSolidOn().forceSolidOn().lightLevel(blockState -> 1).pushReaction(PushReaction.DESTROY)));
         MENDSTONE_CHALK_MARK = registerBlock("mendstone_chalk_mark", () -> new MendstoneChalkMarkBlock(BlockBehaviour.Properties.of().strength(0.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
+
+        SOUL_EXTRACTOR = registerBlock("soul_extractor", () -> new SoulExtractorBlock(BlockBehaviour.Properties.of().strength(1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
 
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));

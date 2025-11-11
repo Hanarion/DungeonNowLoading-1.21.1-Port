@@ -45,6 +45,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(SpawnerCarrierModel.LAYER_LOCATION, SpawnerCarrierModel::createBodyLayer);
         event.registerLayerDefinition(ScuttleModel.LAYER_LOCATION, ScuttleModel::createBodyLayer);
         event.registerLayerDefinition(BallistaGolemModel.LAYER_LOCATION, BallistaGolemModel::createBodyLayer);
+        event.registerLayerDefinition(WispModel.LAYER_LOCATION, WispModel::createBodyLayer);
 
         // Passive
         event.registerLayerDefinition(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);
@@ -87,6 +88,7 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.SPAWNER_CARRIER.get(), SpawnerCarrierRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.SCUTTLE.get(), ScuttleRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BALLISTA_GOLEM.get(), BallistaGolemRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.WISP.get(), WispRenderer::new);
 
         // Passive
         event.registerEntityRenderer(DNLEntityTypes.SEALED_CHAOS.get(), SealedChaosRenderer::new);

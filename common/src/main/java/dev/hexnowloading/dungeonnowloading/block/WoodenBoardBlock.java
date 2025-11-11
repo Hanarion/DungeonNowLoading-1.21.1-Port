@@ -75,7 +75,6 @@ public class WoodenBoardBlock extends Block implements SimpleWaterloggedBlock {
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         Direction facing = state.getValue(FACING);
         BlockPos supportPos = pos.relative(facing.getOpposite());
-        // Needs a solid face behind it to “hang” on
         return level.getBlockState(supportPos).isFaceSturdy(level, supportPos, facing);
     }
 
