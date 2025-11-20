@@ -4,7 +4,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.phys.Vec3;
 
-public class FairkeeperFlyingMoveControl extends MoveControl {
+public class SimpleFlyingMoveControl extends MoveControl {
 
     private double maxSpeed;
     private double minSpeed;
@@ -12,7 +12,7 @@ public class FairkeeperFlyingMoveControl extends MoveControl {
     private Vec3 targetPos;
     private double stopAccuracy;
 
-    public FairkeeperFlyingMoveControl(Mob mob) {
+    public SimpleFlyingMoveControl(Mob mob) {
         super(mob);
     }
 

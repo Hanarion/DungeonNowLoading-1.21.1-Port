@@ -39,15 +39,21 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
         //simpleItem(DNLItems.COPPER_DETONATOR.get());
         simpleItem(DNLItems.MENDSTONE_CHALK.get());
+        simpleItem(DNLItems.CINDERLITE.get());
+        simpleItem(DNLItems.ZONE_WAND.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
         spawnEggItem(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
+        spawnEggItem(DNLItems.WISP_SPAWNEGG.get());
+        spawnEggItem(DNLItems.WISP_LANTERN_SPAWNEGG.get());
+        spawnEggItem(DNLItems.WEB_SPITTER_SPAWNEGG.get());
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.65f, 0.9f, 1.5f);
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.43f, 0.6f, 1.0f);
         booleanPropertyItem(DNLItems.COPPER_DETONATOR.get(), "mode_switch", "copper_detonator", "copper_detonator_switched");
         booleanPropertyItem(DNLItems.REPULSOR.get(), "golden_mode", "repulsor", "repulsor_golden");
         PlayerStatueItemWithDisplay(DNLItems.PLAYER_STATUE.get());
+        itemFromExistingModel(DNLItems.RAIL_PLATFORM.get(), "block/rail_platform");
     }
 
     private void simpleItem(Item item) {
@@ -250,6 +256,13 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
                 .scale(1f, 1f, 1f)
                 .end()
                 .end();
+    }
+
+    private void itemFromExistingModel(Item item, String existingModelPath) {
+        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+
+        getBuilder(ITEM_FOLDER + "/" + name)
+                .parent(getExistingFile(modLoc(existingModelPath)));
     }
 
 }

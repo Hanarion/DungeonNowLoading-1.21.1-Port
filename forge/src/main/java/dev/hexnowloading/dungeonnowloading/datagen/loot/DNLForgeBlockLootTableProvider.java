@@ -131,6 +131,13 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.add(DNLBlocks.LARGE_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.75f));
         this.add(DNLBlocks.MEDIUM_DURITE_BUD.get(), b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.50f));
         this.add(DNLBlocks.SMALL_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.25f));
+
+        this.add(DNLBlocks.CINDERLITE_ORE.get(), createOreDrop(DNLBlocks.CINDERLITE_ORE.get(), DNLItems.CINDERLITE.get()));
+        this.add(DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get(), createOreDrop(DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get(), DNLItems.CINDERLITE.get()));
+        this.dropWhenSilkTouch(DNLBlocks.BRITTLESTONE.get());
+        this.dropSelf(DNLBlocks.RAIL_PLATFORM.get());
+        this.dropSelf(DNLBlocks.DEEPSTEEL_BLOCK.get());
+        this.add(DNLBlocks.WEB_CARPET.get(), block -> this.createMultifaceBlockDrops(block, HAS_SHEARS));
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {

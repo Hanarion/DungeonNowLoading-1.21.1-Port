@@ -23,6 +23,9 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
                 output.accept(DNLItems.SEALED_CHAOS_SPAWNEGG.get());
                 output.accept(DNLItems.WHIMPER_SPAWNEGG.get());
+                output.accept(DNLItems.WISP_SPAWNEGG.get());
+                output.accept(DNLItems.WISP_LANTERN_SPAWNEGG.get());
+                output.accept(DNLItems.WEB_SPITTER_SPAWNEGG.get());
                 // Items - Ingredients
                 output.accept(DNLItems.SPAWNER_FRAGMENT.get());
                 output.accept(DNLItems.SPAWNER_FRAME.get());
@@ -38,6 +41,9 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.CATALYZED_REDSTONE.get());
                 output.accept(DNLItems.DURITE.get());
                 output.accept(DNLItems.MENDSTONE.get());
+
+                output.accept(DNLItems.CINDERLITE.get());
+
                 // Items - Combat (Boss Item, then non-boss Item order)
                 output.accept(DNLItems.SCEPTER_OF_SEALED_CHAOS.get());
                 output.accept(DNLItems.LIFE_STEALER.get());
@@ -164,7 +170,16 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SMALL_DURITE_BUD.get());
                 output.accept(DNLItems.MENDSTONE_CHALK_MARK.get());
                 output.accept(DNLItems.MENDING_TABLE.get());
+
                 output.accept(DNLItems.SOUL_EXTRACTOR.get());
+                output.accept(DNLItems.CINDERLITE_ORE.get());
+                output.accept(DNLItems.DEEPSLATE_CINDERLITE_ORE.get());
+                output.accept(DNLItems.BRITTLESTONE.get());
+                output.accept(DNLItems.DEEPSTEEL_BLOCK.get());
+                output.accept(DNLItems.RAIL_PLATFORM.get());
+                output.accept(DNLItems.WEB_CARPET.get());
+                output.accept(DNLItems.MOB_SPAWNPOINT.get());
+                output.accept(DNLItems.ZONE_WAND.get());
 
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());

@@ -54,6 +54,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
         simpleBlockWithItem(DNLBlocks.SOUL_EXTRACTOR.get());
+        simpleBlockWithItem(DNLBlocks.CINDERLITE_ORE.get());
+        simpleBlockWithItem(DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get());
+        simpleBlockWithItem(DNLBlocks.BRITTLESTONE.get());
+        simpleBlockWithItem(DNLBlocks.DEEPSTEEL_BLOCK.get());
 
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientStairsLikeBlockWithItem(DNLBlocks.MENDING_AURA_STAIRS.get(), DNLBlocks.MENDING_AURA.get());
@@ -98,29 +102,17 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.AZURO_OAK_LOG.get());
         rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.STRIPPED_AZURO_OAK_LOG.get());
         simpleBlockWithItem(DNLBlocks.AZURO_LEAVES.get());
-
         simpleBlockWithItem(DNLBlocks.AZURO_OAK_PLANKS.get());
-
         stairsBlockWithItem((StairBlock) DNLBlocks.AZURO_OAK_PLANK_STAIRS.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
         slabBlockWithItems((SlabBlock) DNLBlocks.AZURO_OAK_PLANK_SLAB.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
         fenceBlockWithItem((FenceBlock) DNLBlocks.AZURO_OAK_PLANK_FENCE.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
         fenceGateBlockWithItem((FenceGateBlock) DNLBlocks.AZURO_OAK_PLANK_FENCE_GATE.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
         buttonBlockWithItem((ButtonBlock) DNLBlocks.AZURO_OAK_BUTTON.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
         simplePressurePlateBlockWithItem((PressurePlateBlock) DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
-        doorBlockWithRenderType((DoorBlock) DNLBlocks.AZURO_OAK_DOOR.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_bottom"),
-                new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_top"), "cutout");
-
+        doorBlockWithRenderType((DoorBlock) DNLBlocks.AZURO_OAK_DOOR.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_bottom"), new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_top"), "cutout");
         generateMendstoneChalkMarkModels((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK_MARK.get(), MendstoneChalkMarkBlock.OUTLINE);
-        //faceBlockWithItem((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK.get());
-
-        //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());
-        //simpleRandomBlockWithItem(DNLBlocks.MOSS.get(), 5);
+        railPlatformStates(DNLBlocks.RAIL_PLATFORM.get());
+        multifaceWebCarpet(DNLBlocks.WEB_CARPET.get());
     }
 
     private void fenceGateBlockWithItem(FenceGateBlock block, Block parent) {
@@ -1031,6 +1023,100 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         simpleBlockItem(block, models().getExistingFile(extend(blockTexture(block), "_off")));
     }
+// inside your DNLBlockStateProvider
+
+    private void multifaceBlockWithItem(Block block, String textureName) {
+        String name = key(block).getPath();
+        ResourceLocation texture = modLoc("block/" + textureName); // block/web_carpet
+
+        ModelFile model = models()
+                .withExistingParent(name, mcLoc("block/glow_lichen"))
+                .texture("glow_lichen", texture) // <- IMPORTANT
+                .texture("particle", texture);   // item particles too
+
+        MultiPartBlockStateBuilder builder = getMultipartBuilder(block);
+
+        for (Direction dir : Direction.values()) {
+            BooleanProperty prop = MultifaceBlock.getFaceProperty(dir);
+
+            int xRot = 0;
+            int yRot = 0;
+            switch (dir) {
+                case NORTH -> { xRot = 0;   yRot = 0;   }
+                case EAST  -> { xRot = 0;   yRot = 90;  }
+                case SOUTH -> { xRot = 0;   yRot = 180; }
+                case WEST  -> { xRot = 0;   yRot = 270; }
+                case UP    -> { xRot = 270; yRot = 0;   }
+                case DOWN  -> { xRot = 90;  yRot = 0;   }
+            }
+
+            builder.part()
+                    .modelFile(model)
+                    .rotationX(xRot)
+                    .rotationY(yRot)
+                    .uvLock(true)
+                    .addModel()
+                    .condition(prop, true);
+        }
+
+        simpleBlockItem(block, model);
+    }
+
+    private void multifaceWebCarpet(Block block) {
+        String name = key(block).getPath();
+
+        ModelFile normal = models()
+                .withExistingParent(name, mcLoc("block/glow_lichen"))
+                .texture("glow_lichen", modLoc("block/web_carpet"))
+                .texture("particle", modLoc("block/web_carpet"));
+
+        ModelFile burning = models()
+                .withExistingParent(name + "_burning", mcLoc("block/glow_lichen"))
+                .texture("glow_lichen", modLoc("block/web_carpet_burning"))
+                .texture("particle", modLoc("block/web_carpet_burning"));
+
+        MultiPartBlockStateBuilder builder = getMultipartBuilder(block);
+
+        for (Direction dir : Direction.values()) {
+            BooleanProperty faceProp = MultifaceBlock.getFaceProperty(dir);
+
+            int xRot = 0;
+            int yRot = 0;
+            switch (dir) {
+                case NORTH -> { xRot = 0;   yRot = 0;   }
+                case EAST  -> { xRot = 0;   yRot = 90;  }
+                case SOUTH -> { xRot = 0;   yRot = 180; }
+                case WEST  -> { xRot = 0;   yRot = 270; }
+                case UP    -> { xRot = 270; yRot = 0;   }
+                case DOWN ->  { xRot = 90;  yRot = 0;   }
+            }
+
+            // Normal web
+            builder.part()
+                    .modelFile(normal)
+                    .rotationX(xRot)
+                    .rotationY(yRot)
+                    .uvLock(true)
+                    .addModel()
+                    .condition(faceProp, true)
+                    .condition(WebCarpetBlock.BURNING, false);
+
+            // Burning web
+            builder.part()
+                    .modelFile(burning)
+                    .rotationX(xRot)
+                    .rotationY(yRot)
+                    .uvLock(true)
+                    .addModel()
+                    .condition(faceProp, true)
+                    .condition(WebCarpetBlock.BURNING, true);
+        }
+
+        simpleBlockItem(block, normal);
+    }
+
+
+
 
     private void facingSixWayWithExistingModel(Block block, String modelName) {
         ModelFile model = models().getExistingFile(modLoc("block/" + modelName));
@@ -1124,6 +1210,34 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
             // Fallback to the block model
             simpleBlockItem(block, mf);
         }
+    }
+
+    private void railPlatformStates(Block block) {
+        ModelFile normal = models().getExistingFile(modLoc("block/rail_platform"));
+        ModelFile raised = models().getExistingFile(modLoc("block/rail_platform_raised"));
+
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction dir = state.getValue(RailPlatformBlock.FACING);
+            boolean isRaised = state.getValue(RailPlatformBlock.RAISED);
+
+            ModelFile model = isRaised ? raised : normal;
+
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationY((int) dir.toYRot())
+                    .build();
+        });
+    }
+
+
+    private void horizontalExistingModel(Block block, String existingBlockModelName) {
+        String n = name(block); // usually the registry path, ex: "rail_platform"
+
+        ModelFile existingModel = models().getExistingFile(
+                modLoc("block/" + existingBlockModelName)
+        );
+
+        horizontalBlock(block, existingModel);
     }
 
     private void particleOnlyModel(Block block) {

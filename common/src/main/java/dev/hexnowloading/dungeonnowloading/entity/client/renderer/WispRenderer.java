@@ -12,7 +12,7 @@ public class WispRenderer<T extends WispEntity> extends MobRenderer<T, WispModel
     private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wisp/wisp.png");
 
     public WispRenderer(EntityRendererProvider.Context renderManager) {
-        super(renderManager, new WispModel<>(renderManager.bakeLayer(WispModel.LAYER_LOCATION)), 1.0F);
+        super(renderManager, new WispModel<>(renderManager.bakeLayer(WispModel.LAYER_LOCATION)), 0.5F);
     }
 
     @Override

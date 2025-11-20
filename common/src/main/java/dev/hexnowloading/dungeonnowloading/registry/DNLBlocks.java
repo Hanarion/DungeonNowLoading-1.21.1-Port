@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -124,6 +125,13 @@ public class DNLBlocks {
     public static Supplier<Block> SMALL_DURITE_BUD;
     public static Supplier<Block> MENDSTONE_CHALK_MARK;
     public static Supplier<Block> SOUL_EXTRACTOR;
+    public static Supplier<Block> CINDERLITE_ORE;
+    public static Supplier<Block> DEEPSLATE_CINDERLITE_ORE;
+    public static Supplier<Block> BRITTLESTONE;
+    public static Supplier<Block> DEEPSTEEL_BLOCK;
+    public static Supplier<Block> RAIL_PLATFORM;
+    public static Supplier<Block> WEB_CARPET;
+    public static Supplier<Block> MOB_SPAWN_POINT;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -255,6 +263,13 @@ public class DNLBlocks {
         MENDSTONE_CHALK_MARK = registerBlock("mendstone_chalk_mark", () -> new MendstoneChalkMarkBlock(BlockBehaviour.Properties.of().strength(0.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
 
         SOUL_EXTRACTOR = registerBlock("soul_extractor", () -> new SoulExtractorBlock(BlockBehaviour.Properties.of().strength(1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
+        CINDERLITE_ORE = registerBlock("cinderlite_ore", () -> new CinderliteOreBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.0f, 3.0f), UniformInt.of(3, 7)));
+        DEEPSLATE_CINDERLITE_ORE = registerBlock("deepslate_cinderlite_ore", () -> new CinderliteOreBlock(BlockBehaviour.Properties.copy(CINDERLITE_ORE.get()).mapColor(MapColor.DEEPSLATE).strength(4.5F, 3.0F).sound(SoundType.DEEPSLATE), UniformInt.of(3, 7)));
+        BRITTLESTONE = registerBlock("brittlestone", () -> new BrittlestoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0f, 6.0f).noOcclusion()));
+        DEEPSTEEL_BLOCK = registerBlock("deepsteel_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F)));
+        RAIL_PLATFORM = registerBlock("rail_platform", () -> new RailPlatformBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).noOcclusion()));
+        WEB_CARPET = registerBlock("web_carpet", () -> new WebCarpetBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).forceSolidOn().noCollission().requiresCorrectToolForDrops().strength(4.0F).pushReaction(PushReaction.DESTROY)));
+        MOB_SPAWN_POINT = registerBlock("mob_spawn_point", () -> new MobSpawnPointBlock(BlockBehaviour.Properties.of().noCollission().noOcclusion().strength(-1.0F, 3600000.0F).noLootTable()));
 
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
