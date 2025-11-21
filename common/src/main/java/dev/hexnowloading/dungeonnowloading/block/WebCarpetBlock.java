@@ -4,8 +4,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -14,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -64,6 +73,60 @@ public class WebCarpetBlock extends MultifaceBlock {
         return Shapes.empty();
     }
 
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        super.onPlace(state, level, pos, oldState, isMoving);
+
+        if (level.isClientSide) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        // Only react when the block actually changed to WebCarpet
+        if (oldState.is(this)) return;
+
+        // If any neighbor is fire, ignite immediately
+        for (Direction dir : Direction.values()) {
+            BlockPos neighborPos = pos.relative(dir);
+            BlockState neighborState = level.getBlockState(neighborPos);
+
+            if (neighborState.is(Blocks.FIRE)) {
+                ignite(serverLevel, pos, state);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public InteractionResult use(BlockState state,
+                                 Level level,
+                                 BlockPos pos,
+                                 Player player,
+                                 InteractionHand hand,
+                                 BlockHitResult hit) {
+        ItemStack stack = player.getItemInHand(hand);
+
+        boolean isIgniter =
+                stack.is(Items.FLINT_AND_STEEL) ||
+                        stack.is(Items.FIRE_CHARGE);
+
+        if (!isIgniter) {
+            return super.use(state, level, pos, player, hand, hit);
+        }
+
+        if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
+            ignite(serverLevel, pos, state);
+
+            if (!player.getAbilities().instabuild) {
+                if (stack.is(Items.FLINT_AND_STEEL)) {
+                    stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                } else if (stack.is(Items.FIRE_CHARGE)) {
+                    stack.shrink(1);
+                }
+            }
+        }
+
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
     // --- Slowing + natural breaking ---
 
     @Override
@@ -73,19 +136,37 @@ public class WebCarpetBlock extends MultifaceBlock {
         VoxelShape shape = state.getShape(level, pos);
         if (shape.isEmpty()) return;
 
-        // Shape is in local [0,1] coords, move it to world space
         AABB webBox = shape.bounds().move(pos);
-
-        // If the entity's hitbox doesn't touch the web geometry at all, do nothing
         if (!webBox.intersects(entity.getBoundingBox())) {
             return;
         }
 
-        // → apply slowdown like cobweb
+        // --- 1) Flaming projectile -> ignite ---
+        if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
+            if (entity instanceof AbstractArrow arrow) {
+                if (arrow.isOnFire()) {
+                    ignite(serverLevel, pos, state);
+                }
+            } else if (entity instanceof Projectile projectile && projectile.isOnFire()) {
+                ignite(serverLevel, pos, state);
+            }
+        }
+
+        // --- 2) Normal slow + random breaking for living entities ---
+
+        if (!(entity instanceof LivingEntity living)) {
+            return;
+        }
+
+        // Don't slow spiders (vanilla Spider + your WebSpitterEntity, since it extends Spider)
+        if (living instanceof Spider) {
+            return;
+        }
+
+        // Slow like cobweb
         entity.makeStuckInBlock(state, new Vec3(0.25D, 0.05D, 0.25D));
 
         if (level.isClientSide) return;
-        if (!(entity instanceof LivingEntity)) return;
 
         // Check if entity is actually trying to move
         double dx = entity.getX() - entity.xo;
@@ -96,14 +177,69 @@ public class WebCarpetBlock extends MultifaceBlock {
         boolean isMoving = sq > 0.0D;
 
         if (isMoving) {
+            // ~1/20 chance per tick
             if (level.random.nextInt(20) == 0) {
                 level.destroyBlock(pos, true, entity);
             }
         }
     }
 
+
+
     // --- Burning logic ---
 
+
+    // --- Spread rule support (shared logic with projectile-style pattern) ---
+
+    private record SpreadRule(
+            int dx, int dy, int dz,                  // target offset from center
+            Direction faceDir,                       // face direction on the neighbor web (in base orientation)
+            int cornerDx, int cornerDy, int cornerDz,// corner-block offset to check
+            boolean requiresCornerClear              // if true, skip if corner is solid
+    ) {}
+
+    private enum LocalAxis {
+        U_POS, U_NEG,
+        V_POS, V_NEG,
+        N_POS, N_NEG
+    }
+
+    // Base pattern for DOWN-facing webs (floor).
+    // Same idea as the projectile's DOWN_RULES, but here we "ignite" neighbors instead of placing webs.
+    private static final SpreadRule[] DOWN_FIRE_RULES = new SpreadRule[] {
+            // down:true in NESW (floor neighbors)
+            new SpreadRule( 1, 0,  0, Direction.DOWN, 0, 0, 0, false),
+            new SpreadRule(-1, 0,  0, Direction.DOWN, 0, 0, 0, false),
+            new SpreadRule( 0, 0,  1, Direction.DOWN, 0, 0, 0, false),
+            new SpreadRule( 0, 0, -1, Direction.DOWN, 0, 0, 0, false),
+
+            // diagonal wall webs with corner checks
+            // east:true at (-1,-1,0), blocked by corner (-1,0,0)
+            new SpreadRule(-1, -1, 0, Direction.EAST,  -1, 0,  0, true),
+
+            // south:true at (0,-1,-1), blocked by corner (0,0,-1)
+            new SpreadRule( 0, -1,-1, Direction.SOUTH,  0, 0, -1, true),
+
+            // west:true at (1,-1,0), blocked by corner (1,0,0)
+            new SpreadRule( 1, -1, 0, Direction.WEST,   1, 0,  0, true),
+
+            // north:true at (0,-1,1), blocked by corner (0,0,1)
+            new SpreadRule( 0, -1, 1, Direction.NORTH,  0, 0,  1, true)
+    };
+
+    private LocalAxis toLocalAxis(Direction faceDir) {
+        // Base orientation:
+        // U_base = EAST, V_base = SOUTH, N_base = DOWN
+        return switch (faceDir) {
+            case EAST  -> LocalAxis.U_POS;
+            case WEST  -> LocalAxis.U_NEG;
+            case SOUTH -> LocalAxis.V_POS;
+            case NORTH -> LocalAxis.V_NEG;
+            case DOWN  -> LocalAxis.N_POS;
+            case UP    -> LocalAxis.N_NEG;
+            default    -> LocalAxis.N_POS;
+        };
+    }
     /**
      * Called by neighbor fire or chain spread to start the burning phase:
      *  normal -> burning (visual) -> fire (via tick)
@@ -166,7 +302,7 @@ public class WebCarpetBlock extends MultifaceBlock {
                     case SOUTH -> FireBlock.SOUTH;
                     case WEST  -> FireBlock.WEST;
                     case UP    -> FireBlock.UP;
-                    case DOWN  -> FireBlock.UP; // shouldn't happen here
+                    case DOWN  -> FireBlock.UP; // shouldn't happen
                 };
 
                 fireState = fireState
@@ -192,7 +328,7 @@ public class WebCarpetBlock extends MultifaceBlock {
             return;
         }
 
-        // Orthogonal spread as before
+        // 1) Simple orthogonal spread: adjacent webs always ignite
         for (Direction dir : Direction.values()) {
             BlockPos nextPos = pos.relative(dir);
             BlockState neighbor = level.getBlockState(nextPos);
@@ -202,196 +338,142 @@ public class WebCarpetBlock extends MultifaceBlock {
             }
         }
 
-        // NEW: diagonal “around the corner” rules
-        igniteDiagonalWebConnections(level, pos, state);
+        // 2) Pattern-based spread (same logic as projectile), rotated for each face
+        spreadFirePattern(level, pos, state);
     }
 
-    private void igniteDiagonalWebConnections(ServerLevel level, BlockPos pos, BlockState state) {
-        // Helper to check corner solidity
-        java.util.function.Predicate<BlockPos> isCornerBlocked =
-                cornerPos -> level.getBlockState(cornerPos).isSolid();
+    private void spreadFirePattern(ServerLevel level, BlockPos center, BlockState state) {
+        // For every face this web has, apply the DOWN_FIRE_RULES pattern rotated into that face's frame.
+        if (hasFace(state, Direction.DOWN)) {
+            applyFireSpreadRules(level, center, Direction.DOWN, DOWN_FIRE_RULES);
+        }
+        if (hasFace(state, Direction.UP)) {
+            applyFireSpreadRules(level, center, Direction.UP, DOWN_FIRE_RULES);
+        }
+        if (hasFace(state, Direction.NORTH)) {
+            applyFireSpreadRules(level, center, Direction.NORTH, DOWN_FIRE_RULES);
+        }
+        if (hasFace(state, Direction.EAST)) {
+            applyFireSpreadRules(level, center, Direction.EAST, DOWN_FIRE_RULES);
+        }
+        if (hasFace(state, Direction.SOUTH)) {
+            applyFireSpreadRules(level, center, Direction.SOUTH, DOWN_FIRE_RULES);
+        }
+        if (hasFace(state, Direction.WEST)) {
+            applyFireSpreadRules(level, center, Direction.WEST, DOWN_FIRE_RULES);
+        }
+    }
 
-        // ------------------------
-        // CASE A: this web has DOWN:true (floor) burning
-        // ------------------------
-        if (state.getValue(FACE_DOWN)) {
-            // (-1, -1, 0) east:true, but NOT if (-1, 0, 0) is solid
-            BlockPos corner = pos.offset(-1, 0, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(-1, -1, 0);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_EAST)) {
-                    ignite(level, targetPos, target);
-                }
+    private void applyFireSpreadRules(ServerLevel level,
+                                      BlockPos center,
+                                      Direction sourceFace,
+                                      SpreadRule[] rules) {
+        // Base orientation for DOWN rules:
+        // U_base = EAST (+X), V_base = SOUTH (+Z), N_base = DOWN (-Y)
+
+        Direction U_t, V_t, N_t;
+        N_t = sourceFace;
+
+        switch (sourceFace) {
+            case DOWN -> {
+                U_t = Direction.EAST;
+                V_t = Direction.SOUTH;
             }
-
-            // (0, -1, -1) south:true, but NOT if (0, 0, -1) is solid
-            corner = pos.offset(0, 0, -1);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(0, -1, -1);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_SOUTH)) {
-                    ignite(level, targetPos, target);
-                }
+            case UP -> {
+                U_t = Direction.EAST;
+                V_t = Direction.SOUTH;
             }
-
-            // (1, -1, 0) west:true, but NOT if (1, 0, 0) is solid
-            corner = pos.offset(1, 0, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(1, -1, 0);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_WEST)) {
-                    ignite(level, targetPos, target);
-                }
+            case NORTH -> {
+                U_t = Direction.EAST;
+                V_t = Direction.DOWN;
             }
-
-            // (0, -1, 1) north:true, but NOT if (0, 0, 1) is solid
-            corner = pos.offset(0, 0, 1);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(0, -1, 1);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_NORTH)) {
-                    ignite(level, targetPos, target);
-                }
+            case SOUTH -> {
+                U_t = Direction.WEST;
+                V_t = Direction.DOWN;
+            }
+            case EAST -> {
+                U_t = Direction.SOUTH;
+                V_t = Direction.DOWN;
+            }
+            case WEST -> {
+                U_t = Direction.NORTH;
+                V_t = Direction.DOWN;
+            }
+            default -> {
+                U_t = Direction.EAST;
+                V_t = Direction.SOUTH;
             }
         }
 
-        // ------------------------
-        // CASE B: this web has UP:true (ceiling) burning
-        // ------------------------
-        if (state.getValue(FACE_UP)) {
-            // (-1, 1, 0) east:true, but NOT if (-1, 0, 0) is solid
-            BlockPos corner = pos.offset(-1, 0, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(-1, 1, 0);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_EAST)) {
-                    ignite(level, targetPos, target);
+        int Ux = U_t.getStepX(), Uy = U_t.getStepY(), Uz = U_t.getStepZ();
+        int Vx = V_t.getStepX(), Vy = V_t.getStepY(), Vz = V_t.getStepZ();
+        int Nx = N_t.getStepX(), Ny = N_t.getStepY(), Nz = N_t.getStepZ();
+
+        for (SpreadRule rule : rules) {
+            // --- 1) Base world delta -> local (a,b,c) relative to (U_base, V_base, N_base) ---
+            int dx = rule.dx();
+            int dy = rule.dy();
+            int dz = rule.dz();
+
+            // Base: dx = a, dz = b, dy = -c  => a=dx, b=dz, c=-dy
+            int a = dx;
+            int b = dz;
+            int c = -dy;
+
+            // --- 2) Rotate local (a,b,c) into this face's basis (U_t, V_t, N_t) ---
+            int tdx = a * Ux + b * Vx + c * Nx;
+            int tdy = a * Uy + b * Vy + c * Ny;
+            int tdz = a * Uz + b * Vz + c * Nz;
+
+            BlockPos targetPos = center.offset(tdx, tdy, tdz);
+
+            // --- 3) Corner block check, if required ---
+            if (rule.requiresCornerClear()) {
+                int cdx = rule.cornerDx();
+                int cdy = rule.cornerDy();
+                int cdz = rule.cornerDz();
+
+                int ca = cdx;
+                int cb = cdz;
+                int cc = -cdy;
+
+                int tCdx = ca * Ux + cb * Vx + cc * Nx;
+                int tCdy = ca * Uy + cb * Vy + cc * Ny;
+                int tCdz = ca * Uz + cb * Vz + cc * Nz;
+
+                BlockPos cornerPos = center.offset(tCdx, tCdy, tCdz);
+                if (level.getBlockState(cornerPos).isSolid()) {
+                    continue;
                 }
             }
 
-            // (0, 1, -1) south:true, but NOT if (0, 0, -1) is solid
-            corner = pos.offset(0, 0, -1);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(0, 1, -1);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_SOUTH)) {
-                    ignite(level, targetPos, target);
-                }
-            }
+            // --- 4) Rotate faceDir (EAST/WEST/etc.) from base into this basis ---
+            Direction baseFace = rule.faceDir();
+            LocalAxis localAxis = toLocalAxis(baseFace);
 
-            // (1, 1, 0) west:true, but NOT if (1, 0, 0) is solid
-            corner = pos.offset(1, 0, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(1, 1, 0);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_WEST)) {
-                    ignite(level, targetPos, target);
-                }
-            }
+            Direction faceDirWorld = switch (localAxis) {
+                case U_POS -> U_t;
+                case U_NEG -> U_t.getOpposite();
+                case V_POS -> V_t;
+                case V_NEG -> V_t.getOpposite();
+                case N_POS -> N_t;
+                case N_NEG -> N_t.getOpposite();
+            };
 
-            // (0, 1, 1) north:true, but NOT if (0, 0, 1) is solid
-            corner = pos.offset(0, 0, 1);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(0, 1, 1);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_NORTH)) {
-                    ignite(level, targetPos, target);
-                }
-            }
-        }
-
-        // ------------------------
-        // CASE C: “reverse” – wall burning ignites floor/ceiling
-        // ------------------------
-        // EAST:true wall burning → down/up webs around corner
-        if (state.getValue(FACE_EAST)) {
-            // floor (down:true) at ( +1, +1, 0 ), corner at (0, +1, 0 )
-            BlockPos corner = pos.offset(0, 1, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(1, 1, 0);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_DOWN)) {
-                    ignite(level, targetPos, target);
-                }
-            }
-            // ceiling (up:true) at ( +1, -1, 0 ), corner at (0, -1, 0 )
-            corner = pos.offset(0, -1, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(1, -1, 0);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_UP)) {
-                    ignite(level, targetPos, target);
-                }
-            }
-        }
-
-        // WEST:true wall burning → down/up webs
-        if (state.getValue(FACE_WEST)) {
-            // floor at ( -1, +1, 0 ), corner at (0, +1, 0 )
-            BlockPos corner = pos.offset(0, 1, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(-1, 1, 0);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_DOWN)) {
-                    ignite(level, targetPos, target);
-                }
-            }
-            // ceiling at ( -1, -1, 0 ), corner at (0, -1, 0 )
-            corner = pos.offset(0, -1, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(-1, -1, 0);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_UP)) {
-                    ignite(level, targetPos, target);
-                }
-            }
-        }
-
-        // SOUTH:true wall burning → down/up webs
-        if (state.getValue(FACE_SOUTH)) {
-            // floor at (0, +1, +1), corner at (0, +1, 0)
-            BlockPos corner = pos.offset(0, 1, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(0, 1, 1);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_DOWN)) {
-                    ignite(level, targetPos, target);
-                }
-            }
-            // ceiling at (0, -1, +1), corner at (0, -1, 0)
-            corner = pos.offset(0, -1, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(0, -1, 1);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_UP)) {
-                    ignite(level, targetPos, target);
-                }
-            }
-        }
-
-        // NORTH:true wall burning → down/up webs
-        if (state.getValue(FACE_NORTH)) {
-            // floor at (0, +1, -1), corner at (0, +1, 0)
-            BlockPos corner = pos.offset(0, 1, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(0, 1, -1);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_DOWN)) {
-                    ignite(level, targetPos, target);
-                }
-            }
-            // ceiling at (0, -1, -1), corner at (0, -1, 0)
-            corner = pos.offset(0, -1, 0);
-            if (!isCornerBlocked.test(corner)) {
-                BlockPos targetPos = pos.offset(0, -1, -1);
-                BlockState target = level.getBlockState(targetPos);
-                if (target.getBlock() instanceof WebCarpetBlock && target.getValue(FACE_UP)) {
-                    ignite(level, targetPos, target);
+            // Ignite only if there is a web at targetPos with that face set
+            BlockState neighbor = level.getBlockState(targetPos);
+            if (neighbor.getBlock() instanceof WebCarpetBlock web) {
+                BooleanProperty faceProp = MultifaceBlock.getFaceProperty(faceDirWorld);
+                if (faceProp != null && neighbor.hasProperty(faceProp) && neighbor.getValue(faceProp)) {
+                    ignite(level, targetPos, neighbor);
                 }
             }
         }
     }
+
+
+
+
 
     // --- React to neighbouring fire ---
 

@@ -6,6 +6,7 @@ import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
@@ -15,6 +16,8 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.MultifaceBlock;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -23,10 +26,7 @@ import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.functions.EnchantRandomlyFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
-import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition;
-import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
+import net.minecraft.world.level.storage.loot.predicates.*;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
@@ -137,7 +137,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropWhenSilkTouch(DNLBlocks.BRITTLESTONE.get());
         this.dropSelf(DNLBlocks.RAIL_PLATFORM.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_BLOCK.get());
-        this.add(DNLBlocks.WEB_CARPET.get(), block -> this.createMultifaceBlockDrops(block, HAS_SHEARS));
+        this.add(DNLBlocks.WEB_CARPET.get(), this::addWebCarpetDrop);
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {
@@ -322,5 +322,37 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                         )
         );
         this.add(block, table);
+    }
+
+    private LootTable.Builder addWebCarpetDrop(Block block) {
+        LootTable.Builder table = this.createMultifaceBlockDrops(block, HAS_SHEARS);
+
+        // Only give string when *not* using shears
+        LootItemCondition.Builder noShears =
+                net.minecraft.world.level.storage.loot.predicates.InvertedLootItemCondition.invert(HAS_SHEARS);
+
+        for (Direction dir : Direction.values()) {
+            BooleanProperty faceProp = MultifaceBlock.getFaceProperty(dir);
+            if (faceProp == null) continue;
+
+            // Only roll this pool if this face is present (faceProp = true)
+            LootItemCondition.Builder hasFace =
+                    LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
+                            .setProperties(StatePropertiesPredicate.Builder.properties()
+                                    .hasProperty(faceProp, true));
+
+            table.withPool(
+                    LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1.0F))
+                            .when(noShears)       // don't give string when shearing
+                            .when(hasFace)        // only if this face exists
+                            .add(LootItem.lootTableItem(Items.STRING)
+                                    .when(LootItemRandomChanceCondition.randomChance(1.0F / 6.0F))
+                                    .when(ExplosionCondition.survivesExplosion())
+                            )
+            );
+        }
+
+        return table;
     }
 }

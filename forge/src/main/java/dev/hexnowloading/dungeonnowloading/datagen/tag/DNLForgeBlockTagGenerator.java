@@ -106,6 +106,10 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get()
         );
 
+        this.tag(BlockTags.FALL_DAMAGE_RESETTING).add(
+                DNLBlocks.WEB_CARPET.get()
+        );
+
         this.tag(BlockTags.WALLS).add(
                 DNLBlocks.COILING_STONE_PILLAR_WALL.get(),
                 DNLBlocks.STONE_TILE_WALL.get(),

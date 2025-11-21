@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,raised=false": {
+      "model": "dungeonnowloading:block/rail_platform",
+      "y": 270
+    },
+    "facing=east,raised=true": {
+      "model": "dungeonnowloading:block/rail_platform_raised",
+      "y": 270
+    },
+    "facing=north,raised=false": {
+      "model": "dungeonnowloading:block/rail_platform",
+      "y": 180
+    },
+    "facing=north,raised=true": {
+      "model": "dungeonnowloading:block/rail_platform_raised",
+      "y": 180
+    },
+    "facing=south,raised=false": {
+      "model": "dungeonnowloading:block/rail_platform"
+    },
+    "facing=south,raised=true": {
+      "model": "dungeonnowloading:block/rail_platform_raised"
+    },
+    "facing=west,raised=false": {
+      "model": "dungeonnowloading:block/rail_platform",
+      "y": 90
+    },
+    "facing=west,raised=true": {
+      "model": "dungeonnowloading:block/rail_platform_raised",
+      "y": 90
+    }
+  }
+}

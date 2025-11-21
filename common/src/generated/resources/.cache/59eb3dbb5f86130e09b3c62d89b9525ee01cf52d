@@ -1,4 +1,4 @@
-// 1.20.1	2025-11-21T05:01:40.0537274	Loot Tables
+// 1.20.1	2025-11-21T09:56:03.2921388	Loot Tables
 5b9f54bbbebffdf1696e10a26f9a6b225355add4 data/dungeonnowloading/loot_tables/blocks/acacia_wooden_board.json
 8de5512c6e498fd7a4e162f42dd356b7cb01701f data/dungeonnowloading/loot_tables/blocks/amethyst_stone_notch.json
 aee384cfe4e67aeb143699641353b85775ccf71a data/dungeonnowloading/loot_tables/blocks/azuro_hanging_leaves.json
@@ -90,7 +90,7 @@ b1cccc4c1d285ed6a943631a33cfd293e536c088 data/dungeonnowloading/loot_tables/bloc
 95e996fce0e76ff7987d018485c307f19d718515 data/dungeonnowloading/loot_tables/blocks/stripped_azuro_oak_log.json
 0b5272b5e2ea79758f4b6bc28152cf3f521e2f06 data/dungeonnowloading/loot_tables/blocks/temple_of_duality_trophy.json
 1b26e32e5b53280448134d4e85c03a1091fff9ae data/dungeonnowloading/loot_tables/blocks/warped_wooden_board.json
-f3ec08c9e8e750327d840b1487ee2cfd8a5bfcad data/dungeonnowloading/loot_tables/blocks/web_carpet.json
+1eb7da0f71e68a1dabfc7918ffaee768a8ac4ef8 data/dungeonnowloading/loot_tables/blocks/web_carpet.json
 98e1d7a7e6ac080910dec65bb876a2bc74948780 data/dungeonnowloading/loot_tables/blocks/wise_fairkeeper_chest.json
 0f6a96ed4e64885da278ef356bc9c6fb675bab52 data/dungeonnowloading/loot_tables/blocks/wooden_wall_platform.json
 7ab977320386579e297bcac277e68a8ec13b63de data/dungeonnowloading/loot_tables/blocks/wooden_wall_rack.json

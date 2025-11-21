@@ -19,6 +19,8 @@
     "block.IronBarsMixin",
     "items.ItemInHandRendererMixin",
     "items.ItemStackBreakProtectionMixin",
+    "items.ShearsItemMixin",
+    "items.SwordItemMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",

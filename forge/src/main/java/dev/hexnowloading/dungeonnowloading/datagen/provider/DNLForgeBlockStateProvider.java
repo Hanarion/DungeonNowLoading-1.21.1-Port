@@ -1065,6 +1065,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     private void multifaceWebCarpet(Block block) {
         String name = key(block).getPath();
 
+        // === Model files for normal & burning ===
         ModelFile normal = models()
                 .withExistingParent(name, mcLoc("block/glow_lichen"))
                 .texture("glow_lichen", modLoc("block/web_carpet"))
@@ -1075,23 +1076,28 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                 .texture("glow_lichen", modLoc("block/web_carpet_burning"))
                 .texture("particle", modLoc("block/web_carpet_burning"));
 
+        // === Multipart blockstate builder ===
         MultiPartBlockStateBuilder builder = getMultipartBuilder(block);
 
         for (Direction dir : Direction.values()) {
             BooleanProperty faceProp = MultifaceBlock.getFaceProperty(dir);
 
-            int xRot = 0;
-            int yRot = 0;
-            switch (dir) {
-                case NORTH -> { xRot = 0;   yRot = 0;   }
-                case EAST  -> { xRot = 0;   yRot = 90;  }
-                case SOUTH -> { xRot = 0;   yRot = 180; }
-                case WEST  -> { xRot = 0;   yRot = 270; }
-                case UP    -> { xRot = 270; yRot = 0;   }
-                case DOWN ->  { xRot = 90;  yRot = 0;   }
-            }
+            if (faceProp == null) continue; // Safety
 
-            // Normal web
+            int xRot = switch (dir) {
+                case UP -> 270;
+                case DOWN -> 90;
+                default -> 0;
+            };
+            int yRot = switch (dir) {
+                case NORTH -> 0;
+                case EAST -> 90;
+                case SOUTH -> 180;
+                case WEST -> 270;
+                default -> 0;
+            };
+
+            // Normal face
             builder.part()
                     .modelFile(normal)
                     .rotationX(xRot)
@@ -1101,7 +1107,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                     .condition(faceProp, true)
                     .condition(WebCarpetBlock.BURNING, false);
 
-            // Burning web
+            // Burning face
             builder.part()
                     .modelFile(burning)
                     .rotationX(xRot)
@@ -1112,8 +1118,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                     .condition(WebCarpetBlock.BURNING, true);
         }
 
-        simpleBlockItem(block, normal);
+        // === Item model generation ===
+        simpleItem(block);
     }
+
 
 
 
