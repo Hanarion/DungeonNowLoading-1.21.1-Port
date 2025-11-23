@@ -1,13 +1,22 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -21,7 +30,7 @@ import net.minecraft.world.phys.HitResult;
 
 public class WebWebProjectileEntity extends ThrowableItemProjectile {
 
-    public static final float GRAVITY = 0.045F;
+    public static final float GRAVITY = 0.03F;
 
     // Rule describing how to place 1 extra web relative to a "center"
     private record SpreadRule(
@@ -98,13 +107,76 @@ public class WebWebProjectileEntity extends ThrowableItemProjectile {
         super.onHitEntity(hitResult);
 
         Entity hit = hitResult.getEntity();
-        if (!this.level().isClientSide && hit instanceof LivingEntity living) {
-            float damage = this.getOwner() instanceof LivingEntity owner
-                    ? (float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE)
+        if (this.level().isClientSide) return;
+
+        Entity owner = this.getOwner();
+
+        // Prevent friendly fire against spiders if fired by WebSpitterEntity
+        if (owner instanceof WebSpitterEntity && hit instanceof Spider) {
+            return;
+        }
+
+        if (hit instanceof LivingEntity living) {
+
+            // Deal damage (same as before)
+            float damage = owner instanceof LivingEntity ownerLiving
+                    ? (float) ownerLiving.getAttributeValue(Attributes.ATTACK_DAMAGE)
                     : 1.0F;
 
-            living.hurt(this.damageSources().thrown(this, this.getOwner()), damage);
+            living.hurt(this.damageSources().thrown(this, owner), damage);
+
+            // Apply slowness III for 2 seconds (40 ticks)
+            living.addEffect(new MobEffectInstance(
+                    MobEffects.MOVEMENT_SLOWDOWN,
+                    40,   // 2 seconds @ 20 tps
+                    2,    // level 3 = amplifier 2
+                    false, // ambient
+                    true,  // show particles
+                    true   // show icon
+            ));
         }
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
+            return false;
+        }
+
+        if (this.level().isClientSide || this.isRemoved()) {
+            return true;
+        }
+
+        // Spawn particles + sound, then destroy
+        if (this.level() instanceof ServerLevel serverLevel) {
+            // Web-like block particles
+            BlockState webState = DNLBlocks.WEB_CARPET.get().defaultBlockState();
+            serverLevel.sendParticles(
+                    new BlockParticleOption(ParticleTypes.BLOCK, webState),
+                    this.getX(), this.getY(), this.getZ(),
+                    12,          // count
+                    0.15D, 0.15D, 0.15D,  // spread in XYZ
+                    0.02D        // speed
+            );
+        }
+
+        // Soft, squishy pop
+        this.level().playSound(
+                null,
+                this.getX(), this.getY(), this.getZ(),
+                SoundEvents.SLIME_SQUISH_SMALL,
+                this.getSoundSource(),
+                0.7F,
+                1.2F + (this.random.nextFloat() - 0.5F) * 0.3F
+        );
+
+        this.discard();
+        return true;
+    }
+
+    @Override
+    public boolean isPickable() {
+        return !this.isRemoved();
     }
 
     private void spawnWebField(HitResult hitResult) {

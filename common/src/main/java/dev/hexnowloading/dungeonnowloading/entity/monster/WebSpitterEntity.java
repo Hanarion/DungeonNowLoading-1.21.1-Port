@@ -1,16 +1,16 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.WebSpitterRangedAttackGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.WebSpitterRetreatGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.WebSpitterMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.WebWebProjectileEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -29,20 +29,24 @@ import javax.annotation.Nullable;
 
 public class WebSpitterEntity extends Spider implements RangedAttackMob {
 
-    private static final EntityDataAccessor<Boolean> ANCHORED =
-            SynchedEntityData.defineId(WebSpitterEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> ANCHORED = SynchedEntityData.defineId(WebSpitterEntity.class, EntityDataSerializers.BOOLEAN);
+
+    private WebSpitterRangedAttackGoal rangedGoal;
+    private WebSpitterRetreatGoal retreatGoal;
 
     // Distance at which an anchored spider “wakes up” and becomes mobile
     private static final double ANCHORED_BREAK_RANGE = 10.0D; // blocks
 
     public WebSpitterEntity(EntityType<? extends WebSpitterEntity> entityType, Level level) {
         super(entityType, level);
+        this.moveControl = new WebSpitterMoveControl(this, 0.6D, 1.3d);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Spider.createAttributes()
-                .add(Attributes.MAX_HEALTH, 20.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.28F)
+                .add(Attributes.MAX_HEALTH, 30.0D)
+                .add(Attributes.FOLLOW_RANGE, 32.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.30000001192092896)
                 .add(Attributes.ATTACK_DAMAGE, 6.0F);
     }
 
@@ -94,23 +98,24 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
 
-        // Custom ranged attack + range management
-        this.goalSelector.addGoal(2, new WebSpitterRangedAttackGoal(
-                this,
-                1.0D,   // move speed
-                40,     // attack interval ticks
-                16.0F   // max attack distance
-        ));
+        float minDistance = 7.0F;
+        float maxDistance = 16.0F;
+        double moveSpeed = 1.0D;
 
-        // Generic behaviours
+        this.retreatGoal = new WebSpitterRetreatGoal(this, moveSpeed, minDistance);
+        this.rangedGoal = new WebSpitterRangedAttackGoal(this, moveSpeed, 40, minDistance, maxDistance);
+
+        this.goalSelector.addGoal(2, this.retreatGoal);
+        this.goalSelector.addGoal(3, this.rangedGoal);
+
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
 
-        // Targets
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
+
 
     // --- Ranged attack implementation ---
 
@@ -137,7 +142,7 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
             return;
         }
 
-        float speed = 0.8F;
+        float speed = 1.1F;
         double v = speed;
         double g = WebWebProjectileEntity.GRAVITY;
 
@@ -171,6 +176,26 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         this.level().addFreshEntity(projectile);
     }
 
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        boolean result = super.hurt(source, amount);
+        if (!result) return false;
+
+        Entity rawAttacker = source.getEntity();
+        if (rawAttacker instanceof LivingEntity attacker) {
+
+            // Only flee if the hit was strong enough
+            if (amount > 5.0F) {
+                double distSq = this.distanceToSqr(attacker);
+
+                // Only flee if attacker is too close
+                if (distSq < rangedGoal.getMinAttackDistanceSq()) {
+                    retreatGoal.requestRetreat();
+                }
+            }
+        }
+        return true;
+    }
 
 
     public boolean shouldBreakAnchorTo(LivingEntity target) {

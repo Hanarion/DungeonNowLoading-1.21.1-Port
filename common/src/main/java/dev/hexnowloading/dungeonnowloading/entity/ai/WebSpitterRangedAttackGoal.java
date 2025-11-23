@@ -1,121 +1,222 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
-
 public class WebSpitterRangedAttackGoal extends Goal {
 
-    private final WebSpitterEntity mob;
-    private final double speedModifier;
-    private final int attackInterval;
-    private final float attackRadius;
-    private final float attackRadiusSqr;
+    private enum CombatState {
+        CHASE,
+        SHOOT,
+        BACK_UP
+    }
 
-    private int attackTime = -1;
+    private final WebSpitterEntity mob;
+    private final double moveSpeed;
+
+    private final int attackIntervalTicks;
+    private final int windupDurationTicks;
+
+    private final float minAttackDistanceSq;
+    private final float maxAttackDistanceSq;
+
+    private int attackCooldown;
+    private int windupTicks;
     private int seeTime;
 
+    // strafing for SHOOT
+    private int strafingTime = -1;
+    private boolean strafingClockwise = true;
+
+    private CombatState state = CombatState.CHASE;
+
     public WebSpitterRangedAttackGoal(WebSpitterEntity mob,
-                                      double speedModifier,
+                                      double moveSpeed,
                                       int attackInterval,
-                                      float attackRadius) {
+                                      float minAttackDistance,
+                                      float maxAttackDistance) {
         this.mob = mob;
-        this.speedModifier = speedModifier;
-        this.attackInterval = attackInterval;
-        this.attackRadius = attackRadius;
-        this.attackRadiusSqr = attackRadius * attackRadius;
+        this.moveSpeed = moveSpeed;
+
+        int baseWindupDuration = 20; // 1 second
+
+        this.attackIntervalTicks = reducedTickDelay(attackInterval);
+        this.windupDurationTicks = reducedTickDelay(baseWindupDuration);
+
+        this.minAttackDistanceSq = minAttackDistance * minAttackDistance;
+        this.maxAttackDistanceSq = maxAttackDistance * maxAttackDistance;
+
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+    }
+
+    public float getMinAttackDistanceSq() {
+        return minAttackDistanceSq;
     }
 
     @Override
     public boolean canUse() {
-        return this.mob.getTarget() != null;
+        LivingEntity target = mob.getTarget();
+        return target != null && target.isAlive();
     }
 
     @Override
     public boolean canContinueToUse() {
-        return (this.canUse() || !this.mob.getNavigation().isDone());
+        LivingEntity target = mob.getTarget();
+        if (target == null || !target.isAlive()) {
+            return false;
+        }
+        return !mob.getNavigation().isDone()
+                || mob.distanceToSqr(target) <= maxAttackDistanceSq * 1.5F;
+    }
+
+    @Override
+    public void start() {
+        attackCooldown = 0;
+        windupTicks = 0;
+        seeTime = 0;
+        strafingTime = -1;
+        state = CombatState.CHASE;
+        mob.setAggressive(false);
     }
 
     @Override
     public void stop() {
-        this.mob.setAggressive(false);
-        this.seeTime = 0;
-        this.attackTime = -1;
+        attackCooldown = 0;
+        windupTicks = 0;
+        seeTime = 0;
+        strafingTime = -1;
+        mob.setAggressive(false);
+        mob.getNavigation().stop();
     }
 
     @Override
     public void tick() {
-        LivingEntity target = this.mob.getTarget();
+        LivingEntity target = mob.getTarget();
         if (target == null) return;
 
-        double distSq = this.mob.distanceToSqr(target);
-        boolean canSee = this.mob.getSensing().hasLineOfSight(target);
+        double distSq = mob.distanceToSqr(target.getX(), target.getY(), target.getZ());
+        boolean canSee = mob.getSensing().hasLineOfSight(target);
 
+        // LOS timer
         if (canSee) {
-            this.seeTime++;
+            seeTime = Math.min(seeTime + 1, 60);
         } else {
-            this.seeTime--;
+            seeTime = Math.max(seeTime - 1, -60);
         }
 
-        // Look at target
-        this.mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+        updateState(distSq, canSee);
 
-        // --- Anchored behaviour ---
-        if (this.mob.isAnchored()) {
-            // Only break anchor if player gets close enough
-            if (this.mob.shouldBreakAnchorTo(target)) {
-                this.mob.setAnchored(false);
-            } else {
-                // Stay put, no chasing / kiting
-                this.mob.getNavigation().stop();
-            }
-        } else {
-            // --- Range management ---
-            // If inside 7 blocks, back up while firing
-            if (distSq < 49.0D) { // 7 * 7
-                Vec3 away = new Vec3(
-                        this.mob.getX() - target.getX(),
-                        0.0D,
-                        this.mob.getZ() - target.getZ()
-                ).normalize().scale(1.0D);
-
-                this.mob.getNavigation().moveTo(
-                        this.mob.getX() + away.x,
-                        this.mob.getY(),
-                        this.mob.getZ() + away.z,
-                        this.speedModifier
-                );
-            }
-            // If too far (but within "engage" radius), close in a bit
-            else if (distSq > this.attackRadiusSqr * 0.75F && distSq <= this.attackRadiusSqr * 1.5F) {
-                this.mob.getNavigation().moveTo(target, this.speedModifier);
-            } else {
-                // In the sweet spot – stay roughly where we are
-                this.mob.getNavigation().stop();
-            }
-        }
-
-        // --- Firing logic (16-block range + LOS) ---
-        if (this.attackTime > 0) {
-            this.attackTime--;
-        }
-
-        if (canSee && distSq <= this.attackRadiusSqr) {
-            if (this.attackTime <= 0) {
-                float dist = (float) Math.sqrt(distSq);
-                float distanceFactor = dist / this.attackRadius; // 0.0 – 1.0
-                this.mob.performRangedAttack(target, distanceFactor);
-                this.attackTime = this.attackInterval;
-            }
+        switch (state) {
+            case CHASE -> tickChase(target);
+            case SHOOT -> tickShoot(target);
+            case BACK_UP -> tickBackUp(target);
         }
     }
 
-    @Override
-    public boolean requiresUpdateEveryTick() {
-        return true;
+    private void updateState(double distSq, boolean canSee) {
+        CombatState prev = state;
+
+        if (!canSee) {
+            state = CombatState.CHASE;
+        } else if (distSq > maxAttackDistanceSq) {
+            state = CombatState.CHASE;
+        } else if (distSq >= minAttackDistanceSq) {
+            state = CombatState.SHOOT;
+        } else {
+            state = CombatState.BACK_UP;
+        }
+
+        // CHASE -> SHOOT transition: cancel active pathing immediately
+        if (prev != state && state == CombatState.SHOOT) {
+            mob.getNavigation().moveTo(mob, 0.0D); // “navigate to self”
+        }
+    }
+
+
+    // --- shared shooting logic ---
+
+    private void handleRangedAttack(LivingEntity target) {
+        if (attackCooldown > 0) {
+            attackCooldown--;
+            return;
+        }
+
+        if (seeTime <= 0) {
+            windupTicks = 0;
+            mob.setAggressive(false);
+            return;
+        }
+
+        if (windupTicks < windupDurationTicks) {
+            windupTicks++;
+            mob.setAggressive(true);
+            return;
+        }
+
+        mob.performRangedAttack(target, 1.0F);
+        mob.setAggressive(false);
+
+        windupTicks = 0;
+        attackCooldown = attackIntervalTicks;
+    }
+
+    // --- state behaviours ---
+
+    // CHASING: move in normal moveSpeed towards the target
+    private void tickChase(LivingEntity target) {
+        mob.getNavigation().moveTo(target, moveSpeed);
+        mob.setAggressive(false);
+    }
+
+    private void tickShoot(LivingEntity target) {
+        mob.getNavigation().stop();
+
+        // rotate body + head toward player
+        faceTargetBody(target);
+
+        if (strafingTime < 0) {
+            strafingTime = 20 + mob.getRandom().nextInt(20);
+            strafingClockwise = !strafingClockwise;
+        }
+        strafingTime--;
+
+        float sideways = strafingClockwise ? 0.5F : -0.5F;
+        mob.getMoveControl().strafe(0.0F, sideways);
+
+        handleRangedAttack(target);
+    }
+
+    private void tickBackUp(LivingEntity target) {
+        mob.getNavigation().stop();
+
+        // rotate body + head toward player
+        faceTargetBody(target);
+
+        mob.getMoveControl().strafe(-0.5F, 0.0F);
+
+        handleRangedAttack(target);
+    }
+
+
+    private void faceTargetBody(LivingEntity target) {
+        double dx = target.getX() - mob.getX();
+        double dz = target.getZ() - mob.getZ();
+
+        // angle from mob -> target
+        float targetYaw = (float)(Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
+
+        float currentYaw = mob.getYRot();
+        float maxTurnPerTick = 20.0F; // how fast the body can turn (deg per tick)
+
+        float newYaw = Mth.approachDegrees(currentYaw, targetYaw, maxTurnPerTick);
+
+        mob.setYRot(newYaw);       // main yaw
+        mob.setYHeadRot(newYaw);   // head yaw
+        mob.yBodyRot = newYaw;     // body render yaw
+        mob.yBodyRotO = newYaw;    // previous body yaw (helps avoid jitter)
     }
 }
+
