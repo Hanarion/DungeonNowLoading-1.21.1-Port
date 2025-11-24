@@ -39,12 +39,12 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
 
     public WebSpitterEntity(EntityType<? extends WebSpitterEntity> entityType, Level level) {
         super(entityType, level);
-        this.moveControl = new WebSpitterMoveControl(this, 0.6D, 1.3d);
+        this.moveControl = new WebSpitterMoveControl(this, 0.6D, 0.7d);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Spider.createAttributes()
-                .add(Attributes.MAX_HEALTH, 30.0D)
+                .add(Attributes.MAX_HEALTH, 16.0D)
                 .add(Attributes.FOLLOW_RANGE, 32.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.30000001192092896)
                 .add(Attributes.ATTACK_DAMAGE, 6.0F);
@@ -115,6 +115,24 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
+
+    /**
+     * Fixes spider climbing when backing up.
+     *
+     * Vanilla spiders only become climbable *one tick after* hitting a wall,
+     * because `isClimbing` updates after movement. When backing up, that delay
+     * prevents climbing from ever triggering.
+     *
+     * By including `horizontalCollision` here, we allow the spider to climb
+     * immediately when pushing into a wall — including while reversing.
+     */
+
+    @Override
+    public boolean onClimbable() {
+        boolean vanilla = super.onClimbable();
+        return vanilla || this.horizontalCollision;
+    }
+
 
 
     // --- Ranged attack implementation ---
@@ -196,7 +214,6 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         }
         return true;
     }
-
 
     public boolean shouldBreakAnchorTo(LivingEntity target) {
         return this.distanceToSqr(target) <= ANCHORED_BREAK_RANGE * ANCHORED_BREAK_RANGE;

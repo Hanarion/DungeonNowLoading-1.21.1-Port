@@ -27,10 +27,6 @@ public class WebSpitterRangedAttackGoal extends Goal {
     private int windupTicks;
     private int seeTime;
 
-    // strafing for SHOOT
-    private int strafingTime = -1;
-    private boolean strafingClockwise = true;
-
     private CombatState state = CombatState.CHASE;
 
     public WebSpitterRangedAttackGoal(WebSpitterEntity mob,
@@ -77,7 +73,6 @@ public class WebSpitterRangedAttackGoal extends Goal {
         attackCooldown = 0;
         windupTicks = 0;
         seeTime = 0;
-        strafingTime = -1;
         state = CombatState.CHASE;
         mob.setAggressive(false);
     }
@@ -87,7 +82,6 @@ public class WebSpitterRangedAttackGoal extends Goal {
         attackCooldown = 0;
         windupTicks = 0;
         seeTime = 0;
-        strafingTime = -1;
         mob.setAggressive(false);
         mob.getNavigation().stop();
     }
@@ -177,14 +171,8 @@ public class WebSpitterRangedAttackGoal extends Goal {
         // rotate body + head toward player
         faceTargetBody(target);
 
-        if (strafingTime < 0) {
-            strafingTime = 20 + mob.getRandom().nextInt(20);
-            strafingClockwise = !strafingClockwise;
-        }
-        strafingTime--;
-
-        float sideways = strafingClockwise ? 0.5F : -0.5F;
-        mob.getMoveControl().strafe(0.0F, sideways);
+        // "Strafe around target": sideways magnitude 0.5, move control picks left/right
+        mob.getMoveControl().strafe(0.0F, 0.5F);
 
         handleRangedAttack(target);
     }
@@ -195,10 +183,12 @@ public class WebSpitterRangedAttackGoal extends Goal {
         // rotate body + head toward player
         faceTargetBody(target);
 
+        // Pure backpedal: move control treats this as backward, no sideways component
         mob.getMoveControl().strafe(-0.5F, 0.0F);
 
         handleRangedAttack(target);
     }
+
 
 
     private void faceTargetBody(LivingEntity target) {
