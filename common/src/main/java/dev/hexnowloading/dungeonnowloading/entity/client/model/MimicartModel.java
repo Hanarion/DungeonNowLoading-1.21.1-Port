@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.client.model;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.misc.WaywardLanternMinecartEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.MimicartEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -12,11 +12,11 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.resources.ResourceLocation;
 
-public class WaywardLanternMinecartModel<T extends WaywardLanternMinecartEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "wayward_lantern_minecart"), "main");
+public class MimicartModel<T extends MimicartEntity> extends HierarchicalModel<T> {
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicart"), "main");
     private final ModelPart root;
 
-    public WaywardLanternMinecartModel(ModelPart modelPart) {
+    public MimicartModel(ModelPart modelPart) {
         this.root = modelPart;
     }
 

@@ -44,7 +44,7 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Spider.createAttributes()
-                .add(Attributes.MAX_HEALTH, 16.0D)
+                .add(Attributes.MAX_HEALTH, 30.0D)
                 .add(Attributes.FOLLOW_RANGE, 32.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.30000001192092896)
                 .add(Attributes.ATTACK_DAMAGE, 6.0F);
@@ -86,9 +86,6 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
                                         @Nullable CompoundTag dataTag) {
         SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
         // e.g. 40% chance to spawn as anchored turret
-        if (this.getRandom().nextFloat() < 0.4F) {
-            this.setAnchored(true);
-        }
         return data;
     }
 

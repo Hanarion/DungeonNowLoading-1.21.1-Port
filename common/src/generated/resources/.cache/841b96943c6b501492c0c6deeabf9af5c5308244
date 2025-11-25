@@ -1,4 +1,4 @@
-// 1.20.1	2025-11-20T02:15:25.7109501	Item Models: dungeonnowloading
+// 1.20.1	2025-11-24T12:23:58.3670803	Item Models: dungeonnowloading
 2124c6574480f7d9a17d0b61aea2566f5dd0bb82 assets/dungeonnowloading/models/item/catalyzed_redstone.json
 a170d25f1dd7643996e91ef916290822fc771952 assets/dungeonnowloading/models/item/cinderlite.json
 94e215a0bc9a27d2999b7b4254ad0381bf58d4f9 assets/dungeonnowloading/models/item/combustion_cell.json
@@ -19,6 +19,7 @@ e6144c488cdc16c964b3ed94f8630ea485d4cec4 assets/dungeonnowloading/models/item/re
 2693026055360a030e8892fac047ea9f4263521f assets/dungeonnowloading/models/item/repulsor.json
 afb5d05d2baef8c1b6eba9e7c5b1a431cdfa10e9 assets/dungeonnowloading/models/item/repulsor_golden.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_ballista_golem.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_reaper_spider.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_scuttle.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_web_spitter.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_wisp.json

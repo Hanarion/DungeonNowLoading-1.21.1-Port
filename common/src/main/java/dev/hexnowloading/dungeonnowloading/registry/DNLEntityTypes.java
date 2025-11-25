@@ -40,6 +40,7 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<WispLanternEntity>> WISP_LANTERN = register("wisp_lantern", () -> EntityType.Builder.of(WispLanternEntity::new, MobCategory.MONSTER).sized(1.0F, 1.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "wisp_lantern").toString()));
     public static final Supplier<EntityType<ThumperEntity>> THUMPER = register("thumper", () -> EntityType.Builder.of(ThumperEntity::new, MobCategory.MONSTER).sized(3.0F, 1.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "thumper").toString()));
     public static final Supplier<EntityType<WebSpitterEntity>> WEB_SPITTER = register("web_spitter", () -> EntityType.Builder.of(WebSpitterEntity::new, MobCategory.MONSTER).sized(1.4F, 0.9F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "web_spitter").toString()));
+    public static final Supplier<EntityType<ReaperSpiderEntity>> REAPER_SPIDER = register("reaper_spider", () -> EntityType.Builder.of(ReaperSpiderEntity::new, MobCategory.MONSTER).sized(1.8F, 1.8F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "reaper_spider").toString()));
 
     // Passive
     public static final Supplier<EntityType<SealedChaosEntity>> SEALED_CHAOS = register("sealed_chaos", () -> EntityType.Builder.of(SealedChaosEntity::new, MobCategory.CREATURE).sized(1F, 1F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "sealed_chaos").toString()));
@@ -61,7 +62,7 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<SpecialItemEntity>> SPECIAL_ITEM_ENTITY = register("special_item_entity", () -> EntityType.Builder.<SpecialItemEntity>of(SpecialItemEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "special_item_entity").toString()));
     public static final Supplier<EntityType<GreatExperienceBottleEntity>> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> EntityType.Builder.<GreatExperienceBottleEntity>of(GreatExperienceBottleEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "great_experience_bottle").toString()));
     public static final Supplier<EntityType<RepulsorEntity>> REPULSOR = register("repulsor", () -> EntityType.Builder.<RepulsorEntity>of(RepulsorEntity::new, MobCategory.MISC).sized(0.99F, 0.3F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "command_pylon").toString()));
-    public static final Supplier<EntityType<WaywardLanternMinecartEntity>> WAYWARD_LANTERN_MINECART = register("wayward_lantern_minecart", () -> EntityType.Builder.<WaywardLanternMinecartEntity>of(WaywardLanternMinecartEntity::new, MobCategory.MISC).sized(0.98F, 0.7F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "wayward_lantern_minecart").toString()));
+    public static final Supplier<EntityType<MimicartEntity>> MIMICART = register("mimicart", () -> EntityType.Builder.<MimicartEntity>of(MimicartEntity::new, MobCategory.MISC).sized(0.98F, 0.7F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "wayward_lantern_minecart").toString()));
     public static final Supplier<EntityType<MobSpawnEffectEntity>> MOB_SPAWN_EFFECT = register("mob_spawn_effect", () -> EntityType.Builder.<MobSpawnEffectEntity>of(MobSpawnEffectEntity::new, MobCategory.MISC).sized(0.0F, 0.0F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "mob_spawn_effect").toString()));
 
     private static <T extends EntityType<?>> Supplier<T> register(String name, Supplier<T> entityTypeSupplier) {
@@ -89,6 +90,7 @@ public class DNLEntityTypes {
         map.put(WISP_LANTERN.get(), WispLanternEntity.createAttributes().build());
         map.put(THUMPER.get(), ThumperEntity.createAttributes().build());
         map.put(WEB_SPITTER.get(), WebSpitterEntity.createAttributes().build());
+        map.put(REAPER_SPIDER.get(), ReaperSpiderEntity.createAttributes().build());
 
         // Passive
         map.put(SEALED_CHAOS.get(), SealedChaosEntity.createAttributes().build());
