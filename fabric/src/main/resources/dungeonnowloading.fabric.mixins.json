@@ -37,6 +37,7 @@
     "inventory.AnvilMenuMixin"
   ],
   "client": [
+    "client.ClientPacketListenerMixin",
     "client.HumanoidModelMixin",
     "client.PlayerRendererMixin",
     "client.AbstractClientPlayerMixin",

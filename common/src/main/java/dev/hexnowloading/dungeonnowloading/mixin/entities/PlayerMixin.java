@@ -1,8 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.mixin.entities;
 
+import dev.hexnowloading.dungeonnowloading.entity.monster.MimicartEntity;
 import dev.hexnowloading.dungeonnowloading.item.DNLAnimatedItem;
 import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
 import dev.hexnowloading.dungeonnowloading.item.client.ItemAnimationState;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,6 +27,16 @@ public abstract class PlayerMixin {
             if (ItemAnimationState.isAnimating(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_ACTIVATED.getName(), gameTime) || ItemAnimationState.isAnimating(itemStack, ScorcherItem.ScorcherAnimationState.SCORCHER_SHOOT.getName(), gameTime)) {
                 animatedItem.playDroppedAnimation(player, itemStack);
             }
+        }
+    }
+
+    @Inject(method = "wantsToStopRiding", at = @At("HEAD"), cancellable = true)
+    private void dnl$blockDismountOnMimicart(CallbackInfoReturnable<Boolean> cir) {
+        Player self = (Player)(Object) this;
+        Entity vehicle = self.getVehicle();
+
+        if (vehicle instanceof MimicartEntity) {
+            cir.setReturnValue(false);
         }
     }
 }

@@ -226,6 +226,7 @@
   "entity.dungeonnowloading.web_spitter": "Web Spitter",
   "entity.dungeonnowloading.reaper_spider": "Reaper Spider",
   "entity.dungeonnowloading.mimicart": "Mimicart",
+  "entity.dungeonnowloading.mimicart.dismount_hint": "Derail the Mimicart to Dismount",
   "sounds.dungeonnowloading.signal_gate_click": "Signal Gate clicks",
   "sounds.dungeonnowloading.overcharged_redstone_block_component_detonation": "Redstone component detonates",
   "sounds.dungeonnowloading.overcharged_redstone_block_dust_combustion": "Redstone dust combusts",
