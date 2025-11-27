@@ -56,7 +56,7 @@ public class DNLItems {
     public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
     public static final Supplier<Item> MENDSTONE_CHALK = register("mendstone_chalk", () -> new MendstoneChalkItem(new Item.Properties().rarity(Rarity.COMMON).durability(15), DNLBlocks.MENDSTONE_CHALK_MARK.get()));
-
+    public static final Supplier<Item> MIMICART = register("mimicart", () -> new MimicartItem(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
 
     // ITEMS - MUSIC DISC
     public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_clash_of_duality_ouros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_OUROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
@@ -195,6 +195,8 @@ public class DNLItems {
     public static final Supplier<Item> WEB_CARPET = register("web_carpet", () -> new BlockItem(DNLBlocks.WEB_CARPET.get(), new Item.Properties()));
     public static final Supplier<Item> MOB_SPAWNPOINT = register("mob_spawnpoint", () -> new BlockItem(DNLBlocks.MOB_SPAWN_POINT.get(), new Item.Properties()));
     public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new DetectionWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
+    public static final Supplier<Item> BULLET = register("bullet", () -> new BulletItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
+
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> LABYRINTH_TROPHY = register("labyrinth_trophy", () -> new BlockItem(DNLBlocks.LABYRINTH_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));

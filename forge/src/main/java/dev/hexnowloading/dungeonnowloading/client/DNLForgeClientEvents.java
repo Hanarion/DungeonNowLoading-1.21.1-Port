@@ -115,6 +115,7 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), VertexDomainProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BORUS_ARROW.get(), BorusArrowRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.WEB_BALL.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.BULLET.get(), ThrownItemRenderer::new);
 
         // Misc
         event.registerEntityRenderer(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);

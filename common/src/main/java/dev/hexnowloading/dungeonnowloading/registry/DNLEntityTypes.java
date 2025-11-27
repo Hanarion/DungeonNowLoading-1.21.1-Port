@@ -2,7 +2,10 @@ package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.*;
-import dev.hexnowloading.dungeonnowloading.entity.misc.*;
+import dev.hexnowloading.dungeonnowloading.entity.misc.GreatExperienceBottleEntity;
+import dev.hexnowloading.dungeonnowloading.entity.misc.MobSpawnEffectEntity;
+import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
+import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
@@ -57,6 +60,7 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<VertexDomainProjectileEntity>> VERTEX_DOMAIN_PROJECTILE = register("vertex_domain_projectile", () -> EntityType.Builder.<VertexDomainProjectileEntity>of(VertexDomainProjectileEntity::new, MobCategory.MISC).sized(2.0F, 2.0F).clientTrackingRange(4).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "vertex_domain_projectile").toString()));
     public static final Supplier<EntityType<BorusArrowEntity>> BORUS_ARROW = register("borus_arrow", () -> EntityType.Builder.<BorusArrowEntity>of(BorusArrowEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "borus_arrow").toString()));
     public static final Supplier<EntityType<WebWebProjectileEntity>> WEB_BALL = register("web_ball", () -> EntityType.Builder.<WebWebProjectileEntity>of(WebWebProjectileEntity::new, MobCategory.MISC).sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "web_ball").toString()));
+    public static final Supplier<EntityType<BulletEntity>> BULLET = register("bullet", () -> EntityType.Builder.<BulletEntity>of(BulletEntity::new, MobCategory.MISC).sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "bullet").toString()));
 
     // Misc
     public static final Supplier<EntityType<SpecialItemEntity>> SPECIAL_ITEM_ENTITY = register("special_item_entity", () -> EntityType.Builder.<SpecialItemEntity>of(SpecialItemEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "special_item_entity").toString()));

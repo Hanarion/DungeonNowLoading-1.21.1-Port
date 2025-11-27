@@ -178,6 +178,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), VertexDomainProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BORUS_ARROW.get(), BorusArrowRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WEB_BALL.get(), ThrownItemRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.BULLET.get(), ThrownItemRenderer::new);
 
         // Misc
         EntityRendererRegistry.register(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);

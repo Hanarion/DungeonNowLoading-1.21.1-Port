@@ -1,4 +1,5 @@
-// 1.20.1	2025-11-24T12:23:58.3670803	Item Models: dungeonnowloading
+// 1.20.1	2025-11-27T06:12:45.7359694	Item Models: dungeonnowloading
+9ec79055c55542dd2cbf13e35e30684a62b51ae2 assets/dungeonnowloading/models/item/bullet.json
 2124c6574480f7d9a17d0b61aea2566f5dd0bb82 assets/dungeonnowloading/models/item/catalyzed_redstone.json
 a170d25f1dd7643996e91ef916290822fc771952 assets/dungeonnowloading/models/item/cinderlite.json
 94e215a0bc9a27d2999b7b4254ad0381bf58d4f9 assets/dungeonnowloading/models/item/combustion_cell.json
@@ -6,6 +7,7 @@ a170d25f1dd7643996e91ef916290822fc771952 assets/dungeonnowloading/models/item/ci
 000ce228703d1b6348eec375e480e43a93430159 assets/dungeonnowloading/models/item/copper_detonator_switched.json
 e0873f7caacb5be2419896d8686d2e623c811776 assets/dungeonnowloading/models/item/fairkeeper_serpent_caller.json
 08ea6106f463052b5919f1546b7416d2be00117c assets/dungeonnowloading/models/item/mendstone_chalk.json
+c77c2640159cae4ad3fe28865b905033ac3f8a03 assets/dungeonnowloading/models/item/mimicart.json
 999e9199e13e8f35c14385de99289dd88eb2f156 assets/dungeonnowloading/models/item/music_disc_clash_of_duality_boros.json
 5a8b0b0a2a711a5669fb816003b977b57945663d assets/dungeonnowloading/models/item/music_disc_clash_of_duality_ouros.json
 af3c41cb14ab84039e31dc946703fb837122c1b9 assets/dungeonnowloading/models/item/music_disc_clash_of_duality_pythonic_overdrive.json

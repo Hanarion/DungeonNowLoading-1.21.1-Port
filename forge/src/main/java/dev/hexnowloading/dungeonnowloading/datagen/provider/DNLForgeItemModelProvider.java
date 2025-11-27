@@ -41,6 +41,8 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.MENDSTONE_CHALK.get());
         simpleItem(DNLItems.CINDERLITE.get());
         simpleItem(DNLItems.ZONE_WAND.get());
+        simpleItem(DNLItems.MIMICART.get());
+        simpleItem(DNLItems.BULLET.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
