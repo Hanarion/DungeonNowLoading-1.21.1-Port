@@ -125,7 +125,7 @@ public class WebSpitterRangedAttackGoal extends Goal {
 
         // CHASE -> SHOOT transition: cancel active pathing immediately
         if (prev != state && state == CombatState.SHOOT) {
-            mob.getNavigation().moveTo(mob, 0.0D); // “navigate to self”
+            mob.getNavigation().moveTo(mob, 0.0D);
         }
     }
 

@@ -34,7 +34,6 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
     private WebSpitterRangedAttackGoal rangedGoal;
     private WebSpitterRetreatGoal retreatGoal;
 
-    // Distance at which an anchored spider “wakes up” and becomes mobile
     private static final double ANCHORED_BREAK_RANGE = 10.0D; // blocks
 
     public WebSpitterEntity(EntityType<? extends WebSpitterEntity> entityType, Level level) {

@@ -17,11 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ShearsItem.class)
 public abstract class ShearsItemMixin {
 
-    /**
-     * Make shears behave “naturally” when mining Web Carpet:
-     * - Consume durability like vanilla
-     * - Return true so the vanilla tool logic is happy
-     */
     @Inject(method = "mineBlock", at = @At("HEAD"), cancellable = true)
     private void dnl$mineWebCarpet(ItemStack stack,
                                    Level level,
@@ -40,21 +35,13 @@ public abstract class ShearsItemMixin {
         cir.setReturnValue(true);
     }
 
-    /**
-     * Treat Web Carpet as a “correct tool” target for shears, like cobweb/tripwire.
-     */
     @Inject(method = "isCorrectToolForDrops", at = @At("HEAD"), cancellable = true)
     private void dnl$isCorrectToolForWebCarpet(BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if (state.is(DNLBlocks.WEB_CARPET.get())) {
             cir.setReturnValue(true);
         }
     }
-
-    /**
-     * Give shears a good destroy speed on Web Carpet.
-     * Here I match vines/glow_lichen at 2.0F.
-     * If you want “cobweb fast”, change to 15.0F.
-     */
+    
     @Inject(method = "getDestroySpeed", at = @At("HEAD"), cancellable = true)
     private void dnl$destroySpeedForWebCarpet(ItemStack stack,
                                               BlockState state,

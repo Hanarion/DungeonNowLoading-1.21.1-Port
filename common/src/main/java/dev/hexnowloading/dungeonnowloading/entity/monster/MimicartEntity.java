@@ -186,7 +186,6 @@ public class MimicartEntity extends AbstractMinecart {
             // tick down after checks
             suckTimer--;
 
-            // optional “beam start” moment (sound/extra particles)
             if (this.suckTimer == BEAM_DRAW_TICKS) {
                 spawnDetectParticles();
                 this.playSound(SoundEvents.WITCH_CELEBRATE, 0.8F, 1.2F);
@@ -375,7 +374,6 @@ public class MimicartEntity extends AbstractMinecart {
     private void spawnDetectParticles() {
         if (!(this.level() instanceof ServerLevel serverLevel)) return;
 
-        // small “alert” burst around the cart
         double cx = this.getX();
         double cy = this.getY() + 0.5D;
         double cz = this.getZ();
