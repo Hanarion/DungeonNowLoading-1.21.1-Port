@@ -138,6 +138,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.RAIL_PLATFORM.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_BLOCK.get());
         this.add(DNLBlocks.WEB_CARPET.get(), this::addWebCarpetDrop);
+        this.dropSelf(DNLBlocks.BURNACLE.get());
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {

@@ -131,6 +131,7 @@ public class DNLBlocks {
     public static Supplier<Block> DEEPSTEEL_BLOCK;
     public static Supplier<Block> RAIL_PLATFORM;
     public static Supplier<Block> WEB_CARPET;
+    public static Supplier<Block> BURNACLE;
     public static Supplier<Block> MOB_SPAWN_POINT;
 
     // Trophies
@@ -269,6 +270,7 @@ public class DNLBlocks {
         DEEPSTEEL_BLOCK = registerBlock("deepsteel_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F)));
         RAIL_PLATFORM = registerBlock("rail_platform", () -> new RailPlatformBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).noOcclusion()));
         WEB_CARPET = registerBlock("web_carpet", () -> new WebCarpetBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).forceSolidOn().noCollission().requiresCorrectToolForDrops().strength(4.0F).pushReaction(PushReaction.DESTROY)));
+        BURNACLE = registerBlock("burnacle", () -> new BurnacleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).pushReaction(PushReaction.DESTROY).noOcclusion()));
         MOB_SPAWN_POINT = registerBlock("mob_spawn_point", () -> new MobSpawnPointBlock(BlockBehaviour.Properties.of().noCollission().noOcclusion().strength(-1.0F, 3600000.0F).noLootTable()));
 
         // Trophies

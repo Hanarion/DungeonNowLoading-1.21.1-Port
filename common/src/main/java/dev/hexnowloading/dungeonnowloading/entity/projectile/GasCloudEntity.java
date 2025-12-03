@@ -868,4 +868,37 @@ public class GasCloudEntity extends Entity {
 
     }
 
+    public void configureFromBurnacle(
+            int gasSize,
+            int growthTime,
+            float gasSpread,
+            float gasSpeed,
+            float airResistance,
+            int life,
+            float explosionMultiplier,
+            int chainDelay,
+            int ignitionDelay,
+            int explosionDelay
+    ) {
+        // Values stored via entityData and NBT
+        this.entityData.set(DATA_GAS_SIZE, gasSize);
+        this.entityData.set(DATA_GROWTH_TIME, growthTime);
+        this.entityData.set(DATA_GAS_SPREAD, gasSpread);
+        this.entityData.set(DATA_GAS_SPEED, gasSpeed);
+        this.entityData.set(DATA_LIFE, life);
+        this.entityData.set(DATA_EXPLOSION_MULTIPLIER, explosionMultiplier);
+        this.entityData.set(DATA_AIR_RESISTANCE, airResistance);
+
+        // These are the "Note: Only for testing" base delays you persist
+        this.baseChainedDelay = chainDelay;
+        this.baseIgnitionDelay = ignitionDelay;
+        this.baseExplosionDelay = explosionDelay;
+
+        // Reset timers so the new values take effect cleanly
+        this.growthTicks = 0;
+        this.ignitionTimer = 0;
+        this.explosionTimer = 0;
+    }
+
+
 }

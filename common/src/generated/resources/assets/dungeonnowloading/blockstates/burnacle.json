@@ -1,0 +1,82 @@
+{
+  "variants": {
+    "facing=down,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 180
+    },
+    "facing=down,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 180
+    },
+    "facing=down,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 180
+    },
+    "facing=east,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90
+    },
+    "facing=north,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90
+    },
+    "facing=north,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90
+    },
+    "facing=south,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud"
+    },
+    "facing=up,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile"
+    },
+    "facing=up,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature"
+    },
+    "facing=west,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

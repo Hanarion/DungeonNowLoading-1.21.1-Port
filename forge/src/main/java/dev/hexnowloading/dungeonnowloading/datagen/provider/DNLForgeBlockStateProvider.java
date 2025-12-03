@@ -113,6 +113,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         generateMendstoneChalkMarkModels((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK_MARK.get(), MendstoneChalkMarkBlock.OUTLINE);
         railPlatformStates(DNLBlocks.RAIL_PLATFORM.get());
         multifaceWebCarpet(DNLBlocks.WEB_CARPET.get());
+        burnacleSixWayWithStages(DNLBlocks.BURNACLE.get());
     }
 
     private void fenceGateBlockWithItem(FenceGateBlock block, Block parent) {
@@ -1121,6 +1122,41 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         // === Item model generation ===
         simpleItem(block);
     }
+
+    private void burnacleSixWayWithStages(Block block) {
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction f = state.getValue(BlockStateProperties.FACING);
+            BurnacleBlock.Stage stage = state.getValue(BurnacleBlock.STAGE);
+
+            String modelName = switch (stage) {
+                case BUD      -> "burnacle_bud";
+                case JUVENILE -> "burnacle_juvenile";
+                case MATURE   -> "burnacle_mature";
+            };
+
+            ModelFile model = models().getExistingFile(modLoc("block/" + modelName));
+
+            int x = 0, y = 0;
+            switch (f) {
+                case UP    -> { x = 0;   y = 0;   }
+                case DOWN  -> { x = 180; y = 0;   }
+                case NORTH -> { x = 90;  y = 0;   }
+                case SOUTH -> { x = 90;  y = 180; }
+                case WEST  -> { x = 90;  y = 270; }
+                case EAST  -> { x = 90;  y = 90;  }
+            }
+
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationX(x)
+                    .rotationY(y)
+                    .build();
+        });
+
+        // Item model: use burnacle_bud block model as parent (has handheld transforms)
+        simpleBlockItem(block, models().getExistingFile(modLoc("block/burnacle_bud")));
+    }
+
 
 
 

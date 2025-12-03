@@ -194,6 +194,7 @@ public class DNLItems {
     public static final Supplier<Item> RAIL_PLATFORM = register("rail_platform", () -> new BlockItem(DNLBlocks.RAIL_PLATFORM.get(), new Item.Properties()));
     public static final Supplier<Item> WEB_CARPET = register("web_carpet", () -> new BlockItem(DNLBlocks.WEB_CARPET.get(), new Item.Properties()));
     public static final Supplier<Item> MOB_SPAWNPOINT = register("mob_spawnpoint", () -> new BlockItem(DNLBlocks.MOB_SPAWN_POINT.get(), new Item.Properties()));
+    public static final Supplier<Item> BURNACLE = register("burnacle", () -> new BlockItem(DNLBlocks.BURNACLE.get(), new Item.Properties()));
     public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new DetectionWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
     public static final Supplier<Item> BULLET = register("bullet", () -> new BulletItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
 

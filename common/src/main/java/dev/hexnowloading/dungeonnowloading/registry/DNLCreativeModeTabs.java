@@ -181,6 +181,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DEEPSTEEL_BLOCK.get());
                 output.accept(DNLItems.RAIL_PLATFORM.get());
                 output.accept(DNLItems.WEB_CARPET.get());
+                output.accept(DNLItems.BURNACLE.get());
                 output.accept(DNLItems.MOB_SPAWNPOINT.get());
                 output.accept(DNLItems.ZONE_WAND.get());
 

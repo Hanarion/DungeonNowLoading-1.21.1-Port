@@ -1,4 +1,4 @@
-// 1.20.1	2025-11-21T09:56:03.2921388	Loot Tables
+// 1.20.1	2025-12-01T13:41:48.1900441	Loot Tables
 5b9f54bbbebffdf1696e10a26f9a6b225355add4 data/dungeonnowloading/loot_tables/blocks/acacia_wooden_board.json
 8de5512c6e498fd7a4e162f42dd356b7cb01701f data/dungeonnowloading/loot_tables/blocks/amethyst_stone_notch.json
 aee384cfe4e67aeb143699641353b85775ccf71a data/dungeonnowloading/loot_tables/blocks/azuro_hanging_leaves.json
@@ -21,6 +21,7 @@ f53688c73807c9fcae5aa91d30f7900b862903b2 data/dungeonnowloading/loot_tables/bloc
 e667b0755da6d97f3bb77f8c4a7af22b8b2ecb10 data/dungeonnowloading/loot_tables/blocks/book_pile.json
 ec264f3c071cfb019cec7a36ebb7bf945af39db1 data/dungeonnowloading/loot_tables/blocks/bordered_stone.json
 2098d0edcd477523fe2c1347e0c2b30e369495b2 data/dungeonnowloading/loot_tables/blocks/brittlestone.json
+fca05b32a373281ab4cdcdaee95f0e59245a387e data/dungeonnowloading/loot_tables/blocks/burnacle.json
 58c3a50bf4dc71b9bceffc34e9b8ba9d1d248d8b data/dungeonnowloading/loot_tables/blocks/cherry_wooden_board.json
 1a7dd2d39b6d41bdceccf24135508f0926d0f8c1 data/dungeonnowloading/loot_tables/blocks/chiseled_coiling_stone_pillar.json
 57bcaf303f0f441f4a87bc26a7b1a89d6a70040e data/dungeonnowloading/loot_tables/blocks/chorus_stone_notch.json
