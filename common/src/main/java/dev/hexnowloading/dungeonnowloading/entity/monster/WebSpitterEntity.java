@@ -3,7 +3,10 @@ package dev.hexnowloading.dungeonnowloading.entity.monster;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WebSpitterRangedAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WebSpitterRetreatGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.WebSpitterMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.WebSpitterAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.WebWebProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -30,6 +33,12 @@ import javax.annotation.Nullable;
 public class WebSpitterEntity extends Spider implements RangedAttackMob {
 
     private static final EntityDataAccessor<Boolean> ANCHORED = SynchedEntityData.defineId(WebSpitterEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> BACKING_UP = SynchedEntityData.defineId(WebSpitterEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<WebSpitterAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(WebSpitterEntity.class, EntityStates.WEB_SPITTER_ANIMATION_STATE);
+
+    private AnimationChainer<WebSpitterAnimationState> animationChainer = new AnimationChainer<>();
+
+    public final AnimationState shootAnimationState = new AnimationState();
 
     private WebSpitterRangedAttackGoal rangedGoal;
     private WebSpitterRetreatGoal retreatGoal;
@@ -55,6 +64,8 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(ANCHORED, Boolean.FALSE);
+        this.entityData.define(BACKING_UP, Boolean.FALSE);
+        this.entityData.define(ANIMATION_STATE, WebSpitterAnimationState.IDLE);
     }
 
     public boolean isAnchored() {
@@ -129,6 +140,19 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         return vanilla || this.horizontalCollision;
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.level().isClientSide) {
+            return;
+        }
+        this.animationChainer.tick(this::transitionTo);
+    }
+
+    public void playShootAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WebSpitterAnimationState.SHOOT, WebSpitterAnimationDuration.SHOOT, null, () -> this.entityData.set(ANIMATION_STATE, WebSpitterAnimationState.IDLE)));
+    }
 
 
     // --- Ranged attack implementation ---
@@ -211,7 +235,52 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         return true;
     }
 
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            WebSpitterAnimationState animationState = this.getAnimationState();
+            this.resetAnimation();
+            switch (animationState) {
+                case SHOOT -> this.shootAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    public WebSpitterEntity transitionTo(WebSpitterAnimationState animationState) {
+        switch (animationState) {
+            case IDLE:
+                this.entityData.set(ANIMATION_STATE, WebSpitterAnimationState.IDLE);
+                break;
+            case SHOOT:
+                this.entityData.set(ANIMATION_STATE, WebSpitterAnimationState.SHOOT);
+                break;
+        }
+        return this;
+    }
+
+    private void resetAnimation() {
+        this.shootAnimationState.stop();
+    }
+
     public boolean shouldBreakAnchorTo(LivingEntity target) {
         return this.distanceToSqr(target) <= ANCHORED_BREAK_RANGE * ANCHORED_BREAK_RANGE;
+    }
+
+    public boolean isBackingUp() {
+        return this.entityData.get(BACKING_UP);
+    }
+
+    public void setBackingUp(boolean backingUp) {
+        this.entityData.set(BACKING_UP, backingUp);
+    }
+
+    public WebSpitterAnimationState getAnimationState() {
+        return this.entityData.get(ANIMATION_STATE);
+    }
+
+    public enum WebSpitterAnimationState {
+        IDLE,
+        SHOOT
     }
 }

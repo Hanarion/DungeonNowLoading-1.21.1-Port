@@ -1,135 +1,141 @@
 package dev.hexnowloading.dungeonnowloading.entity.client.model;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.WebSpitterAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.CubeListBuilder;
-import net.minecraft.client.model.geom.builders.LayerDefinition;
-import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import net.minecraft.world.entity.AnimationState;
 
 public class WebSpitterModel <T extends WebSpitterEntity> extends HierarchicalModel<T> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "web_spitter"), "main");
 
-    private static final String BODY_0 = "body0";
-    private static final String BODY_1 = "body1";
-    private static final String RIGHT_MIDDLE_FRONT_LEG = "right_middle_front_leg";
-    private static final String LEFT_MIDDLE_FRONT_LEG = "left_middle_front_leg";
-    private static final String RIGHT_MIDDLE_HIND_LEG = "right_middle_hind_leg";
-    private static final String LEFT_MIDDLE_HIND_LEG = "left_middle_hind_leg";
     private final ModelPart root;
+    private final ModelPart Spider;
     private final ModelPart head;
-    private final ModelPart rightHindLeg;
-    private final ModelPart leftHindLeg;
-    private final ModelPart rightMiddleHindLeg;
-    private final ModelPart leftMiddleHindLeg;
-    private final ModelPart rightMiddleFrontLeg;
-    private final ModelPart leftMiddleFrontLeg;
-    private final ModelPart rightFrontLeg;
-    private final ModelPart leftFrontLeg;
+    private final ModelPart fang;
+    private final ModelPart fang2;
+    private final ModelPart backpart;
+    private final ModelPart bone;
+    private final ModelPart bone2;
+    private final ModelPart leg1;
+    private final ModelPart bone3;
+    private final ModelPart bone4;
+    private final ModelPart leg2;
 
-    public WebSpitterModel(ModelPart modelPart) {
-        this.root = modelPart;
-        this.head = modelPart.getChild("head");
-        this.rightHindLeg = modelPart.getChild("right_hind_leg");
-        this.leftHindLeg = modelPart.getChild("left_hind_leg");
-        this.rightMiddleHindLeg = modelPart.getChild("right_middle_hind_leg");
-        this.leftMiddleHindLeg = modelPart.getChild("left_middle_hind_leg");
-        this.rightMiddleFrontLeg = modelPart.getChild("right_middle_front_leg");
-        this.leftMiddleFrontLeg = modelPart.getChild("left_middle_front_leg");
-        this.rightFrontLeg = modelPart.getChild("right_front_leg");
-        this.leftFrontLeg = modelPart.getChild("left_front_leg");
+    public WebSpitterModel(ModelPart root) {
+        this.root = root;
+        this.Spider = root.getChild("Spider");
+        this.head = this.Spider.getChild("head");
+        this.fang = this.head.getChild("fang");
+        this.fang2 = this.head.getChild("fang2");
+        this.backpart = this.Spider.getChild("backpart");
+        this.bone = this.Spider.getChild("bone");
+        this.bone2 = this.Spider.getChild("bone2");
+        this.leg1 = this.Spider.getChild("leg1");
+        this.bone3 = this.Spider.getChild("bone3");
+        this.bone4 = this.Spider.getChild("bone4");
+        this.leg2 = this.Spider.getChild("leg2");
     }
 
-    public static LayerDefinition createSpiderBodyLayer() {
-        MeshDefinition $$0 = new MeshDefinition();
-        PartDefinition $$1 = $$0.getRoot();
-        $$1.addOrReplaceChild("head", CubeListBuilder.create().texOffs(32, 4).addBox(-4.0F, -4.0F, -8.0F, 8.0F, 8.0F, 8.0F), PartPose.offset(0.0F, 15.0F, -3.0F));
-        $$1.addOrReplaceChild("body0", CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -3.0F, -3.0F, 6.0F, 6.0F, 6.0F), PartPose.offset(0.0F, 15.0F, 0.0F));
-        $$1.addOrReplaceChild("body1", CubeListBuilder.create().texOffs(0, 12).addBox(-5.0F, -4.0F, -6.0F, 10.0F, 8.0F, 12.0F), PartPose.offset(0.0F, 15.0F, 9.0F));
-        CubeListBuilder $$3 = CubeListBuilder.create().texOffs(18, 0).addBox(-15.0F, -1.0F, -1.0F, 16.0F, 2.0F, 2.0F);
-        CubeListBuilder $$4 = CubeListBuilder.create().texOffs(18, 0).mirror().addBox(-1.0F, -1.0F, -1.0F, 16.0F, 2.0F, 2.0F);
-        $$1.addOrReplaceChild("right_hind_leg", $$3, PartPose.offset(-4.0F, 15.0F, 2.0F));
-        $$1.addOrReplaceChild("left_hind_leg", $$4, PartPose.offset(4.0F, 15.0F, 2.0F));
-        $$1.addOrReplaceChild("right_middle_hind_leg", $$3, PartPose.offset(-4.0F, 15.0F, 1.0F));
-        $$1.addOrReplaceChild("left_middle_hind_leg", $$4, PartPose.offset(4.0F, 15.0F, 1.0F));
-        $$1.addOrReplaceChild("right_middle_front_leg", $$3, PartPose.offset(-4.0F, 15.0F, 0.0F));
-        $$1.addOrReplaceChild("left_middle_front_leg", $$4, PartPose.offset(4.0F, 15.0F, 0.0F));
-        $$1.addOrReplaceChild("right_front_leg", $$3, PartPose.offset(-4.0F, 15.0F, -1.0F));
-        $$1.addOrReplaceChild("left_front_leg", $$4, PartPose.offset(4.0F, 15.0F, -1.0F));
-        return LayerDefinition.create($$0, 64, 32);
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
+
+        PartDefinition Spider = partdefinition.addOrReplaceChild("Spider", CubeListBuilder.create().texOffs(33, 25).addBox(-3.0F, -2.0324F, -3.2814F, 6.0F, 5.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0887F, 16.9034F, 3.2814F));
+
+        PartDefinition head = Spider.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 25).addBox(-4.0F, -4.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -1.0324F, -7.2813F));
+
+        PartDefinition cube_r1 = head.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(50, 56).addBox(-3.0F, 0.0F, -4.0F, 3.0F, 0.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -4.0F, 0.0F, 0.0F, 0.0F, 0.5672F));
+
+        PartDefinition cube_r2 = head.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(0, 59).addBox(0.0F, 0.0F, -4.0F, 3.0F, 0.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -4.0F, 0.0F, 0.0F, 0.0F, -0.5672F));
+
+        PartDefinition fang = head.addOrReplaceChild("fang", CubeListBuilder.create(), PartPose.offset(2.5F, 1.0F, -4.0F));
+
+        PartDefinition cube_r3 = fang.addOrReplaceChild("cube_r3", CubeListBuilder.create().texOffs(11, 71).addBox(-1.5F, 0.0F, -2.0F, 3.0F, 4.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.1745F));
+
+        PartDefinition fang2 = head.addOrReplaceChild("fang2", CubeListBuilder.create(), PartPose.offset(-2.5F, 1.0F, -4.0F));
+
+        PartDefinition cube_r4 = fang2.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(0, 71).addBox(-1.5F, 0.0F, -2.0F, 3.0F, 4.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -0.1745F));
+
+        PartDefinition backpart = Spider.addOrReplaceChild("backpart", CubeListBuilder.create(), PartPose.offset(0.0F, -1.4811F, 3.8051F));
+
+        PartDefinition cube_r5 = backpart.addOrReplaceChild("cube_r5", CubeListBuilder.create().texOffs(49, 0).addBox(0.0F, 0.0588F, -6.034F, 0.0F, 4.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-6.0F, -6.0212F, 2.7097F, 0.4971F, -0.1719F, 0.3053F));
+
+        PartDefinition cube_r6 = backpart.addOrReplaceChild("cube_r6", CubeListBuilder.create().texOffs(25, 56).addBox(0.0F, 0.0588F, -6.034F, 0.0F, 4.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-6.0F, -1.0212F, 5.6097F, 0.4971F, -0.1719F, 0.3053F));
+
+        PartDefinition cube_r7 = backpart.addOrReplaceChild("cube_r7", CubeListBuilder.create().texOffs(0, 42).addBox(0.0F, 0.0588F, -6.034F, 0.0F, 4.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(6.0F, -6.0212F, 2.7097F, 0.4971F, 0.1719F, -0.3053F));
+
+        PartDefinition cube_r8 = backpart.addOrReplaceChild("cube_r8", CubeListBuilder.create().texOffs(33, 39).addBox(0.0F, 0.0588F, -6.034F, 0.0F, 4.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(6.0F, -1.0212F, 5.6097F, 0.4971F, 0.1719F, -0.3053F));
+
+        PartDefinition cube_r9 = backpart.addOrReplaceChild("cube_r9", CubeListBuilder.create().texOffs(0, 0).addBox(-6.0F, -5.0F, 0.0F, 12.0F, 12.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -0.5513F, -1.0865F, 0.5236F, 0.0F, 0.0F));
+
+        PartDefinition bone = Spider.addOrReplaceChild("bone", CubeListBuilder.create(), PartPose.offset(3.0F, -0.0324F, -0.2814F));
+
+        PartDefinition cube_r10 = bone.addOrReplaceChild("cube_r10", CubeListBuilder.create().texOffs(58, 49).addBox(0.0F, -1.0F, -1.0F, 11.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0229F, 0.1289F, 0.6123F));
+
+        PartDefinition bone2 = Spider.addOrReplaceChild("bone2", CubeListBuilder.create(), PartPose.offset(3.0F, -0.0324F, 1.7186F));
+
+        PartDefinition cube_r11 = bone2.addOrReplaceChild("cube_r11", CubeListBuilder.create().texOffs(58, 44).addBox(0.0F, -1.0F, -1.0F, 11.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.0465F, -0.2577F, 0.6169F));
+
+        PartDefinition leg1 = Spider.addOrReplaceChild("leg1", CubeListBuilder.create().texOffs(50, 68).addBox(0.0F, -3.0F, -1.0F, 5.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(62, 32).addBox(5.0F, -2.0F, -3.5F, 8.0F, 0.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(62, 35).addBox(5.0F, -2.0F, 1.5F, 8.0F, 0.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(62, 22).addBox(5.0F, -3.0F, -1.0F, 9.0F, 2.0F, 2.0F, new CubeDeformation(0.5F)), PartPose.offsetAndRotation(3.0F, 1.9676F, -1.2814F, 0.3107F, 0.6358F, 0.4957F));
+
+        PartDefinition bone3 = Spider.addOrReplaceChild("bone3", CubeListBuilder.create(), PartPose.offset(-3.0F, -0.0324F, -0.2814F));
+
+        PartDefinition cube_r12 = bone3.addOrReplaceChild("cube_r12", CubeListBuilder.create().texOffs(49, 17).addBox(-11.0F, -1.0F, -1.0F, 11.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0229F, -0.1289F, -0.6123F));
+
+        PartDefinition bone4 = Spider.addOrReplaceChild("bone4", CubeListBuilder.create(), PartPose.offset(-3.0F, -0.0324F, 1.7186F));
+
+        PartDefinition cube_r13 = bone4.addOrReplaceChild("cube_r13", CubeListBuilder.create().texOffs(58, 39).addBox(-11.0F, -1.0F, -1.0F, 11.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.0465F, 0.2577F, -0.6169F));
+
+        PartDefinition leg2 = Spider.addOrReplaceChild("leg2", CubeListBuilder.create().texOffs(0, 68).addBox(-13.0F, -2.0F, 1.5F, 8.0F, 0.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(50, 65).addBox(-13.0F, -2.0F, -3.5F, 8.0F, 0.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(65, 68).addBox(-5.0F, -3.0F, -1.0F, 5.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(62, 27).addBox(-14.0F, -3.0F, -1.0F, 9.0F, 2.0F, 2.0F, new CubeDeformation(0.5F)), PartPose.offsetAndRotation(-3.0F, 1.9676F, -1.2814F, 0.3107F, -0.6358F, -0.4957F));
+
+        return LayerDefinition.create(meshdefinition, 128, 128);
     }
 
+    private final AnimationState idleLoop = new AnimationState();
+
+    @Override
+    public void setupAnim(WebSpitterEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        this.root.getAllParts().forEach(ModelPart::resetPose);
+
+        this.idleLoop.startIfStopped(entity.tickCount);
+        this.animate(idleLoop, WebSpitterAnimation.IDLE, ageInTicks);
+
+        boolean backingUp = entity.isBackingUp();
+        if (backingUp) {
+            this.animateWalk(WebSpitterAnimation.WALK_BACK, limbSwing, limbSwingAmount, 1.0F, 1.0F);
+        }
+        this.animateWalk(WebSpitterAnimation.WALK, limbSwing, limbSwingAmount, 1.0F, 1.0F);
+        this.animate(entity.shootAnimationState, WebSpitterAnimation.SHOOT, ageInTicks);
+
+        this.animateHeadLookTarget(netHeadYaw, headPitch);
+    }
+
+    private void animateHeadLookTarget(float netHeadYaw, float headPitch) {
+        this.head.yRot = netHeadYaw * (float) (Math.PI / 180.0);
+        this.head.xRot = headPitch * (float) (Math.PI / 180.0);
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        Spider.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    }
+
+    @Override
     public ModelPart root() {
-        return this.root;
-    }
-
-    public void setupAnim(T $$0, float $$1, float $$2, float $$3, float $$4, float $$5) {
-        this.head.yRot = $$4 * 0.017453292F;
-        this.head.xRot = $$5 * 0.017453292F;
-        float $$6 = 0.7853982F;
-        this.rightHindLeg.zRot = -0.7853982F;
-        this.leftHindLeg.zRot = 0.7853982F;
-        this.rightMiddleHindLeg.zRot = -0.58119464F;
-        this.leftMiddleHindLeg.zRot = 0.58119464F;
-        this.rightMiddleFrontLeg.zRot = -0.58119464F;
-        this.leftMiddleFrontLeg.zRot = 0.58119464F;
-        this.rightFrontLeg.zRot = -0.7853982F;
-        this.leftFrontLeg.zRot = 0.7853982F;
-        float $$7 = -0.0F;
-        float $$8 = 0.3926991F;
-        this.rightHindLeg.yRot = 0.7853982F;
-        this.leftHindLeg.yRot = -0.7853982F;
-        this.rightMiddleHindLeg.yRot = 0.3926991F;
-        this.leftMiddleHindLeg.yRot = -0.3926991F;
-        this.rightMiddleFrontLeg.yRot = -0.3926991F;
-        this.leftMiddleFrontLeg.yRot = 0.3926991F;
-        this.rightFrontLeg.yRot = -0.7853982F;
-        this.leftFrontLeg.yRot = 0.7853982F;
-        float $$9 = -(Mth.cos($$1 * 0.6662F * 2.0F + 0.0F) * 0.4F) * $$2;
-        float $$10 = -(Mth.cos($$1 * 0.6662F * 2.0F + 3.1415927F) * 0.4F) * $$2;
-        float $$11 = -(Mth.cos($$1 * 0.6662F * 2.0F + 1.5707964F) * 0.4F) * $$2;
-        float $$12 = -(Mth.cos($$1 * 0.6662F * 2.0F + 4.712389F) * 0.4F) * $$2;
-        float $$13 = Math.abs(Mth.sin($$1 * 0.6662F + 0.0F) * 0.4F) * $$2;
-        float $$14 = Math.abs(Mth.sin($$1 * 0.6662F + 3.1415927F) * 0.4F) * $$2;
-        float $$15 = Math.abs(Mth.sin($$1 * 0.6662F + 1.5707964F) * 0.4F) * $$2;
-        float $$16 = Math.abs(Mth.sin($$1 * 0.6662F + 4.712389F) * 0.4F) * $$2;
-        ModelPart var10000 = this.rightHindLeg;
-        var10000.yRot += $$9;
-        var10000 = this.leftHindLeg;
-        var10000.yRot += -$$9;
-        var10000 = this.rightMiddleHindLeg;
-        var10000.yRot += $$10;
-        var10000 = this.leftMiddleHindLeg;
-        var10000.yRot += -$$10;
-        var10000 = this.rightMiddleFrontLeg;
-        var10000.yRot += $$11;
-        var10000 = this.leftMiddleFrontLeg;
-        var10000.yRot += -$$11;
-        var10000 = this.rightFrontLeg;
-        var10000.yRot += $$12;
-        var10000 = this.leftFrontLeg;
-        var10000.yRot += -$$12;
-        var10000 = this.rightHindLeg;
-        var10000.zRot += $$13;
-        var10000 = this.leftHindLeg;
-        var10000.zRot += -$$13;
-        var10000 = this.rightMiddleHindLeg;
-        var10000.zRot += $$14;
-        var10000 = this.leftMiddleHindLeg;
-        var10000.zRot += -$$14;
-        var10000 = this.rightMiddleFrontLeg;
-        var10000.zRot += $$15;
-        var10000 = this.leftMiddleFrontLeg;
-        var10000.zRot += -$$15;
-        var10000 = this.rightFrontLeg;
-        var10000.zRot += $$16;
-        var10000 = this.leftFrontLeg;
-        var10000.zRot += -$$16;
+        return root;
     }
 }

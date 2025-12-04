@@ -49,7 +49,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(WispModel.LAYER_LOCATION, WispModel::createBodyLayer);
         event.registerLayerDefinition(WispLanternModel.LAYER_LOCATION, WispLanternModel::createBodyLayer);
         event.registerLayerDefinition(ThumperModel.LAYER_LOCATION, ThumperModel::createBodyLayer);
-        event.registerLayerDefinition(WebSpitterModel.LAYER_LOCATION, WebSpitterModel::createSpiderBodyLayer);
+        event.registerLayerDefinition(WebSpitterModel.LAYER_LOCATION, WebSpitterModel::createBodyLayer);
         event.registerLayerDefinition(ReaperSpiderModel.LAYER_LOCATION, ReaperSpiderModel::createSpiderBodyLayer);
 
         // Passive

@@ -37,7 +37,7 @@ public class WebSpitterRangedAttackGoal extends Goal {
         this.mob = mob;
         this.moveSpeed = moveSpeed;
 
-        int baseWindupDuration = 20; // 1 second
+        int baseWindupDuration = 6; // 1 second
 
         this.attackIntervalTicks = reducedTickDelay(attackInterval);
         this.windupDurationTicks = reducedTickDelay(baseWindupDuration);
@@ -83,6 +83,7 @@ public class WebSpitterRangedAttackGoal extends Goal {
         windupTicks = 0;
         seeTime = 0;
         mob.setAggressive(false);
+        mob.setBackingUp(false);
         mob.getNavigation().stop();
     }
 
@@ -127,6 +128,8 @@ public class WebSpitterRangedAttackGoal extends Goal {
         if (prev != state && state == CombatState.SHOOT) {
             mob.getNavigation().moveTo(mob, 0.0D);
         }
+
+        mob.setBackingUp(state == CombatState.BACK_UP);
     }
 
 
@@ -145,6 +148,11 @@ public class WebSpitterRangedAttackGoal extends Goal {
         }
 
         if (windupTicks < windupDurationTicks) {
+
+            if (windupTicks == 0) {
+                mob.playShootAnimation();
+            }
+
             windupTicks++;
             mob.setAggressive(true);
             return;
