@@ -1,15 +1,21 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.MimicartAnimationDuration;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,13 +39,21 @@ public class MimicartEntity extends AbstractMinecart {
 
     private static final int BEAM_DRAW_TICKS = 10; // 0.5s at 20 TPS
     private static final int SUCK_WINDUP_TICKS = 20;    // 1 second a
-    private static final int FAIL_COOLDOWN_TICKS = 40;// t 20 tps (comment was 2s before)
+    private static final int FAIL_COOLDOWN_TICKS = 60;// t 20 tps (comment was 2s before)
     private static final int SUCK_COOLDOWN_TICKS = 80;  // 4 seconds cooldown
     private static final int TRAP_DURATION_TICKS = 600; // 10 seconds
     private static final int POST_TRAP_COOLDOWN_TICKS = 100; // 5 seconds
     private static final float SPEED_MODIFIER = 2.5F;
     private static final float ATTACK_DAMAGE = 1.0F;
     private static final float RIDING_OFFSET_EASE = 0.92F;
+
+    private static final EntityDataAccessor<MimicartAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(MimicartEntity.class, EntityStates.MIMICART_ANIMATION_STATE);
+    private AnimationChainer<MimicartAnimationState> animationChainer = new AnimationChainer<>();
+
+    public final AnimationState openAnimationState = new AnimationState();
+    public final AnimationState swingAnimationState = new AnimationState();
+    public final AnimationState snatchAnimationState = new AnimationState();
+    public final AnimationState openAndCloseAnimationState = new AnimationState();
 
 
     // suck / pull state
@@ -81,40 +95,90 @@ public class MimicartEntity extends AbstractMinecart {
     public void tick() {
         super.tick();
 
+        // --- client: no server logic here ---
         if (this.level().isClientSide) {
             return;
         }
 
+        // --- rail / dismount handling ---
+        this.updateRailStateAndAutoDismount();
+
+        // --- post-trap immunity ticking ---
+        this.tickPostTrapImmunity();
+
+        // --- trap damage / auto-eject after duration ---
+        this.tickTrapState();
+
+        // --- if dead or already carrying somebody, don't try to suck in players ---
+        if (!this.isAlive() || this.isVehicle()) {
+            resetSuckState(true);
+            return;
+        }
+
+        // --- cooldowns (suck + collide grab) ---
+        this.tickSuckCooldowns();
+
+        // --- main suck / snatch logic (may early-return like original) ---
+        if (!this.tickSuckAndSnatch()) {
+            return; // matches original early-return paths inside suck logic
+        }
+
+        // --- collision-based grab when not doing tongue attack ---
+        if (this.suckTimer <= 0 && this.suckTargetId == null) {
+            this.tryCollideGrab();
+        }
+
+        // --- server-side animation chainer ---
+        this.animationChainer.tick(this::transitionTo);
+    }
+
+    // ---------------------------------------------------------
+//  Rail + trap helpers
+// ---------------------------------------------------------
+
+    /**
+     * Handles rail state tracking and forced dismount when leaving rails.
+     */
+    private void updateRailStateAndAutoDismount() {
         boolean onRailNow = this.isOnRails();
         if (this.wasOnRail && !onRailNow && this.isVehicle()) {
             dismountTrappedPassengerWithCooldown();
         }
         this.wasOnRail = onRailNow;
+    }
 
-        // --- post-trap cooldown ticking ---
+    /**
+     * Ticks the "recently released" immunity window.
+     */
+    private void tickPostTrapImmunity() {
         if (lastReleasedCooldown > 0) {
             lastReleasedCooldown--;
             if (lastReleasedCooldown == 0) {
                 lastReleasedPlayerId = null;
             }
         }
+    }
 
-        // --- trap ticking / auto-eject after 10s ---
-        // --- trap ticking / auto-eject after 10s ---
+    /**
+     * Handles damage over time and auto-eject for trapped passengers.
+     */
+    private void tickTrapState() {
         if (trappedPassengerId != null) {
             Entity passenger = this.getFirstPassenger();
 
             if (passenger != null
                     && passenger.getUUID().equals(trappedPassengerId)
-                    && passenger instanceof net.minecraft.world.entity.LivingEntity living) {
+                    && passenger instanceof LivingEntity living) {
 
                 trappedTicks++;
 
+                // periodic damage + sound
                 if (trappedTicks % 60 == 0 && trappedTicks > 0) {
                     living.hurt(this.damageSources().generic(), ATTACK_DAMAGE);
                     this.playSound(SoundEvents.MINECART_RIDING, 1.0F, 0.8F + this.random.nextFloat() * 0.4F);
                 }
 
+                // auto-eject after trap duration
                 if (trappedTicks >= TRAP_DURATION_TICKS) {
                     dismountTrappedPassengerWithCooldown();
                 }
@@ -126,42 +190,48 @@ public class MimicartEntity extends AbstractMinecart {
                 snatchOffset = Vec3.ZERO;
             }
         }
+    }
 
+// ---------------------------------------------------------
+//  Suck / snatch helpers
+// ---------------------------------------------------------
 
-        // If dead or already carrying somebody, don't try to suck in players
-        if (!this.isAlive() || this.isVehicle()) {
-            resetSuckState(true);
-            return;
-        }
-
-        // --- suck logic ---
-
-        // Cooldown ticking
+    /**
+     * Ticks simple integer cooldowns for the suck attack and collision grab.
+     */
+    private void tickSuckCooldowns() {
         if (suckCooldown > 0) {
             suckCooldown--;
         }
-
         if (collideGrabCooldown > 0) {
             collideGrabCooldown--;
         }
+    }
 
+    /**
+     * Main tongue / suck / snatch logic.
+     *
+     * @return false if the original code would have returned early from tick(),
+     *         true if tick should continue.
+     */
+    private boolean tickSuckAndSnatch() {
         // Resolve current target (if we have one)
         Player target = getSuckTarget();
 
-        // If we had a target UUID but that player no longer exists, reset
+        // If we had a target UUID but that player no longer exists, reset + early-return
         if (suckTargetId != null && target == null) {
             resetSuckState(true);
-            return;
+            return false;
         }
 
-        // Windup / beam phase
+        // --- Windup / beam phase ---
         if (suckTimer > 0) {
             // PRE-LOCK: still tracking the live player
             if (this.suckLockedPos == null) {
                 // we haven't locked yet → need a valid target in range & LOS
                 if (target == null) {
                     resetSuckState(true);
-                    return;
+                    return false;
                 }
 
                 boolean outOfDetection = target.distanceToSqr(this) > DETECT_RADIUS * DETECT_RADIUS;
@@ -169,7 +239,7 @@ public class MimicartEntity extends AbstractMinecart {
 
                 if (outOfDetection || noPull) {
                     resetSuckState(true);
-                    return;
+                    return false;
                 }
 
             } else {
@@ -179,7 +249,7 @@ public class MimicartEntity extends AbstractMinecart {
                 if (distCartToLockSq > SNATCH_MAX_DISTANCE * SNATCH_MAX_DISTANCE) {
                     // cart drifted too far from the telegraphed point → cancel
                     resetSuckState(true);
-                    return;
+                    return false;
                 }
             }
 
@@ -215,7 +285,7 @@ public class MimicartEntity extends AbstractMinecart {
                     Vec3 point = start.add(delta.scale(t));
 
                     server.sendParticles(
-                            ParticleTypes.POOF,
+                            ParticleTypes.ELECTRIC_SPARK,
                             point.x, point.y, point.z,
                             1,
                             0.01D, 0.01D, 0.01D,
@@ -224,7 +294,6 @@ public class MimicartEntity extends AbstractMinecart {
                 }
             }
 
-            // resolve snatch when timer finishes (your existing code)
             // resolve snatch when timer finishes
             if (suckTimer == 0) {
                 if (this.suckLockedPos != null) {
@@ -239,7 +308,7 @@ public class MimicartEntity extends AbstractMinecart {
                                 this.suckLockedPos.y,
                                 this.suckLockedPos.z,
                                 grabRadius,
-                                (p) -> p instanceof Player player &&canBePulled(player)
+                                (p) -> p instanceof Player player && canBePulled(player)
                         );
 
                         Entity grabbedEntity = grabbedPlayer;
@@ -247,7 +316,7 @@ public class MimicartEntity extends AbstractMinecart {
                         // 2) If no player, try any other living entity in the radius (optional)
                         if (grabbedEntity == null) {
                             var others = this.level().getEntitiesOfClass(
-                                    net.minecraft.world.entity.LivingEntity.class,
+                                    LivingEntity.class,
                                     new net.minecraft.world.phys.AABB(
                                             this.suckLockedPos.x - grabRadius,
                                             this.suckLockedPos.y - grabRadius,
@@ -289,10 +358,17 @@ public class MimicartEntity extends AbstractMinecart {
                     resetSuckState(true);
                 }
             }
+
+            // we handled the "suckTimer > 0" branch completely; continue tick
+            return true;
         }
+
+        // --- Start a new suck if off cooldown and not currently sucking ---
         else if (suckTimer == 0 && suckTargetId == null && suckCooldown <= 0) {
             Player nearest = this.level().getNearestPlayer(this, DETECT_RADIUS);
             if (nearest != null && canBePulled(nearest) && hasLineOfSightTo(nearest)) {
+                this.playSwingAnimation();
+
                 this.suckTargetId = nearest.getUUID();
                 this.suckTimer = SUCK_WINDUP_TICKS;
 
@@ -306,9 +382,19 @@ public class MimicartEntity extends AbstractMinecart {
             }
         }
 
-        if (this.suckTimer <= 0 && this.suckTargetId == null) {
-            tryCollideGrab();
-        }
+        return true;
+    }
+
+    public void playSnatchAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(MimicartAnimationState.SNATCH, MimicartAnimationDuration.SNATCH));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(MimicartAnimationState.IDLE, MimicartAnimationDuration.IDLE));
+    }
+
+    public void playSwingAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(MimicartAnimationState.SWING, MimicartAnimationDuration.SWING));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(MimicartAnimationState.IDLE, MimicartAnimationDuration.IDLE));
     }
 
     private void resetSuckState(boolean failed) {
@@ -728,6 +814,55 @@ public class MimicartEntity extends AbstractMinecart {
         }
     }
 
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            MimicartAnimationState animationState = this.getAnimationState();
+            this.resetAnimations();
+            switch (animationState) {
+                case OPEN -> this.openAnimationState.startIfStopped(this.tickCount);
+                case SWING -> this.swingAnimationState.startIfStopped(this.tickCount);
+                case SNATCH -> this.snatchAnimationState.startIfStopped(this.tickCount);
+                case OPEN_AND_CLOSE -> this.openAndCloseAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    private void resetAnimations() {
+        this.openAnimationState.stop();
+        this.snatchAnimationState.stop();
+        this.swingAnimationState.stop();
+        this.openAndCloseAnimationState.stop();
+    }
+
+    public MimicartEntity transitionTo(MimicartAnimationState state) {
+        switch (state) {
+            case OPEN:
+                this.entityData.set(ANIMATION_STATE, MimicartAnimationState.OPEN);
+                break;
+            case SWING:
+                this.entityData.set(ANIMATION_STATE, MimicartAnimationState.SWING);
+                break;
+            case SNATCH:
+                this.entityData.set(ANIMATION_STATE, MimicartAnimationState.SNATCH);
+                break;
+            case OPEN_AND_CLOSE:
+                this.entityData.set(ANIMATION_STATE, MimicartAnimationState.OPEN_AND_CLOSE);
+                break;
+            case IDLE:
+                this.entityData.set(ANIMATION_STATE, MimicartAnimationState.IDLE);
+                break;
+        }
+
+        return this;
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(ANIMATION_STATE, MimicartAnimationState.IDLE);
+    }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
@@ -824,5 +959,18 @@ public class MimicartEntity extends AbstractMinecart {
     public boolean isOnFire() {
         return false;
     }
+
+    public MimicartAnimationState getAnimationState() {
+        return this.entityData.get(ANIMATION_STATE);
+    }
+
+    public enum MimicartAnimationState {
+        IDLE,
+        OPEN,
+        SWING,
+        SNATCH,
+        OPEN_AND_CLOSE
+    }
+
 
 }

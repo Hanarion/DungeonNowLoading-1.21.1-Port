@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.util;
 import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.MimicartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
@@ -26,6 +27,7 @@ public class EntityStates {
     public static final EntityDataSerializer<VertexDomainProjectileEntity.VertexDomainAnimationState> VERTEX_DOMAIN_ANIMATION_STATE;
     public static final EntityDataSerializer<RepulsorEntity.State> COMMAND_PYLON_STATE;
     public static final EntityDataSerializer<RepulsorEntity.Skin> REPULSOR_SKIN;
+    public static final EntityDataSerializer<MimicartEntity.MimicartAnimationState> MIMICART_ANIMATION_STATE;
 
     static {
         CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
@@ -44,6 +46,7 @@ public class EntityStates {
         VERTEX_DOMAIN_ANIMATION_STATE = EntityDataSerializer.simpleEnum(VertexDomainProjectileEntity.VertexDomainAnimationState.class);
         COMMAND_PYLON_STATE = EntityDataSerializer.simpleEnum(RepulsorEntity.State.class);
         REPULSOR_SKIN = EntityDataSerializer.simpleEnum(RepulsorEntity.Skin.class);
+        MIMICART_ANIMATION_STATE = EntityDataSerializer.simpleEnum(MimicartEntity.MimicartAnimationState.class);
 
         EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
@@ -61,5 +64,6 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(VERTEX_DOMAIN_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(COMMAND_PYLON_STATE);
         EntityDataSerializers.registerSerializer(REPULSOR_SKIN);
+        EntityDataSerializers.registerSerializer(MIMICART_ANIMATION_STATE);
     }
 }

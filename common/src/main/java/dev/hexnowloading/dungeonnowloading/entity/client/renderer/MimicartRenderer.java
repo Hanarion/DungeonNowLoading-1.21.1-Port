@@ -90,8 +90,10 @@ public class MimicartRenderer<T extends MimicartEntity> extends EntityRenderer<T
             poseStack.popPose();
         }
 
+        rotateAndTranslate(poseStack);
         poseStack.scale(-1.0F, -1.0F, 1.0F);
-        this.model.setupAnim(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+        float ageInTicks = entity.tickCount + partialTicks;
+        this.model.setupAnim(entity, 0.0F, 0.0F, ageInTicks, 0.0F, 0.0F);
 
         boolean hurt = entity.getHurtTime() > 0;
 
@@ -114,6 +116,12 @@ public class MimicartRenderer<T extends MimicartEntity> extends EntityRenderer<T
 
     protected void renderMinecartContents(T $$0, float $$1, BlockState $$2, PoseStack $$3, MultiBufferSource $$4, int $$5) {
         this.blockRenderer.renderSingleBlock($$2, $$3, $$4, $$5, OverlayTexture.NO_OVERLAY);
+    }
+
+    // For matching the vanilla minecart model position
+    private void rotateAndTranslate(PoseStack poseStack) {
+        poseStack.translate(0.0F, 1.1872F, 0.0F);
+        poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
     }
 }
 
