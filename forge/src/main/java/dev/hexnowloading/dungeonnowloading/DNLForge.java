@@ -3,30 +3,23 @@ package dev.hexnowloading.dungeonnowloading;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClient;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClientEvents;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
-import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
-import dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu;
-import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.common.extensions.IForgeMenuType;
+import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
+import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FireBlock;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod(DungeonNowLoading.MOD_ID)
 public class DNLForge {
@@ -87,6 +80,10 @@ public class DNLForge {
             // Optional: do it in background to avoid blocking the server thread
             java.util.concurrent.CompletableFuture.runAsync(
                     () -> PatronRegistry.initOrReload(e.getServer()),
+                    net.minecraft.Util.backgroundExecutor()
+            );
+            java.util.concurrent.CompletableFuture.runAsync(
+                    () -> DataRegistryManager.initOrReload(e.getServer()),
                     net.minecraft.Util.backgroundExecutor()
             );
         });

@@ -2,7 +2,7 @@ package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
-import dev.hexnowloading.dungeonnowloading.client.screen.MendingTableScreen;
+import dev.hexnowloading.dungeonnowloading.client.preview.PreviewOverlayFabric;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepModel;
@@ -14,6 +14,7 @@ import dev.hexnowloading.dungeonnowloading.item.client.renderer.PlayerStatueItem
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.ScorcherRenderer;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
@@ -42,8 +43,9 @@ public class DNLFabricClient implements ClientModInitializer {
         registerRenderers();
         registerParticleFactories();
         MendstonePickaxeParticleHandlerFabric.register();
+        PreviewOverlayFabric.register();
 
-        final var ID = new ResourceLocation("dungeonnowloading","serverbound_pedestal_update");
+        final var ID = new ResourceLocation("dungeonnowloading", "serverbound_pedestal_update");
         ServerPlayNetworking.registerGlobalReceiver(ID, (server, player, handler, buf, responseSender) -> {
             System.out.println("[Server] registered receiver hit for " + ID);
             var pkt = dev.hexnowloading.dungeonnowloading.network.packets.C2SPedestalUpdatePacket.decode(buf);
@@ -73,7 +75,7 @@ public class DNLFabricClient implements ClientModInitializer {
     }
 
     private void registerBlockRenderers() {
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get(), RenderType.translucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get()  , RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_BARRIER_EDGE.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_BARRIER_VERTEX.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_DIAMOND_EDGE.get(), RenderType.cutout());
@@ -104,8 +106,8 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_HANGING_LEAVES.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_OAK_DOOR.get(), RenderType.translucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.POTION_BARREL.get(), RenderType.translucent());
     }
-
 
 
     private void registerRenderers() {
@@ -145,6 +147,8 @@ public class DNLFabricClient implements ClientModInitializer {
             return new ThrownItemRenderer<>(context, 1.25F, false);
         });
         EntityRendererRegistry.register(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
+        // Render payloads as small tinted cubes instead of items
+        EntityRendererRegistry.register(DNLEntityTypes.PAYLOAD.get(), dev.hexnowloading.dungeonnowloading.client.render.PayloadEntityRenderer::new);
 
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);

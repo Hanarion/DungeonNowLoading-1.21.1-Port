@@ -73,7 +73,6 @@ public class GauntletVaultBlock extends BaseEntityBlock {
             BlockPos above = pos.above();
             BlockState aboveState = level.getBlockState(above);
             if (aboveState.is(DNLBlocks.GAUNTLET.get())) {
-                // Break gauntlet and drop its loot (true). Pedestal already gone so no double drops.
                 level.destroyBlock(above, true);
             }
         }

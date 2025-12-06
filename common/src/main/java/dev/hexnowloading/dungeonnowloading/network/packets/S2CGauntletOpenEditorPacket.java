@@ -19,12 +19,12 @@ public class S2CGauntletOpenEditorPacket implements DNLPacket {
     private final int sizeX, sizeY, sizeZ;
     private final int activationRange;
     private final String lootTable;   // empty for null
-    private final String testWave;    // may be empty
+    private final String gauntletName;  // may be empty
 
     public S2CGauntletOpenEditorPacket(BlockPos pos, int wavesTotal, int wavesCurrent, boolean active,
                                        int relX, int relY, int relZ,
                                        int sizeX, int sizeY, int sizeZ,
-                                       int activationRange, String lootTable, String testWave) {
+                                       int activationRange, String lootTable, String gauntletName) {
         this.pos = pos.immutable();
         this.wavesTotal = wavesTotal;
         this.wavesCurrent = wavesCurrent;
@@ -33,7 +33,7 @@ public class S2CGauntletOpenEditorPacket implements DNLPacket {
         this.sizeX = sizeX; this.sizeY = sizeY; this.sizeZ = sizeZ;
         this.activationRange = activationRange;
         this.lootTable = lootTable == null ? "" : lootTable;
-        this.testWave = testWave == null ? "" : testWave;
+        this.gauntletName = gauntletName == null ? "" : gauntletName;
     }
 
     public S2CGauntletOpenEditorPacket(FriendlyByteBuf buf) {
@@ -49,7 +49,7 @@ public class S2CGauntletOpenEditorPacket implements DNLPacket {
         this.sizeZ = buf.readVarInt();
         this.activationRange = buf.readVarInt();
         this.lootTable = buf.readUtf(32767);
-        this.testWave = buf.readUtf(32767);
+        this.gauntletName = buf.readUtf(32767);
     }
 
     public static S2CGauntletOpenEditorPacket decode(FriendlyByteBuf buf) { return new S2CGauntletOpenEditorPacket(buf); }
@@ -68,7 +68,7 @@ public class S2CGauntletOpenEditorPacket implements DNLPacket {
         buf.writeVarInt(sizeZ);
         buf.writeVarInt(activationRange);
         buf.writeUtf(lootTable);
-        buf.writeUtf(testWave);
+        buf.writeUtf(gauntletName);
     }
 
     @Override
@@ -76,6 +76,6 @@ public class S2CGauntletOpenEditorPacket implements DNLPacket {
         var mc = ClientUtil.getClient();
         if (mc == null) return;
         mc.execute(() -> ClientScreens.openGauntletEditor(pos, wavesTotal, wavesCurrent, active,
-                relX, relY, relZ, sizeX, sizeY, sizeZ, activationRange, lootTable, testWave));
+                relX, relY, relZ, sizeX, sizeY, sizeZ, activationRange, lootTable, gauntletName));
     }
 }

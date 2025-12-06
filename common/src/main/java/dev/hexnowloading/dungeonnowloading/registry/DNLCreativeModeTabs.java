@@ -87,6 +87,11 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DUNGEON_WALL_TORCH.get());
                 output.accept(DNLItems.BOOK_PILE.get());
                 output.accept(DNLItems.EXPLOSIVE_BARREL.get());
+                output.accept(DNLItems.CRYO_BARREL.get());
+                output.accept(DNLItems.PYRO_BARREL.get());
+//                output.accept(DNLItems.POTION_BARREL.get());
+                output.accept(DNLItems.CALTROP_BARREL.get());
+
                 output.accept(DNLItems.COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.MOSSY_COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.IRON_INGOT_PILE.get());

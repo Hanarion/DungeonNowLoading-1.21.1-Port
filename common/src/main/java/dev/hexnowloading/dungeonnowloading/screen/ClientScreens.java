@@ -18,8 +18,12 @@ public class ClientScreens {
                                           int wavesTotal, int wavesCurrent, boolean active,
                                           int relX, int relY, int relZ,
                                           int sizeX, int sizeY, int sizeZ,
-                                          int activationRange, String lootTable, String testWave) {
-        Minecraft.getInstance().setScreen(new GauntletEditScreen(pos, wavesTotal, wavesCurrent, active,
-                relX, relY, relZ, sizeX, sizeY, sizeZ, activationRange, lootTable, testWave));
+                                          int activationRange, String lootTable, String gauntletName) {
+        Minecraft.getInstance().setScreen(new GauntletScreen(pos, wavesTotal, wavesCurrent, active,
+                relX, relY, relZ, sizeX, sizeY, sizeZ, activationRange, lootTable, gauntletName));
+    }
+
+    public static void openGauntletWaves() {
+        Minecraft.getInstance().setScreen(new GauntletWavesScreen(Component.translatable("screen.dnl.gauntlet_waves")));
     }
 }

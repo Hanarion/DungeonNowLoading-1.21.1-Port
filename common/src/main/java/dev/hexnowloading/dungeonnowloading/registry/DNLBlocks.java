@@ -16,6 +16,8 @@ import net.minecraft.world.level.material.PushReaction;
 
 import java.util.function.Supplier;
 
+import static dev.hexnowloading.dungeonnowloading.block.GenericExplosiveBarrelBlock.FUSE;
+
 public class DNLBlocks {
 
 
@@ -44,6 +46,11 @@ public class DNLBlocks {
     // MECHANICAL BLOCKS
     public static Supplier<Block> BOOK_PILE;// = registerBlock("book_pile", () -> new BookPileBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOL)));
     public static Supplier<Block> EXPLOSIVE_BARREL;// = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.GRASS)));
+    public static Supplier<Block> CRYO_BARREL;
+    public static Supplier<Block> PYRO_BARREL;
+    public static Supplier<Block> OIL_SPILL;
+    public static Supplier<Block> POTION_BARREL;
+    public static Supplier<Block> CALTROP_BARREL;
     public static Supplier<Block> COBBLESTONE_PEBBLES;// = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> MOSSY_COBBLESTONE_PEBBLES;// = registerBlock("mossy_cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> IRON_INGOT_PILE;// = registerBlock("iron_ingot_pile", () -> new PileBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL)));
@@ -106,6 +113,7 @@ public class DNLBlocks {
     public static Supplier<Block> MENDING_TABLE;
     public static Supplier<Block> GAUNTLET;
     public static Supplier<Block> GAUNTLET_VAULT;
+    public static Supplier<Block> MOB_NODE;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -127,7 +135,6 @@ public class DNLBlocks {
     public static Supplier<Block> AZURO_OAK_BUTTON;
     public static Supplier<Block> AZURO_OAK_PRESSURE_PLATE;
     public static Supplier<Block> AZURO_OAK_DOOR;
-
 
     public static boolean blocksRegistered = false;
 
@@ -153,7 +160,21 @@ public class DNLBlocks {
 
         // MECHANICAL BLOCKS
         BOOK_PILE = registerBlock("book_pile", () -> new BookPileBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOL)));
-        EXPLOSIVE_BARREL = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.GRASS)));
+        EXPLOSIVE_BARREL = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)
+                .lightLevel(state -> state.hasProperty(FUSE) && state.getValue(FUSE) > 0 ? 12 : 0)
+                .emissiveRendering((state, getter, pos) -> state.hasProperty(FUSE) && state.getValue(FUSE) > 0)
+        ));
+        CRYO_BARREL = registerBlock("cryo_barrel", () -> new CryoBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
+        PYRO_BARREL = registerBlock("pyro_barrel", () -> new PyroBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
+        CALTROP_BARREL = registerBlock("caltrop_barrel", () -> new CaltropBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
+        POTION_BARREL = registerBlock("potion_barrel", () -> new PotionBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
+        OIL_SPILL = registerBlock("oil_spill", () -> new OilSpillBlock(
+                BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.COLOR_BLACK)
+                        .noOcclusion()
+                        .strength(0.1F)
+                        .sound(SoundType.SLIME_BLOCK)
+                        .friction(0.98F)));
         COBBLESTONE_PEBBLES = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
         MOSSY_COBBLESTONE_PEBBLES = registerBlock("mossy_cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
         IRON_INGOT_PILE = registerBlock("iron_ingot_pile", () -> new PileBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL)));
@@ -222,6 +243,7 @@ public class DNLBlocks {
         MENDING_TABLE = registerBlock("mending_table", () -> new MendingTableBlock(BlockBehaviour.Properties.of().strength(5.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
         GAUNTLET = registerBlock("gauntlet", () -> new GauntletBlock(BlockBehaviour.Properties.of().strength(50.0F, 50.0F).sound(SoundType.METAL).noOcclusion().noLootTable()));
         GAUNTLET_VAULT = registerBlock("gauntlet_vault", () -> new GauntletVaultBlock(BlockBehaviour.Properties.of().strength(50.0F, 50.0F).sound(SoundType.METAL).noOcclusion().noLootTable()));
+        MOB_NODE = registerBlock("mob_node", () -> new MobNodeBlock(BlockBehaviour.Properties.of().strength(5.0F, 6.0F).sound(SoundType.METAL).noOcclusion().noCollission()));
 
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
@@ -270,6 +292,8 @@ public class DNLBlocks {
     private static boolean never(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {
         return false;
     }
+}
+
 
     /*public static <T extends Block> Supplier<T> registerBEWLR(String name, Supplier<T> block) {
         RegistryObject<T> ret = BLOCKS.register(name, block);
@@ -297,4 +321,3 @@ public class DNLBlocks {
 
     }*/
 
-}

@@ -22,6 +22,8 @@ public class DNLBlockEntityTypes {
     public static final Supplier<BlockEntityType<GauntletVaultBlockEntity>> GAUNTLET_VAULT = register("gauntlet_vault", () -> BlockEntityType.Builder.of(GauntletVaultBlockEntity::new, DNLBlocks.GAUNTLET_VAULT.get()).build(null));
 
     public static final Supplier<BlockEntityType<PlayerStatueBlockEntity>> PLAYER_STATUE = register("player_statue", () -> BlockEntityType.Builder.of(PlayerStatueBlockEntity::new, DNLBlocks.PLAYER_STATUE.get()).build(null));
+    public static final Supplier<BlockEntityType<MobNodeBlockEntity>> MOB_NODE = register("mob_node", () -> BlockEntityType.Builder.of(MobNodeBlockEntity::new, DNLBlocks.MOB_NODE.get()).build(null));
+    public static final Supplier<BlockEntityType<PotionBarrelBlockEntity>> POTION_BARREL = register("potion_barrel", () -> BlockEntityType.Builder.of(PotionBarrelBlockEntity::new, DNLBlocks.POTION_BARREL.get()).build(null));
     //public static final RegistryObject<BlockEntityType<WindAlterBlockEntity>> WIND_ALTER = BLOCK_ENTITY_TYPES.register("wind_alter", () -> BlockEntityType.Builder.of(WindAlterBlockEntity::new, SkyislandBlocks.WIND_ALTER.get()).build(null));
 
     private static <T extends BlockEntity> Supplier<BlockEntityType<T>> register(String name, Supplier<BlockEntityType<T>> type) {
