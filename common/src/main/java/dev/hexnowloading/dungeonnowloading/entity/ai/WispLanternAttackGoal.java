@@ -4,7 +4,11 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.HoveringFlying
 import dev.hexnowloading.dungeonnowloading.entity.monster.WispEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
@@ -47,7 +51,7 @@ public class WispLanternAttackGoal extends Goal {
 
     @Override
     public void tick() {
-        if (cooldown == reducedTickDelay(60)) {
+        if (cooldown == reducedTickDelay(20)) {
             ((HoveringFlyingMoveControl)owner.getMoveControl()).setWantedPosition();
         }
         if (--cooldown > 0) return;
@@ -61,9 +65,26 @@ public class WispLanternAttackGoal extends Goal {
         wisp.setPos(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
         wisp.setOwner(owner);
         if (owner.getTarget() != null) {
-            wisp.setTarget(owner.getTarget());
+            LivingEntity target = owner.getTarget();
+            wisp.setTarget(target);
+
+            // --- Rotate Wisp to face target immediately ---
+            double dx = target.getX() - wisp.getX();
+            double dz = target.getZ() - wisp.getZ();
+            float yaw = (float)(Mth.atan2(dz, dx) * (180F / Math.PI)) - 90F;  // convert to Minecraft yaw
+
+            wisp.setYRot(yaw);
+            wisp.setYHeadRot(yaw);
+            wisp.setYBodyRot(yaw);
         }
         if (level.noCollision(wisp)) {
+            if (level instanceof ServerLevel server) {
+                server.sendParticles(
+                        ParticleTypes.POOF,
+                        wisp.getX(), wisp.getY(), wisp.getZ(),
+                        10, 0.2, 0.2, 0.2, 0.01
+                );
+            }
             level.addFreshEntity(wisp);
         }
     }

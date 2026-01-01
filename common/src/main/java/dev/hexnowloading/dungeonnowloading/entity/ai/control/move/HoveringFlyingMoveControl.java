@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.ai.control.move;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
@@ -42,11 +43,85 @@ public class HoveringFlyingMoveControl extends MoveControl {
      * Call this from your goal (you already do) to make it wander intelligently.
      */
     public void setWantedPosition() {
-        Vec3 target = pickRandomReachableTarget();
-        if (target == null) return;
-        double speed = Mth.clamp(mob.getAttributeValue(Attributes.FLYING_SPEED), 0.5D, 1.5D);
-        this.setWantedPosition(target.x, target.y, target.z, speed);
+
+        // 1. If touching the ground, rise upwards a bit
+        if (mob.onGround() || isTouchingGround()) {
+            Vec3 up = mob.position().add(0, 2 + rng.nextInt(2), 0); // +2 to +3 blocks up
+            this.setWantedPosition(up.x, up.y, up.z, 1.0);
+            return;
+        }
+
+        // 2. Prefer moving relative to target, if one exists
+        LivingEntity target = mob.getTarget();
+        if (target != null) {
+            double distSq = mob.distanceToSqr(target);
+            double FAR_RANGE_SQ = 16.0 * 16.0;
+            double NEAR_RANGE_SQ = 8.0 * 8.0;
+
+            // 2a. If far away (>16 blocks) → move toward the player
+            if (distSq > FAR_RANGE_SQ) {
+                Vec3 basePos = mob.position();
+                Vec3 toward = target.position()
+                        .subtract(basePos)
+                        .normalize()
+                        .scale(6.0)           // move about 6 blocks toward the player
+                        .add(basePos);
+
+                if (pathIsClear(basePos, toward) && noCollisionAt(toward)) {
+                    this.setWantedPosition(toward.x, toward.y, toward.z, 1.0);
+                    return;
+                }
+            }
+            // 2b. If too close (<8 blocks) → move away from the player
+            else if (distSq < NEAR_RANGE_SQ) {
+                Vec3 basePos = mob.position();
+
+                // Direction away from player
+                Vec3 awayDir = basePos.subtract(target.position());
+                if (awayDir.lengthSqr() < 1.0E-4) {
+                    // fallback if somehow same position
+                    awayDir = new Vec3(1, 0, 0);
+                }
+                awayDir = awayDir.normalize();
+
+                // Add a little sideways jitter so it doesn't move in a perfectly straight line
+                Vec3 up = new Vec3(0, 1, 0);
+                Vec3 side = awayDir.cross(up);
+                if (side.lengthSqr() < 1.0E-4) {
+                    side = new Vec3(0, 0, 1);
+                }
+                side = side.normalize();
+
+                double forwardDist = 4.0 + rng.nextDouble() * 4.0;     // 4–8 blocks away
+                double sideOffset  = (rng.nextDouble() - 0.5) * 4.0;   // -2 to +2 blocks sideways
+                int   verticalJitter = rng.nextInt(-1, 2);             // -1 to +1 Y
+
+                Vec3 candidate = basePos
+                        .add(awayDir.scale(forwardDist))
+                        .add(side.scale(sideOffset))
+                        .add(0, verticalJitter, 0);
+
+                if (pathIsClear(basePos, candidate) && noCollisionAt(candidate)) {
+                    this.setWantedPosition(candidate.x, candidate.y, candidate.z, 1.0);
+                    return;
+                }
+            }
+        }
+
+        // 3. Otherwise use natural wandering
+        Vec3 targetPos = pickRandomReachableTarget();
+        if (targetPos != null) {
+            double speed = Mth.clamp(mob.getAttributeValue(Attributes.FLYING_SPEED), 0.5D, 1.5D);
+            this.setWantedPosition(targetPos.x, targetPos.y, targetPos.z, speed);
+        }
     }
+
+
+    private boolean isTouchingGround() {
+        BlockPos below = mob.blockPosition().below();
+        return !level.getBlockState(below).getCollisionShape(level, below).isEmpty();
+    }
+
 
     @Nullable
     private Vec3 pickRandomReachableTarget() {

@@ -232,7 +232,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(WispLanternModel.LAYER_LOCATION, WispLanternModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ThumperModel.LAYER_LOCATION, ThumperModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WebSpitterModel.LAYER_LOCATION, WebSpitterModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(ReaperSpiderModel.LAYER_LOCATION, ReaperSpiderModel::createSpiderBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(ReaperSpiderModel.LAYER_LOCATION, ReaperSpiderModel::createBodyLayer);
 
         // Passive
         EntityModelLayerRegistry.registerModelLayer(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);

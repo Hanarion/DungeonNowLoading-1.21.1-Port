@@ -2,11 +2,16 @@ package dev.hexnowloading.dungeonnowloading.entity.monster;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.WispAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.WispFlyingMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.WispAnimationDuration;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
@@ -34,6 +39,14 @@ import java.util.UUID;
 
 public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
 
+    private static final EntityDataAccessor<WispAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(WispEntity.class, EntityStates.WISP_ANIMATION_STATE);
+
+    private AnimationChainer<WispAnimationState> animationChainer = new AnimationChainer<>();
+
+    public final AnimationState flareUpAnimationState = new AnimationState();
+    public final AnimationState tackleStartAnimationState = new AnimationState();
+    public final AnimationState tackleAnimationState = new AnimationState();
+
     @Nullable
     protected UUID ownerUUID;
     @Nullable
@@ -41,8 +54,6 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     protected boolean leftOwner;
     protected boolean hasBeenShot;
 
-    int impactTick;
-    boolean delayImpact = false;
     Entity hitEntity = null;
 
     public WispEntity(EntityType<? extends WispEntity> type, Level level) {
@@ -96,6 +107,12 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     }
 
     @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(ANIMATION_STATE, WispAnimationState.IDLE);
+    }
+
+    @Override
     public void tick() {
         if (!this.hasBeenShot) {
             this.gameEvent(GameEvent.PROJECTILE_SHOOT, this.getOwner());
@@ -106,15 +123,6 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
         }
         Entity owner = this.getOwner();
         if (this.level().isClientSide || (owner == null || !owner.isRemoved()) && this.level().hasChunkAt(this.blockPosition())) {
-
-            if (delayImpact) {
-                if (impactTick > 0) {
-                    impactTick--;
-                } else {
-                    discardWithBurst();
-                    return;
-                }
-            }
 
             HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
             if (hitResult.getType() != HitResult.Type.MISS) {
@@ -128,6 +136,21 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
         } else {
             discard();
         }
+
+
+    }
+
+    public void playFlareUpAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.FLARE_UP, WispAnimationDuration.FLARE_UP));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.TACKLE_START, WispAnimationDuration.TACKLE_START));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(WispAnimationState.TACKLE, 0));
+    }
+
+    public void playTackleAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.TACKLE_START, WispAnimationDuration.TACKLE_START));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(WispAnimationState.TACKLE, 0));
     }
 
     @Nullable
@@ -178,6 +201,9 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     }
 
     protected boolean canHitEntity(Entity entity) {
+        if (entity instanceof WispLanternEntity) {
+            return false;
+        }
         if (!entity.canBeHitByProjectile()) {
             return false;
         } else {
@@ -189,24 +215,36 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     protected void onHitEntity(EntityHitResult entityHitResult) {
         if (this.level().isClientSide) return;
 
-        if (delayImpact) return;
-
-        delayImpact = true;
-        impactTick = 1;
-        hitEntity = entityHitResult.getEntity();
-        //discardWithBurst();
+        this.hitEntity = entityHitResult.getEntity();
+        discardWithBurst();
     }
 
     protected void onHitBlock(BlockHitResult blockHitResult) {
         if (this.level().isClientSide) return;
 
-        if (delayImpact) return;
-
-        delayImpact = true;
-        //discardWithBurst();
+        this.hitEntity = null;
+        discardWithBurst();
     }
 
     protected void tickProjectile() {
+        if (this.level().isClientSide) {
+            return;
+        }
+
+        this.animationChainer.tick(this::transitionTo);
+
+        double spread = 0.5D;
+
+        double cx = this.getX() + (this.random.nextDouble() - 0.5D) * spread;
+        double cy = this.getY() + this.getBbHeight() * 0.5D + (this.random.nextDouble() - 0.5D) * spread;
+        double cz = this.getZ() + (this.random.nextDouble() - 0.5D) * spread;
+
+        // Velocity of the particles (0 = just hover)
+        double vx = 0.0D;
+        double vy = 0.0D;
+        double vz = 0.0D;
+
+        this.level().addParticle(ParticleTypes.FLAME, cx, cy, cz, vx, vy, vz);
     }
 
     @Override
@@ -324,5 +362,56 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     @Override
     public boolean causeFallDamage(float distance, float damageMultiplier, net.minecraft.world.damagesource.DamageSource source) {
         return false;
+    }
+
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            WispAnimationState animationState = this.getAnimationState();
+            this.resetAnimation();
+            switch (animationState) {
+                case FLARE_UP -> this.flareUpAnimationState.startIfStopped(this.tickCount);
+                case TACKLE_START -> this.tackleStartAnimationState.startIfStopped(this.tickCount);
+                case TACKLE -> this.tackleAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+
+    }
+
+    public WispEntity transitionTo(WispAnimationState animationState) {
+        switch (animationState) {
+            case IDLE:
+                this.entityData.set(ANIMATION_STATE, WispAnimationState.IDLE);
+                break;
+            case FLARE_UP:
+                this.entityData.set(ANIMATION_STATE, WispAnimationState.FLARE_UP);
+                break;
+            case TACKLE_START:
+                this.entityData.set(ANIMATION_STATE, WispAnimationState.TACKLE_START);
+                break;
+            case TACKLE:
+                this.entityData.set(ANIMATION_STATE, WispAnimationState.TACKLE);
+                break;
+        }
+        return this;
+    }
+
+    private void resetAnimation() {
+        this.flareUpAnimationState.stop();
+        this.tackleStartAnimationState.stop();
+        this.tackleAnimationState.stop();
+    }
+
+    public WispAnimationState getAnimationState() {
+        return this.entityData.get(ANIMATION_STATE);
+    }
+
+    public enum WispAnimationState {
+        IDLE,
+        FLARE_UP,
+        TACKLE_START,
+        TACKLE
     }
 }

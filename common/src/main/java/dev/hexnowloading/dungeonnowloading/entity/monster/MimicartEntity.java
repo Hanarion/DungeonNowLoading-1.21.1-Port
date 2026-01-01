@@ -77,7 +77,7 @@ public class MimicartEntity extends AbstractMinecart {
 
     private Vec3 snatchOffset = Vec3.ZERO;
     private Vec3 snatchStartOffset = Vec3.ZERO;
-    private int snatchDurationTicks = 15;   // total ticks to fully pull in (tweak)
+    private int snatchDurationTicks = 15;
     private int snatchTicksElapsed = 0;
 
     private int collideGrabCooldown;

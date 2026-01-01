@@ -2,8 +2,6 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.ReaperSpiderMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ReaperSpiderEntity;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -16,7 +14,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 public class ReaperSpiderAttackGoal extends Goal {
 
@@ -31,7 +28,7 @@ public class ReaperSpiderAttackGoal extends Goal {
     private final ReaperSpiderEntity mob;
 
     private static final double CHASE_SPEED = 1.0D;
-    private static final double STRAFE_SPEED = 1.0D;
+    private static final double STRAFE_SPEED = 0.6D;
     private static final double STRAFE_DISTANCE = 10.0D;
     private static final double DASH_SPEED = 1.8D;
 
@@ -39,10 +36,16 @@ public class ReaperSpiderAttackGoal extends Goal {
     private static final double CHASE_STOP_RANGE = 7.0D;
     private static final double ATTACK_RANGE = 1.5D;
 
-    private static final int WINDUP_TICKS  = reducedTickDelay(15);  // 1 second
+
+    private static final int STRAFE_TO_DO  = 4;
+    private static final int STRAFE_TO_DO_ADD_RANDOM = 3;
+    private static final int STRAFE_TICKS  = reducedTickDelay(10);
+    private static final int STRAFE_TICKS_ADD_RANDOM = reducedTickDelay(6);
+    private static final int STRAFE_SLASH_COOLDOWN = reducedTickDelay(20);
+    private static final int WINDUP_TICKS  = reducedTickDelay(10);  // 1 second
     private static final int DASH_TICKS    = reducedTickDelay(60);  // base dash cap
-    private static final int RECOVER_TICKS = reducedTickDelay(30);  // 2 seconds stop
-    private static final int SINGLE_ATTACK_LOCK_TICKS = reducedTickDelay(20);
+    private static final int RECOVER_TICKS = reducedTickDelay(20);  // 2 seconds stop
+    private static final int SINGLE_ATTACK_LOCK_TICKS = reducedTickDelay(10);
 
     private State state = State.CHASE;
     private LivingEntity target;
@@ -53,6 +56,7 @@ public class ReaperSpiderAttackGoal extends Goal {
     private Vec3 memorizedTargetPos;
     private Vec3 dashDirection;
     private boolean dashEnteredStrikeZone;
+    private boolean dashHasAttacked;
 
     // strafing
     private int strafesToDo;
@@ -61,7 +65,6 @@ public class ReaperSpiderAttackGoal extends Goal {
     private int maxStrafeTicks;
     private int strafeDirection; // +1 right, -1 left
     private Vec3 strafeStartPos;
-
     // strafe slash
     private int strafeSlashCooldown;
     private int singleAttackLockTicks;
@@ -79,13 +82,38 @@ public class ReaperSpiderAttackGoal extends Goal {
     public boolean canUse() {
         LivingEntity tgt = this.mob.getTarget();
         if (tgt == null || !tgt.isAlive()) return false;
+
+        if (tgt instanceof Player player) {
+            if (player.getAbilities().instabuild) {
+                return false;
+            }
+        }
+
+        if (!this.mob.canAttack(tgt)) {
+            return false;
+        }
+
         this.target = tgt;
         return true;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return this.target != null && this.target.isAlive();
+        if (this.target == null || !this.target.isAlive()) {
+            return false;
+        }
+
+        if (this.target instanceof Player player) {
+            if (player.getAbilities().instabuild) {
+                return false;
+            }
+        }
+
+        if (!this.mob.canAttack(this.target)) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -112,6 +140,10 @@ public class ReaperSpiderAttackGoal extends Goal {
             this.singleAttackLockTicks--;
         }
 
+        if (this.strafeSlashCooldown > 0) {
+            this.strafeSlashCooldown--;
+        }
+
         controlLooking();
 
         double distSq = this.mob.distanceToSqr(this.target);
@@ -125,7 +157,12 @@ public class ReaperSpiderAttackGoal extends Goal {
         }
     }
 
+
     private void controlLooking() {
+        if (this.state == State.RECOVER) {
+            return;
+        }
+
         if (Objects.requireNonNull(this.state) == State.ATTACK_DASH) {
             if (this.memorizedTargetPos != null) {
                 this.mob.getLookControl().setLookAt(
@@ -141,6 +178,7 @@ public class ReaperSpiderAttackGoal extends Goal {
             this.mob.getLookControl().setLookAt(this.target, 30.0F, 30.0F);
         }
     }
+
 
     private void tickChase(double distSq) {
         double chaseStartSq = CHASE_START_RANGE * CHASE_START_RANGE;
@@ -161,7 +199,7 @@ public class ReaperSpiderAttackGoal extends Goal {
     private void startStrafingPhase() {
         this.state = State.STRAFE;
         this.strafesDone = 0;
-        this.strafesToDo = 2 + this.mob.getRandom().nextInt(2); // 2–3 side steps
+        this.strafesToDo = STRAFE_TO_DO + this.mob.getRandom().nextInt(STRAFE_TO_DO_ADD_RANDOM); // 2–3 side steps
 
         // clear any existing "chase" path by navigating to self once
         this.mob.getNavigation().moveTo(this.mob, 0.0D);
@@ -171,7 +209,7 @@ public class ReaperSpiderAttackGoal extends Goal {
 
     private void startSingleStrafe() {
         this.currentStrafeTicks = 0;
-        this.maxStrafeTicks = 6; // cap ~6 ticks; tuned vs STRAFE_SPEED
+        this.maxStrafeTicks = STRAFE_TICKS + this.mob.getRandom().nextInt(STRAFE_TICKS_ADD_RANDOM); // cap ~6 ticks; tuned vs STRAFE_SPEED
         this.strafeStartPos = this.mob.position();
         this.strafeDirection = this.mob.getRandom().nextBoolean() ? 1 : -1;
     }
@@ -197,33 +235,38 @@ public class ReaperSpiderAttackGoal extends Goal {
         double dz = this.target.getZ() - this.mob.getZ();
         double horizDist = Math.sqrt(dx * dx + dz * dz);
 
-        // NEW: quick swipe if inside attack zone and off cooldown
-        if (horizDist <= ATTACK_RANGE && this.strafeSlashCooldown <= 0 && this.singleAttackLockTicks <= 0) {
-            performFrontalSlash(0.75F, false);                       // 75% damage slash
-            this.strafeSlashCooldown = reducedTickDelay(20);  // ~1 second cooldown
+        if (this.strafeSlashCooldown <= 0
+                && this.singleAttackLockTicks <= 0
+                && isTargetInFrontalSlashRange()
+                && !this.mob.isAttackAnimationRunning()) {
+
+            this.mob.playSingleSlashAnimation(() -> performFrontalSlash(0.75F, false));
+            this.strafeSlashCooldown = STRAFE_SLASH_COOLDOWN;
         }
 
-        float forward = 0.0F;
+        float forward;
 
-        double tooClose = ATTACK_RANGE;         // 3 blocks
-        double ideal     = CHASE_STOP_RANGE;    // 7 blocks (your current setting)
-        double innerBand = ideal - 0.5;         // 6.5
-        double outerBand = ideal + 0.5;         // 7.5
+        double tooClose = 2.5;
+        double ideal     = CHASE_STOP_RANGE;
+        double innerBand = ideal - 0.5;
+        double outerBand = ideal + 0.5;
 
         if (horizDist < tooClose) {
-            forward = -1.0F;
+            forward = -0.5F;
         } else if (horizDist < innerBand) {
             forward = -0.5F;
         } else if (horizDist > outerBand) {
             forward = 0.5F;
+        } else {
+            forward = 0.0F;
         }
 
         float right = this.strafeDirection > 0 ? 1.0F : -1.0F;
 
+        double speed = STRAFE_SPEED;
+
         if (this.mob.getMoveControl() instanceof ReaperSpiderMoveControl rmc) {
-            rmc.setStrafe(forward, right, STRAFE_SPEED);
-        } else {
-            this.mob.getMoveControl().strafe(forward, right);
+            rmc.setStrafe(forward, right, speed);
         }
 
         this.currentStrafeTicks++;
@@ -238,8 +281,14 @@ public class ReaperSpiderAttackGoal extends Goal {
 
         if (reachedDistance || timeout) {
             this.strafesDone++;
+
             if (this.strafesDone >= this.strafesToDo) {
-                startAttackWindup();
+                if (!this.mob.isAttackAnimationRunning()) {
+                    startAttackWindup();
+                } else {
+                    this.strafesDone--;
+
+                }
             } else {
                 startSingleStrafe();
             }
@@ -252,6 +301,7 @@ public class ReaperSpiderAttackGoal extends Goal {
         this.windupTickCounter = WINDUP_TICKS;
         // do NOT memorize here; we want to lock in right before the dash
         this.mob.getNavigation().stop();
+        this.mob.playWindUpAnimation();
     }
 
     private void tickAttackWindup() {
@@ -285,11 +335,12 @@ public class ReaperSpiderAttackGoal extends Goal {
         this.dashStartPos = from;
         this.dashMaxTicks = DASH_TICKS;
         this.dashEnteredStrikeZone = false;
+        this.dashHasAttacked = false; // NEW
 
         this.mob.getNavigation().stop();
-
         this.mob.setFastClimb(true);
     }
+
 
     private void tickAttackDash() {
         if (this.dashDirection == null || this.dashStartPos == null) {
@@ -306,37 +357,45 @@ public class ReaperSpiderAttackGoal extends Goal {
         Vec3 motion = this.dashDirection.scale(DASH_SPEED * this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED));
         this.mob.setDeltaMovement(motion.x, this.mob.getDeltaMovement().y, motion.z);
 
-        // --- NEW: XZ strike-zone logic around memorizedTargetPos ---
+        // --- NEW: immediate frontal slash if target is in slash range during dash ---
+        if (!this.dashHasAttacked && isTargetInFrontalSlashRange() && !this.mob.isAttackAnimationRunning()) {
+            this.mob.playDoubleSlashAnimation(() -> performFrontalSlash(1.0F, true));
+            this.dashHasAttacked = true;
+            startRecoverPhase();
+            return;
+        }
+
+        // --- existing XZ strike-zone logic around memorizedTargetPos ---
         if (this.memorizedTargetPos != null) {
-            // horizontal distance only (ignore Y)
             double dx = this.mob.getX() - this.memorizedTargetPos.x;
             double dz = this.mob.getZ() - this.memorizedTargetPos.z;
             double horizDistSq = dx * dx + dz * dz;
 
-            double strikeRadius = ATTACK_RANGE; // same as your 3-block hit range
+            double strikeRadius = ATTACK_RANGE;
             double strikeRadiusSq = strikeRadius * strikeRadius;
 
             boolean inStrikeZone = horizDistSq <= strikeRadiusSq;
 
-            // first time we enter the zone, flag it
             if (!this.dashEnteredStrikeZone && inStrikeZone) {
                 this.dashEnteredStrikeZone = true;
             }
 
-            // once we've entered and then *left* the zone again, attack at this spot
-            if (this.dashEnteredStrikeZone && !inStrikeZone) {
-                performFrontalSlash(1.0F, true); // full damage, heavy attack
+            if (this.dashEnteredStrikeZone && !inStrikeZone && !this.mob.isAttackAnimationRunning()) {
+                this.mob.playDoubleSlashAnimation(() -> performFrontalSlash(1.0F, true));
+                this.dashHasAttacked = true;     // ensure we mark it
                 startRecoverPhase();
                 return;
             }
         }
 
         // safety timeout: if something goes wrong, don't dash forever
-        if (--this.dashMaxTicks <= 0) {
-            performFrontalSlash(1.0F, true);
+        if (--this.dashMaxTicks <= 0 && !this.mob.isAttackAnimationRunning()) {
+            this.mob.playDoubleSlashAnimation(() -> performFrontalSlash(1.0F, true));
+            this.dashHasAttacked = true;
             startRecoverPhase();
         }
     }
+
 
 
     private void startRecoverPhase() {
@@ -364,33 +423,56 @@ public class ReaperSpiderAttackGoal extends Goal {
         }
     }
 
-    // main dash slash uses full damage
-    private void performFrontalSlash() {
-        performFrontalSlash(1.0F, true);
-    }
-
-    private void performFrontalSlash(float damageMultiplier, boolean heavyAttack) {
+    private boolean isTargetInFrontalSlashRange() {
         if (this.target == null || !this.target.isAlive()) {
-            return;
+            return false;
         }
 
         double range = ATTACK_RANGE;
-        Vec3 forward = this.mob.getForward(); // normalized
+        Vec3 forward = this.mob.getForward(); // normalized-ish
         Vec3 origin = this.mob.position().add(0.0D, this.mob.getBbHeight() * 0.5D, 0.0D);
 
         AABB box = this.mob.getBoundingBox()
                 .inflate(range, 0.75D, range)
                 .move(forward.scale(range * 0.5D));
 
-        Predicate<LivingEntity> predicate = candidate ->
-                candidate == this.target &&
-                        candidate != this.mob &&
-                        this.mob.canAttack(candidate);
+        // quick reject if bounding boxes don't intersect
+        if (!box.intersects(this.target.getBoundingBox())) {
+            return false;
+        }
 
-        List<LivingEntity> hits = this.mob.level().getEntitiesOfClass(LivingEntity.class, box, predicate);
+        Vec3 toHit = this.target.position()
+                .add(0.0D, this.target.getBbHeight() * 0.5D, 0.0D)
+                .subtract(origin);
 
-        for (LivingEntity hit : hits) {
-            Vec3 toHit = hit.position().add(0.0D, hit.getBbHeight() * 0.5D, 0.0D).subtract(origin);
+        // must be in front of the spider
+        return toHit.normalize().dot(forward) > 0.0D;
+    }
+
+
+    private void performFrontalSlash(float damageMultiplier, boolean heavyAttack) {
+        double range = ATTACK_RANGE;
+        Vec3 forward = this.mob.getForward(); // normalized-ish
+        Vec3 origin = this.mob.position().add(0.0D, this.mob.getBbHeight() * 0.5D, 0.0D);
+
+        // Hit box in front of the mob
+        AABB box = this.mob.getBoundingBox()
+                .inflate(range, 0.75D, range)
+                .move(forward.scale(range * 0.5D));
+
+        // We only care about players (all of them in range)
+        List<Player> hits = this.mob.level().getEntitiesOfClass(
+                Player.class,
+                box,
+                this.mob::canAttack
+        );
+
+        for (Player hit : hits) {
+            // still enforce "in front of me", not behind
+            Vec3 toHit = hit.position()
+                    .add(0.0D, hit.getBbHeight() * 0.5D, 0.0D)
+                    .subtract(origin);
+
             if (toHit.normalize().dot(forward) > 0.0D) {
                 float baseDamage = (float) this.mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
                 float damage = baseDamage * damageMultiplier;
@@ -398,47 +480,20 @@ public class ReaperSpiderAttackGoal extends Goal {
                 hit.hurt(this.mob.damageSources().mobAttack(this.mob), damage);
                 hit.push(forward.x * 0.5D, 0.1D, forward.z * 0.5D);
 
-                if (hit instanceof Player player) {
-                    var useStack = player.getUseItem();
-                    if (!useStack.isEmpty() && useStack.getItem() instanceof ShieldItem) {
-                        player.stopUsingItem();
-                        int shieldDisableTicks = 120; // 6s
-                        player.getCooldowns().addCooldown(useStack.getItem(), shieldDisableTicks);
-                        player.level().broadcastEntityEvent(player, (byte) 30);
-                    }
+                // shield break stays the same
+                var useStack = hit.getUseItem();
+                if (!useStack.isEmpty() && useStack.getItem() instanceof ShieldItem) {
+                    hit.stopUsingItem();
+                    int shieldDisableTicks = 120; // 6s
+                    hit.getCooldowns().addCooldown(useStack.getItem(), shieldDisableTicks);
+                    hit.level().broadcastEntityEvent(hit, (byte) 30);
                 }
             }
         }
 
-        // particles
-        if (this.mob.level() instanceof ServerLevel server) {
-            int particleCount = heavyAttack ? 20 : 10;
-
-            // choose particle by attack type
-            var particleType = heavyAttack
-                    ? ParticleTypes.SWEEP_ATTACK          // big slash
-                    : ParticleTypes.CRIT;                  // lighter, still slashy-ish
-
-            Vec3 sideVec = new Vec3(-forward.z, 0.0D, forward.x).normalize();
-
-            for (int i = 0; i < particleCount; i++) {
-                double t = this.mob.getRandom().nextDouble() * range;
-                double sideOffset = (this.mob.getRandom().nextDouble() - 0.5D) * 1.5D;
-
-                Vec3 p = origin
-                        .add(forward.scale(t))
-                        .add(sideVec.scale(sideOffset));
-
-                server.sendParticles(
-                        particleType,
-                        p.x, p.y, p.z,
-                        1,
-                        0.0D, 0.0D, 0.0D,
-                        0.0D
-                );
-            }
-        }
+        // particles unchanged if you re-enable them
     }
+
 
 
 
@@ -458,5 +513,4 @@ public class ReaperSpiderAttackGoal extends Goal {
         mob.yBodyRot = newYaw;
         mob.yBodyRotO = newYaw;
     }
-
 }

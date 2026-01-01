@@ -2,10 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.util;
 
 import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.MimicartEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -30,6 +27,8 @@ public class EntityStates {
     public static final EntityDataSerializer<RepulsorEntity.Skin> REPULSOR_SKIN;
     public static final EntityDataSerializer<MimicartEntity.MimicartAnimationState> MIMICART_ANIMATION_STATE;
     public static final EntityDataSerializer<WebSpitterEntity.WebSpitterAnimationState> WEB_SPITTER_ANIMATION_STATE;
+    public static final EntityDataSerializer<ReaperSpiderEntity.ReaperSpiderAnimationState> REAPER_SPIDER_ANIMATION_STATE;
+    public static final EntityDataSerializer<WispEntity.WispAnimationState> WISP_ANIMATION_STATE;
 
     static {
         CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
@@ -50,6 +49,8 @@ public class EntityStates {
         REPULSOR_SKIN = EntityDataSerializer.simpleEnum(RepulsorEntity.Skin.class);
         MIMICART_ANIMATION_STATE = EntityDataSerializer.simpleEnum(MimicartEntity.MimicartAnimationState.class);
         WEB_SPITTER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WebSpitterEntity.WebSpitterAnimationState.class);
+        REAPER_SPIDER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(ReaperSpiderEntity.ReaperSpiderAnimationState.class);
+        WISP_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WispEntity.WispAnimationState.class);
 
         EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
@@ -69,5 +70,7 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(REPULSOR_SKIN);
         EntityDataSerializers.registerSerializer(MIMICART_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(WEB_SPITTER_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(REAPER_SPIDER_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(WISP_ANIMATION_STATE);
     }
 }
