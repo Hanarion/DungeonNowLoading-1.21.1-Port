@@ -45,7 +45,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SOUL_SCORCHER.get());
                 output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.REPULSOR.get());
-                output.accept(DNLItems.WISPROD.get());
+//                output.accept(DNLItems.WISPROD.get());
                 // Items - Armors
                 output.accept(DNLItems.SPAWNER_HELMET.get());
                 output.accept(DNLItems.SPAWNER_CHESTPLATE.get());
@@ -62,7 +62,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
                 // Items - Tools
                 output.accept(DNLItems.MENDSTONE_PICKAXE.get());
-                output.accept(DNLItems.MIMICLING.get());
+//                output.accept(DNLItems.MIMICLING.get());
 
                 // Blocks
 

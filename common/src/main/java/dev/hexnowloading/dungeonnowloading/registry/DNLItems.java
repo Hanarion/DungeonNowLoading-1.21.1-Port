@@ -52,7 +52,7 @@ public class DNLItems {
     public static final Supplier<Item> SCORCHER = register("scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
-    public static final Supplier<Item> MIMICLING = register("mimicling", () -> new MimiclingItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1).durability(1000)));
+//    public static final Supplier<Item> MIMICLING = register("mimicling", () -> new MimiclingItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1).durability(1000)));
 
 
 
@@ -193,7 +193,7 @@ public class DNLItems {
     public static final Supplier<Item> WHIMPER_SPAWNEGG = register("spawn_egg_whimper", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WHIMPER::get, 0x60f5fa, 0xbef5fa, new Item.Properties().rarity(Rarity.COMMON)));
 
     public static final Supplier<Item> MOB_NODE = register("mob_node", () -> new BlockItem(DNLBlocks.MOB_NODE.get(), new Item.Properties()));
-    public static final Supplier<Item> WISPROD = register("wisprod", () -> new WisprodItem(new Item.Properties().rarity(Rarity.UNCOMMON).durability(250)));
+//    public static final Supplier<Item> WISPROD = register("wisprod", () -> new WisprodItem(new Item.Properties().rarity(Rarity.UNCOMMON).durability(250)));
 
     private static <T extends Item> Supplier<T> register(String name, Supplier<T> itemSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ITEM, name, itemSupplier);

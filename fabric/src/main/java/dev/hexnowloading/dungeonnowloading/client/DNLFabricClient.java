@@ -147,8 +147,8 @@ public class DNLFabricClient implements ClientModInitializer {
         // Misc
         EntityRendererRegistry.register(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);
         // Wisp projectiles (placeholder red cube)
-        EntityRendererRegistry.register(DNLEntityTypes.WISP_PROJECTILE.get(), WispProjectileRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.WISP_SEEKING_PROJECTILE.get(), WispProjectileRenderer::new);
+//        EntityRendererRegistry.register(DNLEntityTypes.WISP_PROJECTILE.get(), WispProjectileRenderer::new);
+//        EntityRendererRegistry.register(DNLEntityTypes.WISP_SEEKING_PROJECTILE.get(), WispProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         // Render payloads as small tinted cubes instead of items
         EntityRendererRegistry.register(DNLEntityTypes.PAYLOAD.get(), PayloadEntityRenderer::new);

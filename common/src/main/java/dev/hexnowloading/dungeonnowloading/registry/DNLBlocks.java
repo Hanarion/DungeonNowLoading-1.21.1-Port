@@ -53,7 +53,7 @@ public class DNLBlocks {
     public static Supplier<Block> POTION_BARREL;
     public static Supplier<Block> CALTROP_BARREL;
     public static Supplier<Block> SILVERFISH_EXPLODING_BARREL;
-    public static Supplier<Block> WISP_LIGHT;
+//    public static Supplier<Block> WISP_LIGHT;
     public static Supplier<Block> COBBLESTONE_PEBBLES;// = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> MOSSY_COBBLESTONE_PEBBLES;// = registerBlock("mossy_cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> IRON_INGOT_PILE;// = registerBlock("iron_ingot_pile", () -> new PileBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL)));
@@ -171,14 +171,14 @@ public class DNLBlocks {
         PYRO_BARREL = registerBlock("pyro_barrel", () -> new PyroBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
         CALTROP_BARREL = registerBlock("caltrop_barrel", () -> new CaltropBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
         SILVERFISH_EXPLODING_BARREL = registerBlock("silverfish_exploding_barrel", () -> new SilverfishExplodingBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
-        WISP_LIGHT = registerBlock("wisp_light", () -> new WispLightBlock(
-                BlockBehaviour.Properties.of()
-                        .noCollission()
-                        .noOcclusion()
-                        .instabreak()
-                        .lightLevel(s -> 14)
-                        .sound(SoundType.GLASS)
-        ));
+//        WISP_LIGHT = registerBlock("wisp_light", () -> new WispLightBlock(
+//                BlockBehaviour.Properties.of()
+//                        .noCollission()
+//                        .noOcclusion()
+//                        .instabreak()
+//                        .lightLevel(s -> 14)
+//                        .sound(SoundType.GLASS)
+//        ));
         POTION_BARREL = registerBlock("potion_barrel", () -> new PotionBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
         OIL_SPILL = registerBlock("oil_spill", () -> new OilSpillBlock(
                 BlockBehaviour.Properties.of()
