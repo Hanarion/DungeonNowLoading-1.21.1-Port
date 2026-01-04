@@ -328,5 +328,18 @@
   "item.dungeonnowloading.mendstone_pickaxe": "Mendstone Pickaxe",
   "item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_name": "Durite Conversion",
   "item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description": "Mining Diamond ore drops Durite instead of Diamonds. Drop Count affected by Fortune.",
-  "block.dungeonnowloading.caltrop_barrel": "Caltrop Barrel"
+  "block.dungeonnowloading.caltrop_barrel": "Caltrop Barrel",
+  "item.dungeonnowloading.wisprod": "Wisprod",
+  "item.dungeonnowloading.mimicling": "Mimicling",
+  "item.dungeonnowloading.mimicling.mode.none": "Idle",
+  "item.dungeonnowloading.mimicling.mode.pickaxe": "Pickaxe",
+  "item.dungeonnowloading.mimicling.mode.axe": "Axe",
+  "item.dungeonnowloading.mimicling.mode_set": "Mode: %s",
+  "item.dungeonnowloading.mimicling.tooltip.mode": "Mode: %s",
+  "item.dungeonnowloading.mimicling.tooltip.empty": "It looks hungry...",
+  "item.dungeonnowloading.mimicling.tooltip.tools": "Stored tools:",
+  "item.dungeonnowloading.mimicling.tooltip.controls": "Controls:",
+  "item.dungeonnowloading.mimicling.tooltip.controls_1": "- Sneak + Right-click: change mode",
+  "item.dungeonnowloading.mimicling.tooltip.controls_2": "- In inventory: hover Mimicling with an item to feed",
+  "item.dungeonnowloading.mimicling.tooltip.controls_3": "- Feed slimeball to spit tools"
 }

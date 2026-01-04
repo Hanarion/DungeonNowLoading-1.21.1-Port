@@ -36,11 +36,11 @@ public class PayloadEntity extends Entity {
     private static final EntityDataAccessor<Integer> DATA_KIND = SynchedEntityData.defineId(PayloadEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_STUCK = SynchedEntityData.defineId(PayloadEntity.class, EntityDataSerializers.BOOLEAN);
 
-    private double gravity = 0.04D; // similar to snowball
+    private double gravity = 0.04D;
     private double drag = 0.98D;
-    private int life = 200; // ticks until auto-remove safety
+    private int life = 200;
 
-    private int hitsToBreak = 2; // reduced to two punches
+    private int hitsToBreak = 2;
 
     public PayloadEntity(EntityType<? extends PayloadEntity> type, Level level) {
         super(type, level);
