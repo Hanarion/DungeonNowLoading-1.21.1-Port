@@ -1,7 +1,7 @@
 {
   "parent": "dungeonnowloading:block/explosive_barrel",
   "textures": {
-    "0": "dungeonnowloading:block/caltrop_barrel",
+    "0": "dungeonnowloading:block/silverfish_barrel",
     "particle": "#0"
   }
 }

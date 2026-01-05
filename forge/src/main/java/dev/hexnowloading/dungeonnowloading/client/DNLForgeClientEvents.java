@@ -5,8 +5,8 @@ import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.FairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.GauntletRenderer;
-import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.PlayerStatueRenderer;
+import dev.hexnowloading.dungeonnowloading.client.render.PayloadEntityRenderer;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepModel;
@@ -16,18 +16,15 @@ import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
-
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
-
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 
-
 public class DNLForgeClientEvents {
-
 
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         // Bosses
@@ -37,6 +34,8 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(FairkeeperOurosModel.LAYER_LOCATION, FairkeeperOurosModel::createBodyLayer);
         event.registerLayerDefinition(FairkeeperOurosBodyModel.LAYER_LOCATION, FairkeeperOurosBodyModel::createBodyLayer);
         event.registerLayerDefinition(FairkeeperSerpentCallerModel.LAYER_LOCATION, FairkeeperSerpentCallerModel::createBodyLayer);
+        // Caltrop model layer used by payload renderer
+        event.registerLayerDefinition(Caltrop.LAYER_LOCATION, Caltrop::createBodyLayer);
 
         // Monsters
         event.registerLayerDefinition(HollowModel.LAYER_LOCATION, HollowModel::createBodyLayer);
@@ -50,7 +49,6 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(CopperCreepModel.LAYER_LOCATION, CopperCreepModel::createBodyLayer);
         event.registerLayerDefinition(CopperCreepButlerModel.LAYER_LOCATION, CopperCreepButlerModel::createBodyLayer);
         event.registerLayerDefinition(RepulsorModel.LAYER_LOCATION, RepulsorModel::createBodyLayer);
-
 
         // Projectiles
         event.registerLayerDefinition(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
@@ -70,8 +68,8 @@ public class DNLForgeClientEvents {
 
         // Item
         event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
-
     }
+
     public static void onRegisterRenderer(EntityRenderersEvent.RegisterRenderers event) {
         // Bosses
         event.registerEntityRenderer(DNLEntityTypes.CHAOS_SPAWNER.get(), ChaosSpawnerRenderer::new);
@@ -101,6 +99,8 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), VertexOrbProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), VertexDomainProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BORUS_ARROW.get(), BorusArrowRenderer::new);
+        // Payload entity (spawned by explosive barrels)
+        event.registerEntityRenderer(DNLEntityTypes.PAYLOAD.get(), PayloadEntityRenderer::new);
 
         // Misc
         event.registerEntityRenderer(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);
@@ -158,4 +158,5 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
     }
+
 }

@@ -91,9 +91,25 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.EXPLOSIVE_BARREL.get());
                 output.accept(DNLItems.CRYO_BARREL.get());
                 output.accept(DNLItems.PYRO_BARREL.get());
-//                output.accept(DNLItems.POTION_BARREL.get());
+                // Add potion barrel variants: default and one per mob effect
+                output.accept(DNLItems.POTION_BARREL.get());
+                try {
+                    net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.forEach(effect -> {
+                        if (effect == null) return;
+                        net.minecraft.world.item.ItemStack stack = DNLItems.POTION_BARREL.get().getDefaultInstance();
+                        net.minecraft.nbt.CompoundTag beTag = new net.minecraft.nbt.CompoundTag();
+                        net.minecraft.resources.ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getKey(effect);
+                        if (id == null) return;
+                        beTag.putString("Effect", id.toString());
+                        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+                        tag.put("BlockEntityTag", beTag);
+                        stack.setTag(tag);
+                        stack.setHoverName(net.minecraft.network.chat.Component.translatable("item.dungeonnowloading.potion_barrel.effect", net.minecraft.network.chat.Component.translatable(effect.getDescriptionId())));
+                        output.accept(stack);
+                    });
+                } catch (Exception ignored) {}
                 output.accept(DNLItems.CALTROP_BARREL.get());
-                output.accept(DNLItems.SILVERFISH_EXPLODING_BARREL.get());
+                output.accept(DNLItems.SILVERFISH_BARREL.get());
 
                 output.accept(DNLItems.COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.MOSSY_COBBLESTONE_PEBBLE.get());

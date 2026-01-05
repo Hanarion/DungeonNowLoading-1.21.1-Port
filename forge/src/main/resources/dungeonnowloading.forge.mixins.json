@@ -33,7 +33,6 @@
       "forge.blockentities.WiseFairkeeperChestBlockItemMixin",
       "forge.blockentities.FierceFairkeeperChestBlockItemMixin",
       "forge.blockentities.PlayerStatueBlockItemMixin",
-      "forge.blockentities.GauntletBlockItemMixin",
       "forge.item.ScorcherItemMixin",
       "forge.item.ScorcherItemMixin",
       "forge.block.AzuroLogBlockMixin"

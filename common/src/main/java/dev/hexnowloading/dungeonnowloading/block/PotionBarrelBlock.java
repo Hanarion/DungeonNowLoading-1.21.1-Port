@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.PotionBarrelBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -9,6 +10,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -62,8 +64,33 @@ public class PotionBarrelBlock extends GenericExplosiveBarrelBlock implements En
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return null; // no ticking needed beyond the block's own fuse logic
     }
+
     private static @Nullable PotionBarrelBlockEntity getBlockEntity(ServerLevel level, BlockPos pos) {
         BlockEntity be = level.getBlockEntity(pos);
         return be instanceof PotionBarrelBlockEntity pb ? pb : null;
+    }
+
+    @Override
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(world, pos, state, placer, stack);
+        if (stack != null && stack.hasTag() && stack.getTag().contains("BlockEntityTag")) {
+            CompoundTag beTag = stack.getTag().getCompound("BlockEntityTag");
+            try {
+                if (world.getBlockEntity(pos) instanceof PotionBarrelBlockEntity be) {
+                    if (beTag.contains("Effect", 8)) {
+                        var id = new net.minecraft.resources.ResourceLocation(beTag.getString("Effect"));
+                        var effect = net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.get(id);
+                        be.setEffect(effect);
+                    } else {
+                        be.setEffect(null);
+                    }
+                    if (!world.isClientSide) {
+                        world.sendBlockUpdated(pos, state, state, 3);
+                    } else {
+                        world.sendBlockUpdated(pos, state, state, 3);
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
     }
 }

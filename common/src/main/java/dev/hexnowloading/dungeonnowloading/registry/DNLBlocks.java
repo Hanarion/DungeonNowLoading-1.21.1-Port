@@ -1,7 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.block.*;
-import dev.hexnowloading.dungeonnowloading.block.SilverfishExplodingBarrelBlock;
+import dev.hexnowloading.dungeonnowloading.block.SilverfishBarrelBlock;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -52,7 +52,7 @@ public class DNLBlocks {
     public static Supplier<Block> OIL_SPILL;
     public static Supplier<Block> POTION_BARREL;
     public static Supplier<Block> CALTROP_BARREL;
-    public static Supplier<Block> SILVERFISH_EXPLODING_BARREL;
+    public static Supplier<Block> SILVERFISH_BARREL;
 //    public static Supplier<Block> WISP_LIGHT;
     public static Supplier<Block> COBBLESTONE_PEBBLES;// = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> MOSSY_COBBLESTONE_PEBBLES;// = registerBlock("mossy_cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
@@ -170,7 +170,7 @@ public class DNLBlocks {
         CRYO_BARREL = registerBlock("cryo_barrel", () -> new CryoBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
         PYRO_BARREL = registerBlock("pyro_barrel", () -> new PyroBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
         CALTROP_BARREL = registerBlock("caltrop_barrel", () -> new CaltropBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
-        SILVERFISH_EXPLODING_BARREL = registerBlock("silverfish_exploding_barrel", () -> new SilverfishExplodingBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
+        SILVERFISH_BARREL = registerBlock("silverfish_barrel", () -> new SilverfishBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)));
 //        WISP_LIGHT = registerBlock("wisp_light", () -> new WispLightBlock(
 //                BlockBehaviour.Properties.of()
 //                        .noCollission()

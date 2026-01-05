@@ -91,9 +91,9 @@ public class DNLItems {
     public static final Supplier<Item> EXPLOSIVE_BARREL = register("explosive_barrel", () -> new BlockItem(DNLBlocks.EXPLOSIVE_BARREL.get(), new Item.Properties()));
     public static final Supplier<Item> CRYO_BARREL = register("cryo_barrel", () -> new BlockItem(DNLBlocks.CRYO_BARREL.get(), new Item.Properties()));
     public static final Supplier<Item> PYRO_BARREL = register("pyro_barrel", () -> new BlockItem(DNLBlocks.PYRO_BARREL.get(), new Item.Properties()));
-//    public static final Supplier<Item> POTION_BARREL = register("potion_barrel", () -> new BlockItem(DNLBlocks.POTION_BARREL.get(), new Item.Properties()));
+    public static final Supplier<Item> POTION_BARREL = register("potion_barrel", dev.hexnowloading.dungeonnowloading.item.blockitem.PotionBarrelBlockItem::new);
     public static final Supplier<Item> CALTROP_BARREL = register("caltrop_barrel", () -> new BlockItem(DNLBlocks.CALTROP_BARREL.get(), new Item.Properties()));
-    public static final Supplier<Item> SILVERFISH_EXPLODING_BARREL = register("silverfish_exploding_barrel", () -> new BlockItem(DNLBlocks.SILVERFISH_EXPLODING_BARREL.get(), new Item.Properties()));
+    public static final Supplier<Item> SILVERFISH_BARREL = register("silverfish_barrel", () -> new BlockItem(DNLBlocks.SILVERFISH_BARREL.get(), new Item.Properties()));
     public static final Supplier<Item> COBBLESTONE_PEBBLE = register("cobblestone_pebble", () -> new BlockItem(DNLBlocks.COBBLESTONE_PEBBLES.get(), new Item.Properties()));
     public static final Supplier<Item> MOSSY_COBBLESTONE_PEBBLE = register("mossy_cobblestone_pebble", () -> new BlockItem(DNLBlocks.MOSSY_COBBLESTONE_PEBBLES.get(), new Item.Properties()));
     public static final Supplier<Item> IRON_INGOT_PILE = register("iron_ingot_pile", () -> new BlockItem(DNLBlocks.IRON_INGOT_PILE.get(), new Item.Properties()));

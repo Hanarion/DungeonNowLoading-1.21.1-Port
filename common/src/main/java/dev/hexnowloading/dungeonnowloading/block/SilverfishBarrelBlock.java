@@ -20,9 +20,9 @@ import net.minecraft.world.phys.Vec3;
  *
  * Note: model/texture are handled by assets; this class is only behavior.
  */
-public class SilverfishExplodingBarrelBlock extends GenericExplosiveBarrelBlock {
+public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
 
-    public SilverfishExplodingBarrelBlock(Properties props) {
+    public SilverfishBarrelBlock(Properties props) {
         super(props);
     }
 
