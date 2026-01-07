@@ -1,6 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.platform.Services;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -94,17 +98,17 @@ public class DNLCreativeModeTabs {
                 // Add potion barrel variants: default and one per mob effect
                 output.accept(DNLItems.POTION_BARREL.get());
                 try {
-                    net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.forEach(effect -> {
+                    BuiltInRegistries.MOB_EFFECT.forEach(effect -> {
                         if (effect == null) return;
-                        net.minecraft.world.item.ItemStack stack = DNLItems.POTION_BARREL.get().getDefaultInstance();
-                        net.minecraft.nbt.CompoundTag beTag = new net.minecraft.nbt.CompoundTag();
-                        net.minecraft.resources.ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getKey(effect);
+                        ItemStack stack = DNLItems.POTION_BARREL.get().getDefaultInstance();
+                        CompoundTag beTag = new CompoundTag();
+                        ResourceLocation id = BuiltInRegistries.MOB_EFFECT.getKey(effect);
                         if (id == null) return;
                         beTag.putString("Effect", id.toString());
-                        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+                        CompoundTag tag = new CompoundTag();
                         tag.put("BlockEntityTag", beTag);
                         stack.setTag(tag);
-                        stack.setHoverName(net.minecraft.network.chat.Component.translatable("item.dungeonnowloading.potion_barrel.effect", net.minecraft.network.chat.Component.translatable(effect.getDescriptionId())));
+                        stack.setHoverName(Component.translatable("item.dungeonnowloading.potion_barrel.effect", net.minecraft.network.chat.Component.translatable(effect.getDescriptionId())));
                         output.accept(stack);
                     });
                 } catch (Exception ignored) {}
