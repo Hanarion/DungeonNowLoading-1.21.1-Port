@@ -17,7 +17,7 @@
     "block.FenceMixin",
     "block.WallMixin",
     "block.IronBarsMixin",
-    "items.ItemInHandRendererMixin",
+
     "items.ItemStackBreakProtectionMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
@@ -42,6 +42,7 @@
     "client.MinecraftClientTickMixin",
     "client.MusicManagerMixin",
     "MaxHealthAttributeMixin",
+    "items.ItemInHandRendererMixin",
     "MixinTitleScreen"
   ],
   "server": [
