@@ -8,8 +8,12 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 public class DNLLootInjections {
     public static void setup() {
-        injectLootTableRef(new ResourceLocation("minecraft", "chests/jungle_temple"), new ResourceLocation("dungeonnowloading", "chests/vanilla/jungle_temple"));
-        injectLootTableRef(new ResourceLocation("minecraft", "chests/simple_dungeon"), new ResourceLocation("dungeonnowloading", "chests/vanilla/simple_dungeon"));
+        //chests
+        injectLootTableRef(new ResourceLocation("minecraft", "chests/jungle_temple"), new ResourceLocation("dungeonnowloading", "vanilla/chests/jungle_temple"));
+        injectLootTableRef(new ResourceLocation("minecraft", "chests/simple_dungeon"), new ResourceLocation("dungeonnowloading", "vanilla/chests/simple_dungeon"));
+
+        //blocks
+        injectLootTableRef(new ResourceLocation("minecraft", "blocks/spawner"), new ResourceLocation("dungeonnowloading", "vanilla/blocks/spawner"));
     }
 
     private static void injectLootTableRef(ResourceLocation targetLootTable, ResourceLocation injectTable) {

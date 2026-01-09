@@ -1,10 +1,12 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import com.google.common.collect.ImmutableList;
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.VertexPillarBlockEntity;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.BossTargetSelectorGoal;
+import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
@@ -33,6 +35,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -76,7 +79,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private static final int SPAWN_OFFSET_X = 20;
     private static final int SPAWN_OFFSET_Y = 15;
     private final int BEHIND_BLOCK_SPAWN_OFFSET = 5;
-    private final int ARENA_SIZE = 36;
+    private static final int ARENA_SIZE = 36;
     private final int MAX_SCUTTLE_COUNT = 6;
     private DamageSource lastDamageSource;
     private FairkeeperBorosEntity boros;
@@ -94,6 +97,10 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private int musicTick;
     private Set<UUID> playerUUIDs;
     private Set<UUID> minionUUIDs;
+    private int defeatedCount = 0;
+    private static final UUID RECALL_ATTACK_MOD_UUID = UUID.fromString("3f9c1e2b-8a64-4d0a-9e2c-6d7f1c4a9a12");
+    private static final UUID RECALL_HEALTH_UUID = UUID.fromString("b27a4d91-1c58-4a6e-9b0f-2f8e6c3d5a44");
+
 
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> introMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> comboMoveSet = new WeightBaseMoveSet<>();
@@ -169,6 +176,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             uuidCompoundTag.putUUID("PlayerUUID" + i, var.next());
         }
         compoundTag.put("PlayerUUIDs", listTag);
+        compoundTag.putInt("DefeatedCount", this.defeatedCount);
     }
 
     @Override
@@ -194,6 +202,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 this.playerUUIDs.add(compoundTag1.getUUID("PlayerUUID" + a));
             }
         }
+        this.defeatedCount = compoundTag.getInt("DefeatedCount");
     }
 
     public void startBossFight() {
@@ -656,16 +665,35 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             this.spawnLootTableItems(this.lastDamageSource, true, false, null);
         }
         this.removeAllMinions();
-        this.removePreservers();
         this.removePillars();
+        this.spawnSeepingSoul();
         this.remove(RemovalReason.KILLED);
     }
 
-    private void removePreservers() {
-        Level level = this.level();
-        BlockPos center = this.blockPosition();
+    private void spawnSeepingSoul() {
+        // Spawn at boss *starting position*
+        BlockPos start = this.blockPosition();
+
+        SeepingSoulEntity soul = DNLEntityTypes.SEEPING_SOUL.get().create(this.level());
+        if (soul == null) return;
+
+        soul.moveTo(start.getX() + 0.5, start.getY(), start.getZ() + 0.5, this.getYRot(), 0);
+
+        // bossId should match the recall registry id you use for Chaos Spawner
+        soul.setBossId(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeepers"));
+
+        // next run is +1
+        soul.setDefeatedCount(Mth.clamp(this.defeatedCount + 1, 0, 100));
+
+        this.level().addFreshEntity(soul);
+
+        soul.playSpawnAnimation();
+    }
+
+    private static void removePreservers(ServerLevel level, BlockPos soulPos) {
+        BlockPos center = soulPos;
         int includeWallPreserver = 1;
-        int arenaSize = this.getArenaSize() + includeWallPreserver;
+        int arenaSize = ARENA_SIZE + includeWallPreserver;
 
         Map<BlockPos, BlockEntity> map = new HashMap<>();
 
@@ -912,9 +940,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.IDLE);
             this.setBorosId(boros.getUUID());
             this.setBorosWaitingForCommand(false);
-            EntityScale.scaleBossHealth(boros, playerCount);
-            EntityScale.scaleBossAttack(boros, playerCount);
-            EntityScale.scaleBossExhaustion(boros, playerCount, this.borosExhaustion);
+            EntityScale.scaleBossHealth(boros, playerCount, this.defeatedCount);
+            EntityScale.scaleBossAttack(boros, playerCount, this.defeatedCount);
+            EntityScale.scaleBossExhaustion(boros, playerCount, this.borosExhaustion, this.defeatedCount);
+            if (this.defeatedCount > 0) {
+                boros.setCustomName(RecallUtil.recalledName(Component.translatable("entity.dungeonnowloading.fairkeeper_boros"), defeatedCount));
+            }
             this.boros = boros;
         }
 
@@ -930,9 +961,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.IDLE);
             this.setOurosId(ouros.getUUID());
             this.setOurosWaitingForCommand(false);
-            EntityScale.scaleBossHealth(ouros, playerCount);
-            EntityScale.scaleBossAttack(ouros, playerCount);
-            EntityScale.scaleBossExhaustion(ouros, playerCount, this.ourosExhaustion);
+            EntityScale.scaleBossHealth(ouros, playerCount, this.defeatedCount);
+            EntityScale.scaleBossAttack(ouros, playerCount, this.defeatedCount);
+            EntityScale.scaleBossExhaustion(ouros, playerCount, this.ourosExhaustion, this.defeatedCount);
+            if (this.defeatedCount > 0) {
+                ouros.setCustomName(RecallUtil.recalledName(Component.translatable("entity.dungeonnowloading.fairkeeper_ouros"), defeatedCount));
+            }
             this.ouros = ouros;
         }
     }
@@ -1088,6 +1122,59 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         for (ServerPlayer otherPlayer : nearbyPlayers) {
             Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 20), otherPlayer);
+        }
+    }
+
+    public static void disperse(ServerLevel level, SeepingSoulEntity soul, int defeatedCount) {
+        removePreservers(level, soul.blockPosition());
+    }
+
+    public static void spawnRecalled(ServerLevel level, SeepingSoulEntity soul, int defeatedCount) {
+        FairkeeperSerpentCallerEntity boss = DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get().create(level);
+        if (boss == null) return;
+        BlockPos pos = soul.blockPosition();
+        boss.initRecalled(defeatedCount);
+        boss.moveTo(pos.getX() + 0.5f, pos.getY(), pos.getZ() + 0.5f, soul.getYRot(), 0);
+        level.addFreshEntity(boss);
+        spawnRecallFxTight(level, boss.position());
+    }
+
+    public void initRecalled(int defeatedCount) {
+        this.defeatedCount = defeatedCount;
+    }
+
+    public static void spawnRecallFxTight(ServerLevel level, Vec3 center) {
+        double x0 = center.x;
+        double y0 = center.y + 0.5F;
+        double z0 = center.z;
+
+        // 1.5 x 1.5 area => x/z in [-0.75 .. 0.75]
+        double radius = 0.75;
+
+        // Poof burst (fast)
+        for (int i = 0; i < 25; i++) {
+            double x = x0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double z = z0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double y = y0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+
+            double vx = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+            double vy = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+            double vz = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+
+            level.sendParticles(ParticleTypes.POOF, x, y, z, 1, vx, vy, vz, 0.0);
+        }
+
+        // Soul particles (floaty)
+        for (int i = 0; i < 18; i++) {
+            double x = x0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double z = z0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double y = y0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+
+            double vx = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+            double vy = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+            double vz = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+
+            level.sendParticles(ParticleTypes.SOUL, x, y, z, 1, vx, vy, vz, 0.0);
         }
     }
 

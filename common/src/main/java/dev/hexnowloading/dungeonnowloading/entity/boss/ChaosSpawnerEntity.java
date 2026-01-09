@@ -6,12 +6,11 @@ import com.mojang.logging.LogUtils;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
+import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
-import dev.hexnowloading.dungeonnowloading.entity.util.UniqueDeathAnimationEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.WeightedTargetProvider;
+import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
 import net.minecraft.core.BlockPos;
@@ -29,7 +28,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -88,10 +89,15 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private static final byte TRIGGER_DEATH_ANIMATION_BYTE = 76;
     private static final byte TRIGGER_ANIMATION_STOP_BYTE = 77;
 
+    private static final UUID RECALL_ATTACK_MOD_UUID = UUID.fromString("1f3d0f6b-2c9e-4d4f-9c2d-2a91c8f2b8d7");
+    private static final UUID RECALL_HEALTH_MOD_UUID = UUID.fromString("e41f6c2a-77b1-4c52-9f89-0a3e8c6d21f9");
+    private static final int RECALL_POSITION_OFFSET_Y = 1;
+
     protected int attackTickCount;
     private int contactAttackTickCount;
     private int deathAnimationTickCount;
     private int barrierCheckTickCount;
+    private int defeatedCount = 0;
     private Set<UUID> playerUUIDs;
     private UUID currentPlayerUUID;
     private List<Player> pushTargets;
@@ -192,6 +198,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
             uuidCompoundTag.putUUID("PlayerUUID", uuid1);
         }*/
         compoundTag.put("PlayerUUIDs", listTag);
+        compoundTag.putInt("DefeatedCount", this.defeatedCount);
     }
 
     @Override
@@ -227,6 +234,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 this.playerUUIDs.add(compoundTag1.getUUID("PlayerUUID" + a));
             }
         }
+        this.defeatedCount = compoundTag.getInt("DefeatedCount");
     }
 
     @Override
@@ -244,6 +252,11 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     public void setCustomName(@Nullable Component name) {
         super.setCustomName(name);
         this.bossEvent.setName(this.getDisplayName());
+    }
+
+    @Override
+    public boolean isCustomNameVisible() {
+        return false;
     }
 
     @Override
@@ -281,8 +294,8 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 playerUUIDs.add(p.getUUID());
             }
             int playerCount = players.size();
-            EntityScale.scaleBossHealth(this, playerCount);
-            EntityScale.scaleBossAttack(this, playerCount);
+            EntityScale.scaleBossHealth(this, playerCount, this.defeatedCount);
+            EntityScale.scaleBossAttack(this, playerCount, this.defeatedCount);
             this.entityData.set(PLAYER_COUNT, playerCount);
             this.entityData.set(AWAKENING_TICKS, 160);
             this.entityData.set(DATA_STATE, State.AWAKENING);
@@ -574,10 +587,32 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 }
                 this.level().broadcastEntityEvent(this, (byte)3);
             }
+            spawnSeepingSoul((ServerLevel) level);
             this.level().broadcastEntityEvent(this, (byte)60);
             this.remove(Entity.RemovalReason.KILLED);
         }
     }
+
+    private void spawnSeepingSoul(ServerLevel level) {
+        // Spawn at boss *starting position*
+        BlockPos start = this.getSpawnPointPos();
+
+        SeepingSoulEntity soul = DNLEntityTypes.SEEPING_SOUL.get().create(level);
+        if (soul == null) return;
+
+        soul.moveTo(start.getX() + 0.5, start.getY() + RECALL_POSITION_OFFSET_Y, start.getZ() + 0.5, 0, 0);
+
+        // bossId should match the recall registry id you use for Chaos Spawner
+        soul.setBossId(new ResourceLocation("dungeonnowloading", "chaos_spawner"));
+
+        // next run is +1
+        soul.setDefeatedCount(Mth.clamp(this.defeatedCount + 1, 0, 100));
+
+        level.addFreshEntity(soul);
+
+        soul.playSpawnAnimation();
+    }
+
 
     @Override
     public void die(DamageSource damageSource) {
@@ -819,6 +854,133 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     public int getArenaSize() {
         return (int) this.getFollowDistance();
     }
+
+    public static void spawnRecalledStatic(ServerLevel level, SeepingSoulEntity soul, int defeatedCount) {
+        ChaosSpawnerEntity boss = DNLEntityTypes.CHAOS_SPAWNER.get().create(level);
+        if (boss == null) return;
+        BlockPos pos = soul.blockPosition();
+        boss.initRecalled(soul.blockPosition(), defeatedCount);
+        boss.moveTo(pos.getX() + 0.5f, pos.getY() - RECALL_POSITION_OFFSET_Y, pos.getZ() + 0.5f, soul.getYRot(), 0);
+        level.addFreshEntity(boss);
+        spawnRecallFxTight(level, boss.position());
+    }
+
+    public void initRecalled(BlockPos pos, int defeatedCount) {
+        this.entityData.set(SPAWN_POINT, pos.below(RECALL_POSITION_OFFSET_Y));
+        this.defeatedCount = defeatedCount;
+        this.setCustomName(RecallUtil.recalledName(
+                Component.translatable("entity.dungeonnowloading.chaos_spawner"),
+                defeatedCount
+        ));
+    }
+
+    public static void spawnRecallFxTight(ServerLevel level, Vec3 center) {
+        double x0 = center.x;
+        double y0 = center.y + 1.8F;
+        double z0 = center.z;
+
+        // 1.5 x 1.5 area => x/z in [-0.75 .. 0.75]
+        double radius = 1.7;
+
+        // Poof burst (fast)
+        for (int i = 0; i < 25; i++) {
+            double x = x0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double z = z0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double y = y0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+
+            double vx = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+            double vy = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+            double vz = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+
+            level.sendParticles(ParticleTypes.POOF, x, y, z, 1, vx, vy, vz, 0.0);
+        }
+
+        // Soul particles (floaty)
+        for (int i = 0; i < 18; i++) {
+            double x = x0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double z = z0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double y = y0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+
+            double vx = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+            double vy = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+            double vz = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+
+            level.sendParticles(ParticleTypes.SOUL, x, y, z, 1, vx, vy, vz, 0.0);
+        }
+    }
+
+
+    public static void disperseStatic(ServerLevel level, SeepingSoulEntity soul, int defeatedCount) {
+        // 5x5x5 centered on the soul (radius 2)
+        final BlockPos center = soul.blockPosition();
+        final int radius = 2;
+
+        // Destroy preserved blocks only within the 5x5x5 cube
+        BlockPos.betweenClosedStream(
+                center.offset(-radius, -radius, -radius),
+                center.offset(radius, radius, radius)
+        ).forEach(pos -> {
+            if (isChaosSpawnerPreservedBlock(level, pos)) {
+                level.destroyBlock(pos, false);
+            }
+        });
+
+        BlockPos.betweenClosedStream(
+                center.offset(-radius, -radius, -radius),
+                center.offset(radius, radius, radius)
+        ).forEach(pos -> {
+            if (isChaosSpawnerPreservedBlock(level, pos)) {
+                level.destroyBlock(pos, false);
+            }
+        });
+
+        // Particle + sound feedback at center (nice "disperse" feel)
+        playDisperseEffects(level, center);
+    }
+
+    private static void playDisperseEffects(ServerLevel level, BlockPos center) {
+        double x = center.getX() + 0.5;
+        double y = center.getY() + 0.5;
+        double z = center.getZ() + 0.5;
+
+        // A little sound helps sell it (optional)
+        level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.2F);
+
+        // Explosion-like burst
+        level.sendParticles(ParticleTypes.EXPLOSION, x, y, z,
+                1, 0.0, 0.0, 0.0, 0.0);
+
+        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, x, y, z,
+                1, 0.0, 0.0, 0.0, 0.0);
+
+        // Mixed soul + smoke-ish particles
+        level.sendParticles(ParticleTypes.SOUL, x, y, z,
+                60, 0.9, 0.9, 0.9, 0.05);
+
+        level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, y, z,
+                25, 0.6, 0.6, 0.6, 0.03);
+
+        level.sendParticles(ParticleTypes.POOF, x, y, z,
+                30, 0.8, 0.8, 0.8, 0.03);
+
+        // Optional: block break event (vanilla "pop")
+        // level.levelEvent(2001, center, 0);
+    }
+
+    private static boolean isChaosSpawnerPreservedBlock(Level level, BlockPos pos) {
+        var state = level.getBlockState(pos);
+
+        return state.is(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BARRIER_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BARRIER_VERTEX.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_DIAMOND_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_DIAMOND_VERTEX.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BROKEN_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BROKEN_DIAMOND_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BROKEN_DIAMOND_VERTEX.get());
+    }
+
 
     public enum State {
         SLEEPING,

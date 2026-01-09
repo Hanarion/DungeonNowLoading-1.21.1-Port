@@ -15,28 +15,47 @@ public class EntityScale {
     private static final UUID SCALED_ATTACK_MODIFIER_UUID = UUID.fromString("3a284fc3-6c5a-43d7-93ec-d96423e0f34f");
     private static final double bossHealthScale = BossConfig.BOSS_HEALTH_MODIFIER.get();
     private static final double bossAttackDamageScale = BossConfig.BOSS_DAMAGE_MODIFIER.get();
+    private static final double bossExhaustionScale = BossConfig.BOSS_EXHAUSTION_MODIFIER.get();
     private static final double multiplayerBossHealthScale = BossConfig.TOGGLE_MULTIPLAYER_SCALING.get() ? BossConfig.MULTIPLAYER_BOSS_HEALTH_SCALE.get() : 0;
     private static final double multiplayerBossAttackScale = BossConfig.TOGGLE_MULTIPLAYER_SCALING.get() ? BossConfig.MULTIPLAYER_BOSS_ATTACK_SCALE.get() : 0;
     private static final double multiplayerBossExhaustionScale = BossConfig.TOGGLE_MULTIPLAYER_SCALING.get() ? BossConfig.MULTIPLAYER_BOSS_EXHAUSTION_SCALE.get() : 0;
+    private static final double recallBossHealthScale = BossConfig.RECALL_BOSS_HEALTH_SCALE.get();
+    private static final double recallBossAttackScale = BossConfig.RECALL_BOSS_ATTACK_SCALE.get();
+    private static final double recallBossExhaustionScale = BossConfig.RECALL_BOSS_EXHAUSTION_SCALE.get();
 
-    public static void scaleBossHealth(LivingEntity entityType, int playerCount) {
-        double healthMultiplier = bossHealthScale * (1 + (playerCount - 1) * multiplayerBossHealthScale) - 1;
+    public static void scaleBossHealth(LivingEntity entityType, int playerCount, int defeatedCount) {
+        double baseBonus = bossHealthScale - 1;
+        double mpBonus = Math.max(0, playerCount - 1) * multiplayerBossHealthScale;
+        double recallBonus = recallHpBonus(defeatedCount);
+
+        double healthMultiplier = 1.0 + baseBonus + mpBonus + recallBonus;
+
         AttributeModifier SCALED_HEALTH_MODIFIER = new AttributeModifier(SCALED_HEALTH_MODIFIER_UUID, "Scaled health", healthMultiplier, AttributeModifier.Operation.MULTIPLY_BASE);
         Objects.requireNonNull(entityType.getAttribute(Attributes.MAX_HEALTH)).removeModifier(SCALED_HEALTH_MODIFIER);
         Objects.requireNonNull(entityType.getAttribute(Attributes.MAX_HEALTH)).addPermanentModifier(SCALED_HEALTH_MODIFIER);
         entityType.setHealth(entityType.getMaxHealth());
     }
 
-    public static void scaleBossAttack(LivingEntity entityType, int playerCount) {
-        double attackMultiplier = bossAttackDamageScale * (1 + (playerCount - 1) * multiplayerBossAttackScale) - 1;
+    public static void scaleBossAttack(LivingEntity entityType, int playerCount, int defeatedCount) {
+        double baseBase = bossAttackDamageScale - 1;
+        double mpBonus = Math.max(0, playerCount - 1) * multiplayerBossAttackScale;
+        double recallBonus = recallAtkBonus(defeatedCount);
+
+        double attackMultiplier = 1.0 + baseBase + mpBonus + recallBonus;
+
         AttributeModifier SCALED_ATTACK_MODIFIER = new AttributeModifier(SCALED_ATTACK_MODIFIER_UUID, "Scaled attack", attackMultiplier, AttributeModifier.Operation.MULTIPLY_BASE);
         Objects.requireNonNull(entityType.getAttribute(Attributes.ATTACK_DAMAGE)).removeModifier(SCALED_ATTACK_MODIFIER);
         Objects.requireNonNull(entityType.getAttribute(Attributes.ATTACK_DAMAGE)).addPermanentModifier(SCALED_ATTACK_MODIFIER);
     }
 
-    public static void scaleBossExhaustion(LivingEntity entityType, int playerCount, ExhaustionTracker exhaustionTracker) {
-        double exhaustionMultiplier = (1 + (playerCount - 1) * multiplayerBossExhaustionScale) - 1;
-        exhaustionTracker.setMaxExhaustion((float) (exhaustionTracker.getMaxExhaustion() * (1 + exhaustionMultiplier)));
+    public static void scaleBossExhaustion(LivingEntity entityType, int playerCount, ExhaustionTracker exhaustionTracker, int defeatedCount) {
+        double baseBase = bossExhaustionScale - 1;
+        double mpBonus = Math.max(0, playerCount - 1) * multiplayerBossExhaustionScale;
+        double recallBonus = recallExhaustionBonus(defeatedCount);
+
+        double exhaustionMultiplier = 1.0 + baseBase + mpBonus + recallBonus;
+
+        exhaustionTracker.setMaxExhaustion((float) (exhaustionTracker.getMaxExhaustion() * (exhaustionMultiplier)));
     }
 
     public static void scaleMobAttributes(LivingEntity entity) {
@@ -45,5 +64,20 @@ public class EntityScale {
         entity.getAttribute(Attributes.MAX_HEALTH).setBaseValue(health);
         entity.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(attackDamage);
         entity.setHealth(health);
+    }
+
+    public static double recallHpBonus(int defeatedCount) {
+        int lvl = RecallUtil.clampCount(defeatedCount);
+        return recallBossHealthScale * lvl;
+    }
+
+    public static double recallAtkBonus(int defeatedCount) {
+        int lvl = RecallUtil.clampCount(defeatedCount);
+        return recallBossAttackScale * lvl;
+    }
+
+    public static double recallExhaustionBonus(int defeatedCount) {
+        int lvl = RecallUtil.clampCount(defeatedCount);
+        return recallBossExhaustionScale * lvl;
     }
 }

@@ -9,9 +9,13 @@ public class BossConfig {
 
     public static ForgeConfigSpec.DoubleValue BOSS_HEALTH_MODIFIER;
     public static ForgeConfigSpec.DoubleValue BOSS_DAMAGE_MODIFIER;
+    public static ForgeConfigSpec.DoubleValue BOSS_EXHAUSTION_MODIFIER;
     public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_HEALTH_SCALE;
     public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_ATTACK_SCALE;
     public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_EXHAUSTION_SCALE;
+    public static ForgeConfigSpec.DoubleValue RECALL_BOSS_HEALTH_SCALE;
+    public static ForgeConfigSpec.DoubleValue RECALL_BOSS_ATTACK_SCALE;
+    public static ForgeConfigSpec.DoubleValue RECALL_BOSS_EXHAUSTION_SCALE;
 
     public static void registerServerConfig(ForgeConfigSpec.Builder builder) {
         builder.push("multiplayer-boss-scaling");
@@ -24,8 +28,14 @@ public class BossConfig {
         builder.push("boss-scaling");
         BOSS_HEALTH_MODIFIER = builder.comment("Multiplies the boss health by this value.").translation("boss_health_scale").defineInRange("boss_health_scale", 1.0D, 0.0D, Double.MAX_VALUE);
         BOSS_DAMAGE_MODIFIER = builder.comment("Multiplies the boss attack damage by this value.").translation("boss_damage_scale").defineInRange("boss_damage_scale", 1.0D, 0.0D, Double.MAX_VALUE);
+        BOSS_EXHAUSTION_MODIFIER = builder.comment("Multiplies the boss exhaustion (frequency of attack) by this value. Higher value means it attacks more aggressively").translation("boss_exhaustion_scale").defineInRange("boss_exhaustion_scale", 1.0D, 0.0D, Double.MAX_VALUE);
         TOGGLE_BOSS_RESET = builder.comment("Enables the boss to reset when no player is near the boss.").translation("toggle_boss_reset").define("toggle_boss_reset", true);
 
+        builder.pop();
+        builder.push("boss-recall-scaling");
+        RECALL_BOSS_HEALTH_SCALE = builder.comment("Multiplies the boss health by this value whenever it is recalled.").translation("recall_boss_health_scale").defineInRange("recall_boss_health_scale", 0.5D, 0.0D, Double.MAX_VALUE);
+        RECALL_BOSS_ATTACK_SCALE = builder.comment("Multiplies the boss attack by this value whenever it is recalled.").translation("recall_boss_attack_scale").defineInRange("recall_boss_attack_scale", 0.5D, 0.0D, Double.MAX_VALUE);
+        RECALL_BOSS_EXHAUSTION_SCALE = builder.comment("Multiplies the boss exhaustion by this value whenever it is recalled.").translation("recall_boss_exhaustion_scale").defineInRange("recall_boss_exhaustion_scale", 0.5D, 0.0D, Double.MAX_VALUE);
         builder.pop();
     }
 }
