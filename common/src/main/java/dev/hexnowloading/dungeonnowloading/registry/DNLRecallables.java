@@ -15,8 +15,8 @@ public final class DNLRecallables {
 
 
     public static void registerAll() {
-        register(id("chaos_spawner"), new RecallableDef(DNLItems.SKULL_OF_CHAOS.get(), Component.translatable("entity.dungeonnowloading.chaos_spawner"), ChaosSpawnerEntity::spawnRecalledStatic, ChaosSpawnerEntity::disperseStatic));
-        register(id("fairkeepers"), new RecallableDef(DNLItems.REDSTONE_IDOL.get(), Component.translatable("entity.dungeonnowloading.fairkeeper_serpent_caller"), FairkeeperSerpentCallerEntity::spawnRecalled, FairkeeperSerpentCallerEntity::disperse));
+        register(id("chaos_spawner"), new RecallableDef(() -> DNLItems.SKULL_OF_CHAOS.get(), Component.translatable("entity.dungeonnowloading.chaos_spawner"), ChaosSpawnerEntity::spawnRecalledStatic, ChaosSpawnerEntity::disperseStatic));
+        register(id("fairkeepers"), new RecallableDef(() -> DNLItems.REDSTONE_IDOL.get(), Component.translatable("entity.dungeonnowloading.fairkeeper_serpent_caller"), FairkeeperSerpentCallerEntity::spawnRecalled, FairkeeperSerpentCallerEntity::disperse));
     }
 
     private static final Map<ResourceLocation, RecallableDef> BY_ID = new HashMap<>();

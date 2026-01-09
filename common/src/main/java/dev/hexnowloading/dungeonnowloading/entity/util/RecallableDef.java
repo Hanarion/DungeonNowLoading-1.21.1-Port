@@ -5,8 +5,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 
+import java.util.function.Supplier;
+
 public record RecallableDef(
-        Item recallItem,
+        Supplier<Item> recallItem,
         Component displayName,
         RecallSpawner spawner,
         SoulDisperseHandler disperseHandler

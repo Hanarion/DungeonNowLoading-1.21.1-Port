@@ -210,7 +210,7 @@ public class SeepingSoulEntity extends Entity {
 
         RecallableDef def = def();
         Component bossName = (def != null) ? def.displayName() : Component.literal("???");
-        Component itemName = (def != null) ? def.recallItem().getDefaultInstance().getHoverName() : Component.literal("???");
+        Component itemName = (def != null) ? def.recallItem().get().getDefaultInstance().getHoverName() : Component.literal("???");
 
         player.displayClientMessage(Component.translatable("entity.dungeonnowloading.seeping_soul.right_click", itemName, bossName), true);
 
@@ -273,7 +273,7 @@ public class SeepingSoulEntity extends Entity {
             RecallableDef def = def();
             Component bossName = (def != null) ? def.displayName() : Component.literal("???");
             Component itemName = (def != null)
-                    ? def.recallItem().getDefaultInstance().getHoverName()
+                    ? def.recallItem().get().getDefaultInstance().getHoverName()
                     : Component.literal("???");
 
             player.displayClientMessage(
