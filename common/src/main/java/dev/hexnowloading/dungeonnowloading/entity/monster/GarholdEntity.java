@@ -33,7 +33,7 @@ public class GarholdEntity extends Monster {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new GarholdHoverAboveTargetGoal(this, 1.15, 6.0, 3.0, 14.0));
+        this.goalSelector.addGoal(2, new GarholdHoverAboveTargetGoal(this, 1.0, 6.0, 3.0, 14.0));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
 
         super.registerGoals();
