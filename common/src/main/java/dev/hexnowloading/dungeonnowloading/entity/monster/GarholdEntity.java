@@ -33,7 +33,7 @@ public class GarholdEntity extends Monster {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new GarholdHoverAboveTargetGoal(this, 1.0, 6.0, 3.0, 14.0));
+        this.goalSelector.addGoal(2, new GarholdHoverAboveTargetGoal(this, 1.5F, 6.0, 3.0, 14.0));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
 
         super.registerGoals();
@@ -42,8 +42,8 @@ public class GarholdEntity extends Monster {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 35.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.25)
                 .add(Attributes.FLYING_SPEED, 0.6)
+                .add(Attributes.MOVEMENT_SPEED, 0.2) // Required for slowing down the initial speed on ground.
                 .add(Attributes.ATTACK_DAMAGE, 5.0)
                 .add(Attributes.FOLLOW_RANGE, 20.0)
                 .add(Attributes.ARMOR, 15.0);
