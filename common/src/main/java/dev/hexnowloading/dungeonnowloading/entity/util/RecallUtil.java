@@ -8,16 +8,10 @@ public final class RecallUtil {
 
     public static final int RECALL_CAP = 100;
 
-    /**
-     * Returns the clamped recall count [0..100].
-     */
     public static int clampCount(int defeatedCount) {
         return Mth.clamp(defeatedCount, 0, RECALL_CAP);
     }
 
-    /**
-     * Roman numeral for 1..100 (C). If 0, returns "0" (useful for debugging).
-     */
     public static String toRomanUpTo100(int n) {
         n = clampCount(n);
         if (n == 0) return "0";
@@ -35,10 +29,6 @@ public final class RecallUtil {
         return sb.toString();
     }
 
-    /**
-     * Builds "<base> Recalled <Roman>" as a Component.
-     * If you want this translatable later, you can swap this to a translatable key.
-     */
     public static Component recalledName(Component baseName, int defeatedCount) {
         int c = clampCount(defeatedCount);
         return baseName.copy()
