@@ -197,8 +197,10 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
             LivingEntity owner = projectile.getOwner() instanceof LivingEntity l ? l : null;
             if (projectile.isOnFire() && projectile.mayInteract(level, bpos)) {
                 this.detonateNow(level, bpos, owner, TriggerCause.PROJECTILE_FLAMING_ARROW);
+                projectile.discard();
             } else {
                 this.onImmediateTrigger(level, bpos, owner, TriggerCause.PROJECTILE_NORMAL_ARROW);
+                projectile.discard();
             }
         }
     }

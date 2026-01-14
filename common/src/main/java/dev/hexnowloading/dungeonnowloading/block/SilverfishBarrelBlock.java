@@ -29,15 +29,21 @@ public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
     @Override
     public void onImmediateTrigger(Level level, BlockPos pos, LivingEntity owner, TriggerCause cause) {
         if (!(level instanceof ServerLevel sl)) return;
-        // Immediate triggers: detonate behavior + clear the barrel block
-        detonateNow(sl, pos, owner);
-        sl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+        if (cause == TriggerCause.PROJECTILE_FLAMING_ARROW) {
+            detonateNow(sl, pos, owner);
+            sl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+        } else if (cause == TriggerCause.PROJECTILE_NORMAL_ARROW) {
+            this.onFuseTrigger(level, pos, owner, cause, 10);
+        } else {
+            this.onFuseTrigger(level, pos, owner, cause, 20);
+        }
     }
 
     @Override
     protected void onDetonate(Level level, BlockPos pos, LivingEntity owner) {
         if (!(level instanceof ServerLevel sl)) return;
         detonateNow(sl, pos, owner);
+        level.removeBlock(pos, false);
     }
 
     private void detonateNow(ServerLevel level, BlockPos pos, LivingEntity owner) {
