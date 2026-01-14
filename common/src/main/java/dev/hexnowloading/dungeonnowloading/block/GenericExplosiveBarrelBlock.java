@@ -28,19 +28,13 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/**
- * Shared barrel base: gravity, waterlogging, short fuse + visible flashing, and common priming hooks.
- * Subclasses implement onDetonate to define effects on fuse end.
- */
 public abstract class GenericExplosiveBarrelBlock extends FallingBlock implements SimpleWaterloggedBlock {
     protected static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 16,14);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    // Wider range to support oil barrel delayed behaviors
     public static final IntegerProperty FUSE = IntegerProperty.create("fuse", 0, 60);
 
     protected GenericExplosiveBarrelBlock(Properties properties) {
@@ -78,19 +72,17 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
 
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        // Falling behavior
         if (FallingBlock.isFree(level.getBlockState(pos.below())) && pos.getY() >= level.getMinBuildHeight()) {
-            FallingBlockEntity fallingBlockEntity = FallingBlockEntity.fall(level, pos, state);
-            fallingBlockEntity.disableDrop();
+            FallingBlockEntity falling = FallingBlockEntity.fall(level, pos, state);
+            falling.disableDrop();
+            level.removeBlock(pos, false);
         }
-        // Fuse countdown behavior
         int fuse = state.getValue(FUSE);
         if (fuse > 0) {
             int next = fuse - 1;
             level.setBlock(pos, state.setValue(FUSE, next), Block.UPDATE_ALL);
             if (next == 0) {
                 this.onDetonate(level, pos, null);
-                // allow subclass to replace with fire instead of removal
                 if (this.replaceWithFireOnDetonate(state)) {
                     level.setBlock(pos, net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState(), Block.UPDATE_ALL);
                 } else {
@@ -125,7 +117,6 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         }
     }
 
-    // Big visible priming effect: smoke + lava particles shooting upward from the top
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource source) {
         double x = pos.getX();
@@ -133,18 +124,16 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         double z = pos.getZ();
         int fuse = state.getValue(FUSE);
         if (fuse > 0) {
-            // Occasional smoke puff
             if (source.nextFloat() < 0.5F) {
                 level.addParticle(ParticleTypes.SMOKE, x + 0.5D, y + 1.0D, z + 0.5D, 0.0D, 0.0D, 0.0D);
             }
-            // Shoot a small burst of lava droplets upward from the barrel top
-            int bursts = 2 + source.nextInt(3); // 2..4
+            int bursts = 2 + source.nextInt(3);
             for (int i = 0; i < bursts; i++) {
                 double ox = 0.5D + (source.nextDouble() - 0.5D) * 0.2D;
                 double oy = 1.05D;
                 double oz = 0.5D + (source.nextDouble() - 0.5D) * 0.2D;
                 double vx = (source.nextDouble() - 0.5D) * 0.05D;
-                double vy = 0.30D + source.nextDouble() * 0.40D; // upward velocity 0.30 - 0.70
+                double vy = 0.30D + source.nextDouble() * 0.40D;
                 double vz = (source.nextDouble() - 0.5D) * 0.05D;
                 level.addParticle(ParticleTypes.LAVA, x + ox, y + oy, z + oz, vx, vy, vz);
             }
@@ -153,12 +142,6 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         }
     }
 
-    @Override
-    public boolean isPathfindable(BlockState state, BlockGetter getter, BlockPos pos, PathComputationType type) {
-        return false;
-    }
-
-    // Interactions -> trigger hooks
     public enum TriggerCause {
         FALL_IMPACT,
         IMPACT_BY_FALLING_BLOCK,
@@ -173,7 +156,6 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
     }
 
     public void onImmediateTrigger(Level level, BlockPos pos, LivingEntity owner, TriggerCause cause) {
-        // Default: prime for a shorter delay similar to TNT
         this.prime(level, pos, owner, 8);
     }
 
@@ -181,13 +163,31 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         this.prime(level, pos, owner, fuseTicks);
     }
 
+    protected void detonateNow(Level level, BlockPos pos, LivingEntity owner, TriggerCause cause) {
+        if (level.isClientSide) return;
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof GenericExplosiveBarrelBlock barrel)) {
+            return;
+        }
+        barrel.onDetonate(level, pos, owner);
+        if (barrel.replaceWithFireOnDetonate(state)) {
+            level.setBlock(pos, net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState(), Block.UPDATE_ALL);
+        } else {
+            level.removeBlock(pos, false);
+        }
+    }
+
     // Called when fuse reaches zero (subclass decides what happens)
     protected abstract void onDetonate(Level level, BlockPos pos, LivingEntity owner);
 
     @Override
     public void onBrokenAfterFall(Level level, BlockPos pos, FallingBlockEntity fallingBlockEntity) {
-        this.onImmediateTrigger(level, pos, null, TriggerCause.FALL_IMPACT);
-        super.onBrokenAfterFall(level, pos, fallingBlockEntity);
+        if (!level.isClientSide) {
+            BlockState fallingState = fallingBlockEntity.getBlockState();
+            if (fallingState.getBlock() instanceof GenericExplosiveBarrelBlock barrel) {
+                barrel.onDetonate(level, pos, null);
+            }
+        }
     }
 
     @Override
@@ -196,11 +196,10 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
             BlockPos bpos = hit.getBlockPos();
             LivingEntity owner = projectile.getOwner() instanceof LivingEntity l ? l : null;
             if (projectile.isOnFire() && projectile.mayInteract(level, bpos)) {
-                this.onImmediateTrigger(level, bpos, owner, TriggerCause.PROJECTILE_FLAMING_ARROW);
+                this.detonateNow(level, bpos, owner, TriggerCause.PROJECTILE_FLAMING_ARROW);
             } else {
                 this.onImmediateTrigger(level, bpos, owner, TriggerCause.PROJECTILE_NORMAL_ARROW);
             }
-            projectile.discard();
         }
     }
 
@@ -223,7 +222,12 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
 
     @Override
     public void onLand(Level level, BlockPos pos, BlockState state1, BlockState state2, FallingBlockEntity fallingBlockEntity) {
-        this.onImmediateTrigger(level, pos, null, TriggerCause.FALL_IMPACT);
+        if (!level.isClientSide) {
+            BlockState fallingState = fallingBlockEntity.getBlockState();
+            if (fallingState.getBlock() instanceof GenericExplosiveBarrelBlock barrel) {
+                barrel.onDetonate(level, pos, null);
+            }
+        }
     }
 
     @Override

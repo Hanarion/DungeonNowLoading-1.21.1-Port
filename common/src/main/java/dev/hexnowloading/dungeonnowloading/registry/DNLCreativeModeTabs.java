@@ -1,10 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.platform.Services;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -93,27 +89,27 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DUNGEON_WALL_TORCH.get());
                 output.accept(DNLItems.BOOK_PILE.get());
                 output.accept(DNLItems.EXPLOSIVE_BARREL.get());
-                output.accept(DNLItems.CRYO_BARREL.get());
-                output.accept(DNLItems.PYRO_BARREL.get());
-                // Add potion barrel variants: default and one per mob effect
-                output.accept(DNLItems.POTION_BARREL.get());
-                try {
-                    BuiltInRegistries.MOB_EFFECT.forEach(effect -> {
-                        if (effect == null) return;
-                        ItemStack stack = DNLItems.POTION_BARREL.get().getDefaultInstance();
-                        CompoundTag beTag = new CompoundTag();
-                        ResourceLocation id = BuiltInRegistries.MOB_EFFECT.getKey(effect);
-                        if (id == null) return;
-                        beTag.putString("Effect", id.toString());
-                        CompoundTag tag = new CompoundTag();
-                        tag.put("BlockEntityTag", beTag);
-                        stack.setTag(tag);
-                        stack.setHoverName(Component.translatable("item.dungeonnowloading.potion_barrel.effect", net.minecraft.network.chat.Component.translatable(effect.getDescriptionId())));
-                        output.accept(stack);
-                    });
-                } catch (Exception ignored) {}
-                output.accept(DNLItems.CALTROP_BARREL.get());
                 output.accept(DNLItems.SILVERFISH_BARREL.get());
+//                output.accept(DNLItems.CRYO_BARREL.get());
+//                output.accept(DNLItems.PYRO_BARREL.get());
+//                output.accept(DNLItems.CALTROP_BARREL.get());
+
+                // Potion Barrels
+//                try {
+//                    BuiltInRegistries.MOB_EFFECT.forEach(effect -> {
+//                        if (effect == null) return;
+//                        ItemStack stack = DNLItems.POTION_BARREL.get().getDefaultInstance();
+//                        CompoundTag beTag = new CompoundTag();
+//                        ResourceLocation id = BuiltInRegistries.MOB_EFFECT.getKey(effect);
+//                        if (id == null) return;
+//                        beTag.putString("Effect", id.toString());
+//                        CompoundTag tag = new CompoundTag();
+//                        tag.put("BlockEntityTag", beTag);
+//                        stack.setTag(tag);
+//                        stack.setHoverName(Component.translatable("item.dungeonnowloading.potion_barrel.effect", net.minecraft.network.chat.Component.translatable(effect.getDescriptionId())));
+//                        output.accept(stack);
+//                    });
+//                } catch (Exception ignored) {}
 
                 output.accept(DNLItems.COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.MOSSY_COBBLESTONE_PEBBLE.get());

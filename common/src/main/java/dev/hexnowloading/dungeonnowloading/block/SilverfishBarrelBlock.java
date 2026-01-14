@@ -15,11 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * Barrel that bursts out silverfish on detonation.
- *
- * Note: model/texture are handled by assets; this class is only behavior.
- */
 public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
 
     public SilverfishBarrelBlock(Properties props) {
@@ -34,8 +29,9 @@ public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
     @Override
     public void onImmediateTrigger(Level level, BlockPos pos, LivingEntity owner, TriggerCause cause) {
         if (!(level instanceof ServerLevel sl)) return;
-        // For immediate triggers (redstone / flint&steel / flaming projectile), detonate right away.
+        // Immediate triggers: detonate behavior + clear the barrel block
         detonateNow(sl, pos, owner);
+        sl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
     }
 
     @Override
@@ -45,7 +41,6 @@ public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
     }
 
     private void detonateNow(ServerLevel level, BlockPos pos, LivingEntity owner) {
-        // Small non-destructive pop to sell the burst
         level.explode(null,
                 pos.getX() + 0.5D,
                 pos.getY() + 0.9D,
@@ -65,9 +60,6 @@ public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
                 0.25,
                 0.25,
                 0.03D);
-
-        // Ensure the barrel is gone immediately even if called from non-fuse triggers
-        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
     }
 
     private void emitSilverfishBurst(ServerLevel level, BlockPos pos, RandomSource random, int count) {
@@ -81,14 +73,14 @@ public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
 
             fish.moveTo(sx, sy, sz, random.nextFloat() * 360.0F, 0.0F);
 
-            // Outward velocity with a small upward bias
+
             Vec3 dir = randomSphereDirection(random, 0.35D);
             double speed = 0.55D + random.nextDouble() * 0.25D;
             fish.setDeltaMovement(dir.scale(speed));
 
             level.addFreshEntity(fish);
 
-            // A couple quick particles per spawn
+
             level.sendParticles(ParticleTypes.POOF, sx, sy + 0.5D, sz, 1, 0.02, 0.02, 0.02, 0.0D);
         }
     }
