@@ -2,7 +2,6 @@ package dev.hexnowloading.dungeonnowloading.entity.ai.garhold;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity.GarholdState;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -13,7 +12,7 @@ import java.util.List;
 
 public class GarholdDiveCaptureGoal extends Goal {
 
-    private static final double DROP_PER_TICK = 8.0 / (1.5 * 10.0);
+    private static final double DROP_PER_TICK = 16.0 / (1.5 * 10.0);
 
     // how generous the grab feels
     private static final double HIT_INFLATE = 0.35;
@@ -68,11 +67,6 @@ public class GarholdDiveCaptureGoal extends Goal {
     @Override
     public void tick() {
         diveTicks++;
-
-        LivingEntity target = mob.getTarget();
-        if (target != null) {
-            mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
-        }
 
         mob.getNavigation().stop();
 

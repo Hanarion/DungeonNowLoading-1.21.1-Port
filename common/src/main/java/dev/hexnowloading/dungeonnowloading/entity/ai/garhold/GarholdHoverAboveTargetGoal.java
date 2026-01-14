@@ -14,7 +14,7 @@ import java.util.EnumSet;
 public class GarholdHoverAboveTargetGoal extends Goal {
 
     private static final float LOCK_SPEED = 0.07F;
-    private static final int DIVE_LOCK_TICKS = reducedTickDelay(40); // 2 seconds
+    private static final int DIVE_LOCK_TICKS = reducedTickDelay(10); // 2 seconds
 
     private static final double SIDE_RANGE = 2.0;
     private static final double SIDE_RANGE_SQ = SIDE_RANGE * SIDE_RANGE;
@@ -89,7 +89,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
 
         Desired desired = computeDesired(target);
 
-        mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+        mob.getLookControl().setLookAt(target, 10.0F, 10.0F);
 
         double dx = desired.pos.x - mob.getX();
         double dz = desired.pos.z - mob.getZ();

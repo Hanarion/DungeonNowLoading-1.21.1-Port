@@ -31,7 +31,8 @@ public class EntityStates {
     public static final EntityDataSerializer<SeepingSoulEntity.SeepingSoulAnimationState> SEEPING_SOUL_ANIMATION_STATE;
     public static final EntityDataSerializer<GarholdEntity.GarholdState> GARHOLD_STATE;
     public static final EntityDataSerializer<GarholdEntity.GarholdAnimationState> GARHOLD_ANIMATION_STATE;
-    public static final EntityDataSerializer<GarholdEntity.GarholdGateAnimationState> GARHOLD_GATE_ANIMATION_STATE;
+    public static final EntityDataSerializer<GarholdEntity.GarholdBottomGateAnimationState> GARHOLD_GATE_ANIMATION_STATE;
+    public static final EntityDataSerializer<GarholdEntity.GarholdSideGateAnimationState> GARHOLD_SIDE_GATE_ANIMATION_STATE;
 
     static {
         CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
@@ -53,7 +54,8 @@ public class EntityStates {
         SEEPING_SOUL_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SeepingSoulEntity.SeepingSoulAnimationState.class);
         GARHOLD_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdState.class);
         GARHOLD_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdAnimationState.class);
-        GARHOLD_GATE_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdGateAnimationState.class);
+        GARHOLD_GATE_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdBottomGateAnimationState.class);
+        GARHOLD_SIDE_GATE_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdSideGateAnimationState.class);
 
         EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
@@ -75,5 +77,6 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(GARHOLD_STATE);
         EntityDataSerializers.registerSerializer(GARHOLD_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(GARHOLD_GATE_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(GARHOLD_SIDE_GATE_ANIMATION_STATE);
     }
 }
