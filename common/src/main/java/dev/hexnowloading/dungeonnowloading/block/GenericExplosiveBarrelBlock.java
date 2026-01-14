@@ -12,6 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -82,19 +84,13 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
             int next = fuse - 1;
             level.setBlock(pos, state.setValue(FUSE, next), Block.UPDATE_ALL);
             if (next == 0) {
-                this.onDetonate(level, pos, null);
-                if (this.replaceWithFireOnDetonate(state)) {
-                    level.setBlock(pos, net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState(), Block.UPDATE_ALL);
-                } else {
-                    level.removeBlock(pos, false);
-                }
+                this.handleDetonation(level, pos, null, state);
             } else {
                 level.scheduleTick(pos, this, 1);
             }
         }
     }
 
-    /** Subclasses may override to place fire at the barrel position on detonation. Default false (remove). */
     protected boolean replaceWithFireOnDetonate(BlockState state) {
         return false;
     }
@@ -163,12 +159,35 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         this.prime(level, pos, owner, fuseTicks);
     }
 
-    protected void detonateNow(Level level, BlockPos pos, LivingEntity owner, TriggerCause cause) {
+    private void handleDetonation(Level level, BlockPos pos, LivingEntity owner, BlockState state) {
+        this.removeNearbyArrows(level, pos);
+        this.onDetonate(level, pos, owner);
+        if (this.replaceWithFireOnDetonate(state)) {
+            level.setBlock(pos, net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState(), Block.UPDATE_ALL);
+        } else {
+            level.removeBlock(pos, false);
+        }
+    }
+
+    private void removeNearbyArrows(Level level, BlockPos pos) {
+        if (!(level instanceof ServerLevel sl)) return;
+        double x = pos.getX() + 0.5D;
+        double y = pos.getY() + 0.5D;
+        double z = pos.getZ() + 0.5D;
+        AABB box = new AABB(x - 0.5D, y - 0.5D, z - 0.5D, x + 0.5D, y + 0.5D, z + 0.5D);
+        for (AbstractArrow arrow : sl.getEntitiesOfClass(AbstractArrow.class, box)) {
+            arrow.discard();
+        }
+    }
+
+    protected void detonateNow(Level level, BlockPos pos, LivingEntity owner, TriggerCause cause, Projectile projectile) {
         if (level.isClientSide) return;
         BlockState state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof GenericExplosiveBarrelBlock barrel)) {
             return;
         }
+        projectile.discard();
+        barrel.removeNearbyArrows(level, pos);
         barrel.onDetonate(level, pos, owner);
         if (barrel.replaceWithFireOnDetonate(state)) {
             level.setBlock(pos, net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState(), Block.UPDATE_ALL);
@@ -177,7 +196,6 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         }
     }
 
-    // Called when fuse reaches zero (subclass decides what happens)
     protected abstract void onDetonate(Level level, BlockPos pos, LivingEntity owner);
 
     @Override
@@ -185,6 +203,7 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         if (!level.isClientSide) {
             BlockState fallingState = fallingBlockEntity.getBlockState();
             if (fallingState.getBlock() instanceof GenericExplosiveBarrelBlock barrel) {
+                barrel.removeNearbyArrows(level, pos);
                 barrel.onDetonate(level, pos, null);
             }
         }
@@ -196,11 +215,9 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
             BlockPos bpos = hit.getBlockPos();
             LivingEntity owner = projectile.getOwner() instanceof LivingEntity l ? l : null;
             if (projectile.isOnFire() && projectile.mayInteract(level, bpos)) {
-                this.detonateNow(level, bpos, owner, TriggerCause.PROJECTILE_FLAMING_ARROW);
-                projectile.discard();
+                this.detonateNow(level, bpos, owner, TriggerCause.PROJECTILE_FLAMING_ARROW, projectile);
             } else {
                 this.onImmediateTrigger(level, bpos, owner, TriggerCause.PROJECTILE_NORMAL_ARROW);
-                projectile.discard();
             }
         }
     }
@@ -227,6 +244,7 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         if (!level.isClientSide) {
             BlockState fallingState = fallingBlockEntity.getBlockState();
             if (fallingState.getBlock() instanceof GenericExplosiveBarrelBlock barrel) {
+                barrel.removeNearbyArrows(level, pos);
                 barrel.onDetonate(level, pos, null);
             }
         }

@@ -43,7 +43,6 @@ public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
     protected void onDetonate(Level level, BlockPos pos, LivingEntity owner) {
         if (!(level instanceof ServerLevel sl)) return;
         detonateNow(sl, pos, owner);
-        level.removeBlock(pos, false);
     }
 
     private void detonateNow(ServerLevel level, BlockPos pos, LivingEntity owner) {
