@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.GarholdAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -80,7 +81,24 @@ public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> 
 
     @Override
     public void setupAnim(GarholdEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        this.root().getAllParts().forEach(ModelPart::resetPose);
 
+        this.animate(entity.flyAnimationState, GarholdAnimation.FLY, ageInTicks);
+        this.animate(entity.detachAnimationState, GarholdAnimation.DETACH, ageInTicks);
+        this.animate(entity.chargeDiveAnimationState, GarholdAnimation.CHARGE_DIVE, ageInTicks);
+        this.animate(entity.landDiveAnimationState, GarholdAnimation.LAND_DIVE, ageInTicks);
+        this.animate(entity.closingGateAnimationState, GarholdAnimation.CLOSING_GATE, ageInTicks);
+        this.animate(entity.sideCaptureAnimationState, GarholdAnimation.SIDE_CAPTURE, ageInTicks);
+        this.animate(entity.ascendAnimationState, GarholdAnimation.ASCEND, ageInTicks);
+        this.animate(entity.idleHangAnimationState, GarholdAnimation.IDLE_HANGING, ageInTicks);
+        this.animate(entity.reattachAnimationState, GarholdAnimation.REATTACH, ageInTicks);
+
+        this.animate(entity.bottomOpenAnimationState, GarholdAnimation.BOTTOM_OPEN, ageInTicks);
+        this.animate(entity.bottomOpenedAnimationState, GarholdAnimation.BOTTON_OPENED, ageInTicks);
+        this.animate(entity.bottomClosedAnimationState, GarholdAnimation.BOTTOM_CLOSED, ageInTicks);
+        this.animate(entity.sideOpenedAnimationState, GarholdAnimation.SIDE_OPENED, ageInTicks);
+        this.animate(entity.sideClosedAnimationState, GarholdAnimation.SIDE_CLOSED, ageInTicks);
+        this.animate(entity.sideOpenAnimationState, GarholdAnimation.SIDE_OPENING, ageInTicks);
     }
 
     @Override

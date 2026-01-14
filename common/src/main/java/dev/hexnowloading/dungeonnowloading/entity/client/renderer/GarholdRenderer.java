@@ -17,8 +17,9 @@ public class GarholdRenderer<T extends GarholdEntity> extends MobRenderer<T, Gar
     }
 
     @Override
-    public void render(GarholdEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        super.render((T) entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+    public void render(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+        if (entity.isNoAnimation()) return;
+        super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
     @Override

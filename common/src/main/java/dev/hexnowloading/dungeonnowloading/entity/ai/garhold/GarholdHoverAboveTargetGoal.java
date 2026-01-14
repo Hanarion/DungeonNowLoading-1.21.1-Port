@@ -14,6 +14,7 @@ import java.util.EnumSet;
 public class GarholdHoverAboveTargetGoal extends Goal {
 
     private static final float LOCK_SPEED = 0.07F;
+    private static final int DIVE_LOCK_TICKS = reducedTickDelay(40); // 2 seconds
 
     private static final double SIDE_RANGE = 2.0;
     private static final double SIDE_RANGE_SQ = SIDE_RANGE * SIDE_RANGE;
@@ -21,6 +22,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
     private static final double Y_LOCK_TOL = 0.75;
 
     private static final double VERTICAL_SWEEP_STEP = 0.25;
+
 
     private final GarholdEntity mob;
 
@@ -38,6 +40,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
 
     private boolean locked = false;
     private int repathCooldown = 0;
+    private int lockedTicks = 0;
 
     public GarholdHoverAboveTargetGoal(GarholdEntity mob,
                                        double speed,
@@ -68,6 +71,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
     public void start() {
         repathCooldown = 0;
         locked = false;
+        lockedTicks = 0;
 
         LivingEntity t = mob.getTarget();
         if (t != null) {
@@ -76,6 +80,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         }
         lastHorDistSq = Double.MAX_VALUE;
     }
+
 
     @Override
     public void tick() {
@@ -113,21 +118,53 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         if (desired.forcePath) {
             locked = false;
             tickPathfind(desired.pos.x, desired.pos.y, desired.pos.z, horDistSq, dy, LOCK_DIST_SQ);
+            lockedTicks = 0;
             return;
         }
 
         if (!locked) {
             tickPathfind(desired.pos.x, desired.pos.y, desired.pos.z, horDistSq, dy, LOCK_DIST_SQ);
+
+            lockedTicks = 0;
             return;
         }
 
         tickLock(dx, dy, dz);
 
+        if (tryTriggerDive(target)) {
+            return;
+        }
+
         if (tooFar || (gapIncreasing && desiredMoving)) {
             locked = false;
             repathCooldown = 0;
         }
+
     }
+
+    private boolean tryTriggerDive(LivingEntity target) {
+        // Only count time when we're truly locked and we're in hover-above mode (not side capture)
+        boolean hoveringAbove = !shouldSideCapture(target);
+
+        if (locked && hoveringAbove) {
+            lockedTicks++;
+            if (lockedTicks >= DIVE_LOCK_TICKS) {
+                mob.getNavigation().stop();
+
+                locked = false;
+                repathCooldown = 0;
+                lockedTicks = 0;
+
+                mob.setGarholdState(GarholdState.DIVE);
+                return true;
+            }
+        } else {
+            lockedTicks = 0;
+        }
+
+        return false;
+    }
+
 
     private Desired computeDesired(LivingEntity target) {
         if (!shouldSideCapture(target)) {

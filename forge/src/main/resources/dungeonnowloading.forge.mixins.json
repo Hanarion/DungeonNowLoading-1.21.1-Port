@@ -45,6 +45,7 @@
         "client.SituationalMusicMixin",
         "client.MinecraftClientTickMixin",
         "client.MusicManagerMixin",
+        "client.LivingEntityRendererMixin",
         "MixinTitleScreen",
         "MaxHealthAttributeMixin"
     ],
