@@ -186,7 +186,7 @@ public class DNLItems {
 
     // SPAWN EGG
     //public static final Supplier<Item> WINDSTONE_SPAWNEGG = ITEMS.register("windstone_spawn_egg", () -> new SpawnEggItem(SkyislandEntityTypes.WINDSTONE.get(), 0xF6B201, 0xA80E0E, new Item.Properties()));
-    public static final Supplier<Item> CHAOS_SPAWNER_SPAWNEGG = register("spawn_egg_chaos_sponder", Services.ITEM.makeSpawnEgg(DNLEntityTypes.CHAOS_SPAWNER::get, 0x182c39, 0x9abdd6, new Item.Properties().rarity(Rarity.EPIC)));
+    public static final Supplier<Item> CHAOS_SPAWNER_SPAWNEGG = register("spawn_egg_chaos_spawner", Services.ITEM.makeSpawnEgg(DNLEntityTypes.CHAOS_SPAWNER::get, 0x182c39, 0x9abdd6, new Item.Properties().rarity(Rarity.EPIC)));
     //public static final Supplier<Item> FAIRKEEPER_SPAWNEGG = register("spawn_egg_fairkeeper", Services.ITEM.makeSpawnEgg(DNLEntityTypes.FAIRKEEPER_BOROS::get, 0x6a6d68, 0xff8800, new Item.Properties().rarity(Rarity.EPIC)));
     //public static final Supplier<Item> FAIRKEEPER_OUROS_SPAWNEGG = register("spawn_egg_fairkeeper_ouros", Services.ITEM.makeSpawnEgg(DNLEntityTypes.FAIRKEEPER_OUROS::get, 0x6a6d68, 0xff8800, new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> HOLLOW_SPAWNEGG = register("spawn_egg_hollow", Services.ITEM.makeSpawnEgg(DNLEntityTypes.HOLLOW::get, 0x53455a, 0xf5d5e0, new Item.Properties().rarity(Rarity.COMMON)));

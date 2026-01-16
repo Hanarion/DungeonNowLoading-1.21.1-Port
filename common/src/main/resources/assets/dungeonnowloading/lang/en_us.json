@@ -350,7 +350,7 @@
   "item.dungeonnowloading.item_scraps.tooltip.reconstruct.detail1": "To repair, Use on Mending Table with:",
   "item.dungeonnowloading.item_scraps.tooltip.reconstruct.detail2": "Mendstone/Durite or %s",
   "enchantment.dungeonnowloading.break_protection": "Break Protection",
-  "enchantment.dungeonnowloading.break_protection.desc": "Upon item breaking, turns into repairable Item Scraps"
+  "enchantment.dungeonnowloading.break_protection.desc": "Upon item breaking, turns into repairable Item Scraps",
   "item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description": "Mining Diamond ore drops Durite instead of Diamonds. Drop Count affected by Fortune.",
   "block.dungeonnowloading.caltrop_barrel": "Caltrop Barrel",
   "item.dungeonnowloading.wisprod": "Wisprod",

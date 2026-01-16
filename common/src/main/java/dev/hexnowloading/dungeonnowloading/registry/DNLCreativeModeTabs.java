@@ -66,8 +66,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.MUSIC_DISC_OUROS.get());
                 output.accept(DNLItems.MUSIC_DISC_BOROS.get());
                 output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
-                // Items - Tools
-                output.accept(DNLItems.MENDSTONE_PICKAXE.get());
 
                 // Blocks
 
@@ -180,8 +178,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());
                 output.accept(DNLItems.TEMPLE_OF_DUALITY_TROPHY.get());
-
-                output.accept(DNLItems.MENDING_TABLE.get());
 
                 // Azuro Set
                 /*output.accept(DNLItems.AZURO_OAK_LOG.get());
