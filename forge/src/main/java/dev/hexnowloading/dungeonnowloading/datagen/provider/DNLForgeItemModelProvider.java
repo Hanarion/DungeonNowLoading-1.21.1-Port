@@ -48,6 +48,8 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         booleanPropertyItem(DNLItems.COPPER_DETONATOR.get(), "mode_switch", "copper_detonator", "copper_detonator_switched");
         booleanPropertyItem(DNLItems.REPULSOR.get(), "golden_mode", "repulsor", "repulsor_golden");
         PlayerStatueItemWithDisplay(DNLItems.PLAYER_STATUE.get());
+        GauntletItemWithDisplay(DNLItems.GAUNTLET.get());
+        builtinEntityItem(DNLItems.GAUNTLET_VAULT.get());
     }
 
     private void simpleItem(Item item) {
@@ -204,9 +206,85 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
 
     private void builtinEntityItem(Item item) {
         String name = ForgeRegistries.ITEMS.getKey(item).getPath();
-        // Don’t validate parent; builtin/entity is a virtual model
-        getBuilder(ITEM_FOLDER + "/" + name)
+
+        ItemModelBuilder b = getBuilder(ITEM_FOLDER + "/" + name)
+                // builtin/entity is virtual → UncheckedModelFile
                 .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"));
+
+        // Apply vanilla "item/block" default transforms
+        b.transforms()
+                .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)
+                .rotation(75, 45, 0)
+                .translation(0f, 2.5f, 0f)
+                .scale(0.375f, 0.375f, 0.375f)
+                .end()
+                .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND)
+                .rotation(75, 45, 0)
+                .translation(0f, 2.5f, 0f)
+                .scale(0.375f, 0.375f, 0.375f)
+                .end()
+                .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
+                .rotation(0, 45, 0)
+                .scale(0.4f, 0.4f, 0.4f)
+                .end()
+                .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND)
+                .rotation(0, 225, 0)
+                .scale(0.4f, 0.4f, 0.4f)
+                .end()
+                .transform(ItemDisplayContext.GROUND)
+                .translation(0f, 3f, 0f)
+                .scale(0.25f, 0.25f, 0.25f)
+                .end()
+                .transform(ItemDisplayContext.GUI)
+                .rotation(30, 225, 0)
+                .scale(0.625f, 0.625f, 0.625f)
+                .end()
+                .transform(ItemDisplayContext.FIXED)
+                .scale(0.5f, 0.5f, 0.5f)
+                .end()
+                .end();
+    }
+
+    private void GauntletItemWithDisplay(Item item) {
+        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+
+        ItemModelBuilder b = getBuilder(ITEM_FOLDER + "/" + name)
+                // builtin/entity is virtual → UncheckedModelFile
+                .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"));
+
+        // Apply vanilla "item/block" default transforms
+        b.transforms()
+                .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)
+                .rotation(75, 45, 0)
+                .translation(0f, 2.5f, 0f)
+                .scale(0.375f, 0.375f, 0.375f)
+                .end()
+                .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND)
+                .rotation(75, 45, 0)
+                .translation(0f, 2.5f, 0f)
+                .scale(0.375f, 0.375f, 0.375f)
+                .end()
+                .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
+                .rotation(0, 45, 0)
+                .scale(0.4f, 0.4f, 0.4f)
+                .end()
+                .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND)
+                .rotation(0, 225, 0)
+                .scale(0.4f, 0.4f, 0.4f)
+                .end()
+                .transform(ItemDisplayContext.GROUND)
+                .translation(0f, 3f, 0f)
+                .scale(0.25f, 0.25f, 0.25f)
+                .end()
+                .transform(ItemDisplayContext.GUI)
+                .translation(0f, -1f, 0f)
+                .rotation(30, 225, 0)
+                .scale(0.5f, 0.5f, 0.5f)
+                .end()
+                .transform(ItemDisplayContext.FIXED)
+                .scale(0.5f, 0.5f, 0.5f)
+                .end()
+                .end();
     }
 
     private void PlayerStatueItemWithDisplay(Item item) {

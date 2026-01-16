@@ -1,23 +1,30 @@
 package dev.hexnowloading.dungeonnowloading;
 
+import dev.hexnowloading.dungeonnowloading.block.entity.PotionBarrelBlockEntity;
 import dev.hexnowloading.dungeonnowloading.events.DNLFabricBlockEvents;
 import dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
+import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
 import dev.hexnowloading.dungeonnowloading.server.entity.DNLFabricEntities;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
-import dev.hexnowloading.dungeonnowloading.platform.Services;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.function.Supplier;
 
@@ -66,6 +73,27 @@ public class DNLFabric implements ModInitializer {
             PatronRegistry.initOrReload(server);
         });
 
+        registerBlockColors();
+
+        // Register item colors so the potion barrel gets tinted in inventories/hand
+        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
+            if (tintIndex != 0) return 0xFFFFFFFF;
+            CompoundTag tag = stack.getTag();
+            if (tag == null) return 0xFFFFFFFF;
+            if (!tag.contains("BlockEntityTag", 10)) return 0xFFFFFFFF;
+            CompoundTag be = tag.getCompound("BlockEntityTag");
+            if (!be.contains("Effect", 8)) return 0xFFFFFFFF;
+            try {
+                ResourceLocation id = new ResourceLocation(be.getString("Effect"));
+                MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(id);
+                if (effect != null) {
+                    int rgb = effect.getColor();
+                    return 0xFF000000 | rgb;
+                }
+            } catch (Exception ignored) {}
+            return 0xFFFFFFFF;
+        }, DNLItems.POTION_BARREL.get());
+
         DungeonNowLoading.LOGGER.info("Hello Fabric world!");
     }
 
@@ -76,6 +104,26 @@ public class DNLFabric implements ModInitializer {
             FabricDefaultAttributeRegistry.register(type, DNLEntityTypes.getAllAttributes().get(type));
         }
     }
+
+    private void registerBlockColors() {
+        ColorProviderRegistry.BLOCK.register(
+                (state, world, pos, tintIndex) -> {
+                    if (tintIndex != 0 || world == null || pos == null) {
+                        return 0xFFFFFFFF; // no tint
+                    }
+
+                    BlockEntity be = world.getBlockEntity(pos);
+                    if (be instanceof PotionBarrelBlockEntity barrel && barrel.getEffect() != null) {
+                        int rgb = barrel.getEffect().getColor(); // 0xRRGGBB
+                        return 0xFF000000 | rgb; // force full alpha
+                    }
+
+                    return 0xFFFFFFFF;
+                },
+                DNLBlocks.POTION_BARREL.get() // your Fabric block registry object
+        );
+    }
+
 
     private void registerPackets() { }
 }

@@ -1,13 +1,12 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
-import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
-import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatueModel;
-import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatuePedestalModel;
+import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.DisabledFairkeeperChestBlockRenderer;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.FairkeeperChestBlockRenderer;
+import dev.hexnowloading.dungeonnowloading.block.client.renderer.GauntletRenderer;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.PlayerStatueRenderer;
+import dev.hexnowloading.dungeonnowloading.client.render.PayloadEntityRenderer;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepModel;
@@ -26,9 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 
-
 public class DNLForgeClientEvents {
-
 
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         // Bosses
@@ -38,6 +35,8 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(FairkeeperOurosModel.LAYER_LOCATION, FairkeeperOurosModel::createBodyLayer);
         event.registerLayerDefinition(FairkeeperOurosBodyModel.LAYER_LOCATION, FairkeeperOurosBodyModel::createBodyLayer);
         event.registerLayerDefinition(FairkeeperSerpentCallerModel.LAYER_LOCATION, FairkeeperSerpentCallerModel::createBodyLayer);
+        // Caltrop model layer used by payload renderer
+        event.registerLayerDefinition(Caltrop.LAYER_LOCATION, Caltrop::createBodyLayer);
 
         // Monsters
         event.registerLayerDefinition(HollowModel.LAYER_LOCATION, HollowModel::createBodyLayer);
@@ -51,7 +50,6 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(CopperCreepModel.LAYER_LOCATION, CopperCreepModel::createBodyLayer);
         event.registerLayerDefinition(CopperCreepButlerModel.LAYER_LOCATION, CopperCreepButlerModel::createBodyLayer);
         event.registerLayerDefinition(RepulsorModel.LAYER_LOCATION, RepulsorModel::createBodyLayer);
-
 
         // Projectiles
         event.registerLayerDefinition(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
@@ -67,6 +65,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(DisabledFairkeeperChestModel.LAYER_LOCATION, DisabledFairkeeperChestModel::createBodyLayer);
         event.registerLayerDefinition(PlayerStatueModel.LAYER_LOCATION, PlayerStatueModel::createBodyLayer);
         event.registerLayerDefinition(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
+        event.registerLayerDefinition(GauntletModel.LAYER_LOCATION, GauntletModel::createBodyLayer);
 
         // Item
         event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
@@ -74,6 +73,7 @@ public class DNLForgeClientEvents {
         // Misc
         event.registerLayerDefinition(SeepingSoulChaosSpawnerModel.LAYER_LOCATION, SeepingSoulChaosSpawnerModel::createBodyLayer);
     }
+
     public static void onRegisterRenderer(EntityRenderersEvent.RegisterRenderers event) {
         // Bosses
         event.registerEntityRenderer(DNLEntityTypes.CHAOS_SPAWNER.get(), ChaosSpawnerRenderer::new);
@@ -103,6 +103,8 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), VertexOrbProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), VertexDomainProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BORUS_ARROW.get(), BorusArrowRenderer::new);
+        // Payload entity (spawned by explosive barrels)
+        event.registerEntityRenderer(DNLEntityTypes.PAYLOAD.get(), PayloadEntityRenderer::new);
 
         // Misc
         event.registerEntityRenderer(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);
@@ -116,6 +118,7 @@ public class DNLForgeClientEvents {
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.PLAYER_STATUE.get(), PlayerStatueRenderer::new);
+        event.registerBlockEntityRenderer(DNLBlockEntityTypes.GAUNTLET.get(), GauntletRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
@@ -160,4 +163,5 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
     }
+
 }

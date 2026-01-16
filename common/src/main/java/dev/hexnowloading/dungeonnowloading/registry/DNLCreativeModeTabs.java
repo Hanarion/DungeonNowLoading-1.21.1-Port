@@ -66,6 +66,8 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.MUSIC_DISC_OUROS.get());
                 output.accept(DNLItems.MUSIC_DISC_BOROS.get());
                 output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
+                // Items - Tools
+                output.accept(DNLItems.MENDSTONE_PICKAXE.get());
 
                 // Blocks
 
@@ -92,6 +94,28 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DUNGEON_WALL_TORCH.get());
                 output.accept(DNLItems.BOOK_PILE.get());
                 output.accept(DNLItems.EXPLOSIVE_BARREL.get());
+                output.accept(DNLItems.SILVERFISH_BARREL.get());
+//                output.accept(DNLItems.CRYO_BARREL.get());
+//                output.accept(DNLItems.PYRO_BARREL.get());
+//                output.accept(DNLItems.CALTROP_BARREL.get());
+
+                // Potion Barrels
+//                try {
+//                    BuiltInRegistries.MOB_EFFECT.forEach(effect -> {
+//                        if (effect == null) return;
+//                        ItemStack stack = DNLItems.POTION_BARREL.get().getDefaultInstance();
+//                        CompoundTag beTag = new CompoundTag();
+//                        ResourceLocation id = BuiltInRegistries.MOB_EFFECT.getKey(effect);
+//                        if (id == null) return;
+//                        beTag.putString("Effect", id.toString());
+//                        CompoundTag tag = new CompoundTag();
+//                        tag.put("BlockEntityTag", beTag);
+//                        stack.setTag(tag);
+//                        stack.setHoverName(Component.translatable("item.dungeonnowloading.potion_barrel.effect", net.minecraft.network.chat.Component.translatable(effect.getDescriptionId())));
+//                        output.accept(stack);
+//                    });
+//                } catch (Exception ignored) {}
+
                 output.accept(DNLItems.COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.MOSSY_COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.IRON_INGOT_PILE.get());
@@ -157,6 +181,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());
                 output.accept(DNLItems.TEMPLE_OF_DUALITY_TROPHY.get());
 
+                output.accept(DNLItems.MENDING_TABLE.get());
 
                 // Azuro Set
                 /*output.accept(DNLItems.AZURO_OAK_LOG.get());

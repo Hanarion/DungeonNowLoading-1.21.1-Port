@@ -3,30 +3,26 @@ package dev.hexnowloading.dungeonnowloading;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClient;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClientEvents;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
-import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
-import dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu;
-import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.common.extensions.IForgeMenuType;
+import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
+import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FireBlock;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod(DungeonNowLoading.MOD_ID)
 public class DNLForge {
@@ -52,6 +48,14 @@ public class DNLForge {
             addModClientListeners(bus);
             // run init when registries are ready
             bus.addListener((FMLClientSetupEvent event) -> DNLForgeClient.init());
+            // set block render layers (Forge 1.20.1 API)
+            bus.addListener((FMLClientSetupEvent event) -> {
+                event.enqueueWork(() -> {
+                    try {
+                        ItemBlockRenderTypes.setRenderLayer(DNLBlocks.POTION_BARREL.get(), RenderType.translucent());
+                    } catch (Throwable ignored) {}
+                });
+            });
         }
 
         addForgeListeners();
@@ -89,6 +93,7 @@ public class DNLForge {
                     () -> PatronRegistry.initOrReload(e.getServer()),
                     net.minecraft.Util.backgroundExecutor()
             );
+            // Data registry reload removed — not present in this build
         });
 
         // Optional: /dnlpatrons reload for admins
