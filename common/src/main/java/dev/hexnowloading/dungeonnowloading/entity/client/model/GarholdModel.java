@@ -90,15 +90,17 @@ public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> 
         this.animate(entity.closingGateAnimationState, GarholdAnimation.CLOSING_GATE, ageInTicks);
         this.animate(entity.sideCaptureAnimationState, GarholdAnimation.SIDE_CAPTURE, ageInTicks);
         this.animate(entity.ascendAnimationState, GarholdAnimation.ASCEND, ageInTicks);
-        this.animate(entity.idleHangAnimationState, GarholdAnimation.IDLE_HANGING, ageInTicks);
-        this.animate(entity.reattachAnimationState, GarholdAnimation.REATTACH, ageInTicks);
+        this.animate(entity.idleHangAnimationState, GarholdAnimation.IDLE_HANGED, ageInTicks);
+        this.animate(entity.reattachAnimationState, GarholdAnimation.RE_ATTACH, ageInTicks);
 
         this.animate(entity.bottomOpenAnimationState, GarholdAnimation.BOTTOM_OPEN, ageInTicks);
         this.animate(entity.bottomOpenedAnimationState, GarholdAnimation.BOTTON_OPENED, ageInTicks);
         this.animate(entity.bottomClosedAnimationState, GarholdAnimation.BOTTOM_CLOSED, ageInTicks);
+        this.animate(entity.bottomCloseAnimationState, GarholdAnimation.BOTTOM_CLOSE, ageInTicks);
         this.animate(entity.sideOpenedAnimationState, GarholdAnimation.SIDE_OPENED, ageInTicks);
         this.animate(entity.sideClosedAnimationState, GarholdAnimation.SIDE_CLOSED, ageInTicks);
-        this.animate(entity.sideOpenAnimationState, GarholdAnimation.SIDE_OPENING, ageInTicks);
+        this.animate(entity.sideOpenAnimationState, GarholdAnimation.SIDE_OPEN, ageInTicks);
+        this.animate(entity.sideCloseAnimationState, GarholdAnimation.SIDE_CLOSE, ageInTicks);
 
         float yawRad = netHeadYaw * ((float)Math.PI / 180F);
 

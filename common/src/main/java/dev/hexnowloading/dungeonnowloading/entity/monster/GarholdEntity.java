@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.monster;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.GarholdDiveCaptureGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.GarholdHoverAboveTargetGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.GarholdReturnToChainGoal;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.GarholdAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
@@ -13,27 +14,41 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class GarholdEntity extends Monster {
 
-    private static final EntityDataAccessor<GarholdState> STATE = SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_STATE);
-    private static final EntityDataAccessor<GarholdAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_ANIMATION_STATE);
-    private static final EntityDataAccessor<GarholdBottomGateAnimationState> BOTTOM_GATE_ANIMATION_STATE = SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_GATE_ANIMATION_STATE);
-    private static final EntityDataAccessor<GarholdSideGateAnimationState> SIDE_GATE_ANIMATION_STATE = SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_SIDE_GATE_ANIMATION_STATE);
+    private static final EntityDataAccessor<GarholdState> STATE =
+            SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_STATE);
+    private static final EntityDataAccessor<GarholdAnimationState> ANIMATION_STATE =
+            SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_ANIMATION_STATE);
+    private static final EntityDataAccessor<GarholdBottomGateAnimationState> BOTTOM_GATE_ANIMATION_STATE =
+            SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_GATE_ANIMATION_STATE);
+    private static final EntityDataAccessor<GarholdSideGateAnimationState> SIDE_GATE_ANIMATION_STATE =
+            SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_SIDE_GATE_ANIMATION_STATE);
+
+    private static final UUID CAPTURE_KB_MOD_UUID =
+            UUID.fromString("c84d8d2a-1a5f-4b0c-9a4c-6c2c4d9b6a21");
+    private static final AttributeModifier CAPTURE_KB_MOD =
+            new AttributeModifier(CAPTURE_KB_MOD_UUID, "Garhold capture knockback", 1.0, AttributeModifier.Operation.ADDITION);
 
     private AnimationChainer<GarholdAnimationState> animationChainer = new AnimationChainer<>();
     private AnimationChainer<GarholdBottomGateAnimationState> bottomGateAnimationChainer = new AnimationChainer<>();
@@ -50,15 +65,20 @@ public class GarholdEntity extends Monster {
     public final AnimationState reattachAnimationState = new AnimationState();
 
     public final AnimationState bottomOpenAnimationState = new AnimationState();
+    public final AnimationState bottomCloseAnimationState = new AnimationState();
     public final AnimationState bottomOpenedAnimationState = new AnimationState();
     public final AnimationState bottomClosedAnimationState = new AnimationState();
+
     public final AnimationState sideOpenedAnimationState = new AnimationState();
     public final AnimationState sideClosedAnimationState = new AnimationState();
     public final AnimationState sideOpenAnimationState = new AnimationState();
+    public final AnimationState sideCloseAnimationState = new AnimationState();
 
     // --- Ascend movement (server tick based) ---
     private boolean ascendLiftActive = false;
     private int ascendLiftTicksLeft = 0;
+
+    private BlockPos chainAnchor;
 
     private static final float ASCEND_LIFT_START_PROGRESS = 0.25f;
     private static final int ASCEND_LIFT_TICKS = 10;
@@ -73,11 +93,10 @@ public class GarholdEntity extends Monster {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new GarholdDiveCaptureGoal(this));
         this.goalSelector.addGoal(2, new GarholdHoverAboveTargetGoal(this, 1.5F, 6.0, 3.0, 14.0));
+        this.goalSelector.addGoal(3, new GarholdReturnToChainGoal(this));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
-
         super.registerGoals();
     }
 
@@ -129,15 +148,21 @@ public class GarholdEntity extends Monster {
             return;
         }
 
-        if (this.entityData.get(ANIMATION_STATE).equals(GarholdAnimationState.NONE)) {
-            this.playFlyAnimation();
-            this.playOpenedBottomAnimation();
-            this.playOpenedSideAnimation();
-        }
-
         animationChainer.tick(this::transitionTo);
         bottomGateAnimationChainer.tick(this::transitionTo);
         sideGateAnimationChainer.tick(this::transitionTo);
+
+        if (this.entityData.get(ANIMATION_STATE).equals(GarholdAnimationState.NONE)) {
+            if (this.entityData.get(STATE).equals(GarholdState.CHAINED)) {
+                this.playIdleHanging();
+                this.playClosedSideAnimation();
+                this.playedClosedBottomAnimation();
+            } else {
+                this.playFlyAnimation();
+                this.playOpenedBottomAnimation(true);
+                this.playOpenedSideAnimation(true);
+            }
+        }
     }
 
     @Override
@@ -160,20 +185,31 @@ public class GarholdEntity extends Monster {
         }
     }
 
-
     public boolean hasCapturedPlayer() {
         return !this.getPassengers().isEmpty();
     }
 
     public void beginCapture(Player player) {
-
         // Kick them off whatever they were riding
         if (player.isPassenger()) {
             player.stopRiding();
         }
 
+        this.applyCaptureAttributes();
+        this.clearNearbyTargets(player);
         player.startRiding(this, true);
         playClosingGateAnimation();
+    }
+
+    @Override
+    protected void removePassenger(Entity passenger) {
+        super.removePassenger(passenger);
+
+        if (!this.level().isClientSide) {
+            if (this.getPassengers().isEmpty()) {
+                this.clearCaptureAttributes();
+            }
+        }
     }
 
     @Override
@@ -205,7 +241,6 @@ public class GarholdEntity extends Monster {
         moveFunction.accept(passenger, seat.x, seat.y, seat.z);
     }
 
-
     @Override
     public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
         return false;
@@ -213,6 +248,51 @@ public class GarholdEntity extends Monster {
 
     @Override
     protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
+    }
+
+    private void applyCaptureAttributes() {
+        AttributeInstance kb = this.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+        if (kb != null && !kb.hasModifier(CAPTURE_KB_MOD)) {
+            kb.addTransientModifier(CAPTURE_KB_MOD);
+        }
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        Entity attacker = source.getEntity();
+
+        if (attacker instanceof Player p && this.hasPassenger(p)) {
+            amount *= 0.5f;
+        }
+
+        return super.hurt(source, amount);
+    }
+
+    private void clearCaptureAttributes() {
+        AttributeInstance kb = this.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+        if (kb != null && kb.hasModifier(CAPTURE_KB_MOD)) {
+            kb.removeModifier(CAPTURE_KB_MOD_UUID);
+        }
+    }
+
+    private void clearNearbyTargets(Player player) {
+        double r = 48.0; // tweak radius
+        AABB box = player.getBoundingBox().inflate(r);
+        for (Mob mob : this.level().getEntitiesOfClass(Mob.class, box, m -> m.getTarget() == player)) {
+            mob.setTarget(null);
+        }
+    }
+
+    public BlockPos getChainAnchor() {
+        return chainAnchor;
+    }
+
+    public void setChainAnchor(BlockPos pos) {
+        chainAnchor = pos;
+    }
+
+    public boolean isChainBlock(BlockPos pos) {
+        return this.level().getBlockState(pos).is(Blocks.CHAIN);
     }
 
     public GarholdState getGarholdState() {
@@ -231,49 +311,141 @@ public class GarholdEntity extends Monster {
         return this.entityData.get(ANIMATION_STATE).equals(GarholdAnimationState.NONE);
     }
 
-    private void playIdleOrIdleBreak() {
-            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdAnimationState.FLY, GarholdAnimationDuration.FLY, null, this::playIdleOrIdleBreak));
-    }
 
     public void playFlyAnimation() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdAnimationState.FLY, GarholdAnimationDuration.FLY, null, this::playIdleOrIdleBreak));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.FLY_2,
+                GarholdAnimationDuration.FLY
+        ));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.FLY,
+                GarholdAnimationDuration.FLY
+        ));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.FLY_2,
+                GarholdAnimationDuration.FLY,
+                null,
+                this::playIdleOrIdleBreak
+        ));
+    }
+
+    private void playIdleOrIdleBreak() {
+        if (this.isGarholdState(GarholdState.ATTACHING)) {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.REATTACH,
+                    GarholdAnimationDuration.REATTACH,
+                    null,
+                    () -> {
+                        this.setGarholdState(GarholdState.CHAINED);
+                        this.playIdleHanging();
+                    }
+            ));
+        } else {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.FLY,
+                    GarholdAnimationDuration.FLY,
+                    null,
+                    this::playIdleOrIdleBreak2
+            ));
+        }
+    }
+
+    private void playIdleOrIdleBreak2() {
+        if (this.isGarholdState(GarholdState.ATTACHING)) {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.REATTACH,
+                    GarholdAnimationDuration.REATTACH,
+                    null,
+                    () -> {
+                        this.setGarholdState(GarholdState.CHAINED);
+                        this.playIdleHanging();
+                    }
+            ));
+        } else {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.FLY_2,
+                    GarholdAnimationDuration.FLY,
+                    null,
+                    this::playIdleOrIdleBreak
+            ));
+        }
+    }
+
+    private void playIdleHanging() {
+        if (this.isGarholdState(GarholdState.CHAINED)) {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.IDLE_HANGING,
+                    GarholdAnimationDuration.IDLE_HANGING,
+                    null,
+                    this::playIdleHanging
+            ));
+        } else if (this.isGarholdState(GarholdState.DETACHING)) {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.DETACH,
+                    GarholdAnimationDuration.DETACH,
+                    null,
+                    () -> {
+                        this.setGarholdState(GarholdState.FLYING);
+                        this.playIdleOrIdleBreak();
+                    }
+            ));
+        } else {
+            playIdleOrIdleBreak();
+        }
     }
 
     public void playIdleHangingAnimation() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(GarholdAnimationState.IDLE_HANGING, GarholdAnimationDuration.IDLE_HANGING));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                GarholdAnimationState.IDLE_HANGING,
+                GarholdAnimationDuration.IDLE_HANGING
+        ));
     }
 
     public void playChargeDiveWithProgress(BiConsumer<GarholdAnimationState, Float> onProgress, Runnable onComplete) {
-        this.playCloseBottomAnimation();
+        this.playedClosedBottomAnimation();
         this.playClosedSideAnimation();
+
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdAnimationState.CHARGE_DIVE, GarholdAnimationDuration.CHARGE_DIVE, null, onComplete, onProgress));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.CHARGE_DIVE,
+                GarholdAnimationDuration.CHARGE_DIVE,
+                null,
+                onComplete,
+                onProgress
+        ));
     }
 
     public void playLandDiveAnimation() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdAnimationState.LAND_DIVE, GarholdAnimationDuration.LAND_DIVE, null,
-                        () -> {
-                            if (this.hasCapturedPlayer()) {
-                                this.playClosingGateAnimation();
-                            } else {
-                                this.playAscendAnimation();
-                            }
-                        }
-                )
-        );
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.LAND_DIVE,
+                GarholdAnimationDuration.LAND_DIVE,
+                null,
+                () -> {
+                    if (this.hasCapturedPlayer()) {
+                        this.playClosingGateAnimation();
+                    } else {
+                        this.playAscendAnimation();
+                    }
+                }
+        ));
     }
 
     public void playClosingGateAnimation() {
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdAnimationState.CLOSING_GATE, GarholdAnimationDuration.CLOSING_GATE, null, this::playAscendAnimation));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.CLOSING_GATE,
+                GarholdAnimationDuration.CLOSING_GATE,
+                null,
+                this::playAscendAnimation
+        ));
     }
 
-
     public void playAscendAnimation() {
-        this.playOpeningSideAnimation();
+        this.playOpenSideAnimation();
         this.playOpenBottomAnimation();
+
         this.animationChainer.enqueue(
                 AnimationChainer.AnimationStep.of(
                         GarholdAnimationState.ASCEND,
@@ -301,38 +473,94 @@ public class GarholdEntity extends Monster {
 
     // Bottom Animations
 
-    public void playCloseBottomAnimation() {
+    public void playedClosedBottomAnimation() {
         this.bottomGateAnimationChainer.reset();
-        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdBottomGateAnimationState.BOTTOM_CLOSED, GarholdAnimationDuration.BOTTOM_CLOSED));
+        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                GarholdBottomGateAnimationState.BOTTOM_CLOSED,
+                GarholdAnimationDuration.BOTTOM_CLOSED
+        ));
     }
 
     public void playOpenBottomAnimation() {
         this.bottomGateAnimationChainer.reset();
-        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdBottomGateAnimationState.BOTTOM_OPEN, GarholdAnimationDuration.BOTTOM_OPEN));
-        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(GarholdBottomGateAnimationState.BOTTOM_OPENED, GarholdAnimationDuration.BOTTOM_OPENED));
+        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdBottomGateAnimationState.BOTTOM_OPEN,
+                GarholdAnimationDuration.BOTTOM_OPEN,
+                null,
+                () -> this.playOpenedBottomAnimation(false)
+        ));
     }
 
-    public void playOpenedBottomAnimation() {
-        this.bottomGateAnimationChainer.reset();
-        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(GarholdBottomGateAnimationState.BOTTOM_OPENED, GarholdAnimationDuration.BOTTOM_OPENED));
+    public void playOpenedBottomAnimation(boolean reset) {
+        if (reset) {
+            this.bottomGateAnimationChainer.reset();
+        }
+
+        if (this.isGarholdState(GarholdState.ATTACHING)) {
+            this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdBottomGateAnimationState.BOTTOM_CLOSE,
+                    GarholdAnimationDuration.BOTTOM_CLOSE
+            ));
+            this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                    GarholdBottomGateAnimationState.BOTTOM_CLOSED,
+                    GarholdAnimationDuration.BOTTOM_CLOSED
+            ));
+        } else {
+            this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdBottomGateAnimationState.BOTTOM_OPENED,
+                    GarholdAnimationDuration.BOTTOM_OPENED,
+                    null,
+                    () -> this.playOpenedBottomAnimation(false)
+            ));
+        }
     }
 
     // Side Animations
 
-    public void playOpeningSideAnimation() {
+    public void playOpenSideAnimation() {
         this.sideGateAnimationChainer.reset();
-        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdSideGateAnimationState.SIDE_OPEN, GarholdAnimationDuration.SIDE_OPENING));
-        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(GarholdSideGateAnimationState.SIDE_OPENED, GarholdAnimationDuration.SIDE_OPENED));
+        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdSideGateAnimationState.SIDE_OPEN,
+                GarholdAnimationDuration.SIDE_OPEN
+        ));
+        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdSideGateAnimationState.SIDE_OPENED,
+                GarholdAnimationDuration.SIDE_OPENED,
+                null,
+                () -> this.playOpenedSideAnimation(false)
+        ));
     }
 
-    public void playOpenedSideAnimation() {
-        this.sideGateAnimationChainer.reset();
-        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(GarholdSideGateAnimationState.SIDE_OPENED, GarholdAnimationDuration.SIDE_OPENED));
+    public void playOpenedSideAnimation(boolean reset) {
+        if (reset) {
+            this.sideGateAnimationChainer.reset();
+        }
+
+        if (this.isGarholdState(GarholdState.ATTACHING)) {
+            this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdSideGateAnimationState.SIDE_CLOSE,
+                    GarholdAnimationDuration.SIDE_CLOSE
+            ));
+            this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                    GarholdSideGateAnimationState.SIDE_CLOSED,
+                    GarholdAnimationDuration.SIDE_CLOSED
+            ));
+        } else {
+            this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdSideGateAnimationState.SIDE_OPENED,
+                    GarholdAnimationDuration.SIDE_OPENED,
+                    null,
+                    () -> this.playOpenedSideAnimation(false)
+            ));
+        }
     }
 
     public void playClosedSideAnimation() {
         this.sideGateAnimationChainer.reset();
-        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(GarholdSideGateAnimationState.SIDE_CLOSED, GarholdAnimationDuration.SIDE_CLOSED));
+        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                GarholdSideGateAnimationState.SIDE_CLOSED,
+                GarholdAnimationDuration.SIDE_CLOSED
+        ));
     }
 
     @Override
@@ -341,7 +569,7 @@ public class GarholdEntity extends Monster {
             GarholdAnimationState animationState = this.entityData.get(ANIMATION_STATE);
             this.resetAnimation();
             switch (animationState) {
-                case FLY -> this.flyAnimationState.startIfStopped(this.tickCount);
+                case FLY, FLY_2 -> this.flyAnimationState.startIfStopped(this.tickCount);
                 case DETACH -> this.detachAnimationState.startIfStopped(this.tickCount);
                 case CHARGE_DIVE -> this.chargeDiveAnimationState.startIfStopped(this.tickCount);
                 case LAND_DIVE -> this.landDiveAnimationState.startIfStopped(this.tickCount);
@@ -352,6 +580,7 @@ public class GarholdEntity extends Monster {
                 case REATTACH -> this.reattachAnimationState.startIfStopped(this.tickCount);
             }
         }
+
         if (BOTTOM_GATE_ANIMATION_STATE.equals(entityDataAccessor)) {
             GarholdBottomGateAnimationState gateAnimationState = this.entityData.get(BOTTOM_GATE_ANIMATION_STATE);
             this.resetBottomGateAnimation();
@@ -359,8 +588,10 @@ public class GarholdEntity extends Monster {
                 case BOTTOM_CLOSED -> this.bottomClosedAnimationState.startIfStopped(this.tickCount);
                 case BOTTOM_OPEN -> this.bottomOpenAnimationState.startIfStopped(this.tickCount);
                 case BOTTOM_OPENED -> this.bottomOpenedAnimationState.startIfStopped(this.tickCount);
+                case BOTTOM_CLOSE -> this.bottomCloseAnimationState.startIfStopped(this.tickCount);
             }
         }
+
         if (SIDE_GATE_ANIMATION_STATE.equals(entityDataAccessor)) {
             GarholdSideGateAnimationState sideGateAnimationState = this.entityData.get(SIDE_GATE_ANIMATION_STATE);
             this.resetSideGateAnimation();
@@ -368,8 +599,10 @@ public class GarholdEntity extends Monster {
                 case SIDE_CLOSED -> this.sideClosedAnimationState.startIfStopped(this.tickCount);
                 case SIDE_OPEN -> this.sideOpenAnimationState.startIfStopped(this.tickCount);
                 case SIDE_OPENED -> this.sideOpenedAnimationState.startIfStopped(this.tickCount);
+                case SIDE_CLOSE -> this.sideCloseAnimationState.startIfStopped(this.tickCount);
             }
         }
+
         super.onSyncedDataUpdated(entityDataAccessor);
     }
 
@@ -377,6 +610,7 @@ public class GarholdEntity extends Monster {
         this.bottomOpenAnimationState.stop();
         this.bottomOpenedAnimationState.stop();
         this.bottomClosedAnimationState.stop();
+        this.bottomCloseAnimationState.stop();
     }
 
     private void resetAnimation() {
@@ -395,11 +629,13 @@ public class GarholdEntity extends Monster {
         this.sideOpenedAnimationState.stop();
         this.sideOpenAnimationState.stop();
         this.sideClosedAnimationState.stop();
+        this.sideCloseAnimationState.stop();
     }
 
     public GarholdEntity transitionTo(GarholdAnimationState state) {
         switch (state) {
             case FLY -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.FLY);
+            case FLY_2 -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.FLY_2);
             case DETACH -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.DETACH);
             case CHARGE_DIVE -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.CHARGE_DIVE);
             case LAND_DIVE -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.LAND_DIVE);
@@ -417,6 +653,7 @@ public class GarholdEntity extends Monster {
             case BOTTOM_CLOSED -> this.entityData.set(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_CLOSED);
             case BOTTOM_OPEN -> this.entityData.set(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_OPEN);
             case BOTTOM_OPENED -> this.entityData.set(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_OPENED);
+            case BOTTOM_CLOSE -> this.entityData.set(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_CLOSE);
         }
         return this;
     }
@@ -426,13 +663,15 @@ public class GarholdEntity extends Monster {
             case SIDE_CLOSED -> this.entityData.set(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_CLOSED);
             case SIDE_OPEN -> this.entityData.set(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_OPEN);
             case SIDE_OPENED -> this.entityData.set(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_OPENED);
+            case SIDE_CLOSE -> this.entityData.set(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_CLOSE);
         }
         return this;
     }
 
     public enum GarholdState {
         CHAINED,
-        DETACH,
+        ATTACHING,
+        DETACHING,
         FLYING,
         DIVE
     }
@@ -441,17 +680,20 @@ public class GarholdEntity extends Monster {
         BOTTOM_OPEN,
         BOTTOM_OPENED,
         BOTTOM_CLOSED,
+        BOTTOM_CLOSE
     }
 
     public enum GarholdSideGateAnimationState {
         SIDE_OPENED,
         SIDE_OPEN,
-        SIDE_CLOSED
+        SIDE_CLOSED,
+        SIDE_CLOSE
     }
 
     public enum GarholdAnimationState {
         NONE,
         FLY,
+        FLY_2,
         DETACH,
         CHARGE_DIVE,
         LAND_DIVE,
