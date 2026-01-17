@@ -85,6 +85,7 @@ public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> 
 
         this.animate(entity.flyAnimationState, GarholdAnimation.FLY, ageInTicks);
         this.animate(entity.detachAnimationState, GarholdAnimation.DETACH, ageInTicks);
+        this.animate(entity.forceDetachAnimationState, GarholdAnimation.FORCED_DETACH, ageInTicks);
         this.animate(entity.chargeDiveAnimationState, GarholdAnimation.CHARGE_DIVE, ageInTicks);
         this.animate(entity.landDiveAnimationState, GarholdAnimation.LAND_DIVE, ageInTicks);
         this.animate(entity.closingGateAnimationState, GarholdAnimation.CLOSING_GATE, ageInTicks);

@@ -2,6 +2,8 @@ package dev.hexnowloading.dungeonnowloading.entity.ai.garhold;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity.GarholdState;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -16,15 +18,17 @@ public class GarholdReturnToChainGoal extends Goal {
     private final GarholdEntity mob;
 
     // 47x7x47 scan
-    private static final int RADIUS_XZ = 23;
-    private static final int RADIUS_Y = 3;
+    private static final int RADIUS_XZ = 15;
+    private static final int RADIUS_Y_UP = 9;
+    private static final int RADIUS_Y_DOWN = 5;
+    private static final double BELOW_Y_PENALTY = 9.0;
 
     private static final int BELOW_CHAIN = 3;
 
     private static final float LOCK_SPEED = 0.07F;
     private static final double LOCK_DIST = 2.0;
 
-    private static final int VALIDATE_INTERVAL = 10;
+    private static final int VALIDATE_INTERVAL = reducedTickDelay(20);
 
     private int validateCooldown = 0;
     private int repathCooldown = 0;
@@ -38,8 +42,13 @@ public class GarholdReturnToChainGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (!(mob.isGarholdState(GarholdState.FLYING))) return false;
+        if (!isEligibleState()) return false;
         if (mob.getTarget() != null) return false;
+
+        // If we’re already locking, don’t re-scan unless we lost the target
+        if (mob.isGarholdState(GarholdState.LOCKING_ON_CHAIN) && this.chainBottom != null) {
+            return true;
+        }
 
         this.chainBottom = findNearestChainBottom(mob.level(), mob.blockPosition());
         return this.chainBottom != null;
@@ -47,7 +56,7 @@ public class GarholdReturnToChainGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return (mob.isGarholdState(GarholdState.FLYING)) && mob.getTarget() == null && chainBottom != null;
+        return isEligibleState() && mob.getTarget() == null && chainBottom != null;
     }
 
     @Override
@@ -55,6 +64,27 @@ public class GarholdReturnToChainGoal extends Goal {
         repathCooldown = 0;
         validateCooldown = 0;
         locked = false;
+
+        if (mob.isGarholdState(GarholdState.LOCKING_ON_CHAIN)) {
+            mob.setGarholdState(GarholdState.FLYING);
+        }
+    }
+
+    @Override
+    public void stop() {
+        chainBottom = null;
+        locked = false;
+        mob.getNavigation().stop();
+
+        if (mob.isGarholdState(GarholdState.LOCKING_ON_CHAIN)) {
+            mob.setGarholdState(GarholdState.FLYING);
+        }
+    }
+
+
+    private boolean isEligibleState() {
+        return mob.isGarholdState(GarholdState.FLYING)
+                || mob.isGarholdState(GarholdState.LOCKING_ON_CHAIN);
     }
 
     @Override
@@ -102,10 +132,13 @@ public class GarholdReturnToChainGoal extends Goal {
             return;
         }
 
-// drift reset (also 3D)
         if (distSq > lockDistSq * 2.25) {
             locked = false;
             repathCooldown = 0;
+
+            if (mob.isGarholdState(GarholdState.LOCKING_ON_CHAIN)) {
+                mob.setGarholdState(GarholdState.FLYING);
+            }
         }
     }
 
@@ -118,6 +151,10 @@ public class GarholdReturnToChainGoal extends Goal {
         if (distSq <= lockDistSq) {
             locked = true;
             mob.getNavigation().stop();
+
+            if (!mob.isGarholdState(GarholdState.LOCKING_ON_CHAIN)) {
+                mob.setGarholdState(GarholdState.LOCKING_ON_CHAIN);
+            }
         }
     }
 
@@ -148,19 +185,14 @@ public class GarholdReturnToChainGoal extends Goal {
         mob.hasImpulse = true;
     }
 
-
-
-    @Override
-    public void stop() {
-        chainBottom = null;
-        mob.getNavigation().stop();
-    }
-
     private BlockPos findNearestChainBottom(Level level, BlockPos center) {
         BlockPos best = null;
-        double bestDist2 = Double.MAX_VALUE;
+        double bestScore = Double.MAX_VALUE;
 
-        for (int dy = -RADIUS_Y; dy <= RADIUS_Y; dy++) {
+        // De-dupe: process each chain column (bottom) only once per scan
+        LongSet visitedBottoms = new LongOpenHashSet();
+
+        for (int dy = -RADIUS_Y_DOWN; dy <= RADIUS_Y_UP; dy++) {
             int y = center.getY() + dy;
 
             for (int dx = -RADIUS_XZ; dx <= RADIUS_XZ; dx++) {
@@ -174,6 +206,9 @@ public class GarholdReturnToChainGoal extends Goal {
 
                     BlockPos bottom = findBottomOfChainColumn(p);
 
+                    // Skip if we already processed this column in this scan
+                    if (!visitedBottoms.add(bottom.asLong())) continue;
+
                     // Desired destination point (centered) = 3 blocks below bottom chain
                     double tx = bottom.getX() + 0.5;
                     double ty = (bottom.getY() - BELOW_CHAIN) + 0.5;
@@ -182,16 +217,26 @@ public class GarholdReturnToChainGoal extends Goal {
                     // Check if Garhold's hitbox would fit there (blocks only)
                     if (!canFitAt(tx, ty, tz)) continue;
 
+                    // Skip if occupied by entity
                     if (isOccupiedByEntity(tx, ty, tz)) continue;
 
+                    // Skip if destination is in fluid
                     BlockPos destPos = BlockPos.containing(tx, ty, tz);
-
                     if (!mob.level().getFluidState(destPos).isEmpty()) continue;
 
+                    // Base distance score
+                    double score = mob.distanceToSqr(tx, ty, tz);
 
-                    double d2 = mob.distanceToSqr(tx, ty, tz);
-                    if (d2 < bestDist2) {
-                        bestDist2 = d2;
+                    // ---- TOP-BIAS (selection) ----
+                    // If the chain bottom is below us, add a small penalty so we prefer ones above,
+                    // even if they’re slightly farther.
+                    if (bottom.getY() < center.getY()) {
+                        score += BELOW_Y_PENALTY;
+                    }
+                    // ------------------------------
+
+                    if (score < bestScore) {
+                        bestScore = score;
                         best = bottom;
                     }
                 }
@@ -200,6 +245,8 @@ public class GarholdReturnToChainGoal extends Goal {
 
         return best;
     }
+
+
 
     private BlockPos findBottomOfChainColumn(BlockPos anyChainBlock) {
         BlockPos.MutableBlockPos cur = anyChainBlock.mutable();

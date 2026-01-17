@@ -23,6 +23,9 @@ public class GarholdHoverAboveTargetGoal extends Goal {
 
     private static final double VERTICAL_SWEEP_STEP = 0.25;
 
+    private static final double SIDE_CAPTURE_FACE_DOT = 0.75; // ~41 degrees cone. 0.5=60deg, 0.9=25deg
+    private static final int SIDE_CAPTURE_COOLDOWN = reducedTickDelay(10);
+    private int sideCaptureCooldown = 0;
 
     private final GarholdEntity mob;
 
@@ -86,6 +89,19 @@ public class GarholdHoverAboveTargetGoal extends Goal {
     public void tick() {
         LivingEntity target = mob.getTarget();
         if (target == null) return;
+
+        if (sideCaptureCooldown > 0) sideCaptureCooldown--;
+
+        if (canEnterSideCapture(target)) {
+            mob.getNavigation().stop();
+            mob.setDeltaMovement(Vec3.ZERO);
+
+            // IMPORTANT: prevent re-trigger spam
+            sideCaptureCooldown = SIDE_CAPTURE_COOLDOWN;
+
+            mob.setGarholdState(GarholdState.SIDE_CAPTURE);
+            return;
+        }
 
         Desired desired = computeDesired(target);
 
@@ -309,5 +325,34 @@ public class GarholdHoverAboveTargetGoal extends Goal {
     private record Desired(Vec3 pos, boolean forcePath) {
         static Desired lockOk(Vec3 pos) { return new Desired(pos, false); }
         static Desired forcePath(Vec3 pos) { return new Desired(pos, true); }
+    }
+
+    private boolean isFacingTarget(LivingEntity target) {
+        Vec3 to = target.position().subtract(mob.position());
+        Vec3 flatTo = new Vec3(to.x, 0.0, to.z);
+        if (flatTo.lengthSqr() < 1.0e-6) return true;
+
+        Vec3 look = mob.getLookAngle();
+        Vec3 flatLook = new Vec3(look.x, 0.0, look.z);
+        if (flatLook.lengthSqr() < 1.0e-6) return false;
+
+        flatTo = flatTo.normalize();
+        flatLook = flatLook.normalize();
+        return flatLook.dot(flatTo) >= SIDE_CAPTURE_FACE_DOT;
+    }
+
+    private boolean canEnterSideCapture(LivingEntity target) {
+        if (mob.getGarholdState() != GarholdState.FLYING) return false;     // only from flying
+        if (sideCaptureCooldown > 0) return false;
+
+        // must be "side-capture mode" (vertical blocked) AND close enough
+        if (!shouldSideCapture(target)) return false;
+
+        double dx = mob.getX() - target.getX();
+        double dz = mob.getZ() - target.getZ();
+        double distSq = dx * dx + dz * dz;
+        if (distSq > SIDE_RANGE_SQ) return false;
+
+        return isFacingTarget(target);
     }
 }

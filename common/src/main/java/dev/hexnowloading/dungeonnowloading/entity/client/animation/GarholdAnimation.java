@@ -851,12 +851,12 @@ public class GarholdAnimation {
 
         public static final AnimationDefinition SIDE_CAPTURE = AnimationDefinition.Builder.withLength(1.375F).looping()
                 .addAnimation("bone", new AnimationChannel(AnimationChannel.Targets.ROTATION,
-                        new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.0F, KeyframeAnimations.degreeVec(9.99F, -0.26F, 1.45F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.5417F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(1.25F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
                 ))
                 .addAnimation("bone", new AnimationChannel(AnimationChannel.Targets.POSITION,
-                        new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.0F, KeyframeAnimations.posVec(-2.0F, 6.0F, 4.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.5417F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.75F, KeyframeAnimations.posVec(0.0F, -0.81F, -3.94F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.9167F, KeyframeAnimations.posVec(0.0F, 11.0F, -7.0F), AnimationChannel.Interpolations.CATMULLROM),
@@ -867,7 +867,11 @@ public class GarholdAnimation {
                         new Keyframe(1.25F, KeyframeAnimations.scaleVec(1.0F, 1.0F, 1.0F), AnimationChannel.Interpolations.CATMULLROM)
                 ))
                 .addAnimation("rightwing", new AnimationChannel(AnimationChannel.Targets.ROTATION,
-                        new Keyframe(0.0F, KeyframeAnimations.degreeVec(21.865F, 16.8185F, -2.9687F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.0F, KeyframeAnimations.degreeVec(40.9654F, 16.8185F, -2.9687F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.125F, KeyframeAnimations.degreeVec(67.1012F, 8.4215F, -20.4121F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.25F, KeyframeAnimations.degreeVec(-31.5346F, 16.8185F, -2.9687F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.375F, KeyframeAnimations.degreeVec(67.1012F, 8.4215F, -20.4121F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.5F, KeyframeAnimations.degreeVec(-31.5346F, 16.8185F, -2.9687F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.7083F, KeyframeAnimations.degreeVec(-7.7849F, 16.8185F, -2.9687F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.7917F, KeyframeAnimations.degreeVec(-11.8439F, 12.6189F, -33.714F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(1.0F, KeyframeAnimations.degreeVec(57.2151F, 16.8185F, -2.9687F), AnimationChannel.Interpolations.CATMULLROM),
@@ -876,10 +880,18 @@ public class GarholdAnimation {
                 ))
                 .addAnimation("rightwing", new AnimationChannel(AnimationChannel.Targets.POSITION,
                         new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.125F, KeyframeAnimations.posVec(0.0F, 0.0F, -2.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.25F, KeyframeAnimations.posVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.375F, KeyframeAnimations.posVec(0.0F, 0.0F, -2.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.5F, KeyframeAnimations.posVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(1.375F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
                 ))
                 .addAnimation("leftwing", new AnimationChannel(AnimationChannel.Targets.ROTATION,
-                        new Keyframe(0.0F, KeyframeAnimations.degreeVec(22.7472F, -16.8185F, 2.9687F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.0F, KeyframeAnimations.degreeVec(40.9654F, -16.8185F, 2.9687F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.125F, KeyframeAnimations.degreeVec(67.1012F, -8.4215F, 20.4121F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.25F, KeyframeAnimations.degreeVec(-31.5346F, -16.8185F, 2.9687F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.375F, KeyframeAnimations.degreeVec(67.1012F, -8.4215F, 20.4121F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.5F, KeyframeAnimations.degreeVec(-31.5346F, -16.8185F, 2.9687F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.7083F, KeyframeAnimations.degreeVec(-6.9027F, -16.8185F, 2.9687F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.7917F, KeyframeAnimations.degreeVec(-11.0999F, -13.0512F, 33.804F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(1.0F, KeyframeAnimations.degreeVec(58.0973F, -16.8185F, 2.9687F), AnimationChannel.Interpolations.CATMULLROM),
@@ -888,6 +900,10 @@ public class GarholdAnimation {
                 ))
                 .addAnimation("leftwing", new AnimationChannel(AnimationChannel.Targets.POSITION,
                         new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.125F, KeyframeAnimations.posVec(0.0F, 0.0F, -2.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.25F, KeyframeAnimations.posVec(2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.375F, KeyframeAnimations.posVec(0.0F, 0.0F, -2.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.5F, KeyframeAnimations.posVec(2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(1.375F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
                 ))
                 .addAnimation("leftgate", new AnimationChannel(AnimationChannel.Targets.ROTATION,
@@ -899,8 +915,8 @@ public class GarholdAnimation {
                         new Keyframe(1.375F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
                 ))
                 .addAnimation("leftgate", new AnimationChannel(AnimationChannel.Targets.POSITION,
-                        new Keyframe(0.0F, KeyframeAnimations.posVec(3.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
-                        new Keyframe(0.125F, KeyframeAnimations.posVec(2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.125F, KeyframeAnimations.posVec(-1.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.375F, KeyframeAnimations.posVec(4.54F, 0.0F, 2.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.875F, KeyframeAnimations.posVec(4.54F, 0.0F, 2.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(1.1667F, KeyframeAnimations.posVec(1.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
@@ -915,8 +931,8 @@ public class GarholdAnimation {
                         new Keyframe(1.375F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
                 ))
                 .addAnimation("rightgate", new AnimationChannel(AnimationChannel.Targets.POSITION,
-                        new Keyframe(0.0F, KeyframeAnimations.posVec(-3.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
-                        new Keyframe(0.125F, KeyframeAnimations.posVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.125F, KeyframeAnimations.posVec(1.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.375F, KeyframeAnimations.posVec(-4.54F, 0.0F, 2.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.875F, KeyframeAnimations.posVec(-4.54F, 0.0F, 2.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(1.1667F, KeyframeAnimations.posVec(-1.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),

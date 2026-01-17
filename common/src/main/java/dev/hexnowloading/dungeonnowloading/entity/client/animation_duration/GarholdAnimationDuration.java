@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.animation_duration;
 public class GarholdAnimationDuration {
     public static final float FLY = 1.91f;
     public static final float DETACH = 2.5f;
+    public static final float FORCE_DETACH = 1.1667F;
     public static final float CHARGE_DIVE = 2.0f;
     public static final float LAND_DIVE = 0.875f;
     public static final float CLOSING_GATE = 5.0f;
