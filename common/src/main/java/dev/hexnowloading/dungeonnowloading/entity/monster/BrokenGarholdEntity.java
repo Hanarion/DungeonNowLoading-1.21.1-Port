@@ -1,9 +1,15 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.BrokenGarholdAnimationDuration;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -23,7 +29,13 @@ import net.minecraft.world.phys.Vec3;
 
 public class BrokenGarholdEntity extends Monster {
 
+    private static final EntityDataAccessor<BrokenGarholdState> STATE = SynchedEntityData.defineId(BrokenGarholdEntity.class, EntityStates.BROKEN_GARHOLD_STATE);
+
+    private AnimationChainer<BrokenGarholdState> animationChainer = new AnimationChainer<>();
+
     public final AnimationState idleAnimationState = new AnimationState();
+    public final AnimationState fallingStartAnimationState = new AnimationState();
+    public final AnimationState fallingAnimationState = new AnimationState();
 
     private int hurtHits = 0;
     private boolean dropping = false;
@@ -44,6 +56,24 @@ public class BrokenGarholdEntity extends Monster {
     }
 
     @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(STATE, BrokenGarholdState.HANGING);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        compoundTag.putBoolean("Chained", this.entityData.get(STATE) == BrokenGarholdState.HANGING);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        this.entityData.set(STATE, compoundTag.getBoolean("Chained") ? BrokenGarholdState.HANGING : BrokenGarholdState.FALLING);
+    }
+
+    @Override
     public void tick() {
         super.tick();
 
@@ -53,6 +83,8 @@ public class BrokenGarholdEntity extends Monster {
         if (dropping && !broken && this.onGround()) {
             breakOnGround((ServerLevel) level());
         }
+
+        animationChainer.tick(this::transitionTo);
     }
 
     private boolean hasPlayerPassenger() {
@@ -166,7 +198,7 @@ public class BrokenGarholdEntity extends Monster {
             }
 
             if (this.random.nextFloat() < 0.5f) {
-                beginDrop();
+                this.playFallingAnimation();
             }
         }
 
@@ -204,5 +236,45 @@ public class BrokenGarholdEntity extends Monster {
 
     @Override
     public void push(double x, double y, double z) {
+    }
+
+    public boolean isHanging() {
+        return this.entityData.get(STATE).equals(BrokenGarholdState.HANGING);
+    }
+
+    public void playFallingAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(BrokenGarholdState.FALLING_START, BrokenGarholdAnimationDuration.FALLING_START, null, this::beginDrop));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(BrokenGarholdState.FALLING, BrokenGarholdAnimationDuration.FALLING));
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (STATE.equals(entityDataAccessor)) {
+            BrokenGarholdState state = this.entityData.get(STATE);
+            switch (state) {
+                case FALLING_START -> this.fallingStartAnimationState.startIfStopped(this.tickCount);
+                case FALLING -> {
+                    this.fallingStartAnimationState.stop();
+                    this.fallingAnimationState.startIfStopped(this.tickCount);
+                }
+            }
+
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    public BrokenGarholdEntity transitionTo(BrokenGarholdState state) {
+        switch (state) {
+            case FALLING_START -> this.entityData.set(STATE, BrokenGarholdState.FALLING_START);
+            case FALLING -> this.entityData.set(STATE, BrokenGarholdState.FALLING);
+        }
+        return this;
+    }
+
+    public enum BrokenGarholdState {
+        HANGING,
+        FALLING_START,
+        FALLING
     }
 }

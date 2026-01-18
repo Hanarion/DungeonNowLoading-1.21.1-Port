@@ -122,6 +122,7 @@ public class DNLBlocks {
     public static Supplier<Block> GAUNTLET;
     public static Supplier<Block> GAUNTLET_VAULT;
     public static Supplier<Block> MOB_NODE;
+    public static Supplier<Block> DISPEL_BLOCK;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -238,6 +239,7 @@ public class DNLBlocks {
         MENDING_AURA_PANE = registerBlock("mending_aura_pane", () -> new MendingAuraPaneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
         MENDING_AURA_CHEST = registerBlock("mending_aura_chest", () -> new MendingAuraChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
         STONE_PRESERVER = registerBlock("stone_preserver", () -> new PreserverBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().sound(SoundType.STONE).emissiveRendering(DNLBlocks::always)));
+        //DISPEL_BLOCK = registerBlock("stone_dispel_block", () -> new DispelBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().sound(SoundType.STONE).emissiveRendering(DNLBlocks::always)));
         REDSTONE_IDOL = registerBlock("redstone_idol", () -> new RedstoneIdolBlock(BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).strength(5.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().isRedstoneConductor(DNLBlocks::never).noOcclusion()));
         MENDING_TABLE = registerBlock("mending_table", () -> new MendingTableBlock(BlockBehaviour.Properties.of().strength(5.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
         DURITE_CLUSTER = registerBlock("durite_cluster", () -> new DuriteClusterBlock(DuriteClusterBlock.HitboxPreset.CLUSTER, BlockBehaviour.Properties.of().strength(1.5f, 1.5f).mapColor(MapColor.COLOR_BLUE).forceSolidOn().forceSolidOn().lightLevel(blockState -> 4).pushReaction(PushReaction.DESTROY)));

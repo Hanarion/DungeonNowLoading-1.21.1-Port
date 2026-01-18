@@ -103,8 +103,14 @@ public class BrokenGarholdModel<T extends BrokenGarholdEntity> extends Hierarchi
     @Override
     public void setupAnim(BrokenGarholdEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root.getAllParts().forEach(ModelPart::resetPose);
+
         entity.idleAnimationState.startIfStopped(entity.tickCount);
-        this.animate(entity.idleAnimationState, BrokenGarholdAnimation.BROKEN_IDLE, ageInTicks);
+
+        if (entity.isHanging()) {
+            this.animate(entity.idleAnimationState, BrokenGarholdAnimation.BROKEN_IDLE, ageInTicks);
+        }
+        this.animate(entity.fallingStartAnimationState, BrokenGarholdAnimation.FALLING_START, ageInTicks);
+        this.animate(entity.fallingAnimationState, BrokenGarholdAnimation.FALLING, ageInTicks);
     }
 
     @Override
