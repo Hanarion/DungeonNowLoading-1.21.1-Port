@@ -2,6 +2,9 @@ package dev.hexnowloading.dungeonnowloading.entity.ai.garhold;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity.GarholdState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -17,7 +20,7 @@ public class GarholdSideCaptureGoal extends Goal {
     // - move 3 blocks over 0.25s (5 ticks)
     private static final int WINDUP_TICKS = 15;
     private static final int DASH_TICKS = 5;
-    private static final double DASH_BLOCKS = 3.0;
+    private static final double DASH_BLOCKS = 6.0;
     private static final double DASH_PER_TICK = DASH_BLOCKS / DASH_TICKS;
 
     // how generous the grab feels
@@ -29,6 +32,9 @@ public class GarholdSideCaptureGoal extends Goal {
     private boolean dashing;
 
     private Player capturedPlayer;
+
+    private float lockedYaw;
+    private boolean yawLocked;
 
     public GarholdSideCaptureGoal(GarholdEntity mob) {
         this.mob = mob;
@@ -46,16 +52,46 @@ public class GarholdSideCaptureGoal extends Goal {
     }
 
     @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
+    @Override
     public void start() {
         ticks = 0;
         dashing = false;
         capturedPlayer = null;
+        yawLocked = false;
 
         mob.getNavigation().stop();
         mob.setDeltaMovement(Vec3.ZERO);
 
         // Start the animation immediately when entering SIDE_CAPTURE
         mob.playSideCaptureAnimation();
+
+        LivingEntity t = mob.getTarget();
+        if (t != null) {
+            // lock to where the player was when the goal began
+            double dx = t.getX() - mob.getX();
+            double dz = t.getZ() - mob.getZ();
+
+            if (dx * dx + dz * dz > 1.0e-6) {
+                lockedYaw = (float)(Mth.atan2(dz, dx) * (180.0 / Math.PI)) - 90.0F;
+            } else {
+                lockedYaw = mob.getYRot();
+            }
+        } else {
+            lockedYaw = mob.getYRot();
+        }
+
+        yawLocked = true;
+
+// enforce it immediately
+        mob.setYRot(lockedYaw);
+        mob.setYHeadRot(lockedYaw);
+        mob.yBodyRot = lockedYaw;
+        mob.yRotO = lockedYaw;
+        mob.yHeadRotO = lockedYaw;
     }
 
     @Override
@@ -63,6 +99,15 @@ public class GarholdSideCaptureGoal extends Goal {
         ticks++;
 
         mob.getNavigation().stop();
+
+// While locked, force it every tick (prevents look control / body from drifting)
+        if (yawLocked) {
+            mob.setYRot(lockedYaw);
+            mob.setYHeadRot(lockedYaw);
+            mob.yBodyRot = lockedYaw;
+            mob.yRotO = lockedYaw;       // optional anti-jitter
+            mob.yHeadRotO = lockedYaw;   // optional anti-jitter
+        }
 
         // Windup (first 15 ticks) - keep stable
         if (!dashing) {
@@ -86,12 +131,11 @@ public class GarholdSideCaptureGoal extends Goal {
     }
 
     private void dashForwardAndTryCapture() {
-        // Move forward based on current facing. Usually best to keep it flat in XZ.
-        Vec3 look = mob.getLookAngle();
-        Vec3 fwd = new Vec3(look.x, 0.0, look.z);
-        if (fwd.lengthSqr() < 1.0e-6) {
-            fwd = new Vec3(0.0, 0.0, 1.0);
-        }
+
+        Vec3 dir = Vec3.directionFromRotation(0.0F, lockedYaw); // pitch 0, yaw locked
+        Vec3 fwd = new Vec3(dir.x, 0.0, dir.z);
+        if (fwd.lengthSqr() < 1.0e-6) return;
+
         Vec3 step = fwd.normalize().scale(DASH_PER_TICK);
 
         // Swept AABB capture (avoid tunneling)
@@ -111,7 +155,10 @@ public class GarholdSideCaptureGoal extends Goal {
         // Block collision-aware movement: if we can't fit, stop the dash early
         AABB movedBox = mob.getBoundingBox().move(step);
         if (mob.level().noCollision(mob, movedBox)) {
-            mob.setPos(mob.getX() + step.x, mob.getY(), mob.getZ() + step.z);
+            mob.setDeltaMovement(step.x, mob.getDeltaMovement().y, step.z);
+            mob.hasImpulse = true;
+            mob.move(MoverType.SELF, mob.getDeltaMovement());
+            mob.setDeltaMovement(Vec3.ZERO);
         } else {
             dashing = false;
         }
@@ -147,5 +194,8 @@ public class GarholdSideCaptureGoal extends Goal {
 
         capturedPlayer = null;
         dashing = false;
+        yawLocked = false;
+        lockedYaw = 0.0f;
+        ticks = 0;
     }
 }

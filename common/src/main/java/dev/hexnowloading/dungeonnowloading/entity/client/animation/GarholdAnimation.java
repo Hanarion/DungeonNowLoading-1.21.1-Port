@@ -304,6 +304,15 @@ public class GarholdAnimation {
                         new Keyframe(1.0833F, KeyframeAnimations.posVec(2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(1.1667F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
                 ))
+                .addAnimation("gate", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+                        new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.25F, KeyframeAnimations.degreeVec(10.2059F, 0.652F, -3.8637F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.625F, KeyframeAnimations.degreeVec(-9.9627F, 0.8672F, 4.9244F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(1.1667F, KeyframeAnimations.degreeVec(-2.4976F, 0.109F, 2.4976F), AnimationChannel.Interpolations.CATMULLROM)
+                ))
+                .addAnimation("gate", new AnimationChannel(AnimationChannel.Targets.POSITION,
+                        new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
+                ))
                 .build();
 
         public static final AnimationDefinition CHARGE_DIVE = AnimationDefinition.Builder.withLength(2.0F)
@@ -849,7 +858,7 @@ public class GarholdAnimation {
                 ))
                 .build();
 
-        public static final AnimationDefinition SIDE_CAPTURE = AnimationDefinition.Builder.withLength(1.375F).looping()
+        public static final AnimationDefinition SIDE_CAPTURE = AnimationDefinition.Builder.withLength(1.375F)
                 .addAnimation("bone", new AnimationChannel(AnimationChannel.Targets.ROTATION,
                         new Keyframe(0.0F, KeyframeAnimations.degreeVec(9.99F, -0.26F, 1.45F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.5417F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
@@ -857,6 +866,7 @@ public class GarholdAnimation {
                 ))
                 .addAnimation("bone", new AnimationChannel(AnimationChannel.Targets.POSITION,
                         new Keyframe(0.0F, KeyframeAnimations.posVec(-2.0F, 6.0F, 4.0F), AnimationChannel.Interpolations.CATMULLROM),
+                        new Keyframe(0.125F, KeyframeAnimations.posVec(-1.77F, 4.58F, 11.1F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.5417F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.75F, KeyframeAnimations.posVec(0.0F, -0.81F, -3.94F), AnimationChannel.Interpolations.CATMULLROM),
                         new Keyframe(0.9167F, KeyframeAnimations.posVec(0.0F, 11.0F, -7.0F), AnimationChannel.Interpolations.CATMULLROM),

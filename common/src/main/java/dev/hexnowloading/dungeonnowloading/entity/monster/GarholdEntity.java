@@ -1,9 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
-import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.GarholdDiveCaptureGoal;
-import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.GarholdHoverAboveTargetGoal;
-import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.GarholdReturnToChainGoal;
-import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.GarholdSideCaptureGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.GarholdAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
@@ -79,7 +76,7 @@ public class GarholdEntity extends Monster {
     private boolean ascendLiftActive = false;
     private int ascendLiftTicksLeft = 0;
 
-    private BlockPos chainAnchor;
+    public int sideCaptureCooldownTicks = 0;
 
     private int chainedPassengerHoldTicks = 0;
     private int chainedDetachLockoutTicks = 0;
@@ -101,6 +98,7 @@ public class GarholdEntity extends Monster {
         this.goalSelector.addGoal(2, new GarholdSideCaptureGoal(this));
         this.goalSelector.addGoal(3, new GarholdHoverAboveTargetGoal(this, 1.5F, 6.0, 3.0, 14.0));
         this.goalSelector.addGoal(4, new GarholdReturnToChainGoal(this));
+        this.goalSelector.addGoal(8, new GarholdWanderGoal(this, 1.0, 12, 6));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
         super.registerGoals();
     }
@@ -173,6 +171,7 @@ public class GarholdEntity extends Monster {
     @Override
     protected void customServerAiStep() {
         super.customServerAiStep();
+        if (sideCaptureCooldownTicks > 0) sideCaptureCooldownTicks--;
 
         boolean chainLocked = isPushableState();
 
@@ -215,7 +214,32 @@ public class GarholdEntity extends Monster {
             this.setDeltaMovement(0.0, 0.0, 0.0);
 
             // move up smoothly
-            this.setPos(this.getX(), this.getY() + ASCEND_LIFT_PER_TICK, this.getZ());
+            double step = ASCEND_LIFT_PER_TICK;
+
+            // Try to move up, but stop if we'd collide
+            AABB next = this.getBoundingBox().move(0.0, step, 0.0);
+            if (this.level().noCollision(this, next)) {
+                this.setPos(this.getX(), this.getY() + step, this.getZ());
+            } else {
+                // find the largest safe step (binary search)
+                double lo = 0.0;
+                double hi = step;
+
+                for (int i = 0; i < 8; i++) { // 8 iterations is plenty
+                    double mid = (lo + hi) * 0.5;
+                    AABB midBox = this.getBoundingBox().move(0.0, mid, 0.0);
+                    if (this.level().noCollision(this, midBox)) lo = mid;
+                    else hi = mid;
+                }
+
+                if (lo > 1.0e-4) {
+                    this.setPos(this.getX(), this.getY() + lo, this.getZ());
+                }
+
+                // Stop lifting once blocked
+                ascendLiftTicksLeft = 0;
+                ascendLiftActive = false;
+            }
 
             ascendLiftTicksLeft--;
 
@@ -239,7 +263,6 @@ public class GarholdEntity extends Monster {
         this.applyCaptureAttributes();
         this.clearNearbyTargets(player);
         player.startRiding(this, true);
-        playClosingGateAnimation();
     }
 
     private void teleportRiderToChainedGarhold() {
@@ -305,25 +328,6 @@ public class GarholdEntity extends Monster {
             rider.teleportTo(x, y, z);
         }
     }
-/*
-    private void forceDismountPassengerSameY() {
-        if (this.getPassengers().isEmpty()) return;
-
-        Entity rider = this.getPassengers().get(0);
-        rider.stopRiding();
-
-        // Same Y as Garhold (or a tiny bit above to avoid clipping into the body)
-        double x = this.getX();
-        double y = this.getY();          // keep their current Y
-        double z = this.getZ();
-
-        // small upward nudge helps prevent immediate collision resolution pushing them down
-        y += 0.25;
-
-        rider.teleportTo(x, y, z);
-        rider.setDeltaMovement(Vec3.ZERO); // optional: keep it stable
-        rider.hurtMarked = true;           // helps sync sometimes
-    }*/
 
     @Override
     protected void removePassenger(Entity passenger) {
@@ -469,15 +473,6 @@ public class GarholdEntity extends Monster {
         // Stop any chain-lock motion immediately
         this.getNavigation().stop();
         this.setDeltaMovement(Vec3.ZERO);
-        this.chainAnchor = null;
-    }
-
-    public BlockPos getChainAnchor() {
-        return chainAnchor;
-    }
-
-    public void setChainAnchor(BlockPos pos) {
-        chainAnchor = pos;
     }
 
     public boolean isChainBlock(BlockPos pos) {
