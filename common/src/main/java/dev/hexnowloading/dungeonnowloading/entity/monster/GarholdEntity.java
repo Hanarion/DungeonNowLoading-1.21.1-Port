@@ -4,12 +4,15 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.GarholdAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
@@ -25,6 +28,8 @@ import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -272,7 +277,7 @@ public class GarholdEntity extends Monster {
         Entity rider = this.getPassengers().get(0);
         if (!(rider instanceof Player player)) return;
 
-        GarholdEntity target = findNearestChainedGarhold(128.0);
+        Entity target = findNearestChainedGarhold(128.0);
         if (target == null) return;
 
         ServerLevel level = (ServerLevel) this.level();
@@ -285,14 +290,16 @@ public class GarholdEntity extends Monster {
 
         spawnTeleportSpawnerFx(level, target.position());
 
-        target.chainedPassengerHoldTicks = 60; // your 3s hold, keep if you still want it
+        if (target instanceof GarholdEntity g) {
+            g.chainedPassengerHoldTicks = 60;
+        }
     }
 
 
-    private GarholdEntity findNearestChainedGarhold(double range) {
+    private Entity findNearestChainedGarhold(double range) {
         AABB box = this.getBoundingBox().inflate(range);
 
-        GarholdEntity best = null;
+        Entity best = null;
         double bestDist = Double.MAX_VALUE;
 
         for (GarholdEntity g : this.level().getEntitiesOfClass(GarholdEntity.class, box)) {
@@ -306,6 +313,17 @@ public class GarholdEntity extends Monster {
             if (d < bestDist) {
                 bestDist = d;
                 best = g;
+            }
+        }
+
+        for (BrokenGarholdEntity b : this.level().getEntitiesOfClass(BrokenGarholdEntity.class, box)) {
+            if (!b.isAlive()) continue;
+            if (!b.getPassengers().isEmpty()) continue;
+
+            double d = this.distanceToSqr(b);
+            if (d < bestDist) {
+                bestDist = d;
+                best = b;
             }
         }
         return best;
@@ -391,6 +409,37 @@ public class GarholdEntity extends Monster {
         if (kb != null && !kb.hasModifier(CAPTURE_KB_MOD)) {
             kb.addTransientModifier(CAPTURE_KB_MOD);
         }
+    }
+
+    @Override
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+
+        if (!this.level().isClientSide) {
+            if (player.getAbilities().instabuild) {
+                if (stack.getItem() instanceof PickaxeItem) {
+                    ServerLevel level = (ServerLevel) this.level();
+                    BrokenGarholdEntity broken = DNLEntityTypes.BROKEN_GARHOLD.get().create(level); // <-- replace with your entity registry access
+                    if (broken != null) {
+                        broken.moveTo(
+                                this.getX(),
+                                this.getY(),
+                                this.getZ(),
+                                this.getYRot(),
+                                this.getXRot()
+                        );
+                        broken.setYHeadRot(this.getYHeadRot());
+                        broken.setYBodyRot(this.yBodyRot);
+
+                        level.addFreshEntity(broken);
+                    }
+                    this.discard();
+                    return InteractionResult.CONSUME;
+                }
+            }
+        }
+
+        return super.mobInteract(player, hand);
     }
 
     @Override

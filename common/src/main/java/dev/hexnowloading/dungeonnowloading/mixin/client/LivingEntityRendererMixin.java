@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.client;
 
+import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.PlayerModel;
@@ -33,7 +34,7 @@ public abstract class LivingEntityRendererMixin {
             int packedLight,
             CallbackInfo ci
     ) {
-        if (entity instanceof AbstractClientPlayer player && player.getVehicle() instanceof GarholdEntity) {
+        if (entity instanceof AbstractClientPlayer player && (player.getVehicle() instanceof GarholdEntity || player.getVehicle() instanceof BrokenGarholdEntity)) {
             EntityModel<?> m = this.getModel();
             if (m instanceof PlayerModel<?> pm) {
                 pm.riding = false;

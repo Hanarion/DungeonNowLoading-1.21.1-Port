@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.entities;
 
+import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import dev.hexnowloading.dungeonnowloading.item.DNLAnimatedItem;
 import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
@@ -35,7 +36,7 @@ public abstract class PlayerMixin {
         Player self = (Player)(Object) this;
         Entity vehicle = self.getVehicle();
 
-        if (vehicle instanceof GarholdEntity && !self.getAbilities().instabuild) {
+        if ((vehicle instanceof GarholdEntity || vehicle instanceof BrokenGarholdEntity) && !self.getAbilities().instabuild) {
             cir.setReturnValue(false);
         }
     }
