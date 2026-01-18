@@ -19,6 +19,7 @@ public class DNLCreativeModeTabs {
                 //output.accept(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
                 output.accept(DNLItems.HOLLOW_SPAWNEGG.get());
                 output.accept(DNLItems.SPAWNER_CARRIER_SPAWNEGG.get());
+                output.accept(DNLItems.GARHOLD_SPAWNEGG.get());
                 output.accept(DNLItems.SCUTTLE_SPAWNEGG.get());
                 output.accept(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
                 output.accept(DNLItems.SEALED_CHAOS_SPAWNEGG.get());

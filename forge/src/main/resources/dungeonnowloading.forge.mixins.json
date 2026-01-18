@@ -20,6 +20,7 @@
       "entities.EntityAvoidBlockMixin",
       "entities.ServerPlayerMixin",
       "entities.PlayerMixin",
+      "entities.MobMixin",
       "entities.SummonCommandMixin",
       "structures.StructureProcessorAccessor",
       "structures.StructureTemplateMixin",
@@ -39,14 +40,16 @@
       "inventory.AnvilMenuMixin"
     ],
     "client": [
-        "client.HumanoidModelMixin",
-        "client.PlayerRendererMixin",
-        "client.AbstractClientPlayerMixin",
-        "client.SituationalMusicMixin",
-        "client.MinecraftClientTickMixin",
-        "client.MusicManagerMixin",
-        "MixinTitleScreen",
-        "MaxHealthAttributeMixin"
+      "client.HumanoidModelMixin",
+      "client.PlayerRendererMixin",
+      "client.ClientPacketListenerMixin",
+      "client.AbstractClientPlayerMixin",
+      "client.SituationalMusicMixin",
+      "client.MinecraftClientTickMixin",
+      "client.MusicManagerMixin",
+      "client.LivingEntityRendererMixin",
+      "MixinTitleScreen",
+      "MaxHealthAttributeMixin"
     ],
     "server": [
     ],

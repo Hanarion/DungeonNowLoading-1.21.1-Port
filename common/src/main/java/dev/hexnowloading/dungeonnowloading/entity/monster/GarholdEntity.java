@@ -1,0 +1,1002 @@
+package dev.hexnowloading.dungeonnowloading.entity.monster;
+
+import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.*;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.GarholdAnimationDuration;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.UUID;
+import java.util.function.BiConsumer;
+
+public class GarholdEntity extends Monster {
+
+    private static final EntityDataAccessor<GarholdState> STATE = SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_STATE);
+    private static final EntityDataAccessor<GarholdAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_ANIMATION_STATE);
+    private static final EntityDataAccessor<GarholdBottomGateAnimationState> BOTTOM_GATE_ANIMATION_STATE = SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_GATE_ANIMATION_STATE);
+    private static final EntityDataAccessor<GarholdSideGateAnimationState> SIDE_GATE_ANIMATION_STATE = SynchedEntityData.defineId(GarholdEntity.class, EntityStates.GARHOLD_SIDE_GATE_ANIMATION_STATE);
+
+    private static final UUID CAPTURE_KB_UUID = UUID.fromString("c84d8d2a-1a5f-4b0c-9a4c-6c2c4d9b6a21");
+    private static final AttributeModifier CAPTURE_KB_MOD = new AttributeModifier(CAPTURE_KB_UUID, "Garhold capture knockback", 1.0, AttributeModifier.Operation.ADDITION);
+
+    private static final UUID CHAIN_KB_UUID = UUID.fromString("8c3a1b6e-2d78-4b1d-9c3b-7f7a6a3c2d11");
+    private static final AttributeModifier CHAIN_KB_MOD = new AttributeModifier(CHAIN_KB_UUID, "Garhold chain lock knockback", 1.0, AttributeModifier.Operation.ADDITION);
+
+    private AnimationChainer<GarholdAnimationState> animationChainer = new AnimationChainer<>();
+    private AnimationChainer<GarholdBottomGateAnimationState> bottomGateAnimationChainer = new AnimationChainer<>();
+    private AnimationChainer<GarholdSideGateAnimationState> sideGateAnimationChainer = new AnimationChainer<>();
+
+    public final AnimationState flyAnimationState = new AnimationState();
+    public final AnimationState detachAnimationState = new AnimationState();
+    public final AnimationState forceDetachAnimationState = new AnimationState();
+    public final AnimationState chargeDiveAnimationState = new AnimationState();
+    public final AnimationState landDiveAnimationState = new AnimationState();
+    public final AnimationState closingGateAnimationState = new AnimationState();
+    public final AnimationState sideCaptureAnimationState = new AnimationState();
+    public final AnimationState ascendAnimationState = new AnimationState();
+    public final AnimationState idleHangAnimationState = new AnimationState();
+    public final AnimationState reattachAnimationState = new AnimationState();
+
+    public final AnimationState bottomOpenAnimationState = new AnimationState();
+    public final AnimationState bottomCloseAnimationState = new AnimationState();
+    public final AnimationState bottomOpenedAnimationState = new AnimationState();
+    public final AnimationState bottomClosedAnimationState = new AnimationState();
+
+    public final AnimationState sideOpenedAnimationState = new AnimationState();
+    public final AnimationState sideClosedAnimationState = new AnimationState();
+    public final AnimationState sideOpenAnimationState = new AnimationState();
+    public final AnimationState sideCloseAnimationState = new AnimationState();
+
+    // --- Ascend movement (server tick based) ---
+    private boolean ascendLiftActive = false;
+    private int ascendLiftTicksLeft = 0;
+
+    public int sideCaptureCooldownTicks = 0;
+
+    private int chainedPassengerHoldTicks = 0;
+    private int chainedDetachLockoutTicks = 0;
+
+    private static final float ASCEND_LIFT_START_PROGRESS = 0.25f;
+    private static final int ASCEND_LIFT_TICKS = 10;
+    private static final double ASCEND_LIFT_BLOCKS = 3.0;
+    private static final double ASCEND_LIFT_PER_TICK = ASCEND_LIFT_BLOCKS / ASCEND_LIFT_TICKS;
+
+    public GarholdEntity(EntityType<? extends Monster> type, Level level) {
+        super(type, level);
+        this.xpReward = 20;
+        this.moveControl = new FlyingMoveControl(this, 16, true);
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new GarholdDiveCaptureGoal(this));
+        this.goalSelector.addGoal(2, new GarholdSideCaptureGoal(this));
+        this.goalSelector.addGoal(3, new GarholdHoverAboveTargetGoal(this, 1.5F, 6.0, 3.0, 14.0));
+        this.goalSelector.addGoal(4, new GarholdReturnToChainGoal(this));
+        this.goalSelector.addGoal(8, new GarholdWanderGoal(this, 1.0, 12, 6));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        super.registerGoals();
+    }
+
+    public static AttributeSupplier.Builder createAttributes() {
+        return Monster.createMonsterAttributes()
+                .add(Attributes.MAX_HEALTH, 35.0)
+                .add(Attributes.FLYING_SPEED, 0.6)
+                .add(Attributes.MOVEMENT_SPEED, 0.2) // Required for slowing down the initial speed on ground.
+                .add(Attributes.ATTACK_DAMAGE, 5.0)
+                .add(Attributes.FOLLOW_RANGE, 20.0)
+                .add(Attributes.ARMOR, 15.0);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(STATE, GarholdState.FLYING);
+        this.entityData.define(ANIMATION_STATE, GarholdAnimationState.NONE);
+        this.entityData.define(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_CLOSED);
+        this.entityData.define(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_CLOSED);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        compoundTag.putBoolean("Chained", this.isGarholdState(GarholdState.CHAINED));
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        this.setGarholdState(compoundTag.getBoolean("Chained") ? GarholdState.CHAINED : GarholdState.FLYING);
+    }
+
+    @Override
+    protected PathNavigation createNavigation(Level level) {
+        FlyingPathNavigation nav = new FlyingPathNavigation(this, level);
+        nav.setCanOpenDoors(false);
+        nav.setCanFloat(true);
+        nav.setCanPassDoors(true);
+        return nav;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (this.level().isClientSide) {
+            return;
+        }
+
+        animationChainer.tick(this::transitionTo);
+        bottomGateAnimationChainer.tick(this::transitionTo);
+        sideGateAnimationChainer.tick(this::transitionTo);
+
+        if (this.entityData.get(ANIMATION_STATE).equals(GarholdAnimationState.NONE)) {
+            if (this.entityData.get(STATE).equals(GarholdState.CHAINED)) {
+                this.playIdleHanging();
+                this.playClosedSideAnimation();
+                this.playedClosedBottomAnimation();
+            } else {
+                this.playFlyAnimation();
+                this.playOpenedBottomAnimation(true);
+                this.playOpenedSideAnimation(true);
+            }
+        }
+    }
+
+    @Override
+    protected void customServerAiStep() {
+        super.customServerAiStep();
+        if (sideCaptureCooldownTicks > 0) sideCaptureCooldownTicks--;
+
+        boolean chainLocked = isPushableState();
+
+        var inst = this.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+        if (inst != null) {
+            boolean has = inst.getModifier(CHAIN_KB_UUID) != null;
+
+            if (chainLocked && !has) {
+                inst.addTransientModifier(CHAIN_KB_MOD);
+            } else if (!chainLocked && has) {
+                inst.removeModifier(CHAIN_KB_UUID);
+            }
+        }
+
+        if (chainedPassengerHoldTicks > 0) chainedPassengerHoldTicks--;
+        if (chainedDetachLockoutTicks > 0) chainedDetachLockoutTicks--;
+
+        if (this.isGarholdState(GarholdState.CHAINED)) {
+            if (chainedPassengerHoldTicks == 1) {
+                // about to expire next tick -> dismount now
+                forceDismountPassengerUnderSelf();
+                playReleasePlayerAnimation();
+                chainedDetachLockoutTicks = 100; // 5 seconds
+            }
+
+            // Forced detach ALWAYS wins
+            if (!hasChainAboveSelf()) {
+                startDetaching(true);
+            } else {
+                // Normal detach only if not protected
+                boolean protectedFromNormalDetach = (chainedPassengerHoldTicks > 0) || (chainedDetachLockoutTicks > 0);
+                if (!protectedFromNormalDetach && seesPlayerInRange()) {
+                    startDetaching(false);
+                }
+            }
+        }
+
+        if (ascendLiftTicksLeft > 0) {
+            // keep it stable during the lift
+            this.setDeltaMovement(0.0, 0.0, 0.0);
+
+            // move up smoothly
+            double step = ASCEND_LIFT_PER_TICK;
+
+            // Try to move up, but stop if we'd collide
+            AABB next = this.getBoundingBox().move(0.0, step, 0.0);
+            if (this.level().noCollision(this, next)) {
+                this.setPos(this.getX(), this.getY() + step, this.getZ());
+            } else {
+                // find the largest safe step (binary search)
+                double lo = 0.0;
+                double hi = step;
+
+                for (int i = 0; i < 8; i++) { // 8 iterations is plenty
+                    double mid = (lo + hi) * 0.5;
+                    AABB midBox = this.getBoundingBox().move(0.0, mid, 0.0);
+                    if (this.level().noCollision(this, midBox)) lo = mid;
+                    else hi = mid;
+                }
+
+                if (lo > 1.0e-4) {
+                    this.setPos(this.getX(), this.getY() + lo, this.getZ());
+                }
+
+                // Stop lifting once blocked
+                ascendLiftTicksLeft = 0;
+                ascendLiftActive = false;
+            }
+
+            ascendLiftTicksLeft--;
+
+            if (ascendLiftTicksLeft <= 0) {
+                ascendLiftTicksLeft = 0;
+                ascendLiftActive = false;
+            }
+        }
+    }
+
+    public boolean hasCapturedPlayer() {
+        return !this.getPassengers().isEmpty();
+    }
+
+    public void beginCapture(Player player) {
+        // Kick them off whatever they were riding
+        if (player.isPassenger()) {
+            player.stopRiding();
+        }
+
+        this.applyCaptureAttributes();
+        this.clearNearbyTargets(player);
+        player.startRiding(this, true);
+    }
+
+    private void teleportRiderToChainedGarhold() {
+        if (this.level().isClientSide) return;
+        if (this.getPassengers().isEmpty()) return;
+
+        Entity rider = this.getPassengers().get(0);
+        if (!(rider instanceof Player player)) return;
+
+        Entity target = findNearestChainedGarhold(128.0);
+        if (target == null) return;
+
+        ServerLevel level = (ServerLevel) this.level();
+
+        spawnTeleportSpawnerFx(level, this.position());
+
+        player.teleportTo(target.getX(), target.getY(), target.getZ());
+        player.stopRiding();
+        player.startRiding(target, true);
+
+        spawnTeleportSpawnerFx(level, target.position());
+
+        if (target instanceof GarholdEntity g) {
+            g.chainedPassengerHoldTicks = 60;
+        }
+    }
+
+
+    private Entity findNearestChainedGarhold(double range) {
+        AABB box = this.getBoundingBox().inflate(range);
+
+        Entity best = null;
+        double bestDist = Double.MAX_VALUE;
+
+        for (GarholdEntity g : this.level().getEntitiesOfClass(GarholdEntity.class, box)) {
+            if (g == this) continue;
+            if (!g.isAlive()) continue;
+            if (!g.isGarholdState(GarholdState.CHAINED)) continue;
+            if (!g.hasChainAboveSelf()) continue; // must really be chained
+            if (!g.getPassengers().isEmpty()) continue; // skip if already holding someone (optional)
+
+            double d = this.distanceToSqr(g);
+            if (d < bestDist) {
+                bestDist = d;
+                best = g;
+            }
+        }
+
+        for (BrokenGarholdEntity b : this.level().getEntitiesOfClass(BrokenGarholdEntity.class, box)) {
+            if (!b.isAlive()) continue;
+            if (!b.getPassengers().isEmpty()) continue;
+
+            double d = this.distanceToSqr(b);
+            if (d < bestDist) {
+                bestDist = d;
+                best = b;
+            }
+        }
+        return best;
+    }
+
+    private void forceDismountPassengerUnderSelf() {
+        if (this.getPassengers().isEmpty()) return;
+
+        Entity rider = this.getPassengers().get(0);
+        rider.stopRiding();
+
+        // Place them underneath (try to find a safe-ish spot)
+        double x = this.getX();
+        double z = this.getZ();
+        double y = this.getBoundingBox().minY;
+
+        if (rider instanceof Player p) {
+            p.teleportTo(x, y, z);
+        } else {
+            rider.teleportTo(x, y, z);
+        }
+    }
+
+    @Override
+    protected void removePassenger(Entity passenger) {
+        super.removePassenger(passenger);
+
+        if (!this.level().isClientSide) {
+            if (this.getPassengers().isEmpty()) {
+                this.clearCaptureAttributes();
+            }
+        }
+    }
+
+    @Override
+    protected void positionRider(Entity passenger, MoveFunction moveFunction) {
+        if (!this.hasPassenger(passenger)) return;
+
+        float seatY;
+
+        if (this.isGarholdState(GarholdState.CHAINED)) {
+            seatY = 0.5f;
+        } else {
+            seatY = 0.1f; // default
+        }
+
+        Vec3 seat = new Vec3(this.getX(), this.getY() + seatY, this.getZ());
+        moveFunction.accept(passenger, seat.x, seat.y, seat.z);
+    }
+
+    @Override
+    public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
+        return false;
+    }
+
+    @Override
+    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
+    }
+
+    @Override
+    public boolean isPushable() {
+        if (isPushableState()) {
+            return false;
+        }
+        return super.isPushable();
+    }
+
+    @Override
+    public void push(double x, double y, double z) {
+        if (isPushableState()) {
+            return;
+        }
+        super.push(x, y, z);
+    }
+
+    private boolean isPushableState() {
+        return isGarholdState(GarholdState.LOCKING_ON_CHAIN) || isGarholdState(GarholdState.ATTACHING) || isGarholdState(GarholdState.CHAINED);
+    }
+
+
+    private void applyCaptureAttributes() {
+        AttributeInstance kb = this.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+        if (kb != null && !kb.hasModifier(CAPTURE_KB_MOD)) {
+            kb.addTransientModifier(CAPTURE_KB_MOD);
+        }
+    }
+
+    @Override
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+
+        if (!this.level().isClientSide) {
+            if (player.getAbilities().instabuild) {
+                if (stack.getItem() instanceof PickaxeItem) {
+                    ServerLevel level = (ServerLevel) this.level();
+                    BrokenGarholdEntity broken = DNLEntityTypes.BROKEN_GARHOLD.get().create(level); // <-- replace with your entity registry access
+                    if (broken != null) {
+                        broken.moveTo(
+                                this.getX(),
+                                this.getY(),
+                                this.getZ(),
+                                this.getYRot(),
+                                this.getXRot()
+                        );
+                        broken.setYHeadRot(this.getYHeadRot());
+                        broken.setYBodyRot(this.yBodyRot);
+
+                        level.addFreshEntity(broken);
+                    }
+                    this.discard();
+                    return InteractionResult.CONSUME;
+                }
+            }
+        }
+
+        return super.mobInteract(player, hand);
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        Entity attacker = source.getEntity();
+
+        if (attacker instanceof Player p && this.hasPassenger(p)) {
+            amount *= 0.5f;
+        }
+
+        boolean ok = super.hurt(source, amount);
+
+        if (ok && this.isGarholdState(GarholdState.CHAINED)) {
+            boolean protectedFromNormalDetach = (chainedPassengerHoldTicks > 0) || (chainedDetachLockoutTicks > 0);
+            if (!protectedFromNormalDetach) {
+                startDetaching(false);
+            }
+        }
+
+        return ok;
+    }
+
+
+    private void clearCaptureAttributes() {
+        AttributeInstance kb = this.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+        if (kb != null && kb.hasModifier(CAPTURE_KB_MOD)) {
+            kb.removeModifier(CAPTURE_KB_UUID);
+        }
+    }
+
+    private void clearNearbyTargets(Player player) {
+        double r = 48.0; // tweak radius
+        AABB box = player.getBoundingBox().inflate(r);
+        for (Mob mob : this.level().getEntitiesOfClass(Mob.class, box, m -> m.getTarget() == player)) {
+            mob.setTarget(null);
+        }
+    }
+
+    private boolean hasChainAboveSelf() {
+        AABB box = this.getBoundingBox();
+
+        // center XZ, bottom Y
+        double cx = (box.minX + box.maxX) * 0.5;
+        double cz = (box.minZ + box.maxZ) * 0.5;
+        double y0 = box.minY; // bottom of hitbox
+
+        // Build a blockpos from that point, then go up
+        BlockPos base = BlockPos.containing(cx, y0, cz);
+        return isChainBlock(base.above(3));
+    }
+
+    private boolean seesPlayerInRange() {
+        double range = this.getAttributeValue(Attributes.FOLLOW_RANGE);
+
+        Player p = this.level().getNearestPlayer(
+                this.getX(), this.getEyeY(), this.getZ(),
+                range,
+                player -> player.isAlive()
+                        && player instanceof Player pp
+                        && !pp.getAbilities().instabuild
+                        && !this.hasPassenger(player) // <-- critical
+        );
+
+        return p != null && this.hasLineOfSight(p);
+    }
+
+    private void startDetaching(boolean forced) {
+        // Don’t stomp other states
+        if (!isGarholdState(GarholdState.CHAINED)) return;
+
+        this.setGarholdState(forced ? GarholdState.FORCE_DETACHING :GarholdState.DETACHING);
+
+        if (forced) {
+            playForceDetach();
+        } else {
+            playDetach();
+        }
+        //if (forced) playForceDetach();
+
+        // Stop any chain-lock motion immediately
+        this.getNavigation().stop();
+        this.setDeltaMovement(Vec3.ZERO);
+    }
+
+    public boolean isChainBlock(BlockPos pos) {
+        return this.level().getBlockState(pos).is(Blocks.CHAIN);
+    }
+
+    public GarholdState getGarholdState() {
+        return this.entityData.get(STATE);
+    }
+
+    public void setGarholdState(GarholdState state) {
+        this.entityData.set(STATE, state);
+    }
+
+    public boolean isGarholdState(GarholdState state) {
+        return this.entityData.get(STATE).equals(state);
+    }
+
+    public boolean isNoAnimation() {
+        return this.entityData.get(ANIMATION_STATE).equals(GarholdAnimationState.NONE);
+    }
+
+    public static void spawnTeleportSpawnerFx(ServerLevel level, Vec3 pos) {
+
+        level.sendParticles(ParticleTypes.FLAME,
+                pos.x, pos.y, pos.z,
+                30,           // count
+                0.7, 2.3, 0.7,
+                0.001
+        );
+
+        level.sendParticles(ParticleTypes.POOF,
+                pos.x, pos.y, pos.z,
+                30,           // count
+                0.7, 2.3, 0.7,
+                0.001
+        );
+    }
+
+
+    public void playFlyAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.FLY_2,
+                GarholdAnimationDuration.FLY
+        ));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.FLY,
+                GarholdAnimationDuration.FLY
+        ));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.FLY_2,
+                GarholdAnimationDuration.FLY,
+                null,
+                this::playIdleOrIdleBreak
+        ));
+    }
+
+    private void playIdleOrIdleBreak() {
+        if (this.isGarholdState(GarholdState.ATTACHING)) {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.REATTACH,
+                    GarholdAnimationDuration.REATTACH,
+                    null,
+                    () -> {
+                        this.setGarholdState(GarholdState.CHAINED);
+                        this.playIdleHanging();
+                    }
+            ));
+        } else {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.FLY,
+                    GarholdAnimationDuration.FLY,
+                    null,
+                    this::playIdleOrIdleBreak2
+            ));
+        }
+    }
+
+    private void playIdleOrIdleBreak2() {
+        if (this.isGarholdState(GarholdState.ATTACHING)) {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.REATTACH,
+                    GarholdAnimationDuration.REATTACH,
+                    null,
+                    () -> {
+                        this.setGarholdState(GarholdState.CHAINED);
+                        this.playIdleHanging();
+                    }
+            ));
+        } else {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.FLY_2,
+                    GarholdAnimationDuration.FLY,
+                    null,
+                    this::playIdleOrIdleBreak
+            ));
+        }
+    }
+
+    private void playForceDetach() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdAnimationState.FORCE_DETACH, GarholdAnimationDuration.FORCE_DETACH, null, () -> {
+            this.setGarholdState(GarholdState.FLYING);
+            this.playIdleOrIdleBreak();
+            this.playOpenSideAnimation();
+            this.playOpenBottomAnimation();
+        }));
+    }
+
+    private void playDetach() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdAnimationState.DETACH, GarholdAnimationDuration.DETACH, null, () -> {
+            this.setGarholdState(GarholdState.FLYING);
+            this.playIdleOrIdleBreak();
+            this.playOpenSideAnimation();
+            this.playOpenBottomAnimation();
+        }));
+
+    }
+
+    private void playIdleHanging() {
+        if (this.isGarholdState(GarholdState.CHAINED)) {
+            this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdAnimationState.IDLE_HANGING,
+                    GarholdAnimationDuration.IDLE_HANGING,
+                    null,
+                    this::playIdleHanging
+            ));
+        } else {
+            playIdleOrIdleBreak();
+        }
+    }
+
+    public void playChargeDiveWithProgress(BiConsumer<GarholdAnimationState, Float> onProgress, Runnable onComplete) {
+        this.playedClosedBottomAnimation();
+        this.playClosedSideAnimation();
+
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.CHARGE_DIVE,
+                GarholdAnimationDuration.CHARGE_DIVE,
+                null,
+                onComplete,
+                onProgress
+        ));
+    }
+
+    public void playLandDiveAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.LAND_DIVE,
+                GarholdAnimationDuration.LAND_DIVE,
+                null,
+                () -> {
+                    if (this.hasCapturedPlayer()) {
+                        this.playClosingGateAnimation();
+                    } else {
+                        this.playAscendAnimation();
+                    }
+                }
+        ));
+    }
+
+    public void playSideCaptureAnimation() {
+        this.animationChainer.reset();
+
+        this.animationChainer.enqueue(
+                AnimationChainer.AnimationStep.of(
+                        GarholdAnimationState.SIDE_CAPTURE,
+                        GarholdAnimationDuration.SIDE_CAPTURE,
+                        null,
+                        () -> { // onComplete
+                            if (this.hasCapturedPlayer()) {
+                                this.playClosingGateAnimation();
+                            } else {
+                                this.playAscendAnimation();
+                            }
+                        }
+                )
+        );
+    }
+
+
+    public void playClosingGateAnimation() {
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdAnimationState.CLOSING_GATE,
+                GarholdAnimationDuration.CLOSING_GATE,
+                null,
+                () -> {
+                    teleportRiderToChainedGarhold();
+
+                    this.playAscendAnimation();
+                }
+        ));
+    }
+
+    public void playAscendAnimation() {
+        this.playOpenSideAnimation();
+        this.playOpenBottomAnimation();
+
+        this.animationChainer.enqueue(
+                AnimationChainer.AnimationStep.of(
+                        GarholdAnimationState.ASCEND,
+                        GarholdAnimationDuration.ASCEND,
+                        () -> { // onStart
+                            ascendLiftActive = false;
+                            ascendLiftTicksLeft = 0;
+
+                            // If we failed to teleport the captured player to a chained Garhold,
+                            // eject them now as we ascend.
+
+                            // reset for next capture cycle
+                        },
+                        () -> { // onComplete
+                            ascendLiftActive = false;
+                            ascendLiftTicksLeft = 0;
+
+                            this.setGarholdState(GarholdState.FLYING);
+                            this.playFlyAnimation();
+                        },
+                        (anim, progress) -> {
+                            if (this.hasCapturedPlayer()) this.forceDismountPassengerUnderSelf();
+                            if (!ascendLiftActive && progress >= ASCEND_LIFT_START_PROGRESS) {
+                                ascendLiftActive = true;
+                                ascendLiftTicksLeft = ASCEND_LIFT_TICKS;
+                            }
+                        }
+                )
+        );
+    }
+
+    public void playReleasePlayerAnimation() {
+        this.bottomGateAnimationChainer.reset();
+        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdBottomGateAnimationState.BOTTOM_OPEN, GarholdAnimationDuration.BOTTOM_OPEN));
+        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdBottomGateAnimationState.BOTTOM_CLOSE, GarholdAnimationDuration.BOTTOM_CLOSE));
+    }
+
+    // Bottom Animations
+
+    public void playedClosedBottomAnimation() {
+        this.bottomGateAnimationChainer.reset();
+        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                GarholdBottomGateAnimationState.BOTTOM_CLOSED,
+                GarholdAnimationDuration.BOTTOM_CLOSED
+        ));
+    }
+
+    public void playOpenBottomAnimation() {
+        this.bottomGateAnimationChainer.reset();
+        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdBottomGateAnimationState.BOTTOM_OPEN,
+                GarholdAnimationDuration.BOTTOM_OPEN,
+                null,
+                () -> this.playOpenedBottomAnimation(false)
+        ));
+    }
+
+    public void playOpenedBottomAnimation(boolean reset) {
+        if (reset) {
+            this.bottomGateAnimationChainer.reset();
+        }
+
+        if (this.isGarholdState(GarholdState.ATTACHING) || this.isGarholdState(GarholdState.SIDE_CAPTURE)) {
+            this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdBottomGateAnimationState.BOTTOM_CLOSE,
+                    GarholdAnimationDuration.BOTTOM_CLOSE
+            ));
+            this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                    GarholdBottomGateAnimationState.BOTTOM_CLOSED,
+                    GarholdAnimationDuration.BOTTOM_CLOSED
+            ));
+        } else {
+            this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdBottomGateAnimationState.BOTTOM_OPENED,
+                    GarholdAnimationDuration.BOTTOM_OPENED,
+                    null,
+                    () -> this.playOpenedBottomAnimation(false)
+            ));
+        }
+    }
+
+    // Side Animations
+
+    public void playOpenSideAnimation() {
+        this.sideGateAnimationChainer.reset();
+        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdSideGateAnimationState.SIDE_OPEN,
+                GarholdAnimationDuration.SIDE_OPEN
+        ));
+        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                GarholdSideGateAnimationState.SIDE_OPENED,
+                GarholdAnimationDuration.SIDE_OPENED,
+                null,
+                () -> this.playOpenedSideAnimation(false)
+        ));
+    }
+
+    public void playOpenedSideAnimation(boolean reset) {
+        if (reset) {
+            this.sideGateAnimationChainer.reset();
+        }
+
+        if (this.isGarholdState(GarholdState.ATTACHING) || this.isGarholdState(GarholdState.SIDE_CAPTURE)) {
+            this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdSideGateAnimationState.SIDE_CLOSE,
+                    GarholdAnimationDuration.SIDE_CLOSE
+            ));
+            this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                    GarholdSideGateAnimationState.SIDE_CLOSED,
+                    GarholdAnimationDuration.SIDE_CLOSED
+            ));
+        } else {
+            this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                    GarholdSideGateAnimationState.SIDE_OPENED,
+                    GarholdAnimationDuration.SIDE_OPENED,
+                    null,
+                    () -> this.playOpenedSideAnimation(false)
+            ));
+        }
+    }
+
+    public void playClosedSideAnimation() {
+        this.sideGateAnimationChainer.reset();
+        this.sideGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.looping(
+                GarholdSideGateAnimationState.SIDE_CLOSED,
+                GarholdAnimationDuration.SIDE_CLOSED
+        ));
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            GarholdAnimationState animationState = this.entityData.get(ANIMATION_STATE);
+            this.resetAnimation();
+            switch (animationState) {
+                case FLY, FLY_2 -> this.flyAnimationState.startIfStopped(this.tickCount);
+                case DETACH -> this.detachAnimationState.startIfStopped(this.tickCount);
+                case FORCE_DETACH -> this.forceDetachAnimationState.startIfStopped(this.tickCount);
+                case CHARGE_DIVE -> this.chargeDiveAnimationState.startIfStopped(this.tickCount);
+                case LAND_DIVE -> this.landDiveAnimationState.startIfStopped(this.tickCount);
+                case CLOSING_GATE -> this.closingGateAnimationState.startIfStopped(this.tickCount);
+                case SIDE_CAPTURE -> this.sideCaptureAnimationState.startIfStopped(this.tickCount);
+                case ASCEND -> this.ascendAnimationState.startIfStopped(this.tickCount);
+                case IDLE_HANGING -> this.idleHangAnimationState.startIfStopped(this.tickCount);
+                case REATTACH -> this.reattachAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+
+        if (BOTTOM_GATE_ANIMATION_STATE.equals(entityDataAccessor)) {
+            GarholdBottomGateAnimationState gateAnimationState = this.entityData.get(BOTTOM_GATE_ANIMATION_STATE);
+            this.resetBottomGateAnimation();
+            switch (gateAnimationState) {
+                case BOTTOM_CLOSED -> this.bottomClosedAnimationState.startIfStopped(this.tickCount);
+                case BOTTOM_OPEN -> this.bottomOpenAnimationState.startIfStopped(this.tickCount);
+                case BOTTOM_OPENED -> this.bottomOpenedAnimationState.startIfStopped(this.tickCount);
+                case BOTTOM_CLOSE -> this.bottomCloseAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+
+        if (SIDE_GATE_ANIMATION_STATE.equals(entityDataAccessor)) {
+            GarholdSideGateAnimationState sideGateAnimationState = this.entityData.get(SIDE_GATE_ANIMATION_STATE);
+            this.resetSideGateAnimation();
+            switch (sideGateAnimationState) {
+                case SIDE_CLOSED -> this.sideClosedAnimationState.startIfStopped(this.tickCount);
+                case SIDE_OPEN -> this.sideOpenAnimationState.startIfStopped(this.tickCount);
+                case SIDE_OPENED -> this.sideOpenedAnimationState.startIfStopped(this.tickCount);
+                case SIDE_CLOSE -> this.sideCloseAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    private void resetBottomGateAnimation() {
+        this.bottomOpenAnimationState.stop();
+        this.bottomOpenedAnimationState.stop();
+        this.bottomClosedAnimationState.stop();
+        this.bottomCloseAnimationState.stop();
+    }
+
+    private void resetAnimation() {
+        this.flyAnimationState.stop();
+        this.detachAnimationState.stop();
+        this.forceDetachAnimationState.stop();
+        this.chargeDiveAnimationState.stop();
+        this.landDiveAnimationState.stop();
+        this.closingGateAnimationState.stop();
+        this.sideCaptureAnimationState.stop();
+        this.ascendAnimationState.stop();
+        this.idleHangAnimationState.stop();
+        this.reattachAnimationState.stop();
+    }
+
+    private void resetSideGateAnimation() {
+        this.sideOpenedAnimationState.stop();
+        this.sideOpenAnimationState.stop();
+        this.sideClosedAnimationState.stop();
+        this.sideCloseAnimationState.stop();
+    }
+
+    public GarholdEntity transitionTo(GarholdAnimationState state) {
+        switch (state) {
+            case FLY -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.FLY);
+            case FLY_2 -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.FLY_2);
+            case DETACH -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.DETACH);
+            case FORCE_DETACH -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.FORCE_DETACH);
+            case CHARGE_DIVE -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.CHARGE_DIVE);
+            case LAND_DIVE -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.LAND_DIVE);
+            case CLOSING_GATE -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.CLOSING_GATE);
+            case SIDE_CAPTURE -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.SIDE_CAPTURE);
+            case ASCEND -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.ASCEND);
+            case IDLE_HANGING -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.IDLE_HANGING);
+            case REATTACH -> this.entityData.set(ANIMATION_STATE, GarholdAnimationState.REATTACH);
+        }
+        return this;
+    }
+
+    public GarholdEntity transitionTo(GarholdBottomGateAnimationState state) {
+        switch (state) {
+            case BOTTOM_CLOSED -> this.entityData.set(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_CLOSED);
+            case BOTTOM_OPEN -> this.entityData.set(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_OPEN);
+            case BOTTOM_OPENED -> this.entityData.set(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_OPENED);
+            case BOTTOM_CLOSE -> this.entityData.set(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_CLOSE);
+        }
+        return this;
+    }
+
+    public GarholdEntity transitionTo(GarholdSideGateAnimationState state) {
+        switch (state) {
+            case SIDE_CLOSED -> this.entityData.set(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_CLOSED);
+            case SIDE_OPEN -> this.entityData.set(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_OPEN);
+            case SIDE_OPENED -> this.entityData.set(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_OPENED);
+            case SIDE_CLOSE -> this.entityData.set(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.SIDE_CLOSE);
+        }
+        return this;
+    }
+
+    public enum GarholdState {
+        CHAINED,
+        LOCKING_ON_CHAIN,
+        ATTACHING,
+        FORCE_DETACHING,
+        DETACHING,
+        FLYING,
+        DIVE,
+        SIDE_CAPTURE
+    }
+
+    public enum GarholdBottomGateAnimationState {
+        BOTTOM_OPEN,
+        BOTTOM_OPENED,
+        BOTTOM_CLOSED,
+        BOTTOM_CLOSE
+    }
+
+    public enum GarholdSideGateAnimationState {
+        SIDE_OPENED,
+        SIDE_OPEN,
+        SIDE_CLOSED,
+        SIDE_CLOSE
+    }
+
+    public enum GarholdAnimationState {
+        NONE,
+        FLY,
+        FLY_2,
+        DETACH,
+        FORCE_DETACH,
+        CHARGE_DIVE,
+        LAND_DIVE,
+        CLOSING_GATE,
+        SIDE_CAPTURE,
+        ASCEND,
+        IDLE_HANGING,
+        REATTACH
+    }
+}

@@ -8,10 +8,7 @@ import dev.hexnowloading.dungeonnowloading.entity.misc.PayloadEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.SpawnerCarrierEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
@@ -44,7 +41,8 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<SpawnerCarrierEntity>> SPAWNER_CARRIER = register("spawner_carrier", () -> EntityType.Builder.of(SpawnerCarrierEntity::new, MobCategory.MONSTER).sized(1.95F, 1.95F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "spawner_carrier").toString()));
     public static final Supplier<EntityType<ScuttleEntity>> SCUTTLE = register("scuttle", () -> EntityType.Builder.of(ScuttleEntity::new, MobCategory.MONSTER).sized(0.97F, 1.95F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "scuttle").toString()));
     public static final Supplier<EntityType<BallistaGolemEntity>> BALLISTA_GOLEM = register("ballista_golem", () -> EntityType.Builder.of(BallistaGolemEntity::new, MobCategory.MONSTER).sized(2.9F, 4.0F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "ballista_golem").toString()));
-
+    public static final Supplier<EntityType<GarholdEntity>> GARHOLD = register("garhold", () -> EntityType.Builder.of(GarholdEntity::new, MobCategory.MONSTER).sized(1.2F, 2.5F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "garhold").toString()));
+    public static final Supplier<EntityType<BrokenGarholdEntity>> BROKEN_GARHOLD = register("broken_garhold", () -> EntityType.Builder.of(BrokenGarholdEntity::new, MobCategory.MONSTER).sized(1.2F, 2.5F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "broken_garhold").toString()));
 
     // Passive
     public static final Supplier<EntityType<SealedChaosEntity>> SEALED_CHAOS = register("sealed_chaos", () -> EntityType.Builder.of(SealedChaosEntity::new, MobCategory.CREATURE).sized(1F, 1F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "sealed_chaos").toString()));
@@ -89,6 +87,8 @@ public class DNLEntityTypes {
         map.put(SPAWNER_CARRIER.get(), SpawnerCarrierEntity.createAttributes().build());
         map.put(SCUTTLE.get(), ScuttleEntity.createAttributes().build());
         map.put(BALLISTA_GOLEM.get(), BallistaGolemEntity.createAttributes().build());
+        map.put(GARHOLD.get(), GarholdEntity.createAttributes().build());
+        map.put(BROKEN_GARHOLD.get(), BrokenGarholdEntity.createAttributes().build());
 
         // Passive
         map.put(SEALED_CHAOS.get(), SealedChaosEntity.createAttributes().build());

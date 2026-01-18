@@ -23,6 +23,7 @@
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",
     "entities.PlayerMixin",
+    "entities.MobMixin",
     "fabric.block.BlockPlaceMixin",
     "fabric.block.BucketItemMixin",
     "fabric.block.FlintAndSteelMixin",
@@ -36,11 +37,13 @@
   ],
   "client": [
     "client.HumanoidModelMixin",
+    "client.ClientPacketListenerMixin",
     "client.PlayerRendererMixin",
     "client.AbstractClientPlayerMixin",
     "client.SituationalMusicMixin",
     "client.MinecraftClientTickMixin",
     "client.MusicManagerMixin",
+    "client.LivingEntityRendererMixin",
     "MaxHealthAttributeMixin",
     "MixinTitleScreen"
   ],
