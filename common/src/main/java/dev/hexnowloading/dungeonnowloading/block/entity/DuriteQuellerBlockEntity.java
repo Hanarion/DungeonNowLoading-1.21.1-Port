@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
+import dev.hexnowloading.dungeonnowloading.particle.type.DirectionalParticleType;
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
@@ -16,10 +18,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
-public class DispelBlockEntity extends BlockEntity {
+public class DuriteQuellerBlockEntity extends BlockEntity {
 
     private static final float RETURN_PARTICLE_SPEED = 0.18f; // blocks per tick
     private static final double MAX_SPAWN_DISTANCE = 32.0;
+    private static final int GROWTH_INTERVAL_TICKS = 20; // 1 second
+
 
     // Stored "structure-local" corners (offsets) + the facing they were authored in
     private BlockPos cornerA = BlockPos.ZERO;
@@ -27,14 +31,14 @@ public class DispelBlockEntity extends BlockEntity {
     private Direction nbtFacing = Direction.NORTH;
 
     private boolean wasPowered = false;
-
-    private static final int DELAY_TICKS = 20 * 5;
+    private int spawnTicksTotal = 0;
     private int delayTicks = 0;
     private boolean pending = false;
 
     private final LongList cachedPreservers = new LongArrayList();
 
     private static final int SPAWN_TICKS_TOTAL = 20 * 5; // 5 seconds
+    private static final int EARLY_MENDING_POP_TICKS = 16;
 
     // we compute per particle ticks, but this is a cap / safety
     private static final int MAX_WAIT_TICKS = 40;
@@ -50,29 +54,49 @@ public class DispelBlockEntity extends BlockEntity {
     private int lastArrivalTick = 0;  // relative to triggerGameTime
 
     private int growthTotal = 0;      // G = preserverCount + 3
+    private int nextEarlyIndex = 0;   // 0..growthTotal-1
     private int nextGrowthIndex = 0;  // 0..growthTotal-1
 
+    private int particleFirstArrivalTick = 0; // relative to triggerGameTime
 
-    public DispelBlockEntity(BlockPos pos, BlockState state) {
-        super(DNLBlockEntityTypes.DISPEL_BLOCK.get(), pos, state);
+    public DuriteQuellerBlockEntity(BlockPos pos, BlockState state) {
+        super(DNLBlockEntityTypes.DURITE_QUELLER.get(), pos, state);
     }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, DispelBlockEntity be) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, DuriteQuellerBlockEntity be) {
         if (!(level instanceof ServerLevel server)) return;
-        if (!be.pending) return;
+
+        // Nothing to do if not running
+        if (!be.pending || be.phase == Phase.NONE) return;
+
+        // Only re-cache while we still expect preservers to exist
+        if (be.phase == Phase.SPAWNING) {
+            be.ensureCachedPreservers(server);
+
+            if (be.cachedPreservers.isEmpty()) {
+                be.pending = false;
+                be.phase = Phase.NONE;
+
+                be.spawnTicksLeft = 0;
+                be.waitTicksLeft = 0;
+                be.growthTotal = 0;
+                be.nextGrowthIndex = 0;
+                be.nextEarlyIndex = 0;
+
+                be.setChanged();
+                return;
+            }
+        }
 
         be.tryDoGrowth(server);
 
         if (be.phase == Phase.SPAWNING) {
             boolean isLastSpawnTick = (be.spawnTicksLeft == 1);
 
-            // Spawn the inward-travel particles every tick
             be.spawnReturnParticlesBatch(server);
 
-            // On the LAST spawn tick: pop + replace preservers NOW
             if (isLastSpawnTick) {
                 be.popAndReplacePreservers(server);
-                // After this, cached preservers are no longer preservers (but we keep the list for visuals if needed)
             }
 
             be.spawnTicksLeft--;
@@ -84,7 +108,6 @@ public class DispelBlockEntity extends BlockEntity {
             }
             return;
         }
-
 
         if (be.phase == Phase.WAITING) {
             be.waitTicksLeft--;
@@ -100,27 +123,37 @@ public class DispelBlockEntity extends BlockEntity {
         }
     }
 
+
     private void tryDoGrowth(ServerLevel level) {
         if (!pending || growthTotal <= 0) return;
 
         int relTick = (int) (level.getGameTime() - triggerGameTime);
 
-        if (relTick < firstArrivalTick) return;
-        if (relTick > lastArrivalTick) return; // after window, stop
+        // ----- EARLY POPS (16 ticks before each growth) -----
+        while (nextEarlyIndex < growthTotal) {
+            int growthTick = getScheduledGrowthTick(nextEarlyIndex);
+            int earlyTick = Math.max(particleFirstArrivalTick, growthTick - EARLY_MENDING_POP_TICKS);
 
-        // If only 1 growth event, schedule it at lastArrival (also equals firstArrival if window=0)
-        int denom = Math.max(1, growthTotal - 1);
-        int window = Math.max(0, lastArrivalTick - firstArrivalTick);
+            if (relTick < earlyTick) break;
 
-        // Catch up in case of lag (do multiple growth steps if needed)
+            BlockPos startPos = this.getBlockPos().above();
+            float scale = getScaleForIndex(level, nextEarlyIndex);
+            spawnMendingPop(level, startPos, scale);
+
+            nextEarlyIndex++;
+        }
+
+        // ----- ACTUAL GROWTH + POP BURST -----
         while (nextGrowthIndex < growthTotal) {
-            int scheduledTick = firstArrivalTick + (nextGrowthIndex * window) / denom;
-            if (relTick < scheduledTick) break;
+            int growthTick = getScheduledGrowthTick(nextGrowthIndex);
+            if (relTick < growthTick) break;
 
             doOneGrowth(level);
             nextGrowthIndex++;
         }
     }
+
+
 
     private void doOneGrowth(ServerLevel level) {
         BlockPos startPos = this.getBlockPos().above();
@@ -165,9 +198,19 @@ public class DispelBlockEntity extends BlockEntity {
             level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(
                     level,
                     startPos.getX() + 0.5, startPos.getY() + 0.5, startPos.getZ() + 0.5,
-                    new net.minecraft.world.item.ItemStack(DNLItems.DURITE.get()) // adjust
+                    new net.minecraft.world.item.ItemStack(DNLItems.DURITE.get())
             ));
             level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            return;
+        }
+
+        level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.5F);
+        if (level.random.nextFloat() < 0.25f) {
+            level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(
+                    level,
+                    startPos.getX() + 0.5, startPos.getY() + 0.5, startPos.getZ() + 0.5,
+                    new net.minecraft.world.item.ItemStack(DNLItems.DURITE.get())
+            ));
         }
     }
 
@@ -201,13 +244,66 @@ public class DispelBlockEntity extends BlockEntity {
         }
     }
 
+    private void spawnMendingPop(ServerLevel level, BlockPos blockPos, float scale) {
+        double x = blockPos.getX() + 0.5;
+        double y = blockPos.getY() + 0.5; // slightly above the bottom face
+        double z = blockPos.getZ() + 0.5;
+
+        var data = new ScalableParticleType.ScalableParticleData(
+                DNLParticleTypes.MENDING_POP_PARTICLE.get(),
+                scale
+        );
+
+        level.sendParticles(data, x, y, z, 1, 0, 0, 0, 0);
+    }
+
+    private void spawnUpperHemisphereMendingPop(ServerLevel level, BlockPos blockPos) {
+        // Center of the durite block
+        Vec3 c = Vec3.atCenterOf(blockPos);
+
+        int count = 3 + level.random.nextInt(2); // 6..9
+        float speedMin = 0.04f;
+        float speedMax = 0.10f;
+
+        // how far from the center it can spawn (in blocks)
+        double spawnOffsetRadius = 0.30; // tweak (0.15 = tight, 0.40 = wider)
+
+        for (int i = 0; i < count; i++) {
+            // Random direction in upper hemisphere
+            double rx = (level.random.nextDouble() * 2.0 - 1.0);
+            double ry = (level.random.nextDouble());          // 0..1 (upper hemisphere)
+            double rz = (level.random.nextDouble() * 2.0 - 1.0);
+
+            Vec3 dir = new Vec3(rx, ry, rz);
+            if (dir.lengthSqr() < 1.0e-6) dir = new Vec3(0, 1, 0);
+            dir = dir.normalize();
+
+            float speed = speedMin + level.random.nextFloat() * (speedMax - speedMin);
+            Vec3 vel = dir.scale(speed);
+
+            // Spawn near the durite center with small random offset in all directions
+            double x = c.x + (level.random.nextDouble() * 2.0 - 1.0) * spawnOffsetRadius;
+            double y = c.y + (level.random.nextDouble() * 2.0 - 1.0) * spawnOffsetRadius;
+            double z = c.z + (level.random.nextDouble() * 2.0 - 1.0) * spawnOffsetRadius;
+
+            var data = new DirectionalParticleType.Data(
+                    DNLParticleTypes.MENDING_POP_AND_RUNE_PARTICLE.get(),
+                    (float) -vel.x, (float) -vel.y, (float) -vel.z
+            );
+
+            level.sendParticles(data, x, y, z, 1, 0, 0, 0, 0);
+        }
+    }
+
+
+
 
     private void spawnReturnParticlesBatch(ServerLevel level) {
         if (cachedPreservers.isEmpty()) return;
 
         Vec3 start = Vec3.atCenterOf(this.getBlockPos().above());
 
-        final int fadeIn = 10;
+        final int fadeIn = 4;
         final int fadeOut = 10;
         final double jitter = 0.10;
 
@@ -343,30 +439,54 @@ public class DispelBlockEntity extends BlockEntity {
         if (this.level == null || this.level.isClientSide) return;
 
         if (powered && !wasPowered) {
+
+            // already running -> ignore
+            if (this.pending || this.phase != Phase.NONE) {
+                wasPowered = powered;
+                return;
+            }
+
             if (this.level instanceof ServerLevel server) {
                 cachePreservers(server);
+
+                if (cachedPreservers.isEmpty()) {
+                    wasPowered = powered;
+                    return;
+                }
 
                 this.triggerGameTime = server.getGameTime();
 
                 int preserverCount = cachedPreservers.size();
-                this.growthTotal = preserverCount + 3; // P + 3
+                this.growthTotal = preserverCount + 3;
                 this.nextGrowthIndex = 0;
+                this.nextEarlyIndex = 0;
 
                 int minTravel = computeMinTravelTicks(server);
                 int maxTravel = computeMaxTravelTicks(server);
 
-// arrivals are relative to trigger tick
-                this.firstArrivalTick = minTravel;
-                this.lastArrivalTick  = (SPAWN_TICKS_TOTAL - 1) + maxTravel;
+                // When the first particle can arrive
+                this.particleFirstArrivalTick = minTravel;
 
-// keep your 5s spawning phase
-                this.spawnTicksLeft = SPAWN_TICKS_TOTAL;
-                this.phase = Phase.SPAWNING;
-                this.pending = true;
+                // First growth happens 16 ticks AFTER first particle arrival
+                int firstGrowthTick = this.particleFirstArrivalTick + EARLY_MENDING_POP_TICKS;
 
-// wait phase length = time from end of spawning to last arrival
+                // Last growth tick (fixed 1s interval)
+                int lastGrowthTick = firstGrowthTick + (this.growthTotal - 1) * GROWTH_INTERVAL_TICKS;
+
+                // Make last particle arrival match last growth tick:
+                // lastArrival = (spawnTicksTotal - 1) + maxTravel
+                // => spawnTicksTotal = (lastGrowthTick - maxTravel) + 1
+                this.spawnTicksTotal = Math.max(1, (lastGrowthTick - maxTravel) + 1);
+
+                // Save these for your schedulers
+                this.firstArrivalTick = firstGrowthTick; // "first growth tick"
+                this.lastArrivalTick  = lastGrowthTick;  // "last growth / last arrival tick"
+
+                this.spawnTicksLeft = this.spawnTicksTotal;
                 this.waitTicksLeft = maxTravel;
 
+                this.phase = Phase.SPAWNING;
+                this.pending = true;
 
                 setChanged();
             }
@@ -375,16 +495,7 @@ public class DispelBlockEntity extends BlockEntity {
         wasPowered = powered;
     }
 
-
     private void runDispel(ServerLevel level) {
-        // Place bud 1 block above dispel
-        BlockPos budPos = this.getBlockPos().above();
-        BlockState budState = DNLBlocks.LARGE_DURITE_BUD.get().defaultBlockState();
-
-        if (level.getBlockState(budPos).canBeReplaced()) {
-            level.setBlock(budPos, budState, Block.UPDATE_ALL);
-        }
-
         cachedPreservers.clear();
     }
 
@@ -421,8 +532,28 @@ public class DispelBlockEntity extends BlockEntity {
         return max;
     }
 
+    private int getScheduledGrowthTick(int index) {
+        return firstArrivalTick + index * GROWTH_INTERVAL_TICKS;
+    }
 
+    private float getScaleForIndex(ServerLevel level, int index) {
+        BlockPos startPos = this.getBlockPos().above();
+        BlockState state = level.getBlockState(startPos);
 
+        Block small   = DNLBlocks.SMALL_DURITE_BUD.get();
+        Block medium  = DNLBlocks.MEDIUM_DURITE_BUD.get();
+        Block large   = DNLBlocks.LARGE_DURITE_BUD.get();
+        Block cluster = DNLBlocks.DURITE_CLUSTER.get();
+
+        if (state.isAir() || state.canBeReplaced()) return 1.5f;
+        if (state.is(small)) return 2.0f;
+        if (state.is(medium)) return 2.5f;
+        if (state.is(large)) return 3.0f;
+        if (state.is(cluster)) return 3.5f;
+
+        // blocked case
+        return 1.5f;
+    }
 
     // === Rotation helper (same idea as your Preserver code) ===
     public static BlockPos rotateOffset(Level level, BlockPos pos, BlockPos offset, Direction nbtFacing) {
@@ -452,6 +583,11 @@ public class DispelBlockEntity extends BlockEntity {
         };
     }
 
+    private void ensureCachedPreservers(ServerLevel level) {
+        if (!this.cachedPreservers.isEmpty()) return;
+        cachePreservers(level);
+    }
+
     // === Save/load ===
     @Override
     protected void saveAdditional(CompoundTag tag) {
@@ -466,6 +602,20 @@ public class DispelBlockEntity extends BlockEntity {
         tag.putInt("delayTicks", delayTicks);
         tag.putBoolean("pending", pending);
         tag.putBoolean("wasPowered", wasPowered);
+        tag.putString("phase", this.phase.name());
+        tag.putInt("spawnTicksLeft", this.spawnTicksLeft);
+        tag.putInt("waitTicksLeft", this.waitTicksLeft);
+
+        tag.putLong("triggerGameTime", this.triggerGameTime);
+        tag.putInt("firstArrivalTick", this.firstArrivalTick);
+        tag.putInt("lastArrivalTick", this.lastArrivalTick);
+
+        tag.putInt("growthTotal", this.growthTotal);
+        tag.putInt("nextGrowthIndex", this.nextGrowthIndex);
+        tag.putInt("nextEarlyIndex", this.nextEarlyIndex);
+
+        tag.putInt("spawnTicksTotal", this.spawnTicksTotal);
+        tag.putInt("particleFirstArrivalTick", this.particleFirstArrivalTick);
     }
 
     @Override
@@ -478,5 +628,19 @@ public class DispelBlockEntity extends BlockEntity {
         delayTicks = tag.getInt("delayTicks");
         pending = tag.getBoolean("pending");
         wasPowered = tag.getBoolean("wasPowered");
+        this.phase = Phase.valueOf(tag.getString("phase"));
+        this.spawnTicksLeft = tag.getInt("spawnTicksLeft");
+        this.waitTicksLeft = tag.getInt("waitTicksLeft");
+
+        this.triggerGameTime = tag.getLong("triggerGameTime");
+        this.firstArrivalTick = tag.getInt("firstArrivalTick");
+        this.lastArrivalTick = tag.getInt("lastArrivalTick");
+
+        this.growthTotal = tag.getInt("growthTotal");
+        this.nextGrowthIndex = tag.getInt("nextGrowthIndex");
+        this.nextEarlyIndex = tag.getInt("nextEarlyIndex");
+
+        this.spawnTicksTotal = tag.getInt("spawnTicksTotal");
+        this.particleFirstArrivalTick = tag.getInt("particleFirstArrivalTick");
     }
 }

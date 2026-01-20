@@ -12,6 +12,7 @@ public class DNLParticleTypes {
 
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> LARGE_FLAME_PARTICLE = register("large_flame", () -> new ScalableParticleType(false));
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> LARGE_SOUL_FLAME_PARTICLE = register("large_soul_flame", () -> new ScalableParticleType(false));
+    public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> MENDING_POP_PARTICLE = register("mending_pop", () -> new ScalableParticleType(false));
     public static final Supplier<SimpleParticleType> SCORCHER_FLAME_PARTICLE = register("scorcher_flame", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<ParticleType<AxisParticleType.AxisParticleData>> FAIRKEEPER_BOUNDARY_PARTICLE = register("fairkeeper_boundary", () -> new AxisParticleType(false));
     public static final Supplier<ParticleType<AxisParticleType.AxisParticleData>> VERTEX_BOUNDARY_PARTICLE = register("vertex_boundary", () -> new AxisParticleType(false));
@@ -19,7 +20,7 @@ public class DNLParticleTypes {
     public static final Supplier<ParticleType<ScalableAxisParticleType.ScalableAxisParticleData>> REDSTONE_HAZARD_INDICATOR_PARTICLE = register("redstone_hazard_indicator", () -> new ScalableAxisParticleType(false));
     public static final Supplier<ParticleType<ScalableAxisParticleType.ScalableAxisParticleData>> WHITE_SHOCKWAVE_PARTICLE = register("white_shockwave", () -> new ScalableAxisParticleType(false));
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> ARROW_HAZARD_INDICATOR = register("arrow_hazard_indicator", () -> new ScalableParticleType(false));
-    public static final Supplier<SimpleParticleType> MENDING_POP_PARTICLE = register("mending_pop", () -> new SimpleParticleTypeOverride(false));
+    public static final Supplier<ParticleType<DirectionalParticleType.Data>> MENDING_POP_AND_RUNE_PARTICLE = register("mending_pop_and_rune", () -> new DirectionalParticleType(false));
     public static final Supplier<SimpleParticleType> MENDING_RUNE_PARTICLE = register("mending_rune", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<SimpleParticleType> MENDING_RUNE_SHORT_PARTICLE = register("mending_rune_short", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<MendingFadeParticleType> MENDING_FADE_PARTICLE = register("mending_fade", () -> new MendingFadeParticleType(false));

@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
+import dev.hexnowloading.dungeonnowloading.particle.type.DirectionalParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
@@ -144,7 +145,12 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
             double y = blockPos.getY() + randomSource.nextDouble() + spawnOffset.y * (0.5F + randomSource.nextDouble() * 1.0F);
             double z = blockPos.getZ() + randomSource.nextDouble() + spawnOffset.z * (0.5F + randomSource.nextDouble() * 1.0F);
 
-            level.addParticle(DNLParticleTypes.MENDING_POP_PARTICLE.get(), true, x, y, z, -velocity.x, -velocity.y, -velocity.z);
+            var data = new DirectionalParticleType.Data(
+                    DNLParticleTypes.MENDING_POP_AND_RUNE_PARTICLE.get(),
+                    (float) -velocity.x, (float) -velocity.y, (float) -velocity.z
+            );
+
+            level.addParticle(data, true, x, y, z, 0, 0, 0);
         }
     }
 }

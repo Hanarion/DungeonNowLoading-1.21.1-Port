@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
-import dev.hexnowloading.dungeonnowloading.block.entity.DispelBlockEntity;
+import dev.hexnowloading.dungeonnowloading.block.entity.DuriteQuellerBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-public class DispelBlock extends BaseEntityBlock {
-    public DispelBlock(Properties props) {
+public class DuriteQuellerBlock extends BaseEntityBlock {
+    public DuriteQuellerBlock(Properties props) {
         super(props);
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(BlockStateProperties.FACING, Direction.NORTH));
@@ -41,19 +41,19 @@ public class DispelBlock extends BaseEntityBlock {
         boolean powered = level.hasNeighborSignal(pos);
 
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof DispelBlockEntity dispelBe) {
+        if (be instanceof DuriteQuellerBlockEntity dispelBe) {
             dispelBe.onRedstone(powered);
         }
     }
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, DNLBlockEntityTypes.DISPEL_BLOCK.get(), DispelBlockEntity::serverTick);
+        return level.isClientSide ? null : createTickerHelper(type, DNLBlockEntityTypes.DURITE_QUELLER.get(), DuriteQuellerBlockEntity::serverTick);
     }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new DispelBlockEntity(pos, state);
+        return new DuriteQuellerBlockEntity(pos, state);
     }
 
     @Override

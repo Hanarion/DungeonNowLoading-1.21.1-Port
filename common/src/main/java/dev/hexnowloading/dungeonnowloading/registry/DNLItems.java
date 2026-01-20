@@ -149,7 +149,7 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_AURA_PANE = register("mending_aura_pane", () -> new BlockItem(DNLBlocks.MENDING_AURA_PANE.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA_CHEST = register("mending_aura_chest", () -> new BlockItem(DNLBlocks.MENDING_AURA_CHEST.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
-    public static final Supplier<Item> DISPEL_BLOCK = register("dispel_block", () -> new BlockItem(DNLBlocks.DISPEL_BLOCK.get(), new Item.Properties()));
+    public static final Supplier<Item> DURITE_QUELLER = register("durite_queller", () -> new BlockItem(DNLBlocks.DURITE_QUELLER.get(), new Item.Properties()));
     public static final Supplier<Item> PLAYER_STATUE = register("player_statue", PlayerStatueBlockItem::new);
     public static final Supplier<Item> DURITE_CLUSTER = register("durite_cluster", () -> new BlockItem(DNLBlocks.DURITE_CLUSTER.get(), new Item.Properties()));
     public static final Supplier<Item> LARGE_DURITE_BUD = register("large_durite_bud", () -> new BlockItem(DNLBlocks.LARGE_DURITE_BUD.get(), new Item.Properties()));

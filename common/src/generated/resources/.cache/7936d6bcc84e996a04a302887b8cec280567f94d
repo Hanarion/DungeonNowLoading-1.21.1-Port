@@ -1,8 +1,8 @@
-// 1.20.1	2026-01-16T15:01:14.9404265	Tags for minecraft:block mod id dungeonnowloading
+// 1.20.1	2026-01-21T00:53:59.6322162	Tags for minecraft:block mod id dungeonnowloading
 28a2a9be631aa4b1fe168398677eed3cf9e7e3d4 data/minecraft/tags/blocks/dragon_immune.json
 9d234881a09c002d8c931b3b43e8c9bbc711c8f4 data/minecraft/tags/blocks/infiniburn_overworld.json
 4f9f237f2ea25a9c028d37f969fd04c948124506 data/minecraft/tags/blocks/mineable/axe.json
-6a835d6bea1d88f7283f3e024ab2e7ba17f57a3c data/minecraft/tags/blocks/mineable/pickaxe.json
+c4cb2b1b461d84240b771270b536cc5f398ab1b0 data/minecraft/tags/blocks/mineable/pickaxe.json
 690291dfce68a33c40050f616c3d26ea07bc6efc data/minecraft/tags/blocks/stairs.json
 03b21f55fced74dd19e76451b94e1df105f6f9b8 data/minecraft/tags/blocks/walls.json
 7dbfefcde075327c1526593d9b45d4006084afbe data/minecraft/tags/blocks/wither_immune.json

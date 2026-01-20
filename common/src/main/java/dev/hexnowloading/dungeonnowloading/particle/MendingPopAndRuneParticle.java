@@ -1,0 +1,86 @@
+package dev.hexnowloading.dungeonnowloading.particle;
+
+import dev.hexnowloading.dungeonnowloading.particle.type.DirectionalParticleType;
+import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.*;
+import org.jetbrains.annotations.Nullable;
+
+public class MendingPopAndRuneParticle extends TextureSheetParticle {
+    private SpriteSet spriteSet;
+
+    private final int EARLY_SPAWN_TICK = 6;
+    private final double initialXSpeed;
+    private final double initialYSpeed;
+    private final double initialZSpeed;
+
+    protected MendingPopAndRuneParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet spriteSet) {
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+        this.quadSize *= 1.5F;
+        this.hasPhysics = true;
+        this.xd = xSpeed;
+        this.yd = ySpeed;
+        this.zd = zSpeed;
+        this.setAlpha(1.0F);
+        this.spriteSet = spriteSet;
+        this.friction = 0.95F;
+        this.lifetime = 16;
+        this.initialXSpeed = xSpeed;
+        this.initialYSpeed = ySpeed;
+        this.initialZSpeed = zSpeed;
+
+    }
+
+    @Override
+    public void tick() {
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+
+        if (this.age % 2 == 0) {
+            int sprite = Math.min(7, this.age / 2);
+            this.setSprite(spriteSet.get(sprite, 8));
+        }
+
+        if (this.age == this.lifetime - EARLY_SPAWN_TICK) {
+            int tickMultiplier = EARLY_SPAWN_TICK - 2;
+            level.addParticle(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), this.x + this.initialXSpeed * tickMultiplier, this.y + this.initialYSpeed * tickMultiplier, this.z + this.initialZSpeed * tickMultiplier, this.xd, this.yd, this.zd);
+        }
+
+        if (this.age++ >= this.lifetime) {
+            this.remove();
+        }
+    }
+
+    @Override
+    public int getLightColor(float $$0) {
+        return 240;
+    }
+
+    @Override
+    public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
+
+    public static class Factory implements ParticleProvider<DirectionalParticleType.Data> {
+
+        private final SpriteSet sprites;
+
+        public Factory(SpriteSet sprites) {
+            this.sprites = sprites;
+        }
+
+        @Nullable
+        @Override
+        public Particle createParticle(DirectionalParticleType.Data data, ClientLevel clientLevel,
+                                       double x, double y, double z,
+                                       double xSpeed, double ySpeed, double zSpeed) {
+            MendingPopAndRuneParticle particle = new MendingPopAndRuneParticle(
+                    clientLevel,
+                    x, y, z,
+                    data.vx, data.vy, data.vz,
+                    this.sprites
+            );
+            particle.setSprite(sprites.get(0, 1));
+            return particle;
+        }
+    }
+}

@@ -164,10 +164,11 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.REDSTONE_HAZARD_INDICATOR_PARTICLE.get(), RedstoneHazardIndicatorParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.WHITE_SHOCKWAVE_PARTICLE.get(), WhiteShockwaveParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.ARROW_HAZARD_INDICATOR.get(), ArrowHazardIndicatorParticle.Factory::new);
-        event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.MENDING_POP_AND_RUNE_PARTICLE.get(), MendingPopAndRuneParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
     }
 
 }

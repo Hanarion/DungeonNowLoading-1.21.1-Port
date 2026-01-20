@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "bottom": "dungeonnowloading:block/dispel_block_bottom",
-    "side": "dungeonnowloading:block/dispel_block_side",
-    "top": "dungeonnowloading:block/dispel_block_top"
-  }
-}
