@@ -53,6 +53,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.DIAMOND_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
+        anyModelBlockWithItem(DNLBlocks.DISPEL_BLOCK.get(), models().cubeBottomTop(ForgeRegistries.BLOCKS.getKey(DNLBlocks.DISPEL_BLOCK.get()).getPath(), modLoc("block/dispel_block_side"), modLoc("block/dispel_block_bottom"), modLoc("block/dispel_block_top")));
 
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientStairsLikeBlockWithItem(DNLBlocks.MENDING_AURA_STAIRS.get(), DNLBlocks.MENDING_AURA.get());
@@ -153,6 +154,11 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     private void simpleBlockWithItem(Block block) {
         simpleBlock(block);
         simpleBlockItem(block, models().getExistingFile(modLoc("block/" + ForgeRegistries.BLOCKS.getKey(block).getPath())));
+    }
+
+    private void anyModelBlockWithItem(Block block, ModelFile model) {
+        simpleBlock(block, model);
+        simpleBlockItem(block, model);
     }
 
     private void simpleItem(Block block) {

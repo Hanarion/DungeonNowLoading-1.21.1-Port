@@ -3,7 +3,7 @@ package dev.hexnowloading.dungeonnowloading.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.client.Caltrop;
+import dev.hexnowloading.dungeonnowloading.render.Caltrop;
 import dev.hexnowloading.dungeonnowloading.entity.misc.PayloadEntity;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;

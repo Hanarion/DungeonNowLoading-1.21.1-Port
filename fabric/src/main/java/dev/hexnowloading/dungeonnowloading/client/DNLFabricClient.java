@@ -1,10 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.block.client.model.DisabledFairkeeperChestModel;
-import dev.hexnowloading.dungeonnowloading.block.client.model.FairkeeperChestModel;
-import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatueModel;
-import dev.hexnowloading.dungeonnowloading.block.client.model.PlayerStatuePedestalModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.client.preview.PreviewOverlayFabric;
@@ -21,6 +17,7 @@ import dev.hexnowloading.dungeonnowloading.item.client.renderer.PlayerStatueItem
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.ScorcherRenderer;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.render.Caltrop;
 import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -31,7 +28,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -267,6 +263,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
+        registry.register(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
     }
 
     private static void addDnlEnchantmentDescriptions(ItemStack stack, List<Component> lines) {

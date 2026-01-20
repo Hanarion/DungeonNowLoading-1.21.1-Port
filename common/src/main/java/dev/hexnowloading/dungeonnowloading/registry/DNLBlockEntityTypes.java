@@ -1,7 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
-import com.mojang.realmsclient.gui.screens.RealmsGenericErrorScreen;
-import dev.hexnowloading.dungeonnowloading.block.MendingTableBlock;
 import dev.hexnowloading.dungeonnowloading.block.entity.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,6 +20,7 @@ public class DNLBlockEntityTypes {
     public static final Supplier<BlockEntityType<MendingTableBlockEntity>> MENDING_TABLE = register("mending_table", () -> BlockEntityType.Builder.of(MendingTableBlockEntity::new, DNLBlocks.MENDING_TABLE.get()).build(null));
     public static final Supplier<BlockEntityType<GauntletBlockEntity>> GAUNTLET = register("gauntlet_block", () -> BlockEntityType.Builder.of(GauntletBlockEntity::new, DNLBlocks.GAUNTLET.get()).build(null));
     public static final Supplier<BlockEntityType<GauntletVaultBlockEntity>> GAUNTLET_VAULT = register("gauntlet_vault", () -> BlockEntityType.Builder.of(GauntletVaultBlockEntity::new, DNLBlocks.GAUNTLET_VAULT.get()).build(null));
+    public static final Supplier<BlockEntityType<DispelBlockEntity>> DISPEL_BLOCK = register("dispel_block", () -> BlockEntityType.Builder.of(DispelBlockEntity::new, DNLBlocks.DISPEL_BLOCK.get()).build(null));
 
     public static final Supplier<BlockEntityType<PlayerStatueBlockEntity>> PLAYER_STATUE = register("player_statue", () -> BlockEntityType.Builder.of(PlayerStatueBlockEntity::new, DNLBlocks.PLAYER_STATUE.get()).build(null));
     public static final Supplier<BlockEntityType<MendstoneChalkMarkBlockEntity>> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> BlockEntityType.Builder.of(MendstoneChalkMarkBlockEntity::new, DNLBlocks.MENDSTONE_CHALK_MARK.get()).build(null));

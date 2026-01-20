@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.client;
+package dev.hexnowloading.dungeonnowloading.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

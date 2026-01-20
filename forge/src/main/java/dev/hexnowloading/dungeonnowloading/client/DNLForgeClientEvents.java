@@ -17,6 +17,7 @@ import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.render.Caltrop;
 import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -166,6 +167,7 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
     }
 
 }

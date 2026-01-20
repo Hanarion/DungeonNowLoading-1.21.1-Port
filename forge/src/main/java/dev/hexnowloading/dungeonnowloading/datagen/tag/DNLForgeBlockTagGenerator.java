@@ -78,7 +78,8 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.DURITE_CLUSTER.get(),
                 DNLBlocks.SMALL_DURITE_BUD.get(),
                 DNLBlocks.MEDIUM_DURITE_BUD.get(),
-                DNLBlocks.LARGE_DURITE_BUD.get()
+                DNLBlocks.LARGE_DURITE_BUD.get(),
+                DNLBlocks.DISPEL_BLOCK.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(

@@ -118,6 +118,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.add(DNLBlocks.LARGE_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.75f));
         this.add(DNLBlocks.MEDIUM_DURITE_BUD.get(), b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.50f));
         this.add(DNLBlocks.SMALL_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.25f));
+        this.add(DNLBlocks.DISPEL_BLOCK.get(), block -> createSingleItemTable(Items.OBSIDIAN));
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {

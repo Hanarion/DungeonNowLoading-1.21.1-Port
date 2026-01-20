@@ -1,4 +1,4 @@
-// 1.20.1	2025-09-27T15:01:31.6005562	Loot Tables
+// 1.20.1	2026-01-19T19:43:11.9678793	Loot Tables
 8de5512c6e498fd7a4e162f42dd356b7cb01701f data/dungeonnowloading/loot_tables/blocks/amethyst_stone_notch.json
 aee384cfe4e67aeb143699641353b85775ccf71a data/dungeonnowloading/loot_tables/blocks/azuro_hanging_leaves.json
 dafe28258e6c5e7f76cc6eb1403b2baa3d1300df data/dungeonnowloading/loot_tables/blocks/azuro_hanging_leaves_tip.json
@@ -28,6 +28,7 @@ fa3479f051363ff845d91b96e357338a2d0be42c data/dungeonnowloading/loot_tables/bloc
 63cdde54972d6d463f83ea4d86f05aae583f7153 data/dungeonnowloading/loot_tables/blocks/copper_stone_notch.json
 04050e65caedbb51ab199fa4a01aab742340f244 data/dungeonnowloading/loot_tables/blocks/cracked_stone_tiles.json
 b31e6ad0d6015f2d7608e500cff0247a9616d908 data/dungeonnowloading/loot_tables/blocks/diamond_stone_notch.json
+ba7c734cbd300eec7df4e2b884e8c9c0ee76dc25 data/dungeonnowloading/loot_tables/blocks/dispel_block.json
 9e86ee88deab6ebd5c73324b22d8e577855b69b1 data/dungeonnowloading/loot_tables/blocks/dueling_stone_emblem.json
 5b7553587dfe83e3b274611c144f616bd8f05349 data/dungeonnowloading/loot_tables/blocks/dungeon_wall_torch.json
 b37a6ab3f7b209319cc860ac349e7ff9ec8d3b38 data/dungeonnowloading/loot_tables/blocks/durite_cluster.json

@@ -1,4 +1,4 @@
-// 1.20.1	2026-01-16T15:01:14.9414275	Item Models: dungeonnowloading
+// 1.20.1	2026-01-19T19:43:11.9698812	Item Models: dungeonnowloading
 2124c6574480f7d9a17d0b61aea2566f5dd0bb82 assets/dungeonnowloading/models/item/catalyzed_redstone.json
 94e215a0bc9a27d2999b7b4254ad0381bf58d4f9 assets/dungeonnowloading/models/item/combustion_cell.json
 9d9112531923eef5e11ce7491776171967a912cb assets/dungeonnowloading/models/item/copper_detonator.json
@@ -19,6 +19,7 @@ e6144c488cdc16c964b3ed94f8630ea485d4cec4 assets/dungeonnowloading/models/item/re
 2693026055360a030e8892fac047ea9f4263521f assets/dungeonnowloading/models/item/repulsor.json
 afb5d05d2baef8c1b6eba9e7c5b1a431cdfa10e9 assets/dungeonnowloading/models/item/repulsor_golden.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_ballista_golem.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_garhold.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/dungeonnowloading/models/item/spawn_egg_scuttle.json
 a454d11b77113f58ac5ccd1b182e589bc6a3c8fc assets/dungeonnowloading/models/item/vertex_bow.json
 8726821e61b6ae3b764849adcc140d13626c140c assets/dungeonnowloading/models/item/vertex_bow_pulling_0.json

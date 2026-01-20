@@ -199,6 +199,7 @@
   "block.dungeonnowloading.player_statue.named": "%s's Stone Statue",
   "block.dungeonnowloading.player_statue.message": "In the Name of %1$s",
   "block.dungeonnowloading.gauntlet": "Gauntlet",
+  "block.dungeonnowloading.dispel_block": "Dispel Block",
   "death.attack.dungeonnowloading.spike": "%1$s was spiked to death",
   "death.attack.dungeonnowloading.spike.player": "%1$s was spiked to death",
   "entity.dungeonnowloading.chaos_spawner": "Chaos Spawner",
