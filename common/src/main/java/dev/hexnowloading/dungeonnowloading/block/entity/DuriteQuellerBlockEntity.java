@@ -433,6 +433,10 @@ public class DuriteQuellerBlockEntity extends BlockEntity {
         setChanged();
     }
 
+    public void setNbtFacing(Direction direction) {
+        this.nbtFacing = direction;
+    }
+
     public void onRedstone(boolean powered) {
         if (this.level == null || this.level.isClientSide) return;
 
@@ -495,7 +499,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity {
     }
 
     private int travelTicksForDistance(double travelDist) {
-        int t = (int) Math.ceil(travelDist / 0.18); // your chosen “desired speed”
+        int t = (int) Math.ceil(travelDist / 0.18);
         return Math.max(1, t);
     }
 
