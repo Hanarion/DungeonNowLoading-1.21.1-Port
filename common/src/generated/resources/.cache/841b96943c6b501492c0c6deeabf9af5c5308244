@@ -1,4 +1,4 @@
-// 1.20.1	2026-01-19T19:43:11.9698812	Item Models: dungeonnowloading
+// 1.20.1	2026-01-21T19:23:13.0630311	Item Models: dungeonnowloading
 2124c6574480f7d9a17d0b61aea2566f5dd0bb82 assets/dungeonnowloading/models/item/catalyzed_redstone.json
 94e215a0bc9a27d2999b7b4254ad0381bf58d4f9 assets/dungeonnowloading/models/item/combustion_cell.json
 9d9112531923eef5e11ce7491776171967a912cb assets/dungeonnowloading/models/item/copper_detonator.json
@@ -26,3 +26,4 @@ a454d11b77113f58ac5ccd1b182e589bc6a3c8fc assets/dungeonnowloading/models/item/ve
 9b4fdeb9386d14174202d399faeb3114144e616e assets/dungeonnowloading/models/item/vertex_bow_pulling_1.json
 3328df4ba7c22aaac8d446ecef19e208263a75d4 assets/dungeonnowloading/models/item/vertex_bow_pulling_2.json
 4da38db2b09a67c64474e6c93bfbaf22a9354116 assets/dungeonnowloading/models/item/vertex_bow_pulling_3.json
+0f9076fabfaafa4f1cb059b51f774ed9810acb8c assets/dungeonnowloading/models/item/zone_wand.json

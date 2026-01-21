@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
+import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.DirectionalParticleType;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.*;
@@ -18,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
-public class DuriteQuellerBlockEntity extends BlockEntity {
+public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceiverBlockEntity {
 
     private static final float RETURN_PARTICLE_SPEED = 0.18f; // blocks per tick
     private static final double MAX_SPAWN_DISTANCE = 32.0;
@@ -425,10 +426,12 @@ public class DuriteQuellerBlockEntity extends BlockEntity {
         return Math.max(1, ticks);
     }
 
-    // Call from structure placement code or processor
-    public void setRegion(BlockPos cornerA, BlockPos cornerB, Direction authoredFacing) {
-        this.cornerA = cornerA;
-        this.cornerB = cornerB;
+    @Override
+    public void setRegion(BlockPos cornerAWorld, BlockPos cornerBWorld, Direction authoredFacing) {
+        // If your BE expects STRUCTURE-LOCAL offsets, store offsets relative to this block:
+        BlockPos center = this.getBlockPos();
+        this.cornerA = cornerAWorld.subtract(center);
+        this.cornerB = cornerBWorld.subtract(center);
         this.nbtFacing = authoredFacing;
         setChanged();
     }
