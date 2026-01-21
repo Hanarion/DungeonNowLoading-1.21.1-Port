@@ -41,7 +41,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity {
     private static final int EARLY_MENDING_POP_TICKS = 16;
 
     // we compute per particle ticks, but this is a cap / safety
-    private static final int MAX_WAIT_TICKS = 40;
+    private static final int RETURN_TRAVEL_TICKS = 40;
 
     private int spawnTicksLeft = 0;
     private int waitTicksLeft = 0;
@@ -322,13 +322,11 @@ public class DuriteQuellerBlockEntity extends BlockEntity {
             Vec3 spawn = start.add(dirToTarget.scale(travelDist));
 
             // Decide travel ticks (same rule as computeMaxTravelTicks)
-            int travelTicks = (int) Math.ceil(travelDist / 0.18);
-            travelTicks = Math.max(1, travelTicks);
+            int travelTicks = RETURN_TRAVEL_TICKS;
 
-            // Velocity magnitude chosen so it arrives exactly in travelTicks
+// speed becomes distance / fixedTime (farther => faster)
             float vMag = (float) (travelDist / (double) travelTicks);
 
-            // Velocity points back toward start
             Vec3 vel = start.subtract(spawn);
             if (vel.lengthSqr() < 1.0e-6) continue;
             vel = vel.normalize().scale(vMag);
@@ -461,29 +459,26 @@ public class DuriteQuellerBlockEntity extends BlockEntity {
                 this.nextGrowthIndex = 0;
                 this.nextEarlyIndex = 0;
 
-                int minTravel = computeMinTravelTicks(server);
-                int maxTravel = computeMaxTravelTicks(server);
+                int travelTicksAll = RETURN_TRAVEL_TICKS;
 
-                // When the first particle can arrive
-                this.particleFirstArrivalTick = minTravel;
+// first particle can arrive at this tick (because you spawn continuously starting immediately)
+                this.particleFirstArrivalTick = travelTicksAll;
 
-                // First growth happens 16 ticks AFTER first particle arrival
+// First growth happens 16 ticks AFTER first arrival
                 int firstGrowthTick = this.particleFirstArrivalTick + EARLY_MENDING_POP_TICKS;
 
-                // Last growth tick (fixed 1s interval)
+// Last growth tick (fixed 1s interval)
                 int lastGrowthTick = firstGrowthTick + (this.growthTotal - 1) * GROWTH_INTERVAL_TICKS;
 
-                // Make last particle arrival match last growth tick:
-                // lastArrival = (spawnTicksTotal - 1) + maxTravel
-                // => spawnTicksTotal = (lastGrowthTick - maxTravel) + 1
-                this.spawnTicksTotal = Math.max(1, (lastGrowthTick - maxTravel) + 1);
+// Sync: lastArrival = (spawnTicksTotal - 1) + travelTicksAll
+                this.spawnTicksTotal = Math.max(1, (lastGrowthTick - travelTicksAll) + 1);
 
-                // Save these for your schedulers
-                this.firstArrivalTick = firstGrowthTick; // "first growth tick"
-                this.lastArrivalTick  = lastGrowthTick;  // "last growth / last arrival tick"
+                this.firstArrivalTick = firstGrowthTick;
+                this.lastArrivalTick  = lastGrowthTick;
 
                 this.spawnTicksLeft = this.spawnTicksTotal;
-                this.waitTicksLeft = maxTravel;
+                this.waitTicksLeft = travelTicksAll;
+
 
                 this.phase = Phase.SPAWNING;
                 this.pending = true;
