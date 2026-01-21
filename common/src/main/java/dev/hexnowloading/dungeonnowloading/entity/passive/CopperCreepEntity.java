@@ -42,6 +42,9 @@ import java.util.*;
 
 public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, PowerableMob {
 
+    private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> OVERWORKED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
+
     @Nullable
     @Override
     public UUID getOwnerUUID() {
@@ -203,6 +206,8 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         this.entityData.define(STATE, State.SUMMONING);
         this.entityData.define(SKIN, Skin.DEFAULT);
         this.entityData.define(SKIN_VALIDATION, false);
+        this.entityData.define(GIGANTIC, false);
+        this.entityData.define(OVERWORKED, false);
     }
 
     @Override
@@ -219,6 +224,8 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         compoundTag.putBoolean("isSitting", this.isState(State.SITTING));
         compoundTag.putBoolean("isWandering", this.isState(State.WANDERING));
         compoundTag.putString("skin", getSkin().getId());
+        compoundTag.putBoolean("Gigantic", this.isGigantic());
+        compoundTag.putBoolean("Overworked", this.isOverworked());
     }
 
     @Override
@@ -250,6 +257,12 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
             this.entityData.set(SKIN, Skin.fromId(compoundTag.getString("skin")));
         }
         this.setSkinValidation(true);
+        if (compoundTag.contains("Gigantic")) {
+            this.setGigantic(compoundTag.getBoolean("Gigantic"));
+        }
+        if (compoundTag.contains("Overworked")) {
+            this.setOverworked(compoundTag.getBoolean("Overworked"));
+        }
     }
 
     //    @Override
@@ -338,6 +351,30 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
 
     public boolean isIgnited() {
         return (Boolean) this.entityData.get(DATA_IS_IGNITED);
+    }
+
+    public boolean isGigantic() {
+        return this.entityData.get(GIGANTIC);
+    }
+
+    public void setGigantic(boolean gigantic) {
+        this.entityData.set(GIGANTIC, gigantic);
+        this.refreshDimensions();
+    }
+
+    public boolean isOverworked() {
+        return this.entityData.get(OVERWORKED);
+    }
+
+    public void setOverworked(boolean value) {
+        this.entityData.set(OVERWORKED, value);
+        // If we later want per-creep attack speed or animation changes, hook them here.
+    }
+
+    @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        EntityDimensions base = super.getDimensions(pose);
+        return this.isGigantic() ? base.scale(2.0F) : base;
     }
 
     @Override

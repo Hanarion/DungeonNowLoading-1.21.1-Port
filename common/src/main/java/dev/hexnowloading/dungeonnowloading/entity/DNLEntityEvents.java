@@ -10,8 +10,15 @@ public class DNLEntityEvents {
     public static float onLivingDamageEvent(LivingEntity attacker, LivingEntity target, float damage) {
         ItemStack mainHandItem = attacker.getMainHandItem();
         if (mainHandItem.is(DNLItems.LIFE_STEALER.get())) {
-            LifeStealerItem.healthDrain(attacker, damage);
+            // Delegate Life Stealer-specific effects (Sacrifice etc.) to the item class
+            damage = LifeStealerItem.onLivingDamage(attacker, target, damage);
         }
+
+        if (mainHandItem.is(DNLItems.SPAWNER_SWORD.get())) {
+            // Delegate Spawner Sword-specific effects (Reckless etc.) to the item class
+            damage = SpawnerSword.onLivingDamage(attacker, target, damage);
+        }
+
         return damage;
     }
 

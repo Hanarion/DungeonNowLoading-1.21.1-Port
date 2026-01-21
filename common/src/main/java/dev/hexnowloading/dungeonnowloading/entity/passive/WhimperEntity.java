@@ -37,6 +37,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Integer> DESPAWN_TICK = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
 
     public WhimperEntity(EntityType<? extends WhimperEntity> entityType, Level level) {
         super(entityType, level);
@@ -108,6 +109,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         this.entityData.define(DESPAWN_TICK, 600);
         this.entityData.define(OWNER_UUID, Optional.empty());
         this.entityData.define(CHARGING, false);
+        this.entityData.define(GIGANTIC, false);
     }
 
     @Override
@@ -117,6 +119,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         if (this.getOwnerUUID() != null) {
             compoundTag.putUUID("Owner", this.getOwnerUUID());
         }
+        compoundTag.putBoolean("Gigantic", this.isGigantic());
     }
 
     @Override
@@ -132,6 +135,9 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         }
         if (uuid != null) {
             this.setOwnerUUID(uuid);
+        }
+        if (compoundTag.contains("Gigantic")) {
+            this.setGigantic(compoundTag.getBoolean("Gigantic"));
         }
     }
 
@@ -169,8 +175,15 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        EntityDimensions base = super.getDimensions(pose);
+        return this.isGigantic() ? base.scale(2.0F) : base;
+    }
+
+    @Override
     protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return 0.6F;
+        float base = 0.6F;
+        return this.isGigantic() ? base * 2.0F : base;
     }
 
     @Nullable
@@ -202,4 +215,13 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     public boolean IsCharging() { return this.entityData.get(CHARGING); }
 
     public void setCharging(boolean b) { this.entityData.set(CHARGING, b); }
+
+    public boolean isGigantic() {
+        return this.entityData.get(GIGANTIC);
+    }
+
+    public void setGigantic(boolean gigantic) {
+        this.entityData.set(GIGANTIC, gigantic);
+        this.refreshDimensions();
+    }
 }

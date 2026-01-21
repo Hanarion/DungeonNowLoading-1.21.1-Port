@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.ChatFormatting;
@@ -14,7 +15,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -23,9 +23,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -66,6 +66,15 @@ public class ScepterOfSealedChaosItem extends Item {
                 if (sealedChaosEntity != null) {
                     sealedChaosEntity.moveTo(blockPos1, 0.0F, 0.0F);
                     sealedChaosEntity.setOwnerUUID(player.getUUID());
+                    int arcLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.ARC_SHOT.get(), itemStack);
+                    int pulseLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.PULSE_SHOT.get(), itemStack);
+                    sealedChaosEntity.setArcShotLevel(Math.max(0, Math.min(2, arcLevel)));
+                    sealedChaosEntity.setPulseShotLevel(Math.max(0, Math.min(2, pulseLevel)));
+                    int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), itemStack);
+                    if (gigantismLevel > 0) {
+                        sealedChaosEntity.setGigantic(true);
+                    }
+                    // Commander / Overworked flags are for behavior; Overworked is mainly handled on the player side.
                     level.addFreshEntity(sealedChaosEntity);
                 }
             }
@@ -76,8 +85,6 @@ public class ScepterOfSealedChaosItem extends Item {
             return InteractionResult.SUCCESS;
         }
     }
-
-
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {

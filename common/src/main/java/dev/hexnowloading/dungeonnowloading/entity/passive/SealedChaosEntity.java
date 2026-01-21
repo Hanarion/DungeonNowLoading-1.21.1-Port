@@ -15,6 +15,7 @@ import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
@@ -25,6 +26,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
@@ -34,6 +36,10 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
 
     private static final EntityDataAccessor<Integer> DESPAWN_TICK = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Integer> ARC_SHOT_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> PULSE_SHOT_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> OVERWORKED = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
 
     public SealedChaosEntity(EntityType<? extends SealedChaosEntity> entityType, Level level) {
         super(entityType, level);
@@ -75,6 +81,10 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         super.defineSynchedData();
         this.entityData.define(DESPAWN_TICK, 600);
         this.entityData.define(OWNER_UUID, Optional.empty());
+        this.entityData.define(ARC_SHOT_LEVEL, 0);
+        this.entityData.define(PULSE_SHOT_LEVEL, 0);
+        this.entityData.define(GIGANTIC, false);
+        this.entityData.define(OVERWORKED, false);
     }
 
     @Override
@@ -84,6 +94,10 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         if (this.getOwnerUUID() != null) {
             compoundTag.putUUID("Owner", this.getOwnerUUID());
         }
+        compoundTag.putInt("ArcShotLevel", this.getArcShotLevel());
+        compoundTag.putInt("PulseShotLevel", this.getPulseShotLevel());
+        compoundTag.putBoolean("Gigantic", this.isGigantic());
+        compoundTag.putBoolean("Overworked", this.isOverworked());
     }
 
     @Override
@@ -99,6 +113,18 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         }
         if (uuid != null) {
             this.setOwnerUUID(uuid);
+        }
+        if (compoundTag.contains("ArcShotLevel")) {
+            this.setArcShotLevel(compoundTag.getInt("ArcShotLevel"));
+        }
+        if (compoundTag.contains("PulseShotLevel")) {
+            this.setPulseShotLevel(compoundTag.getInt("PulseShotLevel"));
+        }
+        if (compoundTag.contains("Gigantic")) {
+            this.setGigantic(compoundTag.getBoolean("Gigantic"));
+        }
+        if (compoundTag.contains("Overworked")) {
+            this.setOverworked(compoundTag.getBoolean("Overworked"));
         }
     }
 
@@ -178,4 +204,42 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     public UUID getOwnerUUID() { return (UUID) ((Optional) this.entityData.get(OWNER_UUID)).orElse((Object) null); }
 
     public void setOwnerUUID(UUID uuid) { this.entityData.set(OWNER_UUID, Optional.ofNullable(uuid));}
+
+    public int getArcShotLevel() { return this.entityData.get(ARC_SHOT_LEVEL); }
+
+    public void setArcShotLevel(int level) { this.entityData.set(ARC_SHOT_LEVEL, level); }
+
+    public int getPulseShotLevel() { return this.entityData.get(PULSE_SHOT_LEVEL); }
+
+    public void setPulseShotLevel(int level) { this.entityData.set(PULSE_SHOT_LEVEL, level); }
+
+    public boolean isGigantic() {
+        return this.entityData.get(GIGANTIC);
+    }
+
+    public void setGigantic(boolean gigantic) {
+        this.entityData.set(GIGANTIC, gigantic);
+        this.refreshDimensions();
+    }
+
+    public boolean isOverworked() {
+        return this.entityData.get(OVERWORKED);
+    }
+
+    public void setOverworked(boolean value) {
+        this.entityData.set(OVERWORKED, value);
+        // Attack speed tuning could go here if we add an attribute.
+    }
+
+    @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        EntityDimensions base = super.getDimensions(pose);
+        return this.isGigantic() ? base.scale(2.0F) : base;
+    }
+
+    @Override
+    public double getMyRidingOffset() {
+        // keep eye height reasonable when scaled
+        return this.isGigantic() ? super.getMyRidingOffset() * 2.0D : super.getMyRidingOffset();
+    }
 }

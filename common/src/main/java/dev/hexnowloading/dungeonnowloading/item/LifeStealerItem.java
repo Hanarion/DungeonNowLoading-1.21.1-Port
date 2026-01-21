@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -15,8 +16,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +49,40 @@ public class LifeStealerItem extends SwordItem {
             return false;
         }
     }*/
+
+    public static float onLivingDamage(LivingEntity attacker, LivingEntity target, float damage) {
+        // Sacrifice enchantment: heal when hitting allies/summons
+        int sacrificeLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.SACRIFICE.get(), attacker.getMainHandItem());
+        if (sacrificeLevel > 0 && damage > 0.0F && isAllyOrSummon(attacker, target)) {
+            float healFactor = 0.2F + 0.1F * sacrificeLevel; // 20% + 10% per level
+            float healAmount = damage * healFactor;
+            if (healAmount > 0.0F) {
+                attacker.heal(healAmount);
+            }
+        }
+
+        // Base Life Stealer lifesteal (always active regardless of Sacrifice)
+        healthDrain(attacker, damage);
+        return damage;
+    }
+
+    private static boolean isAllyOrSummon(LivingEntity attacker, LivingEntity target) {
+        if (attacker == target) {
+            return false; // don't treat self-hit as Sacrifice trigger
+        }
+
+        // Vanilla team/ally logic (covers same team and tamed pets)
+        if (attacker.isAlliedTo(target)) {
+            return true;
+        }
+
+        // Explicit ownership check for tamable/ownable entities
+        if (target instanceof OwnableEntity ownable && ownable.getOwner() == attacker) {
+            return true;
+        }
+
+        return false;
+    }
 
     public static void healthDrain(LivingEntity hurtingEntity, float damage) {
         int healAmount = (int) Math.floor(damage * 0.2F);

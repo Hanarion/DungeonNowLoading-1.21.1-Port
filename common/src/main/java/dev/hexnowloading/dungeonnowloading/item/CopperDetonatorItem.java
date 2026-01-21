@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.supporter.DNLSupporters;
 import net.minecraft.ChatFormatting;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -162,6 +164,17 @@ public class CopperDetonatorItem extends Item {
             }
         }
         creep.setSkinValidation(true);
+
+        // Gigantism: if the detonator has the enchant, double the Copper Creep's size
+        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), player.getItemInHand(InteractionHand.MAIN_HAND));
+        if (gigantismLevel > 0) {
+            creep.setGigantic(true);
+        }
+
+        int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), player.getItemInHand(InteractionHand.MAIN_HAND));
+        if (overworkedLevel > 0) {
+            creep.setOverworked(true);
+        }
 
         level.addFreshEntity(creep);
     }
