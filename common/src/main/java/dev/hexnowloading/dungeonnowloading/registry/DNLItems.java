@@ -158,6 +158,8 @@ public class DNLItems {
     public static final Supplier<Item> SMALL_DURITE_BUD = register("small_durite_bud", () -> new BlockItem(DNLBlocks.SMALL_DURITE_BUD.get(), new Item.Properties()));
     public static final Supplier<Item> GAUNTLET = register("gauntlet", GauntletBlockItem::new);
     public static final Supplier<Item> GAUNTLET_VAULT = register("gauntlet_vault", GauntletVaultBlockItem::new);
+    public static final Supplier<Item> DUNGEON_DIRECTOR = register("dungeon_director", () -> new BlockItem(DNLBlocks.DUNGEON_DIRECTOR.get(), new Item.Properties()));
+    public static final Supplier<Item> SPAWN_NODE = register("spawn_node", () -> new BlockItem(DNLBlocks.SPAWN_NODE.get(), new Item.Properties()));
 
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
     public static final Supplier<Item> AZURO_OAK_LOG = register("azuro_oak_log", () -> new BlockItem(DNLBlocks.AZURO_OAK_LOG.get(), new Item.Properties()));

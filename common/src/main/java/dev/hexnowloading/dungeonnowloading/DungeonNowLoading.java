@@ -41,6 +41,7 @@ public class DungeonNowLoading {
         DNLGameEvents.init();
         DNLLootInjections.setup();
         DNLRecallables.registerAll();
+        DNLReloadListeners.init();
         DNLSupporters.loadSupporters();
     }
 

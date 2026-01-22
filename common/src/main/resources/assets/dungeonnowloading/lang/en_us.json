@@ -200,6 +200,8 @@
   "block.dungeonnowloading.player_statue.message": "In the Name of %1$s",
   "block.dungeonnowloading.gauntlet": "Gauntlet",
   "block.dungeonnowloading.durite_queller": "Durite Queller",
+  "block.dungeonnowloading.dungeon_director": "Dungeon Director",
+  "block.dungeonnowloading.spawn_node": "Spawn Node",
   "death.attack.dungeonnowloading.spike": "%1$s was spiked to death",
   "death.attack.dungeonnowloading.spike.player": "%1$s was spiked to death",
   "entity.dungeonnowloading.chaos_spawner": "Chaos Spawner",
