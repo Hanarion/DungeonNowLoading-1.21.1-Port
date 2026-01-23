@@ -43,6 +43,8 @@ public class ChaosSpawnerProjectileEntity extends Entity {
     private final ParticleOptions SPAWN_PARTICLE = ParticleTypes.POOF;
     private final ParticleOptions TRAIL_PARTICLE = ParticleTypes.DRAGON_BREATH;
 
+    private boolean giganticOwner;
+
     public ChaosSpawnerProjectileEntity(EntityType<? extends ChaosSpawnerProjectileEntity> entityType, Level level) {
         super(entityType, level);
     }
@@ -63,6 +65,17 @@ public class ChaosSpawnerProjectileEntity extends Entity {
         this(owner.getX(), owner.getY(), owner.getZ(), xP, yP, zP, owner.level());
         this.setOwner(owner);
         this.setRot(owner.getYRot(), owner.getXRot());
+    }
+
+    public ChaosSpawnerProjectileEntity(SealedChaosEntity owner, double xPower, double yPower, double zPower) {
+        this(owner.getX(), owner.getY(), owner.getZ(), xPower, yPower, zPower, owner.level());
+        this.setOwner(owner);
+        this.setRot(owner.getYRot(), owner.getXRot());
+        this.giganticOwner = owner.isGigantic();
+    }
+
+    public boolean isGiganticOwner() {
+        return giganticOwner;
     }
 
     @Override

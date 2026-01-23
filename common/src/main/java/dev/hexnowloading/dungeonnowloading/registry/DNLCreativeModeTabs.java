@@ -57,6 +57,15 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SPAWNER_BOOTS.get());
                 // Enchantments - Books
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.BREAK_PROTECTION.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.GIGANTISM.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.COMMANDER.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.OVERWORKED.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.PACK_BLESSING.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.ARC_SHOT.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.PULSE_SHOT.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.SACRIFICE.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.RECKLESS.get(), 1)));
+
                 // Items - Boss Related
                 output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
                 output.accept(DNLItems.SKULL_OF_CHAOS.get());

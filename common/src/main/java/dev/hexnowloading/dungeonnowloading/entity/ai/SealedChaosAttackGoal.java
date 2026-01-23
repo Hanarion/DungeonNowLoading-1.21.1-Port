@@ -15,6 +15,7 @@ public class SealedChaosAttackGoal extends Goal {
     private final SealedChaosEntity sealedChaosEntity;
     private final int shootIntervalTick;
     private int attackTick;
+    private boolean hasAimedOnce; // ensure at least one aiming tick before first shot
 
     // State for pulse (rapid) firing
     private int remainingPulseShots;
@@ -34,11 +35,23 @@ public class SealedChaosAttackGoal extends Goal {
         return target != null && target.isAlive();
     }
 
-    /*@Override
-    public boolean canContinueToUse() {
-        LivingEntity target = this.sealedChaosEntity.getTarget();
-        return target != null && target.isAlive();
-    }*/
+    @Override
+    public void start() {
+        // On goal start, reset state and require at least one aim tick before firing
+        this.attackTick = 5; // small warm-up before first possible shot
+        this.remainingPulseShots = 0;
+        this.pulseCooldown = 0;
+        this.lastPulseDirection = null;
+        this.hasAimedOnce = false;
+    }
+
+    @Override
+    public void stop() {
+        this.remainingPulseShots = 0;
+        this.pulseCooldown = 0;
+        this.lastPulseDirection = null;
+        this.hasAimedOnce = false;
+    }
 
     @Override
     public void tick() {
@@ -46,6 +59,7 @@ public class SealedChaosAttackGoal extends Goal {
         LivingEntity target = this.sealedChaosEntity.getTarget();
         if (target != null) {
             this.sealedChaosEntity.getLookControl().setLookAt(target, 30.0F, 30.0F);
+            this.hasAimedOnce = true; // we've spent at least one tick aiming at the current target
         }
 
         // Handle ongoing pulse sequence if any (continues even while attackTick is > 0)
@@ -67,12 +81,32 @@ public class SealedChaosAttackGoal extends Goal {
 
         if (this.attackTick > 0) {
             this.attackTick--;
-        } else if (this.remainingPulseShots == 0) {
-            // Only start a new attack if no pulse burst is currently active
-            if (target != null && this.sealedChaosEntity.hasLineOfSight(target)) {
-                performEnchantedShot(target);
-            }
+            return;
         }
+
+        if (!this.hasAimedOnce) {
+            // ensure we've aimed for at least one tick before any shot
+            this.attackTick = 1;
+            return;
+        }
+
+        if (this.remainingPulseShots == 0 && target != null && this.sealedChaosEntity.hasLineOfSight(target)) {
+            performEnchantedShot(target);
+        }
+    }
+
+    private int getEffectiveShootInterval() {
+        int base = this.shootIntervalTick;
+        int overworkedLevel = this.sealedChaosEntity.getOverworkedLevel();
+        if (overworkedLevel <= 0) {
+            return base;
+        }
+        // 20% faster per level => interval * (1 - 0.2 * level)
+        float factor = 1.0F - 0.2F * overworkedLevel;
+        if (factor < 0.2F) {
+            factor = 0.2F; // cap at 80% reduction (very fast but not zero)
+        }
+        return Math.max(3, (int)(base * factor));
     }
 
     private void performEnchantedShot(LivingEntity target) {
@@ -86,10 +120,12 @@ public class SealedChaosAttackGoal extends Goal {
         // Play the shot sound once per attack, before spawning any projectiles
         playShotSound();
 
+        int interval = getEffectiveShootInterval();
+
         if (arcLevel > 0 && effectiveLevel > 0) {
             // Arc pattern: fire all bullets at once in an arc, then start cooldown immediately
             performArcShot(totalBullets, target, false);
-            this.attackTick = this.shootIntervalTick;
+            this.attackTick = interval;
         } else if (pulseLevel > 0 && effectiveLevel > 0) {
             // Pulse pattern: fire one now, queue the rest; cooldown will start after last pulse
             if (performStraightShotIfValid(target, false)) {
@@ -100,12 +136,12 @@ public class SealedChaosAttackGoal extends Goal {
             } else {
                 // If we couldn't fire the first shot, just fall back to normal single shot + cooldown
                 performSingleShot(target, false);
-                this.attackTick = this.shootIntervalTick;
+                this.attackTick = interval;
             }
         } else {
             // No relevant enchantment, keep original single-shot behavior
             performSingleShot(target, false);
-            this.attackTick = this.shootIntervalTick;
+            this.attackTick = interval;
         }
     }
 
@@ -180,7 +216,7 @@ public class SealedChaosAttackGoal extends Goal {
 
     private void vecFromCenterToFrontOfFace(float angle, Vec3 overrideDirection) {
         // Use the owner-based constructor so the projectile gets a clean origin, then offset spawn and direction
-        double viewDistance = 0.35F; // a bit closer to really feel like it comes from inside/just in front
+        double viewDistance = 0.15F; // spawn much closer to the body so it feels like it comes from inside
         Vec3 viewVector = overrideDirection != null ? overrideDirection : this.sealedChaosEntity.getViewVector(1.0F);
         if (angle != 0.0F) {
             float offset = (float) Math.toRadians(angle);
@@ -198,8 +234,8 @@ public class SealedChaosAttackGoal extends Goal {
                 direction.z
         );
 
-        // Move it slightly forward and at roughly mid-body height (below eye level)
-        double baseY = this.sealedChaosEntity.getY() + this.sealedChaosEntity.getBbHeight() * 0.5F;
+        // Move it slightly forward and at roughly chest height (below eye level)
+        double baseY = this.sealedChaosEntity.getY() + this.sealedChaosEntity.getBbHeight() * 0.25F;
         Vec3 spawnOffsetHorizontal = direction.scale(viewDistance);
         projectile.setPos(
                 this.sealedChaosEntity.getX() + spawnOffsetHorizontal.x,

@@ -2,9 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.client.model.HollowModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.SealedChaosModel;
-import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -19,9 +17,17 @@ public class SealedChaosRenderer<T extends SealedChaosEntity> extends MobRendere
     }
 
     @Override
-    protected void scale(T t, PoseStack poseStack, float f) {
-        poseStack.scale(1.59F, 1.59F, 1.59F);
-        super.scale(t, poseStack, 1.6F);
+    protected void scale(T entity, PoseStack poseStack, float partialTick) {
+        // Base scale so Sealed Chaos has presence even without Gigantism
+        float baseScale = 1.6F;
+        poseStack.scale(baseScale, baseScale, baseScale);
+
+        // If Gigantism is active, double the size visually to match the 2x hitbox
+        if (entity.isGigantic()) {
+            poseStack.scale(2.0F, 2.0F, 2.0F);
+        }
+
+        super.scale(entity, poseStack, partialTick);
     }
 
     @Override

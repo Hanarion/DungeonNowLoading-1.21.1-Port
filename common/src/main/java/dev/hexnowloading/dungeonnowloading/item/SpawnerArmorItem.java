@@ -34,6 +34,8 @@ public class SpawnerArmorItem extends ArmorItem {
 
     private int summonTick = 200;
     private final int spawnRange = 4;
+    private static final java.util.UUID OVERWORKED_HP_MODIFIER_ID =
+            java.util.UUID.nameUUIDFromBytes("dnl_overworked_player_max_health".getBytes());
 
     public SpawnerArmorItem(ArmorMaterial armorMaterial, Type slot) {
         super(armorMaterial, slot, new Properties());
@@ -45,21 +47,11 @@ public class SpawnerArmorItem extends ArmorItem {
 
         if (level.isClientSide) return;
         if (!(entity instanceof Player player)) return;
+        // Only the equipped spawner helmet in the armor helmet slot should drive the logic
         if (!itemStack.is(DNLItems.SPAWNER_HELMET.get())) return;
+        if (player.getInventory().getArmor(3) != itemStack) return;
 
-        // Overworked: soft health cap while wearing helmet with enchant
-        int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), itemStack);
-        if (overworkedLevel > 0) {
-            // Each level effectively removes 1 heart (2 HP) from the "safe" health cap
-            float baseMax = (float) player.getAttributeValue(Attributes.MAX_HEALTH);
-            float effectiveMax = baseMax - (2.0F * overworkedLevel);
-            if (effectiveMax < 1.0F) {
-                effectiveMax = 1.0F; // never hard-cap below 1 HP
-            }
-            if (player.getHealth() > effectiveMax) {
-                player.setHealth(effectiveMax);
-            }
-        }
+        // Overworked: HP penalty is now applied on summon in summonMob(), not every tick while wearing the helmet
 
         if (!hasFullSuitOfArmorOn(player)) return;
 
@@ -97,7 +89,6 @@ public class SpawnerArmorItem extends ArmorItem {
             summonTick = 40;
         }
 
-        // Pack Blessing: 10s Regen, Regen I starts at 2 Whimpers
         int packBlessingLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.PACK_BLESSING.get(), itemStack);
         if (packBlessingLevel > 0) {
             List<WhimperEntity> whimpers = level.getEntitiesOfClass(
@@ -114,10 +105,51 @@ public class SpawnerArmorItem extends ArmorItem {
 
             int count = whimpers.size();
             if (count >= 2) {
-                // 2 Whimpers -> Regen I (amp 0), 3 -> Regen II (amp 1), etc.
-                int amplifier = count - 2;
-                player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 200, amplifier, true, false));
+                MobEffectInstance current = player.getEffect(MobEffects.REGENERATION);
+                if (current == null || current.getDuration() <= 20 || current.getAmplifier() < 0) {
+                    player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 200, 0, true, false));
+                }
             }
+        }
+    }
+
+    private void applyOverworkedMaxHealthPenalty(Player owner, int overworkedLevel) {
+        // Remove any existing modifier first
+        var maxHealthAttr = owner.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealthAttr == null) return;
+
+        if (maxHealthAttr.getModifier(OVERWORKED_HP_MODIFIER_ID) != null) {
+            maxHealthAttr.removeModifier(OVERWORKED_HP_MODIFIER_ID);
+        }
+
+        if (overworkedLevel <= 0) {
+            return; // no penalty
+        }
+
+        // Each Overworked level reduces max HP by 2.0 (one heart), but never below 1 HP total
+        double baseMax = maxHealthAttr.getBaseValue();
+        double penalty = 2.0D * overworkedLevel;
+        double minAllowed = 1.0D;
+        if (baseMax - penalty < minAllowed) {
+            penalty = baseMax - minAllowed;
+            if (penalty < 0.0D) {
+                penalty = 0.0D;
+            }
+        }
+
+        if (penalty > 0.0D) {
+            maxHealthAttr.addPermanentModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(
+                    OVERWORKED_HP_MODIFIER_ID,
+                    "dnl_overworked_player_max_health",
+                    -penalty,
+                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION
+            ));
+        }
+
+        // Clamp current health to new max if necessary
+        float newMax = (float) owner.getAttributeValue(Attributes.MAX_HEALTH);
+        if (owner.getHealth() > newMax) {
+            owner.setHealth(newMax);
         }
     }
 
@@ -134,12 +166,15 @@ public class SpawnerArmorItem extends ArmorItem {
             if (whimper != null) {
                 whimper.moveTo(x, y, z, 0.0F, 0.0F);
                 whimper.setOwnerUUID(owner.getUUID());
-                // Gigantism: if the helmet has the enchant, double Whimper's size
                 ItemStack helmetStack = owner.getInventory().getArmor(3);
                 int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), helmetStack);
                 if (gigantismLevel > 0) {
                     whimper.setGigantic(true);
                 }
+                int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), helmetStack);
+                whimper.setOverworkedLevel(overworkedLevel);
+                applyOverworkedMaxHealthPenalty(owner, overworkedLevel);
+
                 level.addFreshEntity(whimper);
             }
         }

@@ -17,9 +17,17 @@ public class WhimperRenderer<T extends WhimperEntity> extends MobRenderer<T, Whi
     }
 
     @Override
-    protected void scale(T entity, PoseStack poseStack, float f) {
-        poseStack.scale(1.5F, 1.5F, 1.5F);
-        super.scale(entity, poseStack, f);
+    protected void scale(T entity, PoseStack poseStack, float partialTick) {
+        // Base whimper scale
+        float baseScale = 1.5F;
+        poseStack.scale(baseScale, baseScale, baseScale);
+
+        // Gigantism: double the whimper model when flagged
+        if (entity.isGigantic()) {
+            poseStack.scale(2.0F, 2.0F, 2.0F);
+        }
+
+        super.scale(entity, poseStack, partialTick);
     }
 
     @Override

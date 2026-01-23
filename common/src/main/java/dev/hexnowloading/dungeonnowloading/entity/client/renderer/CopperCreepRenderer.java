@@ -38,6 +38,9 @@ public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, Hierarch
         float finalScale = (1.0F + swelling * 0.4F) * scaleFactor;
         float inverseScale = (1.0F + swelling * 0.1F) / scaleFactor;
         poseStack.scale(finalScale, inverseScale, finalScale);
+        if (entity.isGigantic()) {
+            poseStack.scale(2.0F, 2.0F, 2.0F);
+        }
     }
 
     @Override

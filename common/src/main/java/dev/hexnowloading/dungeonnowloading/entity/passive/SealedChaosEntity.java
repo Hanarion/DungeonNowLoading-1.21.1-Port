@@ -16,6 +16,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
@@ -39,7 +40,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Integer> ARC_SHOT_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> PULSE_SHOT_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> OVERWORKED = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
 
     public SealedChaosEntity(EntityType<? extends SealedChaosEntity> entityType, Level level) {
         super(entityType, level);
@@ -84,7 +85,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         this.entityData.define(ARC_SHOT_LEVEL, 0);
         this.entityData.define(PULSE_SHOT_LEVEL, 0);
         this.entityData.define(GIGANTIC, false);
-        this.entityData.define(OVERWORKED, false);
+        this.entityData.define(OVERWORKED_LEVEL, 0);
     }
 
     @Override
@@ -97,7 +98,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         compoundTag.putInt("ArcShotLevel", this.getArcShotLevel());
         compoundTag.putInt("PulseShotLevel", this.getPulseShotLevel());
         compoundTag.putBoolean("Gigantic", this.isGigantic());
-        compoundTag.putBoolean("Overworked", this.isOverworked());
+        compoundTag.putInt("OverworkedLevel", this.getOverworkedLevel());
     }
 
     @Override
@@ -123,8 +124,8 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         if (compoundTag.contains("Gigantic")) {
             this.setGigantic(compoundTag.getBoolean("Gigantic"));
         }
-        if (compoundTag.contains("Overworked")) {
-            this.setOverworked(compoundTag.getBoolean("Overworked"));
+        if (compoundTag.contains("OverworkedLevel")) {
+            this.setOverworkedLevel(compoundTag.getInt("OverworkedLevel"));
         }
     }
 
@@ -182,8 +183,31 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return 0.5F;
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
+        // Base eye height as a fraction of current height so it scales naturally with size
+        return size.height * 0.8F;
+    }
+
+    @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        EntityDimensions base = super.getDimensions(pose);
+        return this.isGigantic() ? base.scale(2.0F) : base;
+    }
+
+    @Override
+    public double getMyRidingOffset() {
+        // Keep riding offset proportional to size
+        double base = super.getMyRidingOffset();
+        return this.isGigantic() ? base * 2.0D : base;
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (GIGANTIC.equals(key)) {
+            // When gigantic flag changes on the client, recompute dimensions/eye height
+            this.refreshDimensions();
+        }
     }
 
     @Override
@@ -191,6 +215,8 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         super.recreateFromPacket(clientboundAddEntityPacket);
         this.yBodyRot = 0.0F;
         this.yBodyRotO = 0.0F;
+        // Ensure initial dimensions on the client match current gigantic state
+        this.refreshDimensions();
     }
 
     @Override
@@ -222,24 +248,36 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         this.refreshDimensions();
     }
 
+    public int getOverworkedLevel() {
+        return this.entityData.get(OVERWORKED_LEVEL);
+    }
+
+    public void setOverworkedLevel(int level) {
+        int clamped = Math.max(0, Math.min(5, level));
+        this.entityData.set(OVERWORKED_LEVEL, clamped);
+    }
+
     public boolean isOverworked() {
-        return this.entityData.get(OVERWORKED);
+        return this.getOverworkedLevel() > 0;
     }
 
-    public void setOverworked(boolean value) {
-        this.entityData.set(OVERWORKED, value);
-        // Attack speed tuning could go here if we add an attribute.
-    }
-
-    @Override
-    public EntityDimensions getDimensions(Pose pose) {
-        EntityDimensions base = super.getDimensions(pose);
-        return this.isGigantic() ? base.scale(2.0F) : base;
-    }
-
-    @Override
-    public double getMyRidingOffset() {
-        // keep eye height reasonable when scaled
-        return this.isGigantic() ? super.getMyRidingOffset() * 2.0D : super.getMyRidingOffset();
+    public void applyOverworkedAttackSpeedBonus() {
+        int level = this.getOverworkedLevel();
+        AttributeInstance attackSpeed = this.getAttribute(Attributes.ATTACK_SPEED);
+        if (attackSpeed != null) {
+            java.util.UUID modifierId = java.util.UUID.nameUUIDFromBytes("dnl_overworked_attack_speed".getBytes());
+            if (attackSpeed.getModifier(modifierId) != null) {
+                attackSpeed.removeModifier(modifierId);
+            }
+            if (level > 0) {
+                double bonus = 0.2D * level; // 20% per level
+                attackSpeed.addPermanentModifier(new AttributeModifier(
+                        modifierId,
+                        "dnl_overworked_attack_speed",
+                        bonus,
+                        AttributeModifier.Operation.MULTIPLY_TOTAL
+                ));
+            }
+        }
     }
 }

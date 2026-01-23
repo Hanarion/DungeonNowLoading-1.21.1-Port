@@ -65,6 +65,10 @@ public class ScepterOfSealedChaosItem extends Item {
                 SealedChaosEntity sealedChaosEntity = DNLEntityTypes.SEALED_CHAOS.get().create(level);
                 if (sealedChaosEntity != null) {
                     sealedChaosEntity.moveTo(blockPos1, 0.0F, 0.0F);
+                    // Prevent spawn if there is not enough free space for its bounding box
+                    if (!level.noCollision(sealedChaosEntity)) {
+                        return InteractionResult.FAIL;
+                    }
                     sealedChaosEntity.setOwnerUUID(player.getUUID());
                     int arcLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.ARC_SHOT.get(), itemStack);
                     int pulseLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.PULSE_SHOT.get(), itemStack);
@@ -74,7 +78,11 @@ public class ScepterOfSealedChaosItem extends Item {
                     if (gigantismLevel > 0) {
                         sealedChaosEntity.setGigantic(true);
                     }
-                    // Commander / Overworked flags are for behavior; Overworked is mainly handled on the player side.
+                    int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), itemStack);
+                    if (overworkedLevel > 0) {
+                        sealedChaosEntity.setOverworkedLevel(overworkedLevel);
+                        sealedChaosEntity.applyOverworkedAttackSpeedBonus();
+                    }
                     level.addFreshEntity(sealedChaosEntity);
                 }
             }

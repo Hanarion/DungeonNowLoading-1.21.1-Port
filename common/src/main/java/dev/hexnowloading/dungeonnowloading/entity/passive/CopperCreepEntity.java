@@ -368,13 +368,18 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
 
     public void setOverworked(boolean value) {
         this.entityData.set(OVERWORKED, value);
-        // If we later want per-creep attack speed or animation changes, hook them here.
     }
 
     @Override
     public EntityDimensions getDimensions(Pose pose) {
         EntityDimensions base = super.getDimensions(pose);
         return this.isGigantic() ? base.scale(2.0F) : base;
+    }
+
+    @Override
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
+        // Scale eye height as a fraction of current height so it matches both normal and gigantic
+        return size.height * 0.8F;
     }
 
     @Override
@@ -385,6 +390,24 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
             this.triggerSummonAnimation();
             this.playSound(DNLSounds.COPPER_CREEP_SPAWN.get());
             this.entityData.set(DATA_IS_ALREADY_SUMMONED, true);
+        }
+
+        if (this.isOverworked()) {
+            // Overworked creeps move more aggressively when they have a target: apply a temporary speed boost
+            if (this.getTarget() != null && !this.isDefused()) {
+                AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
+                if (moveSpeedAttr != null) {
+                    UUID overworkedSpeedId = UUID.nameUUIDFromBytes("dnl_overworked_speed".getBytes());
+                    if (moveSpeedAttr.getModifier(overworkedSpeedId) == null) {
+                        moveSpeedAttr.addTransientModifier(new AttributeModifier(
+                                overworkedSpeedId,
+                                "dnl_overworked_speed",
+                                0.2D,
+                                AttributeModifier.Operation.MULTIPLY_TOTAL
+                        ));
+                    }
+                }
+            }
         }
 
         if (this.isState(State.SUMMONING) && this.aiTick == (int) (CopperCreepAnimationDuration.SUMMON * 20)) {
@@ -452,6 +475,10 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
                 float finalExplosionRadius = EXPLOSION_RADIUS;
                 if (this.isPowered()) {
                     finalExplosionRadius = POWERED_EXPLOSION_RADIUS;
+                }
+                // Gigantism: larger creeps have a larger explosion
+                if (this.isGigantic()) {
+                    finalExplosionRadius *= 1.5F;
                 }
 
                 DamageSource source = level().damageSources().explosion(this, this.getSummoner());
@@ -704,6 +731,9 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
                 case SITTING -> this.sittingAnimationState.startIfStopped(this.tickCount);
                 case SITTING_DETONATION -> this.sittingDetonationAnimationState.startIfStopped(this.tickCount);
             }
+        }
+        if (GIGANTIC.equals(entityDataAccessor)) {
+            this.refreshDimensions();
         }
         super.onSyncedDataUpdated(entityDataAccessor);
     }

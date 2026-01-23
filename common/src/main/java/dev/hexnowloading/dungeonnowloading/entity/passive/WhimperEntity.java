@@ -23,6 +23,7 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -38,12 +39,14 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.INT);
 
     public WhimperEntity(EntityType<? extends WhimperEntity> entityType, Level level) {
         super(entityType, level);
         this.xpReward = 0;
         this.moveControl = new WhimperMoveControl(this);
         this.lookControl = new LookControl(this);
+        this.noPhysics = true;
         this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.FENCE, -1.0F);
@@ -110,6 +113,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         this.entityData.define(OWNER_UUID, Optional.empty());
         this.entityData.define(CHARGING, false);
         this.entityData.define(GIGANTIC, false);
+        this.entityData.define(OVERWORKED_LEVEL, 0);
     }
 
     @Override
@@ -181,9 +185,9 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        float base = 0.6F;
-        return this.isGigantic() ? base * 2.0F : base;
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
+        // Scale eye height with current bounding box height for consistent visuals
+        return size.height * 0.8F;
     }
 
     @Nullable
@@ -224,4 +228,34 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         this.entityData.set(GIGANTIC, gigantic);
         this.refreshDimensions();
     }
+
+    public int getOverworkedLevel() {
+        return this.entityData.get(OVERWORKED_LEVEL);
+    }
+
+    public void setOverworkedLevel(int level) {
+        int clamped = Math.max(0, Math.min(5, level));
+        this.entityData.set(OVERWORKED_LEVEL, clamped);
+    }
+
+    public boolean isOverworked() {
+        return this.getOverworkedLevel() > 0;
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (GIGANTIC.equals(key)) {
+            this.refreshDimensions();
+        }
+    }
+
+
+
+    @Override
+    public boolean isPushable() {
+        return true;
+    }
+
+
 }
