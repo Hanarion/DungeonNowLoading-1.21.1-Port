@@ -22,7 +22,7 @@ public class SpawnDefinitionReloadListener extends SimpleJsonResourceReloadListe
 
     // Folder: data/<namespace>/dnl_spawn_definitions/*.json
     public SpawnDefinitionReloadListener(Gson gson, Logger logger) {
-        super(gson, "spawn_definitions");
+        super(gson, "spawn_nodes");
         this.logger = logger;
     }
 
@@ -50,13 +50,13 @@ public class SpawnDefinitionReloadListener extends SimpleJsonResourceReloadListe
                 String spawnEffect = obj.has("spawn_effect") ? obj.get("spawn_effect").getAsString() : "none";
 
                 CompoundTag nbtPatch = new CompoundTag();
-                if (obj.has("nbt_patch") && obj.get("nbt_patch").isJsonObject()) {
-                    nbtPatch = jsonObjectToNbt(obj.getAsJsonObject("nbt_patch"));
+                if (obj.has("nbt") && obj.get("nbt").isJsonObject()) {
+                    nbtPatch = jsonObjectToNbt(obj.getAsJsonObject("nbt"));
                 }
 
                 CompoundTag snbtPatch = new CompoundTag();
-                if (obj.has("snbt_patch")) {
-                    String snbt = obj.get("snbt_patch").getAsString();
+                if (obj.has("snbt")) {
+                    String snbt = obj.get("snbt").getAsString();
                     snbtPatch = TagParser.parseTag(snbt);
                 }
 

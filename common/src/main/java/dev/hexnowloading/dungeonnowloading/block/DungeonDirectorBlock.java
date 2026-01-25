@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -29,14 +31,18 @@ import javax.annotation.Nullable;
 
 public class DungeonDirectorBlock extends Block implements EntityBlock {
 
+    public static final BooleanProperty REMOVE_AFTER_SUMMON = BooleanProperty.create("remove");
+
+
     public DungeonDirectorBlock(Properties props) {
         super(props);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(BlockStateProperties.FACING, Direction.NORTH));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(BlockStateProperties.FACING, Direction.NORTH).setValue(REMOVE_AFTER_SUMMON, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.FACING);
+        builder.add(REMOVE_AFTER_SUMMON);
     }
 
     @Override
@@ -69,24 +75,46 @@ public class DungeonDirectorBlock extends Block implements EntityBlock {
             return InteractionResult.PASS; // don’t spam survival players
         }
 
-        // Shift-right-click: toggle bake/unbake
-        if (player.isCrouching()) {
-            int n;
-            if (!director.isBaked()) {
-                n = director.bakeFromWorldSpawnNodes(); // <- rename if you kept old name
-                player.displayClientMessage(Component.literal("Baked " + n + " Spawn Nodes into Director."), true);
+        if (player.getAbilities().instabuild && player.getItemInHand(hand).is(Items.BARRIER)) {
+            BlockState newState = state.cycle(REMOVE_AFTER_SUMMON);
+
+            level.setBlock(pos, newState, 3);
+            level.sendBlockUpdated(pos, state, newState, 3);
+
+            director.resetEncounterState();
+            director.setChanged();
+
+            if (newState.getValue(REMOVE_AFTER_SUMMON)) {
+                player.displayClientMessage(Component.translatable("block.dungeonnowloading.dungeon_director.hint_remove"),
+                        true
+                );
             } else {
-                n = director.restoreSpawnNodesToWorld(); // <- rename if you kept old name
-                player.displayClientMessage(Component.literal("Restored " + n + " Spawn Nodes from Director."), true);
+                player.displayClientMessage(Component.translatable("block.dungeonnowloading.dungeon_director.hint_retain"),
+                        true
+                );
             }
 
-            director.setChanged();
-            level.sendBlockUpdated(pos, state, state, 3);
             return InteractionResult.CONSUME;
         }
 
-        // Optional: hint on normal right-click (creative only)
-        player.displayClientMessage(Component.literal("Shift-right-click to bake/unbake Spawn Nodes."), true);
+        int n;
+        if (!director.isBaked()) {
+            n = director.bakeFromWorldSpawnNodes(); // <- rename if you kept old name
+            player.displayClientMessage(
+                    Component.translatable("block.dungeonnowloading.dungeon_director.baked", n),
+                    true
+            );
+        } else {
+            n = director.restoreSpawnNodesToWorld(); // <- rename if you kept old name
+            player.displayClientMessage(
+                    Component.translatable("block.dungeonnowloading.dungeon_director.restored", n),
+                    true
+            );
+        }
+
+        director.setChanged();
+        level.sendBlockUpdated(pos, state, state, 3);
+
         return InteractionResult.CONSUME;
     }
 

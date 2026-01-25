@@ -23,15 +23,21 @@ public class PoofSpawnEffect implements SpawnTask {
         if (done) return true;
 
         BlockPos pos = req.basePos();
+        SpawnDefinition def = req.def();
 
-        // Scale poof based on entity size
-        PoofParams poof = computePoof(level, req.def(), pos);
+        // Precompute poof params once
+        PoofParams poof = computePoof(level, def, pos);
 
-        // One poof burst per "spawn attempt" feels good (count times)
-        int count = Math.max(1, req.def().count);
-        for (int i = 0; i < count; i++) {
-            // Visual first (even if chance fails, you might prefer poof only on success)
-            // If you only want poof when something actually spawns, move this after spawnOne() returns true.
+        int slots = Math.max(1, def.count);
+        double chance = def.chance;
+
+        for (int i = 0; i < slots; i++) {
+            if (!roll(level, chance)) continue;
+
+            // Spawn first (so poof means "a mob spawned")
+            boolean spawned = director.spawnOne(level, def, req.patch(), pos);
+            if (!spawned) continue;
+
             level.sendParticles(
                     ParticleTypes.POOF,
                     pos.getX() + 0.5, pos.getY() + poof.yCenter, pos.getZ() + 0.5,
@@ -39,43 +45,39 @@ public class PoofSpawnEffect implements SpawnTask {
                     poof.spreadXZ, poof.spreadY, poof.spreadXZ,
                     poof.speed
             );
-
-            director.spawnOne(level, req.def(), req.patch(), pos);
         }
 
         done = true;
         return true;
     }
 
+    private static boolean roll(ServerLevel level, double chance) {
+        if (chance >= 1.0) return true;
+        if (chance <= 0.0) return false;
+        return level.random.nextDouble() < chance;
+    }
+
     private static PoofParams computePoof(ServerLevel level, SpawnDefinition def, BlockPos pos) {
-        // Default values if entity can't be constructed
         float bbW = 0.6f;
         float bbH = 1.8f;
 
         try {
             Entity probe = def.entityType.create(level);
             if (probe != null) {
-                // Position affects some entities' bounding boxes less often, but harmless
                 probe.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
                 bbW = Math.max(0.1f, probe.getBbWidth());
                 bbH = Math.max(0.1f, probe.getBbHeight());
-                probe.discard(); // not added to world, but safe
+                probe.discard();
             }
-        } catch (Throwable ignored) {
-        }
+        } catch (Throwable ignored) {}
 
-        // Particle scaling:
-        // - width affects XZ spread + count
-        // - height affects Y spread + yCenter
         int particles = clampInt((int) (12 + (bbW * bbH) * 18), 8, 60);
 
         double spreadXZ = clampDouble(0.15 + (bbW * 0.6), 0.15, 1.25);
         double spreadY  = clampDouble(0.15 + (bbH * 0.35), 0.15, 1.25);
 
-        // Center poof around mid-body
         double yCenter = clampDouble(bbH * 0.5, 0.3, 2.0);
 
-        // Particle motion speed
         double speed = clampDouble(0.01 + (bbW * 0.01) + (bbH * 0.005), 0.01, 0.08);
 
         return new PoofParams(particles, spreadXZ, spreadY, yCenter, speed);

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
+import dev.hexnowloading.dungeonnowloading.block.DungeonDirectorBlock;
 import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
@@ -25,7 +26,7 @@ import java.util.*;
 
 public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneReceiverBlockEntity {
 
-    private static final int CHECK_INTERVAL = 20;
+    private static final int CHECK_INTERVAL = 1;
 
     private BlockPos cornerAOffset = BlockPos.ZERO;
     private BlockPos cornerBOffset = BlockPos.ZERO;
@@ -83,9 +84,15 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
         be.pruneDeadSpawnedMobs(server);
 
         // 3) Clear ONLY when tasks done AND mobs dead
-        if (be.pendingTasks.isEmpty() && be.spawnedMobs.isEmpty()) {
+        if (be.pendingTasks.isEmpty() && be.spawnsScheduled) {
             be.cleared = true;
             be.setChanged();
+
+            if (state.getValue(DungeonDirectorBlock.REMOVE_AFTER_SUMMON)) {
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                return;
+            }
+
             level.sendBlockUpdated(pos, state, state, 3);
         }
     }
@@ -161,9 +168,6 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
     }
 
     public boolean spawnOne(ServerLevel server, SpawnDefinition def, CompoundTag patch, BlockPos pos) {
-        // Per-mob chance (you can move this to task if you want per-node chance)
-        if (def.chance < 1.0 && server.random.nextDouble() >= def.chance) return false;
-
         Entity entity = def.entityType.create(server);
         if (!(entity instanceof Mob mob)) {
             if (entity != null) entity.discard();
@@ -181,6 +185,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
         spawnedMobs.add(mob.getUUID());
         return true;
     }
+
 
     private boolean rollChance(ServerLevel level, double chance) {
         if (chance >= 1.0) return true;
@@ -273,7 +278,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
         return placed;
     }
 
-    private void resetEncounterState() {
+    public void resetEncounterState() {
         triggered = false;
         cleared = false;
         spawnedMobs.clear();
@@ -339,7 +344,6 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
         this.authoredFacing = (facing == null) ? Direction.NORTH : facing;
         setChanged();
     }
-
 
     // =========================
     // NBT Save/Load

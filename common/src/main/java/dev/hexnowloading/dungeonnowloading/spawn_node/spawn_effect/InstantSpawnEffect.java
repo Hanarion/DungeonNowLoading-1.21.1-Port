@@ -18,12 +18,21 @@ public class InstantSpawnEffect implements SpawnTask {
     public boolean tick(ServerLevel level, DungeonDirectorBlockEntity director) {
         if (done) return true;
 
-        int count = Math.max(1, req.def().count);
-        for (int i = 0; i < count; i++) {
+        int slots = Math.max(1, req.def().count);
+        double chance = req.def().chance;
+
+        for (int i = 0; i < slots; i++) {
+            if (!roll(level, chance)) continue;
             director.spawnOne(level, req.def(), req.patch(), req.basePos());
         }
 
         done = true;
         return true;
+    }
+
+    private static boolean roll(ServerLevel level, double chance) {
+        if (chance >= 1.0) return true;
+        if (chance <= 0.0) return false;
+        return level.random.nextDouble() < chance;
     }
 }

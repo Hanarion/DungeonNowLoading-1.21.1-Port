@@ -1,0 +1,10 @@
+{
+  "entity": "minecraft:zombie",
+  "count": 1,
+  "chance": 0.1,
+  "spawn_effect": "poof",
+  "nbt": {
+    "IsBaby": 1,
+    "Health": 40.0
+  }
+}

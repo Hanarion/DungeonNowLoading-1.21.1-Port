@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.block.entity.DungeonDirectorBlockEnti
 import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnRequest;
 import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnTask;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 
 public class PoofDelaySpreadSpawnEffect implements SpawnTask {
@@ -25,21 +26,31 @@ public class PoofDelaySpreadSpawnEffect implements SpawnTask {
     @Override
     public boolean tick(ServerLevel level, DungeonDirectorBlockEntity director) {
         if (delay-- > 0) return false;
-
         if (remaining <= 0) return true;
-
         if ((t++ % interval) != 0) return false;
+
+        // consume one "slot" each time
+        remaining--;
+
+        // roll chance for this slot
+        double chance = req.def().chance;
+        boolean willSpawn = chance >= 1.0 || (chance > 0.0 && level.random.nextDouble() < chance);
 
         BlockPos pos = pickSpread(level, req.basePos(), radius);
 
-        // visual
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.POOF,
-                pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                20, 0.25, 0.25, 0.25, 0.02);
+        // If you want: poof only when spawning, or always.
+        // I'd recommend "only when spawning" so poof implies something happened:
+        if (willSpawn) {
+            level.sendParticles(ParticleTypes.POOF,
+                    pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                    20, 0.25, 0.25, 0.25, 0.02);
 
-        if (director.spawnOne(level, req.def(), req.patch(), pos)) {
-            remaining--;
+            director.spawnOne(level, req.def(), req.patch(), pos);
+        } else {
+            // Optional: small fizzle effect when it "fails"
+            // level.sendParticles(ParticleTypes.SMOKE, ...);
         }
+
         return remaining <= 0;
     }
 

@@ -53,10 +53,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.DIAMOND_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
-        simpleBlockWithItem(DNLBlocks.DUNGEON_DIRECTOR.get());
         simpleBlockWithItem(DNLBlocks.SPAWN_NODE.get());
         anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(ForgeRegistries.BLOCKS.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
 
+        dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientStairsLikeBlockWithItem(DNLBlocks.MENDING_AURA_STAIRS.get(), DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientSlabLikeBlockWithItem(DNLBlocks.MENDING_AURA_SLAB.get(), DNLBlocks.MENDING_AURA.get());
@@ -1055,6 +1055,21 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleItem(block);
     }
 
+    private void dungeonDirectorBlock(Block block) {
+        ModelFile normal = models()
+                .cubeAll("dungeon_director", modLoc("block/dungeon_director")).renderType("cutout");
+        ModelFile remove = models()
+                .cubeAll("dungeon_director_remove", modLoc("block/dungeon_director_remove")).renderType("cutout");
+
+        getVariantBuilder(block)
+                .partialState().with(DungeonDirectorBlock.REMOVE_AFTER_SUMMON, false)
+                .modelForState().modelFile(normal).addModel()
+                .partialState().with(DungeonDirectorBlock.REMOVE_AFTER_SUMMON, true)
+                .modelForState().modelFile(remove).addModel();
+
+        // Item model uses normal
+        simpleBlockItem(block, normal);
+    }
 
     private void particleOnlyModel(Block block) {
         String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
