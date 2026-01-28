@@ -3,9 +3,10 @@ package dev.hexnowloading.dungeonnowloading.item;
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
-import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
+import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -16,7 +17,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -34,8 +34,6 @@ public class SpawnerArmorItem extends ArmorItem {
 
     private int summonTick = 200;
     private final int spawnRange = 4;
-    private static final java.util.UUID OVERWORKED_HP_MODIFIER_ID =
-            java.util.UUID.nameUUIDFromBytes("dnl_overworked_player_max_health".getBytes());
 
     public SpawnerArmorItem(ArmorMaterial armorMaterial, Type slot) {
         super(armorMaterial, slot, new Properties());
@@ -113,46 +111,6 @@ public class SpawnerArmorItem extends ArmorItem {
         }
     }
 
-    private void applyOverworkedMaxHealthPenalty(Player owner, int overworkedLevel) {
-        // Remove any existing modifier first
-        var maxHealthAttr = owner.getAttribute(Attributes.MAX_HEALTH);
-        if (maxHealthAttr == null) return;
-
-        if (maxHealthAttr.getModifier(OVERWORKED_HP_MODIFIER_ID) != null) {
-            maxHealthAttr.removeModifier(OVERWORKED_HP_MODIFIER_ID);
-        }
-
-        if (overworkedLevel <= 0) {
-            return; // no penalty
-        }
-
-        // Each Overworked level reduces max HP by 2.0 (one heart), but never below 1 HP total
-        double baseMax = maxHealthAttr.getBaseValue();
-        double penalty = 2.0D * overworkedLevel;
-        double minAllowed = 1.0D;
-        if (baseMax - penalty < minAllowed) {
-            penalty = baseMax - minAllowed;
-            if (penalty < 0.0D) {
-                penalty = 0.0D;
-            }
-        }
-
-        if (penalty > 0.0D) {
-            maxHealthAttr.addPermanentModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(
-                    OVERWORKED_HP_MODIFIER_ID,
-                    "dnl_overworked_player_max_health",
-                    -penalty,
-                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION
-            ));
-        }
-
-        // Clamp current health to new max if necessary
-        float newMax = (float) owner.getAttributeValue(Attributes.MAX_HEALTH);
-        if (owner.getHealth() > newMax) {
-            owner.setHealth(newMax);
-        }
-    }
-
     private void summonMob(Level level, BlockPos entityPos, Player owner) {
         RandomSource randomSource = level.getRandom();
         EntityType<Zombie> spawningEntity = EntityType.ZOMBIE;
@@ -173,9 +131,16 @@ public class SpawnerArmorItem extends ArmorItem {
                 }
                 int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), helmetStack);
                 whimper.setOverworkedLevel(overworkedLevel);
-                applyOverworkedMaxHealthPenalty(owner, overworkedLevel);
+                if (overworkedLevel > 0) {
+                    whimper.applyOverworkedAttackSpeedBonus();
+                }
 
                 level.addFreshEntity(whimper);
+
+                // Refresh owner penalty after the summon is actually alive in the world.
+                if (level instanceof ServerLevel serverLevel) {
+                    OverworkedPenaltyUtil.refreshOwnerPenalty(serverLevel, owner);
+                }
             }
         }
     }

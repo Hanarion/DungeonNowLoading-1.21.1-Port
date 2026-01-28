@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.ai.SealedChaosAttackGoal;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -278,6 +279,17 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
                         AttributeModifier.Operation.MULTIPLY_TOTAL
                 ));
             }
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        UUID owner = this.getOwnerUUID();
+        int overworkedLevel = this.getOverworkedLevel();
+        super.remove(reason);
+
+        if (!this.level().isClientSide && owner != null && overworkedLevel > 0) {
+            OverworkedPenaltyUtil.refreshOwnerPenaltyIfPossible(this.level(), owner);
         }
     }
 }

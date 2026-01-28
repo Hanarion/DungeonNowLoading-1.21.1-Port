@@ -16,6 +16,7 @@ import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.LookControl;
@@ -23,7 +24,6 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -257,5 +257,37 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         return true;
     }
 
+    // DNL_OVERWORKED_PATCH_BEGIN
+    public void applyOverworkedAttackSpeedBonus() {
+        int level = this.getOverworkedLevel();
+        AttributeInstance attackSpeed = this.getAttribute(Attributes.ATTACK_SPEED);
+        if (attackSpeed != null) {
+            UUID modifierId = UUID.nameUUIDFromBytes("dnl_overworked_attack_speed".getBytes());
+            if (attackSpeed.getModifier(modifierId) != null) {
+                attackSpeed.removeModifier(modifierId);
+            }
+            if (level > 0) {
+                double bonus = 0.2D * level;
+                attackSpeed.addPermanentModifier(new AttributeModifier(
+                        modifierId,
+                        "dnl_overworked_attack_speed",
+                        bonus,
+                        AttributeModifier.Operation.MULTIPLY_TOTAL
+                ));
+            }
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        UUID owner = this.getOwnerUUID();
+        int overworkedLevel = this.getOverworkedLevel();
+        super.remove(reason);
+
+        if (!this.level().isClientSide && owner != null && overworkedLevel > 0) {
+            OverworkedPenaltyUtil.refreshOwnerPenaltyIfPossible(this.level(), owner);
+        }
+    }
+    // DNL_OVERWORKED_PATCH_END
 
 }

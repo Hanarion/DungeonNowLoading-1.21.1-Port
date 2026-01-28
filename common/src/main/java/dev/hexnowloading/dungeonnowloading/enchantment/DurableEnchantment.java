@@ -1,0 +1,27 @@
+package dev.hexnowloading.dungeonnowloading.enchantment;
+
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
+
+/**
+ * Durable: armor-only enchantment that reduces durability loss by requiring multiple "hits"
+ * per durability point.
+ */
+public class DurableEnchantment extends Enchantment {
+    public DurableEnchantment(Rarity rarity, EquipmentSlot... slots) {
+        super(rarity, EnchantmentCategory.ARMOR, slots);
+    }
+
+    @Override
+    public int getMaxLevel() {
+        return 3;
+    }
+
+    @Override
+    public boolean canEnchant(ItemStack stack) {
+        return stack.getItem() instanceof ArmorItem;
+    }
+}

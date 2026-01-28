@@ -10,6 +10,7 @@ import static dev.hexnowloading.dungeonnowloading.platform.Services.REGISTRY;
 
 public class DNLEnchantments {
     public static final Supplier<Enchantment> BREAK_PROTECTION = register("break_protection", () -> new ScrapEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
+    public static final Supplier<Enchantment> DURABLE = register("durable", () -> new DurableEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
     public static final Supplier<Enchantment> GIGANTISM = register("gigantism", () -> new GigantismEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
     public static final Supplier<Enchantment> COMMANDER = register("commander", () -> new CommanderEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
     public static final Supplier<Enchantment> OVERWORKED = register("overworked", () -> new OverworkedEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
@@ -27,4 +28,3 @@ public class DNLEnchantments {
 
     public static void init() {}
 }
-

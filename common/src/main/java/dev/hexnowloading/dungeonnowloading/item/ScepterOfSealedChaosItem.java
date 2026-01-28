@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,8 +30,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 public class ScepterOfSealedChaosItem extends Item {
 
@@ -46,7 +45,9 @@ public class ScepterOfSealedChaosItem extends Item {
         } else {
             Level level = useOnContext.getLevel();
             Player player = useOnContext.getPlayer();
-            UUID uuid = Objects.requireNonNull(player.getUUID());
+            if (player == null) {
+                return InteractionResult.PASS;
+            }
             player.getCooldowns().addCooldown(this, 600);
             BlockPos playerPos = new BlockPos((int) player.getX(), (int) player.getY(), (int) player.getZ());
             level.playSound(player, playerPos, SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS);
@@ -84,6 +85,9 @@ public class ScepterOfSealedChaosItem extends Item {
                         sealedChaosEntity.applyOverworkedAttackSpeedBonus();
                     }
                     level.addFreshEntity(sealedChaosEntity);
+
+                    // Apply/refresh owner HP penalty based on overworked summons currently alive.
+                    OverworkedPenaltyUtil.refreshOwnerPenalty((ServerLevel) level, player);
                 }
             }
             player.awardStat(Stats.ITEM_USED.get(this));
