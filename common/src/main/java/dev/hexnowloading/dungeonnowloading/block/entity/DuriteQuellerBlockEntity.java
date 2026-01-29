@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -168,29 +169,34 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         Block cluster = DNLBlocks.DURITE_CLUSTER.get();
 
         // helper
-        var sound = DNLSounds.MENDING_TABLE_MEND.get(); // adjust to your registry accessor
+        var sound = DNLSounds.DURITE_QUELLER_CRYSTAL_GROW.get(); // adjust to your registry accessor
+        var soundPop = DNLSounds.MENDING_AURA_POP.get();
 
         if (state.isAir() || state.canBeReplaced()) {
             level.setBlock(startPos, small.defaultBlockState(), Block.UPDATE_ALL);
-            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.5F);
+            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, startPos, soundPop, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.5F);
             return;
         }
 
         if (state.is(small)) {
             level.setBlock(startPos, medium.defaultBlockState(), Block.UPDATE_ALL);
-            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.5F);
+            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, startPos, soundPop, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.5F);
             return;
         }
 
         if (state.is(medium)) {
             level.setBlock(startPos, large.defaultBlockState(), Block.UPDATE_ALL);
-            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.5F);
+            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, startPos, soundPop, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.5F);
             return;
         }
 
         if (state.is(large)) {
             level.setBlock(startPos, cluster.defaultBlockState(), Block.UPDATE_ALL);
-            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.7F);
+            level.playSound(null, startPos, soundPop, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
             return;
         }
 
@@ -201,11 +207,13 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
                     startPos.getX() + 0.5, startPos.getY() + 0.5, startPos.getZ() + 0.5,
                     new net.minecraft.world.item.ItemStack(DNLItems.DURITE.get())
             ));
-            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.7F);
+            level.playSound(null, startPos, soundPop, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
             return;
         }
 
-        level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.5F);
+        level.playSound(null, startPos, sound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.7F);
+        level.playSound(null, startPos, soundPop, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
         if (level.random.nextFloat() < 0.25f) {
             level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(
                     level,
@@ -352,7 +360,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         Block preserver = DNLBlocks.STONE_PRESERVER.get();
         BlockState replaceState = Blocks.CHISELED_STONE_BRICKS.defaultBlockState();
 
-        var breakSound = DNLSounds.MENDSTONE_CHALK_MARK_BREAK.get(); // adjust accessor
+        var breakSound = DNLSounds.DURITE_QUELLER_REPLACE_PRESERVER.get(); // adjust accessor
 
         for (int i = 0; i < cachedPreservers.size(); i++) {
             BlockPos p = BlockPos.of(cachedPreservers.getLong(i));
@@ -364,7 +372,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
             level.setBlock(p, replaceState, Block.UPDATE_ALL);
 
             // play at that block position
-            level.playSound(null, p, breakSound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, p, breakSound, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.5F);
         }
     }
 
@@ -489,6 +497,8 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
 
                 this.phase = Phase.SPAWNING;
                 this.pending = true;
+
+                level.playSound(null, this.getBlockPos(), DNLSounds.DURITE_QUELLER_ACTIVATE.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
 
                 setChanged();
             }

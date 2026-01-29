@@ -338,6 +338,30 @@
       "dungeonnowloading:block/overcharged_redstone_block/overcharged_redstone_block_tnt_explosion_1"
     ]
   },
+  "durite_queller_activate": {
+    "subtitle": "sounds.dungeonnowloading.durite_queller_activate",
+    "sounds": [
+      "dungeonnowloading:block/durite_queller/durite_queller_activate_0",
+      "dungeonnowloading:block/durite_queller/durite_queller_activate_1",
+      "dungeonnowloading:block/durite_queller/durite_queller_activate_2"
+    ]
+  },
+  "durite_queller_crystal_grow": {
+    "subtitle": "sounds.dungeonnowloading.durite_queller_crystal_grow",
+    "sounds": [
+      "dungeonnowloading:block/durite_queller/durite_queller_crystal_grow_0",
+      "dungeonnowloading:block/durite_queller/durite_queller_crystal_grow_1",
+      "dungeonnowloading:block/durite_queller/durite_queller_crystal_grow_2"
+    ]
+  },
+  "durite_queller_replace_preserver": {
+    "subtitle": "sounds.dungeonnowloading.durite_queller_replace_preserver",
+    "sounds": [
+      "dungeonnowloading:block/durite_queller/durite_queller_replace_preserver_0",
+      "dungeonnowloading:block/durite_queller/durite_queller_replace_preserver_1",
+      "dungeonnowloading:block/durite_queller/durite_queller_replace_preserver_2"
+    ]
+  },
   "mending_aura_pop": {
     "subtitle": "sounds.dungeonnowloading.mending_aura_pop",
     "sounds": [
