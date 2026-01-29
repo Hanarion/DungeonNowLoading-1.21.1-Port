@@ -34,6 +34,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
 
     private static final EntityDataAccessor<Integer> DESPAWN_TICK = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Boolean> BASIC = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
 
     public SealedChaosEntity(EntityType<? extends SealedChaosEntity> entityType, Level level) {
         super(entityType, level);
@@ -75,6 +76,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         super.defineSynchedData();
         this.entityData.define(DESPAWN_TICK, 600);
         this.entityData.define(OWNER_UUID, Optional.empty());
+        this.entityData.define(BASIC, false);
     }
 
     @Override
@@ -84,6 +86,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         if (this.getOwnerUUID() != null) {
             compoundTag.putUUID("Owner", this.getOwnerUUID());
         }
+        compoundTag.putBoolean("Basic", this.isBasicVariant());
     }
 
     @Override
@@ -100,6 +103,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         if (uuid != null) {
             this.setOwnerUUID(uuid);
         }
+        this.setBasicVariant(compoundTag.getBoolean("Basic"));
     }
 
     @Override
@@ -178,4 +182,12 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     public UUID getOwnerUUID() { return (UUID) ((Optional) this.entityData.get(OWNER_UUID)).orElse((Object) null); }
 
     public void setOwnerUUID(UUID uuid) { this.entityData.set(OWNER_UUID, Optional.ofNullable(uuid));}
+
+    public boolean isBasicVariant() {
+        return this.entityData.get(BASIC);
+    }
+
+    public void setBasicVariant(boolean basic) {
+        this.entityData.set(BASIC, basic);
+    }
 }

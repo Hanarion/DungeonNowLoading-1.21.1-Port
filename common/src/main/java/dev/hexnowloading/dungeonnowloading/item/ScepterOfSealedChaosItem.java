@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -25,7 +24,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -34,18 +32,42 @@ import java.util.UUID;
 
 public class ScepterOfSealedChaosItem extends Item {
 
+    private static final String MODE_BASIC = "SealedChaosBasic";
+
     public ScepterOfSealedChaosItem(Properties properties) {
         super(properties);
     }
 
     @Override
     public InteractionResult useOn(UseOnContext useOnContext) {
+        Level level = useOnContext.getLevel();
+        Player player = useOnContext.getPlayer();
         ItemStack itemStack = useOnContext.getItemInHand();
+        BlockPos clicked = useOnContext.getClickedPos();
+        BlockState clickedState = level.getBlockState(clicked);
+
+// cycle mode if amethyst cluster is clicked
+        if (clickedState.is(net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER)) {
+            if (!level.isClientSide && player != null) {
+                boolean basic = itemStack.getOrCreateTag().getBoolean(MODE_BASIC);
+                basic = !basic;
+                itemStack.getOrCreateTag().putBoolean(MODE_BASIC, basic);
+
+                player.displayClientMessage(
+                        Component.translatable(
+                                basic
+                                        ? "item.dungeonnowloading.scepter_of_sealed_chaos.mode.basic"
+                                        : "item.dungeonnowloading.scepter_of_sealed_chaos.mode.normal"
+                        ),
+                        true
+                );
+                level.playSound(null, clicked, SoundEvents.AMETHYST_CLUSTER_HIT, SoundSource.PLAYERS, 1.0F, basic ? 1.2F : 0.9F);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
         if (itemStack.getDamageValue() == itemStack.getMaxDamage()) {
             return InteractionResult.FAIL;
         } else {
-            Level level = useOnContext.getLevel();
-            Player player = useOnContext.getPlayer();
             UUID uuid = Objects.requireNonNull(player.getUUID());
             player.getCooldowns().addCooldown(this, 600);
             BlockPos playerPos = new BlockPos((int) player.getX(), (int) player.getY(), (int) player.getZ());
@@ -66,6 +88,10 @@ public class ScepterOfSealedChaosItem extends Item {
                 if (sealedChaosEntity != null) {
                     sealedChaosEntity.moveTo(blockPos1, 0.0F, 0.0F);
                     sealedChaosEntity.setOwnerUUID(player.getUUID());
+
+                    boolean basic = itemStack.getOrCreateTag().getBoolean(MODE_BASIC);
+                    sealedChaosEntity.setBasicVariant(basic);
+
                     level.addFreshEntity(sealedChaosEntity);
                 }
             }

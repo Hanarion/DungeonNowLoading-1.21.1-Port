@@ -1,7 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.SpawnerCarrierAttackGoal;
-import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -12,28 +11,42 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Arrays;
+import javax.annotation.Nullable;
 
 public class SpawnerCarrierEntity extends Monster {
     public final AnimationState attackAnimationState = new AnimationState();
-    private static final EntityDataAccessor<String> SUMMON_MOB_TYPE = SynchedEntityData.defineId(SpawnerCarrierEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<String> STORED_ENTITY_ID = SynchedEntityData.defineId(SpawnerCarrierEntity.class, EntityDataSerializers.STRING);
     private int summonTick = 200;
+    @Nullable public transient Entity previewEntity;
+    @Nullable public transient String previewEntityId;
+    public float previewSpin = 0.0F;
+    public float previewOSpin = 0.0F;
+
     private final float SPAWN_RANGE = 5;
-    private final String[] SUMMON_MOB_TYPE_LIST = {"Zombie", "Skeleton", "Spider", "Creeper", "Cave Spider"};
+    private CompoundTag storedEntityNbt = null;
+
+    private static final String[] DEFAULT_POOL = {
+            "minecraft:zombie",
+            "minecraft:skeleton",
+            "minecraft:spider",
+            "minecraft:creeper",
+            "minecraft:cave_spider"
+    };
 
     public SpawnerCarrierEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -64,83 +77,188 @@ public class SpawnerCarrierEntity extends Monster {
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(SUMMON_MOB_TYPE, "");
+        this.entityData.define(STORED_ENTITY_ID, "");
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compoundTag) {
-        super.addAdditionalSaveData(compoundTag);
-        compoundTag.putString("SummonMobType", this.entityData.get(SUMMON_MOB_TYPE));
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+
+        tag.putString("StoredEntityId", this.entityData.get(STORED_ENTITY_ID));
+        if (this.storedEntityNbt != null) {
+            tag.put("StoredEntityNbt", this.storedEntityNbt);
+        }
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compoundTag) {
-        super.readAdditionalSaveData(compoundTag);
-        this.entityData.set(SUMMON_MOB_TYPE, compoundTag.getString("SummonMobType"));
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+
+        this.entityData.set(STORED_ENTITY_ID, tag.getString("StoredEntityId"));
+        this.storedEntityNbt = tag.contains("StoredEntityNbt", CompoundTag.TAG_COMPOUND)
+                ? tag.getCompound("StoredEntityNbt")
+                : null;
     }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (this.level().isClientSide) {
+            this.previewOSpin = this.previewSpin;
+
+            // mirror BaseSpawner: (1000 / (delay + 200)) degrees per tick
+            // you can use summonTick or a client-synced delay value (see note below)
+            float delay = Math.max(0, this.summonTick); // this field is server-only right now unless you sync it
+            float add = 1000.0F / (delay + 200.0F);
+            this.previewSpin = (this.previewSpin + add) % 360.0F;
+        }
+    }
+
+    public boolean storeMobFrom(LivingEntity mob) {
+        // Don’t store players, bosses, or itself, etc.
+        if (mob instanceof Player) return false;
+        if (mob.getType() == this.getType()) return false;
+
+        // Type id
+        var key = EntityType.getKey(mob.getType());
+        if (key == null) return false;
+
+        this.entityData.set(STORED_ENTITY_ID, key.toString());
+
+        // NBT snapshot
+        CompoundTag nbt = new CompoundTag();
+        mob.saveWithoutId(nbt);
+
+        // Strip / sanitize things you *usually* don’t want to clone
+        nbt.remove("UUID");
+        nbt.remove("Pos");
+        nbt.remove("Motion");
+        nbt.remove("Rotation");
+        nbt.remove("Dimension");
+        nbt.remove("Passengers");
+        nbt.remove("Leash");
+
+        // Optional: avoid copying active aggression / targets
+        nbt.remove("Brain");
+        nbt.remove("HurtTime");
+        nbt.remove("HurtByTimestamp");
+
+        this.storedEntityNbt = nbt;
+        return true;
+    }
+
+    @Nullable
+    public Entity spawnStoredMob(ServerLevel level, double x, double y, double z) {
+        if (this.entityData.get(STORED_ENTITY_ID).isEmpty()) return null;
+
+        CompoundTag tag = (this.storedEntityNbt == null ? new CompoundTag() : this.storedEntityNbt.copy());
+        tag.putString("id", this.getStoredEntityId());
+
+        Entity spawned = EntityType.loadEntityRecursive(tag, level, (entity) -> {
+            entity.moveTo(x, y, z, entity.getYRot(), entity.getXRot());
+            return entity;
+        });
+
+        if (spawned == null) return null;
+
+        if (spawned instanceof Mob mob) {
+            BlockPos pos = BlockPos.containing(x, y, z);
+            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.MOB_SUMMONED, null, null);
+            mob.setTarget(this.getTarget());
+
+        }
+
+        level.addFreshEntity(spawned);
+        return spawned;
+    }
+
 
     @Override
     protected void customServerAiStep() {
-        if (this.getTarget() instanceof Player) {
-            ((ServerLevel) this.level()).sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 1.75D, this.getZ(), 1, 0.25D, 0.15D, 0.25D, 0.0D);
-            if (summonTick > 0) {
-                summonTick--;
-            } else {
-                if (this.getSummonMobType().equals("")) {
-                    this.setSummonMobType(Arrays.stream(SUMMON_MOB_TYPE_LIST).toList().get(random.nextInt(SUMMON_MOB_TYPE_LIST.length)));
-                }
-                int spawnCount = this.getRandom().nextInt(1, 4);
-                BlockPos centerPos = this.getOnPos();
-                for (int i = 0; i < spawnCount; i++) {
-                    RandomSource randomSource = this.level().getRandom();
-                    EntityType<?> spawningEntity = this.summonSpawnerMob();
-                    double x = centerPos.getX() + (randomSource.nextDouble() - randomSource.nextDouble()) * (double)this.SPAWN_RANGE + 0.5;
-                    double y = centerPos.getY() + randomSource.nextInt(3) - 1;
-                    double z = centerPos.getZ() + (randomSource.nextDouble() - randomSource.nextDouble()) * (double)this.SPAWN_RANGE + 0.5;
-                    if (spawningEntity != null && this.level().noCollision(spawningEntity.getAABB(x, y, z))) {
-                        ((ServerLevel) this.level()).sendParticles(ParticleTypes.POOF, x + 0.5F, y + 0.5F, z + 0.5F, 20, 0.3D, 0.3D, 0.3D, 0.0D);
-                        ((ServerLevel) this.level()).sendParticles(ParticleTypes.FLAME, x + 0.5F, y + 0.5F, z + 0.5F, 10, 0.3D, 0.3D, 0.3D, 0.0D);
-                        Entity livingEntity = spawningEntity.create(this.level());
-                        if (livingEntity != null) {
-                            BlockPos summonPos = new BlockPos((int) x, (int) y, (int) z);
-                            livingEntity.moveTo(x, y, z, 0.0F, 0.0F);
-                            ((Monster) livingEntity).finalizeSpawn((ServerLevel) this.level(), this.level().getCurrentDifficultyAt(summonPos), MobSpawnType.MOB_SUMMONED, null, null);
-                            this.level().addFreshEntity(livingEntity);
-                        }
-                    }
-
-                }
-                summonTick = 100 + this.getRandom().nextInt(0, 5) * 20;
-            }
-        }
         super.customServerAiStep();
+
+        if (!(this.level() instanceof ServerLevel level)) return;
+        if (!(this.getTarget() instanceof Player)) return;
+
+        level.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 1.75D, this.getZ(),
+                1, 0.25D, 0.15D, 0.25D, 0.0D);
+
+        if (summonTick-- > 0) return;
+
+        ensureStoredMob();
+
+        int spawnCount = this.getRandom().nextInt(1, 4);
+        BlockPos centerPos = this.getOnPos();
+
+        for (int i = 0; i < spawnCount; i++) {
+            RandomSource r = level.getRandom();
+
+            double x = centerPos.getX() + (r.nextDouble() - r.nextDouble()) * this.SPAWN_RANGE + 0.5;
+            double y = centerPos.getY() + r.nextInt(3) - 1;
+            double z = centerPos.getZ() + (r.nextDouble() - r.nextDouble()) * this.SPAWN_RANGE + 0.5;
+
+            if (!canSpawnAt(level, x, y, z)) continue;
+
+            level.sendParticles(ParticleTypes.POOF, x, y + 0.5, z, 20, 0.3D, 0.3D, 0.3D, 0.0D);
+            level.sendParticles(ParticleTypes.FLAME, x, y + 0.5, z, 10, 0.3D, 0.3D, 0.3D, 0.0D);
+
+            this.spawnStoredMob(level, x, y, z);
+        }
+
+        summonTick = 100 + this.getRandom().nextInt(0, 5) * 20;
     }
 
-    private EntityType summonSpawnerMob() {
-        switch (this.getSummonMobType()) {
-            case "Zombie" -> {
-                EntityType<Zombie> zombie = EntityType.ZOMBIE;
-                return zombie;
-            }
-            case "Skeleton" -> {
-                EntityType<Skeleton> skeleton = EntityType.SKELETON;
-                return skeleton;
-            }
-            case "Spider" -> {
-                EntityType<Spider> spider = EntityType.SPIDER;
-                return spider;
-            }
-            case "Cave Spider" -> {
-                EntityType<CaveSpider> caveSpider = EntityType.CAVE_SPIDER;
-                return caveSpider;
-            }
-            case "Creeper" -> {
-                EntityType<Creeper> creeper = EntityType.CREEPER;
-                return creeper;
+    private void ensureStoredMob() {
+        if (!this.entityData.get(STORED_ENTITY_ID).isEmpty()) return;
+
+        String id = DEFAULT_POOL[this.random.nextInt(DEFAULT_POOL.length)];
+        this.entityData.set(STORED_ENTITY_ID, id);
+
+        // Empty tag = default variant. (Still valid with loadEntityRecursive if id is set)
+        this.storedEntityNbt = new CompoundTag();
+    }
+
+    private boolean canSpawnAt(ServerLevel level, double x, double y, double z) {
+        var type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getOptional(
+                new net.minecraft.resources.ResourceLocation(this.getStoredEntityId())
+        ).orElse(null);
+
+        if (type == null) return false;
+
+        Entity temp = type.create(level);
+        if (temp == null) return false;
+
+        temp.moveTo(x, y, z, 0, 0);
+        return level.noCollision(temp);
+    }
+
+    public boolean hasStoredMob() {
+        return !this.entityData.get(STORED_ENTITY_ID).isEmpty() && this.storedEntityNbt != null;
+    }
+
+    public String getStoredEntityId() {
+        return this.entityData.get(STORED_ENTITY_ID);
+    }
+
+    @Override
+    @Nullable
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
+                                        @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+        // Only choose randomly when it "naturally" appears in the world
+        if (spawnType == MobSpawnType.NATURAL || spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.SPAWN_EGG) {
+            if (this.entityData.get(STORED_ENTITY_ID).isEmpty()) {
+                String id = DEFAULT_POOL[this.random.nextInt(DEFAULT_POOL.length)];
+                this.entityData.set(STORED_ENTITY_ID, id);
+                this.storedEntityNbt = new CompoundTag(); // default variant
             }
         }
-        return null;
+
+        return data;
     }
+
 
     @Override
     protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
@@ -185,13 +303,5 @@ public class SpawnerCarrierEntity extends Monster {
     @Override
     protected void playStepSound(BlockPos blockPos, BlockState blockState) {
         this.playSound(SoundEvents.IRON_GOLEM_STEP, 1.0F, 2.0F);
-    }
-
-    public String getSummonMobType() {
-        return this.entityData.get(SUMMON_MOB_TYPE);
-    }
-
-    public void setSummonMobType(String string) {
-        this.entityData.set(SUMMON_MOB_TYPE, string);
     }
 }

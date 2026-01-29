@@ -25,11 +25,11 @@ public class SpawnerCarrierFeature extends Feature<EntityTypeConfig> {
         EntityScale.scaleMobAttributes(spawnerCarrier);
         EntityType<?> entityType = context.config().entityType;
         if (EntityType.ZOMBIE.equals(entityType)) {
-            spawnerCarrier.setSummonMobType("Zombie");
+            //spawnerCarrier.setSummonMobType("Zombie");
         } else if (EntityType.SKELETON.equals(entityType)) {
-            spawnerCarrier.setSummonMobType("Skeleton");
+            //spawnerCarrier.setSummonMobType("Skeleton");
         } else if (EntityType.SPIDER.equals(entityType)) {
-            spawnerCarrier.setSummonMobType("Spider");
+            //spawnerCarrier.setSummonMobType("Spider");
         }
 
         context.level().addFreshEntity(spawnerCarrier);

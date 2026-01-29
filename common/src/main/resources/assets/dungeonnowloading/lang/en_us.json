@@ -73,6 +73,8 @@
   "item.dungeonnowloading.scepter_of_sealed_chaos.tooltip.right_click_block.description": " Summons the Sealed Chaos",
   "item.dungeonnowloading.scepter_of_sealed_chaos.tooltip.right_click_sealed_chaos": "Right-click on Sealed Chaos:",
   "item.dungeonnowloading.scepter_of_sealed_chaos.tooltip.right_click_sealed_chaos.description": " Recovers the Sealed Chaos and decreases the cooldown",
+  "item.dungeonnowloading.scepter_of_sealed_chaos.mode.basic": "Mode: Basic",
+  "item.dungeonnowloading.scepter_of_sealed_chaos.mode.normal": "Mode: Normal",
   "item.dungeonnowloading.skull_of_chaos": "Skull of Chaos",
   "item.dungeonnowloading.skull_of_chaos.tooltip": "Right-click near the sealed Chaos Spawner to awaken it",
   "item.dungeonnowloading.life_stealer": "Life Stealer",
