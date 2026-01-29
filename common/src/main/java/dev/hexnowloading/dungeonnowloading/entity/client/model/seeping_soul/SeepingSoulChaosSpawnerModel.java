@@ -12,7 +12,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 
-public class SeepingSoulChaosSpawnerModel<T extends SeepingSoulEntity> extends HierarchicalModel<T> {
+public class SeepingSoulChaosSpawnerModel<T extends SeepingSoulEntity> extends HierarchicalModel<T> implements SeepingSoulRenderModel {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "seeping_soul_chaos_spawner"), "main");
     private final ModelPart Skullsoul;

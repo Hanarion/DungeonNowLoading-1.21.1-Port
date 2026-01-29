@@ -13,10 +13,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
@@ -24,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class RedstoneIdolItem extends BlockItem {
+public class RedstoneIdolItem extends BlockItem implements BossSummoningItem, Vanishable {
 
     public RedstoneIdolItem(Block block, Item.Properties properties) {
         super(block, properties);
@@ -41,7 +38,7 @@ public class RedstoneIdolItem extends BlockItem {
         AABB aabb = (new AABB(player.blockPosition())).inflate(32);
 
         // 1) Try recall first: find nearby souls that belong to Chaos Spawner
-        ResourceLocation fairkeepersId = new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeepers");
+        ResourceLocation fairkeepersId = new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller");
 
         List<SeepingSoulEntity> souls = level.getEntitiesOfClass(SeepingSoulEntity.class, aabb);
         for (SeepingSoulEntity soul : souls) {
@@ -64,7 +61,7 @@ public class RedstoneIdolItem extends BlockItem {
             player.awardStat(Stats.ITEM_USED.get(this));
             for (FairkeeperSerpentCallerEntity serpentCallerEntity : targets) {
                 if (!level.isClientSide) {
-                    serpentCallerEntity.startBossFight();
+                    serpentCallerEntity.startBossFight(stack);
                 }
             }
             /*if (player instanceof ServerPlayer) {
@@ -81,5 +78,15 @@ public class RedstoneIdolItem extends BlockItem {
         if (GeneralConfig.TOGGLE_HELPFUL_ITEM_TOOLTIP.get()) {
             components.add(Component.translatable("item.dungeonnowloading.redstone_idol.tooltip").withStyle(ChatFormatting.GRAY));
         }
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack itemStack) {
+        return itemStack.getCount() == 1;
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return 1;
     }
 }

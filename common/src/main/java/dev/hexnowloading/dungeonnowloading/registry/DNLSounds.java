@@ -39,6 +39,10 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> REPULSOR_BREAK = registerSoundEvent("repulsor_break");
     public static final Supplier<SoundEvent> REPULSOR_PLACE = registerSoundEvent("repulsor_place");
     public static final Supplier<SoundEvent> REPULSOR_RECHARGE = registerSoundEvent("repulsor_recharge");
+    public static final Supplier<SoundEvent> SEEPING_SOUL_AMBIENT = registerSoundEvent("seeping_soul_ambient");
+    public static final Supplier<SoundEvent> SEEPING_SOUL_DISSIPATE = registerSoundEvent("seeping_soul_dissipate");
+    public static final Supplier<SoundEvent> SEEPING_SOUL_EXPAND = registerSoundEvent("seeping_soul_expand");
+    public static final Supplier<SoundEvent> SEEPING_SOUL_HURT = registerSoundEvent("seeping_soul_hurt");
     public static final Supplier<SoundEvent> VERTEX_ARROW_BOOTUP = registerSoundEvent("vertex_arrow_bootup");
     public static final Supplier<SoundEvent> VERTEX_NODE_CONNECT = registerSoundEvent("vertex_node_connect");
     public static final Supplier<SoundEvent> VERTEX_ARROW_DAMAGE = registerSoundEvent("vertex_arrow_damage");

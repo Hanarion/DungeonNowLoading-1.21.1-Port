@@ -15,6 +15,7 @@ import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeOutBackgroundM
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
+import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -44,6 +45,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -97,9 +99,12 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private int musicTick;
     private Set<UUID> playerUUIDs;
     private Set<UUID> minionUUIDs;
+    private Set<UUID> playerDefeatedUUIDs;
     private int defeatedCount = 0;
+    private int modifiedDefeatedCount = 0;
     private static final UUID RECALL_ATTACK_MOD_UUID = UUID.fromString("3f9c1e2b-8a64-4d0a-9e2c-6d7f1c4a9a12");
     private static final UUID RECALL_HEALTH_UUID = UUID.fromString("b27a4d91-1c58-4a6e-9b0f-2f8e6c3d5a44");
+    private ItemStack recallItemStack;
 
 
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> introMoveSet = new WeightBaseMoveSet<>();
@@ -141,6 +146,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         super(entityType, level);
         this.playerUUIDs = new HashSet<>();
         this.minionUUIDs = new HashSet<>();
+        this.playerDefeatedUUIDs = new HashSet<>();
     }
 
     @Override
@@ -176,7 +182,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             uuidCompoundTag.putUUID("PlayerUUID" + i, var.next());
         }
         compoundTag.put("PlayerUUIDs", listTag);
-        compoundTag.putInt("DefeatedCount", this.defeatedCount);
+        SeepingSoulEntity.writeRecallNBT(compoundTag, this.playerDefeatedUUIDs, this.defeatedCount, this.modifiedDefeatedCount);
     }
 
     @Override
@@ -202,10 +208,18 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 this.playerUUIDs.add(compoundTag1.getUUID("PlayerUUID" + a));
             }
         }
-        this.defeatedCount = compoundTag.getInt("DefeatedCount");
+        SeepingSoulEntity.RecallData data = SeepingSoulEntity.readRecallNBT(compoundTag);
+
+        this.playerDefeatedUUIDs.clear();
+        this.playerDefeatedUUIDs.addAll(data.playerDefeatedUUIDs());
+
+        this.defeatedCount = data.defeatedCount();
+        this.modifiedDefeatedCount = data.modifiedDefeatedCount();
     }
 
-    public void startBossFight() {
+    public void startBossFight(ItemStack recallItemStack) {
+        this.recallItemStack = recallItemStack;
+        this.modifiedDefeatedCount = SeepingSoulEntity.getModifiedDefeatedCount(this.defeatedCount, recallItemStack);
         this.activationTick = 60;
         this.isBorosDefeated = 0;
         this.isOurosDefeated = 0;
@@ -657,17 +671,76 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     private void defeatedBosses() {
         this.level().explode(null, this.getX(), this.getY(), this.getZ(), 1.0F, Level.ExplosionInteraction.BLOCK);
-        if (BossConfig.TOGGLE_MULTIPLAYER_LOOT.get() && !this.playerUUIDs.isEmpty()) {
-            for (UUID playerUUID : this.playerUUIDs) {
-                this.spawnLootTableItems(this.lastDamageSource, true, true, playerUUID);
-            }
-        } else {
-            this.spawnLootTableItems(this.lastDamageSource, true, false, null);
-        }
+        this.dropDeathLoot();
         this.removeAllMinions();
         this.removePillars();
         this.spawnSeepingSoul();
         this.remove(RemovalReason.KILLED);
+    }
+
+    private void dropDeathLoot() {
+        if (!BossConfig.TOGGLE_MULTIPLAYER_LOOT.get()) {
+            this.spawnLootTableItems(this.lastDamageSource, true, false, null);
+        }
+
+        if (this.playerUUIDs.isEmpty()) return;
+
+        boolean ignoreGate = this.modifiedDefeatedCount > 0;
+
+        int drops = Math.max(1, (this.modifiedDefeatedCount - this.defeatedCount) + 1);
+
+        for (UUID playerUUID : this.playerUUIDs) {
+
+            dropGreatXpBottlesForPlayer(playerUUID);
+
+            if (this.modifiedDefeatedCount >= 4) {
+                dropTempleOfDualityTrophyForPlayer(playerUUID);
+            }
+
+            // Gate: only first-clear gets loot (only on non-ignored runs)
+            if (!ignoreGate) {
+                if (this.playerDefeatedUUIDs.contains(playerUUID)) {
+                    continue;
+                }
+            }
+
+            // Drop multiple times for this player
+            for (int i = 0; i < drops; i++) {
+                this.spawnLootTableItems(this.lastDamageSource, true, true, playerUUID);
+            }
+
+            // Mark claimed only for gated runs
+            if (!ignoreGate) {
+                this.playerDefeatedUUIDs.add(playerUUID);
+            }
+        }
+    }
+
+    private void dropTempleOfDualityTrophyForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        ItemStack trophy = new ItemStack(DNLBlocks.TEMPLE_OF_DUALITY_TROPHY.get());
+        this.spawnSpecialItemEntity(trophy, 0.0F, playerUuid);
+    }
+
+    private void dropGreatXpBottlesForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        int recallCount = Math.max(0, this.modifiedDefeatedCount);
+        int total = 15 * (recallCount + 1);
+
+        Item greatBottleItem = DNLItems.GREAT_EXPERIENCE_BOTTLE.get();
+
+        if (greatBottleItem == null) return;
+
+        // Split into max stack sizes
+        int max = greatBottleItem.getMaxStackSize(); // typically 64
+        while (total > 0) {
+            int n = Math.min(total, max);
+            ItemStack stack = new ItemStack(greatBottleItem, n);
+            this.spawnSpecialItemEntity(stack, 0.0F, playerUuid);
+            total -= n;
+        }
     }
 
     private void spawnSeepingSoul() {
@@ -680,10 +753,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         soul.moveTo(start.getX() + 0.5, start.getY(), start.getZ() + 0.5, this.getYRot(), 0);
 
         // bossId should match the recall registry id you use for Chaos Spawner
-        soul.setBossId(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeepers"));
+        soul.setBossId(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller"));
+
+        int count = SeepingSoulEntity.getRecallCountForSeepingSoul(this.defeatedCount, this.modifiedDefeatedCount);
+
+        soul.setPlayerDefeatedUUIDs(this.playerDefeatedUUIDs);
 
         // next run is +1
-        soul.setDefeatedCount(Mth.clamp(this.defeatedCount + 1, 0, 100));
+        soul.setDefeatedCount(Mth.clamp(count, 0, 100));
 
         this.level().addFreshEntity(soul);
 
@@ -940,11 +1017,13 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.IDLE);
             this.setBorosId(boros.getUUID());
             this.setBorosWaitingForCommand(false);
-            EntityScale.scaleBossHealth(boros, playerCount, this.defeatedCount);
-            EntityScale.scaleBossAttack(boros, playerCount, this.defeatedCount);
-            EntityScale.scaleBossExhaustion(boros, playerCount, this.borosExhaustion, this.defeatedCount);
-            if (this.defeatedCount > 0) {
-                boros.setCustomName(RecallUtil.recalledName(Component.translatable("entity.dungeonnowloading.fairkeeper_boros"), defeatedCount));
+            EntityScale.scaleBossHealth(boros, playerCount, modifiedDefeatedCount);
+            EntityScale.scaleBossAttack(boros, playerCount, modifiedDefeatedCount);
+            EntityScale.scaleBossExhaustion(boros, playerCount, this.borosExhaustion, modifiedDefeatedCount);
+            if (modifiedDefeatedCount > 0) {
+                boros.setCustomName(RecallUtil.recalledName(Component.translatable("entity.dungeonnowloading.fairkeeper_boros"), modifiedDefeatedCount));
+            } else {
+                boros.setCustomName(Component.translatable("entity.dungeonnowloading.fairkeeper_boros"));
             }
             this.boros = boros;
         }
@@ -961,11 +1040,13 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.IDLE);
             this.setOurosId(ouros.getUUID());
             this.setOurosWaitingForCommand(false);
-            EntityScale.scaleBossHealth(ouros, playerCount, this.defeatedCount);
-            EntityScale.scaleBossAttack(ouros, playerCount, this.defeatedCount);
-            EntityScale.scaleBossExhaustion(ouros, playerCount, this.ourosExhaustion, this.defeatedCount);
-            if (this.defeatedCount > 0) {
-                ouros.setCustomName(RecallUtil.recalledName(Component.translatable("entity.dungeonnowloading.fairkeeper_ouros"), defeatedCount));
+            EntityScale.scaleBossHealth(ouros, playerCount, modifiedDefeatedCount);
+            EntityScale.scaleBossAttack(ouros, playerCount, modifiedDefeatedCount);
+            EntityScale.scaleBossExhaustion(ouros, playerCount, this.ourosExhaustion, modifiedDefeatedCount);
+            if (modifiedDefeatedCount > 0) {
+                ouros.setCustomName(RecallUtil.recalledName(Component.translatable("entity.dungeonnowloading.fairkeeper_ouros"), modifiedDefeatedCount));
+            } else {
+                ouros.setCustomName(Component.translatable("entity.dungeonnowloading.fairkeeper_ouros"));
             }
             this.ouros = ouros;
         }
@@ -1133,14 +1214,15 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         FairkeeperSerpentCallerEntity boss = DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get().create(level);
         if (boss == null) return;
         BlockPos pos = soul.blockPosition();
-        boss.initRecalled(defeatedCount);
+        boss.initRecalled(soul, defeatedCount);
         boss.moveTo(pos.getX() + 0.5f, pos.getY(), pos.getZ() + 0.5f, soul.getYRot(), 0);
         level.addFreshEntity(boss);
         spawnRecallFxTight(level, boss.position());
     }
 
-    public void initRecalled(int defeatedCount) {
+    public void initRecalled(SeepingSoulEntity soul,  int defeatedCount) {
         this.defeatedCount = defeatedCount;
+        this.playerDefeatedUUIDs = soul.getPlayerDefeatedUUIDs();
     }
 
     public static void spawnRecallFxTight(ServerLevel level, Vec3 center) {

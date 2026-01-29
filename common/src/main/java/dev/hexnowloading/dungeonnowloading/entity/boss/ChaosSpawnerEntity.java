@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
@@ -11,6 +12,7 @@ import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
 import net.minecraft.core.BlockPos;
@@ -44,6 +46,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -98,9 +101,11 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private int deathAnimationTickCount;
     private int barrierCheckTickCount;
     private int defeatedCount = 0;
+    private int modifiedDefeatedCount = 0;
     private Set<UUID> playerUUIDs;
     private UUID currentPlayerUUID;
     private List<Player> pushTargets;
+    private Set<UUID> playerDefeatedUUIDs;
 
     public final AnimationState awakeningAnimationState = new AnimationState();
     public final AnimationState sleepingAnimationState = new AnimationState();
@@ -123,6 +128,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.xpReward = 500;
         this.playerUUIDs = Sets.newHashSet();
         this.currentPlayerUUID = UUID.randomUUID();
+        this.playerDefeatedUUIDs = Sets.newHashSet();
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -187,18 +193,14 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         compoundTag.putInt("BarrierUpTicks,", this.entityData.get(BARRIER_UP_TICK));
         compoundTag.putInt("BarrierDownTicks,", this.entityData.get(BARRIER_DOWN_TICK));
         ListTag listTag = new ListTag();
-        CompoundTag uuidCompoundTag = new CompoundTag();
-        Iterator<UUID> var = this.playerUUIDs.iterator();
-        for (int i = 0; var.hasNext(); i++) {
-            listTag.add(uuidCompoundTag);
-            uuidCompoundTag.putUUID("PlayerUUID" + i, var.next());
+        for (UUID id : this.playerUUIDs) {
+            CompoundTag t = new CompoundTag();
+            t.putUUID("Id", id);
+            listTag.add(t);
         }
-        /*for (var.hasNext(); listTag.add(uuidCompoundTag)) {
-            UUID uuid1 = var.next();
-            uuidCompoundTag.putUUID("PlayerUUID", uuid1);
-        }*/
         compoundTag.put("PlayerUUIDs", listTag);
-        compoundTag.putInt("DefeatedCount", this.defeatedCount);
+
+        SeepingSoulEntity.writeRecallNBT(compoundTag, this.playerDefeatedUUIDs, this.defeatedCount, this.modifiedDefeatedCount);
     }
 
     @Override
@@ -230,11 +232,16 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         if (compoundTag.contains("PlayerUUIDs", CompoundTag.TAG_LIST)) {
             ListTag listTag = compoundTag.getList("PlayerUUIDs", CompoundTag.TAG_COMPOUND);
             for (int a = 0; a < listTag.size(); ++a) {
-                CompoundTag compoundTag1 = listTag.getCompound(a);
-                this.playerUUIDs.add(compoundTag1.getUUID("PlayerUUID" + a));
+                this.playerUUIDs.add(listTag.getCompound(a).getUUID("Id"));
             }
         }
-        this.defeatedCount = compoundTag.getInt("DefeatedCount");
+        SeepingSoulEntity.RecallData data = SeepingSoulEntity.readRecallNBT(compoundTag);
+
+        this.playerDefeatedUUIDs.clear();
+        this.playerDefeatedUUIDs.addAll(data.playerDefeatedUUIDs());
+
+        this.defeatedCount = data.defeatedCount();
+        this.modifiedDefeatedCount = data.modifiedDefeatedCount();
     }
 
     @Override
@@ -286,7 +293,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.bossEvent.removePlayer(player);
     }
 
-    public void startBossFight() {
+    public void startBossFight(ItemStack recallItemStack) {
         if (this.isAlive() && this.entityData.get(PHASE) < 1 && this.getState() != State.AWAKENING) {
             AABB bossArena = new AABB(this.blockPosition()).inflate(getFollowDistance());
             List<ServerPlayer> players = this.level().getEntitiesOfClass(ServerPlayer.class, bossArena);
@@ -294,11 +301,20 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 playerUUIDs.add(p.getUUID());
             }
             int playerCount = players.size();
-            EntityScale.scaleBossHealth(this, playerCount, this.defeatedCount);
-            EntityScale.scaleBossAttack(this, playerCount, this.defeatedCount);
+            this.modifiedDefeatedCount = SeepingSoulEntity.getModifiedDefeatedCount(this.defeatedCount, recallItemStack);
+            EntityScale.scaleBossHealth(this, playerCount, this.modifiedDefeatedCount);
+            EntityScale.scaleBossAttack(this, playerCount, this.modifiedDefeatedCount);
             this.entityData.set(PLAYER_COUNT, playerCount);
             this.entityData.set(AWAKENING_TICKS, 160);
             this.entityData.set(DATA_STATE, State.AWAKENING);
+            if (modifiedDefeatedCount > 0) {
+                this.setCustomName(RecallUtil.recalledName(
+                        Component.translatable("entity.dungeonnowloading.chaos_spawner"),
+                        modifiedDefeatedCount
+                ));
+            } else {
+                this.setCustomName(Component.translatable("entity.dungeonnowloading.chaos_spawner"));
+            }
         }
     }
 
@@ -603,10 +619,13 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         soul.moveTo(start.getX() + 0.5, start.getY() + RECALL_POSITION_OFFSET_Y, start.getZ() + 0.5, 0, 0);
 
         // bossId should match the recall registry id you use for Chaos Spawner
-        soul.setBossId(new ResourceLocation("dungeonnowloading", "chaos_spawner"));
+        soul.setBossId(new ResourceLocation(DungeonNowLoading.MOD_ID, "chaos_spawner"));
 
+        int count = SeepingSoulEntity.getRecallCountForSeepingSoul(this.defeatedCount, this.modifiedDefeatedCount);
+
+        soul.setPlayerDefeatedUUIDs(this.playerDefeatedUUIDs);
         // next run is +1
-        soul.setDefeatedCount(Mth.clamp(this.defeatedCount + 1, 0, 100));
+        soul.setDefeatedCount(Mth.clamp(count, 0, 100));
 
         level.addFreshEntity(soul);
 
@@ -642,13 +661,72 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     @Override
     protected void dropCustomDeathLoot(DamageSource damageSource, int a, boolean b) {
-        if (BossConfig.TOGGLE_MULTIPLAYER_LOOT.get() && !this.playerUUIDs.isEmpty()) {
-            for (UUID playerUUID : this.playerUUIDs) {
-                this.currentPlayerUUID = playerUUID;
+        if (!BossConfig.TOGGLE_MULTIPLAYER_LOOT.get()) {
+            super.dropCustomDeathLoot(damageSource, a, b);
+            return;
+        }
+
+        if (this.playerUUIDs.isEmpty()) return;
+
+        // If recalled enough times, ignore gating entirely
+        boolean ignoreGate = this.modifiedDefeatedCount > 0;
+
+        // How many times to roll the loot table per eligible player
+        int drops = Math.max(1, (this.modifiedDefeatedCount - this.defeatedCount) + 1);
+
+        for (UUID playerUUID : this.playerUUIDs) {
+
+            dropGreatXpBottlesForPlayer(playerUUID);
+
+            if (this.modifiedDefeatedCount >= 4) {
+                dropLabyrinthTrophyForPlayer(playerUUID);
+            }
+
+            // Gate: only first-clear gets loot (only on non-ignored runs)
+            if (!ignoreGate) {
+                if (this.playerDefeatedUUIDs.contains(playerUUID)) {
+                    continue;
+                }
+            }
+
+            this.currentPlayerUUID = playerUUID;
+
+            // Drop multiple times for this player
+            for (int i = 0; i < drops; i++) {
                 this.spawnLootTableItems(damageSource, true);
             }
-        } else {
-            super.dropCustomDeathLoot(damageSource, a, b);
+
+            // Mark claimed only for gated runs
+            if (!ignoreGate) {
+                this.playerDefeatedUUIDs.add(playerUUID);
+            }
+        }
+    }
+
+    private void dropLabyrinthTrophyForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        ItemStack trophy = new ItemStack(DNLBlocks.LABYRINTH_TROPHY.get());
+        this.spawnSpecialItemEntity(trophy, 0.0F, playerUuid);
+    }
+
+    private void dropGreatXpBottlesForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        int recallCount = Math.max(0, this.modifiedDefeatedCount);; // 0,1,2,...
+        int total = 5 * (recallCount + 1);
+
+        Item greatBottleItem = DNLItems.GREAT_EXPERIENCE_BOTTLE.get();
+
+        if (greatBottleItem == null) return;
+
+        // Split into max stack sizes
+        int max = greatBottleItem.getMaxStackSize(); // typically 64
+        while (total > 0) {
+            int n = Math.min(total, max);
+            ItemStack stack = new ItemStack(greatBottleItem, n);
+            this.spawnSpecialItemEntity(stack, 0.0F, playerUuid);
+            total -= n;
         }
     }
 
@@ -810,6 +888,8 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     public void disableBossBar() { this.bossEvent.setVisible(false); }
 
+    public void setPlayerDefeatedUUIDs(Set<UUID> uuids) { this.playerDefeatedUUIDs = uuids; }
+
     public void stopAttacking(int cooldown) {
         this.entityData.set(DATA_STATE, State.IDLE);
         this.setAttackTick(cooldown);
@@ -859,19 +939,16 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         ChaosSpawnerEntity boss = DNLEntityTypes.CHAOS_SPAWNER.get().create(level);
         if (boss == null) return;
         BlockPos pos = soul.blockPosition();
-        boss.initRecalled(soul.blockPosition(), defeatedCount);
+        boss.initRecalled(soul, defeatedCount);
         boss.moveTo(pos.getX() + 0.5f, pos.getY() - RECALL_POSITION_OFFSET_Y, pos.getZ() + 0.5f, soul.getYRot(), 0);
         level.addFreshEntity(boss);
         spawnRecallFxTight(level, boss.position());
     }
 
-    public void initRecalled(BlockPos pos, int defeatedCount) {
-        this.entityData.set(SPAWN_POINT, pos.below(RECALL_POSITION_OFFSET_Y));
+    public void initRecalled(SeepingSoulEntity soul, int defeatedCount) {
+        this.entityData.set(SPAWN_POINT, soul.blockPosition().below(RECALL_POSITION_OFFSET_Y));
         this.defeatedCount = defeatedCount;
-        this.setCustomName(RecallUtil.recalledName(
-                Component.translatable("entity.dungeonnowloading.chaos_spawner"),
-                defeatedCount
-        ));
+        this.setPlayerDefeatedUUIDs(soul.getPlayerDefeatedUUIDs());
     }
 
     public static void spawnRecallFxTight(ServerLevel level, Vec3 center) {

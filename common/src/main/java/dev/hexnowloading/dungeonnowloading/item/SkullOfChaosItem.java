@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Vanishable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SkullOfChaosItem extends Item {
+public class SkullOfChaosItem extends Item implements BossSummoningItem, Vanishable {
 
     public SkullOfChaosItem(Properties properties) {
         super(properties);
@@ -71,7 +72,7 @@ public class SkullOfChaosItem extends Item {
             player.awardStat(Stats.ITEM_USED.get(this));
 
             for (ChaosSpawnerEntity e : sleepingTargets) {
-                e.startBossFight();
+                e.startBossFight(stack);
             }
 
             return InteractionResultHolder.consume(stack);
@@ -87,5 +88,15 @@ public class SkullOfChaosItem extends Item {
         if (GeneralConfig.TOGGLE_HELPFUL_ITEM_TOOLTIP.get()) {
             components.add(Component.translatable("item.dungeonnowloading.skull_of_chaos.tooltip").withStyle(ChatFormatting.GRAY));
         }
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack itemStack) {
+        return itemStack.getCount() == 1;
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return 1;
     }
 }

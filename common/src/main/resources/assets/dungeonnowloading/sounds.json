@@ -224,6 +224,34 @@
       "dungeonnowloading:entity/repulsor/repulsor_recharge_2"
     ]
   },
+  "seeping_soul_ambient": {
+    "subtitle": "sounds.dungeonnowloading.seeping_soul_ambient",
+    "sounds": [
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_ambient_0",
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_ambient_1",
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_ambient_2"
+    ]
+  },
+  "seeping_soul_dissipate": {
+    "subtitle": "sounds.dungeonnowloading.seeping_soul_dissipate",
+    "sounds": [
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_dissipate"
+    ]
+  },
+  "seeping_soul_expand": {
+    "subtitle": "sounds.dungeonnowloading.seeping_soul_expand",
+    "sounds": [
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_expand"
+    ]
+  },
+  "seeping_soul_hurt": {
+    "subtitle": "sounds.dungeonnowloading.seeping_soul_hurt",
+    "sounds": [
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_hurt_0",
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_hurt_1",
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_hurt_2"
+    ]
+  },
   "vertex_arrow_bootup": {
     "subtitle": "sounds.dungeonnowloading.vertex_arrow_bootup",
     "sounds": [

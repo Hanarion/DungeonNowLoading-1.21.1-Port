@@ -1,19 +1,31 @@
 package dev.hexnowloading.dungeonnowloading.entity.misc;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.seeping_soul.SeepingSoulAnimationDuration;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.seeping_soul.SeepingSoulDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.entity.util.EventAnimationSystem;
 import dev.hexnowloading.dungeonnowloading.entity.util.RecallableDef;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.registry.DNLRecallables;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,7 +33,14 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class SeepingSoulEntity extends Entity {
 
@@ -38,6 +57,8 @@ public class SeepingSoulEntity extends Entity {
 
     private static final byte EVENT_HURT_LEFT = 70;
     private static final byte EVENT_HURT_RIGHT = 71;
+    private static final byte EVENT_IDLE_BREAK = 72;
+    private static final byte EVENT_RECALL = 73;
 
     private static final int MAX_HP = 10;
     private static final int SPAWN_DELAY_TICKS = 20 * 3; // 3 sec
@@ -52,10 +73,13 @@ public class SeepingSoulEntity extends Entity {
     private static final EntityDataAccessor<Integer> DATA_CHANNEL_TICKS = SynchedEntityData.defineId(SeepingSoulEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_HURT_TICKS = SynchedEntityData.defineId(SeepingSoulEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<SeepingSoulAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(SeepingSoulEntity.class, EntityStates.SEEPING_SOUL_ANIMATION_STATE);
+    private static final EntityDataAccessor<String> DATA_BOSS_ID = SynchedEntityData.defineId(SeepingSoulEntity.class, EntityDataSerializers.STRING);
 
+    private static final ResourceLocation DEFAULT_BOSS_ID = new ResourceLocation("minecraft", "pig"); // fallback
     // Stored as string in NBT
-    private ResourceLocation bossId = new ResourceLocation("minecraft", "pig"); // placeholder
     private int lastHitTick = -999999;
+    private final Set<UUID> playerDefeatedUUIDs = new HashSet<>();
+    private int ambientSoundCooldown = 20 * 10;
 
     public SeepingSoulEntity(EntityType<? extends Entity> type, Level level) {
         super(type, level);
@@ -63,7 +87,7 @@ public class SeepingSoulEntity extends Entity {
     }
 
     private RecallableDef def() {
-        return DNLRecallables.get(this.bossId);
+        return DNLRecallables.get(this.getBossId());
     }
 
     // --- Hitbox 1x1 ---
@@ -90,6 +114,8 @@ public class SeepingSoulEntity extends Entity {
         this.entityData.define(DATA_CHANNEL_TICKS, 0);
         this.entityData.define(DATA_HURT_TICKS, 0);
         this.entityData.define(ANIMATION_STATE, SeepingSoulAnimationState.NONE);
+        this.entityData.define(DATA_BOSS_ID, DEFAULT_BOSS_ID.toString());
+
     }
 
     @Override
@@ -113,6 +139,7 @@ public class SeepingSoulEntity extends Entity {
             setSpawnDelayTicks(delay);
 
             if (delay == 0) {
+                this.playSound(DNLSounds.SEEPING_SOUL_EXPAND.get());
                 playSpawnAnimation();
             }
 
@@ -123,8 +150,12 @@ public class SeepingSoulEntity extends Entity {
         int channel = getChannelTicks();
         if (channel > 0) {
             channel++;
+            if (channel >= CHANNEL_TOTAL_TICKS - 20) {
+                this.stopSeepingSoulAmbient();
+            }
             if (channel >= CHANNEL_TOTAL_TICKS) {
                 setChannelTicks(0);
+                this.playSound(SoundEvents.ZOMBIE_VILLAGER_CURE);
                 summonBoss();
                 this.discard();
                 return;
@@ -140,6 +171,16 @@ public class SeepingSoulEntity extends Entity {
                 if (hp < MAX_HP) setHp(hp + 1);
             }
         }
+
+        if (!isInSpawnDelay()) {
+            ambientSoundCooldown--;
+
+            if (ambientSoundCooldown <= 0) {
+                this.playSeepingSoulAmbient(DNLSounds.SEEPING_SOUL_AMBIENT.get());
+                ambientSoundCooldown = 20 * (10 + this.random.nextInt(11));
+            }
+        }
+
 
         animationChainer.tick(this::transitionTo);
 
@@ -197,6 +238,8 @@ public class SeepingSoulEntity extends Entity {
             if (this.level() instanceof ServerLevel sl) {
                 playDeathFx(sl);
             }
+            this.stopSeepingSoulAmbient();
+            this.playSound(DNLSounds.SEEPING_SOUL_DISSIPATE.get());
             disperse();
             this.discard();
             return true;
@@ -299,6 +342,9 @@ public class SeepingSoulEntity extends Entity {
 
         if (getChannelTicks() > 0) return false;
 
+        this.stopSeepingSoulAmbient();
+        this.playSeepingSoulAmbient(DNLSounds.SEEPING_SOUL_AMBIENT.get());
+
         playRecallingAnimation();
 
         setChannelTicks(1);
@@ -328,7 +374,11 @@ public class SeepingSoulEntity extends Entity {
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
         if (tag.contains("Boss", CompoundTag.TAG_STRING)) {
-            this.bossId = new ResourceLocation(tag.getString("Boss"));
+            try {
+                this.setBossId(new ResourceLocation(tag.getString("Boss")));
+            } catch (Exception ignored) {
+                this.setBossId(DEFAULT_BOSS_ID);
+            }
         }
 
         setSpawnDelayTicks(Mth.clamp(tag.getInt("SpawnDelayTicks"), 0, SPAWN_DELAY_TICKS));
@@ -336,17 +386,105 @@ public class SeepingSoulEntity extends Entity {
         setDefeatedCount(Mth.clamp(tag.getInt("DefeatedCount"), 0, 100));
         setChannelTicks(Mth.clamp(tag.getInt("ChannelTicks"), 0, CHANNEL_TOTAL_TICKS));
         this.lastHitTick = tag.getInt("LastHitTick");
+
+        this.playerDefeatedUUIDs.clear();
+
+        if (tag.contains("PlayerDefeatedUUIDs", CompoundTag.TAG_LIST)) {
+            ListTag list = tag.getList("PlayerDefeatedUUIDs", CompoundTag.TAG_COMPOUND);
+            for (int i = 0; i < list.size(); i++) {
+                this.playerDefeatedUUIDs.add(list.getCompound(i).getUUID("Id"));
+            }
+        }
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-        tag.putString("Boss", this.bossId.toString());
+        tag.putString("Boss", this.getBossId().toString());
         tag.putInt("Health", getHp());
         tag.putInt("DefeatedCount", getDefeatedCount());
         tag.putInt("ChannelTicks", getChannelTicks());
         tag.putInt("LastHitTick", this.lastHitTick);
         tag.putInt("SpawnDelayTicks", getSpawnDelayTicks());
+        ListTag list = new ListTag();
+        for (UUID id : this.playerDefeatedUUIDs) {
+            CompoundTag t = new CompoundTag();
+            t.putUUID("Id", id);
+            list.add(t);
+        }
+        tag.put("PlayerDefeatedUUIDs", list);
 
+    }
+
+    public static void writeRecallNBT(
+            CompoundTag tag,
+            Set<UUID> playerDefeatedUUIDs,
+            int defeatedCount,
+            int modifiedDefeatedCount
+    ) {
+        ListTag list = new ListTag();
+        for (UUID id : playerDefeatedUUIDs) {
+            CompoundTag t = new CompoundTag();
+            t.putUUID("Id", id);
+            list.add(t);
+        }
+
+        tag.put("PlayerDefeatedUUIDs", list);
+        tag.putInt("DefeatedCount", defeatedCount);
+        tag.putInt("ModifiedDefeatedCount", modifiedDefeatedCount);
+    }
+
+    public static RecallData readRecallNBT(CompoundTag tag) {
+        Set<UUID> set = new HashSet<>();
+
+        if (tag.contains("PlayerDefeatedUUIDs", CompoundTag.TAG_LIST)) {
+            ListTag list = tag.getList("PlayerDefeatedUUIDs", CompoundTag.TAG_COMPOUND);
+            for (int i = 0; i < list.size(); i++) {
+                set.add(list.getCompound(i).getUUID("Id"));
+            }
+        }
+
+        int defeatedCount = tag.getInt("DefeatedCount");
+        int modifiedDefeatedCount = tag.getInt("ModifiedDefeatedCount");
+
+        return new RecallData(set, defeatedCount, modifiedDefeatedCount);
+    }
+
+    public record RecallData(Set<UUID> playerDefeatedUUIDs, int defeatedCount, int modifiedDefeatedCount) {}
+
+
+    public static int getModifiedDefeatedCount(int defeatedCount, ItemStack recallItemStack) {
+        int modifiedDefeatedCount = defeatedCount;
+
+        if (recallItemStack != null && !recallItemStack.isEmpty()) {
+
+            // Check Nullification first (it overrides everything)
+            int nullifyLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.NULLIFICATION.get(), recallItemStack);
+
+            if (nullifyLevel > 0) {
+                modifiedDefeatedCount = 0;
+            } else {
+
+                // Apply Amplification bonus
+                int ampLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.AMPLIFICATION.get(), recallItemStack);
+
+                if (ampLevel > 0) {
+                    modifiedDefeatedCount = defeatedCount + ampLevel;
+                }
+            }
+        }
+        return modifiedDefeatedCount;
+    }
+
+    public static int getRecallCountForSeepingSoul(int defeatedCount, int modifiedDefeatedCount) {
+        int count = defeatedCount;
+        if (defeatedCount < modifiedDefeatedCount) {
+            count = modifiedDefeatedCount + 1;
+        } else if (defeatedCount > modifiedDefeatedCount) {
+            count = defeatedCount;
+        } else {
+            count++;
+        }
+        return count;
     }
 
     // --- Getters/Setters ---
@@ -365,57 +503,122 @@ public class SeepingSoulEntity extends Entity {
     public int getChannelTicks() { return this.entityData.get(DATA_CHANNEL_TICKS); }
     public void setChannelTicks(int v) { this.entityData.set(DATA_CHANNEL_TICKS, Mth.clamp(v, 0, CHANNEL_TOTAL_TICKS)); }
 
-    public ResourceLocation getBossId() { return bossId; }
-    public void setBossId(ResourceLocation bossId) { this.bossId = bossId; }
+    public ResourceLocation getBossId() {
+        String s = this.entityData.get(DATA_BOSS_ID);
+        if (s == null || s.isBlank()) return DEFAULT_BOSS_ID;
+
+        try {
+            return new ResourceLocation(s);
+        } catch (Exception e) {
+            return DEFAULT_BOSS_ID;
+        }
+    }
+
+    public void setBossId(ResourceLocation id) {
+        this.entityData.set(DATA_BOSS_ID, (id == null ? DEFAULT_BOSS_ID : id).toString());
+    }
+
 
     public int getHurtTicks() { return this.entityData.get(DATA_HURT_TICKS); }
     public void setHurtTicks(int v) { this.entityData.set(DATA_HURT_TICKS, Math.max(0, v)); }
+
+    public void setPlayerDefeatedUUIDs(Set<UUID> set) {
+        this.playerDefeatedUUIDs.clear();
+        this.playerDefeatedUUIDs.addAll(set);
+    }
+
+    public Set<UUID> getPlayerDefeatedUUIDs() {
+        return this.playerDefeatedUUIDs;
+    }
+
+    public boolean hasPlayerDefeated(UUID uuid) {
+        return this.playerDefeatedUUIDs.contains(uuid);
+    }
+
+    public boolean markPlayerDefeated(UUID uuid) {
+        return this.playerDefeatedUUIDs.add(uuid);
+    }
+
+    public void playSeepingSoulAmbient(SoundEvent soundEvent) {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), soundEvent.getLocation(), SoundSource.HOSTILE), player);
+        }
+    }
+
+    public void stopSeepingSoulAmbient() {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), DNLSounds.SEEPING_SOUL_AMBIENT.get().getLocation(), 20, true), player);
+        }
+    }
 
     public boolean isNoAnimation() {
         return this.entityData.get(ANIMATION_STATE).equals(SeepingSoulAnimationState.NONE);
     }
 
-    private void playIdleOrIdleBreak() {
-        if (this.random.nextInt(3) == 0) {
-            this.animationChainer.enqueue(
-                    AnimationChainer.AnimationStep.of(
-                            SeepingSoulAnimationState.IDLE_BREAK,
-                            SeepingSoulAnimationDuration.IDLE_BREAK,
-                            null,
-                            () -> this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.IDLE, SeepingSoulAnimationDuration.IDLE, null, this::playIdleOrIdleBreak))
-                    )
-            );
-        } else {
-            this.animationChainer.enqueue(
-                    AnimationChainer.AnimationStep.of(
-                            SeepingSoulAnimationState.IDLE,
-                            SeepingSoulAnimationDuration.IDLE,
-                            null,
-                            this::playIdleOrIdleBreak
-                    )
-            );
+    private SeepingSoulDuration durations() {
+        // simplest: switch by boss id
+        ResourceLocation boss = this.getBossId();
+
+        // Use exact ids that you used in the renderer bundles map:
+        if (boss.equals(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller"))) {
+            return SeepingSoulAnimationDuration.SERPENT_CALLER;
         }
+
+        // default
+        return SeepingSoulAnimationDuration.DEFAULT;
+    }
+
+    private void playIdleOrIdleBreak() {
+        SeepingSoulDuration d = durations();
+
+        if (this.random.nextInt(3) == 0 && this.getChannelTicks() < 1) {
+            this.level().broadcastEntityEvent(this, EVENT_IDLE_BREAK);
+        }
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.IDLE, d.idle(), null, this::playIdleOrIdleBreak));
     }
 
     private void playIdleAnimation() {
+        SeepingSoulDuration d = durations();
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.IDLE, SeepingSoulAnimationDuration.IDLE, null, this::playIdleOrIdleBreak));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.IDLE, d.idle(), null, this::playIdleOrIdleBreak));
     }
+
 
     private void playHurtAnimation() {
         byte evt = this.random.nextBoolean() ? EVENT_HURT_LEFT : EVENT_HURT_RIGHT;
         this.level().broadcastEntityEvent(this, evt);
+        this.playSound(DNLSounds.SEEPING_SOUL_HURT.get());
     }
 
     private void playRecallingAnimation() {
+        this.level().broadcastEntityEvent(this, EVENT_RECALL);
+        /*SeepingSoulDuration d = durations();
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.RECALLING, SeepingSoulAnimationDuration.RECALLING));
+        this.animationChainer.enqueue(
+                AnimationChainer.AnimationStep.of(
+                        SeepingSoulAnimationState.RECALLING,
+                        d.recalling()
+                )
+        );*/
     }
 
     public void playSpawnAnimation() {
+        SeepingSoulDuration d = durations();
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.SPAWN, SeepingSoulAnimationDuration.SPAWN));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.IDLE, SeepingSoulAnimationDuration.IDLE, null, this::playIdleOrIdleBreak));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.SPAWN, d.spawn()));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SeepingSoulAnimationState.IDLE, d.idle(), null, this::playIdleOrIdleBreak));
     }
 
     @Override
@@ -430,10 +633,6 @@ public class SeepingSoulEntity extends Entity {
                     this.idleBreakAnimation.startIfStopped(this.tickCount);
                 }
                 case SPAWN -> this.spawnAnimation.startIfStopped(this.tickCount);
-                case RECALLING -> {
-                    this.idleAnimation.stop();
-                    this.recallingAnimation.startIfStopped(this.tickCount);
-                }
             }
         }
         super.onSyncedDataUpdated(entityDataAccessor);
@@ -441,9 +640,33 @@ public class SeepingSoulEntity extends Entity {
 
     @Override
     public void handleEntityEvent(byte b) {
+        SeepingSoulDuration d = durations();
+
         switch (b) {
-            case EVENT_HURT_LEFT -> eventAnimations.playSeconds("hurt", SeepingSoulAnimationDuration.HURT, () -> hurtLeftAnimation.start(this.tickCount), () -> hurtLeftAnimation.stop());
-            case EVENT_HURT_RIGHT -> eventAnimations.playSeconds("hurt", SeepingSoulAnimationDuration.HURT, () -> hurtRightAnimation.start(this.tickCount), () -> hurtRightAnimation.stop());
+            case EVENT_HURT_LEFT -> eventAnimations.playSeconds(
+                    "hurt",
+                    d.hurt(),
+                    () -> hurtLeftAnimation.start(this.tickCount),
+                    () -> hurtLeftAnimation.stop()
+            );
+            case EVENT_HURT_RIGHT -> eventAnimations.playSeconds(
+                    "hurt",
+                    d.hurt(),
+                    () -> hurtRightAnimation.start(this.tickCount),
+                    () -> hurtRightAnimation.stop()
+            );
+            case EVENT_IDLE_BREAK -> eventAnimations.playSeconds(
+                    "idle_break",
+                    d.idleBreak(),
+                    () -> idleBreakAnimation.start(this.tickCount),
+                    () -> idleBreakAnimation.stop()
+            );
+            case EVENT_RECALL -> eventAnimations.playSeconds(
+                    "recall",
+                    d.recalling(),
+                    () -> recallingAnimation.start(this.tickCount),
+                    () -> recallingAnimation.stop()
+            );
             default -> super.handleEntityEvent(b);
         }
     }
@@ -452,9 +675,6 @@ public class SeepingSoulEntity extends Entity {
         //this.idleAnimation.stop();
         this.idleBreakAnimation.stop();
         this.spawnAnimation.stop();
-        this.hurtLeftAnimation.stop();
-        this.hurtRightAnimation.stop();
-        this.recallingAnimation.stop();
     }
 
     public SeepingSoulEntity transitionTo(SeepingSoulAnimationState state) {

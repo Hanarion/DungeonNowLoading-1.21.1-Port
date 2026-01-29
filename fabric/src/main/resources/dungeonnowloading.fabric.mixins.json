@@ -11,6 +11,7 @@
     "block.ExplosionMixin",
     "block.ContainerMixin",
     "block.DNLFireBlockMixin",
+    "block.EnchantmentHelperMixin",
     "block.LecternBlockMixin",
     "block.PistonBlockMixin",
     "block.StairsMixin",

@@ -58,6 +58,8 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SPAWNER_BOOTS.get());
                 // Enchantments - Books
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.BREAK_PROTECTION.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.AMPLIFICATION.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.NULLIFICATION.get(), 1)));
                 // Items - Boss Related
                 output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
                 output.accept(DNLItems.SKULL_OF_CHAOS.get());
