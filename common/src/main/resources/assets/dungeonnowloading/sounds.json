@@ -252,6 +252,18 @@
       "dungeonnowloading:entity/seeping_soul/seeping_soul_hurt_2"
     ]
   },
+  "seeping_soul_recall": {
+    "subtitle": "sounds.dungeonnowloading.seeping_soul_recall",
+    "sounds": [
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_recall"
+    ]
+  },
+  "seeping_soul_replace": {
+    "subtitle": "sounds.dungeonnowloading.seeping_soul_replace",
+    "sounds": [
+      "dungeonnowloading:entity/seeping_soul/seeping_soul_replace"
+    ]
+  },
   "vertex_arrow_bootup": {
     "subtitle": "sounds.dungeonnowloading.vertex_arrow_bootup",
     "sounds": [

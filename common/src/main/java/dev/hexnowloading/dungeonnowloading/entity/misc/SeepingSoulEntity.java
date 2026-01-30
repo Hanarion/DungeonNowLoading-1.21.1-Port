@@ -24,7 +24,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -151,11 +150,11 @@ public class SeepingSoulEntity extends Entity {
         if (channel > 0) {
             channel++;
             if (channel >= CHANNEL_TOTAL_TICKS - 20) {
-                this.stopSeepingSoulAmbient();
+                this.stopSeepingSoulTickingSound();
             }
             if (channel >= CHANNEL_TOTAL_TICKS) {
                 setChannelTicks(0);
-                this.playSound(SoundEvents.ZOMBIE_VILLAGER_CURE);
+                this.playSound(DNLSounds.SEEPING_SOUL_REPLACE.get());
                 summonBoss();
                 this.discard();
                 return;
@@ -176,7 +175,7 @@ public class SeepingSoulEntity extends Entity {
             ambientSoundCooldown--;
 
             if (ambientSoundCooldown <= 0) {
-                this.playSeepingSoulAmbient(DNLSounds.SEEPING_SOUL_AMBIENT.get());
+                this.playSeepingSoulTickingSound(DNLSounds.SEEPING_SOUL_AMBIENT.get());
                 ambientSoundCooldown = 20 * (10 + this.random.nextInt(11));
             }
         }
@@ -238,7 +237,7 @@ public class SeepingSoulEntity extends Entity {
             if (this.level() instanceof ServerLevel sl) {
                 playDeathFx(sl);
             }
-            this.stopSeepingSoulAmbient();
+            this.stopSeepingSoulTickingSound();
             this.playSound(DNLSounds.SEEPING_SOUL_DISSIPATE.get());
             disperse();
             this.discard();
@@ -342,8 +341,9 @@ public class SeepingSoulEntity extends Entity {
 
         if (getChannelTicks() > 0) return false;
 
-        this.stopSeepingSoulAmbient();
-        this.playSeepingSoulAmbient(DNLSounds.SEEPING_SOUL_AMBIENT.get());
+        this.stopSeepingSoulTickingSound();
+        this.playSeepingSoulTickingSound(DNLSounds.SEEPING_SOUL_AMBIENT.get());
+        this.playSound(DNLSounds.SEEPING_SOUL_RECALL.get());
 
         playRecallingAnimation();
 
@@ -539,7 +539,7 @@ public class SeepingSoulEntity extends Entity {
         return this.playerDefeatedUUIDs.add(uuid);
     }
 
-    public void playSeepingSoulAmbient(SoundEvent soundEvent) {
+    public void playSeepingSoulTickingSound(SoundEvent soundEvent) {
         float radius = 32.0f;
         AABB detectionBox = this.getBoundingBox().inflate(radius);
         List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
@@ -551,7 +551,7 @@ public class SeepingSoulEntity extends Entity {
         }
     }
 
-    public void stopSeepingSoulAmbient() {
+    public void stopSeepingSoulTickingSound() {
         float radius = 32.0f;
         AABB detectionBox = this.getBoundingBox().inflate(radius);
         List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
