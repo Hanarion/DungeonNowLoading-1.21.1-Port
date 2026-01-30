@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.SpawnerCarrierAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.monster.SpawnerCarrierEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -10,6 +11,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
 public class SpawnerCarrierModel<T extends SpawnerCarrierEntity> extends HierarchicalModel<T> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "spawner_carrier"), "main");
@@ -64,9 +66,33 @@ public class SpawnerCarrierModel<T extends SpawnerCarrierEntity> extends Hierarc
         return LayerDefinition.create(meshdefinition, 128, 128);
     }
 
+    private float walkBlend = 0.0F;
+
     @Override
     public void setupAnim(SpawnerCarrierEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        this.root.getAllParts().forEach(ModelPart::resetPose);
 
+        this.Spawner.visible = !entity.isSpawnerBroken();
+        entity.idleAnimationState.startIfStopped(entity.tickCount);
+
+        float raw = limbSwingAmount * 2.5F;
+        float target = raw < 0.08F ? 0.0F : Mth.clamp(raw, 0.0F, 1.0F);
+
+        float fadeIn  = 0.12F;
+        float fadeOut = 0.06F;
+
+        float rate = (target > walkBlend) ? fadeIn : fadeOut;
+        walkBlend += (target - walkBlend) * rate;
+
+        float fakeLimbSwingAmount = walkBlend / 2.5F;
+        this.animateWalk(SpawnerCarrierAnimation.WALK, limbSwing, fakeLimbSwingAmount, 2.0F, 2.5F);
+
+        // Animations
+
+        this.animate(entity.idleAnimationState, SpawnerCarrierAnimation.IDLE, ageInTicks);
+        this.animate(entity.groundSmashAnimationState, SpawnerCarrierAnimation.GROUND_SMASH, ageInTicks);
+        this.animate(entity.summonAnimationState, SpawnerCarrierAnimation.SUMMON, ageInTicks);
+        this.animate(entity.summonEndAnimationState, SpawnerCarrierAnimation.SUMMON_END, ageInTicks);
     }
 
     @Override

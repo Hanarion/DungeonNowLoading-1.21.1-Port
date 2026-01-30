@@ -3,10 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.util;
 import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.BallistaGolemEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -14,6 +11,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 
 public class EntityStates {
     public static final EntityDataSerializer<ChaosSpawnerEntity.State> CHAOS_SPAWNER_STATE;
+    public static final EntityDataSerializer<SpawnerCarrierEntity.SpawnerCarrierAnimationState> SPAWNER_CARRIER_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState> FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperBorosEntity.FairkeeperBorosState> FAIRKEEPER_BOROS_STATE;
     public static final EntityDataSerializer<FairkeeperBorosEntity.FairkeeperBorosAnimationState> FAIRKEEPER_BOROS_ANIMATION_STATE;
@@ -38,6 +36,7 @@ public class EntityStates {
 
     static {
         CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
+        SPAWNER_CARRIER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SpawnerCarrierEntity.SpawnerCarrierAnimationState.class);
         FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState.class);
         FAIRKEEPER_BOROS_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosState.class);
         FAIRKEEPER_BOROS_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosAnimationState.class);
@@ -61,6 +60,7 @@ public class EntityStates {
         BROKEN_GARHOLD_STATE = EntityDataSerializer.simpleEnum(BrokenGarholdEntity.BrokenGarholdState.class);
 
         EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
+        EntityDataSerializers.registerSerializer(SPAWNER_CARRIER_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_STATE);
         EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_ANIMATION_STATE);

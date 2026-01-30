@@ -1,7 +1,11 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.SpawnerCarrierAttackGoal;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -10,6 +14,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -22,23 +27,44 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 
 public class SpawnerCarrierEntity extends Monster {
-    public final AnimationState attackAnimationState = new AnimationState();
     private static final EntityDataAccessor<String> STORED_ENTITY_ID = SynchedEntityData.defineId(SpawnerCarrierEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Float> PICKAXE_ACCUM_DAMAGE = SynchedEntityData.defineId(SpawnerCarrierEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<SpawnerCarrierAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(SpawnerCarrierEntity.class, EntityStates.SPAWNER_CARRIER_ANIMATION_STATE);
+
+    public final AnimationState idleAnimationState = new AnimationState();
+    public final AnimationState walkAnimationState = new AnimationState();
+    public final AnimationState groundSmashAnimationState = new AnimationState();
+    public final AnimationState summonAnimationState = new AnimationState();
+    public final AnimationState summonEndAnimationState = new AnimationState();
+    private AnimationChainer<SpawnerCarrierAnimationState> animationChainer = new AnimationChainer<>();
+
     private int summonTick = 200;
     @Nullable public transient Entity previewEntity;
     @Nullable public transient String previewEntityId;
     public float previewSpin = 0.0F;
     public float previewOSpin = 0.0F;
+    private CompoundTag storedEntityNbt = null;
+
+    private boolean wasMoving = false;
+    private boolean locomotionLocked = false;
 
     private final float SPAWN_RANGE = 5;
-    private CompoundTag storedEntityNbt = null;
+
+    private static final float FRAG_THRESHOLD = 5.0F;
+    private static final float FRAG_MAX = 40.0F;
+    private static final float FRAG_SPAWN_HEIGHT = 1.0F;
 
     private static final String[] DEFAULT_POOL = {
             "minecraft:zombie",
@@ -78,6 +104,8 @@ public class SpawnerCarrierEntity extends Monster {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(STORED_ENTITY_ID, "");
+        this.entityData.define(PICKAXE_ACCUM_DAMAGE, 0.0F);
+        this.entityData.define(ANIMATION_STATE, SpawnerCarrierAnimationState.IDLE);
     }
 
     @Override
@@ -88,6 +116,7 @@ public class SpawnerCarrierEntity extends Monster {
         if (this.storedEntityNbt != null) {
             tag.put("StoredEntityNbt", this.storedEntityNbt);
         }
+        tag.putFloat("PickaxeAccumDamage", this.getPickaxeAccumDamage());
     }
 
     @Override
@@ -98,6 +127,9 @@ public class SpawnerCarrierEntity extends Monster {
         this.storedEntityNbt = tag.contains("StoredEntityNbt", CompoundTag.TAG_COMPOUND)
                 ? tag.getCompound("StoredEntityNbt")
                 : null;
+        if (tag.contains("PickaxeAccumDamage")) {
+            this.entityData.set(PICKAXE_ACCUM_DAMAGE, tag.getFloat("PickaxeAccumDamage"));
+        }
     }
 
     @Override
@@ -113,39 +145,10 @@ public class SpawnerCarrierEntity extends Monster {
             float add = 1000.0F / (delay + 200.0F);
             this.previewSpin = (this.previewSpin + add) % 360.0F;
         }
-    }
 
-    public boolean storeMobFrom(LivingEntity mob) {
-        // Don’t store players, bosses, or itself, etc.
-        if (mob instanceof Player) return false;
-        if (mob.getType() == this.getType()) return false;
+        if (this.level().isClientSide) return;
 
-        // Type id
-        var key = EntityType.getKey(mob.getType());
-        if (key == null) return false;
-
-        this.entityData.set(STORED_ENTITY_ID, key.toString());
-
-        // NBT snapshot
-        CompoundTag nbt = new CompoundTag();
-        mob.saveWithoutId(nbt);
-
-        // Strip / sanitize things you *usually* don’t want to clone
-        nbt.remove("UUID");
-        nbt.remove("Pos");
-        nbt.remove("Motion");
-        nbt.remove("Rotation");
-        nbt.remove("Dimension");
-        nbt.remove("Passengers");
-        nbt.remove("Leash");
-
-        // Optional: avoid copying active aggression / targets
-        nbt.remove("Brain");
-        nbt.remove("HurtTime");
-        nbt.remove("HurtByTimestamp");
-
-        this.storedEntityNbt = nbt;
-        return true;
+        animationChainer.tick(this::transitionTo);
     }
 
     @Nullable
@@ -180,6 +183,7 @@ public class SpawnerCarrierEntity extends Monster {
 
         if (!(this.level() instanceof ServerLevel level)) return;
         if (!(this.getTarget() instanceof Player)) return;
+        if (this.isSpawnerBroken()) return;
 
         level.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 1.75D, this.getZ(),
                 1, 0.25D, 0.15D, 0.25D, 0.0D);
@@ -266,18 +270,74 @@ public class SpawnerCarrierEntity extends Monster {
     }
 
     @Override
+    public boolean hurt(DamageSource source, float amount) {
+        boolean didHurt = super.hurt(source, amount);
+        if (!didHurt) return false;
+
+        // Server only
+        if (this.level().isClientSide) return true;
+
+        // Already broken? ignore pickaxe mining
+        if (this.isSpawnerBroken()) return true;
+
+        // Must be a player using a pickaxe as the direct hit
+        Entity attacker = source.getEntity();
+        if (!(attacker instanceof Player player)) return true;
+
+        ItemStack held = player.getMainHandItem();
+        if (!(held.getItem() instanceof PickaxeItem)) return true;
+
+        // Accumulate the actual damage dealt by this hit
+        float before = this.getPickaxeAccumDamage();
+        float after = Mth.clamp(before + amount, 0.0F, FRAG_MAX);
+
+        int beforeSteps = (int)(before / FRAG_THRESHOLD);
+        int afterSteps  = (int)(after  / FRAG_THRESHOLD);
+
+        // Drop 1 fragment per crossed 5-damage threshold
+        int toDrop = Math.max(0, afterSteps - beforeSteps);
+        if (toDrop > 0) {
+
+            int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, held);
+            float height = this.getBbHeight();
+
+            for (int i = 0; i < toDrop; i++) {
+                int count = fortuneLikeCount(this.getRandom(), fortune);
+
+                this.spawnAtLocation(new ItemStack(DNLItems.SPAWNER_FRAGMENT.get(), count), height);
+
+                spawnSpawnerChipParticles((ServerLevel) this.level(), 10);
+            }
+        }
+
+        this.entityData.set(PICKAXE_ACCUM_DAMAGE, after);
+
+        // When it reaches 40, "break" the spawner (stop future spawns)
+        if (after >= FRAG_MAX) {
+            onSpawnerBreak((ServerLevel) this.level());
+        }
+
+        return true;
+    }
+
+    private void onSpawnerBreak(ServerLevel level) {
+        // Visual/audio feedback (tweak as you like)
+        spawnSpawnerChipParticles(level, 40);
+        level.sendParticles(ParticleTypes.POOF, this.getX(), this.getY() + 1.5, this.getZ(),
+                20, 0.3D, 0.3D, 0.3D, 0.0D);
+        this.playSound(SoundEvents.GLASS_BREAK, 1.0F, 1.0F); //TODO: replace with your actual break sound
+
+        this.entityData.set(STORED_ENTITY_ID, "");
+        this.storedEntityNbt = null;
+        this.previewEntity = null;
+        this.previewEntityId = null;
+    }
+
+
+    @Override
     public boolean doHurtTarget(Entity entity) {
         this.level().broadcastEntityEvent(this, (byte) 4);
         return super.doHurtTarget(entity);
-    }
-
-    @Override
-    public void handleEntityEvent(byte b) {
-        if (b == 4) {
-            this.attackAnimationState.start(this.tickCount);
-        } else {
-            super.handleEntityEvent(b);
-        }
     }
 
     @Override
@@ -293,6 +353,85 @@ public class SpawnerCarrierEntity extends Monster {
     }
 
     @Override
+    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
+        super.dropCustomDeathLoot(source, looting, recentlyHit);
+
+        int base = this.getDeathFragmentValue(); // your 0..4 value based on spawner damage
+        if (base <= 0) return;
+
+        float height = this.getBbHeight();
+
+        // Base payout: either 1 frame (value 4) or fragments (1..3)
+        if (base == 4) {
+            this.spawnAtLocation(new ItemStack(DNLItems.SPAWNER_FRAME.get(), 1), height);
+        } else {
+            this.spawnAtLocation(new ItemStack(DNLItems.SPAWNER_FRAGMENT.get(), base), height);
+        }
+
+        // Looting bonus: fragments on top (also works "on top of the frame")
+        int extra = lootingExtraCount(this.getRandom(), looting);
+        if (extra > 0) {
+            this.spawnAtLocation(new ItemStack(DNLItems.SPAWNER_FRAGMENT.get(), extra), height);
+        }
+    }
+
+    public float getSpawnerDamageProgress() {
+        return Mth.clamp(this.getPickaxeAccumDamage() / FRAG_MAX, 0.0F, 1.0F);
+    }
+
+    // Death reward in "fragment value" (0..4)
+    public int getDeathFragmentValue() {
+        float dmg = Mth.clamp(this.getPickaxeAccumDamage(), 0.0F, FRAG_MAX);
+        int lost = (int)(dmg / 10.0F);      // 0..4
+        return Mth.clamp(4 - lost, 0, 4);
+    }
+
+    public float getPickaxeAccumDamage() {
+        return this.entityData.get(PICKAXE_ACCUM_DAMAGE);
+    }
+
+    public int getSpawnerCrackStage() {
+        // -1 means "no crack overlay"
+        if (this.isSpawnerBroken()) return -1;
+
+        float p = Mth.clamp(this.getPickaxeAccumDamage() / FRAG_MAX, 0.0F, 1.0F);
+        int stage = (int)(p * 10.0F); // 0..10
+        return Mth.clamp(stage, 0, 9); // vanilla has 0..9
+    }
+
+
+    public boolean isSpawnerBroken() {
+        return this.getPickaxeAccumDamage() >= FRAG_MAX;
+    }
+
+    private static int fortuneLikeCount(net.minecraft.util.RandomSource random, int fortuneLevel) {
+        if (fortuneLevel <= 0) return 1;
+
+        int i = random.nextInt(fortuneLevel + 2) - 1;
+        if (i < 0) i = 0;
+        return 1 * (i + 1); // base is 1 fragment per threshold
+    }
+
+    private static int lootingExtraCount(net.minecraft.util.RandomSource random, int lootingLevel) {
+        if (lootingLevel <= 0) return 0;
+        return random.nextInt(lootingLevel + 1); // 0..looting
+    }
+
+    private void spawnSpawnerChipParticles(ServerLevel level, int count) {
+        BlockState state = Blocks.SPAWNER.defaultBlockState();
+
+        // Spawn around the spawner area (near top looks best since you're dropping from top)
+        level.sendParticles(
+                new BlockParticleOption(ParticleTypes.BLOCK, state),
+                this.getX(),
+                this.getY() + this.getBbHeight() * 0.85,
+                this.getZ(),
+                count,
+                0.5, 0.5, 0.5,   // spread
+                0.05                // speed
+        );
+    }
+    @Override
     protected SoundEvent getHurtSound(DamageSource $$0) { return SoundEvents.IRON_GOLEM_HURT; }
 
     @Override
@@ -303,5 +442,45 @@ public class SpawnerCarrierEntity extends Monster {
     @Override
     protected void playStepSound(BlockPos blockPos, BlockState blockState) {
         this.playSound(SoundEvents.IRON_GOLEM_STEP, 1.0F, 2.0F);
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
+        if (ANIMATION_STATE.equals(entityDataAccessor)) {
+            SpawnerCarrierAnimationState animationState = this.entityData.get(ANIMATION_STATE);
+            this.resetAnimation();
+            switch (animationState) {
+                case GROUND_SMASH -> this.groundSmashAnimationState.startIfStopped(this.tickCount);
+                case SUMMON -> this.summonAnimationState.startIfStopped(this.tickCount);
+                case SUMMON_END -> this.summonEndAnimationState.startIfStopped(this.tickCount);
+            }
+        }
+        super.onSyncedDataUpdated(entityDataAccessor);
+    }
+
+    private void resetAnimation() {
+        this.idleAnimationState.stop();
+        this.walkAnimationState.stop();
+        this.groundSmashAnimationState.stop();
+        this.summonAnimationState.stop();
+        this.summonEndAnimationState.stop();
+    }
+
+
+    public SpawnerCarrierEntity transitionTo(SpawnerCarrierAnimationState state) {
+        switch (state) {
+            case IDLE -> this.entityData.set(ANIMATION_STATE, SpawnerCarrierAnimationState.IDLE);
+            case GROUND_SMASH -> this.entityData.set(ANIMATION_STATE, SpawnerCarrierAnimationState.GROUND_SMASH);
+            case SUMMON -> this.entityData.set(ANIMATION_STATE, SpawnerCarrierAnimationState.SUMMON);
+            case SUMMON_END -> this.entityData.set(ANIMATION_STATE, SpawnerCarrierAnimationState.SUMMON_END);
+        }
+        return this;
+    }
+
+    public enum SpawnerCarrierAnimationState {
+        IDLE,
+        GROUND_SMASH,
+        SUMMON,
+        SUMMON_END,
     }
 }

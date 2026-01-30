@@ -37,6 +37,8 @@ public class SpawnerCarrierPreviewLayer<T extends SpawnerCarrierEntity, M extend
                        T carrier, float limbSwing, float limbSwingAmount, float partialTick,
                        float ageInTicks, float netHeadYaw, float headPitch) {
 
+        if (carrier.isSpawnerBroken()) return;
+
         String id = carrier.getStoredEntityId();
         if (id == null || id.isEmpty()) return;
 
