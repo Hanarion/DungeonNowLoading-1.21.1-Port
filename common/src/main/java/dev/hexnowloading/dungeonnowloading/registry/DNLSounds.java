@@ -103,6 +103,16 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> SPAWNER_CARRIER_SPAWN_MOB = registerSoundEvent("spawner_carrier_spawn_mob");
     public static final Supplier<SoundEvent> SPAWNER_CARRIER_SPAWNER_BREAK = registerSoundEvent("spawner_carrier_spawner_break");
     public static final Supplier<SoundEvent> SPAWNER_CARRIER_STEP = registerSoundEvent("spawner_carrier_step");
+    public static final Supplier<SoundEvent> GARHOLD_CHARGE_DIVE = registerSoundEvent("garhold_charge_dive");
+    public static final Supplier<SoundEvent> GARHOLD_CLOSING = registerSoundEvent("garhold_closing");
+    public static final Supplier<SoundEvent> GARHOLD_DEATH = registerSoundEvent("garhold_death");
+    public static final Supplier<SoundEvent> GARHOLD_FLAP = registerSoundEvent("garhold_flap");
+    public static final Supplier<SoundEvent> GARHOLD_HURT = registerSoundEvent("garhold_hurt");
+    public static final Supplier<SoundEvent> GARHOLD_LAND_DIVE = registerSoundEvent("garhold_land_dive");
+    public static final Supplier<SoundEvent> GARHOLD_RELEASE = registerSoundEvent("garhold_release");
+    public static final Supplier<SoundEvent> GARHOLD_SIDE_BAR_CLOSE = registerSoundEvent("garhold_side_bar_close");
+    public static final Supplier<SoundEvent> GARHOLD_SIDE_BAR_OPEN = registerSoundEvent("garhold_side_bar_open");
+    public static final Supplier<SoundEvent> GARHOLD_TELEPORT = registerSoundEvent("garhold_teleport");
     public static final Supplier<SoundEvent> BALLISTA_GOLEM_DEATH = registerSoundEvent("ballista_golem_death");
     public static final Supplier<SoundEvent> BALLISTA_GOLEM_HURT = registerSoundEvent("ballista_golem_hurt");
     public static final Supplier<SoundEvent> BALLISTA_GOLEM_SHOOT = registerSoundEvent("ballista_golem_shoot");

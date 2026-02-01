@@ -966,5 +966,78 @@
     "sounds": [
       "dungeonnowloading:mob/fairkeeper/fairkeeper_mouth_open"
     ]
+  },
+  "garhold_charge_dive": {
+    "subtitle": "sounds.dungeonnowloading.garhold_charge_dive",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_charge_dive_0",
+      "dungeonnowloading:mob/garhold/garhold_charge_dive_1"
+    ]
+  },
+  "garhold_closing": {
+    "subtitle": "sounds.dungeonnowloading.garhold_closing",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_closing_0",
+      "dungeonnowloading:mob/garhold/garhold_closing_1"
+    ]
+  },
+  "garhold_death": {
+    "subtitle": "sounds.dungeonnowloading.garhold_death",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_death_0",
+      "dungeonnowloading:mob/garhold/garhold_death_1"
+    ]
+  },
+  "garhold_flap": {
+    "subtitle": "sounds.dungeonnowloading.garhold_flap",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_flap_0",
+      "dungeonnowloading:mob/garhold/garhold_flap_1",
+      "dungeonnowloading:mob/garhold/garhold_flap_2",
+      "dungeonnowloading:mob/garhold/garhold_flap_3"
+    ]
+  },
+  "garhold_hurt": {
+    "subtitle": "sounds.dungeonnowloading.garhold_hurt",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_hurt_0",
+      "dungeonnowloading:mob/garhold/garhold_hurt_1",
+      "dungeonnowloading:mob/garhold/garhold_hurt_2"
+    ]
+  },
+  "garhold_land_dive": {
+    "subtitle": "sounds.dungeonnowloading.garhold_land_dive",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_land_dive_0",
+      "dungeonnowloading:mob/garhold/garhold_land_dive_1"
+    ]
+  },
+  "garhold_release": {
+    "subtitle": "sounds.dungeonnowloading.garhold_release",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_release_0",
+      "dungeonnowloading:mob/garhold/garhold_release_1"
+    ]
+  },
+  "garhold_side_bar_close": {
+    "subtitle": "sounds.dungeonnowloading.garhold_side_bar_close",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_side_bar_close_0",
+      "dungeonnowloading:mob/garhold/garhold_side_bar_close_1"
+    ]
+  },
+  "garhold_side_bar_open": {
+    "subtitle": "sounds.dungeonnowloading.garhold_side_bar_open",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_side_bar_open_0",
+      "dungeonnowloading:mob/garhold/garhold_side_bar_open_1"
+    ]
+  },
+  "garhold_teleport": {
+    "subtitle": "sounds.dungeonnowloading.garhold_teleport",
+    "sounds": [
+      "dungeonnowloading:mob/garhold/garhold_teleport_0",
+      "dungeonnowloading:mob/garhold/garhold_teleport_1"
+    ]
   }
 }

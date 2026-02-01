@@ -5,12 +5,14 @@ import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.Garh
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -85,6 +87,8 @@ public class GarholdEntity extends Monster {
 
     private int chainedPassengerHoldTicks = 0;
     private int chainedDetachLockoutTicks = 0;
+
+    private int flapSoundCooldown = 0;
 
     private static final float ASCEND_LIFT_START_PROGRESS = 0.25f;
     private static final int ASCEND_LIFT_TICKS = 10;
@@ -253,6 +257,8 @@ public class GarholdEntity extends Monster {
                 ascendLiftActive = false;
             }
         }
+
+        tickFlapSound();
     }
 
     public boolean hasCapturedPlayer() {
@@ -283,12 +289,14 @@ public class GarholdEntity extends Monster {
         ServerLevel level = (ServerLevel) this.level();
 
         spawnTeleportSpawnerFx(level, this.position());
+        this.playSound(DNLSounds.GARHOLD_TELEPORT.get());
 
         player.teleportTo(target.getX(), target.getY(), target.getZ());
         player.stopRiding();
         player.startRiding(target, true);
 
         spawnTeleportSpawnerFx(level, target.position());
+        target.playSound(DNLSounds.GARHOLD_TELEPORT.get());
 
         if (target instanceof GarholdEntity g) {
             g.chainedPassengerHoldTicks = 60;
@@ -524,6 +532,68 @@ public class GarholdEntity extends Monster {
         this.setDeltaMovement(Vec3.ZERO);
     }
 
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSource) {
+        return DNLSounds.GARHOLD_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return DNLSounds.GARHOLD_DEATH.get();
+    }
+
+    private static final int FLAP_INTERVAL_TICKS = 5;
+    private static final float FLAP_VOL = 0.5f;
+    private static final float FLAP_PITCH_MIN = 0.95f;
+    private static final float FLAP_PITCH_MAX = 1.05f;
+
+    private void tickFlapSound() {
+        if (!(this.level() instanceof ServerLevel level)) return;
+
+        GarholdAnimationState anim = this.entityData.get(ANIMATION_STATE);
+
+        // only flap during flap-capable animations
+        if (!isFlapAnimation(anim)) {
+            flapSoundCooldown = 0; // so the next time we enter a flap anim, it can play immediately
+            return;
+        }
+
+        // optional: different cadence per animation
+        int interval = getFlapInterval(anim);
+
+        if (flapSoundCooldown-- > 0) return;
+        flapSoundCooldown = interval;
+
+        float pitch = FLAP_PITCH_MIN + this.random.nextFloat() * (FLAP_PITCH_MAX - FLAP_PITCH_MIN);
+
+        level.playSound(
+                null,
+                this.getX(), this.getY(), this.getZ(),
+                DNLSounds.GARHOLD_FLAP.get(),
+                this.getSoundSource(),
+                FLAP_VOL,
+                pitch
+        );
+    }
+
+    private boolean isFlapAnimation(GarholdAnimationState anim) {
+        return anim == GarholdAnimationState.FLY
+                || anim == GarholdAnimationState.FLY_2
+                || anim == GarholdAnimationState.ASCEND
+                || anim == GarholdAnimationState.REATTACH
+                || anim == GarholdAnimationState.FORCE_DETACH;
+    }
+
+    // Optional: tune cadence by animation
+    private int getFlapInterval(GarholdAnimationState anim) {
+        return switch (anim) {
+            case FORCE_DETACH -> Math.max(6, FLAP_INTERVAL_TICKS - 4); // faster
+            case ASCEND       -> FLAP_INTERVAL_TICKS + 4;              // slower
+            case REATTACH     -> FLAP_INTERVAL_TICKS + 2;              // slightly slower
+            default           -> FLAP_INTERVAL_TICKS;                  // FLY / FLY_2
+        };
+    }
+
     public boolean isChainBlock(BlockPos pos) {
         return this.level().getBlockState(pos).is(Blocks.CHAIN);
     }
@@ -664,7 +734,7 @@ public class GarholdEntity extends Monster {
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
                 GarholdAnimationState.CHARGE_DIVE,
                 GarholdAnimationDuration.CHARGE_DIVE,
-                null,
+                () -> this.playSound(DNLSounds.GARHOLD_CHARGE_DIVE.get()),
                 onComplete,
                 onProgress
         ));
@@ -675,7 +745,7 @@ public class GarholdEntity extends Monster {
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
                 GarholdAnimationState.LAND_DIVE,
                 GarholdAnimationDuration.LAND_DIVE,
-                null,
+                () -> this.playSound(DNLSounds.GARHOLD_LAND_DIVE.get()),
                 () -> {
                     if (this.hasCapturedPlayer()) {
                         this.playClosingGateAnimation();
@@ -686,6 +756,8 @@ public class GarholdEntity extends Monster {
         ));
     }
 
+    private boolean playedSideBarOpenSound;
+
     public void playSideCaptureAnimation() {
         this.animationChainer.reset();
 
@@ -693,24 +765,32 @@ public class GarholdEntity extends Monster {
                 AnimationChainer.AnimationStep.of(
                         GarholdAnimationState.SIDE_CAPTURE,
                         GarholdAnimationDuration.SIDE_CAPTURE,
-                        null,
+                        () -> {
+                            this.playSound(DNLSounds.GARHOLD_SIDE_BAR_CLOSE.get());
+                            this.playedSideBarOpenSound = false; // reset for this animation
+                        },
                         () -> { // onComplete
                             if (this.hasCapturedPlayer()) {
                                 this.playClosingGateAnimation();
                             } else {
                                 this.playAscendAnimation();
                             }
+                        },
+                        (state, progress) -> {
+                            if (!playedSideBarOpenSound && progress >= 0.75f) {
+                                playedSideBarOpenSound = true;
+                                this.playSound(DNLSounds.GARHOLD_SIDE_BAR_OPEN.get());
+                            }
                         }
                 )
         );
     }
 
-
     public void playClosingGateAnimation() {
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
                 GarholdAnimationState.CLOSING_GATE,
                 GarholdAnimationDuration.CLOSING_GATE,
-                null,
+                () -> this.playSound(DNLSounds.GARHOLD_CLOSING.get()),
                 () -> {
                     teleportRiderToChainedGarhold();
 
@@ -746,6 +826,7 @@ public class GarholdEntity extends Monster {
                         (anim, progress) -> {
                             if (this.hasCapturedPlayer()) this.forceDismountPassengerUnderSelf();
                             if (!ascendLiftActive && progress >= ASCEND_LIFT_START_PROGRESS) {
+                                this.playSound(DNLSounds.GARHOLD_FLAP.get(), FLAP_VOL, 1.0F);
                                 ascendLiftActive = true;
                                 ascendLiftTicksLeft = ASCEND_LIFT_TICKS;
                             }
@@ -756,7 +837,7 @@ public class GarholdEntity extends Monster {
 
     public void playReleasePlayerAnimation() {
         this.bottomGateAnimationChainer.reset();
-        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdBottomGateAnimationState.BOTTOM_OPEN, GarholdAnimationDuration.BOTTOM_OPEN));
+        this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdBottomGateAnimationState.BOTTOM_OPEN, GarholdAnimationDuration.BOTTOM_OPEN, () -> this.playSound(DNLSounds.GARHOLD_RELEASE.get()), null));
         this.bottomGateAnimationChainer.enqueue(AnimationChainer.AnimationStep.of(GarholdBottomGateAnimationState.BOTTOM_CLOSE, GarholdAnimationDuration.BOTTOM_CLOSE));
     }
 

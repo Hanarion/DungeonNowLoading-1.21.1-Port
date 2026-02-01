@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.spawner_carrier.SpawnerCarrierApproachAndSmashGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.spawner_carrier.SpawnerCarrierHurtByTargetGoal;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.SpawnerCarrierAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
@@ -137,7 +138,7 @@ public class SpawnerCarrierEntity extends Monster {
         this.goalSelector.addGoal(2, new WaterAvoidingRandomStrollGoal(this, 0.5));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Mob.class, 8.0F));
-        //this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, SpawnerCarrierEntity.class)).setAlertOthers());
+        this.targetSelector.addGoal(1, new SpawnerCarrierHurtByTargetGoal(this).setAlertOthers());
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
@@ -623,71 +624,80 @@ public class SpawnerCarrierEntity extends Monster {
         return random.nextInt(lootingLevel + 1); // 0..looting
     }
 
-// ...
-
     private void doGroundSmashHit() {
         if (!(this.level() instanceof ServerLevel level)) return;
         if (!this.isAlive()) return;
 
         AABB box = this.getBoundingBox().inflate(GROUND_SMASH_RADIUS, 1.5, GROUND_SMASH_RADIUS);
 
-        ParticleOptions particleData = new ScalableAxisParticleType.ScalableAxisParticleData(DNLParticleTypes.WHITE_SHOCKWAVE_MEDIUM_PARTICLE.get(), 0, 90, GROUND_SMASH_RADIUS * 2 + 1);
-        level.sendParticles(particleData, this.getX(), this.getY() + 0.01F, this.getZ(), 1, 0.0d, 0.0d, 0.0d, 0);
+        ParticleOptions particleData = new ScalableAxisParticleType.ScalableAxisParticleData(
+                DNLParticleTypes.WHITE_SHOCKWAVE_MEDIUM_PARTICLE.get(), 0, 90, GROUND_SMASH_RADIUS * 2 + 1
+        );
+        level.sendParticles(particleData, this.getX(), this.getY() + 0.01F, this.getZ(), 1, 0, 0, 0, 0);
 
-        ParticleOptions particleDataSmall = new ScalableAxisParticleType.ScalableAxisParticleData(DNLParticleTypes.WHITE_SHOCKWAVE_MEDIUM_PARTICLE.get(), 0, 90, GROUND_SMASH_RADIUS * 1 + 2);
-        level.sendParticles(particleDataSmall, this.getX(), this.getY() + 0.01F, this.getZ(), 1, 0.0d, 0.0d, 0.0d, 0);
+        ParticleOptions particleDataSmall = new ScalableAxisParticleType.ScalableAxisParticleData(
+                DNLParticleTypes.WHITE_SHOCKWAVE_MEDIUM_PARTICLE.get(), 0, 90, GROUND_SMASH_RADIUS * 1 + 2
+        );
+        level.sendParticles(particleDataSmall, this.getX(), this.getY() + 0.01F, this.getZ(), 1, 0, 0, 0, 0);
 
+        DamageSource src = this.damageSources().mobAttack(this);
+        float dmg = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+
+        // 1) Hit all players in range
         for (Player player : level.getEntitiesOfClass(Player.class, box,
                 p -> p.isAlive() && !p.isSpectator() && !p.getAbilities().invulnerable)) {
 
-            DamageSource src = this.damageSources().mobAttack(this);
-
-            // Was this smash blocked by the player's shield?
             boolean blockedByShield = player.isBlocking() && player.isDamageSourceBlocked(src);
 
-            // Deal damage (shield may fully/partially block depending on vanilla behavior)
-            player.hurt(src, (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+            player.hurt(src, dmg);
 
-            // If blocked, disable shield (axe-like)
             if (blockedByShield) {
-                // immediately stop blocking
                 player.stopUsingItem();
-
-                // apply cooldown so they can't raise it again
                 player.getCooldowns().addCooldown(Items.SHIELD, 100);
 
-                // optional: play the "shield disabled" feel (pick whichever sound you like)
                 level.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.SHIELD_BREAK, SoundSource.PLAYERS, 0.8F, 1.0F);
 
-                this.level().broadcastEntityEvent(this, (byte)30);
+                this.level().broadcastEntityEvent(this, (byte) 30);
             }
 
-            // Knockback: apply even if they blocked (or reduce it if you prefer)
             applySmashKnockback(player);
+        }
+
+        // 2) Also hit the current target mob (if it’s not a player and is in range)
+        LivingEntity target = this.getTarget();
+        if (target != null
+                && target.isAlive()
+                && !(target instanceof Player)
+                && box.intersects(target.getBoundingBox())
+                && !this.isSpawnedMinion(target)) { // optional: don't friendly-fire your minions
+
+            target.hurt(src, dmg);
+            applySmashKnockback(target);
         }
     }
 
 
-    private void applySmashKnockback(Player player) {
-        double dx = player.getX() - this.getX();
-        double dz = player.getZ() - this.getZ();
+    private void applySmashKnockback(LivingEntity entity) {
+        double dx = entity.getX() - this.getX();
+        double dz = entity.getZ() - this.getZ();
         double len = Math.max(0.001, Math.sqrt(dx * dx + dz * dz));
         dx /= len; dz /= len;
 
-        // use delta movement instead of push() (more reliable)
-        var v = player.getDeltaMovement();
-        player.setDeltaMovement(
+        var v = entity.getDeltaMovement();
+        entity.setDeltaMovement(
                 v.x + dx * GROUND_SMASH_KB_H,
                 Math.max(v.y, GROUND_SMASH_KB_Y),
                 v.z + dz * GROUND_SMASH_KB_H
         );
 
-        player.hurtMarked = true;
-        player.hasImpulse = true;
-        player.setOnGround(false);
+        entity.hurtMarked = true;
+        entity.hasImpulse = true;
+        entity.setOnGround(false);
     }
-
+    public boolean isSpawnedMinion(@Nullable Entity e) {
+        return e != null && this.spawnedMinions.contains(e.getUUID());
+    }
 
     public boolean isLocomotionLocked() { return locomotionLocked; }
 

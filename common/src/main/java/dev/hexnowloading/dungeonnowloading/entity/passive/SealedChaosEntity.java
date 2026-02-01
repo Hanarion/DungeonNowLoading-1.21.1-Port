@@ -136,7 +136,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     }
 
     private void discardWithParticle() {
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.SEALED_CHAOS_PLACE.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.SEALED_CHAOS_PLACE.get(), SoundSource.HOSTILE, 0.5F, 1.0F);
         if (!this.level().isClientSide) {
             ((ServerLevel) this.level()).sendParticles(ParticleTypes.POOF, this.getX(), this.getY(), this.getZ(), 20, 0.3D, 0.3D, 0.3D, 0.0D);
         }

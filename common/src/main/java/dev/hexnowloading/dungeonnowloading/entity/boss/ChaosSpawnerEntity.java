@@ -147,7 +147,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.goalSelector.addGoal(2, new ChaosSpawnerSummonMobGoal(this));
         this.goalSelector.addGoal(2, new ChaosSpawnerShootGhostBulletGoal(this));
         this.goalSelector.addGoal(2, new ChaosSpawnerPushGoal(this));
-        this.goalSelector.addGoal(2, new ChaosSpawnerLookAtPlayerGoal(this, LivingEntity.class, 30.0F, 1.0F, false));
+        this.goalSelector.addGoal(2, new ChaosSpawnerLookAtTargetGoal(this, false));
         this.goalSelector.addGoal(8, new ChaosSpawnerRandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new BossTargetSelectorGoal(this));
     }
@@ -480,7 +480,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     }
 
     private void placeFullBarrier(BlockPos barrierCenterPos, int barrierDirection) {
-        this.level().playSound(null, barrierCenterPos, DNLSounds.CHAOS_SPAWNER_BARRIER_REGENERATE.get(), this.getSoundSource(), 1.0F, 1.0F);
+        this.level().playSound(null, barrierCenterPos, DNLSounds.CHAOS_SPAWNER_BARRIER_REGENERATE.get(), this.getSoundSource(), 3.0F, 1.0F);
         ChaosSpawnerBarrierCenterBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
         ChaosSpawnerBarrierEdgeBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
         ChaosSpawnerBarrierVertexBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
