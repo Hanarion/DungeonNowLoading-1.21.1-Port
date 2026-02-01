@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -71,7 +72,8 @@ public class ScepterOfSealedChaosItem extends Item {
             UUID uuid = Objects.requireNonNull(player.getUUID());
             player.getCooldowns().addCooldown(this, 600);
             BlockPos playerPos = new BlockPos((int) player.getX(), (int) player.getY(), (int) player.getZ());
-            level.playSound(player, playerPos, SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS);
+            level.playSound(player, playerPos, DNLSounds.SEALED_CHAOS_PLACE.get(), SoundSource.PLAYERS, 1.0F, 0.8F);
+            //level.playSound(player, playerPos, SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS);
             if (!level.isClientSide) {
                 BlockPos blockPos = useOnContext.getClickedPos();
                 Direction direction = useOnContext.getClickedFace();

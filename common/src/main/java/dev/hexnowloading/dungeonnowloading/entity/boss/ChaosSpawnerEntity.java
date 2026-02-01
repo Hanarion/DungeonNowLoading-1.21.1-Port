@@ -29,7 +29,6 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
@@ -463,10 +462,10 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                     fixedFrame++;
                 } else {
                     if (frameState.getBlock() instanceof ChaosSpawnerEdgeBlock) {
-                        this.level().playSound(null, framePos, SoundEvents.END_PORTAL_FRAME_FILL, this.getSoundSource(), 3.0F, 1.0F);
+                        this.level().playSound(null, framePos, DNLSounds.CHAOS_SPAWNER_DIAMOND_NOTCH_REGENERATE.get(), this.getSoundSource(), 3.0F, 0.8F);
                         ChaosSpawnerEdgeBlock.fixFrame(this.level(), framePos, frameState);
                     } else if (frameState.getBlock() instanceof  ChaosSpawnerVertexBlock) {
-                        this.level().playSound(null, framePos, SoundEvents.END_PORTAL_FRAME_FILL, this.getSoundSource(), 3.0F, 1.0F);
+                        this.level().playSound(null, framePos, DNLSounds.CHAOS_SPAWNER_DIAMOND_NOTCH_REGENERATE.get(), this.getSoundSource(), 3.0F, 0.8F);
                         ChaosSpawnerVertexBlock.fixFrame(this.level(), framePos, frameState);
                     }
                     this.entityData.set(entityDataAccessor, 20);
@@ -481,7 +480,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     }
 
     private void placeFullBarrier(BlockPos barrierCenterPos, int barrierDirection) {
-        this.level().playSound(null, barrierCenterPos, SoundEvents.END_PORTAL_SPAWN, this.getSoundSource(), 1.0F, 2.0F);
+        this.level().playSound(null, barrierCenterPos, DNLSounds.CHAOS_SPAWNER_BARRIER_REGENERATE.get(), this.getSoundSource(), 1.0F, 1.0F);
         ChaosSpawnerBarrierCenterBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
         ChaosSpawnerBarrierEdgeBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
         ChaosSpawnerBarrierVertexBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
@@ -1021,7 +1020,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         double z = center.getZ() + 0.5;
 
         // A little sound helps sell it (optional)
-        level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.2F);
+        level.playSound(null, x, y, z, DNLSounds.CHAOS_SPAWNER_SHOCKWAVE.get(), SoundSource.BLOCKS, 1.0F, 1.2F);
 
         // Explosion-like burst
         level.sendParticles(ParticleTypes.EXPLOSION, x, y, z,

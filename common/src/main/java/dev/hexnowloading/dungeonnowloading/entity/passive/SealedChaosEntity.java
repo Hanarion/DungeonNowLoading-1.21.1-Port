@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.ai.SealedChaosAttackGoal;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -12,6 +13,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.players.OldUsersConverter;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
@@ -134,6 +136,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     }
 
     private void discardWithParticle() {
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.SEALED_CHAOS_PLACE.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
         if (!this.level().isClientSide) {
             ((ServerLevel) this.level()).sendParticles(ParticleTypes.POOF, this.getX(), this.getY(), this.getZ(), 20, 0.3D, 0.3D, 0.3D, 0.0D);
         }

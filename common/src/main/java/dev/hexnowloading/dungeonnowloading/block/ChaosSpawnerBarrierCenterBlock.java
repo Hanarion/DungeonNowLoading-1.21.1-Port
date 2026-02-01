@@ -1,36 +1,30 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.pattern.BlockInWorld;
-import net.minecraft.world.level.block.state.pattern.BlockPattern;
-import net.minecraft.world.level.block.state.pattern.BlockPatternBuilder;
-import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class ChaosSpawnerBarrierCenterBlock extends Block implements SimpleWaterloggedBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -130,6 +124,7 @@ public class ChaosSpawnerBarrierCenterBlock extends Block implements SimpleWater
                     BlockPos breakPos = blockPos.offset((BlockPos) barrierIterator.next());
                     level.destroyBlock(breakPos, false);
                 }
+                level.playSound(null, blockPos, DNLSounds.CHAOS_SPAWNER_BARRIER_BREAK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
             }
         }
     }

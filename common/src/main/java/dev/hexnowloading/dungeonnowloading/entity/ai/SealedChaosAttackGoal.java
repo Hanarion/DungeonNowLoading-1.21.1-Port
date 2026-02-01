@@ -2,7 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.ChaosSpawnerProjectileEntity;
-import net.minecraft.sounds.SoundEvents;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -52,24 +52,50 @@ public class SealedChaosAttackGoal extends Goal {
     }
 
     private void performSingleShot(LivingEntity target) {
-        if (target.distanceTo(this.sealedChaosEntity) < this.sealedChaosEntity.getAttributeValue(Attributes.FOLLOW_RANGE) && this.sealedChaosEntity.getLookControl().isLookingAtTarget()) {
-            vecFromCenterToFrontOfFace(0.0F);
+        if (target.distanceTo(this.sealedChaosEntity) < this.sealedChaosEntity.getAttributeValue(Attributes.FOLLOW_RANGE)
+                && this.sealedChaosEntity.getLookControl().isLookingAtTarget()) {
+
+            shootProjectile(0.0F);
         }
     }
 
-    private void vecFromCenterToFrontOfFace(float angle) {
-        this.sealedChaosEntity.level().playSound(null, this.sealedChaosEntity.getX(), this.sealedChaosEntity.getY(), this.sealedChaosEntity.getZ(), SoundEvents.WITHER_SHOOT, this.sealedChaosEntity.getSoundSource(), 3.0F, 1.0F + (this.sealedChaosEntity.getRandom().nextFloat() - this.sealedChaosEntity.getRandom().nextFloat()) * 0.2F);
-        double viewDistance = 0.1F;
+    private void shootProjectile(float angle) {
+
+        // 🔊 Play shoot sound HERE (server side safe)
+        this.sealedChaosEntity.level().playSound(
+                null,
+                this.sealedChaosEntity.getX(),
+                this.sealedChaosEntity.getY(),
+                this.sealedChaosEntity.getZ(),
+                DNLSounds.SEALED_CHAOS_BULLET_SHOOT.get(),
+                //SoundEvents.WITHER_SHOOT,
+                this.sealedChaosEntity.getSoundSource(),
+                1.0F,
+                0.9F + this.sealedChaosEntity.getRandom().nextFloat() * 0.2F
+        );
+
         Vec3 viewVector = this.sealedChaosEntity.getViewVector(1.0F);
+
         if (angle != 0.0F) {
-            float offset = (float) Math.toRadians(angle);
-            viewVector = viewVector.yRot(offset);
+            viewVector = viewVector.yRot((float) Math.toRadians(angle));
         }
-        double d0 = viewVector.x * viewDistance;
-        double d1 = viewVector.y * viewDistance;
-        double d2 = viewVector.z * viewDistance;
-        ChaosSpawnerProjectileEntity chaosSpawnerProjectileEntity = new ChaosSpawnerProjectileEntity(this.sealedChaosEntity, d0, d1, d2);
-        chaosSpawnerProjectileEntity.setPos(chaosSpawnerProjectileEntity.getX() + d0, chaosSpawnerProjectileEntity.getY() + d1, chaosSpawnerProjectileEntity.getZ() + d2);
-        this.sealedChaosEntity.level().addFreshEntity(chaosSpawnerProjectileEntity);
+
+        double speed = 0.1F;
+
+        double dx = viewVector.x * speed;
+        double dy = viewVector.y * speed;
+        double dz = viewVector.z * speed;
+
+        ChaosSpawnerProjectileEntity projectile =
+                new ChaosSpawnerProjectileEntity(this.sealedChaosEntity, dx, dy, dz);
+
+        projectile.setPos(
+                this.sealedChaosEntity.getX() + dx,
+                this.sealedChaosEntity.getEyeY() - 0.1F,
+                this.sealedChaosEntity.getZ() + dz
+        );
+
+        this.sealedChaosEntity.level().addFreshEntity(projectile);
     }
+
 }

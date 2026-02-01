@@ -3,11 +3,11 @@ package dev.hexnowloading.dungeonnowloading.block;
 import dev.hexnowloading.dungeonnowloading.block.property.AllSides;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -151,16 +151,16 @@ public class ChaosSpawnerEdgeBlock extends Block implements SimpleWaterloggedBlo
     }
 
     private void playSound(Level level, BlockPos blockPos, float pitch) {
-        level.playSound((Player) null, blockPos, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 1.0F, pitch);
+        level.playSound((Player) null, blockPos, DNLSounds.CHAOS_SPAWNER_DIAMOND_NOTCH_BREAK.get(), SoundSource.BLOCKS, 0.5F, pitch);
     }
 
     private void brokenFrame(Level level, BlockPos blockPos, BlockState blockState) {
         if (blockState.is(DNLBlocks.CHAOS_SPAWNER_DIAMOND_EDGE.get())) {
-            playSound(level, blockPos, 1.5F);
+            playSound(level, blockPos, 0.8F);
             level.setBlock(blockPos, DNLBlocks.CHAOS_SPAWNER_BROKEN_DIAMOND_EDGE.get().defaultBlockState().setValue(FACING, blockState.getValue(FACING)).setValue(ALL_SIDES, blockState.getValue(ALL_SIDES)).setValue(WATERLOGGED, blockState.getValue(WATERLOGGED)), 2);
             this.signalToBarrierCenter(level, blockPos, blockState);
         } else if (blockState.is(DNLBlocks.CHAOS_SPAWNER_EDGE.get())) {
-            playSound(level, blockPos, 2.0F);
+            playSound(level, blockPos, 0.8F);
             level.setBlock(blockPos, DNLBlocks.CHAOS_SPAWNER_BROKEN_EDGE.get().defaultBlockState().setValue(FACING, blockState.getValue(FACING)).setValue(ALL_SIDES, blockState.getValue(ALL_SIDES)).setValue(WATERLOGGED, blockState.getValue(WATERLOGGED)), 2);
         }
     }

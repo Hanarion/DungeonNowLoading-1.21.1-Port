@@ -1,18 +1,14 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 
-import java.util.EnumSet;
 import java.util.List;
 
 public class ChaosSpawnerPushGoal extends Goal {
@@ -32,12 +28,13 @@ public class ChaosSpawnerPushGoal extends Goal {
         super.start();
         chaosSpawnerEntity.triggerSmashAttackAnimation();
         chaosSpawnerEntity.setAttackTick(100);
+        chaosSpawnerEntity.playSound(DNLSounds.CHAOS_SPAWNER_BUILD_UP.get());
     }
 
     @Override
     public void tick() {
         if (chaosSpawnerEntity.getAttackTick() == 66) { // Only even number tick works for some reason
-            chaosSpawnerEntity.playSound(SoundEvents.GENERIC_EXPLODE, 3.0F, 1.0F);
+            chaosSpawnerEntity.playSound(DNLSounds.CHAOS_SPAWNER_SHOCKWAVE.get(), 3.0F, 1.0F);
             ((ServerLevel) chaosSpawnerEntity.level()).sendParticles(ParticleTypes.POOF, chaosSpawnerEntity.getX(), chaosSpawnerEntity.getY(), chaosSpawnerEntity.getZ(), 50, 3.0D, 0.0D, 3.0D, 0.0D);
             AABB aabb = (new AABB(this.chaosSpawnerEntity.blockPosition())).inflate(8);
             List<LivingEntity> targets = this.chaosSpawnerEntity.level().getEntitiesOfClass(LivingEntity.class, aabb);
