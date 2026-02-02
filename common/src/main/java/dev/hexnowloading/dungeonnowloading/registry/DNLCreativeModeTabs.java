@@ -90,6 +90,18 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.POLISHED_STONE.get());
                 output.accept(DNLItems.BORDERED_STONE.get());
                 output.accept(DNLItems.MOSS.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_BLACK.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_BLUE.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_PURPLE.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_GREEN.get());
+                output.accept(DNLItems.DUNGEON_BANNER_HOLLOW.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_CARRIER.get());
+                output.accept(DNLItems.DUNGEON_BANNER_EXPERIENCE_BOTTLE.get());
+                output.accept(DNLItems.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+                output.accept(DNLItems.DUNGEON_BANNER_WHIMPER_LANTERN.get());
+                output.accept(DNLItems.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
 
                 // Blocks - Mechanical
                 output.accept(DNLItems.DUNGEON_WALL_TORCH.get());

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.datagen.loot;
 
+import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
 import dev.hexnowloading.dungeonnowloading.block.FairkeeperChestBlock;
 import dev.hexnowloading.dungeonnowloading.block.PileBlock;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
@@ -119,6 +120,37 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.add(DNLBlocks.MEDIUM_DURITE_BUD.get(), b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.50f));
         this.add(DNLBlocks.SMALL_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.25f));
         this.add(DNLBlocks.DURITE_QUELLER.get(), block -> createSingleItemTable(Items.OBSIDIAN));
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER.get());
+    }
+
+    private void dungeonBannerDrops(Block bannerBlock) {
+        LootTable.Builder table = LootTable.lootTable();
+
+        LootPool.Builder pool = LootPool.lootPool()
+                .setRolls(ConstantValue.exactly(1));
+
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_MAGENTA, DNLItems.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLACK, DNLItems.DUNGEON_BANNER_SPAWNER_BLACK.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLUE, DNLItems.DUNGEON_BANNER_SPAWNER_BLUE.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_PURPLE, DNLItems.DUNGEON_BANNER_SPAWNER_PURPLE.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_GREEN, DNLItems.DUNGEON_BANNER_SPAWNER_GREEN.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.HOLLOW, DNLItems.DUNGEON_BANNER_HOLLOW.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_CARRIER, DNLItems.DUNGEON_BANNER_SPAWNER_CARRIER.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.EXPERIENCE_BOTTLE, DNLItems.DUNGEON_BANNER_EXPERIENCE_BOTTLE.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.CHAOS_SPAWNER, DNLItems.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.WHIMPER_LANTERN, DNLItems.DUNGEON_BANNER_WHIMPER_LANTERN.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.GARHOLD_UPSIDEDOWN, DNLItems.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
+        addBannerDrop(pool, bannerBlock, DungeonBannerBlock.DungeonBannerVariant.SKULL_OF_CHAOS, DNLItems.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
+
+        table.withPool(pool);
+        add(bannerBlock, table);
+    }
+
+    private void addBannerDrop(LootPool.Builder pool, Block bannerBlock, DungeonBannerBlock.DungeonBannerVariant variant, Item drop) {
+        pool.add(LootItem.lootTableItem(drop)
+                .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(bannerBlock)
+                        .setProperties(net.minecraft.advancements.critereon.StatePropertiesPredicate.Builder.properties()
+                                .hasProperty(DungeonBannerBlock.VARIANT, variant))));
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {

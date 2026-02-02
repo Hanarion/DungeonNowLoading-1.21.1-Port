@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.datagen.provider;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.block.property.RedstoneLaneMode;
+import dev.hexnowloading.dungeonnowloading.datagen.provider.blockitemstategenerators.BannerBlockItemGen;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
@@ -113,6 +114,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());
         //simpleRandomBlockWithItem(DNLBlocks.MOSS.get(), 5);
+        new BannerBlockItemGen(this).dungeonBanners(DNLBlocks.DUNGEON_BANNER.get());
     }
 
     private void fenceGateBlockWithItem(FenceGateBlock block, Block parent) {
@@ -1088,7 +1090,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         return ForgeRegistries.BLOCKS.getKey(block);
     }
 
-    private String name(Block block) {
+    public String name(Block block) {
         return key(block).getPath();
     }
 

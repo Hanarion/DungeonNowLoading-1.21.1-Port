@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
 import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.client.preview.PreviewOverlayFabric;
@@ -83,6 +84,16 @@ public class DNLFabricClient implements ClientModInitializer {
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.PLAYER_STATUE.get(), PlayerStatueItemRenderer.getInstance()::renderByItem);
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.GAUNTLET.get(), GauntletItemRenderer.getInstance()::renderByItem);
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.GAUNTLET_VAULT.get(), GauntletVaultItemRenderer.getInstance()::renderByItem);
+        for (DungeonBannerBlock.DungeonBannerVariant variant : DungeonBannerBlock.DungeonBannerVariant.values()) {
+            BuiltinItemRendererRegistry.INSTANCE.register(
+                    DNLItems.getBannerItem(variant).get(),
+                    (stack, displayContext, poseStack, buffer, light, overlay) -> {
+                        DungeonBannerBlockItemRenderer.getInstance()
+                                .renderByItem(stack, displayContext, poseStack, buffer, light, overlay);
+                    }
+            );
+        }
+
 
         // Item
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
@@ -131,6 +142,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_CHEST.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_BANNER.get(), RenderType.cutout());
     }
 
 
@@ -183,6 +195,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockEntityRenderers.register(DNLBlockEntityTypes.GAUNTLET.get(), GauntletRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.GAUNTLET_VAULT.get(), GauntletVaultRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DUNGEON_DIRECTOR.get(), DungeonDirectorRenderer::new);
+        BlockEntityRenderers.register(DNLBlockEntityTypes.DUNGEON_BANNER.get(), DungeonBannerBlockRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
@@ -247,6 +260,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(GauntletModel.LAYER_LOCATION, GauntletModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(GauntletVaultModel.LAYER_LOCATION, GauntletVaultModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(DungeonBannerBlockModel.LAYER_LOCATION, DungeonBannerBlockModel::createBodyLayer);
 
         // Misc
         EntityModelLayerRegistry.registerModelLayer(SeepingSoulChaosSpawnerModel.LAYER_LOCATION, SeepingSoulChaosSpawnerModel::createBodyLayer);
@@ -283,4 +297,5 @@ public class DNLFabricClient implements ClientModInitializer {
             }
         }
     }
+
 }
