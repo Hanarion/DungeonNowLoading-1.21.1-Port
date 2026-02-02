@@ -37,19 +37,16 @@ public class SealedChaosAttackGoal extends Goal {
 
     @Override
     public void start() {
-        // On goal start, reset state and require at least one aim tick before firing
-        this.attackTick = 5; // small warm-up before first possible shot
-        this.remainingPulseShots = 0;
-        this.pulseCooldown = 0;
-        this.lastPulseDirection = null;
+        // Warm-up before first possible shot.
+        // Important: do NOT clear any in-progress pulse sequence here, otherwise retargeting
+        // (which restarts goals) will wipe the remaining burst and feel broken.
+        this.attackTick = 5;
         this.hasAimedOnce = false;
     }
 
     @Override
     public void stop() {
-        this.remainingPulseShots = 0;
-        this.pulseCooldown = 0;
-        this.lastPulseDirection = null;
+        // Don't hard-reset pulse state on stop; it causes pulse bursts to be lost on retarget.
         this.hasAimedOnce = false;
     }
 
@@ -57,23 +54,36 @@ public class SealedChaosAttackGoal extends Goal {
     public void tick() {
         super.tick();
         LivingEntity target = this.sealedChaosEntity.getTarget();
+
+        // If we fully lose the target (or it died), cancel any stored pulse burst.
+        // We still preserve burst state across retargets (target swap while still non-null),
+        // but not across "no target" periods.
+        if (target == null || !target.isAlive()) {
+            this.remainingPulseShots = 0;
+            this.pulseCooldown = 0;
+            this.lastPulseDirection = null;
+            this.hasAimedOnce = false;
+            return;
+        }
+
         if (target != null) {
             this.sealedChaosEntity.getLookControl().setLookAt(target, 30.0F, 30.0F);
             this.hasAimedOnce = true; // we've spent at least one tick aiming at the current target
         }
 
-        // Handle ongoing pulse sequence if any (continues even while attackTick is > 0)
+        // Handle ongoing pulse sequence.
         if (this.remainingPulseShots > 0) {
             if (this.pulseCooldown > 0) {
                 this.pulseCooldown--;
             } else {
-                // Fire next pulse shot straight ahead using stored direction
                 firePulseShot();
                 this.remainingPulseShots--;
-                this.pulseCooldown = PULSE_INTERVAL_TICKS;
-                // When we've just fired the last pulse shot, start the main cooldown now
+
+                int pulseInterval = Math.max(1, PULSE_INTERVAL_TICKS - (this.sealedChaosEntity.getOverworkedLevel() >= 3 ? 1 : 0));
+                this.pulseCooldown = pulseInterval;
+
+                // When the burst ends, keep whatever attackTick is currently set to (it was set when the burst started).
                 if (this.remainingPulseShots == 0) {
-                    this.attackTick = this.shootIntervalTick;
                     this.lastPulseDirection = null;
                 }
             }
@@ -101,46 +111,43 @@ public class SealedChaosAttackGoal extends Goal {
         if (overworkedLevel <= 0) {
             return base;
         }
-        // 20% faster per level => interval * (1 - 0.2 * level)
-        float factor = 1.0F - 0.2F * overworkedLevel;
-        if (factor < 0.2F) {
-            factor = 0.2F; // cap at 80% reduction (very fast but not zero)
-        }
-        return Math.max(3, (int)(base * factor));
+
+        // Overworked speeds up firing: -12% interval per level.
+        // L5 => ~0.4x interval (2.5x fire rate), clamped to at least 2 ticks.
+        float factor = 1.0F - 0.12F * overworkedLevel;
+        return Math.max(2, (int) (base * factor));
     }
 
     private void performEnchantedShot(LivingEntity target) {
         int arcLevel = this.sealedChaosEntity.getArcShotLevel();
         int pulseLevel = this.sealedChaosEntity.getPulseShotLevel();
 
-        // Determine total bullets based on highest relevant level
         int effectiveLevel = Math.max(arcLevel, pulseLevel);
         int totalBullets = bulletsForLevel(effectiveLevel);
-
-        // Play the shot sound once per attack, before spawning any projectiles
-        playShotSound();
 
         int interval = getEffectiveShootInterval();
 
         if (arcLevel > 0 && effectiveLevel > 0) {
-            // Arc pattern: fire all bullets at once in an arc, then start cooldown immediately
-            performArcShot(totalBullets, target, false);
+            // Arc pattern: fire all bullets at once; sound per bullet.
+            performArcShot(totalBullets, target, true);
             this.attackTick = interval;
         } else if (pulseLevel > 0 && effectiveLevel > 0) {
-            // Pulse pattern: fire one now, queue the rest; cooldown will start after last pulse
-            if (performStraightShotIfValid(target, false)) {
+            // Pulse pattern: sound per bullet.
+            if (performStraightShotIfValid(target, true)) {
                 this.remainingPulseShots = totalBullets - 1;
-                this.pulseCooldown = PULSE_INTERVAL_TICKS;
-                // Capture the direction we used for the first pulse so the rest continue even if target dies
+                // Overworked also speeds up pulse spacing slightly.
+                int pulseInterval = Math.max(1, PULSE_INTERVAL_TICKS - (this.sealedChaosEntity.getOverworkedLevel() >= 3 ? 1 : 0));
+                this.pulseCooldown = pulseInterval;
                 this.lastPulseDirection = this.sealedChaosEntity.getViewVector(1.0F).normalize();
+
+                // IMPORTANT: set the interval *now* so it's preserved even if goals restart mid-burst.
+                this.attackTick = interval;
             } else {
-                // If we couldn't fire the first shot, just fall back to normal single shot + cooldown
-                performSingleShot(target, false);
+                performSingleShot(target, true);
                 this.attackTick = interval;
             }
         } else {
-            // No relevant enchantment, keep original single-shot behavior
-            performSingleShot(target, false);
+            performSingleShot(target, true);
             this.attackTick = interval;
         }
     }
@@ -193,13 +200,13 @@ public class SealedChaosAttackGoal extends Goal {
                 && this.sealedChaosEntity.getLookControl().isLookingAtTarget())) {
             return;
         }
-        if (playSound) {
-            playShotSound();
-        }
         // Symmetric angles around 0
         float stepDegrees = 10.0F;
         float center = (totalBullets - 1) / 2.0F;
         for (int i = 0; i < totalBullets; i++) {
+            if (playSound) {
+                playShotSound();
+            }
             float offsetIndex = i - center;
             float angle = offsetIndex * stepDegrees;
             vecFromCenterToFrontOfFace(angle, null);
@@ -207,10 +214,13 @@ public class SealedChaosAttackGoal extends Goal {
     }
 
     private void firePulseShot() {
-        // Use stored direction if available; otherwise fall back to current view
         Vec3 direction = this.lastPulseDirection != null
                 ? this.lastPulseDirection
                 : this.sealedChaosEntity.getViewVector(1.0F).normalize();
+
+        // Each pulse shot should produce sound.
+        playShotSound();
+
         vecFromCenterToFrontOfFace(0.0F, direction);
     }
 

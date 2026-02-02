@@ -16,9 +16,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
@@ -113,35 +111,47 @@ public class SpawnerArmorItem extends ArmorItem {
 
     private void summonMob(Level level, BlockPos entityPos, Player owner) {
         RandomSource randomSource = level.getRandom();
-        EntityType<Zombie> spawningEntity = EntityType.ZOMBIE;
         double x = entityPos.getX() + (randomSource.nextDouble() - randomSource.nextDouble()) * (double)this.spawnRange + 0.5;
         double y = entityPos.getY() + randomSource.nextInt(3) - 1;
         double z = entityPos.getZ() + (randomSource.nextDouble() - randomSource.nextDouble()) * (double)this.spawnRange + 0.5;
-        if (level.noCollision(spawningEntity.getAABB(x, y, z))) {
-            ((ServerLevel) level).sendParticles(ParticleTypes.POOF, x + 0.5F, y + 0.5F, z + 0.5F, 20, 0.3D, 0.3D, 0.3D, 0.0D);
-            ((ServerLevel) level).sendParticles(ParticleTypes.FLAME, x + 0.5F, y + 0.5F, z + 0.5F, 10, 0.3D, 0.3D, 0.3D, 0.0D);
-            WhimperEntity whimper = DNLEntityTypes.WHIMPER.get().create(level);
-            if (whimper != null) {
-                whimper.moveTo(x, y, z, 0.0F, 0.0F);
-                whimper.setOwnerUUID(owner.getUUID());
-                ItemStack helmetStack = owner.getInventory().getArmor(3);
-                int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), helmetStack);
-                if (gigantismLevel > 0) {
-                    whimper.setGigantic(true);
-                }
-                int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), helmetStack);
-                whimper.setOverworkedLevel(overworkedLevel);
-                if (overworkedLevel > 0) {
-                    whimper.applyOverworkedAttackSpeedBonus();
-                }
 
-                level.addFreshEntity(whimper);
+        WhimperEntity whimper = DNLEntityTypes.WHIMPER.get().create(level);
+        if (whimper == null) {
+            return;
+        }
 
-                // Refresh owner penalty after the summon is actually alive in the world.
-                if (level instanceof ServerLevel serverLevel) {
-                    OverworkedPenaltyUtil.refreshOwnerPenalty(serverLevel, owner);
-                }
-            }
+        whimper.moveTo(x, y, z, 0.0F, 0.0F);
+        whimper.setOwnerUUID(owner.getUUID());
+
+        ItemStack helmetStack = owner.getInventory().getArmor(3);
+
+        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), helmetStack);
+        if (gigantismLevel > 0) {
+            whimper.setGigantic(true);
+        }
+
+        // Prevent spawn if there is not enough free space for its (possibly gigantic) bounding box
+        if (!level.noCollision(whimper)) {
+            return;
+        }
+
+        // Particles only for successful spawns
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(ParticleTypes.POOF, x + 0.5F, y + 0.5F, z + 0.5F, 20, 0.3D, 0.3D, 0.3D, 0.0D);
+            serverLevel.sendParticles(ParticleTypes.FLAME, x + 0.5F, y + 0.5F, z + 0.5F, 10, 0.3D, 0.3D, 0.3D, 0.0D);
+        }
+
+        int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), helmetStack);
+        whimper.setOverworkedLevel(overworkedLevel);
+        if (overworkedLevel > 0) {
+            whimper.applyOverworkedAttackSpeedBonus();
+        }
+
+        level.addFreshEntity(whimper);
+
+        // Refresh owner penalty after the summon is actually alive in the world.
+        if (level instanceof ServerLevel serverLevel) {
+            OverworkedPenaltyUtil.refreshOwnerPenalty(serverLevel, owner);
         }
     }
 

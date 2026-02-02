@@ -28,7 +28,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
@@ -42,6 +41,8 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Integer> PULSE_SHOT_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
+
+    private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
 
     public SealedChaosEntity(EntityType<? extends SealedChaosEntity> entityType, Level level) {
         super(entityType, level);
@@ -128,6 +129,9 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         if (compoundTag.contains("OverworkedLevel")) {
             this.setOverworkedLevel(compoundTag.getInt("OverworkedLevel"));
         }
+
+        // Ensure attributes are consistent after loading.
+        this.applyGigantismHealthBonus();
     }
 
     @Override
@@ -208,6 +212,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         if (GIGANTIC.equals(key)) {
             // When gigantic flag changes on the client, recompute dimensions/eye height
             this.refreshDimensions();
+            this.applyGigantismHealthBonus();
         }
     }
 
@@ -247,6 +252,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     public void setGigantic(boolean gigantic) {
         this.entityData.set(GIGANTIC, gigantic);
         this.refreshDimensions();
+        this.applyGigantismHealthBonus();
     }
 
     public int getOverworkedLevel() {
@@ -278,6 +284,42 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
                         bonus,
                         AttributeModifier.Operation.MULTIPLY_TOTAL
                 ));
+            }
+        }
+    }
+
+    private void applyGigantismHealthBonus() {
+        if (this.level() != null && this.level().isClientSide) {
+            return;
+        }
+
+        AttributeInstance maxHealth = this.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealth == null) return;
+
+        double beforeMax = this.getMaxHealth();
+
+        AttributeModifier existing = maxHealth.getModifier(GIGANTISM_MAX_HEALTH_MODIFIER_ID);
+        if (existing != null) {
+            maxHealth.removeModifier(existing);
+        }
+
+        if (this.isGigantic()) {
+            maxHealth.addTransientModifier(new AttributeModifier(
+                    GIGANTISM_MAX_HEALTH_MODIFIER_ID,
+                    "dnl_gigantism_max_health",
+                    0.5D,
+                    AttributeModifier.Operation.MULTIPLY_TOTAL
+            ));
+        }
+
+        double afterMax = this.getMaxHealth();
+        float gain = (float) (afterMax - beforeMax);
+
+        if (gain > 0.0F) {
+            this.setHealth(Math.min((float) afterMax, this.getHealth() + gain));
+        } else {
+            if (this.getHealth() > afterMax) {
+                this.setHealth((float) afterMax);
             }
         }
     }

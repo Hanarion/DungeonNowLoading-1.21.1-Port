@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.Copp
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import dev.hexnowloading.dungeonnowloading.util.SummonFlag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -44,6 +45,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
 
     private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> OVERWORKED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.INT);
 
     @Nullable
     @Override
@@ -136,6 +138,8 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
     private AnimationChainer<CopperCreepAnimationState> animationChainer = new AnimationChainer<>();
     public State currentState;
 
+    private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
+
     public CopperCreepEntity(EntityType<? extends CopperCreepEntity> entityType, Level level) {
         super(entityType, level);
         this.xpReward = 0;
@@ -208,6 +212,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         this.entityData.define(SKIN_VALIDATION, false);
         this.entityData.define(GIGANTIC, false);
         this.entityData.define(OVERWORKED, false);
+        this.entityData.define(OVERWORKED_LEVEL, 0);
     }
 
     @Override
@@ -226,6 +231,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         compoundTag.putString("skin", getSkin().getId());
         compoundTag.putBoolean("Gigantic", this.isGigantic());
         compoundTag.putBoolean("Overworked", this.isOverworked());
+        compoundTag.putInt("OverworkedLevel", this.getOverworkedLevel());
     }
 
     @Override
@@ -263,6 +269,10 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         if (compoundTag.contains("Overworked")) {
             this.setOverworked(compoundTag.getBoolean("Overworked"));
         }
+        if (compoundTag.contains("OverworkedLevel")) {
+            this.setOverworkedLevel(compoundTag.getInt("OverworkedLevel"));
+        }
+        this.applyGigantismHealthBonus();
     }
 
     //    @Override
@@ -360,6 +370,43 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
     public void setGigantic(boolean gigantic) {
         this.entityData.set(GIGANTIC, gigantic);
         this.refreshDimensions();
+        this.applyGigantismHealthBonus();
+    }
+
+    private void applyGigantismHealthBonus() {
+        if (this.level() != null && this.level().isClientSide) {
+            return;
+        }
+
+        AttributeInstance maxHealth = this.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealth == null) return;
+
+        double beforeMax = this.getMaxHealth();
+
+        AttributeModifier existing = maxHealth.getModifier(GIGANTISM_MAX_HEALTH_MODIFIER_ID);
+        if (existing != null) {
+            maxHealth.removeModifier(existing);
+        }
+
+        if (this.isGigantic()) {
+            maxHealth.addTransientModifier(new AttributeModifier(
+                    GIGANTISM_MAX_HEALTH_MODIFIER_ID,
+                    "dnl_gigantism_max_health",
+                    0.5D,
+                    AttributeModifier.Operation.MULTIPLY_TOTAL
+            ));
+        }
+
+        double afterMax = this.getMaxHealth();
+        float gain = (float) (afterMax - beforeMax);
+
+        if (gain > 0.0F) {
+            this.setHealth(Math.min((float) afterMax, this.getHealth() + gain));
+        } else {
+            if (this.getHealth() > afterMax) {
+                this.setHealth((float) afterMax);
+            }
+        }
     }
 
     public boolean isOverworked() {
@@ -368,6 +415,16 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
 
     public void setOverworked(boolean value) {
         this.entityData.set(OVERWORKED, value);
+    }
+
+    public int getOverworkedLevel() {
+        return this.entityData.get(OVERWORKED_LEVEL);
+    }
+
+    public void setOverworkedLevel(int level) {
+        int clamped = Math.max(0, Math.min(5, level));
+        this.entityData.set(OVERWORKED_LEVEL, clamped);
+        this.setOverworked(clamped > 0);
     }
 
     @Override
@@ -392,21 +449,25 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
             this.entityData.set(DATA_IS_ALREADY_SUMMONED, true);
         }
 
-        if (this.isOverworked()) {
-            // Overworked creeps move more aggressively when they have a target: apply a temporary speed boost
-            if (this.getTarget() != null && !this.isDefused()) {
-                AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
-                if (moveSpeedAttr != null) {
-                    UUID overworkedSpeedId = UUID.nameUUIDFromBytes("dnl_overworked_speed".getBytes());
-                    if (moveSpeedAttr.getModifier(overworkedSpeedId) == null) {
-                        moveSpeedAttr.addTransientModifier(new AttributeModifier(
-                                overworkedSpeedId,
-                                "dnl_overworked_speed",
-                                0.2D,
-                                AttributeModifier.Operation.MULTIPLY_TOTAL
-                        ));
-                    }
-                }
+        // Overworked: scale movement speed. Lvl 5 => 2x speed (= +100%).
+        AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (moveSpeedAttr != null) {
+            UUID overworkedSpeedId = UUID.nameUUIDFromBytes("dnl_overworked_speed".getBytes());
+            AttributeModifier existing = moveSpeedAttr.getModifier(overworkedSpeedId);
+            if (existing != null) {
+                moveSpeedAttr.removeModifier(existing);
+            }
+
+            if (this.isOverworked() && this.getTarget() != null && !this.isDefused()) {
+                int level = this.getOverworkedLevel();
+                if (level <= 0) level = 1;
+                double bonus = 0.2D * Math.max(1, Math.min(5, level));
+                moveSpeedAttr.addTransientModifier(new AttributeModifier(
+                        overworkedSpeedId,
+                        "dnl_overworked_speed",
+                        bonus,
+                        AttributeModifier.Operation.MULTIPLY_TOTAL
+                ));
             }
         }
 
@@ -734,6 +795,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         }
         if (GIGANTIC.equals(entityDataAccessor)) {
             this.refreshDimensions();
+            this.applyGigantismHealthBonus();
         }
         super.onSyncedDataUpdated(entityDataAccessor);
     }
@@ -914,6 +976,17 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
 //                this.mob.swing(InteractionHand.MAIN_HAND);
 //                this.mob.doHurtTarget($$0);
 //            }
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        UUID owner = this.getOwnerUUID();
+        boolean overworked = this.isOverworked();
+        super.remove(reason);
+
+        if (!this.level().isClientSide && owner != null && overworked) {
+            OverworkedPenaltyUtil.refreshOwnerPenaltyIfPossible(this.level(), owner);
         }
     }
 }

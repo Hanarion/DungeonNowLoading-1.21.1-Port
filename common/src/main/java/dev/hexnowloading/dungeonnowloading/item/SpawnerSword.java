@@ -27,11 +27,16 @@ public class SpawnerSword extends SwordItem {
     public boolean hurtEnemy(ItemStack itemStack, LivingEntity target, LivingEntity attacker) {
         boolean result = super.hurtEnemy(itemStack, target, attacker);
         if (result && !target.level().isClientSide) {
-            // Base self-damage only when Reckless is NOT present; Reckless handles its own self-damage
             int recklessLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.RECKLESS.get(), attacker.getMainHandItem());
-            if (recklessLevel == 0 && attacker.getHealth() > 1.0F) {
-                attacker.hurt(attacker.damageSources().generic(), 1.0F);
+            float selfDamage = 1.0F + recklessLevel;
+
+            // Don't self-damage in creative/spectator.
+            if (attacker instanceof Player player && (player.getAbilities().instabuild || player.isSpectator())) {
+                return true;
             }
+
+            // Always apply: 1 + reckless level.
+            attacker.hurt(attacker.damageSources().magic(), selfDamage);
         }
         return result;
     }
@@ -45,15 +50,6 @@ public class SpawnerSword extends SwordItem {
         if (recklessLevel > 0 && damage > 0.0F) {
             // Increase outgoing damage: +2 * level
             damage += 2.0F * recklessLevel;
-
-            // Apply self-damage: 1 * level, but not in creative/spectator and only if enough health to survive
-            if (attacker instanceof Player player) {
-                if (!player.getAbilities().instabuild && attacker.getHealth() > recklessLevel) {
-                    attacker.hurt(attacker.damageSources().magic(), recklessLevel);
-                }
-            } else if (attacker.getHealth() > recklessLevel) {
-                attacker.hurt(attacker.damageSources().magic(), recklessLevel);
-            }
         }
         return damage;
     }

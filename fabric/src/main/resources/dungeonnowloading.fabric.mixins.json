@@ -28,7 +28,6 @@
     "fabric.block.BucketItemMixin",
     "fabric.block.FlintAndSteelMixin",
     "fabric.entities.LivingDamageMixin",
-    "fabric.entities.PlayerDamageMixin",
     "fabric.structures.StructurePoolMixin",
     "structures.StructureProcessorAccessor",
     "structures.StructureTemplateMixin",

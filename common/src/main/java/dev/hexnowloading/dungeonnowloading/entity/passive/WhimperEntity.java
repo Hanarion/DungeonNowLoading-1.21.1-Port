@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperChargeAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperRandomMoveGoal;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +18,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.LookControl;
@@ -40,6 +42,8 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.INT);
+
+    private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
 
     public WhimperEntity(EntityType<? extends WhimperEntity> entityType, Level level) {
         super(entityType, level);
@@ -124,6 +128,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
             compoundTag.putUUID("Owner", this.getOwnerUUID());
         }
         compoundTag.putBoolean("Gigantic", this.isGigantic());
+        compoundTag.putInt("OverworkedLevel", this.getOverworkedLevel());
     }
 
     @Override
@@ -143,6 +148,13 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         if (compoundTag.contains("Gigantic")) {
             this.setGigantic(compoundTag.getBoolean("Gigantic"));
         }
+        if (compoundTag.contains("OverworkedLevel")) {
+            this.setOverworkedLevel(compoundTag.getInt("OverworkedLevel"));
+        }
+
+        // Ensure attributes are consistent after loading.
+        this.applyGigantismHealthBonus();
+        this.applyOverworkedAttackSpeedBonus();
     }
 
     @Override
@@ -227,6 +239,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     public void setGigantic(boolean gigantic) {
         this.entityData.set(GIGANTIC, gigantic);
         this.refreshDimensions();
+        this.applyGigantismHealthBonus();
     }
 
     public int getOverworkedLevel() {
@@ -236,6 +249,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     public void setOverworkedLevel(int level) {
         int clamped = Math.max(0, Math.min(5, level));
         this.entityData.set(OVERWORKED_LEVEL, clamped);
+        this.applyOverworkedAttackSpeedBonus();
     }
 
     public boolean isOverworked() {
@@ -247,14 +261,49 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         super.onSyncedDataUpdated(key);
         if (GIGANTIC.equals(key)) {
             this.refreshDimensions();
+            // Server owns attributes, but this is harmless if called client-side.
+            this.applyGigantismHealthBonus();
         }
     }
 
+    private void applyGigantismHealthBonus() {
+        // Attributes are authoritative server-side.
+        if (this.level() != null && this.level().isClientSide) {
+            return;
+        }
 
+        AttributeInstance maxHealth = this.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealth == null) return;
 
-    @Override
-    public boolean isPushable() {
-        return true;
+        double beforeMax = this.getMaxHealth();
+
+        AttributeModifier existing = maxHealth.getModifier(GIGANTISM_MAX_HEALTH_MODIFIER_ID);
+        if (existing != null) {
+            maxHealth.removeModifier(existing);
+        }
+
+        if (this.isGigantic()) {
+            // +50% max health. Use a transient modifier so it takes effect immediately after spawn and doesn't depend on NBT.
+            maxHealth.addTransientModifier(new AttributeModifier(
+                    GIGANTISM_MAX_HEALTH_MODIFIER_ID,
+                    "dnl_gigantism_max_health",
+                    0.5D,
+                    AttributeModifier.Operation.MULTIPLY_TOTAL
+            ));
+        }
+
+        double afterMax = this.getMaxHealth();
+        float gain = (float) (afterMax - beforeMax);
+
+        // If gigantism increased max HP, heal by that gained amount (so it actually becomes harder to kill).
+        if (gain > 0.0F) {
+            this.setHealth(Math.min((float) afterMax, this.getHealth() + gain));
+        } else {
+            // Otherwise clamp to max.
+            if (this.getHealth() > afterMax) {
+                this.setHealth((float) afterMax);
+            }
+        }
     }
 
     // DNL_OVERWORKED_PATCH_BEGIN

@@ -6,10 +6,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 
-/**
- * Durable: armor-only enchantment that reduces durability loss by requiring multiple "hits"
- * per durability point.
- */
 public class DurableEnchantment extends Enchantment {
     public DurableEnchantment(Rarity rarity, EquipmentSlot... slots) {
         super(rarity, EnchantmentCategory.ARMOR, slots);

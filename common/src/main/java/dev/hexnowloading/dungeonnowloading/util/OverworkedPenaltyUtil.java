@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.util;
 
+import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -51,6 +52,20 @@ public final class OverworkedPenaltyUtil {
                     e -> e.isAlive() && owner.getUUID().equals(e.getOwnerUUID()) && e.getOverworkedLevel() > 0
             )) {
                 maxLevel = Math.max(maxLevel, s.getOverworkedLevel());
+                if (maxLevel >= 5) break;
+            }
+        }
+
+        // Copper Creep also counts toward the owner's overworked penalty.
+        if (maxLevel < 5) {
+            for (CopperCreepEntity c : level.getEntitiesOfClass(
+                    CopperCreepEntity.class,
+                    owner.getBoundingBox().inflate(128.0D),
+                    e -> e.isAlive()
+                            && e.getSummonerUUID().filter(uuid -> uuid.equals(owner.getUUID())).isPresent()
+                            && e.getOverworkedLevel() > 0
+            )) {
+                maxLevel = Math.max(maxLevel, c.getOverworkedLevel());
                 if (maxLevel >= 5) break;
             }
         }
