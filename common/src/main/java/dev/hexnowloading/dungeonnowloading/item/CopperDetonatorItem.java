@@ -115,11 +115,23 @@ public class CopperDetonatorItem extends Item {
         List<CopperCreepEntity> creepsInRange = findNearbyCreeps(player, TRIGGER_RADIUS);
 
         if (usedTime <= MODE_SWITCH_TIMING) {
-            if (creepsInRange.size() < 3 && consumeCopperBlockIfAvailable(player)) {
-                launchCreep(level, player, itemStack);
-                player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
-                itemStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(player1.getUsedItemHand()));
-                player.swing(hand);
+            if (creepsInRange.size() < 3) {
+                // First, check whether there is enough space to spawn (including gigantism size) *before* consuming resources.
+                if (!canSpawnCreepHere(level, player, itemStack)) {
+                    if (!level.isClientSide) {
+                        player.displayClientMessage(Component.literal("Not enough space for summon").withStyle(ChatFormatting.RED), true);
+                    }
+                    player.getCooldowns().addCooldown(this, 20);
+                    return;
+                }
+
+                // Only consume copper block after we know the spawn will succeed.
+                if (consumeCopperBlockIfAvailable(player)) {
+                    launchCreep(level, player, itemStack);
+                    player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
+                    itemStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(player1.getUsedItemHand()));
+                    player.swing(hand);
+                }
             }
         } else {
             if (!creepsInRange.isEmpty()) {
@@ -228,5 +240,23 @@ public class CopperDetonatorItem extends Item {
             components.add(Component.translatable("item.dungeonnowloading.copper_detonator.tooltip.hold_right_mouse_button").withStyle(ChatFormatting.GRAY));
             components.add(Component.translatable("item.dungeonnowloading.copper_detonator.tooltip.hold_right_mouse_button.description").withStyle(ChatFormatting.DARK_GREEN));
         }
+    }
+
+    private boolean canSpawnCreepHere(Level level, Player player, ItemStack detonatorStack) {
+        CopperCreepEntity creep = DNLEntityTypes.COPPER_CREEP.get().create(level);
+        if (creep == null) return false;
+
+        double offset = 1.0;
+        double launchX = player.getX() - Math.sin(Math.toRadians(player.getYRot())) * offset;
+        double launchY = player.getY() + player.getEyeHeight() * 0.6;
+        double launchZ = player.getZ() + Math.cos(Math.toRadians(player.getYRot())) * offset;
+        creep.moveTo(launchX, launchY, launchZ, player.getYRot(), player.getXRot());
+
+        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), detonatorStack);
+        if (gigantismLevel > 0) {
+            creep.setGigantic(true);
+        }
+
+        return level.noCollision(creep);
     }
 }

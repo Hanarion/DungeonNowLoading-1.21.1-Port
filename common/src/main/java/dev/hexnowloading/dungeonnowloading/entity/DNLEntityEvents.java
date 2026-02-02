@@ -35,12 +35,14 @@ public class DNLEntityEvents {
         for (WhimperEntity whimper : player.level().getEntitiesOfClass(WhimperEntity.class, player.getBoundingBox().inflate(radius))) {
             if (player.getUUID().equals(whimper.getOwnerUUID())) {
                 whimper.setTarget(target);
+                whimper.setLastHurtByMob(target);
             }
         }
 
         for (SealedChaosEntity chaos : player.level().getEntitiesOfClass(SealedChaosEntity.class, player.getBoundingBox().inflate(radius))) {
-            if (player.getUUID().equals(chaos.getOwnerUUID())) {
+            if (chaos.getOwnerUUID() != null && player.getUUID().equals(chaos.getOwnerUUID())) {
                 chaos.setTarget(target);
+                chaos.setLastHurtByMob(target);
             }
         }
 
@@ -48,6 +50,7 @@ public class DNLEntityEvents {
             // Copper Creep uses summoner UUID as owner
             if (creep.getSummonerUUID().filter(id -> id.equals(player.getUUID())).isPresent()) {
                 creep.setTarget(target);
+                creep.setLastHurtByMob(target);
             }
         }
     }
