@@ -1,7 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.block.client.renderer;
 
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
 import dev.hexnowloading.dungeonnowloading.block.client.model.DungeonBannerBlockModel;
@@ -54,26 +56,26 @@ public class DungeonBannerBlockItemRenderer extends BlockEntityWithoutLevelRende
         // These transforms are "good defaults". Tweak to taste.
         switch (ctx) {
             case GUI -> {
-                poseStack.translate(0.5, 0.5, 0.0);
-                poseStack.scale(1.0f, 1.0f, 1.0f);
+                Lighting.setupForFlatItems();
+                poseStack.translate(0.8, 0.8, 0.0);   // center-ish for GUI
+                poseStack.scale(0.6F, -0.6F, -0.6F); // <-- FIX
+                poseStack.mulPose(Axis.YP.rotationDegrees(200f));
             }
             case FIXED -> {
-                poseStack.translate(0.5, 0.5, 0.5);
-                poseStack.scale(0.9f, 0.9f, 0.9f);
+                poseStack.translate(0.5, 0.6, 0.2);
+                poseStack.scale(0.9f, -0.9f, -0.9f);
+                poseStack.mulPose(Axis.YP.rotationDegrees(180f));
             }
             case GROUND -> {
-                poseStack.translate(0.5, 0.25, 0.5);
-                poseStack.scale(0.7f, 0.7f, 0.7f);
+                poseStack.translate(0.5, 0.5, 14F/16F);
+                poseStack.scale(0.9f, -0.9f, -0.9f);
             }
             default -> {
-                poseStack.translate(0.5, 0.5, 0.5);
-                poseStack.scale(0.85f, 0.85f, 0.85f);
+                poseStack.translate(0.5, 0.75, 0.5);
+                poseStack.scale(0.85f, -0.85f, -0.85f);
+                poseStack.mulPose(Axis.YP.rotationDegrees(110f));
             }
         }
-
-        // If your model was authored assuming block-space (like your block renderer),
-        // you may want to rotate it so it faces the camera nicely in GUI:
-        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180f));
 
         RenderType type = RenderType.entityCutoutNoCull(tex);
         VertexConsumer vc = buffer.getBuffer(type);

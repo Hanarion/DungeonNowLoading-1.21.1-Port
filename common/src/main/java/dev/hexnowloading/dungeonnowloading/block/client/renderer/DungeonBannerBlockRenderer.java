@@ -64,10 +64,12 @@ public class DungeonBannerBlockRenderer implements BlockEntityRenderer<DungeonBa
             case EAST  -> -90f;
             default -> 0f;
         };
-        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yRot));
 
-        // Back to block-space
-        poseStack.translate(-0.5, -0.5, -0.5);
+        poseStack.translate(0, (float) -10 /16, 0);
+
+        poseStack.scale(1.0F, -1.0F, -1.0F);
+
+        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yRot));
 
         ResourceLocation tex = TEX.get(variant);
         if (tex == null) return; // safety
@@ -75,8 +77,31 @@ public class DungeonBannerBlockRenderer implements BlockEntityRenderer<DungeonBa
         RenderType type = RenderType.entityCutoutNoCull(tex);
         VertexConsumer vc = bufferSource.getBuffer(type);
 
+        waverBanner(be, partialTick);
+
         model.renderToBuffer(poseStack, vc, packedLight, packedOverlay, 1f, 1f, 1f, 1f);
 
         poseStack.popPose();
+    }
+
+    private void waverBanner(DungeonBannerBlockEntity be, float partialTick) {
+        float time = 0.0F;
+        if (be.getLevel() != null) {
+            long gameTime = be.getLevel().getGameTime();
+            var pos = be.getBlockPos();
+
+            // vanilla-like per-block phase (stable between sessions)
+            float phase = (float) Math.floorMod(
+                    (long)(pos.getX() * 7 + pos.getY() * 9 + pos.getZ() * 13) + gameTime,
+                    100L
+            );
+
+            time = (phase + partialTick) / 100.0F; // 0..1 looping
+        }
+
+        float wave = (-0.0125F + 0.01F * net.minecraft.util.Mth.cos((float)(Math.PI * 2.0) * time))
+                * (float)Math.PI;
+
+        model.setWave(wave);
     }
 }

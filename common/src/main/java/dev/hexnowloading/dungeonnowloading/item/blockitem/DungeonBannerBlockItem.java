@@ -30,6 +30,6 @@ public class DungeonBannerBlockItem extends BlockItem {
 
     @Override
     public String getDescriptionId(ItemStack stack) {
-        return "item." + DungeonNowLoading.MOD_ID + "." + this.getVariant().getSerializedName();
+        return "item." + DungeonNowLoading.MOD_ID + ".dungeon_banner_" + this.variant.getSerializedName();
     }
 }

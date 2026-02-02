@@ -46,4 +46,10 @@ public class DungeonBannerBlockModel extends Model {
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         BANNER.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
+
+    public void setWave(float xRotRad) {
+        this.Flag.xRot = xRotRad;
+        // optional: match vanilla "hang point" feel (tweak if needed)
+        // this.Flag.y = -32.0F;
+    }
 }

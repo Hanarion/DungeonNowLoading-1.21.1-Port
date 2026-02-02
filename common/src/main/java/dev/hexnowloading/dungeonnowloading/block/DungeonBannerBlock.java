@@ -1,10 +1,14 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import dev.hexnowloading.dungeonnowloading.block.entity.DungeonBannerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.WallBannerBlock;
@@ -13,10 +17,19 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Map;
 
 public class DungeonBannerBlock extends WallBannerBlock implements EntityBlock {
     public static final EnumProperty<DungeonBannerVariant> VARIANT =
             EnumProperty.create("variant", DungeonBannerVariant.class);
+    private static final Map<Direction, VoxelShape> SHAPES = Maps.newEnumMap(ImmutableMap.of(
+            Direction.NORTH, Block.box(0.0, 2.0, 14.0, 16.0, 16, 16.0),
+            Direction.SOUTH, Block.box(0.0, 2.0, 0.0, 16.0, 16, 2.0),
+            Direction.WEST, Block.box(14.0, 2.0, 0.0, 16.0, 16, 16.0),
+            Direction.EAST, Block.box(0.0, 2.0, 0.0, 2.0, 16, 16.0)));
 
     public DungeonBannerBlock(DyeColor color, BlockBehaviour.Properties props) {
         super(color, props);
@@ -29,6 +42,10 @@ public class DungeonBannerBlock extends WallBannerBlock implements EntityBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(VARIANT);
+    }
+
+    public VoxelShape getShape(BlockState $$0, BlockGetter $$1, BlockPos $$2, CollisionContext $$3) {
+        return (VoxelShape)SHAPES.get($$0.getValue(FACING));
     }
 
     @Override
