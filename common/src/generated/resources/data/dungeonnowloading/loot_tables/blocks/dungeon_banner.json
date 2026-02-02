@@ -1,0 +1,168 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "spawner_magenta"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_spawner_magenta"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "spawner_black"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_spawner_black"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "spawner_blue"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_spawner_blue"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "spawner_purple"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_spawner_purple"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "spawner_green"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_spawner_green"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "hollow"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_hollow"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "spawner_carrier"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_spawner_carrier"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "experience_bottle"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_experience_bottle"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "chaos_spawner"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_chaos_spawner"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "whimper_lantern"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_whimper_lantern"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "garhold_upsidedown"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_garhold_upsidedown"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "dungeonnowloading:dungeon_banner",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "variant": "skull_of_chaos"
+              }
+            }
+          ],
+          "name": "dungeonnowloading:dungeon_banner_skull_of_chaos"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "dungeonnowloading:blocks/dungeon_banner"
+}
