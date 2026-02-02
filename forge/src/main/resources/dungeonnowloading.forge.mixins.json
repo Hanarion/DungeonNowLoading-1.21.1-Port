@@ -18,6 +18,7 @@
       "block.WallMixin",
       "block.IronBarsMixin",
       "items.ItemInHandRendererMixin",
+      "items.ItemStackDurableEnchantmentMixin",
       "entities.EntityAvoidBlockMixin",
       "entities.ServerPlayerMixin",
       "entities.PlayerMixin",
@@ -35,7 +36,6 @@
       "forge.blockentities.WiseFairkeeperChestBlockItemMixin",
       "forge.blockentities.FierceFairkeeperChestBlockItemMixin",
       "forge.blockentities.PlayerStatueBlockItemMixin",
-      "forge.item.ScorcherItemMixin",
       "forge.item.ScorcherItemMixin",
       "forge.block.AzuroLogBlockMixin",
       "inventory.AnvilMenuMixin"

@@ -20,6 +20,7 @@
     "block.IronBarsMixin",
     "items.ItemInHandRendererMixin",
     "items.ItemStackBreakProtectionMixin",
+    "items.ItemStackDurableEnchantmentMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",
@@ -29,7 +30,6 @@
     "fabric.block.BucketItemMixin",
     "fabric.block.FlintAndSteelMixin",
     "fabric.entities.LivingDamageMixin",
-    "fabric.entities.PlayerDamageMixin",
     "fabric.structures.StructurePoolMixin",
     "structures.StructureProcessorAccessor",
     "structures.StructureTemplateMixin",
@@ -53,4 +53,4 @@
   "injectors": {
     "defaultRequire": 1
   }
-  }
+}

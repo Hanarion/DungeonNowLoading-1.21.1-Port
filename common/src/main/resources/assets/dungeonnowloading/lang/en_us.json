@@ -430,4 +430,23 @@
   "item.dungeonnowloading.mimicling.tooltip.controls_1": "- Sneak + Right-click: change mode",
   "item.dungeonnowloading.mimicling.tooltip.controls_2": "- In inventory: hover Mimicling with an item to feed",
   "item.dungeonnowloading.mimicling.tooltip.controls_3": "- Feed slimeball to spit tools"
+  "enchantment.dungeonnowloading.break_protection.desc": "Upon item breaking, turns into repairable Item Scraps",
+  "enchantment.dungeonnowloading.durable": "Durable",
+  "enchantment.dungeonnowloading.durable.desc": "Reduces durability loss (4 + 2×level hits per 1 durability)",
+  "enchantment.dungeonnowloading.gigantism": "Gigantism",
+  "enchantment.dungeonnowloading.gigantism.desc": "Increases summoned mob size",
+  "enchantment.dungeonnowloading.commander": "Commander",
+  "enchantment.dungeonnowloading.commander.desc": "Allies attack the last mob you hit",
+  "enchantment.dungeonnowloading.overworked": "Overworked",
+  "enchantment.dungeonnowloading.overworked.desc": "Reduces max HP for summon more summon attack speed",
+  "enchantment.dungeonnowloading.pack_blessing": "Pack Blessing",
+  "enchantment.dungeonnowloading.pack_blessing.desc": "Having 2 Whimpers grants regeneration",
+  "enchantment.dungeonnowloading.arc_shot": "Arc Shot",
+  "enchantment.dungeonnowloading.arc_shot.desc": "Sealed Chaos Shoots in an arc",
+  "enchantment.dungeonnowloading.pulse_shot": "Pulse Shot",
+  "enchantment.dungeonnowloading.pulse_shot.desc": "Sealed Chaos Shoots in a series",
+  "enchantment.dungeonnowloading.sacrifice": "Sacrifice",
+  "enchantment.dungeonnowloading.sacrifice.desc": "Can hit allies to steal health from them",
+  "enchantment.dungeonnowloading.reckless": "Reckless",
+  "enchantment.dungeonnowloading.reckless.desc": "Take more damage to deal more damage"
 }

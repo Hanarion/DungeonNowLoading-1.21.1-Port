@@ -18,8 +18,17 @@ public class SealedChaosRenderer<T extends SealedChaosEntity> extends MobRendere
     }
 
     @Override
-    protected void scale(T t, PoseStack poseStack, float f) {
-        poseStack.scale(0.98F, 0.98F, 0.98F);
+    protected void scale(T entity, PoseStack poseStack, float partialTick) {
+        // Base scale so Sealed Chaos has presence even without Gigantism
+        float baseScale = 0.98F;
+        poseStack.scale(baseScale, baseScale, baseScale);
+
+        // If Gigantism is active, double the size visually to match the 2x hitbox
+        if (entity.isGigantic()) {
+            poseStack.scale(2.0F, 2.0F, 2.0F);
+        }
+
+        super.scale(entity, poseStack, partialTick);
     }
 
     @Override

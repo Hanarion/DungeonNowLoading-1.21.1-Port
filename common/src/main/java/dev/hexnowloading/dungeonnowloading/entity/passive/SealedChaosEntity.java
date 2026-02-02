@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.ai.SealedChaosAttackGoal;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +18,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
@@ -37,6 +40,12 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Integer> DESPAWN_TICK = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> BASIC = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> ARC_SHOT_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> PULSE_SHOT_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
+
+    private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
 
     public SealedChaosEntity(EntityType<? extends SealedChaosEntity> entityType, Level level) {
         super(entityType, level);
@@ -78,6 +87,10 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         super.defineSynchedData();
         this.entityData.define(DESPAWN_TICK, 600);
         this.entityData.define(OWNER_UUID, Optional.empty());
+        this.entityData.define(ARC_SHOT_LEVEL, 0);
+        this.entityData.define(PULSE_SHOT_LEVEL, 0);
+        this.entityData.define(GIGANTIC, false);
+        this.entityData.define(OVERWORKED_LEVEL, 0);
         this.entityData.define(BASIC, false);
     }
 
@@ -89,6 +102,10 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
             compoundTag.putUUID("Owner", this.getOwnerUUID());
         }
         compoundTag.putBoolean("Basic", this.isBasicVariant());
+        compoundTag.putInt("ArcShotLevel", this.getArcShotLevel());
+        compoundTag.putInt("PulseShotLevel", this.getPulseShotLevel());
+        compoundTag.putBoolean("Gigantic", this.isGigantic());
+        compoundTag.putInt("OverworkedLevel", this.getOverworkedLevel());
     }
 
     @Override
@@ -105,6 +122,21 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         if (uuid != null) {
             this.setOwnerUUID(uuid);
         }
+        if (compoundTag.contains("ArcShotLevel")) {
+            this.setArcShotLevel(compoundTag.getInt("ArcShotLevel"));
+        }
+        if (compoundTag.contains("PulseShotLevel")) {
+            this.setPulseShotLevel(compoundTag.getInt("PulseShotLevel"));
+        }
+        if (compoundTag.contains("Gigantic")) {
+            this.setGigantic(compoundTag.getBoolean("Gigantic"));
+        }
+        if (compoundTag.contains("OverworkedLevel")) {
+            this.setOverworkedLevel(compoundTag.getInt("OverworkedLevel"));
+        }
+
+        // Ensure attributes are consistent after loading.
+        this.applyGigantismHealthBonus();
         this.setBasicVariant(compoundTag.getBoolean("Basic"));
     }
 
@@ -163,8 +195,32 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return 0.5F;
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
+        // Base eye height as a fraction of current height so it scales naturally with size
+        return size.height * 0.8F;
+    }
+
+    @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        EntityDimensions base = super.getDimensions(pose);
+        return this.isGigantic() ? base.scale(2.0F) : base;
+    }
+
+    @Override
+    public double getMyRidingOffset() {
+        // Keep riding offset proportional to size
+        double base = super.getMyRidingOffset();
+        return this.isGigantic() ? base * 2.0D : base;
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (GIGANTIC.equals(key)) {
+            // When gigantic flag changes on the client, recompute dimensions/eye height
+            this.refreshDimensions();
+            this.applyGigantismHealthBonus();
+        }
     }
 
     @Override
@@ -172,6 +228,8 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         super.recreateFromPacket(clientboundAddEntityPacket);
         this.yBodyRot = 0.0F;
         this.yBodyRotO = 0.0F;
+        // Ensure initial dimensions on the client match current gigantic state
+        this.refreshDimensions();
     }
 
     @Override
@@ -185,6 +243,104 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     public UUID getOwnerUUID() { return (UUID) ((Optional) this.entityData.get(OWNER_UUID)).orElse((Object) null); }
 
     public void setOwnerUUID(UUID uuid) { this.entityData.set(OWNER_UUID, Optional.ofNullable(uuid));}
+
+    public int getArcShotLevel() { return this.entityData.get(ARC_SHOT_LEVEL); }
+
+    public void setArcShotLevel(int level) { this.entityData.set(ARC_SHOT_LEVEL, level); }
+
+    public int getPulseShotLevel() { return this.entityData.get(PULSE_SHOT_LEVEL); }
+
+    public void setPulseShotLevel(int level) { this.entityData.set(PULSE_SHOT_LEVEL, level); }
+
+    public boolean isGigantic() {
+        return this.entityData.get(GIGANTIC);
+    }
+
+    public void setGigantic(boolean gigantic) {
+        this.entityData.set(GIGANTIC, gigantic);
+        this.refreshDimensions();
+        this.applyGigantismHealthBonus();
+    }
+
+    public int getOverworkedLevel() {
+        return this.entityData.get(OVERWORKED_LEVEL);
+    }
+
+    public void setOverworkedLevel(int level) {
+        int clamped = Math.max(0, Math.min(5, level));
+        this.entityData.set(OVERWORKED_LEVEL, clamped);
+    }
+
+    public boolean isOverworked() {
+        return this.getOverworkedLevel() > 0;
+    }
+
+    public void applyOverworkedAttackSpeedBonus() {
+        int level = this.getOverworkedLevel();
+        AttributeInstance attackSpeed = this.getAttribute(Attributes.ATTACK_SPEED);
+        if (attackSpeed != null) {
+            java.util.UUID modifierId = java.util.UUID.nameUUIDFromBytes("dnl_overworked_attack_speed".getBytes());
+            if (attackSpeed.getModifier(modifierId) != null) {
+                attackSpeed.removeModifier(modifierId);
+            }
+            if (level > 0) {
+                double bonus = 0.2D * level; // 20% per level
+                attackSpeed.addPermanentModifier(new AttributeModifier(
+                        modifierId,
+                        "dnl_overworked_attack_speed",
+                        bonus,
+                        AttributeModifier.Operation.MULTIPLY_TOTAL
+                ));
+            }
+        }
+    }
+
+    private void applyGigantismHealthBonus() {
+        if (this.level() != null && this.level().isClientSide) {
+            return;
+        }
+
+        AttributeInstance maxHealth = this.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealth == null) return;
+
+        double beforeMax = this.getMaxHealth();
+
+        AttributeModifier existing = maxHealth.getModifier(GIGANTISM_MAX_HEALTH_MODIFIER_ID);
+        if (existing != null) {
+            maxHealth.removeModifier(existing);
+        }
+
+        if (this.isGigantic()) {
+            maxHealth.addTransientModifier(new AttributeModifier(
+                    GIGANTISM_MAX_HEALTH_MODIFIER_ID,
+                    "dnl_gigantism_max_health",
+                    0.5D,
+                    AttributeModifier.Operation.MULTIPLY_TOTAL
+            ));
+        }
+
+        double afterMax = this.getMaxHealth();
+        float gain = (float) (afterMax - beforeMax);
+
+        if (gain > 0.0F) {
+            this.setHealth(Math.min((float) afterMax, this.getHealth() + gain));
+        } else {
+            if (this.getHealth() > afterMax) {
+                this.setHealth((float) afterMax);
+            }
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        UUID owner = this.getOwnerUUID();
+        int overworkedLevel = this.getOverworkedLevel();
+        super.remove(reason);
+
+        if (!this.level().isClientSide && owner != null && overworkedLevel > 0) {
+            OverworkedPenaltyUtil.refreshOwnerPenaltyIfPossible(this.level(), owner);
+        }
+    }
 
     public boolean isBasicVariant() {
         return this.entityData.get(BASIC);

@@ -2,13 +2,16 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,19 +25,33 @@ public class SpawnerSword extends SwordItem {
 
     @Override
     public boolean hurtEnemy(ItemStack itemStack, LivingEntity target, LivingEntity attacker) {
-        boolean result  = super.hurtEnemy(itemStack, target, attacker);
-        if (result) {
-            if (!target.level().isClientSide) {
-                if (attacker.getHealth() > 1) {
-                    attacker.hurt(attacker.damageSources().generic(), 1.0F);
-                }
+        boolean result = super.hurtEnemy(itemStack, target, attacker);
+        if (result && !target.level().isClientSide) {
+            int recklessLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.RECKLESS.get(), attacker.getMainHandItem());
+            float selfDamage = 1.0F + recklessLevel;
+
+            // Don't self-damage in creative/spectator.
+            if (attacker instanceof Player player && (player.getAbilities().instabuild || player.isSpectator())) {
+                return true;
             }
+
+            // Always apply: 1 + reckless level.
+            attacker.hurt(attacker.damageSources().magic(), selfDamage);
         }
         return result;
     }
 
     public static float soulDispersionEffect(LivingEntity attacker, LivingEntity target, float damage) {
         return attacker.getHealth() > 1 ? damage + 3.0F : damage;
+    }
+
+    public static float onLivingDamage(LivingEntity attacker, LivingEntity target, float damage) {
+        int recklessLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.RECKLESS.get(), attacker.getMainHandItem());
+        if (recklessLevel > 0 && damage > 0.0F) {
+            // Increase outgoing damage: +2 * level
+            damage += 2.0F * recklessLevel;
+        }
+        return damage;
     }
 
     @Override

@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperChargeAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperRandomMoveGoal;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -16,6 +17,8 @@ import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.LookControl;
@@ -37,12 +40,17 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Integer> DESPAWN_TICK = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.INT);
+
+    private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
 
     public WhimperEntity(EntityType<? extends WhimperEntity> entityType, Level level) {
         super(entityType, level);
         this.xpReward = 0;
         this.moveControl = new WhimperMoveControl(this);
         this.lookControl = new LookControl(this);
+        this.noPhysics = true;
         this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
         this.setPathfindingMalus(BlockPathTypes.FENCE, -1.0F);
@@ -108,6 +116,8 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         this.entityData.define(DESPAWN_TICK, 600);
         this.entityData.define(OWNER_UUID, Optional.empty());
         this.entityData.define(CHARGING, false);
+        this.entityData.define(GIGANTIC, false);
+        this.entityData.define(OVERWORKED_LEVEL, 0);
     }
 
     @Override
@@ -117,6 +127,8 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         if (this.getOwnerUUID() != null) {
             compoundTag.putUUID("Owner", this.getOwnerUUID());
         }
+        compoundTag.putBoolean("Gigantic", this.isGigantic());
+        compoundTag.putInt("OverworkedLevel", this.getOverworkedLevel());
     }
 
     @Override
@@ -133,6 +145,16 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         if (uuid != null) {
             this.setOwnerUUID(uuid);
         }
+        if (compoundTag.contains("Gigantic")) {
+            this.setGigantic(compoundTag.getBoolean("Gigantic"));
+        }
+        if (compoundTag.contains("OverworkedLevel")) {
+            this.setOverworkedLevel(compoundTag.getInt("OverworkedLevel"));
+        }
+
+        // Ensure attributes are consistent after loading.
+        this.applyGigantismHealthBonus();
+        this.applyOverworkedAttackSpeedBonus();
     }
 
     @Override
@@ -169,8 +191,15 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return 0.6F;
+    public EntityDimensions getDimensions(Pose pose) {
+        EntityDimensions base = super.getDimensions(pose);
+        return this.isGigantic() ? base.scale(2.0F) : base;
+    }
+
+    @Override
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
+        // Scale eye height with current bounding box height for consistent visuals
+        return size.height * 0.8F;
     }
 
     @Nullable
@@ -202,4 +231,112 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     public boolean IsCharging() { return this.entityData.get(CHARGING); }
 
     public void setCharging(boolean b) { this.entityData.set(CHARGING, b); }
+
+    public boolean isGigantic() {
+        return this.entityData.get(GIGANTIC);
+    }
+
+    public void setGigantic(boolean gigantic) {
+        this.entityData.set(GIGANTIC, gigantic);
+        this.refreshDimensions();
+        this.applyGigantismHealthBonus();
+    }
+
+    public int getOverworkedLevel() {
+        return this.entityData.get(OVERWORKED_LEVEL);
+    }
+
+    public void setOverworkedLevel(int level) {
+        int clamped = Math.max(0, Math.min(5, level));
+        this.entityData.set(OVERWORKED_LEVEL, clamped);
+        this.applyOverworkedAttackSpeedBonus();
+    }
+
+    public boolean isOverworked() {
+        return this.getOverworkedLevel() > 0;
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (GIGANTIC.equals(key)) {
+            this.refreshDimensions();
+            // Server owns attributes, but this is harmless if called client-side.
+            this.applyGigantismHealthBonus();
+        }
+    }
+
+    private void applyGigantismHealthBonus() {
+        // Attributes are authoritative server-side.
+        if (this.level() != null && this.level().isClientSide) {
+            return;
+        }
+
+        AttributeInstance maxHealth = this.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealth == null) return;
+
+        double beforeMax = this.getMaxHealth();
+
+        AttributeModifier existing = maxHealth.getModifier(GIGANTISM_MAX_HEALTH_MODIFIER_ID);
+        if (existing != null) {
+            maxHealth.removeModifier(existing);
+        }
+
+        if (this.isGigantic()) {
+            // +50% max health. Use a transient modifier so it takes effect immediately after spawn and doesn't depend on NBT.
+            maxHealth.addTransientModifier(new AttributeModifier(
+                    GIGANTISM_MAX_HEALTH_MODIFIER_ID,
+                    "dnl_gigantism_max_health",
+                    0.5D,
+                    AttributeModifier.Operation.MULTIPLY_TOTAL
+            ));
+        }
+
+        double afterMax = this.getMaxHealth();
+        float gain = (float) (afterMax - beforeMax);
+
+        // If gigantism increased max HP, heal by that gained amount (so it actually becomes harder to kill).
+        if (gain > 0.0F) {
+            this.setHealth(Math.min((float) afterMax, this.getHealth() + gain));
+        } else {
+            // Otherwise clamp to max.
+            if (this.getHealth() > afterMax) {
+                this.setHealth((float) afterMax);
+            }
+        }
+    }
+
+    // DNL_OVERWORKED_PATCH_BEGIN
+    public void applyOverworkedAttackSpeedBonus() {
+        int level = this.getOverworkedLevel();
+        AttributeInstance attackSpeed = this.getAttribute(Attributes.ATTACK_SPEED);
+        if (attackSpeed != null) {
+            UUID modifierId = UUID.nameUUIDFromBytes("dnl_overworked_attack_speed".getBytes());
+            if (attackSpeed.getModifier(modifierId) != null) {
+                attackSpeed.removeModifier(modifierId);
+            }
+            if (level > 0) {
+                double bonus = 0.2D * level;
+                attackSpeed.addPermanentModifier(new AttributeModifier(
+                        modifierId,
+                        "dnl_overworked_attack_speed",
+                        bonus,
+                        AttributeModifier.Operation.MULTIPLY_TOTAL
+                ));
+            }
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        UUID owner = this.getOwnerUUID();
+        int overworkedLevel = this.getOverworkedLevel();
+        super.remove(reason);
+
+        if (!this.level().isClientSide && owner != null && overworkedLevel > 0) {
+            OverworkedPenaltyUtil.refreshOwnerPenaltyIfPossible(this.level(), owner);
+        }
+    }
+    // DNL_OVERWORKED_PATCH_END
+
 }
