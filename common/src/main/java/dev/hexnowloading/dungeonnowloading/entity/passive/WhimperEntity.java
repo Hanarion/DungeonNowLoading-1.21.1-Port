@@ -4,6 +4,8 @@ import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperChargeAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperRandomMoveGoal;
+import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import net.minecraft.core.BlockPos;
@@ -42,8 +44,18 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<WhimperAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(WhimperEntity.class, EntityStates.WHIMPER_ANIMATION_STATE);
+    private static final EntityDataAccessor<Skin> SKIN = SynchedEntityData.defineId(WhimperEntity.class, EntityStates.WHIMPER_SKIN);
+    private static final EntityDataAccessor<Boolean> SKIN_VALIDATION = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
 
     private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
+
+    public AnimationState attackAnimationState = new AnimationState();
+    public AnimationState blessingAnimationState = new AnimationState();
+    public AnimationState idleBreakAnimationState = new AnimationState();
+    public AnimationState idleBreakLanternAnimationState = new AnimationState();
+
+    private AnimationChainer<WhimperAnimationState> animationChainer = new AnimationChainer<>();
 
     public WhimperEntity(EntityType<? extends WhimperEntity> entityType, Level level) {
         super(entityType, level);
@@ -118,6 +130,9 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         this.entityData.define(CHARGING, false);
         this.entityData.define(GIGANTIC, false);
         this.entityData.define(OVERWORKED_LEVEL, 0);
+        this.entityData.define(ANIMATION_STATE, WhimperAnimationState.IDLE);
+        this.entityData.define(SKIN, Skin.DEFAULT);
+        this.entityData.define(SKIN_VALIDATION, false);
     }
 
     @Override
@@ -129,6 +144,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         }
         compoundTag.putBoolean("Gigantic", this.isGigantic());
         compoundTag.putInt("OverworkedLevel", this.getOverworkedLevel());
+        compoundTag.putString("Skin", getSkin().getId());
     }
 
     @Override
@@ -151,10 +167,20 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         if (compoundTag.contains("OverworkedLevel")) {
             this.setOverworkedLevel(compoundTag.getInt("OverworkedLevel"));
         }
+        if (compoundTag.contains("skin") && !this.entityData.get(SKIN_VALIDATION)) {
+            this.entityData.set(SKIN, WhimperEntity.Skin.fromId(compoundTag.getString("skin")));
+        }
 
         // Ensure attributes are consistent after loading.
         this.applyGigantismHealthBonus();
         this.applyOverworkedAttackSpeedBonus();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        animationChainer.tick(this::transitionTo);
     }
 
     @Override
@@ -258,6 +284,16 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        if (ANIMATION_STATE.equals(key)) {
+            this.resetAnimations();
+            WhimperAnimationState state = this.entityData.get(ANIMATION_STATE);
+            switch (state) {
+                case ATTACK -> this.attackAnimationState.start(this.tickCount);
+                case BLESSING -> this.blessingAnimationState.start(this.tickCount);
+                case IDLE_BREAK -> this.idleBreakAnimationState.start(this.tickCount);
+                case IDLE_BREAK_LANTERN -> this.idleBreakLanternAnimationState.start(this.tickCount);
+            }
+        }
         super.onSyncedDataUpdated(key);
         if (GIGANTIC.equals(key)) {
             this.refreshDimensions();
@@ -338,5 +374,87 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         }
     }
     // DNL_OVERWORKED_PATCH_END
+
+    public void playAnimation(WhimperAnimationState state) {
+        this.animationChainer.reset();
+
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                state,
+                state.duration(),
+                null,
+                () -> this.transitionTo(WhimperAnimationState.IDLE)
+        ));
+    }
+
+    public WhimperEntity transitionTo(WhimperAnimationState state) {
+        this.entityData.set(ANIMATION_STATE, state);
+        return this;
+    }
+
+    private void resetAnimations() {
+        this.attackAnimationState.stop();
+        this.blessingAnimationState.stop();
+        this.idleBreakAnimationState.stop();
+        this.idleBreakLanternAnimationState.stop();
+    }
+
+    public Skin getSkin() {
+        return this.entityData.get(SKIN);
+    }
+
+    public void setSkin(Skin skin) {
+        this.entityData.set(SKIN, skin);
+    }
+
+    public void setCosmeticMode(String id) {
+        setSkin(Skin.fromId(id));
+    }
+
+    public void setSkinValidation(boolean skinValidation) {
+        this.entityData.set(SKIN_VALIDATION, skinValidation);
+    }
+
+    public enum WhimperAnimationState {
+        IDLE(0.0F),
+        ATTACK(0.875F),
+        BLESSING(1.625F),
+        IDLE_BREAK(2.25F),
+        IDLE_BREAK_LANTERN(2.25F);
+
+        private final float duration;
+
+        WhimperAnimationState(float duration) {
+            this.duration = duration;
+        }
+
+        public float duration() {
+            return this.duration;
+        }
+    }
+
+    public enum Skin {
+
+        DEFAULT("default"),
+        LANTERN("lantern");
+
+        public final String name;
+
+        Skin(String name) {
+            this.name = name;
+        }
+
+        public String getId() {
+            return this.name;
+        }
+
+        public static WhimperEntity.Skin fromId(String id) {
+            for (WhimperEntity.Skin skin : values()) {
+                if (skin.name.equalsIgnoreCase(id)) {
+                    return skin;
+                }
+            }
+            return DEFAULT;
+        }
+    }
 
 }

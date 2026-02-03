@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.client.preview;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.hexnowloading.dungeonnowloading.preview.HologramPreviewRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;

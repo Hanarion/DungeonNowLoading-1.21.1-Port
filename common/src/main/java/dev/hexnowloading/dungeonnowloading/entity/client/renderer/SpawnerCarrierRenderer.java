@@ -19,7 +19,6 @@ public class SpawnerCarrierRenderer<T extends SpawnerCarrierEntity> extends MobR
     public SpawnerCarrierRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new SpawnerCarrierModel<>(ctx.bakeLayer(SpawnerCarrierModel.LAYER_LOCATION)), 1.5F);
 
-        // Add the “rotating mob preview” layer
         this.addLayer(new SpawnerCarrierPreviewLayer<>(this, ctx));
         this.addLayer(new SpawnerCarrierSpawnerCrackLayer<>(this));
     }

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.client.preview;
 
+import dev.hexnowloading.dungeonnowloading.preview.HologramPreviewRenderer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;

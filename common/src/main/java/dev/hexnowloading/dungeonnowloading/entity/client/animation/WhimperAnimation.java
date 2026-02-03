@@ -219,7 +219,7 @@ public class WhimperAnimation {
             ))
             .build();
 
-    public static final AnimationDefinition IDLE_BREAK_COSMETIC = AnimationDefinition.Builder.withLength(2.25F)
+    public static final AnimationDefinition IDLE_BREAK_LANTERN = AnimationDefinition.Builder.withLength(2.25F)
             .addAnimation("head", new AnimationChannel(AnimationChannel.Targets.ROTATION,
                     new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
                     new Keyframe(0.5F, KeyframeAnimations.degreeVec(3.4091F, 17.8669F, -5.234F), AnimationChannel.Interpolations.CATMULLROM),

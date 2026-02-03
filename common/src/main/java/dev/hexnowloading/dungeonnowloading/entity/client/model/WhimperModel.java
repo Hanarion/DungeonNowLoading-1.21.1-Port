@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.WhimperAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -84,6 +85,18 @@ public class WhimperModel<T extends WhimperEntity> extends HierarchicalModel<T> 
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
+
+        boolean hasLanternSkin = entity.getSkin() == WhimperEntity.Skin.LANTERN;
+
+        this.Lantern.visible = hasLanternSkin;
+        this.Hat.visible = hasLanternSkin;
+
+        this.animate(entity.attackAnimationState, WhimperAnimation.ATTACK, ageInTicks);
+        this.animate(entity.blessingAnimationState, WhimperAnimation.BLESSING, ageInTicks);
+        this.animate(entity.idleBreakAnimationState, WhimperAnimation.IDLE_BREAK, ageInTicks);
+        this.animate(entity.idleBreakLanternAnimationState, WhimperAnimation.IDLE_BREAK_LANTERN, ageInTicks);
+
+
         this.animateHeadLookTarget(netHeadYaw, headPitch);
         this.animateIdlePose(ageInTicks);
     }

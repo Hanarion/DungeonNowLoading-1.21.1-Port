@@ -8,7 +8,6 @@ public class SpawnerCarrierHurtByTargetGoal extends HurtByTargetGoal {
     private final SpawnerCarrierEntity carrier;
 
     public SpawnerCarrierHurtByTargetGoal(SpawnerCarrierEntity carrier) {
-        // keep your “ignore other SpawnerCarrierEntity” behavior if you want:
         super(carrier, SpawnerCarrierEntity.class);
         this.carrier = carrier;
     }
@@ -17,7 +16,6 @@ public class SpawnerCarrierHurtByTargetGoal extends HurtByTargetGoal {
     public boolean canUse() {
         LivingEntity attacker = this.mob.getLastHurtByMob();
         if (attacker != null && carrier.isSpawnedMinion(attacker)) {
-            // Clear it so we don’t keep re-checking the same “hurt by minion” hit
             this.mob.setLastHurtByMob(null);
             return false;
         }

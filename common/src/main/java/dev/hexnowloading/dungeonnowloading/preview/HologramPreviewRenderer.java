@@ -1,6 +1,8 @@
-package dev.hexnowloading.dungeonnowloading.client.preview;
+package dev.hexnowloading.dungeonnowloading.preview;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import dev.hexnowloading.dungeonnowloading.client.preview.ClientPreviewState;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -9,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 public final class HologramPreviewRenderer {
     private HologramPreviewRenderer() {}

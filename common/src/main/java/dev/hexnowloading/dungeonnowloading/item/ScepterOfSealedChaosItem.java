@@ -70,10 +70,7 @@ public class ScepterOfSealedChaosItem extends Item {
         if (itemStack.getDamageValue() == itemStack.getMaxDamage()) {
             return InteractionResult.FAIL;
         } else {
-            UUID uuid = Objects.requireNonNull(player.getUUID());
             player.getCooldowns().addCooldown(this, 600);
-            Level level = useOnContext.getLevel();
-            Player player = useOnContext.getPlayer();
             if (player == null) {
                 return InteractionResult.PASS;
             }

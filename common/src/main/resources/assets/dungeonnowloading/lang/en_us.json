@@ -64,6 +64,7 @@
   "item.dungeonnowloading.repulsor.tooltip.right_click_with_redstone_dust": "Right-click with Redstone Dust:",
   "item.dungeonnowloading.repulsor.tooltip.right_click_with_redstone_dust.description": " Restores 5 durability",
   "item.dungeonnowloading.great_experience_bottle": "Great Bottle o' Enchanting",
+  "item.dungeonnowloading.great_experience_bottle.tooltip": "%d XP",
   "item.dungeonnowloading.potion_barrel": "Potion Barrel",
   "item.dungeonnowloading.potion_barrel.effect": "Potion Barrel: %s",
   "item.dungeonnowloading.scepter_of_sealed_chaos": "Scepter of Sealed Chaos",
@@ -429,8 +430,7 @@
   "item.dungeonnowloading.mimicling.tooltip.controls": "Controls:",
   "item.dungeonnowloading.mimicling.tooltip.controls_1": "- Sneak + Right-click: change mode",
   "item.dungeonnowloading.mimicling.tooltip.controls_2": "- In inventory: hover Mimicling with an item to feed",
-  "item.dungeonnowloading.mimicling.tooltip.controls_3": "- Feed slimeball to spit tools"
-  "enchantment.dungeonnowloading.break_protection.desc": "Upon item breaking, turns into repairable Item Scraps",
+  "item.dungeonnowloading.mimicling.tooltip.controls_3": "- Feed slimeball to spit tools",
   "enchantment.dungeonnowloading.durable": "Durable",
   "enchantment.dungeonnowloading.durable.desc": "Reduces durability loss (4 + 2×level hits per 1 durability)",
   "enchantment.dungeonnowloading.gigantism": "Gigantism",

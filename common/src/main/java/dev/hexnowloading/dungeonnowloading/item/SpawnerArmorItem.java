@@ -6,6 +6,7 @@ import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.supporter.DNLSupporters;
 import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -22,8 +24,11 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,8 +38,45 @@ public class SpawnerArmorItem extends ArmorItem {
     private int summonTick = 200;
     private final int spawnRange = 4;
 
+    private static final String TAG_WHIMPER_COSMETIC_MODE = "WhimperCosmeticMode";
+    private static final String MODE_DEFAULT = "default";
+    private static final String MODE_LANTERN = "lantern";
+    private static final String MODE_MIX = "mix";
+
     public SpawnerArmorItem(ArmorMaterial armorMaterial, Type slot) {
         super(armorMaterial, slot, new Properties());
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos blockPos = context.getClickedPos();
+        BlockState blockState = level.getBlockState(blockPos);
+        ItemStack stack = context.getItemInHand();
+        Player player = context.getPlayer();
+
+        if (blockState.is(Blocks.LANTERN)) {
+
+            if (!level.isClientSide && player != null) {
+                if (!DNLSupporters.hasSkin(player.getUUID(), "whimper_lantern")) return InteractionResult.SUCCESS;
+
+                cycleWhimperCosmeticMode(stack);
+
+                String modeName = getWhimperCosmeticMode(stack);
+                String capitalizedMode = modeName.isEmpty()
+                        ? ""
+                        : modeName.substring(0, 1).toUpperCase() + modeName.substring(1);
+
+                player.displayClientMessage(
+                        Component.literal("Whimper Mode: " + capitalizedMode).withStyle(ChatFormatting.YELLOW),
+                        true
+                );
+            }
+
+            return InteractionResult.SUCCESS;
+        }
+
+        return super.useOn(context);
     }
 
     @Override
@@ -125,6 +167,8 @@ public class SpawnerArmorItem extends ArmorItem {
 
         ItemStack helmetStack = owner.getInventory().getArmor(3);
 
+        whimper.setSkin(resolveWhimperSkin(level, helmetStack));
+
         int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), helmetStack);
         if (gigantismLevel > 0) {
             whimper.setGigantic(true);
@@ -186,5 +230,41 @@ public class SpawnerArmorItem extends ArmorItem {
             components.add(Component.translatable("item.dungeonnowloading.spawner_armor.tooltip.ability_name").withStyle(ChatFormatting.GRAY));
             components.add(Component.translatable("item.dungeonnowloading.spawner_armor.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY));
         }
+    }
+
+    private static void cycleWhimperCosmeticMode(ItemStack stack) {
+        String current = getWhimperCosmeticMode(stack);
+        String next;
+
+        if (current.equals(MODE_DEFAULT)) {
+            next = MODE_LANTERN;
+        } else if (current.equals(MODE_LANTERN)) {
+            next = MODE_MIX; // optional
+        } else {
+            next = MODE_DEFAULT;
+        }
+
+        stack.getOrCreateTag().putString(TAG_WHIMPER_COSMETIC_MODE, next);
+    }
+
+    public static String getWhimperCosmeticMode(ItemStack stack) {
+        String v = stack.getOrCreateTag().getString(TAG_WHIMPER_COSMETIC_MODE);
+        return v.isEmpty() ? MODE_DEFAULT : v;
+    }
+
+    private static WhimperEntity.Skin resolveWhimperSkin(Level level, ItemStack helmetStack) {
+        String mode = getWhimperCosmeticMode(helmetStack);
+
+        if (MODE_LANTERN.equals(mode)) {
+            return WhimperEntity.Skin.LANTERN;
+        }
+
+        if (MODE_MIX.equals(mode)) {
+            return level.getRandom().nextBoolean()
+                    ? WhimperEntity.Skin.LANTERN
+                    : WhimperEntity.Skin.DEFAULT;
+        }
+
+        return WhimperEntity.Skin.DEFAULT;
     }
 }

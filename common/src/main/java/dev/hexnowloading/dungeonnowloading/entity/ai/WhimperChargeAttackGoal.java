@@ -90,6 +90,7 @@ public class WhimperChargeAttackGoal extends Goal {
         // Hit check: AABB intersection is too strict (especially for flying mobs + gigantic hitboxes).
         // Use a reach-based sphere/box check around the target instead.
         if (!this.hasHitThisCharge && isInStrikeRange(target)) {
+            this.whimper.playAnimation(WhimperEntity.WhimperAnimationState.ATTACK);
             this.whimper.doHurtTarget(target);
             this.hasHitThisCharge = true;
             this.whimper.setCharging(false);
