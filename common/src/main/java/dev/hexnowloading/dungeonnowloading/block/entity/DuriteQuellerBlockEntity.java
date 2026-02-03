@@ -1,7 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
 import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
-import dev.hexnowloading.dungeonnowloading.particle.type.DirectionalParticleType;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -266,7 +265,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         level.sendParticles(data, x, y, z, 1, 0, 0, 0, 0);
     }
 
-    private void spawnUpperHemisphereMendingPop(ServerLevel level, BlockPos blockPos) {
+    /*private void spawnUpperHemisphereMendingPop(ServerLevel level, BlockPos blockPos) {
         // Center of the durite block
         Vec3 c = Vec3.atCenterOf(blockPos);
 
@@ -302,7 +301,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
 
             level.sendParticles(data, x, y, z, 1, 0, 0, 0, 0);
         }
-    }
+    }*/
 
 
 

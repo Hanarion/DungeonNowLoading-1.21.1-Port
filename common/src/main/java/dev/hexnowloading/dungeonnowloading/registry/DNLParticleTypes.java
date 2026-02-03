@@ -21,7 +21,7 @@ public class DNLParticleTypes {
     public static final Supplier<ParticleType<ScalableAxisParticleType.ScalableAxisParticleData>> WHITE_SHOCKWAVE_PARTICLE = register("white_shockwave", () -> new ScalableAxisParticleType(true));
     public static final Supplier<ParticleType<ScalableAxisParticleType.ScalableAxisParticleData>> WHITE_SHOCKWAVE_MEDIUM_PARTICLE = register("white_shockwave_medium", () -> new ScalableAxisParticleType(true));
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> ARROW_HAZARD_INDICATOR = register("arrow_hazard_indicator", () -> new ScalableParticleType(false));
-    public static final Supplier<ParticleType<DirectionalParticleType.Data>> MENDING_POP_AND_RUNE_PARTICLE = register("mending_pop_and_rune", () -> new DirectionalParticleType(false));
+    public static final Supplier<SimpleParticleType> MENDING_POP_AND_RUNE_PARTICLE = register("mending_pop_and_rune", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<SimpleParticleType> MENDING_RUNE_PARTICLE = register("mending_rune", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<SimpleParticleType> MENDING_RUNE_SHORT_PARTICLE = register("mending_rune_short", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<MendingFadeParticleType> MENDING_FADE_PARTICLE = register("mending_fade", () -> new MendingFadeParticleType(false));

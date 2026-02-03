@@ -23,7 +23,6 @@ import java.util.Map;
 public class DungeonBannerBlockItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     private final DungeonBannerBlockModel model;
-    private static DungeonBannerBlockItemRenderer INSTANCE;
 
     private static final Map<DungeonBannerBlock.DungeonBannerVariant, ResourceLocation> TEX = new EnumMap<>(DungeonBannerBlock.DungeonBannerVariant.class);
     static {
@@ -57,8 +56,8 @@ public class DungeonBannerBlockItemRenderer extends BlockEntityWithoutLevelRende
         switch (ctx) {
             case GUI -> {
                 Lighting.setupForFlatItems();
-                poseStack.translate(0.8, 0.8, 0.0);   // center-ish for GUI
-                poseStack.scale(0.6F, -0.6F, -0.6F); // <-- FIX
+                poseStack.translate(0.8, 0.8, 0.0);
+                poseStack.scale(0.6F, -0.6F, -0.6F);
                 poseStack.mulPose(Axis.YP.rotationDegrees(200f));
             }
             case FIXED -> {
@@ -86,9 +85,6 @@ public class DungeonBannerBlockItemRenderer extends BlockEntityWithoutLevelRende
     }
 
     public static DungeonBannerBlockItemRenderer getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new DungeonBannerBlockItemRenderer();
-        }
-        return INSTANCE;
+        return new DungeonBannerBlockItemRenderer();
     }
 }

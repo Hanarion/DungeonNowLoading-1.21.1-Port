@@ -1,9 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.particle;
 
-import dev.hexnowloading.dungeonnowloading.particle.type.DirectionalParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.Nullable;
 
 public class MendingPopAndRuneParticle extends TextureSheetParticle {
@@ -38,7 +38,7 @@ public class MendingPopAndRuneParticle extends TextureSheetParticle {
         this.zo = this.z;
 
         if (this.age % 2 == 0) {
-            int sprite = Math.min(7, this.age / 2);
+            int sprite = (this.age / 2) % 8;
             this.setSprite(spriteSet.get(sprite, 8));
         }
 
@@ -60,7 +60,7 @@ public class MendingPopAndRuneParticle extends TextureSheetParticle {
     @Override
     public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
 
-    public static class Factory implements ParticleProvider<DirectionalParticleType.Data> {
+    public static class Factory implements ParticleProvider<SimpleParticleType> {
 
         private final SpriteSet sprites;
 
@@ -70,15 +70,8 @@ public class MendingPopAndRuneParticle extends TextureSheetParticle {
 
         @Nullable
         @Override
-        public Particle createParticle(DirectionalParticleType.Data data, ClientLevel clientLevel,
-                                       double x, double y, double z,
-                                       double xSpeed, double ySpeed, double zSpeed) {
-            MendingPopAndRuneParticle particle = new MendingPopAndRuneParticle(
-                    clientLevel,
-                    x, y, z,
-                    data.vx, data.vy, data.vz,
-                    this.sprites
-            );
+        public Particle createParticle(SimpleParticleType simpleParticleType, ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+            MendingPopAndRuneParticle particle = new MendingPopAndRuneParticle(clientLevel, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites);
             particle.setSprite(sprites.get(0, 1));
             return particle;
         }
