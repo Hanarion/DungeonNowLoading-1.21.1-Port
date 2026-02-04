@@ -14,7 +14,9 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -32,6 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public class SpawnerArmorItem extends ArmorItem {
 
@@ -48,6 +51,15 @@ public class SpawnerArmorItem extends ArmorItem {
     }
 
     @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.is(DNLItems.SPAWNER_HELMET.get())) {
+            return InteractionResultHolder.fail(stack);
+        }
+        return super.use(level, player, hand);
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos blockPos = context.getClickedPos();
@@ -56,21 +68,15 @@ public class SpawnerArmorItem extends ArmorItem {
         Player player = context.getPlayer();
 
         if (blockState.is(Blocks.LANTERN)) {
-
             if (!level.isClientSide && player != null) {
-                if (!(DNLSupporters.hasSkin(player.getUUID(), "whimper_lantern") || DNLSupporters.isSupporter(player.getUUID()))) return InteractionResult.SUCCESS;
-
-                cycleWhimperCosmeticMode(stack);
-
-                String modeName = getWhimperCosmeticMode(stack);
-                String capitalizedMode = modeName.isEmpty()
-                        ? ""
-                        : modeName.substring(0, 1).toUpperCase() + modeName.substring(1);
-
-                player.displayClientMessage(
-                        Component.literal("Whimper Mode: " + capitalizedMode).withStyle(ChatFormatting.YELLOW),
-                        true
-                );
+                UUID uuid = player.getUUID();
+                boolean allowed = DNLSupporters.hasSkin(uuid, "whimper_lantern") || DNLSupporters.isSupporter(uuid);
+                if (allowed) {
+                    cycleWhimperCosmeticMode(stack);
+                    String modeName = getWhimperCosmeticMode(stack);
+                    String capitalizedMode = modeName.isEmpty() ? "" : modeName.substring(0, 1).toUpperCase() + modeName.substring(1);
+                    player.displayClientMessage(Component.literal("Whimper Mode: " + capitalizedMode).withStyle(ChatFormatting.YELLOW), true);
+                }
             }
 
             return InteractionResult.SUCCESS;

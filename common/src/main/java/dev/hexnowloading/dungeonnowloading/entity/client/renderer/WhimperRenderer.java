@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.entity.client.layer.WhimperLayer;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.WhimperModel;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -10,10 +11,11 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WhimperRenderer<T extends WhimperEntity> extends MobRenderer<T, WhimperModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/whimper.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/whimper/whimper.png");
 
     public WhimperRenderer(EntityRendererProvider.Context context) {
         super(context, new WhimperModel<>(context.bakeLayer(WhimperModel.LAYER_LOCATION)), 0.5F);
+        this.addLayer(new WhimperLayer<>(this));
     }
 
     @Override
