@@ -32,6 +32,7 @@
       "forge.block.FlintAndSteelMixin",
       "forge.block.DNLFireBlockMixin",
       "forge.structures.StructurePoolMixin",
+      "forge.blockentities.DungeonBannerBlockItemMixin",
       "forge.blockentities.FairkeeperChestBlockItemMixin",
       "forge.blockentities.WiseFairkeeperChestBlockItemMixin",
       "forge.blockentities.FierceFairkeeperChestBlockItemMixin",

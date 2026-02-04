@@ -58,7 +58,7 @@ public class SpawnerArmorItem extends ArmorItem {
         if (blockState.is(Blocks.LANTERN)) {
 
             if (!level.isClientSide && player != null) {
-                if (!DNLSupporters.hasSkin(player.getUUID(), "whimper_lantern")) return InteractionResult.SUCCESS;
+                if (!(DNLSupporters.hasSkin(player.getUUID(), "whimper_lantern") || DNLSupporters.isSupporter(player.getUUID()))) return InteractionResult.SUCCESS;
 
                 cycleWhimperCosmeticMode(stack);
 
