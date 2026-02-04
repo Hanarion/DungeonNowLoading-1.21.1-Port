@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:builtin/entity",
+  "textures": {
+    "particle": "dungeonnowloading:block/dungeon_banner_particle"
+  }
+}

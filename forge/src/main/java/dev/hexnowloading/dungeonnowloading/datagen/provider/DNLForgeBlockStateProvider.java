@@ -114,7 +114,20 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());
         //simpleRandomBlockWithItem(DNLBlocks.MOSS.get(), 5);
-        new BannerBlockItemGen(this).dungeonBanners(DNLBlocks.DUNGEON_BANNER.get());
+        BannerBlockItemGen gen = new BannerBlockItemGen(this);
+
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_BLACK.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_BLUE.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_PURPLE.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_GREEN.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_HOLLOW.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_CARRIER.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_EXPERIENCE_BOTTLE.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
     }
 
     private void fenceGateBlockWithItem(FenceGateBlock block, Block parent) {

@@ -142,7 +142,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_CHEST.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_BANNER.get(), RenderType.cutout());
     }
 
 

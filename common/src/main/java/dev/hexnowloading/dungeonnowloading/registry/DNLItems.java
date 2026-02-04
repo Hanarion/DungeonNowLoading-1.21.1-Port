@@ -8,6 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Block;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -161,18 +162,18 @@ public class DNLItems {
     public static final Supplier<Item> GAUNTLET_VAULT = register("gauntlet_vault", GauntletVaultBlockItem::new);
     public static final Supplier<Item> DUNGEON_DIRECTOR = register("dungeon_director", () -> new BlockItem(DNLBlocks.DUNGEON_DIRECTOR.get(), new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> SPAWN_NODE = register("spawn_node", () -> new BlockItem(DNLBlocks.SPAWN_NODE.get(), new Item.Properties().rarity(Rarity.EPIC)));
-    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_MAGENTA = banner("dungeon_banner_spawner_magenta", DungeonBannerBlock.DungeonBannerVariant.SPAWNER_MAGENTA);
-    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_BLACK = banner("dungeon_banner_spawner_black", DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLACK);
-    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_BLUE = banner("dungeon_banner_spawner_blue", DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLUE);
-    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_PURPLE = banner("dungeon_banner_spawner_purple", DungeonBannerBlock.DungeonBannerVariant.SPAWNER_PURPLE);
-    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_GREEN = banner("dungeon_banner_spawner_green", DungeonBannerBlock.DungeonBannerVariant.SPAWNER_GREEN);
-    public static final Supplier<Item> DUNGEON_BANNER_HOLLOW = banner("dungeon_banner_hollow", DungeonBannerBlock.DungeonBannerVariant.HOLLOW);
-    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_CARRIER = banner("dungeon_banner_spawner_carrier", DungeonBannerBlock.DungeonBannerVariant.SPAWNER_CARRIER);
-    public static final Supplier<Item> DUNGEON_BANNER_EXPERIENCE_BOTTLE = banner("dungeon_banner_experience_bottle", DungeonBannerBlock.DungeonBannerVariant.EXPERIENCE_BOTTLE);
-    public static final Supplier<Item> DUNGEON_BANNER_CHAOS_SPAWNER = banner("dungeon_banner_chaos_spawner", DungeonBannerBlock.DungeonBannerVariant.CHAOS_SPAWNER);
-    public static final Supplier<Item> DUNGEON_BANNER_WHIMPER_LANTERN = banner("dungeon_banner_whimper_lantern", DungeonBannerBlock.DungeonBannerVariant.WHIMPER_LANTERN);
-    public static final Supplier<Item> DUNGEON_BANNER_GARHOLD_UPSIDEDOWN = banner("dungeon_banner_garhold_upsidedown", DungeonBannerBlock.DungeonBannerVariant.GARHOLD_UPSIDEDOWN);
-    public static final Supplier<Item> DUNGEON_BANNER_SKULL_OF_CHAOS = banner("dungeon_banner_skull_of_chaos", DungeonBannerBlock.DungeonBannerVariant.SKULL_OF_CHAOS);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_MAGENTA = banner("dungeon_banner_spawner_magenta", DNLBlocks.DUNGEON_BANNER_SPAWNER_MAGENTA, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_MAGENTA);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_BLACK = banner("dungeon_banner_spawner_black", DNLBlocks.DUNGEON_BANNER_SPAWNER_BLACK ,DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLACK);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_BLUE = banner("dungeon_banner_spawner_blue", DNLBlocks.DUNGEON_BANNER_SPAWNER_BLUE, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLUE);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_PURPLE = banner("dungeon_banner_spawner_purple", DNLBlocks.DUNGEON_BANNER_SPAWNER_PURPLE, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_PURPLE);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_GREEN = banner("dungeon_banner_spawner_green", DNLBlocks.DUNGEON_BANNER_SPAWNER_GREEN, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_GREEN);
+    public static final Supplier<Item> DUNGEON_BANNER_HOLLOW = banner("dungeon_banner_hollow", DNLBlocks.DUNGEON_BANNER_HOLLOW, DungeonBannerBlock.DungeonBannerVariant.HOLLOW);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_CARRIER = banner("dungeon_banner_spawner_carrier", DNLBlocks.DUNGEON_BANNER_SPAWNER_CARRIER, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_CARRIER);
+    public static final Supplier<Item> DUNGEON_BANNER_EXPERIENCE_BOTTLE = banner("dungeon_banner_experience_bottle", DNLBlocks.DUNGEON_BANNER_EXPERIENCE_BOTTLE, DungeonBannerBlock.DungeonBannerVariant.EXPERIENCE_BOTTLE);
+    public static final Supplier<Item> DUNGEON_BANNER_CHAOS_SPAWNER = banner("dungeon_banner_chaos_spawner", DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER, DungeonBannerBlock.DungeonBannerVariant.CHAOS_SPAWNER);
+    public static final Supplier<Item> DUNGEON_BANNER_WHIMPER_LANTERN = banner("dungeon_banner_whimper_lantern", DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN, DungeonBannerBlock.DungeonBannerVariant.WHIMPER_LANTERN);
+    public static final Supplier<Item> DUNGEON_BANNER_GARHOLD_UPSIDEDOWN = banner("dungeon_banner_garhold_upsidedown", DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN, DungeonBannerBlock.DungeonBannerVariant.GARHOLD_UPSIDEDOWN);
+    public static final Supplier<Item> DUNGEON_BANNER_SKULL_OF_CHAOS = banner("dungeon_banner_skull_of_chaos", DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS, DungeonBannerBlock.DungeonBannerVariant.SKULL_OF_CHAOS);
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
     public static final Supplier<Item> AZURO_OAK_LOG = register("azuro_oak_log", () -> new BlockItem(DNLBlocks.AZURO_OAK_LOG.get(), new Item.Properties()));
     public static final Supplier<Item> STRIPPED_AZURO_OAK_LOG = register("stripped_azuro_oak_log", () -> new BlockItem(DNLBlocks.STRIPPED_AZURO_OAK_LOG.get(), new Item.Properties()));
@@ -235,10 +236,13 @@ public class DNLItems {
         return items;
     }
 
-    private static Supplier<Item> banner(String id, DungeonBannerBlock.DungeonBannerVariant variant) {
+    private static Supplier<Item> banner(String id,
+                                         Supplier<Block> block,
+                                         DungeonBannerBlock.DungeonBannerVariant variant) {
+
         Supplier<Item> item = register(id, () ->
                 new DungeonBannerBlockItem(
-                        DNLBlocks.DUNGEON_BANNER.get(),
+                        block.get(),
                         variant,
                         new Item.Properties().rarity(Rarity.EPIC)
                 )

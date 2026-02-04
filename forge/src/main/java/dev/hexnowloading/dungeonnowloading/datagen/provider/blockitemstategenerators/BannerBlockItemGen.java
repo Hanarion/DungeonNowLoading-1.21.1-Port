@@ -1,20 +1,28 @@
 package dev.hexnowloading.dungeonnowloading.datagen.provider.blockitemstategenerators;
 
+import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
 import dev.hexnowloading.dungeonnowloading.datagen.provider.DNLForgeBlockStateProvider;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.registries.RegistryObject;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 public class BannerBlockItemGen {
     private final DNLForgeBlockStateProvider p;
+
+    public static final Map<DungeonBannerBlock.DungeonBannerVariant, RegistryObject<Block>> DUNGEON_BANNERS = new EnumMap<>(DungeonBannerBlock.DungeonBannerVariant.class);
+
 
     public BannerBlockItemGen(DNLForgeBlockStateProvider p) {
         this.p = p;
     }
 
-    public void dungeonBanners(Block bannerBlock) {
+    public void dungeonBanner(Block bannerBlock) {
         dungeonBannerBlockstateAndModel(bannerBlock);
-        dungeonBannerItemModels();
+        dungeonBannerItemModelForBlock(bannerBlock);
     }
 
     private void dungeonBannerBlockstateAndModel(Block bannerBlock) {
@@ -22,31 +30,18 @@ public class BannerBlockItemGen {
 
         ModelFile blockModel = p.models().getBuilder(n)
                 .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"))
-                .texture("particle", p.modLoc("block/" + n + "_particle"));
+                .texture("particle", p.modLoc("block/dungeon_banner_particle"));
 
         p.getVariantBuilder(bannerBlock).forAllStates(s -> new ConfiguredModel[]{
                 new ConfiguredModel(blockModel)
         });
     }
 
-    private void dungeonBannerItemModels() {
-        bannerItemModel("dungeon_banner_spawner_magenta");
-        bannerItemModel("dungeon_banner_spawner_black");
-        bannerItemModel("dungeon_banner_spawner_blue");
-        bannerItemModel("dungeon_banner_spawner_purple");
-        bannerItemModel("dungeon_banner_spawner_green");
-        bannerItemModel("dungeon_banner_hollow");
-        bannerItemModel("dungeon_banner_spawner_carrier");
-        bannerItemModel("dungeon_banner_experience_bottle");
-        bannerItemModel("dungeon_banner_chaos_spawner");
-        bannerItemModel("dungeon_banner_whimper_lantern");
-        bannerItemModel("dungeon_banner_garhold_upsidedown");
-        bannerItemModel("dungeon_banner_skull_of_chaos");
-    }
+    private void dungeonBannerItemModelForBlock(Block bannerBlock) {
+        String n = p.name(bannerBlock); // "dungeon_banner_spawner_magenta" etc.
 
-    private void bannerItemModel(String itemId) {
         var b = p.itemModels()
-                .getBuilder(itemId)
+                .getBuilder(n)
                 .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"));
 
         b.transforms()

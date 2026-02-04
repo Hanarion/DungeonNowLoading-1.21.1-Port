@@ -10,7 +10,6 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 
 public class DungeonBannerBlockModel extends Model {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "dungeon_banner"), "main");
@@ -36,10 +35,6 @@ public class DungeonBannerBlockModel extends Model {
         PartDefinition Stick = BANNER.addOrReplaceChild("Stick", CubeListBuilder.create().texOffs(0, 40).addBox(-10.0F, -40.0F, 7.0F, 20.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 38.0F, -7.9F));
 
         return LayerDefinition.create(meshdefinition, 64, 64);
-    }
-
-    public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-
     }
 
     @Override
