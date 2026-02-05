@@ -1,7 +1,7 @@
-package dev.hexnowloading.dungeonnowloading.spawn_node.effect;
+package dev.hexnowloading.dungeonnowloading.spawn_node.spawn_effect;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.DungeonDirectorBlockEntity;
-import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnDefinition;
+import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnNode;
 import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnRequest;
 import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnTask;
 import net.minecraft.core.BlockPos;
@@ -23,7 +23,7 @@ public class PoofSpawnEffect implements SpawnTask {
         if (done) return true;
 
         BlockPos pos = req.basePos();
-        SpawnDefinition def = req.def();
+        SpawnNode def = req.node();
 
         // Precompute poof params once
         PoofParams poof = computePoof(level, def, pos);
@@ -57,7 +57,7 @@ public class PoofSpawnEffect implements SpawnTask {
         return level.random.nextDouble() < chance;
     }
 
-    private static PoofParams computePoof(ServerLevel level, SpawnDefinition def, BlockPos pos) {
+    private static PoofParams computePoof(ServerLevel level, SpawnNode def, BlockPos pos) {
         float bbW = 0.6f;
         float bbH = 1.8f;
 

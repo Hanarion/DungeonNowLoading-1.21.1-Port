@@ -2,7 +2,7 @@
   "entries": [
     {
       "weight": 5,
-      "entity": "minecraft:zombie",
+      "entity": "minecraft:husk",
       "count": 1,
       "chance": 1.0,
       "spawn_effect": "poof",

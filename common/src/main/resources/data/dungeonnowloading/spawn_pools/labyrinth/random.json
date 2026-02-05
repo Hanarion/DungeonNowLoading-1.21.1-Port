@@ -1,0 +1,6 @@
+{
+  "entries": [
+    { "weight": 8, "node": "dungeonnowloading:labyrinth/husk" },
+    { "weight": 12, "node": "dungeonnowloading:labyrinth/zombie" }
+  ]
+}

@@ -20,7 +20,7 @@ public class PoofDelaySpreadSpawnEffect implements SpawnTask {
         this.delay = Math.max(0, delay);
         this.interval = Math.max(1, interval);
         this.radius = Math.max(0, radius);
-        this.remaining = Math.max(1, req.def().count);
+        this.remaining = Math.max(1, req.node().count);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class PoofDelaySpreadSpawnEffect implements SpawnTask {
         remaining--;
 
         // roll chance for this slot
-        double chance = req.def().chance;
+        double chance = req.node().chance;
         boolean willSpawn = chance >= 1.0 || (chance > 0.0 && level.random.nextDouble() < chance);
 
         BlockPos pos = pickSpread(level, req.basePos(), radius);
@@ -45,7 +45,7 @@ public class PoofDelaySpreadSpawnEffect implements SpawnTask {
                     pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                     20, 0.25, 0.25, 0.25, 0.02);
 
-            director.spawnOne(level, req.def(), req.patch(), pos);
+            director.spawnOne(level, req.node(), req.patch(), pos);
         } else {
             // Optional: small fizzle effect when it "fails"
             // level.sendParticles(ParticleTypes.SMOKE, ...);

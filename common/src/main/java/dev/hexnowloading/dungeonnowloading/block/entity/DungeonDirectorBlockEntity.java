@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.block.entity;
 
 import dev.hexnowloading.dungeonnowloading.block.DungeonDirectorBlock;
 import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
+import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.spawn_node.*;
@@ -13,6 +14,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
@@ -140,23 +142,29 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
         for (StoredSpawnNode entry : storedNodes) {
             BlockPos basePos = worldPosition.offset(rotateOffset(entry.relPos));
 
-            ResourceLocation defId;
+            ResourceLocation poolId;
             try {
-                defId = new ResourceLocation(entry.defId);
+                poolId = new ResourceLocation(entry.poolId);
             } catch (Exception e) {
                 continue;
             }
 
-            SpawnDefinition def = SpawnDefinitions.get(defId);
-            if (def == null) continue;
+            SpawnPool pool = SpawnPools.get(poolId);
+            if (pool == null) continue;
 
-            SpawnEntry picked = def.pickEntry(server.random);
+            ResourceLocation nodeId = pool.pickNodeId(server.random);
+            if (nodeId == null) continue;
+
+            SpawnNode nodeDef = SpawnNodes.get(nodeId);
+            if (nodeDef == null) continue;
+
+            SpawnEntry picked = nodeDef.pickEntry(server.random);
 
             CompoundTag patch = picked.combinedPatchCopy();
-            NbtMerge.mergeCompound(patch, entry.patch);
 
-            SpawnDefinition resolved = new SpawnDefinition(
-                    def.id,
+            // Create a resolved single-mode node for the spawn task pipeline
+            SpawnNode resolved = new SpawnNode(
+                    nodeDef.id,
                     picked.entityType,
                     picked.count,
                     picked.chance,
@@ -177,7 +185,9 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
         return scheduled;
     }
 
-    public boolean spawnOne(ServerLevel server, SpawnDefinition def, CompoundTag patch, BlockPos pos) {
+
+
+    public boolean spawnOne(ServerLevel server, SpawnNode def, CompoundTag patch, BlockPos pos) {
         Entity entity = def.entityType.create(server);
         if (!(entity instanceof Mob mob)) {
             if (entity != null) entity.discard();
@@ -185,16 +195,42 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
         }
 
         mob.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, mob.getYRot(), mob.getXRot());
-        mob.finalizeSpawn(server, server.getCurrentDifficultyAt(pos), MobSpawnType.TRIGGERED, null, null);
 
+        // If you want "structure" behavior globally, use STRUCTURE here.
+        mob.finalizeSpawn(server, server.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null, null);
+
+        // Apply NBT (this is where Passengers gets created)
         CompoundTag full = mob.saveWithoutId(new CompoundTag());
         NbtMerge.mergeCompound(full, patch);
         mob.load(full);
 
         server.addFreshEntity(mob);
-        spawnedMobs.add(mob.getUUID());
+
+        // Track root + passengers
+        trackSpawnTree(mob);
+
+        // Apply scaling to root + passengers (config can disable inside EntityScale or you gate it here)
+        scaleSpawnTree(mob);
+
         return true;
     }
+
+    private void trackSpawnTree(Entity root) {
+        spawnedMobs.add(root.getUUID());
+        for (Entity p : root.getPassengers()) {
+            trackSpawnTree(p);
+        }
+    }
+
+    private void scaleSpawnTree(Entity root) {
+        if (root instanceof LivingEntity living) {
+            EntityScale.scaleMobAttributes(living);
+        }
+        for (Entity p : root.getPassengers()) {
+            scaleSpawnTree(p);
+        }
+    }
+
 
 
     private boolean rollChance(ServerLevel level, double chance) {
@@ -244,7 +280,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
                         // IMPORTANT: store UNROTATED local offset, relative to the director
                         BlockPos rel = p.subtract(worldPosition);
 
-                        storedNodes.add(new StoredSpawnNode(rel, nodeBe.getSpawnDefId(), nodeBe.getSpawnPatch()));
+                        storedNodes.add(new StoredSpawnNode(rel, nodeBe.getSpawnPool()));
                         count++;
 
                         server.setBlock(p, Blocks.AIR.defaultBlockState(), 3);
@@ -272,8 +308,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
 
             BlockEntity be = server.getBlockEntity(p);
             if (be instanceof SpawnNodeBlockEntity nodeBe) {
-                nodeBe.setSpawnDefId(entry.defId);
-                nodeBe.setSpawnPatch(entry.patch);
+                nodeBe.setSpawnPool(entry.poolId);
                 nodeBe.setChanged();
 
                 BlockState st = server.getBlockState(p);
@@ -375,8 +410,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
             t.putInt("dx", e.relPos.getX());
             t.putInt("dy", e.relPos.getY());
             t.putInt("dz", e.relPos.getZ());
-            t.putString("DefId", e.defId);
-            t.put("Patch", e.patch.copy());
+            t.putString("PoolId", e.poolId);
             stored.add(t);
         }
         tag.put("StoredNodes", stored);
@@ -412,9 +446,8 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
             for (int i = 0; i < list.size(); i++) {
                 CompoundTag t = list.getCompound(i);
                 BlockPos rel = new BlockPos(t.getInt("dx"), t.getInt("dy"), t.getInt("dz"));
-                String defId = t.getString("DefId");
-                CompoundTag patch = t.contains("Patch") ? t.getCompound("Patch") : new CompoundTag();
-                this.storedNodes.add(new StoredSpawnNode(rel, defId, patch));
+                String poolId = t.getString("PoolId");
+                storedNodes.add(new StoredSpawnNode(rel, poolId));
             }
         }
 
@@ -445,13 +478,11 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
 
     public static class StoredSpawnNode {
         public final BlockPos relPos;
-        public final String defId;
-        public final CompoundTag patch;
+        public final String poolId;
 
-        public StoredSpawnNode(BlockPos relPos, String defId, CompoundTag patch) {
+        public StoredSpawnNode(BlockPos relPos, String poolId) {
             this.relPos = relPos;
-            this.defId = defId;
-            this.patch = patch == null ? new CompoundTag() : patch.copy();
+            this.poolId = poolId;
         }
     }
 }

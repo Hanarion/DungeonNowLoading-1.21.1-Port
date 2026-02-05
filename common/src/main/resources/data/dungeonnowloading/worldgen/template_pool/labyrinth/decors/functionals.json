@@ -3,7 +3,7 @@
   "fallback": "minecraft:empty",
   "elements": [
     {
-      "weight": 200,
+      "weight": 212,
       "element": {
         "element_type": "minecraft:empty_pool_element"
       }
@@ -33,15 +33,6 @@
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/anvils/damaged",
         "processors": "dungeonnowloading:labyrinth/anvil"
-      }
-    },
-    {
-      "weight": 12,
-      "element": {
-        "element_type": "minecraft:single_pool_element",
-        "projection": "rigid",
-        "location": "dungeonnowloading:labyrinth/decors/armor_stand",
-        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {

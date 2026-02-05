@@ -4,17 +4,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 
 public class SpawnEntry {
-    public final int weight;
+
     public final EntityType<?> entityType;
     public final int count;
-    public final double chance;      // 0..1
-    public final String spawnEffect; // "none" default
+    public final double chance;
+    public final String spawnEffect;
     public final CompoundTag nbtPatch;
     public final CompoundTag snbtPatch;
 
-    public SpawnEntry(int weight, EntityType<?> entityType, int count, double chance, String spawnEffect,
+    public SpawnEntry(EntityType<?> entityType, int count, double chance, String spawnEffect,
                       CompoundTag nbtPatch, CompoundTag snbtPatch) {
-        this.weight = Math.max(0, weight);
+
         this.entityType = entityType;
         this.count = Math.max(1, count);
         this.chance = Math.max(0.0, Math.min(1.0, chance));

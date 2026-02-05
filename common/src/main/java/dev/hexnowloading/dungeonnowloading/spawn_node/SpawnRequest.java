@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 
 public record SpawnRequest(
-        SpawnDefinition def,
+        SpawnNode node,
         CompoundTag patch,
         BlockPos basePos
 ) {}
