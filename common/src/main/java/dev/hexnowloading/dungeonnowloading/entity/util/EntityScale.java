@@ -59,11 +59,18 @@ public class EntityScale {
     }
 
     public static void scaleMobAttributes(LivingEntity entity) {
-        int health = (int) (entity.getMaxHealth() * MobConfig.DUNGEON_MOB_HEALTH_MODIFIER.get());
-        int attackDamage = (int) (entity.getAttribute(Attributes.ATTACK_DAMAGE).getValue() * MobConfig.DUNGEON_MOB_ATTACK_MODIFIER.get());
-        entity.getAttribute(Attributes.MAX_HEALTH).setBaseValue(health);
-        entity.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(attackDamage);
-        entity.setHealth(health);
+        var maxHealthAttr = entity.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealthAttr != null) {
+            double scaledHealth = maxHealthAttr.getBaseValue() * MobConfig.DUNGEON_MOB_HEALTH_MODIFIER.get();
+            maxHealthAttr.setBaseValue(scaledHealth);
+            entity.setHealth((float) entity.getMaxHealth());
+        }
+
+        var attackAttr = entity.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (attackAttr != null) {
+            double scaledAttack = attackAttr.getBaseValue() * MobConfig.DUNGEON_MOB_ATTACK_MODIFIER.get();
+            attackAttr.setBaseValue(scaledAttack);
+        }
     }
 
     public static double recallHpBonus(int defeatedCount) {

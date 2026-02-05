@@ -1,0 +1,7 @@
+{
+  "entity": "minecraft:skeleton_horse",
+  "count": 1,
+  "chance": 1.0,
+  "spawn_effect": "poof",
+  "snbt": "{PersistenceRequired:1b,Tame:1b,SaddleItem:{id:\"minecraft:saddle\",Count:1b}}"
+}

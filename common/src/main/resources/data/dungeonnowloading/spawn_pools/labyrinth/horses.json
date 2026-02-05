@@ -1,0 +1,6 @@
+{
+  "entries": [
+    { "weight": 1, "node": "dungeonnowloading:labyrinth/horse/zombie_horse" },
+    { "weight": 1, "node": "dungeonnowloading:labyrinth/horse/skeleton_horse" }
+  ]
+}

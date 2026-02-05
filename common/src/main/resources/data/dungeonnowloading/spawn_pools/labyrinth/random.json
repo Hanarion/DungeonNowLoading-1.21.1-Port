@@ -1,6 +1,19 @@
 {
   "entries": [
-    { "weight": 8, "node": "dungeonnowloading:labyrinth/husk" },
-    { "weight": 12, "node": "dungeonnowloading:labyrinth/zombie" }
+    { "weight": 50 },
+    { "weight": 20, "node": "dungeonnowloading:labyrinth/zombie/iron_axe" },
+    { "weight": 20, "node": "dungeonnowloading:labyrinth/zombie/gold_sword" },
+    { "weight": 5, "node": "dungeonnowloading:labyrinth/zombie/gold_axe" },
+    { "weight": 5, "node": "dungeonnowloading:labyrinth/zombie/diamond_axe" },
+    { "weight": 50 },
+    { "weight": 20, "node": "dungeonnowloading:labyrinth/skeleton/weak_flame_bow" },
+    { "weight": 20, "node": "dungeonnowloading:labyrinth/skeleton/weak_punch_bow" },
+    { "weight": 5, "node": "dungeonnowloading:labyrinth/skeleton/strong_flame_bow" },
+    { "weight": 5, "node": "dungeonnowloading:labyrinth/skeleton/strong_punch_bow" },
+    { "weight": 4, "node": "dungeonnowloading:labyrinth/spawner_carrier/zombie" },
+    { "weight": 3, "node": "dungeonnowloading:labyrinth/spawner_carrier/skeleton" },
+    { "weight": 3, "node": "dungeonnowloading:labyrinth/spawner_carrier/spider" },
+    { "weight": 10, "node": "dungeonnowloading:labyrinth/jockey/skeleton_spider" },
+    { "weight": 5, "node": "dungeonnowloading:labyrinth/jockey/skeleton_cave_spider" }
   ]
 }

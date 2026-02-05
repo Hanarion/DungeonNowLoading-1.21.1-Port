@@ -1,0 +1,7 @@
+{
+  "entity": "minecraft:zombie",
+  "count": 1,
+  "chance": 1.0,
+  "spawn_effect": "poof",
+  "snbt": "{PersistenceRequired:1b,LeftHanded:0b,HandItems:[{id:\"minecraft:iron_axe\",Count:1b,tag:{Enchantments:[{id:\"minecraft:sharpness\",lvl:3s},{id:\"minecraft:knockback\",lvl:2s}]}},{}],ArmorItems:[{id:\"minecraft:iron_boots\",Count:1b,tag:{Trim:{material:\"minecraft:netherite\",pattern:\"minecraft:wild\"}}},{id:\"minecraft:iron_leggings\",Count:1b,tag:{Trim:{material:\"minecraft:netherite\",pattern:\"minecraft:wild\"}}},{id:\"minecraft:iron_chestplate\",Count:1b,tag:{Trim:{material:\"minecraft:netherite\",pattern:\"minecraft:wild\"}}},{id:\"minecraft:iron_helmet\",Count:1b,tag:{Trim:{material:\"minecraft:netherite\",pattern:\"minecraft:wild\"}}}],HandDropChances:[0.0f,0.0f],ArmorDropChances:[0.0f,0.0f,0.0f,0.0f],DeathLootTable:\"dungeonnowloading:entities/modified/iron_zombie\"}"
+}

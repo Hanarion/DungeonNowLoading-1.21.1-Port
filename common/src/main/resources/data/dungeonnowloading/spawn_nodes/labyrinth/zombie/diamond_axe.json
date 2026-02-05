@@ -1,0 +1,7 @@
+{
+  "entity": "minecraft:zombie",
+  "count": 1,
+  "chance": 1.0,
+  "spawn_effect": "poof",
+  "snbt": "{PersistenceRequired:1b,Attributes:[{Name:\"generic.movement_speed\",Base:0.3d},{Name:\"generic.knockback_resistance\",Base:1.0d}],HandItems:[{id:\"minecraft:diamond_axe\",Count:1b,tag:{Enchantments:[{id:\"minecraft:sharpness\",lvl:5s},{id:\"minecraft:knockback\",lvl:5s}]}},{}],ArmorItems:[{id:\"minecraft:diamond_boots\",Count:1b,tag:{Trim:{material:\"minecraft:netherite\",pattern:\"minecraft:wild\"}}},{id:\"minecraft:diamond_leggings\",Count:1b,tag:{Trim:{material:\"minecraft:netherite\",pattern:\"minecraft:wild\"}}},{id:\"minecraft:diamond_chestplate\",Count:1b,tag:{Trim:{material:\"minecraft:netherite\",pattern:\"minecraft:wild\"}}},{id:\"minecraft:diamond_helmet\",Count:1b,tag:{Trim:{material:\"minecraft:netherite\",pattern:\"minecraft:wild\"}}}],HandDropChances:[0.0f,0.0f],ArmorDropChances:[0.0f,0.0f,0.0f,0.0f],DeathLootTable:\"dungeonnowloading:entities/modified/diamond_zombie\"}"
+}

@@ -20,7 +20,7 @@ public class SpawnPool {
         int total = 0;
         for (Entry e : entries) total += e.weight;
 
-        if (total <= 0) return entries.get(0).nodeId; // fallback
+        if (total <= 0) return null; // all weights 0 => empty
 
         int roll = random.nextInt(total);
         int acc = 0;

@@ -45,18 +45,28 @@ public class SpawnPoolReloadListener extends SimpleJsonResourceReloadListener {
                     if (!el.isJsonObject()) continue;
                     JsonObject eObj = el.getAsJsonObject();
 
-                    if (!eObj.has("node")) continue;
-
                     int weight = eObj.has("weight") ? eObj.get("weight").getAsInt() : 1;
 
-                    ResourceLocation nodeId;
-                    try {
-                        nodeId = new ResourceLocation(eObj.get("node").getAsString());
-                    } catch (Exception ex) {
-                        continue;
+                    ResourceLocation nodeId = null;
+
+                    if (eObj.has("node") && !eObj.get("node").isJsonNull()) {
+                        String raw = eObj.get("node").getAsString();
+
+                        // explicit "empty" support
+                        if (!raw.equalsIgnoreCase("empty") && !raw.isBlank()) {
+                            try {
+                                nodeId = new ResourceLocation(raw);
+                            } catch (Exception ex) {
+                                // invalid RL -> treat as empty roll (or continue; up to you)
+                                nodeId = null;
+                            }
+                        }
                     }
 
-                    entriesList.add(new SpawnPool.Entry(weight, nodeId));
+                    if (weight > 0) {
+                        entriesList.add(new SpawnPool.Entry(weight, nodeId));
+                    }
+
                 }
 
                 if (entriesList.isEmpty()) {

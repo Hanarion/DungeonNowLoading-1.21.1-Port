@@ -8,15 +8,13 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.spawn_node.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -188,32 +186,49 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
 
 
     public boolean spawnOne(ServerLevel server, SpawnNode def, CompoundTag patch, BlockPos pos) {
-        Entity entity = def.entityType.create(server);
-        if (!(entity instanceof Mob mob)) {
-            if (entity != null) entity.discard();
+        // Build a “spawn NBT” that vanilla can understand
+        CompoundTag nbt = new CompoundTag();
+
+        // IMPORTANT: EntityType.loadEntityRecursive needs "id"
+        nbt.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(def.entityType).toString());
+
+        // Merge in your patch (Passengers, PersistenceRequired, equipment, etc.)
+        if (patch != null) {
+            nbt.merge(patch);
+        }
+
+        // Create entity + passengers from NBT (this is the key!)
+        Entity loaded = EntityType.loadEntityRecursive(nbt, server, e -> {
+            e.moveTo(
+                    pos.getX() + 0.5,
+                    pos.getY(),
+                    pos.getZ() + 0.5,
+                    e.getYRot(),
+                    e.getXRot()
+            );
+            return e;
+        });
+
+        if (!(loaded instanceof Mob mob)) {
+            if (loaded != null) loaded.discard();
             return false;
         }
 
-        mob.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, mob.getYRot(), mob.getXRot());
-
-        // If you want "structure" behavior globally, use STRUCTURE here.
+        // Structure spawn finalize (runs AI setup, equipment rolls if any, etc.)
         mob.finalizeSpawn(server, server.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null, null);
 
-        // Apply NBT (this is where Passengers gets created)
-        CompoundTag full = mob.saveWithoutId(new CompoundTag());
-        NbtMerge.mergeCompound(full, patch);
-        mob.load(full);
-
-        server.addFreshEntity(mob);
+        // Add root + passengers
+        server.addFreshEntityWithPassengers(mob);
 
         // Track root + passengers
         trackSpawnTree(mob);
 
-        // Apply scaling to root + passengers (config can disable inside EntityScale or you gate it here)
+        // Scale root + passengers
         scaleSpawnTree(mob);
 
         return true;
     }
+
 
     private void trackSpawnTree(Entity root) {
         spawnedMobs.add(root.getUUID());
@@ -223,15 +238,13 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
     }
 
     private void scaleSpawnTree(Entity root) {
-        if (root instanceof LivingEntity living) {
-            EntityScale.scaleMobAttributes(living);
+        if (root instanceof Mob mob) {
+            EntityScale.scaleMobAttributes(mob);
         }
         for (Entity p : root.getPassengers()) {
             scaleSpawnTree(p);
         }
     }
-
-
 
     private boolean rollChance(ServerLevel level, double chance) {
         if (chance >= 1.0) return true;

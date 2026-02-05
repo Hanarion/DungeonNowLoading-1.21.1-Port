@@ -1,0 +1,7 @@
+{
+  "entries": [
+    { "weight": 2, "node": "dungeonnowloading:labyrinth/spawner_carrier/zombie" },
+    { "weight": 1, "node": "dungeonnowloading:labyrinth/spawner_carrier/skeleton" },
+    { "weight": 1, "node": "dungeonnowloading:labyrinth/spawner_carrier/spider" }
+  ]
+}
