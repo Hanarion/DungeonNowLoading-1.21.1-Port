@@ -33,7 +33,6 @@ public class DungeonDirectorBlock extends Block implements EntityBlock {
 
     public static final BooleanProperty REMOVE_AFTER_SUMMON = BooleanProperty.create("remove");
 
-
     public DungeonDirectorBlock(Properties props) {
         super(props);
         this.registerDefaultState(this.getStateDefinition().any().setValue(BlockStateProperties.FACING, Direction.NORTH).setValue(REMOVE_AFTER_SUMMON, false));
@@ -62,7 +61,6 @@ public class DungeonDirectorBlock extends Block implements EntityBlock {
 
         if (level.isClientSide) return InteractionResult.SUCCESS;
 
-        // If holding zone wand, let item handle click (sets region)
         if (player.getItemInHand(hand).is(DNLItems.ZONE_WAND.get())) {
             return InteractionResult.PASS;
         }
@@ -70,9 +68,8 @@ public class DungeonDirectorBlock extends Block implements EntityBlock {
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof DungeonDirectorBlockEntity director)) return InteractionResult.PASS;
 
-        // Authoring actions are creative-only
         if (!player.getAbilities().instabuild) {
-            return InteractionResult.PASS; // don’t spam survival players
+            return InteractionResult.PASS;
         }
 
         if (player.getAbilities().instabuild && player.getItemInHand(hand).is(Items.BARRIER)) {
@@ -99,13 +96,13 @@ public class DungeonDirectorBlock extends Block implements EntityBlock {
 
         int n;
         if (!director.isBaked()) {
-            n = director.bakeFromWorldSpawnNodes(); // <- rename if you kept old name
+            n = director.bakeFromWorldSpawnNodes();
             player.displayClientMessage(
                     Component.translatable("block.dungeonnowloading.dungeon_director.baked", n),
                     true
             );
         } else {
-            n = director.restoreSpawnNodesToWorld(); // <- rename if you kept old name
+            n = director.restoreSpawnNodesToWorld();
             player.displayClientMessage(
                     Component.translatable("block.dungeonnowloading.dungeon_director.restored", n),
                     true

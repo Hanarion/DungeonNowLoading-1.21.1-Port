@@ -150,13 +150,23 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
             SpawnDefinition def = SpawnDefinitions.get(defId);
             if (def == null) continue;
 
-            CompoundTag patch = def.combinedPatchCopy();
+            SpawnEntry picked = def.pickEntry(server.random);
+
+            CompoundTag patch = picked.combinedPatchCopy();
             NbtMerge.mergeCompound(patch, entry.patch);
 
-            SpawnRequest req = new SpawnRequest(def, patch, basePos);
+            SpawnDefinition resolved = new SpawnDefinition(
+                    def.id,
+                    picked.entityType,
+                    picked.count,
+                    picked.chance,
+                    picked.spawnEffect,
+                    picked.nbtPatch,
+                    picked.snbtPatch
+            );
 
-            // NEW: spawn_effect creates a task that controls the whole spawn process
-            SpawnTask task = DNLSpawnEffects.createTask(def.spawnEffect, req);
+            SpawnRequest req = new SpawnRequest(resolved, patch, basePos);
+            SpawnTask task = DNLSpawnEffects.createTask(resolved.spawnEffect, req);
             pendingTasks.add(task);
 
             scheduled++;

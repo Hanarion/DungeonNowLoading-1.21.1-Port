@@ -1,10 +1,19 @@
 {
-  "entity": "minecraft:zombie",
-  "count": 1,
-  "chance": 0.1,
-  "spawn_effect": "poof",
-  "nbt": {
-    "IsBaby": 1,
-    "Health": 40.0
-  }
+  "entries": [
+    {
+      "weight": 5,
+      "entity": "minecraft:zombie",
+      "count": 1,
+      "chance": 1.0,
+      "spawn_effect": "poof",
+      "nbt": { "IsBaby": 1, "Health": 40.0 }
+    },
+    {
+      "weight": 5,
+      "entity": "minecraft:husk",
+      "count": 1,
+      "chance": 1.0,
+      "spawn_effect": "poof"
+    }
+  ]
 }

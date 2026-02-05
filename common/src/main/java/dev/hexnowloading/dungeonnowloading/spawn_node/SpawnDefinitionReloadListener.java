@@ -14,6 +14,7 @@ import net.minecraft.world.entity.EntityType;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SpawnDefinitionReloadListener extends SimpleJsonResourceReloadListener {
@@ -36,31 +37,47 @@ public class SpawnDefinitionReloadListener extends SimpleJsonResourceReloadListe
             try {
                 JsonObject obj = entry.getValue().getAsJsonObject();
 
-                ResourceLocation entityId = new ResourceLocation(obj.get("entity").getAsString());
-                EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(entityId);
-                if (type == EntityType.PIG && !entityId.equals(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.PIG))) {
-                    // ignore; just a silly example check
-                }
-                if (type == null || type == EntityType.PIG && entityId.toString().equals("minecraft:empty")) {
-                    // BuiltInRegistries never returns null, but keep sanity checks if you want.
+                // TABLE MODE
+                if (obj.has("entries") && obj.get("entries").isJsonArray()) {
+                    var arr = obj.getAsJsonArray("entries");
+                    List<SpawnEntry> entriesList = new java.util.ArrayList<>();
+
+                    for (JsonElement el : arr) {
+                        if (!el.isJsonObject()) continue;
+                        JsonObject eObj = el.getAsJsonObject();
+
+                        int weight = eObj.has("weight") ? eObj.get("weight").getAsInt() : 1;
+
+                        SpawnEntry spawnEntry = parseEntryObject(eObj, weight);
+                        if (spawnEntry != null) entriesList.add(spawnEntry);
+                    }
+
+                    if (!entriesList.isEmpty()) {
+                        defs.put(id, new SpawnDefinition(id, entriesList));
+                    } else {
+                        logger.warn("Spawn definition {} has entries[], but none were valid.", id);
+                    }
+
+                    continue;
                 }
 
-                int count = obj.has("count") ? obj.get("count").getAsInt() : 1;
-                double chance = obj.has("chance") ? obj.get("chance").getAsDouble() : 1.0;
-                String spawnEffect = obj.has("spawn_effect") ? obj.get("spawn_effect").getAsString() : "none";
-
-                CompoundTag nbtPatch = new CompoundTag();
-                if (obj.has("nbt") && obj.get("nbt").isJsonObject()) {
-                    nbtPatch = jsonObjectToNbt(obj.getAsJsonObject("nbt"));
+                // SINGLE MODE (your current behavior)
+                SpawnEntry single = parseEntryObject(obj, 1);
+                if (single == null) {
+                    logger.warn("Spawn definition {} is invalid.", id);
+                    continue;
                 }
 
-                CompoundTag snbtPatch = new CompoundTag();
-                if (obj.has("snbt")) {
-                    String snbt = obj.get("snbt").getAsString();
-                    snbtPatch = TagParser.parseTag(snbt);
-                }
+                defs.put(id, new SpawnDefinition(
+                        id,
+                        single.entityType,
+                        single.count,
+                        single.chance,
+                        single.spawnEffect,
+                        single.nbtPatch,
+                        single.snbtPatch
+                ));
 
-                defs.put(id, new SpawnDefinition(id, type, count, chance, spawnEffect, nbtPatch, snbtPatch));
             } catch (Exception e) {
                 logger.error("Failed to load spawn definition {}: {}", id, e.toString());
             }
@@ -68,6 +85,37 @@ public class SpawnDefinitionReloadListener extends SimpleJsonResourceReloadListe
 
         SpawnDefinitions.replaceAll(defs);
         logger.info("Loaded {} spawn definitions.", defs.size());
+    }
+
+    private SpawnEntry parseEntryObject(JsonObject obj, int weight) {
+        try {
+            if (!obj.has("entity")) return null;
+
+            ResourceLocation entityId = new ResourceLocation(obj.get("entity").getAsString());
+            EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(entityId);
+
+            // BuiltInRegistries never returns null; you can validate by key match
+            if (!BuiltInRegistries.ENTITY_TYPE.containsKey(entityId)) return null;
+
+            int count = obj.has("count") ? obj.get("count").getAsInt() : 1;
+            double chance = obj.has("chance") ? obj.get("chance").getAsDouble() : 1.0;
+            String spawnEffect = obj.has("spawn_effect") ? obj.get("spawn_effect").getAsString() : "none";
+
+            CompoundTag nbtPatch = new CompoundTag();
+            if (obj.has("nbt") && obj.get("nbt").isJsonObject()) {
+                nbtPatch = jsonObjectToNbt(obj.getAsJsonObject("nbt"));
+            }
+
+            CompoundTag snbtPatch = new CompoundTag();
+            if (obj.has("snbt")) {
+                String snbt = obj.get("snbt").getAsString();
+                snbtPatch = TagParser.parseTag(snbt);
+            }
+
+            return new SpawnEntry(weight, type, count, chance, spawnEffect, nbtPatch, snbtPatch);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     /**
