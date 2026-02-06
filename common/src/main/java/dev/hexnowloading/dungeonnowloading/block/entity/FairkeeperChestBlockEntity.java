@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
 import dev.hexnowloading.dungeonnowloading.block.FairkeeperChestBlock;
+import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.ChestStates;
 import dev.hexnowloading.dungeonnowloading.particle.type.AxisParticleType;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
@@ -9,6 +10,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -45,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity implements MenuProvider {
+public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity implements MenuProvider, ZoneReceiverBlockEntity {
     public static final String LOOT_TABLE_TAG = "LootTable";
     public static final String LOOT_TABLE_SEED_TAG = "LootTableSeed";
     private NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
@@ -73,6 +75,7 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
     private static final int OPEN_CLOSE_ANIMATION_DURATION = 10;
     private int openCloseAnimationProgress = 0;
     private int prevOpenCloseAnimationProgress = 0;
+    private boolean regionAuthoredByWand = false;
 
     public FairkeeperChestBlockEntity(BlockPos pos, BlockState state) {
         super(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), pos, state);
@@ -378,6 +381,14 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
     }
 
     private static void updateActualRegion(Level level, BlockPos pos, BlockState state, FairkeeperChestBlockEntity blockEntity) {
+        if (blockEntity.regionAuthoredByWand) {
+            // still handle rotation if the chest was moved/rotated by structure transforms
+            if (blockEntity.oldBlockPos != null && !pos.equals(blockEntity.oldBlockPos)) {
+                rotationalSetRegion(level, pos, state, blockEntity);
+                blockEntity.oldBlockPos = pos;
+            }
+            return;
+        }
         if (blockEntity.maxRegion == null) {
             blockEntity.maxRegion = new BlockPos(0, 0, 0);
         }
@@ -618,5 +629,64 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
 
     public boolean isDisabled(FairkeeperChestBlockEntity blockEntity) {
         return blockEntity.disabled;
+    }
+
+    @Override
+    public void setRegion(BlockPos cornerAWorld, BlockPos cornerBWorld, Direction authoredFacing) {
+        BlockPos origin = this.getBlockPos();
+
+        this.regionAuthoredByWand = true;
+        // store authored facing as your int system expects
+        this.facing = facingToInt(authoredFacing == null ? Direction.NORTH : authoredFacing);
+
+        // store "oldBlockPos" so your rotation update logic knows what it was authored at
+        this.oldBlockPos = origin;
+
+        // convert world corners -> offsets relative to chest
+        BlockPos aOff = cornerAWorld.subtract(origin);
+        BlockPos bOff = cornerBWorld.subtract(origin);
+
+        // your code treats maxRegion/minRegion as offsets (can be any ordering)
+        this.maxRegion = aOff;
+        this.minRegion = bOff;
+
+        // compute actualRegion bounds right now (world-space)
+        applyOffsetsToActualRegion(origin, this.maxRegion, this.minRegion);
+
+        setChanged();
+        if (this.level != null && !this.level.isClientSide) {
+            BlockState st = this.getBlockState();
+            this.level.sendBlockUpdated(this.worldPosition, st, st, 3);
+        }
+    }
+
+    private static int facingToInt(Direction dir) {
+        // Match whatever FairkeeperChestBlock.getFacingInt uses.
+        // If you can call that directly, do it instead.
+        return switch (dir) {
+            case EAST  -> 1;
+            case SOUTH -> 2;
+            case WEST  -> 3;
+            default    -> 0; // NORTH
+        };
+    }
+
+    private void applyOffsetsToActualRegion(BlockPos origin, BlockPos offA, BlockPos offB) {
+        int x1 = origin.getX() + offA.getX();
+        int y1 = origin.getY() + offA.getY();
+        int z1 = origin.getZ() + offA.getZ();
+
+        int x2 = origin.getX() + offB.getX();
+        int y2 = origin.getY() + offB.getY();
+        int z2 = origin.getZ() + offB.getZ();
+
+        // Your logic generally uses region1 = max+1, region2 = min (for inclusive bounds checks)
+        this.actualRegion1X = Math.max(x1, x2) + 1;
+        this.actualRegion1Y = Math.max(y1, y2) + 1;
+        this.actualRegion1Z = Math.max(z1, z2) + 1;
+
+        this.actualRegion2X = Math.min(x1, x2);
+        this.actualRegion2Y = Math.min(y1, y2);
+        this.actualRegion2Z = Math.min(z1, z2);
     }
 }

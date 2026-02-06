@@ -39,12 +39,14 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
 
     // Runtime encounter state
     private boolean triggered = false;
+    private float triggerRangeMultiplier = 0.0f;
     private boolean cleared = false;
     private final Set<UUID> spawnedMobs = new HashSet<>();
     private int tickCounter = 0;
 
     private final List<SpawnTask> pendingTasks = new ArrayList<>();
     private boolean spawnsScheduled = false;
+
 
     public DungeonDirectorBlockEntity(BlockPos pos, BlockState state) {
         super(DNLBlockEntityTypes.DUNGEON_DIRECTOR.get(), pos, state);
@@ -100,7 +102,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
 
     private boolean isAnySurvivalPlayerInsideRegion() {
         if (!(level instanceof ServerLevel server)) return false;
-        AABB box = getRegionAabbInflated(0.0);
+        AABB box = getRegionAabbInflated(triggerRangeMultiplier);
         return !server.getEntitiesOfClass(Player.class, box,
                 p -> !p.isSpectator() && !p.getAbilities().instabuild
         ).isEmpty();
@@ -186,7 +188,6 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
 
 
     public boolean spawnOne(ServerLevel server, SpawnNode def, CompoundTag patch, BlockPos pos) {
-        // Build a “spawn NBT” that vanilla can understand
         CompoundTag nbt = new CompoundTag();
 
         // IMPORTANT: EntityType.loadEntityRecursive needs "id"
@@ -410,6 +411,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
 
+        tag.putFloat("TriggerRangeMultiplier", triggerRangeMultiplier);
         tag.put("CornerA", writePos(cornerAOffset));
         tag.put("CornerB", writePos(cornerBOffset));
         tag.putInt("AuthoredFacing", authoredFacing.get3DDataValue());
@@ -444,6 +446,9 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
     public void load(CompoundTag tag) {
         super.load(tag);
 
+        this.triggerRangeMultiplier = tag.contains("TriggerRangeMultiplier")
+                ? tag.getFloat("TriggerRangeMultiplier")
+                : 10.0F;
         this.cornerAOffset = tag.contains("CornerA") ? readPos(tag.getCompound("CornerA")) : BlockPos.ZERO;
         this.cornerBOffset = tag.contains("CornerB") ? readPos(tag.getCompound("CornerB")) : BlockPos.ZERO;
         this.authoredFacing = tag.contains("AuthoredFacing")

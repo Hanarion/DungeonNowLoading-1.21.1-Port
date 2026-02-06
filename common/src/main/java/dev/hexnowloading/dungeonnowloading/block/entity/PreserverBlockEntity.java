@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
 import com.mojang.logging.LogUtils;
+import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.game_event_listener.PreserverBlockDestructionSystem;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
@@ -17,7 +18,7 @@ import org.slf4j.Logger;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PreserverBlockEntity extends BlockEntity implements GameEventListener.Holder<PreserverBlockDestructionSystem.Listener>, PreserverBlockDestructionSystem {
+public class PreserverBlockEntity extends BlockEntity implements GameEventListener.Holder<PreserverBlockDestructionSystem.Listener>, PreserverBlockDestructionSystem, ZoneReceiverBlockEntity {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private PreserverBlockDestructionSystem.User user;
@@ -103,5 +104,27 @@ public class PreserverBlockEntity extends BlockEntity implements GameEventListen
             positions.add(new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
         }
         return positions;
+    }
+
+    @Override
+    public void setRegion(BlockPos cornerAWorld, BlockPos cornerBWorld, Direction authoredFacing) {
+        // store OFFSETS relative to this block
+        BlockPos aOff = cornerAWorld.subtract(this.getBlockPos());
+        BlockPos bOff = cornerBWorld.subtract(this.getBlockPos());
+
+        Direction facing = authoredFacing == null ? Direction.NORTH : authoredFacing;
+
+        // Update the User (this is what your codec saves/loads already)
+        this.user = new PreserverBlockDestructionSystem.User(this.getBlockPos(), aOff, bOff, facing);
+
+        // Optional: if your listener caches anything (usually it shouldn’t), rebuild it
+        // this.gameEventListener = new PreserverBlockDestructionSystem.Listener(this);
+
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            BlockState st = this.getBlockState();
+            this.level.sendBlockUpdated(this.worldPosition, st, st, 3);
+        }
     }
 }
