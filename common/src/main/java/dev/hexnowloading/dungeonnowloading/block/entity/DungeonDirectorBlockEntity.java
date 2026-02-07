@@ -189,24 +189,13 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
 
     public boolean spawnOne(ServerLevel server, SpawnNode def, CompoundTag patch, BlockPos pos) {
         CompoundTag nbt = new CompoundTag();
-
-        // IMPORTANT: EntityType.loadEntityRecursive needs "id"
         nbt.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(def.entityType).toString());
 
-        // Merge in your patch (Passengers, PersistenceRequired, equipment, etc.)
-        if (patch != null) {
-            nbt.merge(patch);
-        }
+        // Create entity (+ passengers if your patch includes Passengers)
+        if (patch != null) nbt.merge(patch);
 
-        // Create entity + passengers from NBT (this is the key!)
         Entity loaded = EntityType.loadEntityRecursive(nbt, server, e -> {
-            e.moveTo(
-                    pos.getX() + 0.5,
-                    pos.getY(),
-                    pos.getZ() + 0.5,
-                    e.getYRot(),
-                    e.getXRot()
-            );
+            e.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, e.getYRot(), e.getXRot());
             return e;
         });
 
@@ -215,18 +204,21 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
             return false;
         }
 
-        // Structure spawn finalize (runs AI setup, equipment rolls if any, etc.)
+        // 1) Vanilla setup FIRST (may overwrite gear)
         mob.finalizeSpawn(server, server.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null, null);
 
-        // Add root + passengers
+        // 2) Then FORCE our custom NBT LAST (restores enchanted bow, armor, etc.)
+        if (patch != null && !patch.isEmpty()) {
+            CompoundTag full = mob.saveWithoutId(new CompoundTag());
+            NbtMerge.mergeCompound(full, patch);
+            mob.load(full);
+        }
+
+        // 3) Add root + passengers
         server.addFreshEntityWithPassengers(mob);
 
-        // Track root + passengers
         trackSpawnTree(mob);
-
-        // Scale root + passengers
         scaleSpawnTree(mob);
-
         return true;
     }
 
