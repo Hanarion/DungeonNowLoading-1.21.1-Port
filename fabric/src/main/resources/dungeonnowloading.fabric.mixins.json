@@ -19,7 +19,6 @@
     "block.IronBarsMixin",
     "items.ItemInHandRendererMixin",
     "items.ItemStackBreakProtectionMixin",
-    "items.ItemStackDurableEnchantmentMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",
