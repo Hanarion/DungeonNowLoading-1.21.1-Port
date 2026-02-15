@@ -36,10 +36,12 @@ public class BrokenGarholdEntity extends Monster {
     public final AnimationState idleAnimationState = new AnimationState();
     public final AnimationState fallingStartAnimationState = new AnimationState();
     public final AnimationState fallingAnimationState = new AnimationState();
+    public final AnimationState openAnimationState = new AnimationState();
 
     private int hurtHits = 0;
     private boolean dropping = false;
     private boolean broken = false;
+    private boolean releaseInsteadOfDrop = false;
 
     public BrokenGarholdEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -64,13 +66,15 @@ public class BrokenGarholdEntity extends Monster {
     @Override
     public void addAdditionalSaveData(CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
-        compoundTag.putBoolean("Chained", this.entityData.get(STATE) == BrokenGarholdState.HANGING);
+        compoundTag.putBoolean("Chained", this.entityData.get(STATE) == BrokenGarholdState.HANGING || this.entityData.get(STATE) == BrokenGarholdState.OPEN);
+        compoundTag.putBoolean("ReleaseInsteadOfDrop", this.releaseInsteadOfDrop);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         this.entityData.set(STATE, compoundTag.getBoolean("Chained") ? BrokenGarholdState.HANGING : BrokenGarholdState.FALLING);
+        this.releaseInsteadOfDrop = compoundTag.getBoolean("ReleaseInsteadOfDrop");
     }
 
     @Override
@@ -197,9 +201,14 @@ public class BrokenGarholdEntity extends Monster {
                 return true;
             }
 
-            if (this.random.nextFloat() < 0.5f) {
+            if (releaseInsteadOfDrop) {
+                hurtHits = 0;
+                this.setHealth(25.0f);
+                this.playOpenAnimation();
+            } else {
                 this.playFallingAnimation();
             }
+
         }
 
         return true;
@@ -238,14 +247,24 @@ public class BrokenGarholdEntity extends Monster {
     public void push(double x, double y, double z) {
     }
 
-    public boolean isHanging() {
-        return this.entityData.get(STATE).equals(BrokenGarholdState.HANGING);
+    public void setReleaseInsteadOfDrop(boolean value) {
+        this.releaseInsteadOfDrop = value;
+    }
+
+    public boolean isHangingOrOpening() {
+        return this.entityData.get(STATE).equals(BrokenGarholdState.HANGING) || this.entityData.get(STATE).equals(BrokenGarholdState.OPEN);
     }
 
     public void playFallingAnimation() {
         this.animationChainer.reset();
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(BrokenGarholdState.FALLING_START, BrokenGarholdAnimationDuration.FALLING_START, null, this::beginDrop));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(BrokenGarholdState.FALLING, BrokenGarholdAnimationDuration.FALLING));
+    }
+
+    public void playOpenAnimation() {
+        this.animationChainer.reset();
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(BrokenGarholdState.OPEN, BrokenGarholdAnimationDuration.OPEN, this::forceDismountAtSeat, null));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(BrokenGarholdState.HANGING, 0.0F));
     }
 
     @Override
@@ -258,6 +277,7 @@ public class BrokenGarholdEntity extends Monster {
                     this.fallingStartAnimationState.stop();
                     this.fallingAnimationState.startIfStopped(this.tickCount);
                 }
+                case OPEN -> this.openAnimationState.start(this.tickCount);
             }
 
         }
@@ -266,8 +286,10 @@ public class BrokenGarholdEntity extends Monster {
 
     public BrokenGarholdEntity transitionTo(BrokenGarholdState state) {
         switch (state) {
+            case HANGING -> this.entityData.set(STATE, BrokenGarholdState.HANGING);
             case FALLING_START -> this.entityData.set(STATE, BrokenGarholdState.FALLING_START);
             case FALLING -> this.entityData.set(STATE, BrokenGarholdState.FALLING);
+            case OPEN -> this.entityData.set(STATE, BrokenGarholdState.OPEN);
         }
         return this;
     }
@@ -275,6 +297,7 @@ public class BrokenGarholdEntity extends Monster {
     public enum BrokenGarholdState {
         HANGING,
         FALLING_START,
-        FALLING
+        FALLING,
+        OPEN
     }
 }

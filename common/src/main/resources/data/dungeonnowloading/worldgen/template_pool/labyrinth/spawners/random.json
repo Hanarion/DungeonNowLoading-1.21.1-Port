@@ -2,27 +2,66 @@
   "fallback": "dungeonnowloading:labyrinth/spawners/random",
   "elements": [
     {
-      "weight": 2,
+      "weight": 30,
       "element": {
-        "element_type": "minecraft:feature_pool_element",
+        "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "feature": "dungeonnowloading:spawners/zombie"
+        "location": "dungeonnowloading:labyrinth/spawners/zombie",
+        "processors": "minecraft:empty"
       }
     },
     {
-      "weight": 1,
+      "weight": 20,
       "element": {
-        "element_type": "minecraft:feature_pool_element",
+        "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "feature": "dungeonnowloading:spawners/skeleton"
+        "location": "dungeonnowloading:labyrinth/spawners/skeleton",
+        "processors": "minecraft:empty"
       }
     },
     {
-      "weight": 1,
+      "weight": 20,
       "element": {
-        "element_type": "minecraft:feature_pool_element",
+        "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "feature": "dungeonnowloading:spawners/spider"
+        "location": "dungeonnowloading:labyrinth/spawners/spider",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/spawners/cave_spider",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 15,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/spawners/creeper",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/spawners/silverfish",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/spawners/hollow",
+        "processors": "minecraft:empty"
       }
     }
   ]

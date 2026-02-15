@@ -1,0 +1,18 @@
+{
+  "processors": [
+    {
+      "processor_type": "dungeonnowloading:book_pile_randomizer_processor",
+      "pile_min": 1,
+      "pile_max": 4,
+      "write_seed": true,
+      "loot_tables": [
+        "dungeonnowloading:chests/labyrinth/enchantments/commander",
+        "dungeonnowloading:chests/labyrinth/enchantments/gigantism",
+        "dungeonnowloading:chests/labyrinth/enchantments/overworked",
+        "dungeonnowloading:chests/labyrinth/enchantments/pack_blessing",
+        "dungeonnowloading:chests/labyrinth/enchantments/reckless",
+        "dungeonnowloading:chests/labyrinth/enchantments/sacrifice"
+      ]
+    }
+  ]
+}

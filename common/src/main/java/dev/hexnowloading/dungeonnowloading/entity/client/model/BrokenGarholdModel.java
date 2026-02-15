@@ -28,8 +28,10 @@ public class BrokenGarholdModel<T extends BrokenGarholdEntity> extends Hierarchi
     private final ModelPart RightBar;
     private final ModelPart UpBar;
     private final ModelPart Rightdoor;
+    private final ModelPart RightDoorOpenable;
     private final ModelPart BottBar;
     private final ModelPart Leftdoor;
+    private final ModelPart LeftDoorOpenable;
 
     public BrokenGarholdModel(ModelPart root) {
         this.root = root;
@@ -45,8 +47,10 @@ public class BrokenGarholdModel<T extends BrokenGarholdEntity> extends Hierarchi
         this.RightBar = this.gate.getChild("RightBar");
         this.UpBar = this.RightBar.getChild("UpBar");
         this.Rightdoor = this.gate.getChild("Rightdoor");
+        this.RightDoorOpenable = this.Rightdoor.getChild("RightDoorOpenable");
         this.BottBar = this.Rightdoor.getChild("BottBar");
         this.Leftdoor = this.gate.getChild("Leftdoor");
+        this.LeftDoorOpenable = this.Leftdoor.getChild("LeftDoorOpenable");
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -61,7 +65,7 @@ public class BrokenGarholdModel<T extends BrokenGarholdEntity> extends Hierarchi
 
         PartDefinition leftwing = bone.addOrReplaceChild("leftwing", CubeListBuilder.create().texOffs(101, 116).addBox(-2.0F, -15.0F, 0.0F, 18.0F, 16.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(3.1548F, -41.2938F, -0.0194F));
 
-        PartDefinition gate = bone.addOrReplaceChild("gate", CubeListBuilder.create().texOffs(0, 0).addBox(-8.0F, 7.4667F, -6.9333F, 16.0F, 32.0F, 16.0F, new CubeDeformation(-0.001F))
+        PartDefinition gate = bone.addOrReplaceChild("gate", CubeListBuilder.create()
                 .texOffs(0, 0).addBox(-8.0F, 7.4667F, -6.9333F, 16.0F, 32.0F, 16.0F, new CubeDeformation(-0.001F))
                 .texOffs(64, 11).addBox(-9.0F, 0.4667F, -1.9333F, 18.0F, 5.0F, 6.0F, new CubeDeformation(0.0F))
                 .texOffs(48, 48).addBox(-9.0F, 5.4667F, -4.9333F, 18.0F, 2.0F, 12.0F, new CubeDeformation(0.0F))
@@ -87,15 +91,17 @@ public class BrokenGarholdModel<T extends BrokenGarholdEntity> extends Hierarchi
 
         PartDefinition UpBar = RightBar.addOrReplaceChild("UpBar", CubeListBuilder.create().texOffs(36, 99).addBox(-1.5F, 0.0F, -1.5F, 3.0F, 16.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(7.5F, -32.0F, -7.5F));
 
-        PartDefinition Rightdoor = gate.addOrReplaceChild("Rightdoor", CubeListBuilder.create().texOffs(0, 138).addBox(-0.5F, 0.0F, -9.0F, 9.0F, 2.0F, 18.0F, new CubeDeformation(0.0F))
-                .texOffs(51, 78).addBox(-1.5F, -1.0F, -3.0F, 3.0F, 4.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(-8.5F, 39.4667F, 1.0667F));
+        PartDefinition Rightdoor = gate.addOrReplaceChild("Rightdoor", CubeListBuilder.create().texOffs(51, 78).addBox(-1.5F, -1.0F, -3.0F, 3.0F, 4.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(-8.5F, 39.4667F, 1.0667F));
+
+        PartDefinition RightDoorOpenable = Rightdoor.addOrReplaceChild("RightDoorOpenable", CubeListBuilder.create().texOffs(0, 138).addBox(-0.7737F, -0.5081F, -8.948F, 9.0F, 2.0F, 18.0F, new CubeDeformation(0.0F)), PartPose.offset(0.2737F, 0.5081F, -0.052F));
 
         PartDefinition BottBar = Rightdoor.addOrReplaceChild("BottBar", CubeListBuilder.create().texOffs(37, 114).addBox(-1.5F, -16.0F, -1.5F, 3.0F, 16.0F, 3.0F, new CubeDeformation(0.0F))
                 .texOffs(138, 78).addBox(-0.5F, -16.0F, -8.5F, 0.0F, 16.0F, 7.0F, new CubeDeformation(0.0F)), PartPose.offset(1.0F, 0.0F, 7.5F));
 
         PartDefinition Leftdoor = gate.addOrReplaceChild("Leftdoor", CubeListBuilder.create().texOffs(80, 77).mirror().addBox(-1.5F, -1.0F, -3.0F, 3.0F, 4.0F, 6.0F, new CubeDeformation(0.0F)).mirror(false)
-                .texOffs(0, 163).addBox(-8.5F, 0.0F, -9.0F, 9.0F, 2.0F, 18.0F, new CubeDeformation(0.0F))
                 .texOffs(0, 126).addBox(-2.5F, -4.0F, -9.0F, 3.0F, 4.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(8.5F, 39.4667F, 1.0667F));
+
+        PartDefinition LeftDoorOpenable = Leftdoor.addOrReplaceChild("LeftDoorOpenable", CubeListBuilder.create().texOffs(0, 163).addBox(-8.2737F, -0.5081F, -8.948F, 9.0F, 2.0F, 18.0F, new CubeDeformation(0.0F)), PartPose.offset(-0.2263F, 0.5081F, -0.052F));
 
         return LayerDefinition.create(meshdefinition, 256, 256);
     }
@@ -106,11 +112,12 @@ public class BrokenGarholdModel<T extends BrokenGarholdEntity> extends Hierarchi
 
         entity.idleAnimationState.startIfStopped(entity.tickCount);
 
-        if (entity.isHanging()) {
+        if (entity.isHangingOrOpening()) {
             this.animate(entity.idleAnimationState, BrokenGarholdAnimation.BROKEN_IDLE, ageInTicks);
         }
         this.animate(entity.fallingStartAnimationState, BrokenGarholdAnimation.FALLING_START, ageInTicks);
         this.animate(entity.fallingAnimationState, BrokenGarholdAnimation.FALLING, ageInTicks);
+        this.animate(entity.openAnimationState, BrokenGarholdAnimation.OPEN, ageInTicks);
     }
 
     @Override

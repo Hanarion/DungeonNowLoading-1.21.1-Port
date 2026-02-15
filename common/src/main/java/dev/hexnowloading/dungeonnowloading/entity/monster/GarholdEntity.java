@@ -30,6 +30,7 @@ import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.level.Level;
@@ -425,9 +426,14 @@ public class GarholdEntity extends Monster {
 
         if (!this.level().isClientSide) {
             if (player.getAbilities().instabuild) {
-                if (stack.getItem() instanceof PickaxeItem) {
+
+                boolean usePickaxe = stack.getItem() instanceof PickaxeItem;
+                boolean useHoe = stack.getItem() instanceof HoeItem;
+
+                if (usePickaxe || useHoe) {
                     ServerLevel level = (ServerLevel) this.level();
-                    BrokenGarholdEntity broken = DNLEntityTypes.BROKEN_GARHOLD.get().create(level); // <-- replace with your entity registry access
+                    BrokenGarholdEntity broken = DNLEntityTypes.BROKEN_GARHOLD.get().create(level);
+
                     if (broken != null) {
                         broken.moveTo(
                                 this.getX(),
@@ -436,11 +442,18 @@ public class GarholdEntity extends Monster {
                                 this.getYRot(),
                                 this.getXRot()
                         );
+
                         broken.setYHeadRot(this.getYHeadRot());
                         broken.setYBodyRot(this.yBodyRot);
 
+                        // 👇 If right-clicked with hoe → open & release instead of drop
+                        if (useHoe) {
+                            broken.setReleaseInsteadOfDrop(true);
+                        }
+
                         level.addFreshEntity(broken);
                     }
+
                     this.discard();
                     return InteractionResult.CONSUME;
                 }
