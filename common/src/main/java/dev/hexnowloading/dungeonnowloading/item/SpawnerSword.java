@@ -35,6 +35,12 @@ public class SpawnerSword extends SwordItem {
                 return true;
             }
 
+            // If self damage would kill the attacker, do nothing (no self damage and no bonus damage).
+            // This matches: "shouldn't kill the user, but also shouldn't apply the bonus damage".
+            if (recklessLevel > 0 && attacker.getHealth() <= selfDamage) {
+                return result;
+            }
+
             // Always apply: 1 + reckless level.
             attacker.hurt(attacker.damageSources().magic(), selfDamage);
         }
@@ -48,6 +54,11 @@ public class SpawnerSword extends SwordItem {
     public static float onLivingDamage(LivingEntity attacker, LivingEntity target, float damage) {
         int recklessLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.RECKLESS.get(), attacker.getMainHandItem());
         if (recklessLevel > 0 && damage > 0.0F) {
+            float selfDamage = 1.0F + recklessLevel;
+            // If applying reckless self-damage would kill the attacker, don't grant the bonus damage.
+            if (attacker.getHealth() <= selfDamage) {
+                return damage;
+            }
             // Increase outgoing damage: +2 * level
             damage += 2.0F * recklessLevel;
         }

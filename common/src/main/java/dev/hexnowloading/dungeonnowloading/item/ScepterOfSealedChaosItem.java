@@ -74,55 +74,59 @@ public class ScepterOfSealedChaosItem extends Item {
             if (player == null) {
                 return InteractionResult.PASS;
             }
+        }
 
+        BlockPos playerPos = new BlockPos((int) player.getX(), (int) player.getY(), (int) player.getZ());
+        level.playSound(player, playerPos, SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS);
+
+        boolean spawned = false;
+
+        if (!level.isClientSide) {
+            BlockPos blockPos = useOnContext.getClickedPos();
+            Direction direction = useOnContext.getClickedFace();
+            BlockState blockState = level.getBlockState(blockPos);
+            BlockPos blockPos1;
+            if (blockState.getCollisionShape(level, blockPos).isEmpty()) {
+                blockPos1 = blockPos;
+            } else {
+                blockPos1 = blockPos.relative(direction);
+            }
             // Cooldown is applied after we know whether the summon succeeds.
 
-            BlockPos playerPos = new BlockPos((int) player.getX(), (int) player.getY(), (int) player.getZ());
             level.playSound(player, playerPos, DNLSounds.SEALED_CHAOS_PLACE.get(), SoundSource.PLAYERS, 0.5F, 0.8F);
             //level.playSound(player, playerPos, SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS);
-            if (!level.isClientSide) {
-                BlockPos blockPos = useOnContext.getClickedPos();
-                Direction direction = useOnContext.getClickedFace();
-                BlockState blockState = level.getBlockState(blockPos);
-                BlockPos blockPos1;
-                if (blockState.getCollisionShape(level, blockPos).isEmpty()) {
-                    blockPos1 = blockPos;
-                } else {
-                    blockPos1 = blockPos.relative(direction);
+
+            SealedChaosEntity sealedChaosEntity = DNLEntityTypes.SEALED_CHAOS.get().create(level);
+            if (sealedChaosEntity != null) {
+                sealedChaosEntity.moveTo(blockPos1, 0.0F, 0.0F);
+                sealedChaosEntity.setOwnerUUID(player.getUUID());
+
+                int arcLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.ARC_SHOT.get(), itemStack);
+                int pulseLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.PULSE_SHOT.get(), itemStack);
+                sealedChaosEntity.setArcShotLevel(Math.max(0, Math.min(2, arcLevel)));
+                sealedChaosEntity.setPulseShotLevel(Math.max(0, Math.min(2, pulseLevel)));
+
+                int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), itemStack);
+                if (gigantismLevel > 0) {
+                    sealedChaosEntity.setGigantic(true);
                 }
 
-                SealedChaosEntity sealedChaosEntity = DNLEntityTypes.SEALED_CHAOS.get().create(level);
-                if (sealedChaosEntity != null) {
-                    sealedChaosEntity.moveTo(blockPos1, 0.0F, 0.0F);
-                    sealedChaosEntity.setOwnerUUID(player.getUUID());
+                // Prevent spawn if there is not enough free space for its (possibly gigantic) bounding box
+                if (!level.noCollision(sealedChaosEntity)) {
+                    player.getCooldowns().addCooldown(this, 20);
+                    player.displayClientMessage(Component.literal("Not enough space for summon").withStyle(ChatFormatting.RED), true);
+                    return InteractionResult.FAIL;
+                }
 
-                    int arcLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.ARC_SHOT.get(), itemStack);
-                    int pulseLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.PULSE_SHOT.get(), itemStack);
-                    sealedChaosEntity.setArcShotLevel(Math.max(0, Math.min(2, arcLevel)));
-                    sealedChaosEntity.setPulseShotLevel(Math.max(0, Math.min(2, pulseLevel)));
+                // Visuals only for successful spawns
+                ((ServerLevel) level).sendParticles(ParticleTypes.POOF, blockPos1.getX() + 0.5F, blockPos1.getY() + 0.5F, blockPos1.getZ() + 0.5F, 20, 0.3D, 0.3D, 0.3D, 0.0D);
+                ((ServerLevel) level).sendParticles(ParticleTypes.FLAME, blockPos1.getX() + 0.5F, blockPos1.getY() + 0.5F, blockPos1.getZ() + 0.5F, 10, 0.3D, 0.3D, 0.3D, 0.0D);
 
-                    int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), itemStack);
-                    if (gigantismLevel > 0) {
-                        sealedChaosEntity.setGigantic(true);
-                    }
-
-                    // Prevent spawn if there is not enough free space for its (possibly gigantic) bounding box
-                    if (!level.noCollision(sealedChaosEntity)) {
-                        // Short cooldown on failed placement (prevents spam, but doesn't punish the player like a full summon).
-                        player.getCooldowns().addCooldown(this, 40);
-                        player.displayClientMessage(Component.literal("Not enough space for summon").withStyle(ChatFormatting.RED), true);
-                        return InteractionResult.FAIL;
-                    }
-
-                    // Visuals only for successful spawns
-                    ((ServerLevel) level).sendParticles(ParticleTypes.POOF, blockPos1.getX() + 0.5F, blockPos1.getY() + 0.5F, blockPos1.getZ() + 0.5F, 20, 0.3D, 0.3D, 0.3D, 0.0D);
-                    ((ServerLevel) level).sendParticles(ParticleTypes.FLAME, blockPos1.getX() + 0.5F, blockPos1.getY() + 0.5F, blockPos1.getZ() + 0.5F, 10, 0.3D, 0.3D, 0.3D, 0.0D);
-
-                    int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), itemStack);
-                    if (overworkedLevel > 0) {
-                        sealedChaosEntity.setOverworkedLevel(overworkedLevel);
-                        sealedChaosEntity.applyOverworkedAttackSpeedBonus();
-                    }
+                int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), itemStack);
+                if (overworkedLevel > 0) {
+                    sealedChaosEntity.setOverworkedLevel(overworkedLevel);
+                    sealedChaosEntity.applyOverworkedAttackSpeedBonus();
+                }
 
 
                     boolean basic = itemStack.getOrCreateTag().getBoolean(MODE_BASIC);
@@ -133,17 +137,17 @@ public class ScepterOfSealedChaosItem extends Item {
                     // Apply/refresh owner HP penalty based on overworked summons currently alive.
                     OverworkedPenaltyUtil.refreshOwnerPenalty((ServerLevel) level, player);
 
-                    // Long cooldown only on success.
-                    player.getCooldowns().addCooldown(this, 600);
-                }
+                player.getCooldowns().addCooldown(this, 600);
+                spawned = true;
             }
-
-            player.awardStat(Stats.ITEM_USED.get(this));
-            if (!player.getAbilities().instabuild) {
-                itemStack.hurt(1, level.random, null);
-            }
-            return InteractionResult.SUCCESS;
         }
+
+        player.awardStat(Stats.ITEM_USED.get(this));
+        if (spawned && !player.getAbilities().instabuild) {
+            itemStack.hurt(1, level.random, null);
+        }
+
+        return InteractionResult.SUCCESS;
     }
 
     @Override
