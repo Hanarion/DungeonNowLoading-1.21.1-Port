@@ -24,6 +24,7 @@
       "entities.PlayerMixin",
       "entities.MobMixin",
       "entities.SummonCommandMixin",
+      "entities.AbstractArrowMixin",
       "structures.StructureProcessorAccessor",
       "structures.StructureTemplateMixin",
       "structures.NoGeodesInStructuresMixin",

@@ -13,6 +13,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -30,6 +31,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -58,7 +61,8 @@ public class HollowEntity extends Monster {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 10.0D)
-                .add(Attributes.ATTACK_DAMAGE, 8.0D);
+                .add(Attributes.ATTACK_DAMAGE, 8.0D)
+                .add(Attributes.FOLLOW_RANGE, 48.0D);
     }
 
     @Override
@@ -164,20 +168,37 @@ public class HollowEntity extends Monster {
             return super.hurt(source, amount);
         }
 
+        if (this.hasEffect(net.minecraft.world.effect.MobEffects.GLOWING)) {
+            return super.hurt(source, amount);
+        }
+
+        if (source.getEntity() instanceof LivingEntity attacker) {
+            // Only treat as a "physical hit" if the direct entity is the attacker (not arrows, potions, etc.)
+            if (source.getDirectEntity() == attacker) {
+                ItemStack weapon = attacker.getMainHandItem();
+                if (!weapon.isEmpty() && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SMITE, weapon) > 0) {
+                    return super.hurt(source, amount);
+                }
+            }
+        }
+
         if (this.isNormallyHittable()) {
             if (source.getEntity() instanceof Player) {
                 return super.hurt(source, amount);
             }
         }
 
-        if (!source.is(DNLTags.HOLLOW_HURTABLE)) {
+        if (source.getDirectEntity() instanceof Arrow arrow) {
+            // tipped arrows should damage
+            if (arrow.potion != Potions.EMPTY) {
+                return super.hurt(source, amount);
+            }
+            // non-tipped arrows should not damage
             return false;
         }
 
-        if (source.getDirectEntity() instanceof Arrow arrow) {
-            if (arrow.potion == Potions.EMPTY) {
-                return false;
-            }
+        if (!source.is(DNLTags.HOLLOW_HURTABLE)) {
+            return false;
         }
 
         return super.hurt(source, amount);
@@ -260,6 +281,13 @@ public class HollowEntity extends Monster {
         this.remove(RemovalReason.KILLED);
     }
 
+    public static void playExtinguishFx(ServerLevel level, Vec3 pos) {
+        level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.7F, 1.0F);
+        level.sendParticles(ParticleTypes.SMOKE,
+                pos.x, pos.y, pos.z,
+                8, 0.12, 0.08, 0.12, 0.0
+        );
+    }
 
     @Override
     public MobType getMobType() {
@@ -316,4 +344,13 @@ public class HollowEntity extends Monster {
         startChargeCooldown(CHARGE_COOLDOWN_TICKS); // 5s
     }
 
+    @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
+    public boolean isOnFire() {
+        return false;
+    }
 }

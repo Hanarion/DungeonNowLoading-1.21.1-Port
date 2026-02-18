@@ -25,6 +25,7 @@
     "entities.SummonCommandMixin",
     "entities.PlayerMixin",
     "entities.MobMixin",
+    "entities.AbstractArrowMixin",
     "fabric.block.BlockPlaceMixin",
     "fabric.block.BucketItemMixin",
     "fabric.block.FlintAndSteelMixin",

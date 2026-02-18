@@ -1,7 +1,12 @@
 {
   "entries": [
-    { "weight": 2, "node": "dungeonnowloading:labyrinth/spawner_carrier/zombie" },
-    { "weight": 1, "node": "dungeonnowloading:labyrinth/spawner_carrier/skeleton" },
-    { "weight": 1, "node": "dungeonnowloading:labyrinth/spawner_carrier/spider" }
+    { "weight": 12, "node": "dungeonnowloading:labyrinth/spawner_carrier/zombie" },
+    { "weight": 8, "node": "dungeonnowloading:labyrinth/spawner_carrier/skeleton" },
+    { "weight": 8, "node": "dungeonnowloading:labyrinth/spawner_carrier/spider" },
+    { "weight": 8, "node": "dungeonnowloading:labyrinth/spawner_carrier/creeper" },
+    { "weight": 4, "node": "dungeonnowloading:labyrinth/spawner_carrier/cave_spider" },
+    { "weight": 4, "node": "dungeonnowloading:labyrinth/spawner_carrier/silverfish" },
+    { "weight": 4, "node": "dungeonnowloading:labyrinth/spawner_carrier/hollow" },
+    { "weight": 1, "node": "dungeonnowloading:labyrinth/spawner_carrier/self" }
   ]
 }

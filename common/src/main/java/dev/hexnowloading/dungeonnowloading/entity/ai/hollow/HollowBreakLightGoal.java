@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai.hollow;
 
+import dev.hexnowloading.dungeonnowloading.block.DungeonWallTorch;
 import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -84,7 +85,6 @@ public class HollowBreakLightGoal extends Goal {
 
         timeTrying++;
         if (timeTrying >= GIVE_UP_TICKS) {
-            // Give up after 10s
             target = null;
             mob.getNavigation().stop();
             return;
@@ -92,7 +92,7 @@ public class HollowBreakLightGoal extends Goal {
 
         // Repath occasionally (flying mobs can drift / get bumped)
         if (nextRepathTick-- <= 0) {
-            nextRepathTick = 10; // repath twice per second
+            nextRepathTick = 10;
             moveToTarget();
         }
 
@@ -117,7 +117,7 @@ public class HollowBreakLightGoal extends Goal {
 
         Path path = mob.getNavigation().createPath(target, 0);
         if (path == null || !path.canReach()) {
-            timeTrying += 20; // punish: +1 second
+            timeTrying += 20;
             return;
         }
 
@@ -161,7 +161,7 @@ public class HollowBreakLightGoal extends Goal {
         Block b = state.getBlock();
 
         // Candles & Campfires: valid if LIT
-        if (b instanceof CandleBlock || b instanceof CandleCakeBlock || b instanceof CampfireBlock) {
+        if (b instanceof CandleBlock || b instanceof CandleCakeBlock || b instanceof CampfireBlock || b instanceof DungeonWallTorch) {
             return state.hasProperty(BlockStateProperties.LIT) && state.getValue(BlockStateProperties.LIT);
         }
 
@@ -180,7 +180,7 @@ public class HollowBreakLightGoal extends Goal {
         Block block = state.getBlock();
 
         // Extinguish candles/campfires (don't break)
-        if ((block instanceof CandleBlock || block instanceof CandleCakeBlock || block instanceof CampfireBlock)
+        if ((block instanceof CandleBlock || block instanceof CandleCakeBlock || block instanceof CampfireBlock || block instanceof DungeonWallTorch)
                 && state.hasProperty(BlockStateProperties.LIT) && state.getValue(BlockStateProperties.LIT)) {
 
             level.setBlock(pos, state.setValue(BlockStateProperties.LIT, false), Block.UPDATE_ALL);
