@@ -66,8 +66,6 @@ public class SpawnerCarrierModel<T extends SpawnerCarrierEntity> extends Hierarc
         return LayerDefinition.create(meshdefinition, 128, 128);
     }
 
-    private float walkBlend = 0.0F;
-
     @Override
     public void setupAnim(SpawnerCarrierEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root.getAllParts().forEach(ModelPart::resetPose);
@@ -81,10 +79,10 @@ public class SpawnerCarrierModel<T extends SpawnerCarrierEntity> extends Hierarc
         float fadeIn  = 0.12F;
         float fadeOut = 0.06F;
 
-        float rate = (target > walkBlend) ? fadeIn : fadeOut;
-        walkBlend += (target - walkBlend) * rate;
+        float rate = (target > entity.clientWalkBlend) ? fadeIn : fadeOut;
+        entity.clientWalkBlend += (target - entity.clientWalkBlend) * rate;
 
-        float fakeLimbSwingAmount = walkBlend / 2.5F;
+        float fakeLimbSwingAmount = entity.clientWalkBlend / 2.5F;
         this.animateWalk(SpawnerCarrierAnimation.WALK, limbSwing, fakeLimbSwingAmount, 2.0F, 2.5F);
 
         // Animations

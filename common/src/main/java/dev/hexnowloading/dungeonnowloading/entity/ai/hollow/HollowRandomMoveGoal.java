@@ -1,9 +1,8 @@
-package dev.hexnowloading.dungeonnowloading.entity.ai;
+package dev.hexnowloading.dungeonnowloading.entity.ai.hollow;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.monster.Vex;
 
 import java.util.EnumSet;
 

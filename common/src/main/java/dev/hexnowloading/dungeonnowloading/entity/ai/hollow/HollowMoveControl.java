@@ -1,9 +1,8 @@
-package dev.hexnowloading.dungeonnowloading.entity.ai;
+package dev.hexnowloading.dungeonnowloading.entity.ai.hollow;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.phys.Vec3;
 
 public class HollowMoveControl extends MoveControl {

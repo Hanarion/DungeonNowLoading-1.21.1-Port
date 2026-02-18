@@ -12,7 +12,16 @@
       }
     },
     {
-      "weight": 80,
+      "weight": 40,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/fallbacks/corridor_torch",
+        "processors": "dungeonnowloading:labyrinth/generic_degradation"
+      }
+    },
+    {
+      "weight": 20,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -21,7 +30,7 @@
       }
     },
     {
-      "weight": 20,
+      "weight": 40,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",

@@ -1,0 +1,14 @@
+{
+  "fallback": "dungeonnowloading:labyrinth/spawners/silverfish",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/hanging_spawners/silverfish",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    }
+  ]
+}

@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class BrokenGarholdEntity extends Monster {
@@ -83,12 +84,35 @@ public class BrokenGarholdEntity extends Monster {
 
         if (level().isClientSide) return;
 
+        if (!broken && !dropping && this.entityData.get(STATE) == BrokenGarholdState.HANGING) {
+            if (!hasChainAboveSelf()) {
+                this.playFallingAnimation(); // handles FALLING_START -> beginDrop()
+            }
+        }
+
         // If we're dropping and touch ground => break
         if (dropping && !broken && this.onGround()) {
             breakOnGround((ServerLevel) level());
         }
 
         animationChainer.tick(this::transitionTo);
+    }
+
+    private boolean isChainBlock(BlockPos pos) {
+        return this.level().getBlockState(pos).is(Blocks.CHAIN);
+    }
+
+    private boolean hasChainAboveSelf() {
+        AABB box = this.getBoundingBox();
+
+        double cx = (box.minX + box.maxX) * 0.5;
+        double cz = (box.minZ + box.maxZ) * 0.5;
+        double y0 = box.minY;
+
+        BlockPos base = BlockPos.containing(cx, y0, cz);
+
+        // Same offset as your Garhold
+        return isChainBlock(base.above(3));
     }
 
     private boolean hasPlayerPassenger() {
@@ -256,6 +280,8 @@ public class BrokenGarholdEntity extends Monster {
     }
 
     public void playFallingAnimation() {
+        if (dropping || broken) return;
+        if (this.entityData.get(STATE) == BrokenGarholdState.FALLING_START || this.entityData.get(STATE) == BrokenGarholdState.FALLING) return;
         this.animationChainer.reset();
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(BrokenGarholdState.FALLING_START, BrokenGarholdAnimationDuration.FALLING_START, null, this::beginDrop));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(BrokenGarholdState.FALLING, BrokenGarholdAnimationDuration.FALLING));

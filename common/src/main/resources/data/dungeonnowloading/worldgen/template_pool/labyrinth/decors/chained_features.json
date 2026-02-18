@@ -7,7 +7,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/chained/broken_garhold",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {
@@ -16,7 +16,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/chained/garhold",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {
@@ -25,7 +25,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/chained/chain_short",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {
@@ -34,7 +34,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/chained/chain_medium",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {
@@ -43,7 +43,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/chained/chain_long",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {
@@ -52,7 +52,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/chained/lantern_short",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {
@@ -61,7 +61,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/chained/lantern_medium",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {
@@ -70,7 +70,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/decors/chained/lantern_long",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     }
   ]

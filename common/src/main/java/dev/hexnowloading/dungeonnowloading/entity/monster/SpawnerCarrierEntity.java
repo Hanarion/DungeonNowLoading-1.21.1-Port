@@ -73,6 +73,7 @@ public class SpawnerCarrierEntity extends Monster {
     private boolean locomotionLocked = false;
     private int summonLoopsRemaining = 0;
     private boolean summonTriggeredThisLoop = false;
+    public float clientWalkBlend = 0.0F;
 
 
     private final float SPAWN_RANGE = 5;

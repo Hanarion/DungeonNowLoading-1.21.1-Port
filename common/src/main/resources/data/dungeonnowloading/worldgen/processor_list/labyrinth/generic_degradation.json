@@ -314,42 +314,6 @@
             }
           },
           "weight": 2
-        },
-        {
-          "blockstate" : {
-            "Name": "dungeonnowloading:book_pile",
-            "Properties": {
-              "pile": "1"
-            }
-          },
-          "weight": 1
-        },
-        {
-          "blockstate" : {
-            "Name": "dungeonnowloading:book_pile",
-            "Properties": {
-              "pile": "2"
-            }
-          },
-          "weight": 1
-        },
-        {
-          "blockstate" : {
-            "Name": "dungeonnowloading:book_pile",
-            "Properties": {
-              "pile": "3"
-            }
-          },
-          "weight": 1
-        },
-        {
-          "blockstate" : {
-            "Name": "dungeonnowloading:book_pile",
-            "Properties": {
-              "pile": "4"
-            }
-          },
-          "weight": 1
         }
       ]
     },
@@ -410,42 +374,6 @@
             }
           },
           "weight": 2
-        },
-        {
-          "blockstate" : {
-            "Name": "dungeonnowloading:book_pile",
-            "Properties": {
-              "pile": "1"
-            }
-          },
-          "weight": 1
-        },
-        {
-          "blockstate" : {
-            "Name": "dungeonnowloading:book_pile",
-            "Properties": {
-              "pile": "2"
-            }
-          },
-          "weight": 1
-        },
-        {
-          "blockstate" : {
-            "Name": "dungeonnowloading:book_pile",
-            "Properties": {
-              "pile": "3"
-            }
-          },
-          "weight": 1
-        },
-        {
-          "blockstate" : {
-            "Name": "dungeonnowloading:book_pile",
-            "Properties": {
-              "pile": "4"
-            }
-          },
-          "weight": 1
         }
       ]
     },

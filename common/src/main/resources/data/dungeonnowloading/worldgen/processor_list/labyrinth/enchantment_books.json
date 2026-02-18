@@ -2,8 +2,12 @@
   "processors": [
     {
       "processor_type": "dungeonnowloading:book_pile_randomizer_processor",
-      "pile_min": 1,
-      "pile_max": 4,
+      "pile_weights": {
+        "1": 10,
+        "2": 6,
+        "3": 3,
+        "4": 1
+      },
       "write_seed": true,
       "loot_tables": [
         "dungeonnowloading:chests/labyrinth/enchantments/commander",

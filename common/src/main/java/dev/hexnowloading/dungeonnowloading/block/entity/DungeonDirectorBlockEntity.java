@@ -26,7 +26,7 @@ import java.util.*;
 
 public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneReceiverBlockEntity {
 
-    private static final int CHECK_INTERVAL = 1;
+    private static final int CHECK_INTERVAL = 20;
 
     private BlockPos cornerAOffset = BlockPos.ZERO;
     private BlockPos cornerBOffset = BlockPos.ZERO;
