@@ -383,7 +383,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     private void musicTick() {
         musicTick++;
-        if (this.musicTick >= 2560) {
+        if (this.musicTick >= 2560 + 1) {
             this.musicTick = 0;
             this.playLoopMusic();
         }
@@ -814,9 +814,8 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         soundsToStart.add(DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation());
         for (ServerPlayer player : nearbyPlayers) {
             for (ResourceLocation sound : soundsToStart) {
-                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), sound, SoundSource.MUSIC, 0, 1.0f, false, radius, radius), player);
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), sound, SoundSource.MUSIC, 1.0F, 1.0f, false, radius, radius), player);
             }
-            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 60), player);
             Services.NETWORK.sendToPlayer(new S2CFadeOutBackgroundMusicSoundPacket(60), player);
         }
     }
@@ -829,13 +828,19 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 detectionBox
         );
         for (ServerPlayer player : nearbyPlayers) {
-            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation(), SoundSource.MUSIC, 0, 1.0f, false, radius, radius), player);
-            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 60), player);
-            if (this.getPhase() > 1) {
-                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation(), SoundSource.MUSIC, 1, 1.0f, false, radius, radius), player);
-            }else {
-                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation(), SoundSource.MUSIC, 0, 1.0f, false, radius, radius), player);
-            }
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(
+                    this.getId(),
+                    DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation(),
+                    SoundSource.MUSIC,
+                    -1, 1.0f, 1.0f, false, radius, radius
+            ), player);
+            int overlayVol = (this.getPhase() > 1) ? 1 : 0;
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(
+                    this.getId(),
+                    DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation(),
+                    SoundSource.MUSIC,
+                    -1, overlayVol, 1.0f, false, radius, radius
+            ), player);
         }
     }
 
