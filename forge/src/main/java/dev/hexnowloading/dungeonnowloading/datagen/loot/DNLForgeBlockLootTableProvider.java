@@ -119,7 +119,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.add(DNLBlocks.MEDIUM_DURITE_BUD.get(), b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.50f));
         this.add(DNLBlocks.SMALL_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.25f));
         this.add(DNLBlocks.DURITE_QUELLER.get(), block -> createSingleItemTable(Items.OBSIDIAN));
-        /*dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_MAGENTA.get(), DNLItems.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_MAGENTA.get(), DNLItems.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
         dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_BLACK.get(),   DNLItems.DUNGEON_BANNER_SPAWNER_BLACK.get());
         dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_BLUE.get(),    DNLItems.DUNGEON_BANNER_SPAWNER_BLUE.get());
         dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_PURPLE.get(),  DNLItems.DUNGEON_BANNER_SPAWNER_PURPLE.get());
@@ -130,7 +130,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get(),    DNLItems.DUNGEON_BANNER_CHAOS_SPAWNER.get());
         dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN.get(),  DNLItems.DUNGEON_BANNER_WHIMPER_LANTERN.get());
         dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get(), DNLItems.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
-        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get(),   DNLItems.DUNGEON_BANNER_SKULL_OF_CHAOS.get());*/
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get(),   DNLItems.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
     }
 
     private void dungeonBannerDrops(Block bannerBlock, Item drop) {

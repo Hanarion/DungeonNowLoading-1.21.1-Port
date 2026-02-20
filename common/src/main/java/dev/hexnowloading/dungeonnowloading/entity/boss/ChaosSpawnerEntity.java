@@ -10,10 +10,13 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
-import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeInTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeOutBackgroundMusicSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
+import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.sound.TickingSoundTarget;
 import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -45,8 +48,11 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -95,6 +101,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private static final UUID RECALL_HEALTH_MOD_UUID = UUID.fromString("e41f6c2a-77b1-4c52-9f89-0a3e8c6d21f9");
     private static final int RECALL_POSITION_OFFSET_Y = 1;
 
+    private int musicTick;
     protected int attackTickCount;
     private int contactAttackTickCount;
     private int deathAnimationTickCount;
@@ -347,12 +354,14 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 for (int i = 0; i < 50; ++i) {
                     ((ServerLevel) this.level()).sendParticles(ParticleTypes.FLAME, this.getRandomX(0.9D), this.getRandomY(), this.getRandomZ(0.9D), 1, 0.0D, 0.0D, 0.0D, 0.0D);
                 }
+                this.playBossMusic();
                 this.fillBarriers();
                 this.fillFrames();
                 this.enableBossBar();
             }
         }
         if (this.getPhase() > 0 && !this.getState().equals(State.DEATH)) {
+            this.musicTick();
             this.abilitySelectionTick();
             this.damageContactEntity();
             this.checkBarrierTick();
@@ -372,8 +381,17 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
     }
 
+    private void musicTick() {
+        musicTick++;
+        if (this.musicTick >= 2560) {
+            this.musicTick = 0;
+            this.playLoopMusic();
+        }
+    }
+
     private void phaseUpdateTick() {
         if (this.getPhase() == 1 && this.getHealth() < this.getMaxHealth() * 0.5) {
+            this.fadeInOverlayMusic();
             this.setPhase(2);
         }
     }
@@ -681,6 +699,10 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 dropLabyrinthTrophyForPlayer(playerUUID);
             }
 
+            if (this.modifiedDefeatedCount >= 1) { // Recall I+
+                dropRecallEnchantedBookForPlayer(playerUUID);
+            }
+
             // Gate: only first-clear gets loot (only on non-ignored runs)
             if (!ignoreGate) {
                 if (this.playerDefeatedUUIDs.contains(playerUUID)) {
@@ -705,8 +727,8 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private void dropLabyrinthTrophyForPlayer(UUID playerUuid) {
         if (this.level().isClientSide) return;
 
-        ItemStack trophy = new ItemStack(DNLBlocks.LABYRINTH_TROPHY.get());
-        this.spawnSpecialItemEntity(trophy, 0.0F, playerUuid);
+        ItemStack banner = new ItemStack(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+        this.spawnSpecialItemEntity(banner, 0.0F, playerUuid);
     }
 
     private void dropGreatXpBottlesForPlayer(UUID playerUuid) {
@@ -727,6 +749,21 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
             this.spawnSpecialItemEntity(stack, 0.0F, playerUuid);
             total -= n;
         }
+    }
+
+    private void dropRecallEnchantedBookForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        Enchantment ench = this.random.nextBoolean()
+                ? DNLEnchantments.ARC_SHOT.get()
+                : DNLEnchantments.PULSE_SHOT.get();
+
+        int level = 1;
+
+        ItemStack book = EnchantedBookItem.createForEnchantment(new EnchantmentInstance(ench, level));
+        // (Optional) sanity check: book.getTag() should contain "StoredEnchantments"
+
+        this.spawnSpecialItemEntity(book, 0.0F, playerUuid);
     }
 
     @Override
@@ -762,6 +799,75 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
             specialItemEntity.setDefaultPickUpDelay();
             this.level().addFreshEntity(specialItemEntity);
             return specialItemEntity;
+        }
+    }
+
+    private void playBossMusic() {
+        float radius = (float) this.getFollowDistance();
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        List<ResourceLocation> soundsToStart = new ArrayList<>(List.of());
+        soundsToStart.add(DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation());
+        soundsToStart.add(DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation());
+        for (ServerPlayer player : nearbyPlayers) {
+            for (ResourceLocation sound : soundsToStart) {
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), sound, SoundSource.MUSIC, 0, 1.0f, false, radius, radius), player);
+            }
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 60), player);
+            Services.NETWORK.sendToPlayer(new S2CFadeOutBackgroundMusicSoundPacket(60), player);
+        }
+    }
+
+    private void playLoopMusic() {
+        float radius = (float) this.getFollowDistance();
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation(), SoundSource.MUSIC, 0, 1.0f, false, radius, radius), player);
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 60), player);
+            if (this.getPhase() > 1) {
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation(), SoundSource.MUSIC, 1, 1.0f, false, radius, radius), player);
+            }else {
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation(), SoundSource.MUSIC, 0, 1.0f, false, radius, radius), player);
+            }
+        }
+    }
+
+    public void stopAllBossMusic() {
+        float radius = (float) (this.getFollowDistance() * 2);
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+
+        List<ResourceLocation> soundsToStop = new ArrayList<>(List.of());
+        soundsToStop.add(DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation());
+        soundsToStop.add(DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation());
+
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            for (ResourceLocation sound : soundsToStop) {
+                Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), sound, TickingSoundTarget.ALL, 60, true), otherPlayer);
+            }
+        }
+    }
+
+    private void fadeInOverlayMusic() {
+        float radius = (float) this.getFollowDistance();
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 20), otherPlayer);
         }
     }
 
@@ -823,6 +929,10 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     public State getState() {
         return this.entityData.get(DATA_STATE);
+    }
+
+    public void resetMusicTick() {
+        this.musicTick = 0;
     }
 
     public int getAwakeningTick() { return this.entityData.get(AWAKENING_TICKS); }

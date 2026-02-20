@@ -2,16 +2,16 @@
   "fallback": "dungeonnowloading:labyrinth/rewards",
   "elements": [
     {
-      "weight": 5,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/rewards/amethyst",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     },
     {
-      "weight": 5,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -20,7 +20,7 @@
       }
     },
     {
-      "weight": 5,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",

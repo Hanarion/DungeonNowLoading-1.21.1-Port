@@ -2,7 +2,7 @@
   "fallback": "dungeonnowloading:labyrinth/decors/chained_features",
   "elements": [
     {
-      "weight": 20,
+      "weight": 10,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -11,7 +11,7 @@
       }
     },
     {
-      "weight": 20,
+      "weight": 10,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -20,7 +20,7 @@
       }
     },
     {
-      "weight": 20,
+      "weight": 10,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",

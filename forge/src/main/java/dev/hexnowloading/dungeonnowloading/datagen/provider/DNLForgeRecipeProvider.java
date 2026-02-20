@@ -1,17 +1,53 @@
 package dev.hexnowloading.dungeonnowloading.datagen.provider;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class DNLForgeRecipeProvider extends RecipeProvider {
 
     public DNLForgeRecipeProvider(PackOutput packOutput) {
         super(packOutput);
+    }
+
+    public static final TagKey<Item> SPAWNER_BANNERS_TAG = TagKey.create(
+            Registries.ITEM,
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "dungeon_banner_spawner")
+    );
+
+    private static TagKey<Item> recolorFromTag(DyeColor to) {
+        return TagKey.create(Registries.ITEM,
+                DungeonNowLoading.id("dungeon_banner_spawner_recolor_to_" + to.getName()));
+    }
+
+    private static final Map<DyeColor, Item> SPAWNER_BANNERS = Map.of(
+            DyeColor.MAGENTA, DNLItems.DUNGEON_BANNER_SPAWNER_MAGENTA.get(),
+            DyeColor.BLACK,   DNLItems.DUNGEON_BANNER_SPAWNER_BLACK.get(),
+            DyeColor.BLUE,    DNLItems.DUNGEON_BANNER_SPAWNER_BLUE.get(),
+            DyeColor.PURPLE,  DNLItems.DUNGEON_BANNER_SPAWNER_PURPLE.get(),
+            DyeColor.GREEN,   DNLItems.DUNGEON_BANNER_SPAWNER_GREEN.get()
+    );
+
+    private static Item dyeItem(DyeColor color) {
+        return switch (color) {
+            case MAGENTA -> Items.MAGENTA_DYE;
+            case BLACK   -> Items.BLACK_DYE;
+            case BLUE    -> Items.BLUE_DYE;
+            case PURPLE  -> Items.PURPLE_DYE;
+            case GREEN   -> Items.GREEN_DYE;
+            default -> throw new IllegalArgumentException("Unsupported color: " + color);
+        };
     }
 
     @Override
@@ -358,6 +394,19 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .define('c', Items.CALCITE)
                 .unlockedBy("has_mendstone", has(DNLItems.MENDSTONE.get()))
                 .save(consumer);
+        for (var entry : SPAWNER_BANNERS.entrySet()) {
+            DyeColor to = entry.getKey();
+            Item result = entry.getValue();
+            Item dye = dyeItem(to);
+
+            TagKey<Item> fromTag = recolorFromTag(to);
+
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, result, 1)
+                    .requires(fromTag)          // any OTHER spawner banner
+                    .requires(dye)              // target dye
+                    .unlockedBy("has_spawner_banner", has(SPAWNER_BANNERS_TAG)) // any banner unlocks all recolors
+                    .save(consumer, DungeonNowLoading.id("dungeon_banner_spawner_recolor_" + to.getName()));
+        }
     }
 
     private void buildStoneCutterRecipes(Consumer<FinishedRecipe> consumer) {

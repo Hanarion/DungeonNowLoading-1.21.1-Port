@@ -39,6 +39,24 @@
       }
     ]
   },
+  "music_hellspawn_base" : {
+    "subtitle": "sounds.dungeonnowloading.music_hellspawn_base",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/hellspawn_base_callister_corvus",
+        "stream": true
+      }
+    ]
+  },
+  "music_hellspawn_overlay" : {
+    "subtitle": "sounds.dungeonnowloading.music_hellspawn_overlay",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/hellspawn_overlay_callister_corvus",
+        "stream": true
+      }
+    ]
+  },
   "disc_clash_of_duality_boros" : {
     "subtitle": "sounds.dungeonnowloading.disc_clash_of_duality_boros",
     "sounds": [

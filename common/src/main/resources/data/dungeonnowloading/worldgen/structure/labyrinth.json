@@ -43,7 +43,19 @@
           "maxCount": 4
         },
         {
+          "type": "dungeonnowloading:hollow",
+          "weight": 25,
+          "minCount": 1,
+          "maxCount": 4
+        },
+        {
           "type": "minecraft:enderman",
+          "weight": 10,
+          "minCount": 1,
+          "maxCount": 4
+        },
+        {
+          "type": "dungeonnowloading:spawner_carrier",
           "weight": 10,
           "minCount": 1,
           "maxCount": 4

@@ -18,7 +18,6 @@
       "block.WallMixin",
       "block.IronBarsMixin",
       "items.ItemInHandRendererMixin",
-      "items.ItemStackDurableEnchantmentMixin",
       "entities.EntityAvoidBlockMixin",
       "entities.ServerPlayerMixin",
       "entities.PlayerMixin",

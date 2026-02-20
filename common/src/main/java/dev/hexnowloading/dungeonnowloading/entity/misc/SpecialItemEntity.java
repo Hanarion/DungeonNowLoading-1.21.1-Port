@@ -59,7 +59,7 @@ public class SpecialItemEntity extends ItemEntity implements TraceableEntity {
 
     @Override
     public void playerTouch(Player player) {
-        if (player.getUUID().equals(this.picker)) {
+        if (this.picker != null && player.getUUID().equals(this.picker)) {
             this.getItem().removeTagKey("PickerUUID");
             super.playerTouch(player);
         }
@@ -73,9 +73,9 @@ public class SpecialItemEntity extends ItemEntity implements TraceableEntity {
 
     public void setPickerUUID(UUID uuid) {
         this.picker = uuid;
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putUUID("PickerUUID", uuid);
-        this.getItem().setTag(compoundTag); // Prevents special item entity from merging with an another with a different player uuid.
+
+        // merge into existing tag (don't overwrite enchantments, custom names, etc.)
+        this.getItem().getOrCreateTag().putUUID("PickerUUID", uuid);
     }
 
     public UUID getPickerUUID() {
