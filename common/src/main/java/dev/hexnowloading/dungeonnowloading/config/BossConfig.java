@@ -33,9 +33,9 @@ public class BossConfig {
 
         builder.pop();
         builder.push("boss-recall-scaling");
-        RECALL_BOSS_HEALTH_SCALE = builder.comment("Multiplies the boss health by this value whenever it is recalled.").translation("recall_boss_health_scale").defineInRange("recall_boss_health_scale", 0.5D, 0.0D, Double.MAX_VALUE);
-        RECALL_BOSS_ATTACK_SCALE = builder.comment("Multiplies the boss attack by this value whenever it is recalled.").translation("recall_boss_attack_scale").defineInRange("recall_boss_attack_scale", 0.5D, 0.0D, Double.MAX_VALUE);
-        RECALL_BOSS_EXHAUSTION_SCALE = builder.comment("Multiplies the boss exhaustion by this value whenever it is recalled.").translation("recall_boss_exhaustion_scale").defineInRange("recall_boss_exhaustion_scale", 0.5D, 0.0D, Double.MAX_VALUE);
+        RECALL_BOSS_HEALTH_SCALE = builder.comment("Multiplies the boss health by this value whenever it is recalled.").translation("recall_boss_health_scale").defineInRange("recall_boss_health_scale", 0.25D, 0.0D, Double.MAX_VALUE);
+        RECALL_BOSS_ATTACK_SCALE = builder.comment("Multiplies the boss attack by this value whenever it is recalled.").translation("recall_boss_attack_scale").defineInRange("recall_boss_attack_scale", 0.25D, 0.0D, Double.MAX_VALUE);
+        RECALL_BOSS_EXHAUSTION_SCALE = builder.comment("Multiplies the boss exhaustion by this value whenever it is recalled.").translation("recall_boss_exhaustion_scale").defineInRange("recall_boss_exhaustion_scale", 0.25D, 0.0D, Double.MAX_VALUE);
         builder.pop();
     }
 }

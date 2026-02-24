@@ -92,7 +92,6 @@ public class HollowEntity extends Monster {
         if (!this.level().isClientSide) {
             if (chargeCooldownTicks > 0) chargeCooldownTicks--;
 
-            // If charge is “active”, count it down here (goal controls start/stop, but this is the timer)
             if (this.IsCharging()) {
                 chargeActiveTicks++;
                 if (chargeActiveTicks >= CHARGE_MAX_TICKS) {

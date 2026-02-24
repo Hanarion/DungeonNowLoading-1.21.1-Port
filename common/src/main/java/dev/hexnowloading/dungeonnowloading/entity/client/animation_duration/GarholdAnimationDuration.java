@@ -19,4 +19,5 @@ public class GarholdAnimationDuration {
     public static final float SIDE_CLOSE = 0.875F;
     public static final float SIDE_OPENED = 2.0F;
     public static final float SIDE_CLOSED = 0.0F;
+    public static final float SIDE_WIDE_TO_OPENED = 0.25F;
 }

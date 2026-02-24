@@ -1,8 +1,8 @@
-package dev.hexnowloading.dungeonnowloading.spawn_node;
+package dev.hexnowloading.dungeonnowloading.components.spawn_node;
 
-import dev.hexnowloading.dungeonnowloading.spawn_node.spawn_effect.InstantSpawnEffect;
-import dev.hexnowloading.dungeonnowloading.spawn_node.spawn_effect.PoofDelaySpreadSpawnEffect;
-import dev.hexnowloading.dungeonnowloading.spawn_node.spawn_effect.PoofSpawnEffect;
+import dev.hexnowloading.dungeonnowloading.components.spawn_node.spawn_effect.InstantSpawnEffect;
+import dev.hexnowloading.dungeonnowloading.components.spawn_node.spawn_effect.PoofDelaySpreadSpawnEffect;
+import dev.hexnowloading.dungeonnowloading.components.spawn_node.spawn_effect.PoofSpawnEffect;
 
 public final class DNLSpawnEffects {
     private DNLSpawnEffects() {}

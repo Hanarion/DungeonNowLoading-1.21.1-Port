@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.ai.garhold;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity.GarholdState;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -31,7 +32,7 @@ public class GarholdSideCaptureGoal extends Goal {
     private int ticks;
     private boolean dashing;
 
-    private Player capturedPlayer;
+    private LivingEntity capturedPlayer;
 
     private float lockedYaw;
     private boolean yawLocked;
@@ -140,15 +141,15 @@ public class GarholdSideCaptureGoal extends Goal {
 
         // Swept AABB capture (avoid tunneling)
         if (capturedPlayer == null && !mob.hasCapturedPlayer()) {
-            Player hit = findHitPlayerSwept(step);
+            LivingEntity hit = findHitTargetSwept(step);
             if (hit != null) {
-                capturedPlayer = hit;
-                mob.beginCapture(hit);
-
-                // Stop dash immediately after capture
-                mob.setDeltaMovement(Vec3.ZERO);
-                dashing = false;
-                return;
+                boolean captured = mob.beginCapture(hit);
+                if (captured) {
+                    capturedPlayer = hit;
+                    mob.setDeltaMovement(Vec3.ZERO);
+                    dashing = false;
+                    return;
+                }
             }
         }
 
@@ -166,20 +167,45 @@ public class GarholdSideCaptureGoal extends Goal {
         mob.setDeltaMovement(Vec3.ZERO);
     }
 
-    private Player findHitPlayerSwept(Vec3 step) {
+    private LivingEntity findHitTargetSwept(Vec3 step) {
+
         AABB now = mob.getBoundingBox().inflate(HIT_INFLATE);
         AABB next = now.move(step).inflate(HIT_INFLATE);
         AABB swept = now.minmax(next);
 
-        List<Player> players = mob.level().getEntitiesOfClass(
-                Player.class,
+        List<LivingEntity> entities = mob.level().getEntitiesOfClass(
+                LivingEntity.class,
                 swept,
-                p -> p.isAlive()
-                        && !p.isSpectator()
-                        && !p.getAbilities().instabuild
+                this::isValidCaptureTarget
         );
 
-        return players.isEmpty() ? null : players.get(0);
+        return entities.isEmpty() ? null : entities.get(0);
+    }
+
+    private boolean isValidCaptureTarget(LivingEntity e) {
+        if (e instanceof GarholdEntity) return false;
+        if (e == mob) return false;
+        if (!e.isAlive()) return false;
+        if (e.isSpectator()) return false;
+        if (!isSmallEnoughToCapture(e)) return false;
+
+        if (e instanceof Player p) {
+            return !p.isCreative() && !p.isSpectator();
+        }
+
+        return true;
+    }
+
+    private boolean isSmallEnoughToCapture(LivingEntity target) {
+
+        EntityDimensions selfDims = mob.getDimensions(mob.getPose());
+        EntityDimensions targetDims = target.getDimensions(target.getPose());
+
+        float maxWidth  = selfDims.width  * 1.5f;
+        float maxHeight = selfDims.height * 1.5f;
+
+        return targetDims.width  <= maxWidth
+                && targetDims.height <= maxHeight;
     }
 
     @Override

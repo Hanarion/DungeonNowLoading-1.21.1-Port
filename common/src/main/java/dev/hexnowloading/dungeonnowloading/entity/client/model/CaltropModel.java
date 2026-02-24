@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.render;
+package dev.hexnowloading.dungeonnowloading.entity.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -11,12 +11,12 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-public class Caltrop<T extends Entity> extends EntityModel<T> {
+public class CaltropModel<T extends Entity> extends EntityModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "caltrop"), "main");
     private final ModelPart bone;
 
-    public Caltrop(ModelPart root) {
+    public CaltropModel(ModelPart root) {
         this.bone = root.getChild("bone");
     }
 

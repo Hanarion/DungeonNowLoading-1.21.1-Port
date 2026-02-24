@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.spawn_node;
+package dev.hexnowloading.dungeonnowloading.components.spawn_node;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

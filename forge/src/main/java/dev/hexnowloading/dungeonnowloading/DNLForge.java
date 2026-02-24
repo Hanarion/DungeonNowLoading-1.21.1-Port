@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.client.DNLForgeClientEvents;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.registry.DNLCommands;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
 import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
@@ -98,6 +99,7 @@ public class DNLForge {
 
         // Optional: /dnlpatrons reload for admins
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> {
+            DNLCommands.register(e.getDispatcher());
             e.getDispatcher().register(
                     Commands.literal("dnlpatrons")
                             .requires(src -> src.hasPermission(2)) // OP-only

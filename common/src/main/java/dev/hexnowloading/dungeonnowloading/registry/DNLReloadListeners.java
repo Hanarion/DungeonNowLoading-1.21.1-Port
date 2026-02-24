@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
-import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnNodeReloadListener;
-import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnPoolReloadListener;
+import dev.hexnowloading.dungeonnowloading.components.spawn_node.SpawnNodeReloadListener;
+import dev.hexnowloading.dungeonnowloading.components.spawn_node.SpawnPoolReloadListener;
 import net.minecraft.resources.ResourceLocation;
 
 public final class DNLReloadListeners {

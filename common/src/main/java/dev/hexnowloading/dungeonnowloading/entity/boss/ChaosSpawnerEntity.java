@@ -7,6 +7,7 @@ import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
+import dev.hexnowloading.dungeonnowloading.entity.ai.chaos_spawner.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
@@ -112,6 +113,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private UUID currentPlayerUUID;
     private List<Player> pushTargets;
     private Set<UUID> playerDefeatedUUIDs;
+    private final Set<UUID> summonedMobs = new HashSet<>();
 
     public final AnimationState awakeningAnimationState = new AnimationState();
     public final AnimationState sleepingAnimationState = new AnimationState();
@@ -401,7 +403,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
             this.contactAttackTickCount--;
         } else {
             this.contactAttackTickCount = 20;
-            AABB aabb = (new AABB(this.blockPosition())).inflate(2);
+            AABB aabb = (new AABB(this.blockPosition())).inflate(1.5);
             List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, aabb);
             for (LivingEntity livingEntity : targets) {
                 if (livingEntity == this) {
@@ -527,6 +529,54 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         if (!level.getBlockState(cageCenterPos.offset(-2, 0, 0)).is(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get())) { this.placeFullBarrier(cageCenterPos.offset(-2, 0, 0), 3); }
         if (!level.getBlockState(cageCenterPos.offset(0, 2, 0)).is(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get())) { this.placeFullBarrier(cageCenterPos.offset(0, 2, 0), 4); }
         if (!level.getBlockState(cageCenterPos.offset(0, -2, 0)).is(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get())) { this.placeFullBarrier(cageCenterPos.offset(0, -2, 0), 5); }
+    }
+
+    public void trackSummon(Entity entity) {
+        if (entity != null) {
+            summonedMobs.add(entity.getUUID());
+        }
+    }
+
+    public void removeAllSummonedMobs() {
+        if (!(this.level() instanceof ServerLevel serverLevel)) return;
+
+        for (UUID uuid : summonedMobs) {
+            Entity e = serverLevel.getEntity(uuid);
+            if (e != null && e.isAlive()) {
+                e.discard(); // no drops, instant delete
+            }
+        }
+
+        summonedMobs.clear();
+    }
+
+    public int countSummonedMobs(ServerLevel level) {
+        summonedMobs.removeIf(uuid -> {
+            Entity e = level.getEntity(uuid);
+            return e == null || !e.isAlive();
+        });
+        return summonedMobs.size();
+    }
+
+    public void cullSummonsOutsideArena(ServerLevel level) {
+        final double radius = this.getFollowDistance() / 2.0;
+        final double radiusSqr = radius * radius;
+        final double cx = this.getX();
+        final double cy = this.getY();
+        final double cz = this.getZ();
+
+        summonedMobs.removeIf(uuid -> {
+            Entity e = level.getEntity(uuid);
+
+            if (e == null || !e.isAlive()) return true;
+
+            if (e.distanceToSqr(cx, cy, cz) > radiusSqr) {
+                e.discard();
+                return true;
+            }
+
+            return false;
+        });
     }
 
     @Override
@@ -1006,7 +1056,11 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     public void stopAttacking(int cooldown) {
         this.entityData.set(DATA_STATE, State.IDLE);
-        this.setAttackTick(cooldown);
+
+        int actualCooldown = cooldown - (this.modifiedDefeatedCount * 10);
+        actualCooldown = Math.max(actualCooldown, 20);
+
+        this.setAttackTick(actualCooldown);
     }
 
     static {

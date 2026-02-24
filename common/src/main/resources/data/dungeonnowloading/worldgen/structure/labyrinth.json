@@ -8,13 +8,13 @@
       "spawns": [
         {
           "type": "minecraft:spider",
-          "weight": 100,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         },
         {
           "type": "minecraft:zombie",
-          "weight": 95,
+          "weight": 75,
           "minCount": 4,
           "maxCount": 4
         },
@@ -26,27 +26,33 @@
         },
         {
           "type": "minecraft:skeleton",
-          "weight": 100,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         },
         {
           "type": "minecraft:creeper",
-          "weight": 100,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         },
         {
           "type": "minecraft:slime",
-          "weight": 100,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         },
         {
           "type": "dungeonnowloading:hollow",
-          "weight": 25,
+          "weight": 20,
           "minCount": 1,
           "maxCount": 4
+        },
+        {
+          "type": "dungeonnowloading:garhold",
+          "weight": 10,
+          "minCount": 1,
+          "maxCount": 1
         },
         {
           "type": "minecraft:enderman",
@@ -58,7 +64,7 @@
           "type": "dungeonnowloading:spawner_carrier",
           "weight": 10,
           "minCount": 1,
-          "maxCount": 4
+          "maxCount": 1
         },
         {
           "type": "minecraft:witch",
@@ -68,7 +74,7 @@
         },
         {
           "type": "minecraft:drowned",
-          "weight": 95,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         }

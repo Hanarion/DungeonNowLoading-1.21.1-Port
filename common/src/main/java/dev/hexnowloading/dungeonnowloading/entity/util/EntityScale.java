@@ -28,7 +28,7 @@ public class EntityScale {
         double mpBonus = Math.max(0, playerCount - 1) * multiplayerBossHealthScale;
         double recallBonus = recallHpBonus(defeatedCount);
 
-        double healthMultiplier = 1.0 + baseBonus + mpBonus + recallBonus;
+        double healthMultiplier = baseBonus + mpBonus + recallBonus;
 
         AttributeModifier SCALED_HEALTH_MODIFIER = new AttributeModifier(SCALED_HEALTH_MODIFIER_UUID, "Scaled health", healthMultiplier, AttributeModifier.Operation.MULTIPLY_BASE);
         Objects.requireNonNull(entityType.getAttribute(Attributes.MAX_HEALTH)).removeModifier(SCALED_HEALTH_MODIFIER);
@@ -41,7 +41,7 @@ public class EntityScale {
         double mpBonus = Math.max(0, playerCount - 1) * multiplayerBossAttackScale;
         double recallBonus = recallAtkBonus(defeatedCount);
 
-        double attackMultiplier = 1.0 + baseBase + mpBonus + recallBonus;
+        double attackMultiplier = baseBase + mpBonus + recallBonus;
 
         AttributeModifier SCALED_ATTACK_MODIFIER = new AttributeModifier(SCALED_ATTACK_MODIFIER_UUID, "Scaled attack", attackMultiplier, AttributeModifier.Operation.MULTIPLY_BASE);
         Objects.requireNonNull(entityType.getAttribute(Attributes.ATTACK_DAMAGE)).removeModifier(SCALED_ATTACK_MODIFIER);

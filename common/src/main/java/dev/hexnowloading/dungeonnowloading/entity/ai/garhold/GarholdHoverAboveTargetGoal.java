@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity.GarholdState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -13,8 +14,8 @@ import java.util.EnumSet;
 
 public class GarholdHoverAboveTargetGoal extends Goal {
 
-    private static final float LOCK_SPEED = 0.07F;
-    private static final int DIVE_LOCK_TICKS = reducedTickDelay(10); // 2 seconds
+    private static final float LOCK_SPEED = 4.0F;
+    private static final int DIVE_LOCK_TICKS = 10;
 
     private static final double SIDE_RANGE = 2.0;
     private static final double SIDE_RANGE_SQ = SIDE_RANGE * SIDE_RANGE;
@@ -27,36 +28,41 @@ public class GarholdHoverAboveTargetGoal extends Goal {
     private static final double SIDE_CAPTURE_TRIGGER_XZ = 4.0;
     private static final double SIDE_CAPTURE_TRIGGER_XZ_SQ = SIDE_CAPTURE_TRIGGER_XZ * SIDE_CAPTURE_TRIGGER_XZ;
 
-    private static final double SIDE_CAPTURE_TRIGGER_Y_TOL = 0.25;
+    private static final double SIDE_CAPTURE_TRIGGER_Y_TOL = 1.25;
+
+    private static final int ABOVE_CLEAR_RELEASE_TICKS = 20 * 3;
+
+    private static final double MAX_HOVER_HEIGHT = 6.0;
+    private static final double MIN_HOVER_HEIGHT = 4.0;
+    private static final double HOVER_HEIGHT_STEP = 1.0;
 
     private final GarholdEntity mob;
 
     private final double speed;
-    private final double hoverHeight;
 
     private double lastTargetX;
     private double lastTargetZ;
     private double lastHorDistSq;
 
-    @SuppressWarnings("unused")
-    private final double minHorDist;
-    @SuppressWarnings("unused")
-    private final double maxHorDist;
-
     private boolean locked = false;
     private int repathCooldown = 0;
     private int lockedTicks = 0;
 
+    private boolean committedSideCapture = false;
+    private int clearAboveTicks = 0;
+
+    // Cached per-tick "above space" result
+    private double bestHoverThisTick = MAX_HOVER_HEIGHT;
+    private boolean aboveBlockedThisTick = false;
+
+    // Optional debug/readback
+    @SuppressWarnings("unused")
+    private double effectiveHoverHeight = MAX_HOVER_HEIGHT;
+
     public GarholdHoverAboveTargetGoal(GarholdEntity mob,
-                                       double speed,
-                                       double hoverHeight,
-                                       double minHorDist,
-                                       double maxHorDist) {
+                                       double speed) {
         this.mob = mob;
         this.speed = speed;
-        this.hoverHeight = hoverHeight;
-        this.minHorDist = minHorDist;
-        this.maxHorDist = maxHorDist;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
@@ -78,6 +84,13 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         locked = false;
         lockedTicks = 0;
 
+        committedSideCapture = false;
+        clearAboveTicks = 0;
+
+        aboveBlockedThisTick = false;
+        bestHoverThisTick = MAX_HOVER_HEIGHT;
+        effectiveHoverHeight = MAX_HOVER_HEIGHT;
+
         LivingEntity t = mob.getTarget();
         if (t != null) {
             lastTargetX = t.getX();
@@ -86,18 +99,41 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         lastHorDistSq = Double.MAX_VALUE;
     }
 
-
     @Override
     public void tick() {
         LivingEntity target = mob.getTarget();
         if (target == null) return;
 
+        // Cache hover selection once per tick: 6 -> 5 -> 4, else "blocked"
+        double bestHover = findBestHoverHeight(target);
+        aboveBlockedThisTick = bestHover < 0.0;
+        bestHoverThisTick = aboveBlockedThisTick ? MAX_HOVER_HEIGHT : bestHover;
+        effectiveHoverHeight = bestHoverThisTick; // optional debug
+
+        boolean needsSide = aboveBlockedThisTick;
+
+        mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+
+        // Immediate transition to SIDE_CAPTURE if we meet the "front + close + same Y" trigger.
+        // (This can still happen even if above is clear; that's by design of your trigger.)
         if (canEnterSideCapture(target)) {
             mob.getNavigation().stop();
             mob.setDeltaMovement(Vec3.ZERO);
             mob.setGarholdState(GarholdState.SIDE_CAPTURE);
             mob.sideCaptureCooldownTicks = 10;
             return;
+        }
+
+        // Commit side capture while blocked; require sustained clearance to release the commit.
+        if (needsSide) {
+            committedSideCapture = true;
+            clearAboveTicks = 0;
+        } else if (committedSideCapture) {
+            clearAboveTicks++;
+            if (clearAboveTicks >= ABOVE_CLEAR_RELEASE_TICKS) {
+                committedSideCapture = false;
+                clearAboveTicks = 0;
+            }
         }
 
         Desired desired = computeDesired(target);
@@ -137,14 +173,13 @@ public class GarholdHoverAboveTargetGoal extends Goal {
 
         if (!locked) {
             tickPathfind(desired.pos.x, desired.pos.y, desired.pos.z, horDistSq, dy, LOCK_DIST_SQ);
-
             lockedTicks = 0;
             return;
         }
 
         tickLock(dx, dy, dz);
 
-        if (tryTriggerDive(target)) {
+        if (tryTriggerDive()) {
             return;
         }
 
@@ -152,12 +187,11 @@ public class GarholdHoverAboveTargetGoal extends Goal {
             locked = false;
             repathCooldown = 0;
         }
-
     }
 
-    private boolean tryTriggerDive(LivingEntity target) {
-        // Only count time when we're truly locked and we're in hover-above mode (not side capture)
-        boolean hoveringAbove = !shouldSideCapture(target);
+    private boolean tryTriggerDive() {
+        // Only dive when actually hovering-above (not committed side capture, and above isn't blocked this tick)
+        boolean hoveringAbove = !(committedSideCapture || aboveBlockedThisTick);
 
         if (locked && hoveringAbove) {
             lockedTicks++;
@@ -178,12 +212,19 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         return false;
     }
 
-
     private Desired computeDesired(LivingEntity target) {
-        if (!shouldSideCapture(target)) {
-            return Desired.lockOk(new Vec3(target.getX(), target.getY() + hoverHeight, target.getZ()));
+        boolean wantsSide = committedSideCapture || aboveBlockedThisTick;
+
+        if (!wantsSide) {
+            // Hover directly above target using bestHoverThisTick (6->5->4)
+            return Desired.lockOk(new Vec3(
+                    target.getX(),
+                    target.getY() + bestHoverThisTick,
+                    target.getZ()
+            ));
         }
 
+        // --- existing side behavior below ---
         double px = target.getX();
         double pz = target.getZ();
 
@@ -198,6 +239,8 @@ public class GarholdHoverAboveTargetGoal extends Goal {
             if (Math.abs(dy) <= Y_LOCK_TOL) {
                 Vec3 pos = new Vec3(mob.getX(), targetY, mob.getZ());
 
+                // When we're trying to sweep vertically at our current XZ to match targetY,
+                // ensure the swept volume is clear; otherwise force pathing.
                 if (!isVerticalSweepClearForAabb(targetY)) {
                     return Desired.forcePath(pos);
                 }
@@ -213,15 +256,25 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         return Desired.lockOk(ring);
     }
 
-    // Side capture if the vertical space from playerY -> hoverY at player's XZ is blocked for Garhold's full hitbox.
-    private boolean shouldSideCapture(LivingEntity target) {
+    /**
+     * Returns a hover height in [MAX_HOVER_HEIGHT..MIN_HOVER_HEIGHT] if there's enough vertical clearance
+     * at the target's XZ from y0 -> targetY+height, else returns -1.
+     */
+    private double findBestHoverHeight(LivingEntity target) {
         double x = target.getX();
         double z = target.getZ();
 
-        double y0 = target.getY();
-        double y1 = target.getY() + hoverHeight;
+        // Start slightly above the player's feet (your original choice)
+        double y0 = target.getY() + 1.1;
 
-        return !isVerticalSweepClearForAabbAtXZ(x, z, y0, y1);
+        for (double h = MAX_HOVER_HEIGHT; h >= MIN_HOVER_HEIGHT; h -= HOVER_HEIGHT_STEP) {
+            double y1 = target.getY() + h;
+            if (isVerticalSweepClearForAabbAtXZ(x, z, y0, y1)) {
+                return h;
+            }
+        }
+
+        return -1.0;
     }
 
     private Vec3 computeSideRingPoint(LivingEntity target, double range) {
@@ -252,7 +305,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
     private boolean isVerticalSweepClearForAabbAtXZ(double x, double z, double yA, double yB) {
         Level level = mob.level();
 
-        AABB cur = mob.getBoundingBox();
+        AABB cur = mob.getBoundingBox().inflate(-0.3, 0.0, -0.3);
         double halfX = (cur.maxX - cur.minX) * 0.5;
         double halfZ = (cur.maxZ - cur.minZ) * 0.5;
         double height = (cur.maxY - cur.minY);
@@ -284,7 +337,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
 
     private void tickPathfind(double x, double y, double z, double horDistSq, double dy, double lockDistSq) {
         if (--repathCooldown <= 0) {
-            repathCooldown = 5;
+            repathCooldown = 1; // you can increase this if you want less spammy moveTo
             mob.getNavigation().moveTo(x, y, z, speed);
         }
 
@@ -294,28 +347,38 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         }
     }
 
+    @SuppressWarnings("unused")
+    private static float rotlerp(float from, float to, float maxTurn) {
+        float d = Mth.wrapDegrees(to - from);
+        if (d >  maxTurn) d =  maxTurn;
+        if (d < -maxTurn) d = -maxTurn;
+        return from + d;
+    }
+
     private void tickLock(double dx, double dy, double dz) {
         mob.getNavigation().stop();
+        mob.setNoGravity(true);
 
-        double maxXZVel = LOCK_SPEED * speed;
-        double xzAccel = maxXZVel;
+        float fly = (float) mob.getAttributeValue(Attributes.FLYING_SPEED);
+        double vmax = this.speed * fly * LOCK_SPEED; // max correction speed
 
-        double maxYVel = LOCK_SPEED * speed;
-        double yAccel = maxYVel * 0.5;
+        Vec3 to = new Vec3(dx, dy, dz);
+        double dist = to.length();
 
-        double xzDamping = 0.55;
-        double yDamping = 0.70;
+        if (dist < 0.08) { // deadzone
+            mob.setDeltaMovement(mob.getDeltaMovement().scale(0.2));
+            return;
+        }
 
-        Vec3 vel = mob.getDeltaMovement();
+        // desired speed shrinks as we get close -> no overshoot, no orbit
+        double v = Math.min(vmax, dist * 0.95);
+        Vec3 desiredVel = to.scale(v / dist);
 
-        double addX = Mth.clamp(dx * xzAccel, -maxXZVel, maxXZVel);
-        double addZ = Mth.clamp(dz * xzAccel, -maxXZVel, maxXZVel);
-        double addY = Mth.clamp(dy * yAccel, -maxYVel, maxYVel);
-
+        Vec3 cur = mob.getDeltaMovement();
         mob.setDeltaMovement(
-                vel.x * xzDamping + addX,
-                vel.y * yDamping + addY,
-                vel.z * xzDamping + addZ
+                Mth.lerp(0.25, cur.x, desiredVel.x),
+                Mth.lerp(0.25, cur.y, desiredVel.y),
+                Mth.lerp(0.25, cur.z, desiredVel.z)
         );
     }
 
@@ -348,8 +411,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         double xzDistSq = dx * dx + dz * dz;
         if (xzDistSq > SIDE_CAPTURE_TRIGGER_XZ_SQ) return false;
 
-        // Y must be within +/- 0.25 blocks of target
-        // (Using getY() is "feet". If you want hitbox-bottom match, use getBoundingBox().minY)
+        // Y must be within +/- 1.25 blocks of target feet Y
         double dy = target.getY() - mob.getY();
         if (Math.abs(dy) > SIDE_CAPTURE_TRIGGER_Y_TOL) return false;
 
@@ -357,4 +419,8 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         return isFacingTarget(target);
     }
 
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
 }

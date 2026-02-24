@@ -1,9 +1,9 @@
-package dev.hexnowloading.dungeonnowloading.client.render;
+package dev.hexnowloading.dungeonnowloading.entity.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.render.Caltrop;
+import dev.hexnowloading.dungeonnowloading.entity.client.model.CaltropModel;
 import dev.hexnowloading.dungeonnowloading.entity.misc.PayloadEntity;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,12 +18,12 @@ public class PayloadEntityRenderer extends EntityRenderer<PayloadEntity> {
     private static final ResourceLocation BLANK = new ResourceLocation("minecraft", "textures/misc/white.png");
     private static final ResourceLocation CALTROP_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/caltrop.png");
 
-    private final Caltrop<PayloadEntity> caltropModel;
+    private final CaltropModel<PayloadEntity> caltropModel;
 
 
     public PayloadEntityRenderer(EntityRendererProvider.Context ctx) {
         super(ctx);
-        this.caltropModel = new Caltrop<>(ctx.bakeLayer(Caltrop.LAYER_LOCATION));
+        this.caltropModel = new CaltropModel<>(ctx.bakeLayer(CaltropModel.LAYER_LOCATION));
     }
 
     @Override

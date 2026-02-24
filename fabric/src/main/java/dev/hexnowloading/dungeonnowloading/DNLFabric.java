@@ -4,14 +4,12 @@ import dev.hexnowloading.dungeonnowloading.block.entity.PotionBarrelBlockEntity;
 import dev.hexnowloading.dungeonnowloading.events.DNLFabricBlockEvents;
 import dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
-import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
+import dev.hexnowloading.dungeonnowloading.registry.*;
 import dev.hexnowloading.dungeonnowloading.server.entity.DNLFabricEntities;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
@@ -32,6 +30,7 @@ public class DNLFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         DungeonNowLoading.init();
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {DNLCommands.register(dispatcher);});
         // Register & bootstrap Fabric menu type (simple, no extra data buffer needed)
         Supplier<MenuType<MendingTableMenu>> mendingTable = Services.REGISTRY.register(
                 BuiltInRegistries.MENU,

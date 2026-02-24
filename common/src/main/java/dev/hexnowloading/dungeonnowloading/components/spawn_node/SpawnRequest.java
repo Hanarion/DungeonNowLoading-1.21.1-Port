@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.spawn_node;
+package dev.hexnowloading.dungeonnowloading.components.spawn_node;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.entity.ai;
+package dev.hexnowloading.dungeonnowloading.entity.ai.chaos_spawner;
 
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
@@ -47,6 +47,7 @@ public class ChaosSpawnerResetGoal extends Goal {
         chaosSpawnerEntity.setBarrierWestTick(-1);
         chaosSpawnerEntity.setBarrierUpTick(-1);
         chaosSpawnerEntity.setBarrierDownTick(-1);
+        chaosSpawnerEntity.removeAllSummonedMobs();
         chaosSpawnerEntity.resetMusicTick();
         chaosSpawnerEntity.stopAllBossMusic();
         chaosSpawnerEntity.setTarget(null);

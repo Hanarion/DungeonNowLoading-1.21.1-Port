@@ -1,15 +1,10 @@
-package dev.hexnowloading.dungeonnowloading.entity.ai;
+package dev.hexnowloading.dungeonnowloading.entity.ai.chaos_spawner;
 
-import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ChaosSpawnerMoveControl extends MoveControl {
 

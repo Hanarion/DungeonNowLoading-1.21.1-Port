@@ -102,6 +102,7 @@ public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> 
         this.animate(entity.sideClosedAnimationState, GarholdAnimation.SIDE_CLOSED, ageInTicks);
         this.animate(entity.sideOpenAnimationState, GarholdAnimation.SIDE_OPEN, ageInTicks);
         this.animate(entity.sideCloseAnimationState, GarholdAnimation.SIDE_CLOSE, ageInTicks);
+        this.animate(entity.sideWideToOpenedAnimationState, GarholdAnimation.SIDE_WIDE_TO_OPENED, ageInTicks);
 
         float yawRad = netHeadYaw * ((float)Math.PI / 180F);
 

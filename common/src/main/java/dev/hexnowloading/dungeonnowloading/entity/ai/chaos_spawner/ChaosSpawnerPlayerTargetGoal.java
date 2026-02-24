@@ -1,4 +1,4 @@
-package dev.hexnowloading.dungeonnowloading.entity.ai;
+package dev.hexnowloading.dungeonnowloading.entity.ai.chaos_spawner;
 
 import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
 import net.minecraft.world.entity.LivingEntity;

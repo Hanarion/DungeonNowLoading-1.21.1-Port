@@ -598,6 +598,11 @@ public class SpawnerCarrierEntity extends Monster {
         return this.entityData.get(PICKAXE_ACCUM_DAMAGE);
     }
 
+    public void setBrokenSpawnerCarrier() {
+        this.entityData.set(PICKAXE_ACCUM_DAMAGE, FRAG_MAX);
+        this.entityData.set(STORED_ENTITY_ID, "");
+    }
+
     public int getSpawnerCrackStage() {
         // -1 means "no crack overlay"
         if (this.isSpawnerBroken()) return -1;

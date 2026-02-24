@@ -1,9 +1,9 @@
-package dev.hexnowloading.dungeonnowloading.spawn_node.spawn_effect;
+package dev.hexnowloading.dungeonnowloading.components.spawn_node.spawn_effect;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.DungeonDirectorBlockEntity;
-import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnNode;
-import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnRequest;
-import dev.hexnowloading.dungeonnowloading.spawn_node.SpawnTask;
+import dev.hexnowloading.dungeonnowloading.components.spawn_node.SpawnNode;
+import dev.hexnowloading.dungeonnowloading.components.spawn_node.SpawnRequest;
+import dev.hexnowloading.dungeonnowloading.components.spawn_node.SpawnTask;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
