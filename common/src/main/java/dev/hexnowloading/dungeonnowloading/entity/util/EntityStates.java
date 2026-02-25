@@ -31,7 +31,7 @@ public class EntityStates {
     public static final EntityDataSerializer<SeepingSoulEntity.SeepingSoulAnimationState> SEEPING_SOUL_ANIMATION_STATE;
     public static final EntityDataSerializer<GarholdEntity.GarholdState> GARHOLD_STATE;
     public static final EntityDataSerializer<GarholdEntity.GarholdAnimationState> GARHOLD_ANIMATION_STATE;
-    public static final EntityDataSerializer<GarholdEntity.GarholdBottomGateAnimationState> GARHOLD_GATE_ANIMATION_STATE;
+    //public static final EntityDataSerializer<GarholdEntity.GarholdBottomGateAnimationState> GARHOLD_GATE_ANIMATION_STATE;
     public static final EntityDataSerializer<GarholdEntity.GarholdSideGateAnimationState> GARHOLD_SIDE_GATE_ANIMATION_STATE;
     public static final EntityDataSerializer<BrokenGarholdEntity.BrokenGarholdState> BROKEN_GARHOLD_STATE;
     public static final EntityDataSerializer<WhimperEntity.WhimperAnimationState> WHIMPER_ANIMATION_STATE;
@@ -58,7 +58,7 @@ public class EntityStates {
         SEEPING_SOUL_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SeepingSoulEntity.SeepingSoulAnimationState.class);
         GARHOLD_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdState.class);
         GARHOLD_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdAnimationState.class);
-        GARHOLD_GATE_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdBottomGateAnimationState.class);
+        //GARHOLD_GATE_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdBottomGateAnimationState.class);
         GARHOLD_SIDE_GATE_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdSideGateAnimationState.class);
         BROKEN_GARHOLD_STATE = EntityDataSerializer.simpleEnum(BrokenGarholdEntity.BrokenGarholdState.class);
         WHIMPER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WhimperEntity.WhimperAnimationState.class);
@@ -84,7 +84,7 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(SEEPING_SOUL_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(GARHOLD_STATE);
         EntityDataSerializers.registerSerializer(GARHOLD_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(GARHOLD_GATE_ANIMATION_STATE);
+        //EntityDataSerializers.registerSerializer(GARHOLD_GATE_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(GARHOLD_SIDE_GATE_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(BROKEN_GARHOLD_STATE);
         EntityDataSerializers.registerSerializer(WHIMPER_ANIMATION_STATE);

@@ -14,10 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.AnimationState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
@@ -27,6 +24,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class BrokenGarholdEntity extends Monster {
 
@@ -43,6 +41,9 @@ public class BrokenGarholdEntity extends Monster {
     private boolean dropping = false;
     private boolean broken = false;
     private boolean releaseInsteadOfDrop = false;
+    private int nonPlayerRideStartTick = -1;
+
+    private static final int NON_PLAYER_RIDE_TRIGGER_TICKS = 20 * 3;
 
     public BrokenGarholdEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -83,6 +84,22 @@ public class BrokenGarholdEntity extends Monster {
         super.tick();
 
         if (level().isClientSide) return;
+
+        if (!broken && !dropping && this.entityData.get(STATE) == BrokenGarholdState.HANGING && hasNonPlayerPassenger()) {
+            if (nonPlayerRideStartTick < 0) {
+                nonPlayerRideStartTick = this.tickCount;
+            } else if (this.tickCount - nonPlayerRideStartTick >= NON_PLAYER_RIDE_TRIGGER_TICKS) {
+                nonPlayerRideStartTick = -1; // prevent re-trigger loops
+
+                if (releaseInsteadOfDrop) {
+                    this.playOpenAnimation();
+                } else {
+                    this.playFallingAnimation();
+                }
+            }
+        } else {
+            nonPlayerRideStartTick = -1;
+        }
 
         if (!broken && !dropping && this.entityData.get(STATE) == BrokenGarholdState.HANGING) {
             if (!hasChainAboveSelf()) {
@@ -196,6 +213,20 @@ public class BrokenGarholdEntity extends Monster {
         }
     }
 
+    // For preventing non-player entity from moving the Garhold
+    @Nullable
+    @Override
+    public LivingEntity getControllingPassenger() {
+        return null;
+    }
+
+    @Override
+    protected void removePassenger(Entity passenger) {
+        super.removePassenger(passenger);
+        if (!level().isClientSide) {
+            nonPlayerRideStartTick = -1;
+        }
+    }
 
     @Override
     protected void positionRider(Entity passenger, MoveFunction moveFunction) {
@@ -269,6 +300,11 @@ public class BrokenGarholdEntity extends Monster {
 
     @Override
     public void push(double x, double y, double z) {
+    }
+
+    private boolean hasNonPlayerPassenger() {
+        if (getPassengers().isEmpty()) return false;
+        return !(getPassengers().get(0) instanceof Player);
     }
 
     public void setReleaseInsteadOfDrop(boolean value) {

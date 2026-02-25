@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai.garhold;
 
+import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity.GarholdState;
 import net.minecraft.util.Mth;
@@ -183,7 +184,7 @@ public class GarholdSideCaptureGoal extends Goal {
     }
 
     private boolean isValidCaptureTarget(LivingEntity e) {
-        if (e instanceof GarholdEntity) return false;
+        if (e instanceof GarholdEntity || e instanceof BrokenGarholdEntity) return false;
         if (e == mob) return false;
         if (!e.isAlive()) return false;
         if (e.isSpectator()) return false;

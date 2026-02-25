@@ -5,12 +5,16 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.GarholdAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
+import net.minecraft.client.animation.AnimationDefinition;
+import net.minecraft.client.animation.KeyframeAnimations;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import org.joml.Vector3f;
 
 public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "garhold"), "main");
@@ -79,11 +83,25 @@ public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> 
         return LayerDefinition.create(meshdefinition, 256, 256);
     }
 
+    private static final Vector3f ANIM_VEC_CACHE = new Vector3f();
+
+    protected void animateWeighted(AnimationDefinition def, float ageInTicks, float speed, float weight) {
+        float w = Mth.clamp(weight, 0.0F, 1.0F);
+        if (w <= 0.0001f) return;
+
+        long time = (long) (ageInTicks * 50.0F * speed);
+        KeyframeAnimations.animate(this, def, time, w, ANIM_VEC_CACHE);
+    }
+
+    private static float partialTickFromAge(float ageInTicks) {
+        return ageInTicks - (float)Math.floor(ageInTicks); // 0..1
+    }
+
     @Override
     public void setupAnim(GarholdEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
 
-        this.animate(entity.flyAnimationState, GarholdAnimation.FLY, ageInTicks);
+        //this.animate(entity.flyAnimationState, GarholdAnimation.FLY, ageInTicks);
         this.animate(entity.detachAnimationState, GarholdAnimation.DETACH, ageInTicks);
         this.animate(entity.forceDetachAnimationState, GarholdAnimation.FORCED_DETACH, ageInTicks);
         this.animate(entity.chargeDiveAnimationState, GarholdAnimation.CHARGE_DIVE, ageInTicks);
@@ -94,19 +112,35 @@ public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> 
         this.animate(entity.idleHangAnimationState, GarholdAnimation.IDLE_HANGED, ageInTicks);
         this.animate(entity.reattachAnimationState, GarholdAnimation.RE_ATTACH, ageInTicks);
 
-        this.animate(entity.bottomOpenAnimationState, GarholdAnimation.BOTTOM_OPEN, ageInTicks);
+    /*    this.animate(entity.bottomOpenAnimationState, GarholdAnimation.BOTTOM_OPEN, ageInTicks);
         this.animate(entity.bottomOpenedAnimationState, GarholdAnimation.BOTTON_OPENED, ageInTicks);
         this.animate(entity.bottomClosedAnimationState, GarholdAnimation.BOTTOM_CLOSED, ageInTicks);
-        this.animate(entity.bottomCloseAnimationState, GarholdAnimation.BOTTOM_CLOSE, ageInTicks);
-        this.animate(entity.sideOpenedAnimationState, GarholdAnimation.SIDE_OPENED, ageInTicks);
+        this.animate(entity.bottomCloseAnimationState, GarholdAnimation.BOTTOM_CLOSE, ageInTicks);*/
+        /*this.animate(entity.sideOpenedAnimationState, GarholdAnimation.SIDE_OPENED, ageInTicks);
         this.animate(entity.sideClosedAnimationState, GarholdAnimation.SIDE_CLOSED, ageInTicks);
         this.animate(entity.sideOpenAnimationState, GarholdAnimation.SIDE_OPEN, ageInTicks);
-        this.animate(entity.sideCloseAnimationState, GarholdAnimation.SIDE_CLOSE, ageInTicks);
+        this.animate(entity.sideCloseAnimationState, GarholdAnimation.SIDE_CLOSE, ageInTicks);*/
         this.animate(entity.sideWideToOpenedAnimationState, GarholdAnimation.SIDE_WIDE_TO_OPENED, ageInTicks);
 
-        float yawRad = netHeadYaw * ((float)Math.PI / 180F);
+        float pt = partialTickFromAge(ageInTicks);
 
-        this.Garhold.yRot += yawRad;
+        // Side Doors (interpolated)
+        float side = Mth.lerp(pt, entity.clientSideOpenO, entity.clientSideOpen);
+        side = side * side * (3f - 2f * side);
+        this.animateWeighted(GarholdAnimation.SIDE_OPENED, ageInTicks, 1.0f, side);
+
+        // Bottom Doors (interpolated)
+        float open = Mth.lerp(pt, entity.clientBottomOpenO, entity.clientBottomOpen);
+        open = open * open * (3f - 2f * open);
+        this.animateWeighted(GarholdAnimation.BOTTON_OPENED, ageInTicks, 1.0f, open);
+
+        // Fly (interpolated)
+        float fly = Mth.lerp(pt, entity.clientFlyBlendO, entity.clientFlyBlend);
+        fly = fly * fly * (3f - 2f * fly);
+        this.animateWeighted(GarholdAnimation.FLY, ageInTicks, 1.0f, fly);
+
+        // Yaw
+        this.Garhold.yRot += netHeadYaw * ((float)Math.PI / 180F);
     }
 
     @Override

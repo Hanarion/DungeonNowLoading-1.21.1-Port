@@ -126,6 +126,7 @@ public class GarholdReturnToChainGoal extends Goal {
 
         if (distSq <= 0.02) { // now finish is also 3D
             mob.setGarholdState(GarholdState.ATTACHING);
+            mob.playReattachAnimation();
             mob.setDeltaMovement(Vec3.ZERO);
             mob.getNavigation().stop();
             this.chainBottom = null;
