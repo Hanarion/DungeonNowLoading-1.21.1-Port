@@ -4,7 +4,10 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.GarholdAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableAxisParticleType;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -15,7 +18,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -29,6 +34,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -46,6 +52,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
@@ -129,6 +137,9 @@ public class GarholdEntity extends Monster {
     private static final float GROUND_SMASH_KB_H = 1.1f;     // horizontal knockback
     private static final float GROUND_SMASH_KB_Y = 0.35f;
 
+    public static final float CAPTURE_MAX_WIDTH_ADD  = 0.6f;
+    public static final float CAPTURE_MAX_HEIGHT_ADD = 0.3f;
+
     public GarholdEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
         this.xpReward = 20;
@@ -139,20 +150,28 @@ public class GarholdEntity extends Monster {
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new GarholdDiveCaptureGoal(this));
         this.goalSelector.addGoal(2, new GarholdSideCaptureGoal(this));
-        this.goalSelector.addGoal(3, new GarholdHoverAboveTargetGoal(this, 3.0F));
-        this.goalSelector.addGoal(4, new GarholdHoverAboveTargetGoal(this, 3.0F));
+        this.goalSelector.addGoal(3, new GarholdHoverAboveTargetGoal(this, 1.2F));
         this.goalSelector.addGoal(5, new GarholdReturnToChainGoal(this));
         this.goalSelector.addGoal(8, new GarholdWanderGoal(this, 1.0, 12, 6));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Villager.class, true));
-
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Villager.class, true));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(
+                        this,
+                        LivingEntity.class,
+                        10,
+                        true,
+                        false,
+                        this::isValidGarholdTarget
+                )
+        );
         super.registerGoals();
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 35.0)
-                .add(Attributes.FLYING_SPEED, 0.6)
+                .add(Attributes.FLYING_SPEED, 0.15)
                 .add(Attributes.MOVEMENT_SPEED, 0.2) // Required for slowing down the initial speed on ground.
                 .add(Attributes.ATTACK_DAMAGE, 9.0)
                 .add(Attributes.FOLLOW_RANGE, 20.0)
@@ -199,15 +218,15 @@ public class GarholdEntity extends Monster {
 
     @Override
     public void travel(Vec3 travelVec) {
-        // Only simulate on the authoritative side for AI; client uses vanilla prediction.
-        // (Vanilla checks isControlledByLocalInstance() for a reason.)
+        // Only simulate movement on the authoritative side.
         if (!this.isControlledByLocalInstance()) {
             this.calculateEntityAnimation(false);
             return;
         }
 
-        // Keep fluids sane (copy FlyingMob-ish behavior)
+        // Keep vanilla fluid handling (this is what tends to keep edge cases sane)
         if (this.isInWater()) {
+            // If you want true vanilla water behavior, call super.travel(travelVec) here instead.
             this.moveRelative(0.02F, travelVec);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.8));
@@ -216,6 +235,7 @@ public class GarholdEntity extends Monster {
         }
 
         if (this.isInLava()) {
+            // If you want true vanilla lava behavior, call super.travel(travelVec) here instead.
             this.moveRelative(0.02F, travelVec);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.5));
@@ -223,68 +243,50 @@ public class GarholdEntity extends Monster {
             return;
         }
 
+        // --- AIR / FLYING BRANCH (vanilla-like) ---
+
+        // Your knobs:
+        // - horizontalScale: changes only strafe/forward response (pathing-friendly)
+        // - verticalScale: changes only ascend/descend response
+        final float horizontalScale = this.getGarholdHorizontalFlightScale(); // <-- you implement (can be 0.5f..2.0f etc)
+        final float verticalScale   = this.getGarholdVerticalFlightScale();   // <-- you implement (often 1.0f)
+
+        // IMPORTANT: keep vanilla "speed" usage for AI/pathfinding compatibility
         final float speed = this.getSpeed();
-        final Vec3 vel = this.getDeltaMovement();
 
-        // Convert strafe input into world-space desired motion using yaw
-        // travelVec.x = strafe (xxa), travelVec.z = forward (zza)
-        double strafe = travelVec.x;
-        double forward = travelVec.z;
+        // Scale the *input* (xxa/yya/zza), not the base speed.
+        // This preserves MoveControl/pathfinder expectations much better than custom steering.
+        Vec3 scaledInput = new Vec3(
+                travelVec.x * horizontalScale,
+                travelVec.y * verticalScale,
+                travelVec.z * horizontalScale
+        );
 
-        // Normalize input so diagonal isn't faster
-        double mag = Math.sqrt(strafe * strafe + forward * forward);
-        if (mag > 1.0e-6) {
-            strafe /= mag;
-            forward /= mag;
-        } else {
-            strafe = 0.0;
-            forward = 0.0;
+        // Vanilla-ish: accelerate based on input and current yaw
+        this.moveRelative(speed, scaledInput);
+
+        // Apply gravity if you ever want it (Garhold usually shouldn’t have gravity)
+        if (!this.isNoGravity()) {
+            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.08, 0.0));
         }
-
-        // Yaw -> world space
-        float yawRad = this.getYRot() * ((float) Math.PI / 180F);
-        double sin = Math.sin(yawRad);
-        double cos = Math.cos(yawRad);
-
-        final double desiredXZ = (double) speed * 0.16;
-
-        double desiredVx = (strafe * cos - forward * sin) * desiredXZ;
-        double desiredVz = (forward * cos + strafe * sin) * desiredXZ;
-
-        // Vertical: use yya input as climb/descend request
-        // FlyingMoveControl sets yya to +/- speed when it wants to go up/down.
-        // Scale to something reasonable per tick.
-        final double desiredVy = travelVec.y * 0.18; // <-- vertical knob
-
-        final double steer = 0.35;
-
-        double newVx = vel.x + (desiredVx - vel.x) * steer;
-        double newVz = vel.z + (desiredVz - vel.z) * steer;
-        double newVy = vel.y + (desiredVy - vel.y) * steer;
-        final double dampingXZ = 0.94;
-        final double dampingY = 0.92;
-
-        if (strafe == 0.0 && forward == 0.0) {
-            newVx *= dampingXZ;
-            newVz *= dampingXZ;
-        }
-        if (Math.abs(travelVec.y) < 1.0e-6) {
-            newVy *= dampingY;
-        }
-
-        this.setNoGravity(true);
-        this.setDeltaMovement(newVx, newVy, newVz);
 
         // Actually move
         this.move(MoverType.SELF, this.getDeltaMovement());
 
-        // Light collision response: if you hit a wall, bleed horizontal speed a bit
-        if (this.horizontalCollision) {
-            Vec3 v = this.getDeltaMovement();
-            this.setDeltaMovement(v.x * 0.6, v.y, v.z * 0.6);
-        }
+        final double dampingXZ = 0.91;
+        final double dampingY  = 0.91;
+        Vec3 v = this.getDeltaMovement();
+        this.setDeltaMovement(v.x * dampingXZ, v.y * dampingY, v.z * dampingXZ);
 
         this.calculateEntityAnimation(false);
+    }
+
+    private float getGarholdHorizontalFlightScale() {
+        return 1.0f;
+    }
+
+    private float getGarholdVerticalFlightScale() {
+        return 1.0f;
     }
 
     @Override
@@ -298,23 +300,28 @@ public class GarholdEntity extends Monster {
             return;
         }
 
+        // --- Gravity policy ---
+        // Carrying = has passenger (captured), and NOT chained => should fall.
+        boolean carrying = this.hasCapturedPlayer();
+        boolean chained  = this.isGarholdState(GarholdState.CHAINED);
+
+        if (carrying && !chained) {
+            this.setNoGravity(false);
+        } else {
+            this.setNoGravity(true);
+        }
+
         animationChainer.tick(this::transitionTo);
-       //bottomGateAnimationChainer.tick(this::transitionTo);
         sideGateAnimationChainer.tick(this::transitionTo);
 
         if (this.entityData.get(ANIMATION_STATE).equals(GarholdAnimationState.NONE)) {
             if (this.entityData.get(STATE).equals(GarholdState.CHAINED)) {
                 this.playIdleHanging();
-                //this.playClosedSideAnimation();
                 this.closeSide();
                 this.closeBottom();
-                //this.playedClosedBottomAnimation();
             } else {
-                //this.playFlyAnimation();
                 this.openBottom();
                 this.openSide();
-                //this.playOpenedBottomAnimation(true);
-                //this.playOpenedSideAnimation(true);
             }
         }
     }
@@ -445,24 +452,9 @@ public class GarholdEntity extends Monster {
         return !this.getPassengers().isEmpty();
     }
 
-    public boolean beginCapture(LivingEntity target) {
+    public boolean beginCapture(@Nullable LivingEntity target) {
         if (target == null) return false;
-
-        if (target == this) return false;
-
-        if (this.isPassengerOfSameVehicle(target) || target.isPassengerOfSameVehicle(this)) return false;
-
-        if (target.getVehicle() instanceof GarholdEntity) return false;
-
-        if (this.hasPassenger(target)) return false;
-
-        if (!target.getPassengers().isEmpty()) return false;
-
-        if (!isSmallEnoughToCapture(target)) return false;
-
-        if (target instanceof Player p) {
-            if (p.isSpectator() || p.isCreative()) return false;
-        }
+        if (!isValidCaptureTarget(target)) return false;
 
         if (target.isPassenger()) {
             target.stopRiding();
@@ -481,16 +473,6 @@ public class GarholdEntity extends Monster {
         return true;
     }
 
-    private boolean isSmallEnoughToCapture(LivingEntity target) {
-        var selfDims = this.getDimensions(this.getPose());
-        var targetDims = target.getDimensions(target.getPose());
-
-        float maxW = selfDims.width * 1.5f;
-        float maxH = selfDims.height * 1.5f;
-
-        return targetDims.width <= maxW && targetDims.height <= maxH;
-    }
-
     private void teleportRiderToChainedGarhold() {
         if (this.level().isClientSide) return;
         if (this.getPassengers().isEmpty()) return;
@@ -503,14 +485,14 @@ public class GarholdEntity extends Monster {
 
         ServerLevel level = (ServerLevel) this.level();
 
-        spawnTeleportSpawnerFx(level, this.position());
+        spawnTeleportSpawnerFx(level, this);
         this.playSound(DNLSounds.GARHOLD_TELEPORT.get());
 
         player.teleportTo(target.getX(), target.getY(), target.getZ());
         player.stopRiding();
         player.startRiding(target, true);
 
-        spawnTeleportSpawnerFx(level, target.position());
+        spawnTeleportSpawnerFx(level, target);
         target.playSound(DNLSounds.GARHOLD_TELEPORT.get());
 
         if (target instanceof GarholdEntity g) {
@@ -726,21 +708,6 @@ public class GarholdEntity extends Monster {
         return isChainBlock(base.above(3));
     }
 
-    private boolean seesPlayerInRange() {
-        double range = this.getAttributeValue(Attributes.FOLLOW_RANGE);
-
-        Player p = this.level().getNearestPlayer(
-                this.getX(), this.getEyeY(), this.getZ(),
-                range,
-                player -> player.isAlive()
-                        && player instanceof Player pp
-                        && !pp.getAbilities().instabuild
-                        && !this.hasPassenger(player) // <-- critical
-        );
-
-        return p != null && this.hasLineOfSight(p);
-    }
-
     private void startDetaching(boolean forced) {
         // Don’t stomp other states
         if (!isGarholdState(GarholdState.CHAINED)) return;
@@ -859,6 +826,56 @@ public class GarholdEntity extends Monster {
         return false;
     }
 
+    private boolean isValidGarholdTarget(LivingEntity target) {
+
+        if (target.getMobType() == MobType.UNDEAD) return false;
+
+        return isValidCaptureTarget(target);
+    }
+
+    public boolean isValidCaptureTarget(@Nullable LivingEntity e) {
+        if (e == null) return false;
+
+        if (e == this) return false;
+        if (e instanceof GarholdEntity || e instanceof BrokenGarholdEntity) return false;
+        if (isRidingAnyGarhold(e)) return false;
+
+        if (!e.isAlive()) return false;
+        if (e.isSpectator()) return false;
+
+        if (e instanceof Player p) {
+            if (p.isCreative() || p.isSpectator()) return false;
+        }
+
+        return canCaptureSize(e);
+    }
+
+    private boolean canCaptureSize(LivingEntity target) {
+        if (target == null) return false;
+
+        EntityDimensions self = this.getDimensions(this.getPose());
+        EntityDimensions t    = target.getDimensions(target.getPose());
+
+        float maxW = self.width  + CAPTURE_MAX_WIDTH_ADD;
+        float maxH = self.height + CAPTURE_MAX_HEIGHT_ADD;
+
+        return t.width <= maxW && t.height <= maxH;
+    }
+
+    private static boolean isRidingAnyGarhold(@Nullable LivingEntity target) {
+        if (target == null) return false;
+        Entity v = target.getVehicle();
+        return v instanceof GarholdEntity || v instanceof BrokenGarholdEntity;
+    }
+
+    @Override
+    public void die(DamageSource $$0) {
+        super.die($$0);
+        if (!this.level().isClientSide) {
+            this.stopGarholdSounds();
+        }
+    }
+
     @Nullable
     @Override
     public LivingEntity getControllingPassenger() {
@@ -886,7 +903,7 @@ public class GarholdEntity extends Monster {
         GarholdAnimationState anim = this.entityData.get(ANIMATION_STATE);
 
         // only flap during flap-capable animations
-        if (!isFlapAnimation(anim) || this.isGarholdState(GarholdState.FLYING)) {
+        if (!isFlapAnimation(anim) && !this.isGarholdState(GarholdState.FLYING) && !this.isGarholdState(GarholdState.LOCKING_ON_CHAIN)) {
             flapSoundCooldown = 0; // so the next time we enter a flap anim, it can play immediately
             return;
         }
@@ -925,6 +942,34 @@ public class GarholdEntity extends Monster {
         };
     }
 
+    public void playGarholdSound(SoundEvent soundEvent) {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), soundEvent.getLocation(), SoundSource.HOSTILE), player);
+        }
+    }
+
+    public void stopGarholdSounds() {
+        float radius = 32.0f;
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        List<ResourceLocation> soundsToStop = new ArrayList<>(List.of());
+        soundsToStop.add(DNLSounds.GARHOLD_CLOSING.get().getLocation());
+        for (ServerPlayer player : nearbyPlayers) {
+            for (ResourceLocation sound : soundsToStop) {
+                Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), sound, 20, true), player);
+            }
+        }
+    }
+
     private void openBottom() {
         this.entityData.set(BOTTOM_OPENESS, true);
     }
@@ -961,19 +1006,30 @@ public class GarholdEntity extends Monster {
         return this.entityData.get(ANIMATION_STATE).equals(GarholdAnimationState.NONE);
     }
 
-    public static void spawnTeleportSpawnerFx(ServerLevel level, Vec3 pos) {
+    public static void spawnTeleportSpawnerFx(ServerLevel level, Entity e) {
+        AABB box = e.getBoundingBox();
 
-        level.sendParticles(ParticleTypes.FLAME,
-                pos.x, pos.y, pos.z,
-                30,           // count
-                0.7, 2.3, 0.7,
+        double centerX = box.getCenter().x;
+        double centerY = box.getCenter().y;
+        double centerZ = box.getCenter().z;
+
+        double halfWidth = box.getXsize() * 0.5;
+        double halfHeight = box.getYsize() * 0.5;
+        double halfDepth = box.getZsize() * 0.5;
+
+        level.sendParticles(
+                ParticleTypes.FLAME,
+                centerX, centerY, centerZ,
+                30,
+                halfWidth, halfHeight, halfDepth,
                 0.001
         );
 
-        level.sendParticles(ParticleTypes.POOF,
-                pos.x, pos.y, pos.z,
-                30,           // count
-                0.7, 2.3, 0.7,
+        level.sendParticles(
+                ParticleTypes.POOF,
+                centerX, centerY, centerZ,
+                30,
+                halfWidth, halfHeight, halfDepth,
                 0.001
         );
     }
@@ -1093,7 +1149,7 @@ public class GarholdEntity extends Monster {
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
                 GarholdAnimationState.CLOSING_GATE,
                 GarholdAnimationDuration.CLOSING_GATE,
-                () -> this.playSound(DNLSounds.GARHOLD_CLOSING.get()),
+                () -> this.playGarholdSound(DNLSounds.GARHOLD_CLOSING.get()),
                 () -> {
                     teleportRiderToChainedGarhold();
 

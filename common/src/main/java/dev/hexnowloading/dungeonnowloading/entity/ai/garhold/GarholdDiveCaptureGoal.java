@@ -1,6 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai.garhold;
 
-import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity.GarholdState;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,10 +13,10 @@ import java.util.List;
 
 public class GarholdDiveCaptureGoal extends Goal {
 
-    private static final double DROP_PER_TICK = 16.0 / (1.5 * 5.0);
+    private static final double DROP_PER_TICK = 16.0 / (1.5 * 10.0);
 
     // how generous the grab feels
-    private static final double HIT_INFLATE = 0.35;
+    private static final double HIT_INFLATE = 0.3;
 
     private final GarholdEntity mob;
 
@@ -118,35 +117,10 @@ public class GarholdDiveCaptureGoal extends Goal {
         List<LivingEntity> targets = mob.level().getEntitiesOfClass(
                 LivingEntity.class,
                 swept,
-                this::isValidCaptureTarget
+                mob::isValidCaptureTarget
         );
 
         return targets.isEmpty() ? null : targets.get(0);
-    }
-
-    private boolean isValidCaptureTarget(LivingEntity e) {
-        if (e instanceof GarholdEntity || e instanceof BrokenGarholdEntity) return false;
-        if (e == mob) return false;          // ✅ critical
-        if (!e.isAlive()) return false;
-        if (e.isSpectator()) return false;   // ✅ don’t grab spectator players
-
-        if (!isSmallEnoughToCapture(e)) return false;
-
-        if (e instanceof Player p) {
-            return !p.isCreative();          // survival/adventure only
-        }
-
-        return true;
-    }
-
-    private boolean isSmallEnoughToCapture(LivingEntity target) {
-        var selfDims = mob.getDimensions(mob.getPose());
-        var targetDims = target.getDimensions(target.getPose());
-
-        float maxW = selfDims.width * 1.5f;
-        float maxH = selfDims.height * 1.5f;
-
-        return targetDims.width <= maxW && targetDims.height <= maxH;
     }
 
     @Override

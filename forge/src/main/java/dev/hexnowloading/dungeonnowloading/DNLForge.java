@@ -4,13 +4,10 @@ import dev.hexnowloading.dungeonnowloading.client.DNLForgeClient;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClientEvents;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLCommands;
 import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
 import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -49,14 +46,6 @@ public class DNLForge {
             addModClientListeners(bus);
             // run init when registries are ready
             bus.addListener((FMLClientSetupEvent event) -> DNLForgeClient.init());
-            // set block render layers (Forge 1.20.1 API)
-            bus.addListener((FMLClientSetupEvent event) -> {
-                event.enqueueWork(() -> {
-                    try {
-                        ItemBlockRenderTypes.setRenderLayer(DNLBlocks.POTION_BARREL.get(), RenderType.translucent());
-                    } catch (Throwable ignored) {}
-                });
-            });
         }
 
         addForgeListeners();
@@ -79,6 +68,7 @@ public class DNLForge {
         bus.addListener(DNLForgeClientEvents::onRegisterRenderer);
         bus.addListener(DNLForgeClientEvents::onRegisterLayers);
         bus.addListener(DNLForgeClientEvents::onRegisterParticleProviders);
+        bus.addListener(DNLForgeClientEvents::onRegisterBlockRenderTypes);
     }
 
     private void addForgeListeners() {

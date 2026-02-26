@@ -1,8 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
+import dev.hexnowloading.dungeonnowloading.block.MendingAuraBlock;
 import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.util.event_managers.BlockDestructionManager;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.core.BlockPos;
@@ -265,45 +267,6 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         level.sendParticles(data, x, y, z, 1, 0, 0, 0, 0);
     }
 
-    /*private void spawnUpperHemisphereMendingPop(ServerLevel level, BlockPos blockPos) {
-        // Center of the durite block
-        Vec3 c = Vec3.atCenterOf(blockPos);
-
-        int count = 3 + level.random.nextInt(2); // 6..9
-        float speedMin = 0.04f;
-        float speedMax = 0.10f;
-
-        // how far from the center it can spawn (in blocks)
-        double spawnOffsetRadius = 0.30; // tweak (0.15 = tight, 0.40 = wider)
-
-        for (int i = 0; i < count; i++) {
-            // Random direction in upper hemisphere
-            double rx = (level.random.nextDouble() * 2.0 - 1.0);
-            double ry = (level.random.nextDouble());          // 0..1 (upper hemisphere)
-            double rz = (level.random.nextDouble() * 2.0 - 1.0);
-
-            Vec3 dir = new Vec3(rx, ry, rz);
-            if (dir.lengthSqr() < 1.0e-6) dir = new Vec3(0, 1, 0);
-            dir = dir.normalize();
-
-            float speed = speedMin + level.random.nextFloat() * (speedMax - speedMin);
-            Vec3 vel = dir.scale(speed);
-
-            // Spawn near the durite center with small random offset in all directions
-            double x = c.x + (level.random.nextDouble() * 2.0 - 1.0) * spawnOffsetRadius;
-            double y = c.y + (level.random.nextDouble() * 2.0 - 1.0) * spawnOffsetRadius;
-            double z = c.z + (level.random.nextDouble() * 2.0 - 1.0) * spawnOffsetRadius;
-
-            var data = new DirectionalParticleType.Data(
-                    DNLParticleTypes.MENDING_POP_AND_RUNE_PARTICLE.get(),
-                    (float) -vel.x, (float) -vel.y, (float) -vel.z
-            );
-
-            level.sendParticles(data, x, y, z, 1, 0, 0, 0, 0);
-        }
-    }*/
-
-
 
 
     private void spawnReturnParticlesBatch(ServerLevel level) {
@@ -411,26 +374,61 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         }
     }
 
+    public void tryReplaceSelfWithMendingAura(ServerLevel level) {
+        if (!hasAnyPreserverInRegion(level)) return;
 
-    private int computeDelayTicks(ServerLevel level) {
-        if (cachedPreservers.isEmpty()) return 0;
+        BlockPos pos = this.getBlockPos();
+        BlockState originalState = level.getBlockState(pos);
 
-        Vec3 start = Vec3.atCenterOf(this.getBlockPos().above());
+        // snapshot BEFORE we touch the block
+        CompoundTag tag = this.saveWithFullMetadata(); // or saveWithoutMetadata()
 
-        double maxTravel = 0.0;
+        // mirror your working mending placement behavior
+        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
 
-        for (int i = 0; i < cachedPreservers.size(); i++) {
-            BlockPos p = BlockPos.of(cachedPreservers.getLong(i));
-            double dist = start.distanceTo(Vec3.atCenterOf(p));
-            double travel = Math.min(MAX_SPAWN_DISTANCE, dist); // because you spawn at min(5, dist)
-            if (travel > maxTravel) maxTravel = travel;
+        BlockState auraState = DNLBlocks.MENDING_AURA.get().defaultBlockState();
+        level.setBlock(pos, auraState, Block.UPDATE_CLIENTS);
+
+        BlockEntity newBe = level.getBlockEntity(pos);
+        if (newBe instanceof MendingAuraBlockEntity auraBe) {
+            auraBe.setStoredBlock(originalState, tag);
+            auraBe.setChanged();
         }
 
-        // delay so that the farthest particle reaches start exactly when we execute
-        int ticks = (int) Math.ceil(maxTravel / (double) RETURN_PARTICLE_SPEED);
+        // IMPORTANT: start restoration (your preserver system does this)
+        Block block = level.getBlockState(pos).getBlock();
+        if (block instanceof MendingAuraBlock auraBlock) {
+            auraBlock.startRestoration(level, pos);
+        }
 
-        // keep it at least 1 tick if we’re doing anything
-        return Math.max(1, ticks);
+        // IMPORTANT: cancel AFTER all setBlock calls (same reason as your comment)
+        BlockDestructionManager.cancel();
+    }
+
+    public boolean hasAnyPreserverInRegion(ServerLevel level) {
+        BlockPos center = this.getBlockPos();
+        BlockPos absCornerA = center.offset(rotateOffset(level, center, cornerA, nbtFacing));
+        BlockPos absCornerB = center.offset(rotateOffset(level, center, cornerB, nbtFacing));
+
+        int minX = Math.min(absCornerA.getX(), absCornerB.getX());
+        int minY = Math.min(absCornerA.getY(), absCornerB.getY());
+        int minZ = Math.min(absCornerA.getZ(), absCornerB.getZ());
+        int maxX = Math.max(absCornerA.getX(), absCornerB.getX());
+        int maxY = Math.max(absCornerA.getY(), absCornerB.getY());
+        int maxZ = Math.max(absCornerA.getZ(), absCornerB.getZ());
+
+        Block preserver = DNLBlocks.STONE_PRESERVER.get();
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+
+        for (int y = minY; y <= maxY; y++) {
+            for (int x = minX; x <= maxX; x++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    cursor.set(x, y, z);
+                    if (level.getBlockState(cursor).is(preserver)) return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -513,34 +511,6 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
     private int travelTicksForDistance(double travelDist) {
         int t = (int) Math.ceil(travelDist / 0.18);
         return Math.max(1, t);
-    }
-
-    private int computeMinTravelTicks(ServerLevel level) {
-        if (cachedPreservers.isEmpty()) return 0;
-        Vec3 start = Vec3.atCenterOf(this.getBlockPos().above());
-
-        int min = Integer.MAX_VALUE;
-        for (int i = 0; i < cachedPreservers.size(); i++) {
-            BlockPos p = BlockPos.of(cachedPreservers.getLong(i));
-            double dist = start.distanceTo(Vec3.atCenterOf(p));
-            double travelDist = Math.min(MAX_SPAWN_DISTANCE, dist);
-            min = Math.min(min, travelTicksForDistance(travelDist));
-        }
-        return (min == Integer.MAX_VALUE) ? 0 : min;
-    }
-
-    private int computeMaxTravelTicks(ServerLevel level) {
-        if (cachedPreservers.isEmpty()) return 0;
-        Vec3 start = Vec3.atCenterOf(this.getBlockPos().above());
-
-        int max = 0;
-        for (int i = 0; i < cachedPreservers.size(); i++) {
-            BlockPos p = BlockPos.of(cachedPreservers.getLong(i));
-            double dist = start.distanceTo(Vec3.atCenterOf(p));
-            double travelDist = Math.min(MAX_SPAWN_DISTANCE, dist);
-            max = Math.max(max, travelTicksForDistance(travelDist));
-        }
-        return max;
     }
 
     private int getScheduledGrowthTick(int index) {

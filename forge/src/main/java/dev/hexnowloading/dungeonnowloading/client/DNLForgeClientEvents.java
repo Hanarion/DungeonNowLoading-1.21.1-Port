@@ -16,11 +16,14 @@ import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class DNLForgeClientEvents {
 
@@ -170,6 +173,14 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+    }
+
+    public static void onRegisterBlockRenderTypes(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.POTION_BARREL.get(), RenderType.translucent());
+        });
     }
 
 }

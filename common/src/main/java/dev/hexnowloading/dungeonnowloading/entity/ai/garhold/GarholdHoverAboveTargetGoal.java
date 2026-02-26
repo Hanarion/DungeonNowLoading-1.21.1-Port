@@ -20,7 +20,7 @@ public class GarholdHoverAboveTargetGoal extends Goal {
     private static final double SIDE_RANGE = 2.0;
     private static final double SIDE_RANGE_SQ = SIDE_RANGE * SIDE_RANGE;
 
-    private static final double Y_LOCK_TOL = 0.75;
+    private static final double Y_LOCK_TOL = 1;
 
     private static final double VERTICAL_SWEEP_STEP = 0.25;
 
@@ -137,6 +137,36 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         }
 
         Desired desired = computeDesired(target);
+
+        boolean wantsSideNow = committedSideCapture || aboveBlockedThisTick;
+
+// If we're in side mode and already at ring distance, rotate to face the player instead of trying to move.
+        if (wantsSideNow) {
+            double px = target.getX();
+            double pz = target.getZ();
+            double rx = mob.getX() - px;
+            double rz = mob.getZ() - pz;
+            double distSq = rx * rx + rz * rz;
+
+            double dyToFeet = target.getY() - mob.getY();
+
+            if (distSq <= SIDE_RANGE_SQ && Math.abs(dyToFeet) <= Y_LOCK_TOL) {
+                mob.getNavigation().stop();
+
+                // keep it hovering "stable" (don’t hard-zero if you want floaty feel)
+                mob.setDeltaMovement(mob.getDeltaMovement().scale(0.6));
+                mob.setNoGravity(true);
+
+                // rotate the BODY toward target so isFacingTarget() can become true
+                rotateBodyToward(target, 12.0F); // <-- turn rate knob
+
+                // (optional) still run look control for pitch, etc.
+                mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+
+                // Now just let the top-of-tick canEnterSideCapture() trigger handle the transition next tick.
+                return;
+            }
+        }
 
         mob.getLookControl().setLookAt(target, 10.0F, 10.0F);
 
@@ -399,6 +429,21 @@ public class GarholdHoverAboveTargetGoal extends Goal {
         flatTo = flatTo.normalize();
         flatLook = flatLook.normalize();
         return flatLook.dot(flatTo) >= SIDE_CAPTURE_FACE_DOT;
+    }
+
+    private void rotateBodyToward(LivingEntity target, float maxTurnDegPerTick) {
+        double dx = target.getX() - mob.getX();
+        double dz = target.getZ() - mob.getZ();
+        if (dx * dx + dz * dz < 1.0e-6) return;
+
+        float desiredYaw = (float)(Mth.atan2(dz, dx) * (180.0 / Math.PI)) - 90.0F;
+
+        float newYaw = rotlerp(mob.getYRot(), desiredYaw, maxTurnDegPerTick);
+        mob.setYRot(newYaw);
+
+        // Force body/head to match so it's not just "looking" with head
+        mob.yBodyRot = newYaw;
+        mob.yHeadRot = newYaw;
     }
 
     private boolean canEnterSideCapture(LivingEntity target) {

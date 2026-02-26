@@ -33,7 +33,7 @@ public class DungeonDirectorRenderer implements BlockEntityRenderer<DungeonDirec
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         BakedModel model = dispatcher.getBlockModel(state);
 
-        RenderType layer = ItemBlockRenderTypes.getChunkRenderType(state);
+        RenderType layer = ItemBlockRenderTypes.getRenderType(state, false);
 
         // Render baked model directly (ignores RenderShape.INVISIBLE)
         dispatcher.getModelRenderer().renderModel(

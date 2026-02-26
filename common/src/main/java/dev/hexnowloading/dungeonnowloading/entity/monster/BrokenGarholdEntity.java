@@ -244,6 +244,12 @@ public class BrokenGarholdEntity extends Monster {
             return super.hurt(source, amount);
         }
 
+        Entity attacker = source.getEntity();
+
+        if (attacker != null && this.hasPassenger(attacker)) {
+            amount = Math.min(amount, 4.0F);
+        }
+
         boolean ok = super.hurt(source, amount);
         if (!ok) return false;
 
@@ -263,7 +269,6 @@ public class BrokenGarholdEntity extends Monster {
             } else {
                 this.playFallingAnimation();
             }
-
         }
 
         return true;
