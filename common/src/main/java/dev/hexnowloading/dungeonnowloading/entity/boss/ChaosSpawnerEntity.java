@@ -779,6 +779,9 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
         ItemStack banner = new ItemStack(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get());
         this.spawnSpecialItemEntity(banner, 0.0F, playerUuid);
+
+        ItemStack trophy = new ItemStack(DNLBlocks.LABYRINTH_TROPHY.get());
+        this.spawnSpecialItemEntity(trophy, 0.0F, playerUuid);
     }
 
     private void dropGreatXpBottlesForPlayer(UUID playerUuid) {
