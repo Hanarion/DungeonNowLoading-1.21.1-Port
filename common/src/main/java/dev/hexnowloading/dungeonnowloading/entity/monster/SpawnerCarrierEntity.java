@@ -676,7 +676,7 @@ public class SpawnerCarrierEntity extends Monster {
                 && target.isAlive()
                 && !(target instanceof Player)
                 && box.intersects(target.getBoundingBox())
-                && !this.isSpawnedMinion(target)) { // optional: don't friendly-fire your minions
+                && !this.isSpawnedMinion(target)) {
 
             target.hurt(src, dmg);
             applySmashKnockback(target);

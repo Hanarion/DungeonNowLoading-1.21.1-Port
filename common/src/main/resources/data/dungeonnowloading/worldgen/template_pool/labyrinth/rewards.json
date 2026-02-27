@@ -24,8 +24,26 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/rewards/chest",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/rewards/diamond",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
         "location": "dungeonnowloading:labyrinth/rewards/spawner",
-        "processors": "minecraft:empty"
+        "processors": "dungeonnowloading:waterlogging_fix"
       }
     }
   ]

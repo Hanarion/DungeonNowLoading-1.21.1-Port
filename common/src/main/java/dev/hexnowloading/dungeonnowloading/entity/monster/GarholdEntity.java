@@ -34,6 +34,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
@@ -148,6 +149,7 @@ public class GarholdEntity extends Monster {
 
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new GarholdDiveCaptureGoal(this));
         this.goalSelector.addGoal(2, new GarholdSideCaptureGoal(this));
         this.goalSelector.addGoal(3, new GarholdHoverAboveTargetGoal(this, 1.2F));
@@ -758,6 +760,8 @@ public class GarholdEntity extends Monster {
         DamageSource src = this.damageSources().mobAttack(this);
         float dmg = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE);
 
+        final LivingEntity currentTarget = this.getTarget();
+
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, victim -> {
             if (victim == this) return false;
             if (!victim.isAlive()) return false;
@@ -767,8 +771,12 @@ public class GarholdEntity extends Monster {
             if (excluded != null && victim == excluded) return false;
             if (victim.isPassengerOfSameVehicle(this) || this.isPassengerOfSameVehicle(victim)) return false;
             if (victim instanceof Player p && p.isCreative()) return false;
+            boolean allowed =
+                    (victim instanceof Player)
+                            || isPlayerOrPlayerOwned(victim)
+                            || (currentTarget != null && victim == currentTarget);
 
-            return true;
+            return allowed;
         })) {
 
             boolean blockedByShield = (e instanceof Player p) && p.isBlocking() && p.isDamageSourceBlocked(src);
