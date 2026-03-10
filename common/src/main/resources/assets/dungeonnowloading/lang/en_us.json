@@ -85,7 +85,7 @@
   "item.dungeonnowloading.spawner_sword.tooltip.ability_name": "Soul Dispersion",
   "item.dungeonnowloading.spawner_sword.tooltip.ability_description": "Harms the user by 1 damage, but deals 3 additional damage",
   "item.dungeonnowloading.spawner_armor.tooltip.ability_name": "Whimper's Aid (Full Set Bonus)",
-  "item.dungeonnowloading.spawner_armor.tooltip.ability_description": "Summons a Whimper every 10 seconds if a hostile mob is in the 5 block radius",
+  "item.dungeonnowloading.spawner_armor.tooltip.ability_description": "Summons a Whimper every 10 seconds if a hostile mob is in the 8 block radius. Crouch to speed up the summoning",
   "item.dungeonnowloading.spawner_helmet": "Spawner Helmet",
   "item.dungeonnowloading.spawner_chestplate": "Spawner Chestplate",
   "item.dungeonnowloading.spawner_leggings": "Spawner Leggings",

@@ -3,7 +3,7 @@
   "fallback": "minecraft:empty",
   "elements": [
     {
-      "weight": 212,
+      "weight": 424,
       "element": {
         "element_type": "minecraft:empty_pool_element"
       }
@@ -45,7 +45,7 @@
       }
     },
     {
-      "weight": 3,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -54,7 +54,7 @@
       }
     },
     {
-      "weight": 3,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -63,7 +63,7 @@
       }
     },
     {
-      "weight": 3,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -72,7 +72,7 @@
       }
     },
     {
-      "weight": 3,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",

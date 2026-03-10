@@ -1,0 +1,14 @@
+{
+  "name": "dungeonnowloading:labyrinth/surface",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:feature_pool_element",
+        "projection": "rigid",
+        "feature": "dungeonnowloading:structures/labyrinth/surface"
+      }
+    }
+  ]
+}

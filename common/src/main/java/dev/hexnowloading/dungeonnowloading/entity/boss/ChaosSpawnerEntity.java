@@ -745,12 +745,16 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
             dropGreatXpBottlesForPlayer(playerUUID);
 
-            if (this.modifiedDefeatedCount >= 4) {
-                dropLabyrinthTrophyForPlayer(playerUUID);
-            }
-
             if (this.modifiedDefeatedCount >= 1) { // Recall I+
                 dropRecallEnchantedBookForPlayer(playerUUID);
+            }
+
+            if (this.modifiedDefeatedCount >= 3) {
+                dropBannerForPlayer(playerUUID);
+            }
+
+            if (this.modifiedDefeatedCount >= 4) {
+                dropLabyrinthTrophyForPlayer(playerUUID);
             }
 
             // Gate: only first-clear gets loot (only on non-ignored runs)
@@ -777,11 +781,15 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private void dropLabyrinthTrophyForPlayer(UUID playerUuid) {
         if (this.level().isClientSide) return;
 
-        ItemStack banner = new ItemStack(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get());
-        this.spawnSpecialItemEntity(banner, 0.0F, playerUuid);
-
         ItemStack trophy = new ItemStack(DNLBlocks.LABYRINTH_TROPHY.get());
         this.spawnSpecialItemEntity(trophy, 0.0F, playerUuid);
+    }
+
+    private void dropBannerForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        ItemStack banner = new ItemStack(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+        this.spawnSpecialItemEntity(banner, 0.0F, playerUuid);
     }
 
     private void dropGreatXpBottlesForPlayer(UUID playerUuid) {

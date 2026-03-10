@@ -72,7 +72,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Mob.class, 5, false, false, (c) -> {
-            return !c.getUUID().equals(this.getOwnerUUID()) && PvpConfig.TOGGLE_PVP_MODE.get() && c instanceof OwnableEntity;
+            return !c.getUUID().equals(this.getOwnerUUID()) && PvpConfig.TOGGLE_PVP_MODE.get() && c instanceof OwnableEntity && !isAlliedTo(c);
         }));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 5, true, false, (c) -> {
             return !c.getUUID().equals(this.getOwnerUUID()) && PvpConfig.TOGGLE_PVP_MODE.get();
@@ -173,6 +173,21 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
             ((ServerLevel) this.level()).sendParticles(ParticleTypes.POOF, this.getX(), this.getY(), this.getZ(), 20, 0.3D, 0.3D, 0.3D, 0.0D);
         }
         this.discard();
+    }
+
+    @Override
+    public boolean isAlliedTo(Entity other) {
+        UUID myOwner = this.getOwnerUUID();
+        if (myOwner == null) return false; // or true to be ultra-conservative during first ticks
+
+        if (other instanceof Player p) {
+            return myOwner.equals(p.getUUID());
+        }
+        if (other instanceof OwnableEntity ownable) {
+            UUID theirOwner = ownable.getOwnerUUID();
+            return theirOwner != null && myOwner.equals(theirOwner);
+        }
+        return super.isAlliedTo(other);
     }
 
     @Override

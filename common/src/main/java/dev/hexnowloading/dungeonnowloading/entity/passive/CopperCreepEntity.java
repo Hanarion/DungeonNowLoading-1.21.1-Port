@@ -167,7 +167,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Monster.class, 8.0F));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Mob.class, 5, false, false, (c) -> {
-            return !c.getUUID().equals(this.getOwnerUUID()) && PvpConfig.TOGGLE_PVP_MODE.get() && c instanceof OwnableEntity;
+            return !c.getUUID().equals(this.getOwnerUUID()) && PvpConfig.TOGGLE_PVP_MODE.get() && c instanceof OwnableEntity && !isAlliedTo(c);
         }));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 5, true, false, (c) -> {
             return !c.getUUID().equals(this.getOwnerUUID()) && PvpConfig.TOGGLE_PVP_MODE.get();
@@ -598,6 +598,21 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
 //        this.hurt(this.damageSources().lightningBolt(), 5.0F);
 
         this.entityData.set(DATA_IS_POWERED, true);
+    }
+
+    @Override
+    public boolean isAlliedTo(Entity other) {
+        UUID myOwner = this.getOwnerUUID();
+        if (myOwner == null) return false; // or true to be ultra-conservative during first ticks
+
+        if (other instanceof Player p) {
+            return myOwner.equals(p.getUUID());
+        }
+        if (other instanceof OwnableEntity ownable) {
+            UUID theirOwner = ownable.getOwnerUUID();
+            return theirOwner != null && myOwner.equals(theirOwner);
+        }
+        return super.isAlliedTo(other);
     }
 
     private boolean isPlayerOnDifferentTeam(Player player) {
