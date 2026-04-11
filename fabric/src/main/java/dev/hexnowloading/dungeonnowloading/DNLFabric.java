@@ -4,7 +4,10 @@ import dev.hexnowloading.dungeonnowloading.block.entity.PotionBarrelBlockEntity;
 import dev.hexnowloading.dungeonnowloading.events.DNLFabricBlockEvents;
 import dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
-import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.registry.DNLCommands;
+import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
 import dev.hexnowloading.dungeonnowloading.server.entity.DNLFabricEntities;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
 import net.fabricmc.api.ModInitializer;
@@ -15,9 +18,6 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.flag.FeatureFlags;
@@ -75,7 +75,7 @@ public class DNLFabric implements ModInitializer {
         registerBlockColors();
 
         // Register item colors so the potion barrel gets tinted in inventories/hand
-        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
+        /*ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
             if (tintIndex != 0) return 0xFFFFFFFF;
             CompoundTag tag = stack.getTag();
             if (tag == null) return 0xFFFFFFFF;
@@ -91,9 +91,9 @@ public class DNLFabric implements ModInitializer {
                 }
             } catch (Exception ignored) {}
             return 0xFFFFFFFF;
-        }, DNLItems.POTION_BARREL.get());
+        }, DNLItems.POTION_BARREL.get());*/
 
-        DungeonNowLoading.LOGGER.info("Hello Fabric world!");
+        //DungeonNowLoading.LOGGER.info("Hello Fabric world!");
     }
 
     private void registerEvents() { DNLFabricBlockEvents.init(); }
