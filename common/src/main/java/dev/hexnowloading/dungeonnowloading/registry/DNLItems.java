@@ -58,6 +58,9 @@ public class DNLItems {
     public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new ZoneWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
 
     // ITEMS - MUSIC DISC
+    public static final Supplier<Item> MUSIC_DISC_HELLSPAWN = register("music_disc_hellspawn", () -> new DNLRecordItem(15, DNLSounds.DISC_HELLSPAWN.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 140));
+    public static final Supplier<Item> MUSIC_DISC_AOTSUGI = register("music_disc_aotsugi", () -> new DNLRecordItem(15, DNLSounds.DISC_AOTSUGI.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 218));
+    public static final Supplier<Item> MUSIC_DISC_BROKEN_AOTSUGI = register("music_disc_broken_aotsugi", () -> new BrokenRecordItem(15, DNLSounds.DISC_BROKEN_AOTSUGI.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)), 43));
     public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_clash_of_duality_ouros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_OUROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
     public static final Supplier<Item> MUSIC_DISC_BOROS = register("music_disc_clash_of_duality_boros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_BOROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
     public static final Supplier<Item> MUSIC_DISC_PYTHONIC_OVERDRIVE = register("music_disc_clash_of_duality_pythonic_overdrive", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_PYTHONIC_OVERDRIVE.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));

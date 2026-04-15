@@ -75,6 +75,9 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.REDSTONE_IDOL.get());
                 output.accept(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
                 // Item - Music Disc
+                output.accept(DNLItems.MUSIC_DISC_HELLSPAWN.get());
+                output.accept(DNLItems.MUSIC_DISC_AOTSUGI.get());
+                output.accept(DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get());
                 output.accept(DNLItems.MUSIC_DISC_OUROS.get());
                 output.accept(DNLItems.MUSIC_DISC_BOROS.get());
                 output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());

@@ -33,6 +33,9 @@ public class DNLForgetItemTagGenerator extends ItemTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         this.tag(ItemTags.MUSIC_DISCS).add(
+                DNLItems.MUSIC_DISC_AOTSUGI.get(),
+                DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get(),
+                DNLItems.MUSIC_DISC_HELLSPAWN.get(),
                 DNLItems.MUSIC_DISC_BOROS.get(),
                 DNLItems.MUSIC_DISC_OUROS.get(),
                 DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get()

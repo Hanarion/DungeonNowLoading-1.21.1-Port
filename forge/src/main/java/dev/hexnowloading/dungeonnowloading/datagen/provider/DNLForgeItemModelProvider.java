@@ -34,6 +34,9 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.CATALYZED_REDSTONE.get());
         simpleItem(DNLItems.REDSTONE_IDOL.get());
         simpleItem(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
+        simpleItem(DNLItems.MUSIC_DISC_AOTSUGI.get());
+        simpleItem(DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get());
+        simpleItem(DNLItems.MUSIC_DISC_HELLSPAWN.get());
         simpleItem(DNLItems.MUSIC_DISC_OUROS.get());
         simpleItem(DNLItems.MUSIC_DISC_BOROS.get());
         simpleItem(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());

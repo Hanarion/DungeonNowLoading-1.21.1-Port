@@ -20,6 +20,9 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> DISC_CLASH_OF_DUALITY_PYTHONIC_OVERDRIVE = registerSoundEvent("disc_clash_of_duality_pythonic_overdrive");
     public static final Supplier<SoundEvent> MUSIC_HELLSPAWN_BASE = registerSoundEvent("music_hellspawn_base");
     public static final Supplier<SoundEvent> MUSIC_HELLSPAWN_OVERLAY = registerSoundEvent("music_hellspawn_overlay");
+    public static final Supplier<SoundEvent> DISC_HELLSPAWN = registerSoundEvent("disc_hellspawn");
+    public static final Supplier<SoundEvent> DISC_BROKEN_AOTSUGI = registerSoundEvent("disc_broken_aotsugi");
+    public static final Supplier<SoundEvent> DISC_AOTSUGI = registerSoundEvent("disc_aotsugi");
     public static final Supplier<SoundEvent> HIKE = registerSoundEvent("hike");
     public static final Supplier<SoundEvent> SCORCHER_OVERHEAT = registerSoundEvent("scorcher_overheat");
     public static final Supplier<SoundEvent> SCORCHER_SHOOT = registerSoundEvent("scorcher_shoot");

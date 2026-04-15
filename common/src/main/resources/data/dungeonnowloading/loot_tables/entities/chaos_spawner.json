@@ -184,6 +184,15 @@
           ]
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeonnowloading:music_disc_hellspawn"
+        }
+      ]
     }
   ]
 }

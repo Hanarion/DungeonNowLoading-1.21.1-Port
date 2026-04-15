@@ -57,6 +57,33 @@
       }
     ]
   },
+  "disc_aotsugi" : {
+    "subtitle": "sounds.dungeonnowloading.disc_aotsugi",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/disc_aotsugi_callister_corvus",
+        "stream": true
+      }
+    ]
+  },
+  "disc_broken_aotsugi" : {
+    "subtitle": "sounds.dungeonnowloading.disc_broken_aotsugi",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/disc_broken_aotsugi_callister_corvus",
+        "stream": true
+      }
+    ]
+  },
+  "disc_hellspawn" : {
+    "subtitle": "sounds.dungeonnowloading.disc_hellspawn",
+    "sounds": [
+      {
+        "name": "dungeonnowloading:music/disc_hellspawn_callister_corvus",
+        "stream": true
+      }
+    ]
+  },
   "disc_clash_of_duality_boros" : {
     "subtitle": "sounds.dungeonnowloading.disc_clash_of_duality_boros",
     "sounds": [
