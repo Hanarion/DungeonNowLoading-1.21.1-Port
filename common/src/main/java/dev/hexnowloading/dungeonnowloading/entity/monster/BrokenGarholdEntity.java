@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.monster;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.BrokenGarholdAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
@@ -11,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -272,6 +274,11 @@ public class BrokenGarholdEntity extends Monster {
         }
 
         return true;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSource) {
+        return DNLSounds.GARHOLD_HURT.get();
     }
 
     // Optional: if killed while holding player, also break + release

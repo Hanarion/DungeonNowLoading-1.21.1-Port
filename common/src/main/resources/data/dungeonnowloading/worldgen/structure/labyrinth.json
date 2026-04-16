@@ -111,5 +111,11 @@
   },
   "start_jigsaw_name": "dungeonnowloading:start",
   "max_distance_from_center": 116,
+  "extra_surface_pool": "dungeonnowloading:labyrinth/surface",
+  "extra_surface_start_jigsaw_name": "dungeonnowloading:start",
+  "extra_surface_size": 4,
+  "extra_surface_max_distance_from_center": 80,
+  "extra_surface_heightmap": "WORLD_SURFACE_WG",
+  "extra_surface_y_offset": 0,
   "use_expansion_hack": false
 }
