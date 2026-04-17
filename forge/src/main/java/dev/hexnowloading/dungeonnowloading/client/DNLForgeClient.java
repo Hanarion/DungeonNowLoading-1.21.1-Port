@@ -6,11 +6,13 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLPackets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class DNLForgeClient {
-    public static void init() {
+    public static void init(FMLClientSetupEvent event) {
         DNLPackets.registerClientbound();
         DNLPackets.registerServerbound();
+        event.enqueueWork(DNLClient::registerMenuScreens);
 
         // Register block/item color providers on client without relying on Forge ColorHandlerEvent API
         /*try {

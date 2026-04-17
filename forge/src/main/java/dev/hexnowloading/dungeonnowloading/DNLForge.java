@@ -3,16 +3,12 @@ package dev.hexnowloading.dungeonnowloading;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClient;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClientEvents;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
-import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLCommands;
-import dev.hexnowloading.dungeonnowloading.registry.DNLMenuTypes;
 import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -33,10 +29,6 @@ public class DNLForge {
 
         // Use Forge to bootstrap the Common mod.
         DungeonNowLoading.init();
-        // Register & bootstrap menu types
-        var mendingTable = Services.REGISTRY.register(BuiltInRegistries.MENU, "mending_table",
-                () -> IForgeMenuType.create((id, inv, buf) -> new dev.hexnowloading.dungeonnowloading.menu.MendingTableMenu(id, inv)));
-        DNLMenuTypes.bootstrap(mendingTable);
 
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         //MinecraftForge.EVENT_BUS.register(this);
@@ -45,7 +37,7 @@ public class DNLForge {
             // register client-only listeners
             addModClientListeners(bus);
             // run init when registries are ready
-            bus.addListener((FMLClientSetupEvent event) -> DNLForgeClient.init());
+            bus.addListener(DNLForgeClient::init);
         }
 
         addForgeListeners();
@@ -61,7 +53,7 @@ public class DNLForge {
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(dev.hexnowloading.dungeonnowloading.registry.DNLFlammables::register);
+        event.enqueueWork(dev.hexnowloading.dungeonnowloading.registry.DNLWoodBehaviors::register);
     }
 
     private void addModClientListeners(IEventBus bus) {

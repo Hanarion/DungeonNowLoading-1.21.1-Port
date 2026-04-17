@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
+import dev.hexnowloading.dungeonnowloading.block.entity.PotionBarrelBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
@@ -17,9 +18,9 @@ import dev.hexnowloading.dungeonnowloading.item.client.renderer.PlayerStatueItem
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.ScorcherRenderer;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
-import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -27,7 +28,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -38,6 +38,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -48,13 +49,14 @@ public class DNLFabricClient implements ClientModInitializer {
         DNLPackets.registerServerbound();
         DNLPackets.registerClientbound();
 
-        MenuScreens.register(DNLMenuTypes.MENDING_TABLE.get(), MendingTableScreen::new);
+        DNLClient.registerMenuScreens();
         registerItemModelLayers();
         registerItemRenderers();
         registerBlockRenderers();
         registerModelLayers();
         registerRenderers();
         registerParticleFactories();
+        registerBlockColors();
         MendstonePickaxeParticleHandlerFabric.register();
 
         final var ID = new ResourceLocation("dungeonnowloading", "serverbound_pedestal_update");
@@ -274,6 +276,24 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+    }
+
+    private static void registerBlockColors() {
+        ColorProviderRegistry.BLOCK.register(
+                (state, world, pos, tintIndex) -> {
+                    if (tintIndex != 0 || world == null || pos == null) {
+                        return 0xFFFFFFFF;
+                    }
+
+                    BlockEntity be = world.getBlockEntity(pos);
+                    if (be instanceof PotionBarrelBlockEntity barrel && barrel.getEffect() != null) {
+                        return 0xFF000000 | barrel.getEffect().getColor();
+                    }
+
+                    return 0xFFFFFFFF;
+                },
+                DNLBlocks.POTION_BARREL.get()
+        );
     }
 
     private static void addDnlEnchantmentDescriptions(ItemStack stack, List<Component> lines) {

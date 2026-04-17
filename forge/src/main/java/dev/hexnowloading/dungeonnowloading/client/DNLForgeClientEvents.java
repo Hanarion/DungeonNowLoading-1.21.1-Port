@@ -1,6 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
-import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
@@ -14,8 +13,6 @@ import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
-import dev.hexnowloading.dungeonnowloading.screen.MendingTableScreen;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -142,13 +139,6 @@ public class DNLForgeClientEvents {
             int useTime = stack.getUseDuration() - entity.getUseItemRemainingTicks();
             return useTime > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
         });
-
-        // register here to avoid race issues
-        try {
-            MenuScreens.register(DNLMenuTypes.MENDING_TABLE.get(), MendingTableScreen::new);
-        } catch (Exception e) {
-            DungeonNowLoading.LOGGER.warn("Failed to register mending table MenuScreen in onRegisterRenderer", e);
-        }
 
         ItemProperties.register(DNLItems.REPULSOR.get(), new ResourceLocation("golden_mode"),
                 (stack, level, entity, seed) -> RepulsorItem.isGoldenMode(stack) ? 1.0F : 0.0F);

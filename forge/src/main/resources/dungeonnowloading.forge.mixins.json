@@ -32,16 +32,16 @@
       "forge.block.FlintAndSteelMixin",
       "forge.block.DNLFireBlockMixin",
       "forge.structures.StructurePoolMixin",
+      "forge.block.AzuroLogBlockMixin",
+      "inventory.AnvilMenuMixin"
+    ],
+    "client": [
       "forge.blockentities.DungeonBannerBlockItemMixin",
       "forge.blockentities.FairkeeperChestBlockItemMixin",
       "forge.blockentities.WiseFairkeeperChestBlockItemMixin",
       "forge.blockentities.FierceFairkeeperChestBlockItemMixin",
       "forge.blockentities.PlayerStatueBlockItemMixin",
       "forge.item.ScorcherItemMixin",
-      "forge.block.AzuroLogBlockMixin",
-      "inventory.AnvilMenuMixin"
-    ],
-    "client": [
       "client.HumanoidModelMixin",
       "client.PlayerRendererMixin",
       "client.ClientPacketListenerMixin",

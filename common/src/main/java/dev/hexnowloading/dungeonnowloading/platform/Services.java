@@ -21,6 +21,8 @@ public class Services {
     public static final NetworkHelper NETWORK = load(NetworkHelper.class);
     public static final LootHelper LOOT = load(LootHelper.class);
     public static final ReloadListenerPlatform RELOAD_LISTENERS = load(ReloadListenerPlatform.class);
+    public static final MenuHelper MENU = load(MenuHelper.class);
+    public static final WoodBehaviorHelper WOOD_BEHAVIORS = load(WoodBehaviorHelper.class);
 
 
     // This code is used to load a service for the current environment. Your implementation of the service must be defined
