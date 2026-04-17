@@ -88,18 +88,7 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.FAIRKEEPER_CHEST.get(),
                 DNLBlocks.WISE_FAIRKEEPER_CHEST.get(),
                 DNLBlocks.FIERCE_FAIRKEEPER_CHEST.get(),
-                DNLBlocks.FAIRKEEEPER_SPAWNER.get(),
-
-                DNLBlocks.AZURO_OAK_LOG.get(),
-                DNLBlocks.STRIPPED_AZURO_OAK_LOG.get(),
-                DNLBlocks.AZURO_OAK_PLANKS.get(),
-                DNLBlocks.AZURO_OAK_PLANK_STAIRS.get(),
-                DNLBlocks.AZURO_OAK_PLANK_SLAB.get(),
-                DNLBlocks.AZURO_OAK_PLANK_FENCE.get(),
-                DNLBlocks.AZURO_OAK_PLANK_FENCE_GATE.get(),
-                DNLBlocks.AZURO_OAK_DOOR.get(),
-                DNLBlocks.AZURO_OAK_BUTTON.get(),
-                DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get()
+                DNLBlocks.FAIRKEEEPER_SPAWNER.get()
         );
 
         this.tag(BlockTags.WALLS).add(
@@ -129,18 +118,15 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
         );
 
         this.tag(BlockTags.WOODEN_FENCES).add(
-                DNLBlocks.MENDING_AURA_FENCE.get(),
-                DNLBlocks.AZURO_OAK_PLANK_FENCE.get()
+                DNLBlocks.MENDING_AURA_FENCE.get()
         );
 
         this.tag(BlockTags.STAIRS).add(
-                DNLBlocks.MENDING_AURA_STAIRS.get(),
-                DNLBlocks.AZURO_OAK_PLANK_STAIRS.get()
+                DNLBlocks.MENDING_AURA_STAIRS.get()
         );
 
         this.tag(BlockTags.WOODEN_STAIRS).add(
-                DNLBlocks.MENDING_AURA_STAIRS.get(),
-                DNLBlocks.AZURO_OAK_PLANK_STAIRS.get()
+                DNLBlocks.MENDING_AURA_STAIRS.get()
         );
     }
 }

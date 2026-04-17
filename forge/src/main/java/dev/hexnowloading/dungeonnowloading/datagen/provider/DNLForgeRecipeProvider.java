@@ -326,66 +326,6 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_durite", has(DNLItems.DURITE.get()))
                 .save(consumer);
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, DNLItems.AZURO_OAK_PLANKS.get(), 4)
-                .requires(DNLItems.AZURO_OAK_LOG.get())
-                .unlockedBy("has_azuro_log", has(DNLItems.AZURO_OAK_LOG.get()))
-                .save(consumer);
-
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, DNLItems.AZURO_OAK_PLANK_SLAB.get(), 6)
-                .pattern("ppp")
-                .define('p', DNLItems.AZURO_OAK_PLANKS.get())
-                .unlockedBy("has_azuro_planks", has(DNLItems.AZURO_OAK_PLANKS.get()))
-                .save(consumer);
-
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, DNLItems.AZURO_OAK_PLANK_STAIRS.get(), 4)
-                .pattern("p  ")
-                .pattern("pp ")
-                .pattern("ppp")
-                .define('p', DNLItems.AZURO_OAK_PLANKS.get())
-                .unlockedBy("has_azuro_planks", has(DNLItems.AZURO_OAK_PLANKS.get()))
-                .save(consumer);
-
-        // Azuro fence: vanilla-style shaped recipe (psp / psp -> 3 fences)
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, DNLItems.AZURO_OAK_PLANK_FENCE.get(), 3)
-                .pattern("psp")
-                .pattern("psp")
-                .define('p', DNLItems.AZURO_OAK_PLANKS.get())
-                .define('s', Items.STICK)
-                .unlockedBy("has_azuro_planks", has(DNLItems.AZURO_OAK_PLANKS.get()))
-                .save(consumer);
-
-        // Azuro fence gate: vanilla-style shaped recipe (psp / psp -> 1 gate)
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, DNLItems.AZURO_OAK_PLANK_FENCE_GATE.get(), 1)
-                .pattern("sps")
-                .pattern("sps")
-                .define('p', DNLItems.AZURO_OAK_PLANKS.get())
-                .define('s', Items.STICK)
-                .unlockedBy("has_azuro_planks", has(DNLItems.AZURO_OAK_PLANKS.get()))
-                .save(consumer);
-
-        // Azuro button (wooden button) - 1 plank -> 1 button (keep shapeless)
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, DNLItems.AZURO_OAK_BUTTON.get(), 1)
-                .requires(DNLItems.AZURO_OAK_PLANKS.get())
-                .unlockedBy("has_azuro_planks", has(DNLItems.AZURO_OAK_PLANKS.get()))
-                .save(consumer);
-
-        // Azuro pressure plate - shaped 2 planks -> 1 plate
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, DNLItems.AZURO_OAK_PRESSURE_PLATE.get(), 1)
-                .pattern("pp")
-                .define('p', DNLItems.AZURO_OAK_PLANKS.get())
-                .unlockedBy("has_azuro_planks", has(DNLItems.AZURO_OAK_PLANKS.get()))
-                .save(consumer);
-
-        // Azuro door (3 doors) - 6 planks -> 3 doors
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, DNLItems.AZURO_OAK_DOOR.get(), 3)
-                .pattern("pp")
-                .pattern("pp")
-                .pattern("pp")
-                .define('p', DNLItems.AZURO_OAK_PLANKS.get())
-                .unlockedBy("has_azuro_planks", has(DNLItems.AZURO_OAK_PLANKS.get()))
-                .save(consumer);
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, DNLItems.MENDSTONE_CHALK.get(), 1)
                 .pattern(" cm")
                 .pattern("cmc")

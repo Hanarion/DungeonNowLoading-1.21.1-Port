@@ -14,7 +14,6 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
@@ -49,11 +48,6 @@ public class DNLForge {
         ForgeCommonRegistryHelper.TAB_REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
         bus.addListener(DNLForgeEntityEvents::onEntityAttributeCreation);
         bus.addListener(DNLForgeEntityEvents::registerSpawnPlacements);
-        bus.addListener(this::onCommonSetup);
-    }
-
-    private void onCommonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(dev.hexnowloading.dungeonnowloading.registry.DNLWoodBehaviors::register);
     }
 
     private void addModClientListeners(IEventBus bus) {

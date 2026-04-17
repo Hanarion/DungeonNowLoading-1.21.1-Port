@@ -5,16 +5,6 @@
     "dungeonnowloading:fairkeeper_chest",
     "dungeonnowloading:wise_fairkeeper_chest",
     "dungeonnowloading:fierce_fairkeeper_chest",
-    "dungeonnowloading:fairkeeper_spawner",
-    "dungeonnowloading:azuro_oak_log",
-    "dungeonnowloading:stripped_azuro_oak_log",
-    "dungeonnowloading:azuro_oak_planks",
-    "dungeonnowloading:azuro_oak_plank_stairs",
-    "dungeonnowloading:azuro_oak_plank_slab",
-    "dungeonnowloading:azuro_oak_plank_fence",
-    "dungeonnowloading:azuro_oak_plank_fence_gate",
-    "dungeonnowloading:azuro_oak_door",
-    "dungeonnowloading:azuro_oak_button",
-    "dungeonnowloading:azuro_oak_pressure_plate"
+    "dungeonnowloading:fairkeeper_spawner"
   ]
 }

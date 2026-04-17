@@ -126,9 +126,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_PATH.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_PANE.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.PLAYER_STATUE.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_HANGING_LEAVES.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_OAK_DOOR.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.POTION_BARREL.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DURITE_CLUSTER.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.LARGE_DURITE_BUD.get(), RenderType.cutout());

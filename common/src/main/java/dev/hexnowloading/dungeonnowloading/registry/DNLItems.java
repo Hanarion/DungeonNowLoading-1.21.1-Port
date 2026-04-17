@@ -176,22 +176,6 @@ public class DNLItems {
     public static final Supplier<Item> DUNGEON_BANNER_GARHOLD_UPSIDEDOWN = banner("dungeon_banner_garhold_upsidedown", DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN, DungeonBannerBlock.DungeonBannerVariant.GARHOLD_UPSIDEDOWN);
     public static final Supplier<Item> DUNGEON_BANNER_SKULL_OF_CHAOS = banner("dungeon_banner_skull_of_chaos", DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS, DungeonBannerBlock.DungeonBannerVariant.SKULL_OF_CHAOS);
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_LOG = register("azuro_oak_log", () -> new BlockItem(DNLBlocks.AZURO_OAK_LOG.get(), new Item.Properties()));
-    public static final Supplier<Item> STRIPPED_AZURO_OAK_LOG = register("stripped_azuro_oak_log", () -> new BlockItem(DNLBlocks.STRIPPED_AZURO_OAK_LOG.get(), new Item.Properties()));
-
-    public static final Supplier<Item> AZURO_LEAVES = register("azuro_leaves", () -> new BlockItem(DNLBlocks.AZURO_LEAVES.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_HANGING_LEAVES_TIP = register("azuro_hanging_leaves_tip", () -> new BlockItem(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get(), new Item.Properties()));
-
-    public static final Supplier<Item> AZURO_OAK_PLANKS = register("azuro_oak_planks", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANKS.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PLANK_SLAB = register("azuro_oak_plank_slab", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANK_SLAB.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PLANK_STAIRS = register("azuro_oak_plank_stairs", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANK_STAIRS.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PLANK_FENCE = register("azuro_oak_plank_fence", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANK_FENCE.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PLANK_FENCE_GATE = register("azuro_oak_plank_fence_gate", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANK_FENCE_GATE.get(), new Item.Properties()));
-
-    public static final Supplier<Item> AZURO_OAK_BUTTON = register("azuro_oak_button", () -> new BlockItem(DNLBlocks.AZURO_OAK_BUTTON.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PRESSURE_PLATE = register("azuro_oak_pressure_plate", () -> new BlockItem(DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_DOOR = register("azuro_oak_door", () -> new DoubleHighBlockItem(DNLBlocks.AZURO_OAK_DOOR.get(), new Item.Properties()));
-
     public static final Supplier<Item> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> new BlockItem(DNLBlocks.MENDSTONE_CHALK_MARK.get(), new Item.Properties()));
 
 

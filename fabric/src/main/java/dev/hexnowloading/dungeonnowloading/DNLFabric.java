@@ -4,7 +4,6 @@ import dev.hexnowloading.dungeonnowloading.events.DNLFabricBlockEvents;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLCommands;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import dev.hexnowloading.dungeonnowloading.registry.DNLWoodBehaviors;
 import dev.hexnowloading.dungeonnowloading.server.entity.DNLFabricEntities;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
 import net.fabricmc.api.ModInitializer;
@@ -19,7 +18,6 @@ public class DNLFabric implements ModInitializer {
     public void onInitialize() {
         DungeonNowLoading.init();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {DNLCommands.register(dispatcher);});
-        DNLWoodBehaviors.register();
 
         registerEvents();
         registerEntityAttributes();

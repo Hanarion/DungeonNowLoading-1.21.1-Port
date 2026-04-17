@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 
@@ -141,21 +140,6 @@ public class DNLBlocks {
 
     public static Supplier<Block> PLAYER_STATUE;
 
-    public static Supplier<RotatedPillarBlock> AZURO_OAK_LOG;
-    public static Supplier<RotatedPillarBlock> STRIPPED_AZURO_OAK_LOG;
-    public static Supplier<Block> AZURO_LEAVES;
-    public static Supplier<Block> AZURO_HANGING_LEAVES;
-    public static Supplier<Block> AZURO_HANGING_LEAVES_TIP;
-
-    public static Supplier<Block> AZURO_OAK_PLANKS;
-    public static Supplier<Block> AZURO_OAK_PLANK_SLAB;
-    public static Supplier<Block> AZURO_OAK_PLANK_STAIRS;
-    public static Supplier<Block> AZURO_OAK_PLANK_FENCE;
-    public static Supplier<Block> AZURO_OAK_PLANK_FENCE_GATE;
-    public static Supplier<Block> AZURO_OAK_BUTTON;
-    public static Supplier<Block> AZURO_OAK_PRESSURE_PLATE;
-    public static Supplier<Block> AZURO_OAK_DOOR;
-
     public static boolean blocksRegistered = false;
 
     public static void init() {
@@ -279,24 +263,6 @@ public class DNLBlocks {
 
         // Patron
         PLAYER_STATUE = registerBlock("player_statue", () -> new PlayerStatueBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.5f, 6.0f).noOcclusion().pushReaction(PushReaction.IGNORE)));
-
-        AZURO_LEAVES = registerBlock("azuro_leaves", () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
-        AZURO_HANGING_LEAVES = registerBlock("azuro_hanging_leaves", () -> new HangingAzuroLeavesBlock(BlockBehaviour.Properties.copy(Blocks.WEEPING_VINES_PLANT)));
-        AZURO_HANGING_LEAVES_TIP = registerBlock("azuro_hanging_leaves_tip", () -> new HangingAzuroLeavesTipBlock(BlockBehaviour.Properties.copy(Blocks.WEEPING_VINES)));
-
-        // Register stripped log first so supplier can be passed into main log
-        STRIPPED_AZURO_OAK_LOG = registerBlock("stripped_azuro_oak_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
-        AZURO_OAK_LOG = registerBlock("azuro_oak_log", () -> new AzuroLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG), STRIPPED_AZURO_OAK_LOG));
-
-        AZURO_OAK_PLANKS = registerBlock("azuro_oak_planks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-        AZURO_OAK_PLANK_STAIRS = registerBlock("azuro_oak_plank_stairs", () -> new StairBlock(AZURO_OAK_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-        AZURO_OAK_PLANK_SLAB = registerBlock("azuro_oak_plank_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-        AZURO_OAK_PLANK_FENCE = registerBlock("azuro_oak_plank_fence", () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-        AZURO_OAK_PLANK_FENCE_GATE = registerBlock("azuro_oak_plank_fence_gate", () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS), WoodType.OAK));
-
-        AZURO_OAK_DOOR = registerBlock("azuro_oak_door", () -> new DNLDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR), BlockSetType.OAK));
-        AZURO_OAK_BUTTON = registerBlock("azuro_oak_button", () -> new DNLButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON), BlockSetType.OAK, 30, true));
-        AZURO_OAK_PRESSURE_PLATE = registerBlock("azuro_oak_pressure_plate", () -> new DNLPressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE), BlockSetType.OAK));
 
         blocksRegistered = true;
     }

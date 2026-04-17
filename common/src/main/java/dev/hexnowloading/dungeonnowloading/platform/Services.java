@@ -22,8 +22,6 @@ public class Services {
     public static final LootHelper LOOT = load(LootHelper.class);
     public static final ReloadListenerPlatform RELOAD_LISTENERS = load(ReloadListenerPlatform.class);
     public static final MenuHelper MENU = load(MenuHelper.class);
-    public static final WoodBehaviorHelper WOOD_BEHAVIORS = load(WoodBehaviorHelper.class);
-
 
     // This code is used to load a service for the current environment. Your implementation of the service must be defined
     // manually by including a text file in META-INF/services named with the fully qualified class name of the service.
