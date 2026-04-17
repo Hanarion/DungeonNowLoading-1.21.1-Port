@@ -19,7 +19,6 @@ public class DNLEnchantments {
     public static final Supplier<Enchantment> NULLIFICATION = register("nullification", () -> new NullificationEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.HEAD));
     public static final Supplier<Enchantment> DURABLE = register("durable", () -> new DurableEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
     public static final Supplier<Enchantment> GIGANTISM = register("gigantism", () -> new GigantismEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
-    public static final Supplier<Enchantment> COMMANDER = register("commander", () -> new CommanderEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
     public static final Supplier<Enchantment> OVERWORKED = register("overworked", () -> new OverworkedEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
     public static final Supplier<Enchantment> PACK_BLESSING = register("pack_blessing", () -> new PackBlessingEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
     public static final Supplier<Enchantment> ARC_SHOT = register("arc_shot", () -> new ArcShotEnchantment(Enchantment.Rarity.UNCOMMON, EquipmentSlot.values()));
@@ -35,4 +34,3 @@ public class DNLEnchantments {
 
     public static void init() {}
 }
-

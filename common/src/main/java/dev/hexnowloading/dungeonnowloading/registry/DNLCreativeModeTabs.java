@@ -61,7 +61,6 @@ public class DNLCreativeModeTabs {
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.AMPLIFICATION.get(), 1)));
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.NULLIFICATION.get(), 1)));
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.GIGANTISM.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.COMMANDER.get(), 1)));
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.OVERWORKED.get(), 1)));
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.PACK_BLESSING.get(), 1)));
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.ARC_SHOT.get(), 1)));

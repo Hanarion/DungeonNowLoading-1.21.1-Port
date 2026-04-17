@@ -419,8 +419,6 @@
   "enchantment.dungeonnowloading.durable.desc": "Reduces durability loss (4 + 2×level hits per 1 durability)",
   "enchantment.dungeonnowloading.gigantism": "Gigantism",
   "enchantment.dungeonnowloading.gigantism.desc": "Increases summoned mob size",
-  "enchantment.dungeonnowloading.commander": "Commander",
-  "enchantment.dungeonnowloading.commander.desc": "Allies attack the last mob you hit",
   "enchantment.dungeonnowloading.overworked": "Overworked",
   "enchantment.dungeonnowloading.overworked.desc": "Reduces max HP for summon more summon attack speed",
   "enchantment.dungeonnowloading.pack_blessing": "Pack Blessing",
