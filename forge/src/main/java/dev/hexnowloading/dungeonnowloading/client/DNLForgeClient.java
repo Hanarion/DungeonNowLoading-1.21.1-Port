@@ -1,20 +1,16 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.client.preview.PreviewOverlayForge;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLPackets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.common.MinecraftForge;
 
 public class DNLForgeClient {
     public static void init() {
         DNLPackets.registerClientbound();
         DNLPackets.registerServerbound();
-        // register hologram preview overlay
-        MinecraftForge.EVENT_BUS.addListener(PreviewOverlayForge::onRenderLevelStage);
 
         // Register block/item color providers on client without relying on Forge ColorHandlerEvent API
         /*try {

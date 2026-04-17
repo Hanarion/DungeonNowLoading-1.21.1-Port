@@ -221,7 +221,6 @@
   "block.dungeonnowloading.player_statue": "Stone Statue",
   "block.dungeonnowloading.player_statue.named": "%s's Stone Statue",
   "block.dungeonnowloading.player_statue.message": "In the Name of %1$s",
-  "block.dungeonnowloading.gauntlet": "Gauntlet",
   "block.dungeonnowloading.durite_queller": "Durite Queller",
   "block.dungeonnowloading.dungeon_director": "Dungeon Director",
   "block.dungeonnowloading.dungeon_director.hint_remove": "Removes the Director when triggered.",

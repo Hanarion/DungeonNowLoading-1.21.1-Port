@@ -161,8 +161,6 @@ public class DNLItems {
     public static final Supplier<Item> LARGE_DURITE_BUD = register("large_durite_bud", () -> new BlockItem(DNLBlocks.LARGE_DURITE_BUD.get(), new Item.Properties()));
     public static final Supplier<Item> MEDIUM_DURITE_BUD = register("medium_durite_bud", () -> new BlockItem(DNLBlocks.MEDIUM_DURITE_BUD.get(), new Item.Properties()));
     public static final Supplier<Item> SMALL_DURITE_BUD = register("small_durite_bud", () -> new BlockItem(DNLBlocks.SMALL_DURITE_BUD.get(), new Item.Properties()));
-    public static final Supplier<Item> GAUNTLET = register("gauntlet", GauntletBlockItem::new);
-    public static final Supplier<Item> GAUNTLET_VAULT = register("gauntlet_vault", GauntletVaultBlockItem::new);
     public static final Supplier<Item> DUNGEON_DIRECTOR = register("dungeon_director", () -> new BlockItem(DNLBlocks.DUNGEON_DIRECTOR.get(), new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> SPAWN_NODE = register("spawn_node", () -> new BlockItem(DNLBlocks.SPAWN_NODE.get(), new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_MAGENTA = banner("dungeon_banner_spawner_magenta", DNLBlocks.DUNGEON_BANNER_SPAWNER_MAGENTA, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_MAGENTA);
@@ -218,7 +216,6 @@ public class DNLItems {
     public static final Supplier<Item> SEALED_CHAOS_SPAWNEGG = register("spawn_egg_sealed_chaos", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SEALED_CHAOS::get, 0x5f0d80, 0xd5bcd7, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> WHIMPER_SPAWNEGG = register("spawn_egg_whimper", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WHIMPER::get, 0x60f5fa, 0xbef5fa, new Item.Properties().rarity(Rarity.COMMON)));
 
-    public static final Supplier<Item> MOB_NODE = register("mob_node", () -> new BlockItem(DNLBlocks.MOB_NODE.get(), new Item.Properties()));
 //    public static final Supplier<Item> WISPROD = register("wisprod", () -> new WisprodItem(new Item.Properties().rarity(Rarity.UNCOMMON).durability(250)));
 
     private static <T extends Item> Supplier<T> register(String name, Supplier<T> itemSupplier) {

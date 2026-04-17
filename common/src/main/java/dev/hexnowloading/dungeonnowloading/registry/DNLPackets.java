@@ -9,7 +9,6 @@ public class DNLPackets {
         Services.NETWORK.register("serverbound_stop_ticking_sound", C2SStopTickingSoundPacket.class, C2SStopTickingSoundPacket::decode);
         Services.NETWORK.register("serverbound_pedestal_edit", C2SPedestalEditPacket.class, C2SPedestalEditPacket::decode);
         Services.NETWORK.register("serverbound_pedestal_update", C2SPedestalUpdatePacket.class, C2SPedestalUpdatePacket::decode);
-        Services.NETWORK.register("serverbound_gauntlet_update", C2SGauntletUpdatePacket.class, C2SGauntletUpdatePacket::decode);
     }
 
     public static void registerClientbound() {
@@ -19,6 +18,5 @@ public class DNLPackets {
         Services.NETWORK.register("clientbound_fade_in_ticking_sound", S2CFadeInTickingSoundPacket.class, S2CFadeInTickingSoundPacket::decode);
         Services.NETWORK.register("clientbound_fade_out_background_music", S2CFadeOutBackgroundMusicSoundPacket.class, S2CFadeOutBackgroundMusicSoundPacket::decode);
         Services.NETWORK.register("clientbound_open_pedestal_editor", S2CPedestalOpenEditorPacket.class, S2CPedestalOpenEditorPacket::decode);
-        Services.NETWORK.register("clientbound_open_gauntlet_editor", S2CGauntletOpenEditorPacket.class, S2CGauntletOpenEditorPacket::decode);
     }
 }
