@@ -1,8 +1,0 @@
-{
-  "parent": "dungeonnowloading:block/explosive_barrel",
-  "textures": {
-    "0": "dungeonnowloading:block/caltrop_barrel",
-    "particle": "#0"
-  }
-}
-
