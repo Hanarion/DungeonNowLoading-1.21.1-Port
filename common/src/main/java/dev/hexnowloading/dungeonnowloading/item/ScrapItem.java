@@ -63,7 +63,6 @@ public class ScrapItem extends Item {
         tooltip.add(Component.translatable("item.dungeonnowloading.item_scraps.tooltip.reconstruct.detail2").withStyle(ChatFormatting.DARK_GRAY));
         tooltip.add(Component.translatable("item.dungeonnowloading.item_scraps.tooltip.reconstruct.detail3").withStyle(ChatFormatting.DARK_GRAY));
         tooltip.add(Component.translatable("item.dungeonnowloading.item_scraps.tooltip.reconstruct.detail4", nativeMat.copy().withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.DARK_GRAY));
-        tooltip.add(Component.empty());
     }
 
     private static Component findNativeRepairMaterialName(ItemStack original) {
