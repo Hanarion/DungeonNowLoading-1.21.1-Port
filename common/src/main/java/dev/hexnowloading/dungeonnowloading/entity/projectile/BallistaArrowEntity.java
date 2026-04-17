@@ -1,15 +1,8 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
-import com.google.common.collect.Lists;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,8 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Arrays;
 
 public class BallistaArrowEntity extends AbstractArrow {
 
@@ -53,8 +44,8 @@ public class BallistaArrowEntity extends AbstractArrow {
             damageSource = this.damageSources().arrow(this, this);
         } else {
             damageSource = this.damageSources().arrow(this, owner);
-            if (owner instanceof LivingEntity) {
-                ((LivingEntity) owner).setLastHurtByMob((LivingEntity) target);
+            if (owner instanceof LivingEntity ownerLiving && target instanceof LivingEntity targetLiving) {
+                ownerLiving.setLastHurtByMob(targetLiving);
             }
         }
 

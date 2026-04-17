@@ -15,15 +15,11 @@ public class MendstonePickaxeItem extends PickaxeItem {
     }
 
     @Override
-    public int getEnchantmentValue() {
-        return 22;
-    }
-
-    @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
         components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_name").withStyle(ChatFormatting.BLUE));
-        components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description").withStyle(ChatFormatting.DARK_GRAY));
+        components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.ability_description1").withStyle(ChatFormatting.DARK_GRAY));
+        components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.disclaimer").withStyle(ChatFormatting.YELLOW));
     }
 
     @Override
@@ -31,9 +27,19 @@ public class MendstonePickaxeItem extends PickaxeItem {
         return Rarity.RARE;
     }
 
-    // Disallow repairing this item with any material in an anvil or similar systems
     @Override
     public boolean isValidRepairItem(ItemStack itemStack, ItemStack repairItem) {
         return false;
+    }
+
+    // Prevent enchanting entirely (enchanting table + "enchantability" weight)
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return 0;
     }
 }

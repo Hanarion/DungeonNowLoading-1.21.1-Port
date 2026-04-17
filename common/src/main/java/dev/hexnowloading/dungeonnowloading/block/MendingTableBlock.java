@@ -3,11 +3,13 @@ package dev.hexnowloading.dungeonnowloading.block;
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingTableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -47,7 +49,20 @@ public class MendingTableBlock extends BaseEntityBlock implements SimpleWaterlog
     public void onRemove(BlockState state, Level lvl, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = lvl.getBlockEntity(pos);
-            if (be instanceof Container container) {
+            if (be instanceof MendingTableBlockEntity mending) {
+                NonNullList<ItemStack> drops = NonNullList.create();
+                for (int i = 0; i < 3; i++) {
+                    ItemStack stack = mending.getItem(i);
+                    if (!stack.isEmpty()) {
+                        drops.add(stack.copy());
+                    }
+                }
+                for (ItemStack stack : drops) {
+                    Containers.dropItemStack(lvl, pos.getX(), pos.getY(), pos.getZ(), stack);
+                }
+                mending.clearContent();
+                lvl.updateNeighbourForOutputSignal(pos, this);
+            } else if (be instanceof Container container) {
                 Containers.dropContents(lvl, pos, container);
                 lvl.updateNeighbourForOutputSignal(pos, this);
             }
