@@ -670,6 +670,21 @@
       "dungeonnowloading:mob/sealed_chaos/sealed_chaos_take_2"
     ]
   },
+  "sealed_chaos_hurt": {
+    "subtitle": "sounds.dungeonnowloading.sealed_chaos_hurt",
+    "sounds": [
+      "dungeonnowloading:mob/sealed_chaos/sealed_chaos_hurt_0",
+      "dungeonnowloading:mob/sealed_chaos/sealed_chaos_hurt_1",
+      "dungeonnowloading:mob/sealed_chaos/sealed_chaos_hurt_2"
+    ]
+  },
+  "sealed_chaos_death": {
+    "subtitle": "sounds.dungeonnowloading.sealed_chaos_death",
+    "sounds": [
+      "dungeonnowloading:mob/sealed_chaos/sealed_chaos_death_0",
+      "dungeonnowloading:mob/sealed_chaos/sealed_chaos_death_1"
+    ]
+  },
   "spawner_carrier_charge": {
     "subtitle": "sounds.dungeonnowloading.spawner_carrier_charge",
     "sounds": [
@@ -925,7 +940,8 @@
     "subtitle": "sounds.dungeonnowloading.fairkeeper_ouros_cannon_shoot",
     "sounds": [
       "dungeonnowloading:mob/fairkeeper/ouros/ouros_cannon_shoot_0",
-      "dungeonnowloading:mob/fairkeeper/ouros/ouros_cannon_shoot_1"
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_cannon_shoot_1",
+      "dungeonnowloading:mob/fairkeeper/ouros/ouros_cannon_shoot_2"
     ]
   },
   "fairkeeper_ouros_death": {

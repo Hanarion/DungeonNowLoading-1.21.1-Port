@@ -63,9 +63,6 @@ public class DNLForgeEntityEvents {
     @SubscribeEvent
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
         if(event.getObject() instanceof Player) {
-            /*if(!event.getObject().getCapability(DNLForgePlayerPointProvider.PLAYER_TEST_POINT).isPresent()) {
-                event.addCapability(new ResourceLocation(DungeonNowLoading.MOD_ID, "properties"), new DNLForgePlayerPointProvider());
-            }*/
             if(!event.getObject().getCapability(FairkeeperChestPositionsCapabilityProvider.FAIRKEEPER_CHEST_POSITIONS).isPresent()) {
                 event.addCapability(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_chest_positions"), new FairkeeperChestPositionsCapabilityProvider());
             }
@@ -78,11 +75,6 @@ public class DNLForgeEntityEvents {
     @SubscribeEvent
     public static void onPlayerCloned(PlayerEvent.Clone event) {
         if(event.isWasDeath()) {
-            /*event.getOriginal().getCapability(DNLForgePlayerPointProvider.PLAYER_TEST_POINT).ifPresent(oldStore -> {
-                event.getOriginal().getCapability(DNLForgePlayerPointProvider.PLAYER_TEST_POINT).ifPresent(newStore -> {
-                    newStore.copyFrom(oldStore);
-                });
-            });*/
             event.getOriginal().getCapability(FairkeeperChestPositionsCapabilityProvider.FAIRKEEPER_CHEST_POSITIONS).ifPresent(oldStore -> {
                 event.getOriginal().getCapability(FairkeeperChestPositionsCapabilityProvider.FAIRKEEPER_CHEST_POSITIONS).ifPresent(newStore -> {
                     newStore.copyFrom(oldStore);
@@ -98,7 +90,6 @@ public class DNLForgeEntityEvents {
 
     @SubscribeEvent
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-        //event.register(DNLForgePlayerPoint.class);
         event.register(FairkeeperChestPositionsCapability.class);
         event.register(DNLArmPoseCapability.class);
     }

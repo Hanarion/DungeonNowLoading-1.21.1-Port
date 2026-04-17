@@ -100,6 +100,8 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> SEALED_CHAOS_BULLET_SHOOT = registerSoundEvent("sealed_chaos_bullet_shoot");
     public static final Supplier<SoundEvent> SEALED_CHAOS_PLACE = registerSoundEvent("sealed_chaos_place");
     public static final Supplier<SoundEvent> SEALED_CHAOS_TAKE = registerSoundEvent("sealed_chaos_take");
+    public static final Supplier<SoundEvent> SEALED_CHAOS_HURT = registerSoundEvent("sealed_chaos_hurt");
+    public static final Supplier<SoundEvent> SEALED_CHAOS_DEATH = registerSoundEvent("sealed_chaos_death");
     public static final Supplier<SoundEvent> SPAWNER_CARRIER_CHARGE = registerSoundEvent("spawner_carrier_charge");
     public static final Supplier<SoundEvent> SPAWNER_CARRIER_DEATH = registerSoundEvent("spawner_carrier_death");
     public static final Supplier<SoundEvent> SPAWNER_CARRIER_HURT = registerSoundEvent("spawner_carrier_hurt");

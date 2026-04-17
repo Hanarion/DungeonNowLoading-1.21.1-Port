@@ -297,6 +297,8 @@
   "sounds.dungeonnowloading.sealed_chaos_bullet_shoot": "Sealed Chaos bullet shoots",
   "sounds.dungeonnowloading.sealed_chaos_place": "Sealed Chaos places",
   "sounds.dungeonnowloading.sealed_chaos_take": "Sealed Chaos takes",
+  "sounds.dungeonnowloading.sealed_chaos_hurt": "Sealed Chaos hurts",
+  "sounds.dungeonnowloading.sealed_chaos_death": "Sealed Chaos dies",
   "sounds.dungeonnowloading.spawner_carrier_charge": "Spawner Carrier charges",
   "sounds.dungeonnowloading.spawner_carrier_death": "Spawner Carrier dies",
   "sounds.dungeonnowloading.spawner_carrier_hurt": "Spawner Carrier hurts",
