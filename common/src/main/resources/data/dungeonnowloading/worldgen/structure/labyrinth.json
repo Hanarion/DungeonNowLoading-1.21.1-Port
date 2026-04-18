@@ -8,13 +8,13 @@
       "spawns": [
         {
           "type": "minecraft:spider",
-          "weight": 100,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         },
         {
           "type": "minecraft:zombie",
-          "weight": 95,
+          "weight": 75,
           "minCount": 4,
           "maxCount": 4
         },
@@ -26,27 +26,45 @@
         },
         {
           "type": "minecraft:skeleton",
-          "weight": 100,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         },
         {
           "type": "minecraft:creeper",
-          "weight": 100,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         },
         {
           "type": "minecraft:slime",
-          "weight": 100,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
+        },
+        {
+          "type": "dungeonnowloading:hollow",
+          "weight": 20,
+          "minCount": 1,
+          "maxCount": 4
+        },
+        {
+          "type": "dungeonnowloading:garhold",
+          "weight": 10,
+          "minCount": 1,
+          "maxCount": 1
         },
         {
           "type": "minecraft:enderman",
           "weight": 10,
           "minCount": 1,
           "maxCount": 4
+        },
+        {
+          "type": "dungeonnowloading:spawner_carrier",
+          "weight": 10,
+          "minCount": 1,
+          "maxCount": 1
         },
         {
           "type": "minecraft:witch",
@@ -56,7 +74,7 @@
         },
         {
           "type": "minecraft:drowned",
-          "weight": 95,
+          "weight": 80,
           "minCount": 4,
           "maxCount": 4
         }
@@ -93,5 +111,11 @@
   },
   "start_jigsaw_name": "dungeonnowloading:start",
   "max_distance_from_center": 116,
+  "extra_surface_pool": "dungeonnowloading:labyrinth/surface",
+  "extra_surface_start_jigsaw_name": "dungeonnowloading:start",
+  "extra_surface_size": 4,
+  "extra_surface_max_distance_from_center": 80,
+  "extra_surface_heightmap": "WORLD_SURFACE_WG",
+  "extra_surface_y_offset": 0,
   "use_expansion_hack": false
 }

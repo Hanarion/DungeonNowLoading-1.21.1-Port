@@ -27,15 +27,8 @@
               ]
             },
             {
-              "type": "minecraft:item",
-              "name": "minecraft:diamond",
-              "functions": [
-                {
-                  "function": "minecraft:apply_bonus",
-                  "enchantment": "minecraft:fortune",
-                  "formula": "ore_drops"
-                }
-              ]
+              "type": "minecraft:loot_table",
+              "name": "dungeonnowloading:vanilla/blocks/diamond_ore"
             }
           ]
         }

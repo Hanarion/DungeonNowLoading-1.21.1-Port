@@ -1,67 +1,60 @@
 package dev.hexnowloading.dungeonnowloading.particle;
 
-import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.Nullable;
 
 public class MendingPopParticle extends TextureSheetParticle {
-    private SpriteSet spriteSet;
+    private final SpriteSet spriteSet;
+    private final float baseQuadSize;
 
-    private final int EARLY_SPAWN_TICK = 6;
-    private final double initialXSpeed;
-    private final double initialYSpeed;
-    private final double initialZSpeed;
-
-    protected MendingPopParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet spriteSet) {
+    protected MendingPopParticle(ClientLevel level, double x, double y, double z,
+                                 double xSpeed, double ySpeed, double zSpeed,
+                                 float scale,
+                                 SpriteSet spriteSet) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
-        this.quadSize *= 1.5F;
+
+        this.spriteSet = spriteSet;
+
+        this.baseQuadSize = this.quadSize * 1.5F;
+        this.quadSize = this.baseQuadSize * scale;
+
         this.hasPhysics = true;
+        this.friction = 0.95F;
+
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
-        this.setAlpha(1.0F);
-        this.spriteSet = spriteSet;
-        this.friction = 0.95F;
-        this.lifetime = 16;
-        this.initialXSpeed = xSpeed;
-        this.initialYSpeed = ySpeed;
-        this.initialZSpeed = zSpeed;
 
+        this.alpha = 1.0F;
+        this.lifetime = 16;
+
+        this.setSprite(spriteSet.get(0, 1));
     }
 
     @Override
     public void tick() {
-        this.xo = this.x;
-        this.yo = this.y;
-        this.zo = this.z;
+        super.tick();
+        if (this.removed) return;
 
         if (this.age % 2 == 0) {
-            int sprite = (this.age / 2) % 8;
+            int sprite = Math.min(7, this.age / 2);
             this.setSprite(spriteSet.get(sprite, 8));
-        }
-
-        if (this.age == this.lifetime - EARLY_SPAWN_TICK) {
-            int tickMultiplier = EARLY_SPAWN_TICK - 2;
-            level.addParticle(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), this.x + this.initialXSpeed * tickMultiplier, this.y + this.initialYSpeed * tickMultiplier, this.z + this.initialZSpeed * tickMultiplier, this.xd, this.yd, this.zd);
-        }
-
-        if (this.age++ >= this.lifetime) {
-            this.remove();
         }
     }
 
     @Override
-    public int getLightColor(float $$0) {
+    public int getLightColor(float partialTick) {
         return 240;
     }
 
     @Override
-    public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    }
 
-    public static class Factory implements ParticleProvider<SimpleParticleType> {
-
+    public static class Factory implements ParticleProvider<ScalableParticleType.ScalableParticleData> {
         private final SpriteSet sprites;
 
         public Factory(SpriteSet sprites) {
@@ -70,10 +63,17 @@ public class MendingPopParticle extends TextureSheetParticle {
 
         @Nullable
         @Override
-        public Particle createParticle(SimpleParticleType simpleParticleType, ClientLevel clientLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            MendingPopParticle particle = new MendingPopParticle(clientLevel, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites);
-            particle.setSprite(sprites.get(0, 1));
-            return particle;
+        public Particle createParticle(ScalableParticleType.ScalableParticleData data, ClientLevel level,
+                                       double x, double y, double z,
+                                       double xSpeed, double ySpeed, double zSpeed) {
+
+            return new MendingPopParticle(
+                    level,
+                    x, y, z,
+                    xSpeed, ySpeed, zSpeed,
+                    data.getScale(),
+                    this.sprites
+            );
         }
     }
 }

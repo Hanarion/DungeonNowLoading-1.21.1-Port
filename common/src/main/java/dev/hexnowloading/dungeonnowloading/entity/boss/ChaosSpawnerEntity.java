@@ -3,16 +3,21 @@ package dev.hexnowloading.dungeonnowloading.entity.boss;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
+import dev.hexnowloading.dungeonnowloading.entity.ai.chaos_spawner.*;
+import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
-import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
-import dev.hexnowloading.dungeonnowloading.entity.util.UniqueDeathAnimationEntity;
-import dev.hexnowloading.dungeonnowloading.entity.util.WeightedTargetProvider;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.entity.util.*;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeInTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeOutBackgroundMusicSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
+import dev.hexnowloading.dungeonnowloading.registry.*;
+import dev.hexnowloading.dungeonnowloading.sound.TickingSoundTarget;
 import dev.hexnowloading.dungeonnowloading.util.WeightedRandomBag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,8 +33,9 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -43,7 +49,11 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -88,13 +98,22 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private static final byte TRIGGER_DEATH_ANIMATION_BYTE = 76;
     private static final byte TRIGGER_ANIMATION_STOP_BYTE = 77;
 
+    private static final UUID RECALL_ATTACK_MOD_UUID = UUID.fromString("1f3d0f6b-2c9e-4d4f-9c2d-2a91c8f2b8d7");
+    private static final UUID RECALL_HEALTH_MOD_UUID = UUID.fromString("e41f6c2a-77b1-4c52-9f89-0a3e8c6d21f9");
+    private static final int RECALL_POSITION_OFFSET_Y = 1;
+
+    private int musicTick;
     protected int attackTickCount;
     private int contactAttackTickCount;
     private int deathAnimationTickCount;
     private int barrierCheckTickCount;
+    private int defeatedCount = 0;
+    private int modifiedDefeatedCount = 0;
     private Set<UUID> playerUUIDs;
     private UUID currentPlayerUUID;
     private List<Player> pushTargets;
+    private Set<UUID> playerDefeatedUUIDs;
+    private final Set<UUID> summonedMobs = new HashSet<>();
 
     public final AnimationState awakeningAnimationState = new AnimationState();
     public final AnimationState sleepingAnimationState = new AnimationState();
@@ -117,6 +136,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.xpReward = 500;
         this.playerUUIDs = Sets.newHashSet();
         this.currentPlayerUUID = UUID.randomUUID();
+        this.playerDefeatedUUIDs = Sets.newHashSet();
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -136,7 +156,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.goalSelector.addGoal(2, new ChaosSpawnerSummonMobGoal(this));
         this.goalSelector.addGoal(2, new ChaosSpawnerShootGhostBulletGoal(this));
         this.goalSelector.addGoal(2, new ChaosSpawnerPushGoal(this));
-        this.goalSelector.addGoal(2, new ChaosSpawnerLookAtPlayerGoal(this, LivingEntity.class, 30.0F, 1.0F, false));
+        this.goalSelector.addGoal(2, new ChaosSpawnerLookAtTargetGoal(this, false));
         this.goalSelector.addGoal(8, new ChaosSpawnerRandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new BossTargetSelectorGoal(this));
     }
@@ -181,17 +201,14 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         compoundTag.putInt("BarrierUpTicks,", this.entityData.get(BARRIER_UP_TICK));
         compoundTag.putInt("BarrierDownTicks,", this.entityData.get(BARRIER_DOWN_TICK));
         ListTag listTag = new ListTag();
-        CompoundTag uuidCompoundTag = new CompoundTag();
-        Iterator<UUID> var = this.playerUUIDs.iterator();
-        for (int i = 0; var.hasNext(); i++) {
-            listTag.add(uuidCompoundTag);
-            uuidCompoundTag.putUUID("PlayerUUID" + i, var.next());
+        for (UUID id : this.playerUUIDs) {
+            CompoundTag t = new CompoundTag();
+            t.putUUID("Id", id);
+            listTag.add(t);
         }
-        /*for (var.hasNext(); listTag.add(uuidCompoundTag)) {
-            UUID uuid1 = var.next();
-            uuidCompoundTag.putUUID("PlayerUUID", uuid1);
-        }*/
         compoundTag.put("PlayerUUIDs", listTag);
+
+        SeepingSoulEntity.writeRecallNBT(compoundTag, this.playerDefeatedUUIDs, this.defeatedCount, this.modifiedDefeatedCount);
     }
 
     @Override
@@ -223,10 +240,16 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         if (compoundTag.contains("PlayerUUIDs", CompoundTag.TAG_LIST)) {
             ListTag listTag = compoundTag.getList("PlayerUUIDs", CompoundTag.TAG_COMPOUND);
             for (int a = 0; a < listTag.size(); ++a) {
-                CompoundTag compoundTag1 = listTag.getCompound(a);
-                this.playerUUIDs.add(compoundTag1.getUUID("PlayerUUID" + a));
+                this.playerUUIDs.add(listTag.getCompound(a).getUUID("Id"));
             }
         }
+        SeepingSoulEntity.RecallData data = SeepingSoulEntity.readRecallNBT(compoundTag);
+
+        this.playerDefeatedUUIDs.clear();
+        this.playerDefeatedUUIDs.addAll(data.playerDefeatedUUIDs());
+
+        this.defeatedCount = data.defeatedCount();
+        this.modifiedDefeatedCount = data.modifiedDefeatedCount();
     }
 
     @Override
@@ -244,6 +267,11 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     public void setCustomName(@Nullable Component name) {
         super.setCustomName(name);
         this.bossEvent.setName(this.getDisplayName());
+    }
+
+    @Override
+    public boolean isCustomNameVisible() {
+        return false;
     }
 
     @Override
@@ -273,7 +301,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.bossEvent.removePlayer(player);
     }
 
-    public void startBossFight() {
+    public void startBossFight(ItemStack recallItemStack) {
         if (this.isAlive() && this.entityData.get(PHASE) < 1 && this.getState() != State.AWAKENING) {
             AABB bossArena = new AABB(this.blockPosition()).inflate(getFollowDistance());
             List<ServerPlayer> players = this.level().getEntitiesOfClass(ServerPlayer.class, bossArena);
@@ -281,11 +309,20 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 playerUUIDs.add(p.getUUID());
             }
             int playerCount = players.size();
-            EntityScale.scaleBossHealth(this, playerCount);
-            EntityScale.scaleBossAttack(this, playerCount);
+            this.modifiedDefeatedCount = SeepingSoulEntity.getModifiedDefeatedCount(this.defeatedCount, recallItemStack);
+            EntityScale.scaleBossHealth(this, playerCount, this.modifiedDefeatedCount);
+            EntityScale.scaleBossAttack(this, playerCount, this.modifiedDefeatedCount);
             this.entityData.set(PLAYER_COUNT, playerCount);
             this.entityData.set(AWAKENING_TICKS, 160);
             this.entityData.set(DATA_STATE, State.AWAKENING);
+            if (modifiedDefeatedCount > 0) {
+                this.setCustomName(RecallUtil.recalledName(
+                        Component.translatable("entity.dungeonnowloading.chaos_spawner"),
+                        modifiedDefeatedCount
+                ));
+            } else {
+                this.setCustomName(Component.translatable("entity.dungeonnowloading.chaos_spawner"));
+            }
         }
     }
 
@@ -319,12 +356,14 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 for (int i = 0; i < 50; ++i) {
                     ((ServerLevel) this.level()).sendParticles(ParticleTypes.FLAME, this.getRandomX(0.9D), this.getRandomY(), this.getRandomZ(0.9D), 1, 0.0D, 0.0D, 0.0D, 0.0D);
                 }
+                this.playBossMusic();
                 this.fillBarriers();
                 this.fillFrames();
                 this.enableBossBar();
             }
         }
         if (this.getPhase() > 0 && !this.getState().equals(State.DEATH)) {
+            this.musicTick();
             this.abilitySelectionTick();
             this.damageContactEntity();
             this.checkBarrierTick();
@@ -344,8 +383,17 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
     }
 
+    private void musicTick() {
+        musicTick++;
+        if (this.musicTick >= 2560 + 1) {
+            this.musicTick = 0;
+            this.playLoopMusic();
+        }
+    }
+
     private void phaseUpdateTick() {
         if (this.getPhase() == 1 && this.getHealth() < this.getMaxHealth() * 0.5) {
+            this.fadeInOverlayMusic();
             this.setPhase(2);
         }
     }
@@ -355,7 +403,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
             this.contactAttackTickCount--;
         } else {
             this.contactAttackTickCount = 20;
-            AABB aabb = (new AABB(this.blockPosition())).inflate(2);
+            AABB aabb = (new AABB(this.blockPosition())).inflate(1.5);
             List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, aabb);
             for (LivingEntity livingEntity : targets) {
                 if (livingEntity == this) {
@@ -434,10 +482,10 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                     fixedFrame++;
                 } else {
                     if (frameState.getBlock() instanceof ChaosSpawnerEdgeBlock) {
-                        this.level().playSound(null, framePos, SoundEvents.END_PORTAL_FRAME_FILL, this.getSoundSource(), 3.0F, 1.0F);
+                        this.level().playSound(null, framePos, DNLSounds.CHAOS_SPAWNER_DIAMOND_NOTCH_REGENERATE.get(), this.getSoundSource(), 3.0F, 0.8F);
                         ChaosSpawnerEdgeBlock.fixFrame(this.level(), framePos, frameState);
                     } else if (frameState.getBlock() instanceof  ChaosSpawnerVertexBlock) {
-                        this.level().playSound(null, framePos, SoundEvents.END_PORTAL_FRAME_FILL, this.getSoundSource(), 3.0F, 1.0F);
+                        this.level().playSound(null, framePos, DNLSounds.CHAOS_SPAWNER_DIAMOND_NOTCH_REGENERATE.get(), this.getSoundSource(), 3.0F, 0.8F);
                         ChaosSpawnerVertexBlock.fixFrame(this.level(), framePos, frameState);
                     }
                     this.entityData.set(entityDataAccessor, 20);
@@ -452,7 +500,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     }
 
     private void placeFullBarrier(BlockPos barrierCenterPos, int barrierDirection) {
-        this.level().playSound(null, barrierCenterPos, SoundEvents.END_PORTAL_SPAWN, this.getSoundSource(), 1.0F, 2.0F);
+        this.level().playSound(null, barrierCenterPos, DNLSounds.CHAOS_SPAWNER_BARRIER_REGENERATE.get(), this.getSoundSource(), 3.0F, 1.0F);
         ChaosSpawnerBarrierCenterBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
         ChaosSpawnerBarrierEdgeBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
         ChaosSpawnerBarrierVertexBlock.placeBarrier(this.level(), barrierCenterPos, barrierDirection);
@@ -481,6 +529,54 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         if (!level.getBlockState(cageCenterPos.offset(-2, 0, 0)).is(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get())) { this.placeFullBarrier(cageCenterPos.offset(-2, 0, 0), 3); }
         if (!level.getBlockState(cageCenterPos.offset(0, 2, 0)).is(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get())) { this.placeFullBarrier(cageCenterPos.offset(0, 2, 0), 4); }
         if (!level.getBlockState(cageCenterPos.offset(0, -2, 0)).is(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get())) { this.placeFullBarrier(cageCenterPos.offset(0, -2, 0), 5); }
+    }
+
+    public void trackSummon(Entity entity) {
+        if (entity != null) {
+            summonedMobs.add(entity.getUUID());
+        }
+    }
+
+    public void removeAllSummonedMobs() {
+        if (!(this.level() instanceof ServerLevel serverLevel)) return;
+
+        for (UUID uuid : summonedMobs) {
+            Entity e = serverLevel.getEntity(uuid);
+            if (e != null && e.isAlive()) {
+                e.discard(); // no drops, instant delete
+            }
+        }
+
+        summonedMobs.clear();
+    }
+
+    public int countSummonedMobs(ServerLevel level) {
+        summonedMobs.removeIf(uuid -> {
+            Entity e = level.getEntity(uuid);
+            return e == null || !e.isAlive();
+        });
+        return summonedMobs.size();
+    }
+
+    public void cullSummonsOutsideArena(ServerLevel level) {
+        final double radius = this.getFollowDistance() / 2.0;
+        final double radiusSqr = radius * radius;
+        final double cx = this.getX();
+        final double cy = this.getY();
+        final double cz = this.getZ();
+
+        summonedMobs.removeIf(uuid -> {
+            Entity e = level.getEntity(uuid);
+
+            if (e == null || !e.isAlive()) return true;
+
+            if (e.distanceToSqr(cx, cy, cz) > radiusSqr) {
+                e.discard();
+                return true;
+            }
+
+            return false;
+        });
     }
 
     @Override
@@ -574,10 +670,35 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
                 }
                 this.level().broadcastEntityEvent(this, (byte)3);
             }
+            spawnSeepingSoul((ServerLevel) level);
             this.level().broadcastEntityEvent(this, (byte)60);
             this.remove(Entity.RemovalReason.KILLED);
         }
     }
+
+    private void spawnSeepingSoul(ServerLevel level) {
+        // Spawn at boss *starting position*
+        BlockPos start = this.getSpawnPointPos();
+
+        SeepingSoulEntity soul = DNLEntityTypes.SEEPING_SOUL.get().create(level);
+        if (soul == null) return;
+
+        soul.moveTo(start.getX() + 0.5, start.getY() + RECALL_POSITION_OFFSET_Y, start.getZ() + 0.5, 0, 0);
+
+        // bossId should match the recall registry id you use for Chaos Spawner
+        soul.setBossId(new ResourceLocation(DungeonNowLoading.MOD_ID, "chaos_spawner"));
+
+        int count = SeepingSoulEntity.getRecallCountForSeepingSoul(this.defeatedCount, this.modifiedDefeatedCount);
+
+        soul.setPlayerDefeatedUUIDs(this.playerDefeatedUUIDs);
+        // next run is +1
+        soul.setDefeatedCount(Mth.clamp(count, 0, 100));
+
+        level.addFreshEntity(soul);
+
+        soul.playSpawnAnimation();
+    }
+
 
     @Override
     public void die(DamageSource damageSource) {
@@ -607,14 +728,103 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     @Override
     protected void dropCustomDeathLoot(DamageSource damageSource, int a, boolean b) {
-        if (BossConfig.TOGGLE_MULTIPLAYER_LOOT.get() && !this.playerUUIDs.isEmpty()) {
-            for (UUID playerUUID : this.playerUUIDs) {
-                this.currentPlayerUUID = playerUUID;
+        if (!BossConfig.TOGGLE_MULTIPLAYER_LOOT.get()) {
+            super.dropCustomDeathLoot(damageSource, a, b);
+            return;
+        }
+
+        if (this.playerUUIDs.isEmpty()) return;
+
+        // If recalled enough times, ignore gating entirely
+        boolean ignoreGate = this.modifiedDefeatedCount > 0;
+
+        // How many times to roll the loot table per eligible player
+        int drops = Math.max(1, (this.modifiedDefeatedCount - this.defeatedCount) + 1);
+
+        for (UUID playerUUID : this.playerUUIDs) {
+
+            dropGreatXpBottlesForPlayer(playerUUID);
+
+            if (this.modifiedDefeatedCount >= 1) { // Recall I+
+                dropRecallEnchantedBookForPlayer(playerUUID);
+            }
+
+            if (this.modifiedDefeatedCount >= 3) {
+                dropBannerForPlayer(playerUUID);
+            }
+
+            if (this.modifiedDefeatedCount >= 4) {
+                dropLabyrinthTrophyForPlayer(playerUUID);
+            }
+
+            // Gate: only first-clear gets loot (only on non-ignored runs)
+            if (!ignoreGate) {
+                if (this.playerDefeatedUUIDs.contains(playerUUID)) {
+                    continue;
+                }
+            }
+
+            this.currentPlayerUUID = playerUUID;
+
+            // Drop multiple times for this player
+            for (int i = 0; i < drops; i++) {
                 this.spawnLootTableItems(damageSource, true);
             }
-        } else {
-            super.dropCustomDeathLoot(damageSource, a, b);
+
+            // Mark claimed only for gated runs
+            if (!ignoreGate) {
+                this.playerDefeatedUUIDs.add(playerUUID);
+            }
         }
+    }
+
+    private void dropLabyrinthTrophyForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        ItemStack trophy = new ItemStack(DNLBlocks.LABYRINTH_TROPHY.get());
+        this.spawnSpecialItemEntity(trophy, 0.0F, playerUuid);
+    }
+
+    private void dropBannerForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        ItemStack banner = new ItemStack(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+        this.spawnSpecialItemEntity(banner, 0.0F, playerUuid);
+    }
+
+    private void dropGreatXpBottlesForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        int recallCount = Math.max(0, this.modifiedDefeatedCount);; // 0,1,2,...
+        int total = 5 * (recallCount + 1);
+
+        Item greatBottleItem = DNLItems.GREAT_EXPERIENCE_BOTTLE.get();
+
+        if (greatBottleItem == null) return;
+
+        // Split into max stack sizes
+        int max = greatBottleItem.getMaxStackSize(); // typically 64
+        while (total > 0) {
+            int n = Math.min(total, max);
+            ItemStack stack = new ItemStack(greatBottleItem, n);
+            this.spawnSpecialItemEntity(stack, 0.0F, playerUuid);
+            total -= n;
+        }
+    }
+
+    private void dropRecallEnchantedBookForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        Enchantment ench = this.random.nextBoolean()
+                ? DNLEnchantments.ARC_SHOT.get()
+                : DNLEnchantments.PULSE_SHOT.get();
+
+        int level = 1;
+
+        ItemStack book = EnchantedBookItem.createForEnchantment(new EnchantmentInstance(ench, level));
+        // (Optional) sanity check: book.getTag() should contain "StoredEnchantments"
+
+        this.spawnSpecialItemEntity(book, 0.0F, playerUuid);
     }
 
     @Override
@@ -650,6 +860,80 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
             specialItemEntity.setDefaultPickUpDelay();
             this.level().addFreshEntity(specialItemEntity);
             return specialItemEntity;
+        }
+    }
+
+    private void playBossMusic() {
+        float radius = (float) this.getFollowDistance();
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        List<ResourceLocation> soundsToStart = new ArrayList<>(List.of());
+        soundsToStart.add(DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation());
+        soundsToStart.add(DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation());
+        for (ServerPlayer player : nearbyPlayers) {
+            for (ResourceLocation sound : soundsToStart) {
+                Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(this.getId(), sound, SoundSource.MUSIC, 1.0F, 1.0f, false, radius, radius), player);
+            }
+            Services.NETWORK.sendToPlayer(new S2CFadeOutBackgroundMusicSoundPacket(60), player);
+        }
+    }
+
+    private void playLoopMusic() {
+        float radius = (float) this.getFollowDistance();
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+        for (ServerPlayer player : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(
+                    this.getId(),
+                    DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation(),
+                    SoundSource.MUSIC,
+                    -1, 1.0f, 1.0f, false, radius, radius
+            ), player);
+            int overlayVol = (this.getPhase() > 1) ? 1 : 0;
+            Services.NETWORK.sendToPlayer(new S2CStartTickingSoundPacket(
+                    this.getId(),
+                    DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation(),
+                    SoundSource.MUSIC,
+                    -1, overlayVol, 1.0f, false, radius, radius
+            ), player);
+        }
+    }
+
+    public void stopAllBossMusic() {
+        float radius = (float) (this.getFollowDistance() * 2);
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+
+        List<ResourceLocation> soundsToStop = new ArrayList<>(List.of());
+        soundsToStop.add(DNLSounds.MUSIC_HELLSPAWN_BASE.get().getLocation());
+        soundsToStop.add(DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation());
+
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            for (ResourceLocation sound : soundsToStop) {
+                Services.NETWORK.sendToPlayer(new S2CStopTickingSoundPacket(this.getId(), sound, TickingSoundTarget.ALL, 60, true), otherPlayer);
+            }
+        }
+    }
+
+    private void fadeInOverlayMusic() {
+        float radius = (float) this.getFollowDistance();
+        AABB detectionBox = this.getBoundingBox().inflate(radius);
+        List<ServerPlayer> nearbyPlayers = this.level().getEntitiesOfClass(
+                ServerPlayer.class,
+                detectionBox
+        );
+
+        for (ServerPlayer otherPlayer : nearbyPlayers) {
+            Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_HELLSPAWN_OVERLAY.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 20), otherPlayer);
         }
     }
 
@@ -711,6 +995,10 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     public State getState() {
         return this.entityData.get(DATA_STATE);
+    }
+
+    public void resetMusicTick() {
+        this.musicTick = 0;
     }
 
     public int getAwakeningTick() { return this.entityData.get(AWAKENING_TICKS); }
@@ -775,9 +1063,15 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     public void disableBossBar() { this.bossEvent.setVisible(false); }
 
+    public void setPlayerDefeatedUUIDs(Set<UUID> uuids) { this.playerDefeatedUUIDs = uuids; }
+
     public void stopAttacking(int cooldown) {
         this.entityData.set(DATA_STATE, State.IDLE);
-        this.setAttackTick(cooldown);
+
+        int actualCooldown = cooldown - (this.modifiedDefeatedCount * 10);
+        actualCooldown = Math.max(actualCooldown, 20);
+
+        this.setAttackTick(actualCooldown);
     }
 
     static {
@@ -819,6 +1113,130 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     public int getArenaSize() {
         return (int) this.getFollowDistance();
     }
+
+    public static void spawnRecalledStatic(ServerLevel level, SeepingSoulEntity soul, int defeatedCount) {
+        ChaosSpawnerEntity boss = DNLEntityTypes.CHAOS_SPAWNER.get().create(level);
+        if (boss == null) return;
+        BlockPos pos = soul.blockPosition();
+        boss.initRecalled(soul, defeatedCount);
+        boss.moveTo(pos.getX() + 0.5f, pos.getY() - RECALL_POSITION_OFFSET_Y, pos.getZ() + 0.5f, soul.getYRot(), 0);
+        level.addFreshEntity(boss);
+        spawnRecallFxTight(level, boss.position());
+    }
+
+    public void initRecalled(SeepingSoulEntity soul, int defeatedCount) {
+        this.entityData.set(SPAWN_POINT, soul.blockPosition().below(RECALL_POSITION_OFFSET_Y));
+        this.defeatedCount = defeatedCount;
+        this.setPlayerDefeatedUUIDs(soul.getPlayerDefeatedUUIDs());
+    }
+
+    public static void spawnRecallFxTight(ServerLevel level, Vec3 center) {
+        double x0 = center.x;
+        double y0 = center.y + 1.8F;
+        double z0 = center.z;
+
+        // 1.5 x 1.5 area => x/z in [-0.75 .. 0.75]
+        double radius = 1.7;
+
+        // Poof burst (fast)
+        for (int i = 0; i < 25; i++) {
+            double x = x0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double z = z0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double y = y0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+
+            double vx = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+            double vy = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+            double vz = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+
+            level.sendParticles(ParticleTypes.POOF, x, y, z, 1, vx, vy, vz, 0.0);
+        }
+
+        // Soul particles (floaty)
+        for (int i = 0; i < 18; i++) {
+            double x = x0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double z = z0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double y = y0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+
+            double vx = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+            double vy = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+            double vz = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+
+            level.sendParticles(ParticleTypes.SOUL, x, y, z, 1, vx, vy, vz, 0.0);
+        }
+    }
+
+
+    public static void disperseStatic(ServerLevel level, SeepingSoulEntity soul, int defeatedCount) {
+        // 5x5x5 centered on the soul (radius 2)
+        final BlockPos center = soul.blockPosition();
+        final int radius = 2;
+
+        // Destroy preserved blocks only within the 5x5x5 cube
+        BlockPos.betweenClosedStream(
+                center.offset(-radius, -radius, -radius),
+                center.offset(radius, radius, radius)
+        ).forEach(pos -> {
+            if (isChaosSpawnerPreservedBlock(level, pos)) {
+                level.destroyBlock(pos, false);
+            }
+        });
+
+        BlockPos.betweenClosedStream(
+                center.offset(-radius, -radius, -radius),
+                center.offset(radius, radius, radius)
+        ).forEach(pos -> {
+            if (isChaosSpawnerPreservedBlock(level, pos)) {
+                level.destroyBlock(pos, false);
+            }
+        });
+
+        // Particle + sound feedback at center (nice "disperse" feel)
+        playDisperseEffects(level, center);
+    }
+
+    private static void playDisperseEffects(ServerLevel level, BlockPos center) {
+        double x = center.getX() + 0.5;
+        double y = center.getY() + 0.5;
+        double z = center.getZ() + 0.5;
+
+        // A little sound helps sell it (optional)
+        level.playSound(null, x, y, z, DNLSounds.CHAOS_SPAWNER_SHOCKWAVE.get(), SoundSource.BLOCKS, 1.0F, 1.2F);
+
+        // Explosion-like burst
+        level.sendParticles(ParticleTypes.EXPLOSION, x, y, z,
+                1, 0.0, 0.0, 0.0, 0.0);
+
+        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, x, y, z,
+                1, 0.0, 0.0, 0.0, 0.0);
+
+        // Mixed soul + smoke-ish particles
+        level.sendParticles(ParticleTypes.SOUL, x, y, z,
+                60, 0.9, 0.9, 0.9, 0.05);
+
+        level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, y, z,
+                25, 0.6, 0.6, 0.6, 0.03);
+
+        level.sendParticles(ParticleTypes.POOF, x, y, z,
+                30, 0.8, 0.8, 0.8, 0.03);
+
+        // Optional: block break event (vanilla "pop")
+        // level.levelEvent(2001, center, 0);
+    }
+
+    private static boolean isChaosSpawnerPreservedBlock(Level level, BlockPos pos) {
+        var state = level.getBlockState(pos);
+
+        return state.is(DNLBlocks.CHAOS_SPAWNER_BARRIER_CENTER.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BARRIER_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BARRIER_VERTEX.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_DIAMOND_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_DIAMOND_VERTEX.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BROKEN_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BROKEN_DIAMOND_EDGE.get())
+                || state.is(DNLBlocks.CHAOS_SPAWNER_BROKEN_DIAMOND_VERTEX.get());
+    }
+
 
     public enum State {
         SLEEPING,

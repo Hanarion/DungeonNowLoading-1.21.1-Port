@@ -1,10 +1,12 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
 import com.google.common.collect.ImmutableList;
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.VertexPillarBlockEntity;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.BossTargetSelectorGoal;
+import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.*;
@@ -13,6 +15,7 @@ import dev.hexnowloading.dungeonnowloading.network.packets.S2CFadeOutBackgroundM
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStartTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CStopTickingSoundPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
+import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -33,6 +36,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -41,6 +45,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -76,7 +81,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private static final int SPAWN_OFFSET_X = 20;
     private static final int SPAWN_OFFSET_Y = 15;
     private final int BEHIND_BLOCK_SPAWN_OFFSET = 5;
-    private final int ARENA_SIZE = 36;
+    private static final int ARENA_SIZE = 36;
     private final int MAX_SCUTTLE_COUNT = 6;
     private DamageSource lastDamageSource;
     private FairkeeperBorosEntity boros;
@@ -94,6 +99,13 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     private int musicTick;
     private Set<UUID> playerUUIDs;
     private Set<UUID> minionUUIDs;
+    private Set<UUID> playerDefeatedUUIDs;
+    private int defeatedCount = 0;
+    private int modifiedDefeatedCount = 0;
+    private static final UUID RECALL_ATTACK_MOD_UUID = UUID.fromString("3f9c1e2b-8a64-4d0a-9e2c-6d7f1c4a9a12");
+    private static final UUID RECALL_HEALTH_UUID = UUID.fromString("b27a4d91-1c58-4a6e-9b0f-2f8e6c3d5a44");
+    private ItemStack recallItemStack;
+
 
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> introMoveSet = new WeightBaseMoveSet<>();
     private WeightBaseMoveSet<Pair<FairkeeperBorosEntity.FairkeeperBorosState, FairkeeperOurosEntity.FairkeeperOurosState>> comboMoveSet = new WeightBaseMoveSet<>();
@@ -134,6 +146,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         super(entityType, level);
         this.playerUUIDs = new HashSet<>();
         this.minionUUIDs = new HashSet<>();
+        this.playerDefeatedUUIDs = new HashSet<>();
     }
 
     @Override
@@ -169,6 +182,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             uuidCompoundTag.putUUID("PlayerUUID" + i, var.next());
         }
         compoundTag.put("PlayerUUIDs", listTag);
+        SeepingSoulEntity.writeRecallNBT(compoundTag, this.playerDefeatedUUIDs, this.defeatedCount, this.modifiedDefeatedCount);
     }
 
     @Override
@@ -194,9 +208,18 @@ public class FairkeeperSerpentCallerEntity extends Entity {
                 this.playerUUIDs.add(compoundTag1.getUUID("PlayerUUID" + a));
             }
         }
+        SeepingSoulEntity.RecallData data = SeepingSoulEntity.readRecallNBT(compoundTag);
+
+        this.playerDefeatedUUIDs.clear();
+        this.playerDefeatedUUIDs.addAll(data.playerDefeatedUUIDs());
+
+        this.defeatedCount = data.defeatedCount();
+        this.modifiedDefeatedCount = data.modifiedDefeatedCount();
     }
 
-    public void startBossFight() {
+    public void startBossFight(ItemStack recallItemStack) {
+        this.recallItemStack = recallItemStack;
+        this.modifiedDefeatedCount = SeepingSoulEntity.getModifiedDefeatedCount(this.defeatedCount, recallItemStack);
         this.activationTick = 60;
         this.isBorosDefeated = 0;
         this.isOurosDefeated = 0;
@@ -648,24 +671,106 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
     private void defeatedBosses() {
         this.level().explode(null, this.getX(), this.getY(), this.getZ(), 1.0F, Level.ExplosionInteraction.BLOCK);
-        if (BossConfig.TOGGLE_MULTIPLAYER_LOOT.get() && !this.playerUUIDs.isEmpty()) {
-            for (UUID playerUUID : this.playerUUIDs) {
-                this.spawnLootTableItems(this.lastDamageSource, true, true, playerUUID);
-            }
-        } else {
-            this.spawnLootTableItems(this.lastDamageSource, true, false, null);
-        }
+        this.dropDeathLoot();
         this.removeAllMinions();
-        this.removePreservers();
         this.removePillars();
+        this.spawnSeepingSoul();
         this.remove(RemovalReason.KILLED);
     }
 
-    private void removePreservers() {
-        Level level = this.level();
-        BlockPos center = this.blockPosition();
+    private void dropDeathLoot() {
+        if (!BossConfig.TOGGLE_MULTIPLAYER_LOOT.get()) {
+            this.spawnLootTableItems(this.lastDamageSource, true, false, null);
+        }
+
+        if (this.playerUUIDs.isEmpty()) return;
+
+        boolean ignoreGate = this.modifiedDefeatedCount > 0;
+
+        int drops = Math.max(1, (this.modifiedDefeatedCount - this.defeatedCount) + 1);
+
+        for (UUID playerUUID : this.playerUUIDs) {
+
+            dropGreatXpBottlesForPlayer(playerUUID);
+
+            if (this.modifiedDefeatedCount >= 4) {
+                dropTempleOfDualityTrophyForPlayer(playerUUID);
+            }
+
+            // Gate: only first-clear gets loot (only on non-ignored runs)
+            if (!ignoreGate) {
+                if (this.playerDefeatedUUIDs.contains(playerUUID)) {
+                    continue;
+                }
+            }
+
+            // Drop multiple times for this player
+            for (int i = 0; i < drops; i++) {
+                this.spawnLootTableItems(this.lastDamageSource, true, true, playerUUID);
+            }
+
+            // Mark claimed only for gated runs
+            if (!ignoreGate) {
+                this.playerDefeatedUUIDs.add(playerUUID);
+            }
+        }
+    }
+
+    private void dropTempleOfDualityTrophyForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        ItemStack trophy = new ItemStack(DNLBlocks.TEMPLE_OF_DUALITY_TROPHY.get());
+        this.spawnSpecialItemEntity(trophy, 0.0F, playerUuid);
+    }
+
+    private void dropGreatXpBottlesForPlayer(UUID playerUuid) {
+        if (this.level().isClientSide) return;
+
+        int recallCount = Math.max(0, this.modifiedDefeatedCount);
+        int total = 15 * (recallCount + 1);
+
+        Item greatBottleItem = DNLItems.GREAT_EXPERIENCE_BOTTLE.get();
+
+        if (greatBottleItem == null) return;
+
+        // Split into max stack sizes
+        int max = greatBottleItem.getMaxStackSize(); // typically 64
+        while (total > 0) {
+            int n = Math.min(total, max);
+            ItemStack stack = new ItemStack(greatBottleItem, n);
+            this.spawnSpecialItemEntity(stack, 0.0F, playerUuid);
+            total -= n;
+        }
+    }
+
+    private void spawnSeepingSoul() {
+        // Spawn at boss *starting position*
+        BlockPos start = this.blockPosition();
+
+        SeepingSoulEntity soul = DNLEntityTypes.SEEPING_SOUL.get().create(this.level());
+        if (soul == null) return;
+
+        soul.moveTo(start.getX() + 0.5, start.getY(), start.getZ() + 0.5, this.getYRot(), 0);
+
+        // bossId should match the recall registry id you use for Chaos Spawner
+        soul.setBossId(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller"));
+
+        int count = SeepingSoulEntity.getRecallCountForSeepingSoul(this.defeatedCount, this.modifiedDefeatedCount);
+
+        soul.setPlayerDefeatedUUIDs(this.playerDefeatedUUIDs);
+
+        // next run is +1
+        soul.setDefeatedCount(Mth.clamp(count, 0, 100));
+
+        this.level().addFreshEntity(soul);
+
+        soul.playSpawnAnimation();
+    }
+
+    private static void removePreservers(ServerLevel level, BlockPos soulPos) {
+        BlockPos center = soulPos;
         int includeWallPreserver = 1;
-        int arenaSize = this.getArenaSize() + includeWallPreserver;
+        int arenaSize = ARENA_SIZE + includeWallPreserver;
 
         Map<BlockPos, BlockEntity> map = new HashMap<>();
 
@@ -912,9 +1017,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             boros.transitionTo(FairkeeperBorosEntity.FairkeeperBorosAnimationState.IDLE);
             this.setBorosId(boros.getUUID());
             this.setBorosWaitingForCommand(false);
-            EntityScale.scaleBossHealth(boros, playerCount);
-            EntityScale.scaleBossAttack(boros, playerCount);
-            EntityScale.scaleBossExhaustion(boros, playerCount, this.borosExhaustion);
+            EntityScale.scaleBossHealth(boros, playerCount, modifiedDefeatedCount);
+            EntityScale.scaleBossAttack(boros, playerCount, modifiedDefeatedCount);
+            EntityScale.scaleBossExhaustion(boros, playerCount, this.borosExhaustion, modifiedDefeatedCount);
+            if (modifiedDefeatedCount > 0) {
+                boros.setCustomName(RecallUtil.recalledName(Component.translatable("entity.dungeonnowloading.fairkeeper_boros"), modifiedDefeatedCount));
+            } else {
+                boros.setCustomName(Component.translatable("entity.dungeonnowloading.fairkeeper_boros"));
+            }
             this.boros = boros;
         }
 
@@ -930,9 +1040,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
             ouros.transitionTo(FairkeeperOurosEntity.FairkeeperOurosAnimationState.IDLE);
             this.setOurosId(ouros.getUUID());
             this.setOurosWaitingForCommand(false);
-            EntityScale.scaleBossHealth(ouros, playerCount);
-            EntityScale.scaleBossAttack(ouros, playerCount);
-            EntityScale.scaleBossExhaustion(ouros, playerCount, this.ourosExhaustion);
+            EntityScale.scaleBossHealth(ouros, playerCount, modifiedDefeatedCount);
+            EntityScale.scaleBossAttack(ouros, playerCount, modifiedDefeatedCount);
+            EntityScale.scaleBossExhaustion(ouros, playerCount, this.ourosExhaustion, modifiedDefeatedCount);
+            if (modifiedDefeatedCount > 0) {
+                ouros.setCustomName(RecallUtil.recalledName(Component.translatable("entity.dungeonnowloading.fairkeeper_ouros"), modifiedDefeatedCount));
+            } else {
+                ouros.setCustomName(Component.translatable("entity.dungeonnowloading.fairkeeper_ouros"));
+            }
             this.ouros = ouros;
         }
     }
@@ -1088,6 +1203,60 @@ public class FairkeeperSerpentCallerEntity extends Entity {
 
         for (ServerPlayer otherPlayer : nearbyPlayers) {
             Services.NETWORK.sendToPlayer(new S2CFadeInTickingSoundPacket(this.getId(), DNLSounds.MUSIC_CLASH_OF_DUALITY_OUROS.get().getLocation(), TickingSoundTarget.NEWEST, 1.0f, 20), otherPlayer);
+        }
+    }
+
+    public static void disperse(ServerLevel level, SeepingSoulEntity soul, int defeatedCount) {
+        removePreservers(level, soul.blockPosition());
+    }
+
+    public static void spawnRecalled(ServerLevel level, SeepingSoulEntity soul, int defeatedCount) {
+        FairkeeperSerpentCallerEntity boss = DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get().create(level);
+        if (boss == null) return;
+        BlockPos pos = soul.blockPosition();
+        boss.initRecalled(soul, defeatedCount);
+        boss.moveTo(pos.getX() + 0.5f, pos.getY(), pos.getZ() + 0.5f, soul.getYRot(), 0);
+        level.addFreshEntity(boss);
+        spawnRecallFxTight(level, boss.position());
+    }
+
+    public void initRecalled(SeepingSoulEntity soul,  int defeatedCount) {
+        this.defeatedCount = defeatedCount;
+        this.playerDefeatedUUIDs = soul.getPlayerDefeatedUUIDs();
+    }
+
+    public static void spawnRecallFxTight(ServerLevel level, Vec3 center) {
+        double x0 = center.x;
+        double y0 = center.y + 0.5F;
+        double z0 = center.z;
+
+        // 1.5 x 1.5 area => x/z in [-0.75 .. 0.75]
+        double radius = 0.75;
+
+        // Poof burst (fast)
+        for (int i = 0; i < 25; i++) {
+            double x = x0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double z = z0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double y = y0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+
+            double vx = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+            double vy = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+            double vz = (level.random.nextDouble() * 2.0 - 1.0) * 0.10;
+
+            level.sendParticles(ParticleTypes.POOF, x, y, z, 1, vx, vy, vz, 0.0);
+        }
+
+        // Soul particles (floaty)
+        for (int i = 0; i < 18; i++) {
+            double x = x0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double z = z0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+            double y = y0 + (level.random.nextDouble() * 2.0 - 1.0) * radius;
+
+            double vx = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+            double vy = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+            double vz = (level.random.nextDouble() * 2.0 - 1.0) * 0.025;
+
+            level.sendParticles(ParticleTypes.SOUL, x, y, z, 1, vx, vy, vz, 0.0);
         }
     }
 

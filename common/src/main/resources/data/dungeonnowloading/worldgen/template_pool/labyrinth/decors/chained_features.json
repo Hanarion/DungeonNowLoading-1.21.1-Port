@@ -1,0 +1,77 @@
+{
+  "fallback": "dungeonnowloading:labyrinth/decors/chained_features",
+  "elements": [
+    {
+      "weight": 5,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/broken_garhold",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/garhold",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/chain_short",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/chain_medium",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/chain_long",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/lantern_short",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/lantern_medium",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/lantern_long",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    }
+  ]
+}

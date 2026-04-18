@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.world.structures;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.hexnowloading.dungeonnowloading.registry.DNLStructures;
@@ -14,6 +15,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
 
 import java.util.Optional;
 
@@ -27,7 +29,13 @@ public class GenericJigsawStructure extends Structure {
             HeightProvider.CODEC.fieldOf("start_height").forGetter(structure -> structure.startHeight),
             Codec.BOOL.fieldOf("use_expansion_hack").forGetter(structure -> structure.useExpansionHack),
             Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(structure -> structure.projectStartToHeightmap),
-            Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter(structure -> structure.maxDistanceFromCenter)
+            Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter(structure -> structure.maxDistanceFromCenter),
+            StructureTemplatePool.CODEC.optionalFieldOf("extra_surface_pool").forGetter(structure -> structure.extraSurfacePool),
+            ResourceLocation.CODEC.optionalFieldOf("extra_surface_start_jigsaw_name").forGetter(structure -> structure.extraSurfaceStartJigsawName),
+            Codec.intRange(0, 100).optionalFieldOf("extra_surface_size", 0).forGetter(structure -> structure.extraSurfaceSize),
+            Codec.intRange(1, 128).optionalFieldOf("extra_surface_max_distance_from_center", 80).forGetter(structure -> structure.extraSurfaceMaxDistanceFromCenter),
+            Heightmap.Types.CODEC.optionalFieldOf("extra_surface_heightmap", Heightmap.Types.WORLD_SURFACE_WG).forGetter(structure -> structure.extraSurfaceHeightmap),
+            Codec.INT.optionalFieldOf("extra_surface_y_offset", 0).forGetter(structure -> structure.extraSurfaceYOffset)
     ).apply(instance, GenericJigsawStructure::new));
     private final Holder<StructureTemplatePool> startPool;
     private final Optional<ResourceLocation> startJigsawName;
@@ -36,8 +44,14 @@ public class GenericJigsawStructure extends Structure {
     private final boolean useExpansionHack;
     private final Optional<Heightmap.Types> projectStartToHeightmap;
     private final int maxDistanceFromCenter;
+    private final Optional<Holder<StructureTemplatePool>> extraSurfacePool;
+    private final Optional<ResourceLocation> extraSurfaceStartJigsawName;
+    private final int extraSurfaceSize;
+    private final int extraSurfaceMaxDistanceFromCenter;
+    private final Heightmap.Types extraSurfaceHeightmap;
+    private final int extraSurfaceYOffset;
 
-    public GenericJigsawStructure(StructureSettings config, Holder<StructureTemplatePool> startPool, Optional<ResourceLocation> startJigsawName, int size, HeightProvider startHeight, boolean useExpansionHack, Optional<Heightmap.Types> projectStartToHeightmap, int maxDistanceFromCenter) {
+    public GenericJigsawStructure(StructureSettings config, Holder<StructureTemplatePool> startPool, Optional<ResourceLocation> startJigsawName, int size, HeightProvider startHeight, boolean useExpansionHack, Optional<Heightmap.Types> projectStartToHeightmap, int maxDistanceFromCenter, Optional<Holder<StructureTemplatePool>> extraSurfacePool, Optional<ResourceLocation> extraSurfaceStartJigsawName, int extraSurfaceSize, int extraSurfaceMaxDistanceFromCenter, Heightmap.Types extraSurfaceHeightmap, int extraSurfaceYOffset) {
         super(config);
         this.startPool = startPool;
         this.startJigsawName = startJigsawName;
@@ -46,6 +60,12 @@ public class GenericJigsawStructure extends Structure {
         this.useExpansionHack = useExpansionHack;
         this.projectStartToHeightmap = projectStartToHeightmap;
         this.maxDistanceFromCenter = maxDistanceFromCenter;
+        this.extraSurfacePool = extraSurfacePool;
+        this.extraSurfaceStartJigsawName = extraSurfaceStartJigsawName;
+        this.extraSurfaceSize = extraSurfaceSize;
+        this.extraSurfaceMaxDistanceFromCenter = extraSurfaceMaxDistanceFromCenter;
+        this.extraSurfaceHeightmap = extraSurfaceHeightmap;
+        this.extraSurfaceYOffset = extraSurfaceYOffset;
     }
 
     @Override
@@ -63,7 +83,36 @@ public class GenericJigsawStructure extends Structure {
                         false,
                         this.projectStartToHeightmap,
                         this.maxDistanceFromCenter);
-        return structurePiecesGenerator;
+        return structurePiecesGenerator.map(generationStub -> this.addExtraSurfacePieces(context, generationStub));
+    }
+
+    private GenerationStub addExtraSurfacePieces(GenerationContext context, GenerationStub generationStub) {
+        if (this.extraSurfacePool.isEmpty()) {
+            return generationStub;
+        }
+
+        StructurePiecesBuilder piecesBuilder = generationStub.getPiecesBuilder();
+        ChunkPos chunkPos = context.chunkPos();
+        int centerX = chunkPos.getMiddleBlockX();
+        int centerZ = chunkPos.getMiddleBlockZ();
+        int surfaceY = context.chunkGenerator().getFirstOccupiedHeight(
+                centerX,
+                centerZ,
+                this.extraSurfaceHeightmap,
+                context.heightAccessor(),
+                context.randomState()) + this.extraSurfaceYOffset;
+
+        JigsawPlacement.addPieces(
+                context,
+                this.extraSurfacePool.get(),
+                this.extraSurfaceStartJigsawName,
+                this.extraSurfaceSize,
+                new BlockPos(centerX, surfaceY, centerZ),
+                false,
+                Optional.empty(),
+                this.extraSurfaceMaxDistanceFromCenter
+        ).ifPresent(surfaceStub -> surfaceStub.getPiecesBuilder().build().pieces().forEach(piecesBuilder::addPiece));
+        return new GenerationStub(generationStub.position(), Either.right(piecesBuilder));
     }
 
     @Override

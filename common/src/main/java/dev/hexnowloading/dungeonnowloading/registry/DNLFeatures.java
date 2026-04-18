@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.world.features.BrewingStandFeature;
+import dev.hexnowloading.dungeonnowloading.world.features.LabyrinthSurfaceTemplateFeature;
 import dev.hexnowloading.dungeonnowloading.world.features.SpawnerFeature;
 import dev.hexnowloading.dungeonnowloading.world.features.configs.ArmorStandConfig;
 import dev.hexnowloading.dungeonnowloading.world.features.configs.PotionConfig;
@@ -30,6 +31,7 @@ public class DNLFeatures {
     public static final Supplier<Feature<NoneFeatureConfiguration>> ZOMBIE_WITH_GOLD_AXE = register("zombie_with_gold_axe", ZombieWithGoldAxeFeature::new);
     public static final Supplier<Feature<NoneFeatureConfiguration>> SKELETON_HORSE = register("skeleton_horse", SkeletonHorseFeature::new);
     public static final Supplier<Feature<NoneFeatureConfiguration>> ZOMBIE_HORSE = register("zombie_horse", ZombieHorseFeature::new);
+    public static final Supplier<Feature<NoneFeatureConfiguration>> LABYRINTH_SURFACE = register("labyrinth_surface", LabyrinthSurfaceTemplateFeature::new);
 
     public static final Supplier<Feature<EntityTypeConfig>> SPAWNER_CARRIER = register("spawner_carrier", () -> new SpawnerCarrierFeature(EntityTypeConfig.CODEC));
 

@@ -12,11 +12,16 @@ import java.util.List;
 public class BackgroundMusicHandler {
     private static final List<FadingChannel> fadingChannels = new ArrayList<>();
 
+    private static final List<ResourceLocation> BLOCKING_TICKING_SOUNDS = List.of(
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "music_clash_of_duality_base"),
+            new ResourceLocation(DungeonNowLoading.MOD_ID, "music_hellspawn_base")
+    );
+
     public static boolean isBackgroundMusicBlocked() {
-        // Avoid calling RegistryObject.get() here since this can run very early on Forge.
-        // Use the raw resource location to check active ticking sounds instead.
-        ResourceLocation id = new ResourceLocation(DungeonNowLoading.MOD_ID, "music_clash_of_duality_base");
-        return DNLClientSoundHandler.isTickingSoundActive(id);
+        for (ResourceLocation id : BLOCKING_TICKING_SOUNDS) {
+            if (DNLClientSoundHandler.isTickingSoundActive(id)) return true;
+        }
+        return false;
     }
 
 

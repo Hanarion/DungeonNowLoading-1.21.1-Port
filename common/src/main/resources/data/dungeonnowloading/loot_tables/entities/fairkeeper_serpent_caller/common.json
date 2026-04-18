@@ -75,28 +75,6 @@
           ]
         }
       ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "name": "dungeonnowloading:great_experience_bottle",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": 15
-            },
-            {
-              "function": "minecraft:looting_enchant",
-              "count": {
-                "min": 0,
-                "max": 1
-              }
-            }
-          ]
-        }
-      ]
     }
   ]
 }

@@ -1,14 +1,11 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
-import dev.hexnowloading.dungeonnowloading.block.property.AllSides;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
-import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -16,12 +13,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -117,12 +112,12 @@ public class ChaosSpawnerVertexBlock extends Block implements SimpleWaterloggedB
     }
 
     private void playSound(Level level, BlockPos blockPos, float pitch) {
-        level.playSound((Player) null, blockPos, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 1.0F, pitch);
+        level.playSound((Player) null, blockPos, DNLSounds.CHAOS_SPAWNER_DIAMOND_NOTCH_BREAK.get(), SoundSource.BLOCKS, 0.5F, pitch);
     }
 
     private void brokenFrame(Level level, BlockPos blockPos, BlockState blockState) {
         if (blockState.is(DNLBlocks.CHAOS_SPAWNER_DIAMOND_VERTEX.get())) {
-            playSound(level, blockPos, 1.5F);
+            playSound(level, blockPos, 0.8F);
             level.setBlock(blockPos, DNLBlocks.CHAOS_SPAWNER_BROKEN_DIAMOND_VERTEX.get().defaultBlockState().setValue(FACING, blockState.getValue(FACING)).setValue(HALF, blockState.getValue(HALF)).setValue(WATERLOGGED, blockState.getValue(WATERLOGGED)), 2);
             this.signalToBarrierCenter(level, blockPos, blockState);
         }

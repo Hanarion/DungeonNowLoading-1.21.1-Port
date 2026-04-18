@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.datagen.provider;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.block.property.RedstoneLaneMode;
+import dev.hexnowloading.dungeonnowloading.datagen.provider.blockitemstategenerators.BannerBlockItemGen;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
@@ -53,7 +54,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.DIAMOND_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
+        simpleBlockWithItem(DNLBlocks.SPAWN_NODE.get());
+        anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(ForgeRegistries.BLOCKS.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
 
+        dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientStairsLikeBlockWithItem(DNLBlocks.MENDING_AURA_STAIRS.get(), DNLBlocks.MENDING_AURA.get());
         fullyRotatedVarientSlabLikeBlockWithItem(DNLBlocks.MENDING_AURA_SLAB.get(), DNLBlocks.MENDING_AURA.get());
@@ -94,32 +98,25 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         horizontalModelFromParent(DNLBlocks.PALE_OAK_WOODEN_BOARD.get(),  "wooden_board", "wooden_board", modLoc("block/pale_oak_wooden_board"),  modLoc("item/pale_oak_wooden_board"));
         horizontalModelFromParent(DNLBlocks.SPRUCE_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/spruce_wooden_board"),    modLoc("item/spruce_wooden_board"));
         horizontalModelFromParent(DNLBlocks.WARPED_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/warped_wooden_board"),    modLoc("item/warped_wooden_board"));
-        rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.AZURO_OAK_LOG.get());
-        rotatedPillarBlockWithItem((RotatedPillarBlock) DNLBlocks.STRIPPED_AZURO_OAK_LOG.get());
-        simpleBlockWithItem(DNLBlocks.AZURO_LEAVES.get());
-
-        simpleBlockWithItem(DNLBlocks.AZURO_OAK_PLANKS.get());
-
-        stairsBlockWithItem((StairBlock) DNLBlocks.AZURO_OAK_PLANK_STAIRS.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
-        slabBlockWithItems((SlabBlock) DNLBlocks.AZURO_OAK_PLANK_SLAB.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
-        fenceBlockWithItem((FenceBlock) DNLBlocks.AZURO_OAK_PLANK_FENCE.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
-        fenceGateBlockWithItem((FenceGateBlock) DNLBlocks.AZURO_OAK_PLANK_FENCE_GATE.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
-        buttonBlockWithItem((ButtonBlock) DNLBlocks.AZURO_OAK_BUTTON.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
-        simplePressurePlateBlockWithItem((PressurePlateBlock) DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get(), DNLBlocks.AZURO_OAK_PLANKS.get());
-
-        doorBlockWithRenderType((DoorBlock) DNLBlocks.AZURO_OAK_DOOR.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_bottom"),
-                new ResourceLocation(DungeonNowLoading.MOD_ID, "block/azuro_oak_door_top"), "cutout");
-
         generateMendstoneChalkMarkModels((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK_MARK.get(), MendstoneChalkMarkBlock.OUTLINE);
         //faceBlockWithItem((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK.get());
 
         //fairkeeperSpawnerWithItem((FairkeeperSpawnerBlock) DNLBlocks.FAIRKEEEPER_SPAWNER.get());
         //simpleRandomBlockWithItem(DNLBlocks.MOSS.get(), 5);
+        BannerBlockItemGen gen = new BannerBlockItemGen(this);
+
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_BLACK.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_BLUE.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_PURPLE.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_GREEN.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_HOLLOW.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SPAWNER_CARRIER.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_EXPERIENCE_BOTTLE.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
+        gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
     }
 
     private void fenceGateBlockWithItem(FenceGateBlock block, Block parent) {
@@ -163,6 +160,11 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     private void simpleBlockWithItem(Block block) {
         simpleBlock(block);
         simpleBlockItem(block, models().getExistingFile(modLoc("block/" + ForgeRegistries.BLOCKS.getKey(block).getPath())));
+    }
+
+    private void anyModelBlockWithItem(Block block, ModelFile model) {
+        simpleBlock(block, model);
+        simpleBlockItem(block, model);
     }
 
     private void simpleItem(Block block) {
@@ -1124,6 +1126,21 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
             simpleBlockItem(block, mf);
         }
     }
+    private void dungeonDirectorBlock(Block block) {
+        ModelFile normal = models()
+                .cubeAll("dungeon_director", modLoc("block/dungeon_director")).renderType("cutout");
+        ModelFile remove = models()
+                .cubeAll("dungeon_director_remove", modLoc("block/dungeon_director_remove")).renderType("cutout");
+
+        getVariantBuilder(block)
+                .partialState().with(DungeonDirectorBlock.REMOVE_AFTER_SUMMON, false)
+                .modelForState().modelFile(normal).addModel()
+                .partialState().with(DungeonDirectorBlock.REMOVE_AFTER_SUMMON, true)
+                .modelForState().modelFile(remove).addModel();
+
+        // Item model uses normal
+        simpleBlockItem(block, normal);
+    }
 
     private void particleOnlyModel(Block block) {
         String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
@@ -1138,13 +1155,11 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         getVariantBuilder(block).forAllStates(s -> new ConfiguredModel[]{new ConfiguredModel(model)});
     }
 
-
-
     private ResourceLocation key(Block block) {
         return ForgeRegistries.BLOCKS.getKey(block);
     }
 
-    private String name(Block block) {
+    public String name(Block block) {
         return key(block).getPath();
     }
 

@@ -14,8 +14,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -112,25 +110,35 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.LABYRINTH_TROPHY.get());
         this.dropSelf(DNLBlocks.TEMPLE_OF_DUALITY_TROPHY.get());
         this.dropSelf(DNLBlocks.MENDING_TABLE.get());
-        this.dropSelf(DNLBlocks.AZURO_OAK_LOG.get());
-        this.dropSelf(DNLBlocks.AZURO_OAK_PLANKS.get());
-        this.dropSelf(DNLBlocks.STRIPPED_AZURO_OAK_LOG.get());
-        this.add(DNLBlocks.AZURO_LEAVES.get(),createShearsOnlyDrop(DNLBlocks.AZURO_LEAVES.get()));
-        this.add(DNLBlocks.AZURO_HANGING_LEAVES.get(),createShearsOnlyDrop(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get()));
-        this.add(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get(),createShearsOnlyDrop(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get()));
-        this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_STAIRS.get());
-        this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_SLAB.get());
-        this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_FENCE.get());
-        this.dropSelf(DNLBlocks.AZURO_OAK_PLANK_FENCE_GATE.get());
-        this.add(DNLBlocks.AZURO_OAK_DOOR.     get(), block -> LootTable.lootTable().withPool(LootPool.lootPool().when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))).add(LootItem.lootTableItem(block))));
-        this.dropSelf(DNLBlocks.AZURO_OAK_BUTTON.get());
-        this.dropSelf(DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get());
-//        this.dropSelf(DNLBlocks.AZURO_OAK_TRAPDOOR.get());
         this.addPlayerStatueDrop(DNLBlocks.PLAYER_STATUE.get());
         this.add(DNLBlocks.DURITE_CLUSTER.get(), b -> duriteClusterWithOverflow(b, DNLItems.DURITE.get()));
         this.add(DNLBlocks.LARGE_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.75f));
         this.add(DNLBlocks.MEDIUM_DURITE_BUD.get(), b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.50f));
         this.add(DNLBlocks.SMALL_DURITE_BUD.get(),  b -> duriteBudWithChanceOverflow(b, DNLItems.DURITE.get(), 0.25f));
+        this.add(DNLBlocks.DURITE_QUELLER.get(), block -> createSingleItemTable(Items.OBSIDIAN));
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_MAGENTA.get(), DNLItems.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_BLACK.get(),   DNLItems.DUNGEON_BANNER_SPAWNER_BLACK.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_BLUE.get(),    DNLItems.DUNGEON_BANNER_SPAWNER_BLUE.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_PURPLE.get(),  DNLItems.DUNGEON_BANNER_SPAWNER_PURPLE.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_GREEN.get(),   DNLItems.DUNGEON_BANNER_SPAWNER_GREEN.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_HOLLOW.get(),          DNLItems.DUNGEON_BANNER_HOLLOW.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SPAWNER_CARRIER.get(), DNLItems.DUNGEON_BANNER_SPAWNER_CARRIER.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_EXPERIENCE_BOTTLE.get(), DNLItems.DUNGEON_BANNER_EXPERIENCE_BOTTLE.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER.get(),    DNLItems.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN.get(),  DNLItems.DUNGEON_BANNER_WHIMPER_LANTERN.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get(), DNLItems.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
+        dungeonBannerDrops(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get(),   DNLItems.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
+    }
+
+    private void dungeonBannerDrops(Block bannerBlock, Item drop) {
+        LootTable.Builder table = LootTable.lootTable();
+
+        LootPool.Builder pool = LootPool.lootPool()
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootItem.lootTableItem(drop));
+
+        table.withPool(pool);
+        add(bannerBlock, table);
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {

@@ -9,9 +9,8 @@ import org.spongepowered.asm.mixin.injection.*;
 
 @Mixin(LivingEntity.class)
 public class LivingDamageMixin {
-    private float f;
-
-    //float newDamage;
+    // Note: this mixin also affects Player (Player extends LivingEntity).
+    // We intentionally do NOT hook Player#actuallyHurt separately to avoid double-invoking DNLEntityEvents.
 
     /*@Inject(method = "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;awardStat(Lnet/minecraft/resources/ResourceLocation;I)V", shift = At.Shift.BY, by = 2))
     private void dungeonnowloading_actuallyHurt(DamageSource damageSource, float f, CallbackInfo ci) {
@@ -54,5 +53,3 @@ public class LivingDamageMixin {
         return f;
     }
 }
-
-

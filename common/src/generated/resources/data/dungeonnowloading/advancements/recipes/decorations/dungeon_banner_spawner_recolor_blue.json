@@ -1,0 +1,33 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_spawner_banner": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "dungeonnowloading:dungeon_banner_spawner"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "dungeonnowloading:dungeon_banner_spawner_recolor_blue"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_spawner_banner",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "dungeonnowloading:dungeon_banner_spawner_recolor_blue"
+    ]
+  },
+  "sends_telemetry_event": false
+}

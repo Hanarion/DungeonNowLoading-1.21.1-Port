@@ -106,6 +106,11 @@ public class PedestalEditScreen extends Screen {
             this.minecraft.setScreen(null);
             return true;
         }
+        if (key == GLFW.GLFW_KEY_ESCAPE) {
+            sendUpdate();
+            if (this.minecraft != null) this.minecraft.setScreen(null);
+            return true;
+        }
         return field.keyPressed(key) || super.keyPressed(key, scancode, modifiers);
     }
 
@@ -210,4 +215,3 @@ public class PedestalEditScreen extends Screen {
     @Override
     public boolean isPauseScreen() { return false; }
 }
-

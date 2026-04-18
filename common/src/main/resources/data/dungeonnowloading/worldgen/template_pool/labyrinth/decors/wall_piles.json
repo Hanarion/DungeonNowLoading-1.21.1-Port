@@ -2,9 +2,54 @@
   "fallback": "minecraft:empty",
   "elements": [
     {
-      "weight": 4000,
+      "weight": 4900,
       "element": {
         "element_type": "minecraft:empty_pool_element"
+      }
+    },
+    {
+      "weight": 20,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/ore_piles/coal_1",
+        "processors": "dungeonnowloading:labyrinth/ores/coal_pile"
+      }
+    },
+    {
+      "weight": 20,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/ore_piles/coal_2",
+        "processors": "dungeonnowloading:labyrinth/ores/coal_pile"
+      }
+    },
+    {
+      "weight": 20,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/ore_piles/coal_3",
+        "processors": "dungeonnowloading:labyrinth/ores/coal_pile"
+      }
+    },
+    {
+      "weight": 20,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/ore_piles/coal_4",
+        "processors": "dungeonnowloading:labyrinth/ores/coal_pile"
+      }
+    },
+    {
+      "weight": 20,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/ore_piles/coal_5",
+        "processors": "dungeonnowloading:labyrinth/ores/coal_pile"
       }
     },
     {

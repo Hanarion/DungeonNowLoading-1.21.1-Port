@@ -1,2 +1,7 @@
-// 1.20.1	2025-08-19T17:12:40.9777622	Tags for minecraft:item mod id dungeonnowloading
-791996866b43d7c259bce830144713c9ca887c1e data/minecraft/tags/items/music_discs.json
+// 1.20.1	2026-04-12T19:12:41.1543387	Tags for minecraft:item mod id dungeonnowloading
+61e02a2070e10188a085dd47c1835b94eeb04b3f data/dungeonnowloading/tags/items/dungeon_banner_spawner_recolor_to_black.json
+879efcb30f80d5250997b21ec9d19937e6a6aa02 data/dungeonnowloading/tags/items/dungeon_banner_spawner_recolor_to_blue.json
+13eb7eca9156db5c8fdb4bbf31e1c0871d376740 data/dungeonnowloading/tags/items/dungeon_banner_spawner_recolor_to_green.json
+2c4043c76833c65824317cfcbdfc48233d97c2b1 data/dungeonnowloading/tags/items/dungeon_banner_spawner_recolor_to_magenta.json
+a6eff04c3d65f42307656809408382c1047053ba data/dungeonnowloading/tags/items/dungeon_banner_spawner_recolor_to_purple.json
+d7e4efa1b76cefa1ed5d5ec714d95e324839225d data/minecraft/tags/items/music_discs.json

@@ -25,6 +25,11 @@ public class FairkeeperBorosRenderer<T extends FairkeeperBorosEntity> extends Mo
     }
 
     @Override
+    protected boolean shouldShowName(T $$0) {
+        return false;
+    }
+
+    @Override
     protected float getFlipDegrees(T t) {
         return 0.0f;
     }

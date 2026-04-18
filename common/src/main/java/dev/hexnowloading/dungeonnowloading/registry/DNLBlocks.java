@@ -10,11 +10,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 
 import java.util.function.Supplier;
+
+import static dev.hexnowloading.dungeonnowloading.block.GenericExplosiveBarrelBlock.FUSE;
 
 public class DNLBlocks {
 
@@ -57,6 +58,7 @@ public class DNLBlocks {
     // MECHANICAL BLOCKS
     public static Supplier<Block> BOOK_PILE;// = registerBlock("book_pile", () -> new BookPileBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOL)));
     public static Supplier<Block> EXPLOSIVE_BARREL;// = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.GRASS)));
+    public static Supplier<Block> SILVERFISH_BARREL;
     public static Supplier<Block> COBBLESTONE_PEBBLES;// = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> MOSSY_COBBLESTONE_PEBBLES;// = registerBlock("mossy_cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> IRON_INGOT_PILE;// = registerBlock("iron_ingot_pile", () -> new PileBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL)));
@@ -75,7 +77,6 @@ public class DNLBlocks {
     public static Supplier<Block> CHAOS_SPAWNER_BARRIER_CENTER;// = registerBlock("chaos_spawner_barrier_center", () -> new ChaosSpawnerBarrierCenterBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.AMETHYST).lightLevel((lightLevel) -> {return 15;}).noOcclusion()));
     public static Supplier<Block> CHAOS_SPAWNER_BARRIER_EDGE;// = registerBlock("chaos_spawner_barrier_edge", () -> new ChaosSpawnerBarrierEdgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.AMETHYST).lightLevel((lightLevel) -> {return 15;}).noOcclusion()));
     public static Supplier<Block> CHAOS_SPAWNER_BARRIER_VERTEX;// = registerBlock("chaos_spawner_barrier_vertex", () -> new ChaosSpawnerBarrierVertexBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).lightLevel((lightLevel) -> {return 15;}).noOcclusion()));
-    //public static final Supplier<Block> WIND_ALTER = registerBlock("wind_alter", () -> new WindAlterBlock(BlockBehaviour.Properties.copy(Blocks.CHISELED_STONE_BRICKS).strength(4.0f).requiresCorrectToolForDrops()));
 
     public static Supplier<Block> FAIRKEEPER_CHEST;
     public static Supplier<Block> WISE_FAIRKEEPER_CHEST;
@@ -123,28 +124,27 @@ public class DNLBlocks {
     public static Supplier<Block> MEDIUM_DURITE_BUD;
     public static Supplier<Block> SMALL_DURITE_BUD;
     public static Supplier<Block> MENDSTONE_CHALK_MARK;
+    public static Supplier<Block> DUNGEON_BANNER_SPAWNER_MAGENTA;
+    public static Supplier<Block> DUNGEON_BANNER_SPAWNER_BLACK;
+    public static Supplier<Block> DUNGEON_BANNER_SPAWNER_BLUE;
+    public static Supplier<Block> DUNGEON_BANNER_SPAWNER_PURPLE;
+    public static Supplier<Block> DUNGEON_BANNER_SPAWNER_GREEN;
+    public static Supplier<Block> DUNGEON_BANNER_HOLLOW;
+    public static Supplier<Block> DUNGEON_BANNER_SPAWNER_CARRIER;
+    public static Supplier<Block> DUNGEON_BANNER_EXPERIENCE_BOTTLE;
+    public static Supplier<Block> DUNGEON_BANNER_CHAOS_SPAWNER;
+    public static Supplier<Block> DUNGEON_BANNER_WHIMPER_LANTERN;
+    public static Supplier<Block> DUNGEON_BANNER_GARHOLD_UPSIDEDOWN;
+    public static Supplier<Block> DUNGEON_BANNER_SKULL_OF_CHAOS;
+    public static Supplier<Block> DURITE_QUELLER;
+    public static Supplier<Block> DUNGEON_DIRECTOR;
+    public static Supplier<Block> SPAWN_NODE;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
     public static Supplier<Block> TEMPLE_OF_DUALITY_TROPHY;
 
     public static Supplier<Block> PLAYER_STATUE;
-
-    public static Supplier<RotatedPillarBlock> AZURO_OAK_LOG;
-    public static Supplier<RotatedPillarBlock> STRIPPED_AZURO_OAK_LOG;
-    public static Supplier<Block> AZURO_LEAVES;
-    public static Supplier<Block> AZURO_HANGING_LEAVES;
-    public static Supplier<Block> AZURO_HANGING_LEAVES_TIP;
-
-    public static Supplier<Block> AZURO_OAK_PLANKS;
-    public static Supplier<Block> AZURO_OAK_PLANK_SLAB;
-    public static Supplier<Block> AZURO_OAK_PLANK_STAIRS;
-    public static Supplier<Block> AZURO_OAK_PLANK_FENCE;
-    public static Supplier<Block> AZURO_OAK_PLANK_FENCE_GATE;
-    public static Supplier<Block> AZURO_OAK_BUTTON;
-    public static Supplier<Block> AZURO_OAK_PRESSURE_PLATE;
-    public static Supplier<Block> AZURO_OAK_DOOR;
-
 
     public static boolean blocksRegistered = false;
 
@@ -184,7 +184,11 @@ public class DNLBlocks {
 
         // MECHANICAL BLOCKS
         BOOK_PILE = registerBlock("book_pile", () -> new BookPileBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOL)));
-        EXPLOSIVE_BARREL = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.GRASS)));
+        EXPLOSIVE_BARREL = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS)
+                .lightLevel(state -> state.hasProperty(FUSE) && state.getValue(FUSE) > 0 ? 12 : 0)
+                .emissiveRendering((state, getter, pos) -> state.hasProperty(FUSE) && state.getValue(FUSE) > 0)
+        ));
+        SILVERFISH_BARREL = registerBlock("silverfish_barrel", () -> new SilverfishBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS).noLootTable()));
         COBBLESTONE_PEBBLES = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
         MOSSY_COBBLESTONE_PEBBLES = registerBlock("mossy_cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
         IRON_INGOT_PILE = registerBlock("iron_ingot_pile", () -> new PileBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL)));
@@ -193,6 +197,18 @@ public class DNLBlocks {
         WOODEN_WALL_PLATFORM = registerBlock("wooden_wall_platform", () -> new WallPlatformBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(3.0F).noOcclusion().ignitedByLava()));
         SPIKES = registerBlock("spikes", () -> new SpikesBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL).pushReaction(PushReaction.DESTROY).noLootTable()));
         DUNGEON_WALL_TORCH = registerBlock("dungeon_wall_torch", () -> new DungeonWallTorch(BlockBehaviour.Properties.of().noCollission().instabreak().lightLevel(DungeonWallTorch.LIGHT_EMISSION).sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY)));
+        DUNGEON_BANNER_SPAWNER_MAGENTA = registerBlock("dungeon_banner_spawner_magenta", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SPAWNER_MAGENTA, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_SPAWNER_BLACK = registerBlock("dungeon_banner_spawner_black", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLACK, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_SPAWNER_BLUE = registerBlock("dungeon_banner_spawner_blue", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLUE, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_SPAWNER_PURPLE = registerBlock("dungeon_banner_spawner_purple", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SPAWNER_PURPLE, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_SPAWNER_GREEN = registerBlock("dungeon_banner_spawner_green", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SPAWNER_GREEN, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_HOLLOW = registerBlock("dungeon_banner_hollow", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.HOLLOW, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_SPAWNER_CARRIER = registerBlock("dungeon_banner_spawner_carrier", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SPAWNER_CARRIER, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_EXPERIENCE_BOTTLE = registerBlock("dungeon_banner_experience_bottle", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.EXPERIENCE_BOTTLE, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_CHAOS_SPAWNER = registerBlock("dungeon_banner_chaos_spawner", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.CHAOS_SPAWNER, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_WHIMPER_LANTERN = registerBlock("dungeon_banner_whimper_lantern", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.WHIMPER_LANTERN, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_GARHOLD_UPSIDEDOWN = registerBlock("dungeon_banner_garhold_upsidedown", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.GARHOLD_UPSIDEDOWN, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
+        DUNGEON_BANNER_SKULL_OF_CHAOS = registerBlock("dungeon_banner_skull_of_chaos", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SKULL_OF_CHAOS, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
 
         CHAOS_SPAWNER_EDGE = registerBlock("chaos_spawner_edge", () -> new ChaosSpawnerEdgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).pushReaction(PushReaction.BLOCK).noOcclusion().noLootTable()));
         CHAOS_SPAWNER_DIAMOND_EDGE = registerBlock("chaos_spawner_diamond_edge", () -> new ChaosSpawnerEdgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(5.0F).sound(SoundType.METAL).pushReaction(PushReaction.BLOCK).noOcclusion().noLootTable()));
@@ -203,7 +219,6 @@ public class DNLBlocks {
         CHAOS_SPAWNER_BARRIER_CENTER = registerBlock("chaos_spawner_barrier_center", () -> new ChaosSpawnerBarrierCenterBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.AMETHYST).lightLevel((lightLevel) -> {return 15;}).noOcclusion().noLootTable()));
         CHAOS_SPAWNER_BARRIER_EDGE = registerBlock("chaos_spawner_barrier_edge", () -> new ChaosSpawnerBarrierEdgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.AMETHYST).lightLevel((lightLevel) -> {return 15;}).noOcclusion().noLootTable()));
         CHAOS_SPAWNER_BARRIER_VERTEX = registerBlock("chaos_spawner_barrier_vertex", () -> new ChaosSpawnerBarrierVertexBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).lightLevel((lightLevel) -> {return 15;}).noOcclusion().noLootTable()));
-        //public static final Supplier<Block> WIND_ALTER = registerBlock("wind_alter", () -> new WindAlterBlock(BlockBehaviour.Properties.copy(Blocks.CHISELED_STONE_BRICKS).strength(4.0f).requiresCorrectToolForDrops()));
 
         FAIRKEEPER_CHEST = registerBlock("fairkeeper_chest", () -> new FairkeeperChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.5F, 2.5F).noOcclusion().sound(SoundType.WOOD).lightLevel((lightLevel) -> 7)));
         WISE_FAIRKEEPER_CHEST = registerBlock("wise_fairkeeper_chest", () -> new DisabledFairkeeperChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.5F, 2.5F).noOcclusion().sound(SoundType.WOOD).lightLevel((lightLevel) -> 7)));
@@ -244,14 +259,16 @@ public class DNLBlocks {
         MENDING_AURA_PANE = registerBlock("mending_aura_pane", () -> new MendingAuraPaneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
         MENDING_AURA_CHEST = registerBlock("mending_aura_chest", () -> new MendingAuraChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
         STONE_PRESERVER = registerBlock("stone_preserver", () -> new PreserverBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().sound(SoundType.STONE).emissiveRendering(DNLBlocks::always)));
+        DURITE_QUELLER = registerBlock("durite_queller", () -> new DuriteQuellerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).strength(50F, 1200.0F).noOcclusion().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE).requiresCorrectToolForDrops().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 10)));
         REDSTONE_IDOL = registerBlock("redstone_idol", () -> new RedstoneIdolBlock(BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).strength(5.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().isRedstoneConductor(DNLBlocks::never).noOcclusion()));
-
         MENDING_TABLE = registerBlock("mending_table", () -> new MendingTableBlock(BlockBehaviour.Properties.of().strength(5.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
         DURITE_CLUSTER = registerBlock("durite_cluster", () -> new DuriteClusterBlock(DuriteClusterBlock.HitboxPreset.CLUSTER, BlockBehaviour.Properties.of().strength(1.5f, 1.5f).mapColor(MapColor.COLOR_BLUE).forceSolidOn().forceSolidOn().lightLevel(blockState -> 4).pushReaction(PushReaction.DESTROY)));
         LARGE_DURITE_BUD = registerBlock("large_durite_bud", () -> new DuriteClusterBlock(DuriteClusterBlock.HitboxPreset.LARGE, BlockBehaviour.Properties.of().strength(1.5f, 1.5f).mapColor(MapColor.COLOR_BLUE).forceSolidOn().forceSolidOn().lightLevel(blockState -> 3).pushReaction(PushReaction.DESTROY)));
         MEDIUM_DURITE_BUD = registerBlock("medium_durite_bud", () -> new DuriteClusterBlock(DuriteClusterBlock.HitboxPreset.MEDIUM, BlockBehaviour.Properties.of().strength(1.5f, 1.5f).mapColor(MapColor.COLOR_BLUE).forceSolidOn().forceSolidOn().lightLevel(blockState -> 2).pushReaction(PushReaction.DESTROY)));
         SMALL_DURITE_BUD = registerBlock("small_durite_bud", () -> new DuriteClusterBlock(DuriteClusterBlock.HitboxPreset.SMALL, BlockBehaviour.Properties.of().strength(1.5f, 1.5f).mapColor(MapColor.COLOR_BLUE).forceSolidOn().forceSolidOn().lightLevel(blockState -> 1).pushReaction(PushReaction.DESTROY)));
         MENDSTONE_CHALK_MARK = registerBlock("mendstone_chalk_mark", () -> new MendstoneChalkMarkBlock(BlockBehaviour.Properties.of().strength(0.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
+        SPAWN_NODE = registerBlock("spawn_node", () -> new SpawnNodeBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
+        DUNGEON_DIRECTOR = registerBlock("dungeon_director", () -> new DungeonDirectorBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
 
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
@@ -259,24 +276,6 @@ public class DNLBlocks {
 
         // Patron
         PLAYER_STATUE = registerBlock("player_statue", () -> new PlayerStatueBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.5f, 6.0f).noOcclusion().pushReaction(PushReaction.IGNORE)));
-
-        AZURO_LEAVES = registerBlock("azuro_leaves", () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
-        AZURO_HANGING_LEAVES = registerBlock("azuro_hanging_leaves", () -> new HangingAzuroLeavesBlock(BlockBehaviour.Properties.copy(Blocks.WEEPING_VINES_PLANT)));
-        AZURO_HANGING_LEAVES_TIP = registerBlock("azuro_hanging_leaves_tip", () -> new HangingAzuroLeavesTipBlock(BlockBehaviour.Properties.copy(Blocks.WEEPING_VINES)));
-
-        // Register stripped log first so supplier can be passed into main log
-        STRIPPED_AZURO_OAK_LOG = registerBlock("stripped_azuro_oak_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
-        AZURO_OAK_LOG = registerBlock("azuro_oak_log", () -> new AzuroLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG), STRIPPED_AZURO_OAK_LOG));
-
-        AZURO_OAK_PLANKS = registerBlock("azuro_oak_planks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-        AZURO_OAK_PLANK_STAIRS = registerBlock("azuro_oak_plank_stairs", () -> new StairBlock(AZURO_OAK_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-        AZURO_OAK_PLANK_SLAB = registerBlock("azuro_oak_plank_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-        AZURO_OAK_PLANK_FENCE = registerBlock("azuro_oak_plank_fence", () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-        AZURO_OAK_PLANK_FENCE_GATE = registerBlock("azuro_oak_plank_fence_gate", () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS), WoodType.OAK));
-
-        AZURO_OAK_DOOR = registerBlock("azuro_oak_door", () -> new DNLDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR), BlockSetType.OAK));
-        AZURO_OAK_BUTTON = registerBlock("azuro_oak_button", () -> new DNLButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON), BlockSetType.OAK, 30, true));
-        AZURO_OAK_PRESSURE_PLATE = registerBlock("azuro_oak_pressure_plate", () -> new DNLPressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE), BlockSetType.OAK));
 
         blocksRegistered = true;
     }
@@ -300,31 +299,4 @@ public class DNLBlocks {
     private static boolean never(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {
         return false;
     }
-
-    /*public static <T extends Block> Supplier<T> registerBEWLR(String name, Supplier<T> block) {
-        RegistryObject<T> ret = BLOCKS.register(name, block);
-        DNLItems.ITEMS.register(name, () -> new BlockItem(ret.get(), new Item.Properties()) {
-            public void initializeClient
-        });
-
-    }*/
-    /*private static RegistryObject<Block> registerBlockAndItem(String name, Supplier<Block> block, ItemType itemType) {
-        RegistryObject<Block> Supplier = BLOCKS.register(name, block);
-        DNLItems.ITEMS.register(name, get)
-    }
-
-    private static Supplier<? extends BlockItem> getBlockSupplier(ItemType itemType, RegistryObject<Block> Supplier) {
-        return switch (itemType) {
-            case DEFAULT -> () -> new BlockItem(Supplier.get(), new Item.Properties());
-            case BUILTIN -> () -> new ;
-        };
-    }
-
-    private enum ItemType {
-        DEFAULT,
-        BUILTIN;
-
-
-    }*/
-
 }

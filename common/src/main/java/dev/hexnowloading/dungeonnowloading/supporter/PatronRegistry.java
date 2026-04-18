@@ -156,4 +156,35 @@ public final class PatronRegistry {
         }
     }
 
+    // ======= campaign-scoped lookup helpers ===================================
+
+    public static @Nullable Patron findByName(String campaignId, String name) {
+        if (campaignId == null || name == null) return null;
+        Campaign c = DATA.get(campaignId);
+        if (c == null || c.patrons == null || c.patrons.isEmpty()) return null;
+
+        String needle = name.trim();
+        if (needle.isEmpty()) return null;
+
+        Patron ciMatch = null;
+        for (Patron p : c.patrons) {
+            if (p == null || p.name == null || p.name.isBlank()) continue;
+
+            if (p.name.equals(needle)) return p;                 // exact-case preferred
+            if (ciMatch == null && p.name.equalsIgnoreCase(needle)) ciMatch = p;
+        }
+        return ciMatch;
+    }
+
+    public static @Nullable Patron findByUuid(String campaignId, UUID id) {
+        if (campaignId == null || id == null) return null;
+        Campaign c = DATA.get(campaignId);
+        if (c == null || c.patrons == null || c.patrons.isEmpty()) return null;
+
+        for (Patron p : c.patrons) {
+            if (p != null && id.equals(p.uuid)) return p;
+        }
+        return null;
+    }
+
 }

@@ -143,6 +143,23 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
         boolean isScrap = input.is(DNLItems.ITEM_SCRAPS.get());
         ItemStack inputTool = isScrap ? ScrapItem.getOriginal(input) : input;
 
+        if (isSpecialMendingConversion(input)) {
+            boolean hasMendstone = mat1.is(DNLItems.MENDSTONE.get()) || mat2.is(DNLItems.MENDSTONE.get());
+            if (!hasMendstone) {
+                setChanged();
+                return;
+            }
+
+            items.set(OUTPUT_SLOT, getSpecialMendingResult(input));
+            cachedRepairPercent = 100;
+            cachedBasePercent = 100;
+            cachedBonusPercent = 0;
+            cachedPotentialBasePercent = 100;
+            cachedPotentialBonusPercent = 0;
+            setChanged();
+            return;
+        }
+
         // If it's not a valid tool or has no damage, abort
         if (inputTool.isEmpty() || !isTool(inputTool)) { setChanged(); return; }
         // Special case: Mendstone Pickaxe cannot be repaired at the table
@@ -183,6 +200,26 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
 
     public void applyRepair() {
         ItemStack input = items.get(PICKAXE_SLOT);
+        if (input.isEmpty()) return;
+
+        if (isSpecialMendingConversion(input)) {
+            ItemStack mat1 = items.get(MAT_SLOT_1);
+            ItemStack mat2 = items.get(MAT_SLOT_2);
+
+            if (mat1.is(DNLItems.MENDSTONE.get())) {
+                mat1.shrink(1);
+            } else if (mat2.is(DNLItems.MENDSTONE.get())) {
+                mat2.shrink(1);
+            } else {
+                return;
+            }
+
+            items.set(PICKAXE_SLOT, ItemStack.EMPTY);
+            items.set(OUTPUT_SLOT, ItemStack.EMPTY);
+            recalc();
+            return;
+        }
+
         if (input.isEmpty() || cachedRepairPercent <= 0) return;
 
         // Reconstruct tool from scraps if needed
@@ -225,5 +262,16 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
         items.set(PICKAXE_SLOT, ItemStack.EMPTY);
         items.set(OUTPUT_SLOT, ItemStack.EMPTY);
         recalc();
+    }
+
+    private ItemStack getSpecialMendingResult(ItemStack stack) {
+        if (stack.is(DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get())) {
+            return new ItemStack(DNLItems.MUSIC_DISC_AOTSUGI.get());
+        }
+        return ItemStack.EMPTY;
+    }
+
+    private boolean isSpecialMendingConversion(ItemStack stack) {
+        return stack.is(DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get());
     }
 }

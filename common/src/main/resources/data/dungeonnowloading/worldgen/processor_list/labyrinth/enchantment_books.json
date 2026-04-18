@@ -1,0 +1,21 @@
+{
+  "processors": [
+    {
+      "processor_type": "dungeonnowloading:book_pile_randomizer_processor",
+      "pile_weights": {
+        "1": 10,
+        "2": 6,
+        "3": 3,
+        "4": 1
+      },
+      "write_seed": true,
+      "loot_tables": [
+        "dungeonnowloading:chests/labyrinth/enchantments/gigantism",
+        "dungeonnowloading:chests/labyrinth/enchantments/overworked",
+        "dungeonnowloading:chests/labyrinth/enchantments/pack_blessing",
+        "dungeonnowloading:chests/labyrinth/enchantments/reckless",
+        "dungeonnowloading:chests/labyrinth/enchantments/sacrifice"
+      ]
+    }
+  ]
+}

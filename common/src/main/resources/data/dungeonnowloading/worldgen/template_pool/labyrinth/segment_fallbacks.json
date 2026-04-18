@@ -12,7 +12,16 @@
       }
     },
     {
-      "weight": 80,
+      "weight": 50,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/fallbacks/corridor_torch",
+        "processors": "dungeonnowloading:labyrinth/generic_degradation"
+      }
+    },
+    {
+      "weight": 25,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -21,12 +30,12 @@
       }
     },
     {
-      "weight": 20,
+      "weight": 25,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "dungeonnowloading:labyrinth/fallbacks/corridor_durite",
-        "processors": "dungeonnowloading:labyrinth/generic_degradation"
+        "location": "dungeonnowloading:labyrinth/fallbacks/corridor_statue",
+        "processors": "dungeonnowloading:labyrinth/statue"
       }
     }
   ]

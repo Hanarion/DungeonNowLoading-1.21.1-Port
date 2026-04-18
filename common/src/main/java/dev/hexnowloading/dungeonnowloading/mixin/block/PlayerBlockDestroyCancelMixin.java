@@ -25,6 +25,12 @@ public class PlayerBlockDestroyCancelMixin {
     private void onBlockBreak(BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
         BlockDestructionManager.reset();
         level.gameEvent(DNLGameEvents.PLAYER_BLOCK_DESTROY_EARLY.get(), blockPos, GameEvent.Context.of(player, level.getBlockState(blockPos)));
+
+        var be = level.getBlockEntity(blockPos);
+        if (be instanceof dev.hexnowloading.dungeonnowloading.block.entity.DuriteQuellerBlockEntity quellerBe) {
+            quellerBe.tryReplaceSelfWithMendingAura(level);
+        }
+
         if (BlockDestructionManager.shouldCancel()) {
             cir.setReturnValue(false);
         }

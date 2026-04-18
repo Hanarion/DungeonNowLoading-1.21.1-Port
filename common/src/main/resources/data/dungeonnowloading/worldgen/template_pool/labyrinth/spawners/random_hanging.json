@@ -1,0 +1,68 @@
+{
+  "fallback": "dungeonnowloading:labyrinth/spawners/random_hanging",
+  "elements": [
+    {
+      "weight": 30,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/hanging_spawners/zombie",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 20,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/hanging_spawners/skeleton",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 20,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/hanging_spawners/spider",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/hanging_spawners/cave_spider",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 15,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/hanging_spawners/creeper",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/hanging_spawners/silverfish",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/hanging_spawners/hollow",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    }
+  ]
+}

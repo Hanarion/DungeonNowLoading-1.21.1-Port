@@ -1,21 +1,21 @@
 package dev.hexnowloading.dungeonnowloading.registry;
 
+import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
 import dev.hexnowloading.dungeonnowloading.item.*;
-import dev.hexnowloading.dungeonnowloading.item.blockitem.FairkeeperChestBlockItem;
-import dev.hexnowloading.dungeonnowloading.item.blockitem.FierceFairkeeperChestBlockItem;
-import dev.hexnowloading.dungeonnowloading.item.blockitem.PlayerStatueBlockItem;
-import dev.hexnowloading.dungeonnowloading.item.blockitem.WiseFairkeeperChestBlockItem;
+import dev.hexnowloading.dungeonnowloading.item.blockitem.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Block;
 
 import java.util.*;
 import java.util.function.Supplier;
 
 public class DNLItems {
     private static final HashMap<ResourceKey<CreativeModeTab>, ArrayList<ResourceLocation>> ITEM_TABS = new HashMap<>();
+    private static final Map<DungeonBannerBlock.DungeonBannerVariant, Supplier<Item>> BANNER_ITEMS = new EnumMap<>(DungeonBannerBlock.DungeonBannerVariant.class);
 
     // ITEMS - INGREDIENTS
     public static final Supplier<Item> MENDSTONE_PICKAXE = register("mendstone_pickaxe", () -> new MendstonePickaxeItem(new Item.Properties()));
@@ -46,8 +46,8 @@ public class DNLItems {
     public static final Supplier<Item> SPAWNER_CHESTPLATE = register("spawner_chestplate", () -> new SpawnerArmorItem(DNLArmorMaterial.SPAWNER, ArmorItem.Type.CHESTPLATE));
     public static final Supplier<Item> SPAWNER_LEGGINGS = register("spawner_leggings", () -> new SpawnerArmorItem(DNLArmorMaterial.SPAWNER, ArmorItem.Type.LEGGINGS));
     public static final Supplier<Item> SPAWNER_BOOTS = register("spawner_boots", () -> new SpawnerArmorItem(DNLArmorMaterial.SPAWNER, ArmorItem.Type.BOOTS));
-    public static final Supplier<Item> SKULL_OF_CHAOS = register("skull_of_chaos", () -> new SkullOfChaosItem(new Item.Properties().rarity(Rarity.EPIC)));
-    public static final Supplier<Item> REDSTONE_IDOL = register("redstone_idol", () -> new RedstoneIdolItem(DNLBlocks.REDSTONE_IDOL.get(), new Item.Properties().rarity(Rarity.EPIC)));
+    public static final Supplier<Item> SKULL_OF_CHAOS = register("skull_of_chaos", () -> new SkullOfChaosItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
+    public static final Supplier<Item> REDSTONE_IDOL = register("redstone_idol", () -> new RedstoneIdolItem(DNLBlocks.REDSTONE_IDOL.get(), new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
     public static final Supplier<Item> VERTEX_BOW = register("vertex_bow", () -> new VertexBowItem(new Item.Properties().rarity(Rarity.RARE).durability(384)));
     public static final Supplier<Item> COPPER_DETONATOR = register("copper_detonator", () -> new CopperDetonatorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
     public static final Supplier<Item> FAIRKEEPER_SERPENT_CALLER = register("fairkeeper_serpent_caller", () -> new FairkeeperSerpentCallerItem(new Item.Properties().rarity(Rarity.EPIC)));
@@ -55,8 +55,12 @@ public class DNLItems {
     public static final Supplier<Item> SOUL_SCORCHER = register("soul_scorcher", () -> new ScorcherItem(new Item.Properties().rarity(Rarity.RARE).durability(500)));
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
     public static final Supplier<Item> MENDSTONE_CHALK = register("mendstone_chalk", () -> new MendstoneChalkItem(new Item.Properties().rarity(Rarity.COMMON).durability(15), DNLBlocks.MENDSTONE_CHALK_MARK.get()));
+    public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new ZoneWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
 
     // ITEMS - MUSIC DISC
+    public static final Supplier<Item> MUSIC_DISC_HELLSPAWN = register("music_disc_hellspawn", () -> new DNLRecordItem(15, DNLSounds.DISC_HELLSPAWN.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 140));
+    public static final Supplier<Item> MUSIC_DISC_AOTSUGI = register("music_disc_aotsugi", () -> new DNLRecordItem(15, DNLSounds.DISC_AOTSUGI.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 218));
+    public static final Supplier<Item> MUSIC_DISC_BROKEN_AOTSUGI = register("music_disc_broken_aotsugi", () -> new BrokenRecordItem(15, DNLSounds.DISC_BROKEN_AOTSUGI.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)), 43));
     public static final Supplier<Item> MUSIC_DISC_OUROS = register("music_disc_clash_of_duality_ouros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_OUROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
     public static final Supplier<Item> MUSIC_DISC_BOROS = register("music_disc_clash_of_duality_boros", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_BOROS.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
     public static final Supplier<Item> MUSIC_DISC_PYTHONIC_OVERDRIVE = register("music_disc_clash_of_duality_pythonic_overdrive", () -> new DNLRecordItem(15, DNLSounds.DISC_CLASH_OF_DUALITY_PYTHONIC_OVERDRIVE.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 170));
@@ -102,6 +106,7 @@ public class DNLItems {
     public static final Supplier<Item> DUNGEON_WALL_TORCH = register("dungeon_wall_torch", () -> new BlockItem(DNLBlocks.DUNGEON_WALL_TORCH.get(), new Item.Properties()));
     public static final Supplier<Item> BOOK_PILE = register("book_pile", () -> new BlockItem(DNLBlocks.BOOK_PILE.get(), new Item.Properties()));
     public static final Supplier<Item> EXPLOSIVE_BARREL = register("explosive_barrel", () -> new BlockItem(DNLBlocks.EXPLOSIVE_BARREL.get(), new Item.Properties()));
+    public static final Supplier<Item> SILVERFISH_BARREL = register("silverfish_barrel", () -> new BlockItem(DNLBlocks.SILVERFISH_BARREL.get(), new Item.Properties()));
     public static final Supplier<Item> COBBLESTONE_PEBBLE = register("cobblestone_pebble", () -> new BlockItem(DNLBlocks.COBBLESTONE_PEBBLES.get(), new Item.Properties()));
     public static final Supplier<Item> MOSSY_COBBLESTONE_PEBBLE = register("mossy_cobblestone_pebble", () -> new BlockItem(DNLBlocks.MOSSY_COBBLESTONE_PEBBLES.get(), new Item.Properties()));
     public static final Supplier<Item> IRON_INGOT_PILE = register("iron_ingot_pile", () -> new BlockItem(DNLBlocks.IRON_INGOT_PILE.get(), new Item.Properties()));
@@ -159,29 +164,27 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_AURA_PANE = register("mending_aura_pane", () -> new BlockItem(DNLBlocks.MENDING_AURA_PANE.get(), new Item.Properties()));
     public static final Supplier<Item> MENDING_AURA_CHEST = register("mending_aura_chest", () -> new BlockItem(DNLBlocks.MENDING_AURA_CHEST.get(), new Item.Properties()));
     public static final Supplier<Item> STONE_PRESERVER = register("stone_preserver", () -> new BlockItem(DNLBlocks.STONE_PRESERVER.get(), new Item.Properties()));
+    public static final Supplier<Item> DURITE_QUELLER = register("durite_queller", () -> new BlockItem(DNLBlocks.DURITE_QUELLER.get(), new Item.Properties()));
     public static final Supplier<Item> PLAYER_STATUE = register("player_statue", PlayerStatueBlockItem::new);
     public static final Supplier<Item> DURITE_CLUSTER = register("durite_cluster", () -> new BlockItem(DNLBlocks.DURITE_CLUSTER.get(), new Item.Properties()));
     public static final Supplier<Item> LARGE_DURITE_BUD = register("large_durite_bud", () -> new BlockItem(DNLBlocks.LARGE_DURITE_BUD.get(), new Item.Properties()));
     public static final Supplier<Item> MEDIUM_DURITE_BUD = register("medium_durite_bud", () -> new BlockItem(DNLBlocks.MEDIUM_DURITE_BUD.get(), new Item.Properties()));
     public static final Supplier<Item> SMALL_DURITE_BUD = register("small_durite_bud", () -> new BlockItem(DNLBlocks.SMALL_DURITE_BUD.get(), new Item.Properties()));
-
+    public static final Supplier<Item> DUNGEON_DIRECTOR = register("dungeon_director", () -> new BlockItem(DNLBlocks.DUNGEON_DIRECTOR.get(), new Item.Properties().rarity(Rarity.EPIC)));
+    public static final Supplier<Item> SPAWN_NODE = register("spawn_node", () -> new BlockItem(DNLBlocks.SPAWN_NODE.get(), new Item.Properties().rarity(Rarity.EPIC)));
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_MAGENTA = banner("dungeon_banner_spawner_magenta", DNLBlocks.DUNGEON_BANNER_SPAWNER_MAGENTA, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_MAGENTA);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_BLACK = banner("dungeon_banner_spawner_black", DNLBlocks.DUNGEON_BANNER_SPAWNER_BLACK ,DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLACK);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_BLUE = banner("dungeon_banner_spawner_blue", DNLBlocks.DUNGEON_BANNER_SPAWNER_BLUE, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLUE);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_PURPLE = banner("dungeon_banner_spawner_purple", DNLBlocks.DUNGEON_BANNER_SPAWNER_PURPLE, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_PURPLE);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_GREEN = banner("dungeon_banner_spawner_green", DNLBlocks.DUNGEON_BANNER_SPAWNER_GREEN, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_GREEN);
+    public static final Supplier<Item> DUNGEON_BANNER_HOLLOW = banner("dungeon_banner_hollow", DNLBlocks.DUNGEON_BANNER_HOLLOW, DungeonBannerBlock.DungeonBannerVariant.HOLLOW);
+    public static final Supplier<Item> DUNGEON_BANNER_SPAWNER_CARRIER = banner("dungeon_banner_spawner_carrier", DNLBlocks.DUNGEON_BANNER_SPAWNER_CARRIER, DungeonBannerBlock.DungeonBannerVariant.SPAWNER_CARRIER);
+    public static final Supplier<Item> DUNGEON_BANNER_EXPERIENCE_BOTTLE = banner("dungeon_banner_experience_bottle", DNLBlocks.DUNGEON_BANNER_EXPERIENCE_BOTTLE, DungeonBannerBlock.DungeonBannerVariant.EXPERIENCE_BOTTLE);
+    public static final Supplier<Item> DUNGEON_BANNER_CHAOS_SPAWNER = banner("dungeon_banner_chaos_spawner", DNLBlocks.DUNGEON_BANNER_CHAOS_SPAWNER, DungeonBannerBlock.DungeonBannerVariant.CHAOS_SPAWNER);
+    public static final Supplier<Item> DUNGEON_BANNER_WHIMPER_LANTERN = banner("dungeon_banner_whimper_lantern", DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN, DungeonBannerBlock.DungeonBannerVariant.WHIMPER_LANTERN);
+    public static final Supplier<Item> DUNGEON_BANNER_GARHOLD_UPSIDEDOWN = banner("dungeon_banner_garhold_upsidedown", DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN, DungeonBannerBlock.DungeonBannerVariant.GARHOLD_UPSIDEDOWN);
+    public static final Supplier<Item> DUNGEON_BANNER_SKULL_OF_CHAOS = banner("dungeon_banner_skull_of_chaos", DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS, DungeonBannerBlock.DungeonBannerVariant.SKULL_OF_CHAOS);
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_LOG = register("azuro_oak_log", () -> new BlockItem(DNLBlocks.AZURO_OAK_LOG.get(), new Item.Properties()));
-    public static final Supplier<Item> STRIPPED_AZURO_OAK_LOG = register("stripped_azuro_oak_log", () -> new BlockItem(DNLBlocks.STRIPPED_AZURO_OAK_LOG.get(), new Item.Properties()));
-
-    public static final Supplier<Item> AZURO_LEAVES = register("azuro_leaves", () -> new BlockItem(DNLBlocks.AZURO_LEAVES.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_HANGING_LEAVES_TIP = register("azuro_hanging_leaves_tip", () -> new BlockItem(DNLBlocks.AZURO_HANGING_LEAVES_TIP.get(), new Item.Properties()));
-
-    public static final Supplier<Item> AZURO_OAK_PLANKS = register("azuro_oak_planks", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANKS.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PLANK_SLAB = register("azuro_oak_plank_slab", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANK_SLAB.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PLANK_STAIRS = register("azuro_oak_plank_stairs", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANK_STAIRS.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PLANK_FENCE = register("azuro_oak_plank_fence", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANK_FENCE.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PLANK_FENCE_GATE = register("azuro_oak_plank_fence_gate", () -> new BlockItem(DNLBlocks.AZURO_OAK_PLANK_FENCE_GATE.get(), new Item.Properties()));
-
-    public static final Supplier<Item> AZURO_OAK_BUTTON = register("azuro_oak_button", () -> new BlockItem(DNLBlocks.AZURO_OAK_BUTTON.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_PRESSURE_PLATE = register("azuro_oak_pressure_plate", () -> new BlockItem(DNLBlocks.AZURO_OAK_PRESSURE_PLATE.get(), new Item.Properties()));
-    public static final Supplier<Item> AZURO_OAK_DOOR = register("azuro_oak_door", () -> new DoubleHighBlockItem(DNLBlocks.AZURO_OAK_DOOR.get(), new Item.Properties()));
-
     public static final Supplier<Item> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> new BlockItem(DNLBlocks.MENDSTONE_CHALK_MARK.get(), new Item.Properties()));
 
 
@@ -201,9 +204,12 @@ public class DNLItems {
     public static final Supplier<Item> SPAWNER_CARRIER_SPAWNEGG = register("spawn_egg_spawner_carrier", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SPAWNER_CARRIER::get, 0x6a6d68, 0x60c9f3, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> SCUTTLE_SPAWNEGG = register("spawn_egg_scuttle", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SCUTTLE::get, 0x6a6d68, 0xff8800, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> BALLISTA_GOLEM_SPAWNEGG = register("spawn_egg_ballista_golem", Services.ITEM.makeSpawnEgg(DNLEntityTypes.BALLISTA_GOLEM::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
+    public static final Supplier<Item> GARHOLD_SPAWNEGG = register("spawn_egg_garhold", Services.ITEM.makeSpawnEgg(DNLEntityTypes.GARHOLD::get, 0x182933, 0x66044d, new Item.Properties().rarity(Rarity.COMMON)));
 
     public static final Supplier<Item> SEALED_CHAOS_SPAWNEGG = register("spawn_egg_sealed_chaos", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SEALED_CHAOS::get, 0x5f0d80, 0xd5bcd7, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> WHIMPER_SPAWNEGG = register("spawn_egg_whimper", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WHIMPER::get, 0x60f5fa, 0xbef5fa, new Item.Properties().rarity(Rarity.COMMON)));
+
+//    public static final Supplier<Item> WISPROD = register("wisprod", () -> new WisprodItem(new Item.Properties().rarity(Rarity.UNCOMMON).durability(250)));
 
     private static <T extends Item> Supplier<T> register(String name, Supplier<T> itemSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ITEM, name, itemSupplier);
@@ -222,6 +228,27 @@ public class DNLItems {
         });
         return items;
     }
+
+    private static Supplier<Item> banner(String id,
+                                         Supplier<Block> block,
+                                         DungeonBannerBlock.DungeonBannerVariant variant) {
+
+        Supplier<Item> item = register(id, () ->
+                new DungeonBannerBlockItem(
+                        block.get(),
+                        variant,
+                        new Item.Properties().rarity(Rarity.EPIC)
+                )
+        );
+
+        BANNER_ITEMS.put(variant, item);
+        return item;
+    }
+
+    public static Supplier<Item> getBannerItem(DungeonBannerBlock.DungeonBannerVariant variant) {
+        return BANNER_ITEMS.get(variant);
+    }
+
 
     public static void init() {
     }

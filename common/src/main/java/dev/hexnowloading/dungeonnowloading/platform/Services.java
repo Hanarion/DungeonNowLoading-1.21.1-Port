@@ -20,6 +20,8 @@ public class Services {
     public static final DataHelper DATA = load(DataHelper.class);
     public static final NetworkHelper NETWORK = load(NetworkHelper.class);
     public static final LootHelper LOOT = load(LootHelper.class);
+    public static final ReloadListenerPlatform RELOAD_LISTENERS = load(ReloadListenerPlatform.class);
+    public static final MenuHelper MENU = load(MenuHelper.class);
 
     // This code is used to load a service for the current environment. Your implementation of the service must be defined
     // manually by including a text file in META-INF/services named with the fully qualified class name of the service.

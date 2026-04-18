@@ -1,0 +1,14 @@
+{
+  "fallback": "dungeonnowloading:labyrinth/decors/broken_garhold",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "dungeonnowloading:labyrinth/decors/chained/broken_garhold",
+        "processors": "dungeonnowloading:waterlogging_fix"
+      }
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "variants": {
+    "facing=east,variant=chaos_spawner": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=experience_bottle": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=garhold_upsidedown": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=hollow": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=skull_of_chaos": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=spawner_black": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=spawner_blue": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=spawner_carrier": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=spawner_green": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=spawner_magenta": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=spawner_purple": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=east,variant=whimper_lantern": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=chaos_spawner": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=experience_bottle": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=garhold_upsidedown": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=hollow": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=skull_of_chaos": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=spawner_black": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=spawner_blue": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=spawner_carrier": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=spawner_green": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=spawner_magenta": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=spawner_purple": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=north,variant=whimper_lantern": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=chaos_spawner": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=experience_bottle": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=garhold_upsidedown": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=hollow": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=skull_of_chaos": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=spawner_black": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=spawner_blue": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=spawner_carrier": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=spawner_green": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=spawner_magenta": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=spawner_purple": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=south,variant=whimper_lantern": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=chaos_spawner": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=experience_bottle": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=garhold_upsidedown": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=hollow": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=skull_of_chaos": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=spawner_black": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=spawner_blue": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=spawner_carrier": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=spawner_green": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=spawner_magenta": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=spawner_purple": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    },
+    "facing=west,variant=whimper_lantern": {
+      "model": "dungeonnowloading:block/dungeon_banner_spawner_green"
+    }
+  }
+}

@@ -11,23 +11,25 @@
     "block.ExplosionMixin",
     "block.ContainerMixin",
     "block.DNLFireBlockMixin",
+    "block.EnchantmentHelperMixin",
     "block.LecternBlockMixin",
     "block.PistonBlockMixin",
     "block.StairsMixin",
     "block.FenceMixin",
     "block.WallMixin",
     "block.IronBarsMixin",
-    "items.ItemInHandRendererMixin",
+
     "items.ItemStackBreakProtectionMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",
     "entities.PlayerMixin",
+    "entities.MobMixin",
+    "entities.AbstractArrowMixin",
     "fabric.block.BlockPlaceMixin",
     "fabric.block.BucketItemMixin",
     "fabric.block.FlintAndSteelMixin",
     "fabric.entities.LivingDamageMixin",
-    "fabric.entities.PlayerDamageMixin",
     "fabric.structures.StructurePoolMixin",
     "structures.StructureProcessorAccessor",
     "structures.StructureTemplateMixin",
@@ -36,12 +38,15 @@
   ],
   "client": [
     "client.HumanoidModelMixin",
+    "client.ClientPacketListenerMixin",
     "client.PlayerRendererMixin",
     "client.AbstractClientPlayerMixin",
     "client.SituationalMusicMixin",
     "client.MinecraftClientTickMixin",
     "client.MusicManagerMixin",
+    "client.LivingEntityRendererMixin",
     "MaxHealthAttributeMixin",
+    "items.ItemInHandRendererMixin",
     "MixinTitleScreen"
   ],
   "server": [
@@ -49,4 +54,4 @@
   "injectors": {
     "defaultRequire": 1
   }
-  }
+}

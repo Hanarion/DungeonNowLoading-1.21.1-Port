@@ -28,6 +28,7 @@ public class DungeonNowLoading {
         DNLBlockEntityTypes.init();
         DNLProperties.init();
         DNLItems.init();
+        DNLMenuTypes.init();
         // Ensure custom enchantments are registered and available to commands and books
         DNLEnchantments.init();
         DNLMobEffects.init();
@@ -40,6 +41,8 @@ public class DungeonNowLoading {
         DNLCreativeModeTabs.init();
         DNLGameEvents.init();
         DNLLootInjections.setup();
+        DNLRecallables.registerAll();
+        DNLReloadListeners.init();
         DNLSupporters.loadSupporters();
     }
 

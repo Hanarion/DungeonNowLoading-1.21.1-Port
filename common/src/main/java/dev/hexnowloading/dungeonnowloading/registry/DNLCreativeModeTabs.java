@@ -19,6 +19,7 @@ public class DNLCreativeModeTabs {
                 //output.accept(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
                 output.accept(DNLItems.HOLLOW_SPAWNEGG.get());
                 output.accept(DNLItems.SPAWNER_CARRIER_SPAWNEGG.get());
+                output.accept(DNLItems.GARHOLD_SPAWNEGG.get());
                 output.accept(DNLItems.SCUTTLE_SPAWNEGG.get());
                 output.accept(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
                 output.accept(DNLItems.SEALED_CHAOS_SPAWNEGG.get());
@@ -57,12 +58,25 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SPAWNER_BOOTS.get());
                 // Enchantments - Books
                 output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.BREAK_PROTECTION.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.AMPLIFICATION.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.NULLIFICATION.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.GIGANTISM.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.OVERWORKED.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.PACK_BLESSING.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.ARC_SHOT.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.PULSE_SHOT.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.SACRIFICE.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.RECKLESS.get(), 1)));
+
                 // Items - Boss Related
                 output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());
                 output.accept(DNLItems.SKULL_OF_CHAOS.get());
                 output.accept(DNLItems.REDSTONE_IDOL.get());
                 output.accept(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
                 // Item - Music Disc
+                output.accept(DNLItems.MUSIC_DISC_HELLSPAWN.get());
+                output.accept(DNLItems.MUSIC_DISC_AOTSUGI.get());
+                output.accept(DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get());
                 output.accept(DNLItems.MUSIC_DISC_OUROS.get());
                 output.accept(DNLItems.MUSIC_DISC_BOROS.get());
                 output.accept(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
@@ -100,11 +114,25 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.PALE_OAK_WOODEN_BOARD.get());
                 output.accept(DNLItems.SPRUCE_WOODEN_BOARD.get());
                 output.accept(DNLItems.WARPED_WOODEN_BOARD.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_BLACK.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_BLUE.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_PURPLE.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_GREEN.get());
+                output.accept(DNLItems.DUNGEON_BANNER_HOLLOW.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_CARRIER.get());
+                output.accept(DNLItems.DUNGEON_BANNER_EXPERIENCE_BOTTLE.get());
+                output.accept(DNLItems.DUNGEON_BANNER_CHAOS_SPAWNER.get());
+                output.accept(DNLItems.DUNGEON_BANNER_WHIMPER_LANTERN.get());
+                output.accept(DNLItems.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
+                output.accept(DNLItems.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
 
                 // Blocks - Mechanical
                 output.accept(DNLItems.DUNGEON_WALL_TORCH.get());
                 output.accept(DNLItems.BOOK_PILE.get());
                 output.accept(DNLItems.EXPLOSIVE_BARREL.get());
+                output.accept(DNLItems.SILVERFISH_BARREL.get());
+
                 output.accept(DNLItems.COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.MOSSY_COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.IRON_INGOT_PILE.get());
@@ -164,26 +192,16 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SMALL_DURITE_BUD.get());
                 output.accept(DNLItems.MENDSTONE_CHALK_MARK.get());
                 output.accept(DNLItems.MENDING_TABLE.get());
+                output.accept(DNLItems.DURITE_QUELLER.get());
+                output.accept(DNLItems.DUNGEON_DIRECTOR.get());
+                output.accept(DNLItems.SPAWN_NODE.get());
+                output.accept(DNLItems.ZONE_WAND.get());
 
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());
                 output.accept(DNLItems.TEMPLE_OF_DUALITY_TROPHY.get());
 
-
-                // Azuro Set
-                /*output.accept(DNLItems.AZURO_OAK_LOG.get());
-                output.accept(DNLItems.STRIPPED_AZURO_OAK_LOG.get());
-                output.accept(DNLItems.AZURO_OAK_PLANKS.get());
-                output.accept(DNLItems.AZURO_LEAVES.get());
-                output.accept(DNLItems.AZURO_HANGING_LEAVES_TIP.get());
-                output.accept(DNLItems.AZURO_OAK_PLANK_STAIRS.get());
-                output.accept(DNLItems.AZURO_OAK_PLANK_SLAB.get());
-                output.accept(DNLItems.AZURO_OAK_PLANK_FENCE.get());
-                output.accept(DNLItems.AZURO_OAK_PLANK_FENCE_GATE.get());
-                output.accept(DNLItems.AZURO_OAK_BUTTON.get());
-                output.accept(DNLItems.AZURO_OAK_PRESSURE_PLATE.get());
-                output.accept(DNLItems.AZURO_OAK_DOOR.get());*/
                 output.accept(DNLItems.PLAYER_STATUE.get());
             });
 

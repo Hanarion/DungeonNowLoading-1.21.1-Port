@@ -107,7 +107,12 @@ public class BossTargetSelectorGoal extends TargetGoal {
 
         for (Map.Entry<UUID, LivingEntity> entry : targetProvider.getAttackers().entrySet()) {
             LivingEntity attacker = entry.getValue();
-            if (attacker != null && attacker.isAlive() && mob.canAttack(attacker) && seen.add(entry.getKey())) {
+            if (attacker == null || !attacker.isAlive() || !mob.canAttack(attacker)) continue;
+
+            double dmg = targetProvider.getDamageMap().getOrDefault(entry.getKey(), 0.0);
+            if (dmg <= 0.0) continue; // <-- must have damaged the boss
+
+            if (seen.add(entry.getKey())) {
                 candidates.add(attacker);
             }
         }

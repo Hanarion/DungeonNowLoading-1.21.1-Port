@@ -144,7 +144,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
             double y = blockPos.getY() + randomSource.nextDouble() + spawnOffset.y * (0.5F + randomSource.nextDouble() * 1.0F);
             double z = blockPos.getZ() + randomSource.nextDouble() + spawnOffset.z * (0.5F + randomSource.nextDouble() * 1.0F);
 
-            level.addParticle(DNLParticleTypes.MENDING_POP_PARTICLE.get(), true, x, y, z, -velocity.x, -velocity.y, -velocity.z);
+            level.addParticle(DNLParticleTypes.MENDING_POP_AND_RUNE_PARTICLE.get(), true, x, y, z, -velocity.x, -velocity.y, -velocity.z);
         }
     }
 }

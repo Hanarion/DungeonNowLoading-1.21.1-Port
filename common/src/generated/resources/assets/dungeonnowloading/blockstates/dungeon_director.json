@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "remove=false": {
+      "model": "dungeonnowloading:block/dungeon_director"
+    },
+    "remove=true": {
+      "model": "dungeonnowloading:block/dungeon_director_remove"
+    }
+  }
+}

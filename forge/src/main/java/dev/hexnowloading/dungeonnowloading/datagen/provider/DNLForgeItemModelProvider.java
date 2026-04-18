@@ -34,15 +34,20 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.CATALYZED_REDSTONE.get());
         simpleItem(DNLItems.REDSTONE_IDOL.get());
         simpleItem(DNLItems.FAIRKEEPER_SERPENT_CALLER.get());
+        simpleItem(DNLItems.MUSIC_DISC_AOTSUGI.get());
+        simpleItem(DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get());
+        simpleItem(DNLItems.MUSIC_DISC_HELLSPAWN.get());
         simpleItem(DNLItems.MUSIC_DISC_OUROS.get());
         simpleItem(DNLItems.MUSIC_DISC_BOROS.get());
         simpleItem(DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get());
         //simpleItem(DNLItems.COPPER_DETONATOR.get());
         simpleItem(DNLItems.MENDSTONE_CHALK.get());
+        simpleItem(DNLItems.ZONE_WAND.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
         spawnEggItem(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
+        spawnEggItem(DNLItems.GARHOLD_SPAWNEGG.get());
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.65f, 0.9f, 1.5f);
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.43f, 0.6f, 1.0f);
         booleanPropertyItem(DNLItems.COPPER_DETONATOR.get(), "mode_switch", "copper_detonator", "copper_detonator_switched");
@@ -204,9 +209,43 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
 
     private void builtinEntityItem(Item item) {
         String name = ForgeRegistries.ITEMS.getKey(item).getPath();
-        // Don’t validate parent; builtin/entity is a virtual model
-        getBuilder(ITEM_FOLDER + "/" + name)
+
+        ItemModelBuilder b = getBuilder(ITEM_FOLDER + "/" + name)
+                // builtin/entity is virtual → UncheckedModelFile
                 .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"));
+
+        // Apply vanilla "item/block" default transforms
+        b.transforms()
+                .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)
+                .rotation(75, 45, 0)
+                .translation(0f, 2.5f, 0f)
+                .scale(0.375f, 0.375f, 0.375f)
+                .end()
+                .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND)
+                .rotation(75, 45, 0)
+                .translation(0f, 2.5f, 0f)
+                .scale(0.375f, 0.375f, 0.375f)
+                .end()
+                .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
+                .rotation(0, 45, 0)
+                .scale(0.4f, 0.4f, 0.4f)
+                .end()
+                .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND)
+                .rotation(0, 225, 0)
+                .scale(0.4f, 0.4f, 0.4f)
+                .end()
+                .transform(ItemDisplayContext.GROUND)
+                .translation(0f, 3f, 0f)
+                .scale(0.25f, 0.25f, 0.25f)
+                .end()
+                .transform(ItemDisplayContext.GUI)
+                .rotation(30, 225, 0)
+                .scale(0.625f, 0.625f, 0.625f)
+                .end()
+                .transform(ItemDisplayContext.FIXED)
+                .scale(0.5f, 0.5f, 0.5f)
+                .end()
+                .end();
     }
 
     private void PlayerStatueItemWithDisplay(Item item) {

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "dungeonnowloading:block/azuro_oak_planks",
-    "side": "dungeonnowloading:block/azuro_oak_planks",
-    "top": "dungeonnowloading:block/azuro_oak_planks"
-  }
-}

@@ -6,13 +6,13 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "dungeonnowloading:spawner_frame",
+          "name": "minecraft:mossy_stone_bricks",
           "functions": [
             {
               "function": "minecraft:set_count",
               "count": {
-                "min": 0,
-                "max": 1
+                "min": 2,
+                "max": 4
               }
             },
             {

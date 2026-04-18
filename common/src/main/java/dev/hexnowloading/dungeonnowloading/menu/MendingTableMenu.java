@@ -43,7 +43,7 @@ public class MendingTableMenu extends AbstractContainerMenu {
         container.startOpen(playerInv.player);
 
         this.addSlot(new Slot(container, PICKAXE_SLOT, 30, 45) {
-            @Override public boolean mayPlace(@NotNull ItemStack stack) { return stack.isDamageableItem() || stack.is(DNLItems.ITEM_SCRAPS.get()); }
+            @Override public boolean mayPlace(@NotNull ItemStack stack) { return stack.isDamageableItem() || stack.is(DNLItems.ITEM_SCRAPS.get()) || stack.is(DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get()); }
             @Override public void setChanged() { super.setChanged(); broadcastChanges(); }
         });
         this.addSlot(new Slot(container, DURITE_SLOT_1, 56, 33) {
@@ -168,7 +168,7 @@ public class MendingTableMenu extends AbstractContainerMenu {
                     return ItemStack.EMPTY;
                 }
             } else { // from player inventory
-                if (stack.isDamageableItem() || stack.is(DNLItems.ITEM_SCRAPS.get())) {
+                if (stack.isDamageableItem() || stack.is(DNLItems.ITEM_SCRAPS.get()) || stack.is(DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get())) {
                     if (!this.moveItemStackTo(stack, PICKAXE_SLOT, PICKAXE_SLOT + 1, false)) return ItemStack.EMPTY;
                 } else if (isAllowedMaterial(stack)) {
                     if (!this.moveItemStackTo(stack, DURITE_SLOT_1, DURITE_SLOT_2 + 1, false)) return ItemStack.EMPTY;
