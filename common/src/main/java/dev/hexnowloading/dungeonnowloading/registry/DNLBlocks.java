@@ -4,7 +4,6 @@ import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -41,7 +40,6 @@ public class DNLBlocks {
     public static Supplier<Block> POLISHED_STONE;
     public static Supplier<Block> BORDERED_STONE;
     public static Supplier<Block> ACACIA_WOODEN_BOARD;
-    public static Supplier<Block> AZURO_OAK_WOODEN_BOARD;
     public static Supplier<Block> BAMBOO_WOODEN_BOARD;
     public static Supplier<Block> BIRCH_WOODEN_BOARD;
     public static Supplier<Block> CHERRY_WOODEN_BOARD;
@@ -140,15 +138,11 @@ public class DNLBlocks {
     public static Supplier<Block> DURITE_QUELLER;
     public static Supplier<Block> DUNGEON_DIRECTOR;
     public static Supplier<Block> SPAWN_NODE;
-    public static Supplier<Block> SOUL_EXTRACTOR;
-    public static Supplier<Block> CINDERLITE_ORE;
-    public static Supplier<Block> DEEPSLATE_CINDERLITE_ORE;
     public static Supplier<Block> BRITTLESTONE;
     public static Supplier<Block> DEEPSTEEL_BLOCK;
     public static Supplier<Block> RAIL_PLATFORM;
     public static Supplier<Block> WEB_CARPET;
     public static Supplier<Block> BURNACLE;
-    public static Supplier<Block> MOB_SPAWN_POINT;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -178,7 +172,6 @@ public class DNLBlocks {
         POLISHED_STONE = registerBlock("polished_stone", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         BORDERED_STONE = registerBlock("bordered_stone", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         ACACIA_WOODEN_BOARD = registerBlock("acacia_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        AZURO_OAK_WOODEN_BOARD = registerBlock("azuro_oak_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
         BAMBOO_WOODEN_BOARD = registerBlock("bamboo_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
         BIRCH_WOODEN_BOARD = registerBlock("birch_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
         CHERRY_WOODEN_BOARD = registerBlock("cherry_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
@@ -280,16 +273,11 @@ public class DNLBlocks {
         SPAWN_NODE = registerBlock("spawn_node", () -> new SpawnNodeBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
         DUNGEON_DIRECTOR = registerBlock("dungeon_director", () -> new DungeonDirectorBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
 
-        SOUL_EXTRACTOR = registerBlock("soul_extractor", () -> new SoulExtractorBlock(BlockBehaviour.Properties.of().strength(1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
-        CINDERLITE_ORE = registerBlock("cinderlite_ore", () -> new CinderliteOreBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.0f, 3.0f), UniformInt.of(3, 7)));
-        DEEPSLATE_CINDERLITE_ORE = registerBlock("deepslate_cinderlite_ore", () -> new CinderliteOreBlock(BlockBehaviour.Properties.copy(CINDERLITE_ORE.get()).mapColor(MapColor.DEEPSLATE).strength(4.5F, 3.0F).sound(SoundType.DEEPSLATE), UniformInt.of(3, 7)));
         BRITTLESTONE = registerBlock("brittlestone", () -> new BrittlestoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0f, 6.0f).noOcclusion()));
         DEEPSTEEL_BLOCK = registerBlock("deepsteel_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F)));
         RAIL_PLATFORM = registerBlock("rail_platform", () -> new RailPlatformBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).noOcclusion()));
         WEB_CARPET = registerBlock("web_carpet", () -> new WebCarpetBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).forceSolidOn().noCollission().requiresCorrectToolForDrops().strength(4.0F).pushReaction(PushReaction.DESTROY)));
         BURNACLE = registerBlock("burnacle", () -> new BurnacleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).pushReaction(PushReaction.DESTROY).noOcclusion()));
-        MOB_SPAWN_POINT = registerBlock("mob_spawn_point", () -> new MobSpawnPointBlock(BlockBehaviour.Properties.of().noCollission().noOcclusion().strength(-1.0F, 3600000.0F).noLootTable()));
-
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
         TEMPLE_OF_DUALITY_TROPHY = registerBlock("temple_of_duality_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));

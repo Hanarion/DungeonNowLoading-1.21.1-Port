@@ -28,7 +28,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -132,7 +131,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDSTONE_CHALK_MARK.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.ACACIA_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.AZURO_OAK_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BAMBOO_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BIRCH_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHERRY_WOODEN_BOARD.get(), RenderType.cutout());
@@ -167,7 +165,6 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.BROKEN_GARHOLD.get(), BrokenGarholdRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WISP.get(), WispRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WISP_LANTERN.get(), WispLanternRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.THUMPER.get(), ThumperRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WEB_SPITTER.get(), WebSpitterRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.REAPER_SPIDER.get(), ReaperSpiderRenderer::new);
 
@@ -187,7 +184,6 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), VertexDomainProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BORUS_ARROW.get(), BorusArrowRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WEB_BALL.get(), ThrownItemRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.BULLET.get(), ThrownItemRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.GAS_CLOUD.get(), GasCloudRenderer::new);
 
         // Misc
@@ -196,8 +192,6 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.MIMICART.get(), MimicartRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.MOB_SPAWN_EFFECT.get(), NoopRenderer::new);
-
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
@@ -244,7 +238,6 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(BrokenGarholdModel.LAYER_LOCATION, BrokenGarholdModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WispModel.LAYER_LOCATION, WispModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WispLanternModel.LAYER_LOCATION, WispLanternModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(ThumperModel.LAYER_LOCATION, ThumperModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WebSpitterModel.LAYER_LOCATION, WebSpitterModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ReaperSpiderModel.LAYER_LOCATION, ReaperSpiderModel::createBodyLayer);
 

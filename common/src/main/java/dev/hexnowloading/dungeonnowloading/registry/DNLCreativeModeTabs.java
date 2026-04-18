@@ -44,8 +44,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DURITE.get());
                 output.accept(DNLItems.MENDSTONE.get());
 
-                output.accept(DNLItems.CINDERLITE.get());
-
                 // Items - Combat (Boss Item, then non-boss Item order)
                 output.accept(DNLItems.SCEPTER_OF_SEALED_CHAOS.get());
                 output.accept(DNLItems.LIFE_STEALER.get());
@@ -56,7 +54,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.REPULSOR.get());
                 output.accept(DNLItems.MIMICART.get());
-                output.accept(DNLItems.BULLET.get());
                 // Items - Tools
                 output.accept(DNLItems.MENDSTONE_CHALK.get());
                 output.accept(DNLItems.MENDSTONE_PICKAXE.get());
@@ -111,7 +108,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.BORDERED_STONE.get());
                 output.accept(DNLItems.MOSS.get());
                 output.accept(DNLItems.ACACIA_WOODEN_BOARD.get());
-                output.accept(DNLItems.AZURO_OAK_WOODEN_BOARD.get());
                 output.accept(DNLItems.BAMBOO_WOODEN_BOARD.get());
                 output.accept(DNLItems.BIRCH_WOODEN_BOARD.get());
                 output.accept(DNLItems.CHERRY_WOODEN_BOARD.get());
@@ -206,17 +202,11 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SPAWN_NODE.get());
                 output.accept(DNLItems.ZONE_WAND.get());
 
-                output.accept(DNLItems.SOUL_EXTRACTOR.get());
-                output.accept(DNLItems.CINDERLITE_ORE.get());
-                output.accept(DNLItems.DEEPSLATE_CINDERLITE_ORE.get());
                 output.accept(DNLItems.BRITTLESTONE.get());
                 output.accept(DNLItems.DEEPSTEEL_BLOCK.get());
                 output.accept(DNLItems.RAIL_PLATFORM.get());
                 output.accept(DNLItems.WEB_CARPET.get());
                 output.accept(DNLItems.BURNACLE.get());
-                output.accept(DNLItems.MOB_SPAWNPOINT.get());
-                output.accept(DNLItems.ZONE_WAND.get());
-
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());

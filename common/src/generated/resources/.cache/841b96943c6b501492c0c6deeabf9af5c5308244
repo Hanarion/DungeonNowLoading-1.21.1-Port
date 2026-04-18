@@ -1,7 +1,5 @@
 // 1.20.1	2025-11-27T06:12:45.7359694	Item Models: dungeonnowloading
-9ec79055c55542dd2cbf13e35e30684a62b51ae2 assets/dungeonnowloading/models/item/bullet.json
 2124c6574480f7d9a17d0b61aea2566f5dd0bb82 assets/dungeonnowloading/models/item/catalyzed_redstone.json
-a170d25f1dd7643996e91ef916290822fc771952 assets/dungeonnowloading/models/item/cinderlite.json
 94e215a0bc9a27d2999b7b4254ad0381bf58d4f9 assets/dungeonnowloading/models/item/combustion_cell.json
 9d9112531923eef5e11ce7491776171967a912cb assets/dungeonnowloading/models/item/copper_detonator.json
 000ce228703d1b6348eec375e480e43a93430159 assets/dungeonnowloading/models/item/copper_detonator_switched.json

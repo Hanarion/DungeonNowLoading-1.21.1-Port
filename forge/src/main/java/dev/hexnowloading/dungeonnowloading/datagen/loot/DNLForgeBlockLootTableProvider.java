@@ -65,7 +65,6 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.REDSTONE_LANE_T.get());
         this.dropSelf(DNLBlocks.ROTATOR_PRESSURE_PLATE.get());
         this.dropSelf(DNLBlocks.ACACIA_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.AZURO_OAK_WOODEN_BOARD.get());
         this.dropSelf(DNLBlocks.BAMBOO_WOODEN_BOARD.get());
         this.dropSelf(DNLBlocks.BIRCH_WOODEN_BOARD.get());
         this.dropSelf(DNLBlocks.CHERRY_WOODEN_BOARD.get());
@@ -142,8 +141,6 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         table.withPool(pool);
         add(bannerBlock, table);
 
-        this.add(DNLBlocks.CINDERLITE_ORE.get(), createOreDrop(DNLBlocks.CINDERLITE_ORE.get(), DNLItems.CINDERLITE.get()));
-        this.add(DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get(), createOreDrop(DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get(), DNLItems.CINDERLITE.get()));
         this.dropWhenSilkTouch(DNLBlocks.BRITTLESTONE.get());
         this.dropSelf(DNLBlocks.RAIL_PLATFORM.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_BLOCK.get());

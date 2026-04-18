@@ -56,9 +56,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
         simpleBlockWithItem(DNLBlocks.SPAWN_NODE.get());
         anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(ForgeRegistries.BLOCKS.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
-        simpleBlockWithItem(DNLBlocks.SOUL_EXTRACTOR.get());
-        simpleBlockWithItem(DNLBlocks.CINDERLITE_ORE.get());
-        simpleBlockWithItem(DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get());
         simpleBlockWithItem(DNLBlocks.BRITTLESTONE.get());
         simpleBlockWithItem(DNLBlocks.DEEPSTEEL_BLOCK.get());
 
@@ -91,7 +88,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         facingSixWayWithExistingModel(DNLBlocks.MEDIUM_DURITE_BUD.get(), "medium_durite_bud");
         facingSixWayWithExistingModel(DNLBlocks.SMALL_DURITE_BUD.get(), "small_durite_bud");
         horizontalModelFromParent(DNLBlocks.ACACIA_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/acacia_wooden_board"),    modLoc("item/acacia_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.AZURO_OAK_WOODEN_BOARD.get(), "wooden_board", "wooden_board", modLoc("block/azuro_oak_wooden_board"), modLoc("item/azuro_oak_wooden_board"));
         horizontalModelFromParent(DNLBlocks.BAMBOO_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/bamboo_wooden_board"),    modLoc("item/bamboo_wooden_board"));
         horizontalModelFromParent(DNLBlocks.BIRCH_WOODEN_BOARD.get(),     "wooden_board", "wooden_board", modLoc("block/birch_wooden_board"),     modLoc("item/birch_wooden_board"));
         horizontalModelFromParent(DNLBlocks.CHERRY_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/cherry_wooden_board"),    modLoc("item/cherry_wooden_board"));
