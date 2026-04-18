@@ -36,6 +36,7 @@ public class DNLItems {
     public static final Supplier<Item> DURITE = register("durite", () -> new Item(new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> MENDSTONE = register("mendstone", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final Supplier<Item> ITEM_SCRAPS = register("item_scraps", () -> new ScrapItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Supplier<Item> CINDERLITE = register("cinderlite", () -> new Item(new Item.Properties()));
 
     // ITEMS - FUNCTIONAL
     public static final Supplier<Item> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> new GreatExperienceBottleItem(new Item.Properties().rarity(Rarity.RARE), 100));
@@ -56,6 +57,7 @@ public class DNLItems {
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
     public static final Supplier<Item> MENDSTONE_CHALK = register("mendstone_chalk", () -> new MendstoneChalkItem(new Item.Properties().rarity(Rarity.COMMON).durability(15), DNLBlocks.MENDSTONE_CHALK_MARK.get()));
     public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new ZoneWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
+    public static final Supplier<Item> MIMICART = register("mimicart", () -> new MimicartItem(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
 
     // ITEMS - MUSIC DISC
     public static final Supplier<Item> MUSIC_DISC_HELLSPAWN = register("music_disc_hellspawn", () -> new DNLRecordItem(15, DNLSounds.DISC_HELLSPAWN.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 140));
@@ -187,6 +189,18 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
     public static final Supplier<Item> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> new BlockItem(DNLBlocks.MENDSTONE_CHALK_MARK.get(), new Item.Properties()));
 
+    public static final Supplier<Item> SOUL_EXTRACTOR = register("soul_extractor", () -> new BlockItem(DNLBlocks.SOUL_EXTRACTOR.get(), new Item.Properties()));
+    public static final Supplier<Item> CINDERLITE_ORE = register("cinderlite_ore", () -> new BlockItem(DNLBlocks.CINDERLITE_ORE.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSLATE_CINDERLITE_ORE = register("deepslate_cinderlite_ore", () -> new BlockItem(DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get(), new Item.Properties()));
+    public static final Supplier<Item> BRITTLESTONE = register("brittlestone", () -> new BlockItem(DNLBlocks.BRITTLESTONE.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_BLOCK = register("deepsteel_block", () -> new BlockItem(DNLBlocks.DEEPSTEEL_BLOCK.get(), new Item.Properties()));
+    public static final Supplier<Item> RAIL_PLATFORM = register("rail_platform", () -> new BlockItem(DNLBlocks.RAIL_PLATFORM.get(), new Item.Properties()));
+    public static final Supplier<Item> WEB_CARPET = register("web_carpet", () -> new BlockItem(DNLBlocks.WEB_CARPET.get(), new Item.Properties()));
+    public static final Supplier<Item> MOB_SPAWNPOINT = register("mob_spawnpoint", () -> new BlockItem(DNLBlocks.MOB_SPAWN_POINT.get(), new Item.Properties()));
+    public static final Supplier<Item> BURNACLE = register("burnacle", () -> new BlockItem(DNLBlocks.BURNACLE.get(), new Item.Properties()));
+    public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new DetectionWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
+    public static final Supplier<Item> BULLET = register("bullet", () -> new BulletItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
+
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final Supplier<Item> LABYRINTH_TROPHY = register("labyrinth_trophy", () -> new BlockItem(DNLBlocks.LABYRINTH_TROPHY.get(), new Item.Properties().rarity(Rarity.RARE)));
@@ -206,10 +220,14 @@ public class DNLItems {
     public static final Supplier<Item> BALLISTA_GOLEM_SPAWNEGG = register("spawn_egg_ballista_golem", Services.ITEM.makeSpawnEgg(DNLEntityTypes.BALLISTA_GOLEM::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> GARHOLD_SPAWNEGG = register("spawn_egg_garhold", Services.ITEM.makeSpawnEgg(DNLEntityTypes.GARHOLD::get, 0x182933, 0x66044d, new Item.Properties().rarity(Rarity.COMMON)));
 
+    public static final Supplier<Item> WISP_SPAWNEGG = register("spawn_egg_wisp", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WISP::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
+    public static final Supplier<Item> WISP_LANTERN_SPAWNEGG = register("spawn_egg_wisp_lantern", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WISP_LANTERN::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
+    public static final Supplier<Item> THUMPER_SPAWNEGG = register("spawn_egg_thumper", Services.ITEM.makeSpawnEgg(DNLEntityTypes.THUMPER::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
+    public static final Supplier<Item> WEB_SPITTER_SPAWNEGG = register("spawn_egg_web_spitter", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WEB_SPITTER::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
+    public static final Supplier<Item> REAPER_SPIDER_SPAWNEGG = register("spawn_egg_reaper_spider", Services.ITEM.makeSpawnEgg(DNLEntityTypes.REAPER_SPIDER::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
+    //public static final Supplier<Item> MIMICART = register("spawn_egg_mimicart", Services.ITEM.makeSpawnEgg(DNLEntityTypes.MIMICART::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> SEALED_CHAOS_SPAWNEGG = register("spawn_egg_sealed_chaos", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SEALED_CHAOS::get, 0x5f0d80, 0xd5bcd7, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> WHIMPER_SPAWNEGG = register("spawn_egg_whimper", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WHIMPER::get, 0x60f5fa, 0xbef5fa, new Item.Properties().rarity(Rarity.COMMON)));
-
-//    public static final Supplier<Item> WISPROD = register("wisprod", () -> new WisprodItem(new Item.Properties().rarity(Rarity.UNCOMMON).durability(250)));
 
     private static <T extends Item> Supplier<T> register(String name, Supplier<T> itemSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ITEM, name, itemSupplier);

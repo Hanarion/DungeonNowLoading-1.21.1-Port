@@ -15,6 +15,9 @@ import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.gui.screens.MenuScreens;
+
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -39,6 +42,11 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(BallistaGolemModel.LAYER_LOCATION, BallistaGolemModel::createBodyLayer);
         event.registerLayerDefinition(GarholdModel.LAYER_LOCATION, GarholdModel::createBodyLayer);
         event.registerLayerDefinition(BrokenGarholdModel.LAYER_LOCATION, BrokenGarholdModel::createBodyLayer);
+        event.registerLayerDefinition(WispModel.LAYER_LOCATION, WispModel::createBodyLayer);
+        event.registerLayerDefinition(WispLanternModel.LAYER_LOCATION, WispLanternModel::createBodyLayer);
+        event.registerLayerDefinition(ThumperModel.LAYER_LOCATION, ThumperModel::createBodyLayer);
+        event.registerLayerDefinition(WebSpitterModel.LAYER_LOCATION, WebSpitterModel::createBodyLayer);
+        event.registerLayerDefinition(ReaperSpiderModel.LAYER_LOCATION, ReaperSpiderModel::createBodyLayer);
 
         // Passive
         event.registerLayerDefinition(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);
@@ -46,6 +54,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(CopperCreepModel.LAYER_LOCATION, CopperCreepModel::createBodyLayer);
         event.registerLayerDefinition(CopperCreepButlerModel.LAYER_LOCATION, CopperCreepButlerModel::createBodyLayer);
         event.registerLayerDefinition(RepulsorModel.LAYER_LOCATION, RepulsorModel::createBodyLayer);
+        event.registerLayerDefinition(MimicartModel.LAYER_LOCATION, MimicartModel::createBodyLayer);
 
         // Projectiles
         event.registerLayerDefinition(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
@@ -87,6 +96,11 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.BALLISTA_GOLEM.get(), BallistaGolemRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.GARHOLD.get(), GarholdRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BROKEN_GARHOLD.get(), BrokenGarholdRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.WISP.get(), WispRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.WISP_LANTERN.get(), WispLanternRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.THUMPER.get(), ThumperRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.WEB_SPITTER.get(), WebSpitterRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.REAPER_SPIDER.get(), ReaperSpiderRenderer::new);
 
         // Passive
         event.registerEntityRenderer(DNLEntityTypes.SEALED_CHAOS.get(), SealedChaosRenderer::new);
@@ -102,6 +116,10 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), VertexOrbProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), VertexDomainProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BORUS_ARROW.get(), BorusArrowRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.WEB_BALL.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.BULLET.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.GAS_CLOUD.get(), GasCloudRenderer::new);
+
         // Misc
         event.registerEntityRenderer(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.GREAT_EXPERIENCE_BOTTLE.get(), (context) -> {
@@ -109,6 +127,8 @@ public class DNLForgeClientEvents {
         });
         event.registerEntityRenderer(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.MIMICART.get(), MimicartRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.MOB_SPAWN_EFFECT.get(), NoopRenderer::new);
 
         // Block Entities
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);

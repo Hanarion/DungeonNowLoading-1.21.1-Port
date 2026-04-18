@@ -2,21 +2,27 @@ package dev.hexnowloading.dungeonnowloading.mixin.entities;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.MimicartEntity;
 import dev.hexnowloading.dungeonnowloading.item.DNLAnimatedItem;
 import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
 import dev.hexnowloading.dungeonnowloading.item.client.ItemAnimationState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin {
+    @Shadow protected abstract void addParticlesAroundSelf(ParticleOptions particleOptions);
+
     @Inject(method = "Lnet/minecraft/world/entity/player/Player;drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("HEAD"))
     private void beforeItemDrop(ItemStack itemStack, boolean bl, boolean bl2, CallbackInfoReturnable<ItemEntity> cir) {
 
@@ -36,7 +42,7 @@ public abstract class PlayerMixin {
         Player self = (Player)(Object) this;
         Entity vehicle = self.getVehicle();
 
-        if ((vehicle instanceof GarholdEntity || vehicle instanceof BrokenGarholdEntity) && !self.getAbilities().instabuild) {
+        if ((vehicle instanceof GarholdEntity || vehicle instanceof BrokenGarholdEntity || vehicle instanceof MimicartEntity) && !self.getAbilities().instabuild) {
             cir.setReturnValue(false);
         }
     }

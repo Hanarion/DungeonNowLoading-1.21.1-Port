@@ -20,6 +20,8 @@
     "block.IronBarsMixin",
 
     "items.ItemStackBreakProtectionMixin",
+    "items.ShearsItemMixin",
+    "items.SwordItemMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",
@@ -37,6 +39,7 @@
     "inventory.AnvilMenuMixin"
   ],
   "client": [
+    "client.ClientPacketListenerMixin",
     "client.HumanoidModelMixin",
     "client.ClientPacketListenerMixin",
     "client.PlayerRendererMixin",

@@ -22,6 +22,9 @@ public class DNLBlockEntityTypes {
     public static final Supplier<BlockEntityType<DuriteQuellerBlockEntity>> DURITE_QUELLER = register("durite_queller", () -> BlockEntityType.Builder.of(DuriteQuellerBlockEntity::new, DNLBlocks.DURITE_QUELLER.get()).build(null));
     public static final Supplier<BlockEntityType<DungeonDirectorBlockEntity>> DUNGEON_DIRECTOR = register("dungeon_director", () -> BlockEntityType.Builder.of(DungeonDirectorBlockEntity::new, DNLBlocks.DUNGEON_DIRECTOR.get()).build(null));
     public static final Supplier<BlockEntityType<SpawnNodeBlockEntity>> SPAWN_NODE = register("spawn_node", () -> BlockEntityType.Builder.of(SpawnNodeBlockEntity::new, DNLBlocks.SPAWN_NODE.get()).build(null));
+    public static final Supplier<BlockEntityType<SoulExtractorBlockEntity>> SOUL_EXTRACTOR = register("soul_extractor", () -> BlockEntityType.Builder.of(SoulExtractorBlockEntity::new, DNLBlocks.SOUL_EXTRACTOR.get()).build(null));
+    public static final Supplier<BlockEntityType<BurnacleBlockEntity>> BURNACLE = register("burnicle", () -> BlockEntityType.Builder.of(BurnacleBlockEntity::new, DNLBlocks.BURNACLE.get()).build(null));
+    public static final Supplier<BlockEntityType<MobSpawnPointBlockEntity>> MOB_SPAWN_POINT = register("mob_spawn_point", () -> BlockEntityType.Builder.of(MobSpawnPointBlockEntity::new, DNLBlocks.MOB_SPAWN_POINT.get()).build(null));
 
     public static final Supplier<BlockEntityType<PlayerStatueBlockEntity>> PLAYER_STATUE = register("player_statue", () -> BlockEntityType.Builder.of(PlayerStatueBlockEntity::new, DNLBlocks.PLAYER_STATUE.get()).build(null));
     public static final Supplier<BlockEntityType<MendstoneChalkMarkBlockEntity>> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> BlockEntityType.Builder.of(MendstoneChalkMarkBlockEntity::new, DNLBlocks.MENDSTONE_CHALK_MARK.get()).build(null));

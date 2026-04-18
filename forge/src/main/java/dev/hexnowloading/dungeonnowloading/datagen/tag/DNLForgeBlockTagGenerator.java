@@ -80,6 +80,12 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.MEDIUM_DURITE_BUD.get(),
                 DNLBlocks.LARGE_DURITE_BUD.get(),
                 DNLBlocks.DURITE_QUELLER.get()
+                DNLBlocks.LARGE_DURITE_BUD.get(),
+                DNLBlocks.CINDERLITE_ORE.get(),
+                DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get(),
+                DNLBlocks.BRITTLESTONE.get(),
+                DNLBlocks.RAIL_PLATFORM.get(),
+                DNLBlocks.DEEPSTEEL_BLOCK.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(
@@ -89,6 +95,10 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.WISE_FAIRKEEPER_CHEST.get(),
                 DNLBlocks.FIERCE_FAIRKEEPER_CHEST.get(),
                 DNLBlocks.FAIRKEEEPER_SPAWNER.get()
+        );
+
+        this.tag(BlockTags.FALL_DAMAGE_RESETTING).add(
+                DNLBlocks.WEB_CARPET.get()
         );
 
         this.tag(BlockTags.WALLS).add(

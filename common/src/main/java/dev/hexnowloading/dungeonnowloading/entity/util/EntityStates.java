@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.*;
+import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
@@ -36,6 +37,10 @@ public class EntityStates {
     public static final EntityDataSerializer<BrokenGarholdEntity.BrokenGarholdState> BROKEN_GARHOLD_STATE;
     public static final EntityDataSerializer<WhimperEntity.WhimperAnimationState> WHIMPER_ANIMATION_STATE;
     public static final EntityDataSerializer<WhimperEntity.Skin> WHIMPER_SKIN;
+    public static final EntityDataSerializer<MimicartEntity.MimicartAnimationState> MIMICART_ANIMATION_STATE;
+    public static final EntityDataSerializer<WebSpitterEntity.WebSpitterAnimationState> WEB_SPITTER_ANIMATION_STATE;
+    public static final EntityDataSerializer<ReaperSpiderEntity.ReaperSpiderAnimationState> REAPER_SPIDER_ANIMATION_STATE;
+    public static final EntityDataSerializer<WispEntity.WispAnimationState> WISP_ANIMATION_STATE;
 
     static {
         CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
@@ -55,6 +60,10 @@ public class EntityStates {
         VERTEX_DOMAIN_ANIMATION_STATE = EntityDataSerializer.simpleEnum(VertexDomainProjectileEntity.VertexDomainAnimationState.class);
         COMMAND_PYLON_STATE = EntityDataSerializer.simpleEnum(RepulsorEntity.State.class);
         REPULSOR_SKIN = EntityDataSerializer.simpleEnum(RepulsorEntity.Skin.class);
+        MIMICART_ANIMATION_STATE = EntityDataSerializer.simpleEnum(MimicartEntity.MimicartAnimationState.class);
+        WEB_SPITTER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WebSpitterEntity.WebSpitterAnimationState.class);
+        REAPER_SPIDER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(ReaperSpiderEntity.ReaperSpiderAnimationState.class);
+        WISP_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WispEntity.WispAnimationState.class);
         SEEPING_SOUL_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SeepingSoulEntity.SeepingSoulAnimationState.class);
         GARHOLD_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdState.class);
         GARHOLD_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdAnimationState.class);
@@ -81,6 +90,10 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(VERTEX_DOMAIN_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(COMMAND_PYLON_STATE);
         EntityDataSerializers.registerSerializer(REPULSOR_SKIN);
+        EntityDataSerializers.registerSerializer(MIMICART_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(WEB_SPITTER_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(REAPER_SPIDER_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(WISP_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(SEEPING_SOUL_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(GARHOLD_STATE);
         EntityDataSerializers.registerSerializer(GARHOLD_ANIMATION_STATE);

@@ -56,6 +56,11 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
         simpleBlockWithItem(DNLBlocks.SPAWN_NODE.get());
         anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(ForgeRegistries.BLOCKS.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
+        simpleBlockWithItem(DNLBlocks.SOUL_EXTRACTOR.get());
+        simpleBlockWithItem(DNLBlocks.CINDERLITE_ORE.get());
+        simpleBlockWithItem(DNLBlocks.DEEPSLATE_CINDERLITE_ORE.get());
+        simpleBlockWithItem(DNLBlocks.BRITTLESTONE.get());
+        simpleBlockWithItem(DNLBlocks.DEEPSTEEL_BLOCK.get());
 
         dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
@@ -117,6 +122,9 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN.get());
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
+        railPlatformStates(DNLBlocks.RAIL_PLATFORM.get());
+        multifaceWebCarpet(DNLBlocks.WEB_CARPET.get());
+        burnacleSixWayWithStages(DNLBlocks.BURNACLE.get());
     }
 
     private void fenceGateBlockWithItem(FenceGateBlock block, Block parent) {
@@ -1032,6 +1040,143 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         simpleBlockItem(block, models().getExistingFile(extend(blockTexture(block), "_off")));
     }
+// inside your DNLBlockStateProvider
+
+    private void multifaceBlockWithItem(Block block, String textureName) {
+        String name = key(block).getPath();
+        ResourceLocation texture = modLoc("block/" + textureName); // block/web_carpet
+
+        ModelFile model = models()
+                .withExistingParent(name, mcLoc("block/glow_lichen"))
+                .texture("glow_lichen", texture) // <- IMPORTANT
+                .texture("particle", texture);   // item particles too
+
+        MultiPartBlockStateBuilder builder = getMultipartBuilder(block);
+
+        for (Direction dir : Direction.values()) {
+            BooleanProperty prop = MultifaceBlock.getFaceProperty(dir);
+
+            int xRot = 0;
+            int yRot = 0;
+            switch (dir) {
+                case NORTH -> { xRot = 0;   yRot = 0;   }
+                case EAST  -> { xRot = 0;   yRot = 90;  }
+                case SOUTH -> { xRot = 0;   yRot = 180; }
+                case WEST  -> { xRot = 0;   yRot = 270; }
+                case UP    -> { xRot = 270; yRot = 0;   }
+                case DOWN  -> { xRot = 90;  yRot = 0;   }
+            }
+
+            builder.part()
+                    .modelFile(model)
+                    .rotationX(xRot)
+                    .rotationY(yRot)
+                    .uvLock(true)
+                    .addModel()
+                    .condition(prop, true);
+        }
+
+        simpleBlockItem(block, model);
+    }
+
+    private void multifaceWebCarpet(Block block) {
+        String name = key(block).getPath();
+
+        // === Model files for normal & burning ===
+        ModelFile normal = models()
+                .withExistingParent(name, mcLoc("block/glow_lichen"))
+                .texture("glow_lichen", modLoc("block/web_carpet"))
+                .texture("particle", modLoc("block/web_carpet"));
+
+        ModelFile burning = models()
+                .withExistingParent(name + "_burning", mcLoc("block/glow_lichen"))
+                .texture("glow_lichen", modLoc("block/web_carpet_burning"))
+                .texture("particle", modLoc("block/web_carpet_burning"));
+
+        // === Multipart blockstate builder ===
+        MultiPartBlockStateBuilder builder = getMultipartBuilder(block);
+
+        for (Direction dir : Direction.values()) {
+            BooleanProperty faceProp = MultifaceBlock.getFaceProperty(dir);
+
+            if (faceProp == null) continue; // Safety
+
+            int xRot = switch (dir) {
+                case UP -> 270;
+                case DOWN -> 90;
+                default -> 0;
+            };
+            int yRot = switch (dir) {
+                case NORTH -> 0;
+                case EAST -> 90;
+                case SOUTH -> 180;
+                case WEST -> 270;
+                default -> 0;
+            };
+
+            // Normal face
+            builder.part()
+                    .modelFile(normal)
+                    .rotationX(xRot)
+                    .rotationY(yRot)
+                    .uvLock(true)
+                    .addModel()
+                    .condition(faceProp, true)
+                    .condition(WebCarpetBlock.BURNING, false);
+
+            // Burning face
+            builder.part()
+                    .modelFile(burning)
+                    .rotationX(xRot)
+                    .rotationY(yRot)
+                    .uvLock(true)
+                    .addModel()
+                    .condition(faceProp, true)
+                    .condition(WebCarpetBlock.BURNING, true);
+        }
+
+        // === Item model generation ===
+        simpleItem(block);
+    }
+
+    private void burnacleSixWayWithStages(Block block) {
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction f = state.getValue(BlockStateProperties.FACING);
+            BurnacleBlock.Stage stage = state.getValue(BurnacleBlock.STAGE);
+
+            String modelName = switch (stage) {
+                case BUD      -> "burnacle_bud";
+                case JUVENILE -> "burnacle_juvenile";
+                case MATURE   -> "burnacle_mature";
+            };
+
+            ModelFile model = models().getExistingFile(modLoc("block/" + modelName));
+
+            int x = 0, y = 0;
+            switch (f) {
+                case UP    -> { x = 0;   y = 0;   }
+                case DOWN  -> { x = 180; y = 0;   }
+                case NORTH -> { x = 90;  y = 0;   }
+                case SOUTH -> { x = 90;  y = 180; }
+                case WEST  -> { x = 90;  y = 270; }
+                case EAST  -> { x = 90;  y = 90;  }
+            }
+
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationX(x)
+                    .rotationY(y)
+                    .build();
+        });
+
+        // Item model: use burnacle_bud block model as parent (has handheld transforms)
+        simpleBlockItem(block, models().getExistingFile(modLoc("block/burnacle_bud")));
+    }
+
+
+
+
+
 
     private void facingSixWayWithExistingModel(Block block, String modelName) {
         ModelFile model = models().getExistingFile(modLoc("block/" + modelName));
@@ -1140,6 +1285,34 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         // Item model uses normal
         simpleBlockItem(block, normal);
+    }
+
+    private void railPlatformStates(Block block) {
+        ModelFile normal = models().getExistingFile(modLoc("block/rail_platform"));
+        ModelFile raised = models().getExistingFile(modLoc("block/rail_platform_raised"));
+
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction dir = state.getValue(RailPlatformBlock.FACING);
+            boolean isRaised = state.getValue(RailPlatformBlock.RAISED);
+
+            ModelFile model = isRaised ? raised : normal;
+
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationY((int) dir.toYRot())
+                    .build();
+        });
+    }
+
+
+    private void horizontalExistingModel(Block block, String existingBlockModelName) {
+        String n = name(block); // usually the registry path, ex: "rail_platform"
+
+        ModelFile existingModel = models().getExistingFile(
+                modLoc("block/" + existingBlockModelName)
+        );
+
+        horizontalBlock(block, existingModel);
     }
 
     private void particleOnlyModel(Block block) {

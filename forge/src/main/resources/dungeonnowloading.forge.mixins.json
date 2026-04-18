@@ -18,6 +18,8 @@
       "block.WallMixin",
       "block.IronBarsMixin",
       "items.ItemInHandRendererMixin",
+      "items.ShearsItemMixin",
+      "items.SwordItemMixin",
       "entities.EntityAvoidBlockMixin",
       "entities.ServerPlayerMixin",
       "entities.PlayerMixin",

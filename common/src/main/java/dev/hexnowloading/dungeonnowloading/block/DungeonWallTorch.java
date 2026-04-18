@@ -2,7 +2,6 @@ package dev.hexnowloading.dungeonnowloading.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -23,7 +22,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -41,7 +39,7 @@ import java.util.function.ToIntFunction;
 
 public class DungeonWallTorch extends HorizontalDirectionalBlock {
 
-    private static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final BooleanProperty LIT = BlockStateProperties.LIT;
     private static final VoxelShape NORTH_AABB = Block.box(4, 1, 9, 12, 16, 16);
@@ -159,7 +157,7 @@ public class DungeonWallTorch extends HorizontalDirectionalBlock {
 
     private boolean canBeLit(BlockState blockState) { return !blockState.getValue(WATERLOGGED) && !blockState.getValue(LIT); }
 
-    private static boolean isLit(BlockState blockState) {
+    public static boolean isLit(BlockState blockState) {
         return blockState.hasProperty(LIT) && blockState.getValue(LIT);
     }
 

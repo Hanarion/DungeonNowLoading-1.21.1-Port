@@ -59,6 +59,12 @@
     "dungeonnowloading:small_durite_bud",
     "dungeonnowloading:medium_durite_bud",
     "dungeonnowloading:large_durite_bud",
-    "dungeonnowloading:durite_queller"
+    "dungeonnowloading:durite_queller",
+    "dungeonnowloading:large_durite_bud",
+    "dungeonnowloading:cinderlite_ore",
+    "dungeonnowloading:deepslate_cinderlite_ore",
+    "dungeonnowloading:brittlestone",
+    "dungeonnowloading:rail_platform",
+    "dungeonnowloading:deepsteel_block"
   ]
 }

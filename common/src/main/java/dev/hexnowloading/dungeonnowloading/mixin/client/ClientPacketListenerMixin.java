@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.mixin.client;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.MimicartEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
@@ -32,11 +33,13 @@ public abstract class ClientPacketListenerMixin {
             ),
             index = 0
     )
-    private Component dnl$replaceGarholdMountOverlay(Component original) {
+    private Component dnl$replaceMountOverlay(Component original) {
         if (this.minecraft.player != null) {
             Entity vehicle = this.minecraft.player.getVehicle();
             if (vehicle instanceof GarholdEntity || vehicle instanceof BrokenGarholdEntity) {
                 return Component.translatable("entity.dungeonnowloading.garhold.dismount_hint");
+            } else if (vehicle instanceof MimicartEntity) {
+                return Component.translatable("entity.dungeonnowloading.mimicart.dismount_hint");
             }
         }
         return original;
