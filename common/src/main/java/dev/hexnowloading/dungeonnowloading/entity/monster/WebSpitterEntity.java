@@ -7,10 +7,14 @@ import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.WebS
 import dev.hexnowloading.dungeonnowloading.entity.projectile.WebWebProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -27,6 +31,7 @@ import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 
@@ -44,6 +49,13 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
     private WebSpitterRetreatGoal retreatGoal;
 
     private static final double ANCHORED_BREAK_RANGE = 10.0D; // blocks
+
+    public float clientWalkBackBlend = 0.0F;
+    public float clientWalkBackBlendO = 0.0F;
+    private float walkBackTarget = 0.0F;
+
+    private static final float WALK_BACK_IN = 0.18F;
+    private static final float WALK_BACK_OUT = 0.12F;
 
     public WebSpitterEntity(EntityType<? extends WebSpitterEntity> entityType, Level level) {
         super(entityType, level);
@@ -144,9 +156,20 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
     public void tick() {
         super.tick();
         if (this.level().isClientSide) {
+            this.walkBackAnimation();
             return;
         }
         this.animationChainer.tick(this::transitionTo);
+    }
+
+    public void walkBackAnimation() {
+        this.clientWalkBackBlendO = this.clientWalkBackBlend;
+
+        this.walkBackTarget = this.isBackingUp() ? 1.0F : 0.0F;
+
+        float rate = (this.walkBackTarget > this.clientWalkBackBlend) ? WALK_BACK_IN : WALK_BACK_OUT;
+        this.clientWalkBackBlend += (this.walkBackTarget - this.clientWalkBackBlend) * rate;
+        this.clientWalkBackBlend = Mth.clamp(this.clientWalkBackBlend, 0.0F, 1.0F);
     }
 
     public void playShootAnimation() {
@@ -160,6 +183,8 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
     @Override
     public void performRangedAttack(LivingEntity target, float distanceFactor) {
         if (this.level().isClientSide) return;
+
+        this.playSound(DNLSounds.WEB_SPITTER_SHOOT.get(), 1.0F, 0.9F + this.random.nextFloat() * 0.2F);
 
         WebWebProjectileEntity projectile = new WebWebProjectileEntity(this.level(), this);
         projectile.setPos(this.getX(), this.getEyeY() - 0.2F, this.getZ());
@@ -233,6 +258,26 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
             }
         }
         return true;
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return DNLSounds.WEB_SPITTER_AMBIENT.get();
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return DNLSounds.WEB_SPITTER_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return DNLSounds.WEB_SPITTER_DEATH.get();
+    }
+
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState state) {
+        this.playSound(DNLSounds.WEB_SPITTER_STEP.get(), 0.15F, 1.0F);
     }
 
     @Override

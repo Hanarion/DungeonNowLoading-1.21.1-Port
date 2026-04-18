@@ -5,13 +5,17 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.WebSpitterAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import net.minecraft.client.animation.AnimationDefinition;
+import net.minecraft.client.animation.KeyframeAnimations;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AnimationState;
+import org.joml.Vector3f;
 
 public class WebSpitterModel <T extends WebSpitterEntity> extends HierarchicalModel<T> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "web_spitter"), "main");
@@ -106,6 +110,22 @@ public class WebSpitterModel <T extends WebSpitterEntity> extends HierarchicalMo
     }
 
     private final AnimationState idleLoop = new AnimationState();
+    private static final Vector3f ANIM_VEC_CACHE = new Vector3f();
+
+    protected void animateWalkWeighted(AnimationDefinition animationDefinition, float limbSwing, float limbSwingAmount, float maxAnimationSpeed, float animationScaleFactor, float weight) {
+        float blend = Mth.clamp(weight, 0.0F, 1.0F);
+        if (blend <= 0.0001F) return;
+
+        long time = (long)(limbSwing * 50.0F * maxAnimationSpeed);
+        float scale = Math.min(limbSwingAmount * animationScaleFactor, 1.0F) * blend;
+        if (scale <= 0.0001F) return;
+
+        KeyframeAnimations.animate(this, animationDefinition, time, scale, ANIM_VEC_CACHE);
+    }
+
+    private static float partialTickFromAge(float ageInTicks) {
+        return ageInTicks - (float)Math.floor(ageInTicks);
+    }
 
     @Override
     public void setupAnim(WebSpitterEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
@@ -114,11 +134,11 @@ public class WebSpitterModel <T extends WebSpitterEntity> extends HierarchicalMo
         this.idleLoop.startIfStopped(entity.tickCount);
         this.animate(idleLoop, WebSpitterAnimation.IDLE, ageInTicks);
 
-        boolean backingUp = entity.isBackingUp();
-        if (backingUp) {
-            this.animateWalk(WebSpitterAnimation.WALK_BACK, limbSwing, limbSwingAmount, 1.0F, 1.0F);
-        }
-        this.animateWalk(WebSpitterAnimation.WALK, limbSwing, limbSwingAmount, 1.0F, 1.0F);
+        float pt = partialTickFromAge(ageInTicks);
+        float walkBack = Mth.lerp(pt, entity.clientWalkBackBlendO, entity.clientWalkBackBlend);
+        walkBack = walkBack * walkBack * (3.0F - 2.0F * walkBack);
+        this.animateWalkWeighted(WebSpitterAnimation.WALK, limbSwing, limbSwingAmount, 1.0F, 1.0F, 1.0F - walkBack);
+        this.animateWalkWeighted(WebSpitterAnimation.WALK_BACK, limbSwing, limbSwingAmount, 2.0F, 1.0F, walkBack);
         this.animate(entity.shootAnimationState, WebSpitterAnimation.SHOOT, ageInTicks);
 
         this.animateHeadLookTarget(netHeadYaw, headPitch);
