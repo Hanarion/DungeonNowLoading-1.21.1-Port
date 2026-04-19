@@ -1,14 +1,14 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
-import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.SilkSpiderEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
-public class WebSpitterRetreatGoal extends Goal {
+public class SilkSpiderRetreatGoal extends Goal {
 
-    private final WebSpitterEntity mob;
+    private final SilkSpiderEntity mob;
     private final double baseMoveSpeed;
     private final float safeDistanceSq;
 
@@ -20,7 +20,7 @@ public class WebSpitterRetreatGoal extends Goal {
     private static final int REQUIRED_SAFE_TICKS = reducedTickDelay(40);
 
 
-    public WebSpitterRetreatGoal(WebSpitterEntity mob,
+    public SilkSpiderRetreatGoal(SilkSpiderEntity mob,
                                  double baseMoveSpeed,
                                  float minAttackDistance) {
         this.mob = mob;

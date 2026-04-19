@@ -1,12 +1,12 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
-import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.SilkSpiderEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
-public class WebSpitterRangedAttackGoal extends Goal {
+public class SilkSpiderRangedAttackGoal extends Goal {
 
     private enum CombatState {
         CHASE,
@@ -14,7 +14,7 @@ public class WebSpitterRangedAttackGoal extends Goal {
         BACK_UP
     }
 
-    private final WebSpitterEntity mob;
+    private final SilkSpiderEntity mob;
     private final double moveSpeed;
 
     private final int attackIntervalTicks;
@@ -22,6 +22,7 @@ public class WebSpitterRangedAttackGoal extends Goal {
 
     private final float minAttackDistanceSq;
     private final float maxAttackDistanceSq;
+    private static final float MAX_SHOOT_ANGLE_DEGREES = 30.0F;
 
     private int attackCooldown;
     private int windupTicks;
@@ -29,7 +30,7 @@ public class WebSpitterRangedAttackGoal extends Goal {
 
     private CombatState state = CombatState.CHASE;
 
-    public WebSpitterRangedAttackGoal(WebSpitterEntity mob,
+    public SilkSpiderRangedAttackGoal(SilkSpiderEntity mob,
                                       double moveSpeed,
                                       int attackInterval,
                                       float minAttackDistance,
@@ -136,6 +137,12 @@ public class WebSpitterRangedAttackGoal extends Goal {
     // --- shared shooting logic ---
 
     private void handleRangedAttack(LivingEntity target) {
+        if (!isTargetWithinShootAngle(target)) {
+            windupTicks = 0;
+            mob.setAggressive(false);
+            return;
+        }
+
         if (attackCooldown > 0) {
             attackCooldown--;
             return;
@@ -163,6 +170,17 @@ public class WebSpitterRangedAttackGoal extends Goal {
 
         windupTicks = 0;
         attackCooldown = attackIntervalTicks;
+    }
+
+    private boolean isTargetWithinShootAngle(LivingEntity target) {
+        double dx = target.getX() - mob.getX();
+        double dz = target.getZ() - mob.getZ();
+        if (dx * dx + dz * dz < 1.0E-4D) {
+            return true;
+        }
+
+        float targetYaw = (float)(Mth.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
+        return Mth.degreesDifferenceAbs(mob.getYRot(), targetYaw) <= MAX_SHOOT_ANGLE_DEGREES;
     }
 
     // --- state behaviours ---
@@ -217,4 +235,3 @@ public class WebSpitterRangedAttackGoal extends Goal {
         mob.yBodyRotO = newYaw;    // previous body yaw (helps avoid jitter)
     }
 }
-

@@ -3,25 +3,25 @@ package dev.hexnowloading.dungeonnowloading.entity.client.layer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.client.model.WebSpitterModel;
-import dev.hexnowloading.dungeonnowloading.entity.client.renderer.WebSpitterRenderer;
-import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import dev.hexnowloading.dungeonnowloading.entity.client.model.SilkSpiderModel;
+import dev.hexnowloading.dungeonnowloading.entity.client.renderer.SilkSpiderRenderer;
+import dev.hexnowloading.dungeonnowloading.entity.monster.SilkSpiderEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
-public class WebSpitterEyesLayer<T extends WebSpitterEntity, M extends WebSpitterModel<T>> extends RenderLayer<T, M> {
+public class SilkSpiderEyesLayer<T extends SilkSpiderEntity, M extends SilkSpiderModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/web_spitter/web_spitter_eyes.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/silk_spider/silk_spider_eyes.png");
 
-    public WebSpitterEyesLayer(WebSpitterRenderer renderer) {
+    public SilkSpiderEyesLayer(SilkSpiderRenderer renderer) {
         super(renderer);
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLightIn, WebSpitterEntity body, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLightIn, SilkSpiderEntity body, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE_EMISSIVE, true));
         this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 0xF00000, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
     }

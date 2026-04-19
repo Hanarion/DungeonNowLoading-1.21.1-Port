@@ -38,7 +38,7 @@ public class EntityStates {
     public static final EntityDataSerializer<WhimperEntity.WhimperAnimationState> WHIMPER_ANIMATION_STATE;
     public static final EntityDataSerializer<WhimperEntity.Skin> WHIMPER_SKIN;
     public static final EntityDataSerializer<MimicartEntity.MimicartAnimationState> MIMICART_ANIMATION_STATE;
-    public static final EntityDataSerializer<WebSpitterEntity.WebSpitterAnimationState> WEB_SPITTER_ANIMATION_STATE;
+    public static final EntityDataSerializer<SilkSpiderEntity.SilkSpiderAnimationState> SILK_SPIDER_ANIMATION_STATE;
     public static final EntityDataSerializer<ReaperSpiderEntity.ReaperSpiderAnimationState> REAPER_SPIDER_ANIMATION_STATE;
     public static final EntityDataSerializer<WispEntity.WispAnimationState> WISP_ANIMATION_STATE;
 
@@ -61,7 +61,7 @@ public class EntityStates {
         COMMAND_PYLON_STATE = EntityDataSerializer.simpleEnum(RepulsorEntity.State.class);
         REPULSOR_SKIN = EntityDataSerializer.simpleEnum(RepulsorEntity.Skin.class);
         MIMICART_ANIMATION_STATE = EntityDataSerializer.simpleEnum(MimicartEntity.MimicartAnimationState.class);
-        WEB_SPITTER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WebSpitterEntity.WebSpitterAnimationState.class);
+        SILK_SPIDER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SilkSpiderEntity.SilkSpiderAnimationState.class);
         REAPER_SPIDER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(ReaperSpiderEntity.ReaperSpiderAnimationState.class);
         WISP_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WispEntity.WispAnimationState.class);
         SEEPING_SOUL_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SeepingSoulEntity.SeepingSoulAnimationState.class);
@@ -91,7 +91,7 @@ public class EntityStates {
         EntityDataSerializers.registerSerializer(COMMAND_PYLON_STATE);
         EntityDataSerializers.registerSerializer(REPULSOR_SKIN);
         EntityDataSerializers.registerSerializer(MIMICART_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(WEB_SPITTER_ANIMATION_STATE);
+        EntityDataSerializers.registerSerializer(SILK_SPIDER_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(REAPER_SPIDER_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(WISP_ANIMATION_STATE);
         EntityDataSerializers.registerSerializer(SEEPING_SOUL_ANIMATION_STATE);

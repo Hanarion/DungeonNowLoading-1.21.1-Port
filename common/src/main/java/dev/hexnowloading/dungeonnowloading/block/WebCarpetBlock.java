@@ -33,6 +33,7 @@ import java.util.List;
 public class WebCarpetBlock extends MultifaceBlock {
 
     private final MultifaceSpreader spreader = new MultifaceSpreader(this);
+    private static final Vec3 ENTITY_SLOWDOWN = new Vec3(0.95D, 0.65D, 0.95D);
 
     private static final BooleanProperty FACE_UP    = MultifaceBlock.getFaceProperty(Direction.UP);
     private static final BooleanProperty FACE_DOWN  = MultifaceBlock.getFaceProperty(Direction.DOWN);
@@ -127,7 +128,7 @@ public class WebCarpetBlock extends MultifaceBlock {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    // --- Slowing + natural breaking ---
+    // --- Slowing ---
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
@@ -152,36 +153,18 @@ public class WebCarpetBlock extends MultifaceBlock {
             }
         }
 
-        // --- 2) Normal slow + random breaking for living entities ---
+        // --- 2) Normal slow for living entities ---
 
         if (!(entity instanceof LivingEntity living)) {
             return;
         }
 
-        // Don't slow spiders (vanilla Spider + your WebSpitterEntity, since it extends Spider)
+        // Don't slow spiders (vanilla Spider + your SilkSpiderEntity, since it extends Spider)
         if (living instanceof Spider) {
             return;
         }
 
-        // Slow like cobweb
-        entity.makeStuckInBlock(state, new Vec3(0.25D, 0.05D, 0.25D));
-
-        if (level.isClientSide) return;
-
-        // Check if entity is actually trying to move
-        double dx = entity.getX() - entity.xo;
-        double dy = entity.getY() - entity.yo;
-        double dz = entity.getZ() - entity.zo;
-        double sq = dx * dx + dy * dy + dz * dz;
-
-        boolean isMoving = sq > 0.0D;
-
-        if (isMoving) {
-            // ~1/20 chance per tick
-            if (level.random.nextInt(20) == 0) {
-                level.destroyBlock(pos, true, entity);
-            }
-        }
+        entity.makeStuckInBlock(state, ENTITY_SLOWDOWN);
     }
 
 

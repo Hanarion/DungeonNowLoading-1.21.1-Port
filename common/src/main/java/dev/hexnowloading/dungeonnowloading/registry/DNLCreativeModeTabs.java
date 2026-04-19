@@ -26,7 +26,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.WHIMPER_SPAWNEGG.get());
                 output.accept(DNLItems.WISP_SPAWNEGG.get());
                 output.accept(DNLItems.WISP_LANTERN_SPAWNEGG.get());
-                output.accept(DNLItems.WEB_SPITTER_SPAWNEGG.get());
+                output.accept(DNLItems.SILK_SPIDER_SPAWNEGG.get());
                 output.accept(DNLItems.REAPER_SPIDER_SPAWNEGG.get());
                 // Items - Ingredients
                 output.accept(DNLItems.SPAWNER_FRAGMENT.get());

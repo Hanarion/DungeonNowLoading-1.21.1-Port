@@ -214,7 +214,7 @@ public class DNLItems {
 
     public static final Supplier<Item> WISP_SPAWNEGG = register("spawn_egg_wisp", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WISP::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> WISP_LANTERN_SPAWNEGG = register("spawn_egg_wisp_lantern", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WISP_LANTERN::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
-    public static final Supplier<Item> WEB_SPITTER_SPAWNEGG = register("spawn_egg_web_spitter", Services.ITEM.makeSpawnEgg(DNLEntityTypes.WEB_SPITTER::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
+    public static final Supplier<Item> SILK_SPIDER_SPAWNEGG = register("spawn_egg_silk_spider", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SILK_SPIDER::get, 0x8d7866, 0xe3ddd4, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> REAPER_SPIDER_SPAWNEGG = register("spawn_egg_reaper_spider", Services.ITEM.makeSpawnEgg(DNLEntityTypes.REAPER_SPIDER::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
     //public static final Supplier<Item> MIMICART = register("spawn_egg_mimicart", Services.ITEM.makeSpawnEgg(DNLEntityTypes.MIMICART::get, 0x7a777a, 0xe0a314, new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> SEALED_CHAOS_SPAWNEGG = register("spawn_egg_sealed_chaos", Services.ITEM.makeSpawnEgg(DNLEntityTypes.SEALED_CHAOS::get, 0x5f0d80, 0xd5bcd7, new Item.Properties().rarity(Rarity.COMMON)));

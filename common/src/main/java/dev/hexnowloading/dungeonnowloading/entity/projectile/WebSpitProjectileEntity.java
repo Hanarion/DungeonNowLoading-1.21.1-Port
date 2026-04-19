@@ -1,14 +1,16 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
-import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.SilkSpiderEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -17,6 +19,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -27,8 +30,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
-public class WebWebProjectileEntity extends ThrowableItemProjectile {
+public class WebSpitProjectileEntity extends ThrowableItemProjectile {
 
     public static final float GRAVITY = 0.03F;
 
@@ -75,12 +79,12 @@ public class WebWebProjectileEntity extends ThrowableItemProjectile {
             new SpreadRule( 0, -1, 1, Direction.NORTH,  0, 0,  1, true)
     };
 
-    public WebWebProjectileEntity(EntityType<? extends WebWebProjectileEntity> type, Level level) {
+    public WebSpitProjectileEntity(EntityType<? extends WebSpitProjectileEntity> type, Level level) {
         super(type, level);
     }
 
-    public WebWebProjectileEntity(Level level, LivingEntity owner) {
-        super(DNLEntityTypes.WEB_BALL.get(), owner, level);
+    public WebSpitProjectileEntity(Level level, LivingEntity owner) {
+        super(DNLEntityTypes.WEB_SPIT_PROJECTILE.get(), owner, level);
     }
 
     @Override
@@ -94,9 +98,54 @@ public class WebWebProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        ProjectileUtil.rotateTowardsMovement(this, 1.0F);
+    }
+
+    @Override
+    public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
+        super.shoot(x, y, z, velocity, inaccuracy);
+        this.seedRotationFromMovement();
+    }
+
+    @Override
+    public void lerpMotion(double x, double y, double z) {
+        super.lerpMotion(x, y, z);
+        this.seedRotationFromMovement();
+    }
+
+    @Override
+    public void recreateFromPacket(ClientboundAddEntityPacket packet) {
+        super.recreateFromPacket(packet);
+        this.setXRot(packet.getXRot());
+        this.setYRot(packet.getYRot());
+        this.xRotO = this.getXRot();
+        this.yRotO = this.getYRot();
+        this.seedRotationFromMovement();
+    }
+
+    private void seedRotationFromMovement() {
+        Vec3 motion = this.getDeltaMovement();
+        if (motion.lengthSqr() <= 1.0E-7D) {
+            return;
+        }
+
+        double horizontalDistance = motion.horizontalDistance();
+        this.setXRot((float)(Mth.atan2(motion.y, horizontalDistance) * (double)(180F / (float)Math.PI)));
+        this.setYRot((float)(Mth.atan2(motion.x, motion.z) * (double)(180F / (float)Math.PI)));
+        this.xRotO = this.getXRot();
+        this.yRotO = this.getYRot();
+        this.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+    }
+
+    @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (!this.level().isClientSide) {
+            if (result.getType() == HitResult.Type.BLOCK) {
+                this.spawnWebBreakParticles();
+            }
             spawnWebField(result);
             this.discard();
         }
@@ -111,8 +160,8 @@ public class WebWebProjectileEntity extends ThrowableItemProjectile {
 
         Entity owner = this.getOwner();
 
-        // Prevent friendly fire against spiders if fired by WebSpitterEntity
-        if (owner instanceof WebSpitterEntity && hit instanceof Spider) {
+        // Prevent friendly fire against spiders if fired by SilkSpiderEntity
+        if (owner instanceof SilkSpiderEntity && hit instanceof Spider) {
             return;
         }
 
@@ -147,18 +196,7 @@ public class WebWebProjectileEntity extends ThrowableItemProjectile {
             return true;
         }
 
-        // Spawn particles + sound, then destroy
-        if (this.level() instanceof ServerLevel serverLevel) {
-            // Web-like block particles
-            BlockState webState = DNLBlocks.WEB_CARPET.get().defaultBlockState();
-            serverLevel.sendParticles(
-                    new BlockParticleOption(ParticleTypes.BLOCK, webState),
-                    this.getX(), this.getY(), this.getZ(),
-                    12,          // count
-                    0.15D, 0.15D, 0.15D,  // spread in XYZ
-                    0.02D        // speed
-            );
-        }
+        this.spawnWebBreakParticles();
 
         // Soft, squishy pop
         this.level().playSound(
@@ -172,6 +210,19 @@ public class WebWebProjectileEntity extends ThrowableItemProjectile {
 
         this.discard();
         return true;
+    }
+
+    private void spawnWebBreakParticles() {
+        if (this.level() instanceof ServerLevel serverLevel) {
+            BlockState webState = DNLBlocks.WEB_CARPET.get().defaultBlockState();
+            serverLevel.sendParticles(
+                    new BlockParticleOption(ParticleTypes.BLOCK, webState),
+                    this.getX(), this.getY(), this.getZ(),
+                    12,
+                    0.15D, 0.15D, 0.15D,
+                    0.02D
+            );
+        }
     }
 
     @Override

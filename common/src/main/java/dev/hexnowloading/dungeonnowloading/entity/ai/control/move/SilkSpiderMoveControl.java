@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai.control.move;
 
-import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.SilkSpiderEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -10,9 +10,9 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.NodeEvaluator;
 
-public class WebSpitterMoveControl extends MoveControl {
+public class SilkSpiderMoveControl extends MoveControl {
 
-    private final WebSpitterEntity webSpitter;
+    private final SilkSpiderEntity silkSpider;
     private final double sideStrafeSpeed;
     private final double backStrafeSpeed;
 
@@ -20,11 +20,11 @@ public class WebSpitterMoveControl extends MoveControl {
     private int strafeDir = 1;
     private int strafeDirTimer = 0;
 
-    public WebSpitterMoveControl(WebSpitterEntity mob,
+    public SilkSpiderMoveControl(SilkSpiderEntity mob,
                                  double sideStrafeSpeed,
                                  double backStrafeSpeed) {
         super(mob);
-        this.webSpitter = mob;
+        this.silkSpider = mob;
         this.sideStrafeSpeed = sideStrafeSpeed;
         this.backStrafeSpeed = backStrafeSpeed;
     }

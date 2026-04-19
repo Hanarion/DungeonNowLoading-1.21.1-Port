@@ -10,7 +10,7 @@ import net.minecraft.client.animation.KeyframeAnimations;
  * Exported for Minecraft version 1.19 or later with Mojang mappings
  * @author Author
  */
-public class WebSpitterAnimation {
+public class SilkSpiderAnimation {
     public static final AnimationDefinition IDLE = AnimationDefinition.Builder.withLength(2.0F).looping()
             .addAnimation("leg1", new AnimationChannel(AnimationChannel.Targets.ROTATION,
                     new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),

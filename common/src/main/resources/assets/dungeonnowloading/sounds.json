@@ -639,44 +639,44 @@
         "dungeonnowloading:mob/scuttle/scuttle_death"
     ]
   },
-  "web_spitter_ambient": {
-    "subtitle": "sounds.dungeonnowloading.web_spitter_ambient",
+  "silk_spider_ambient": {
+    "subtitle": "sounds.dungeonnowloading.silk_spider_ambient",
     "sounds": [
-      "dungeonnowloading:mob/web_spitter/web_spitter_ambient_0",
-      "dungeonnowloading:mob/web_spitter/web_spitter_ambient_1",
-      "dungeonnowloading:mob/web_spitter/web_spitter_ambient_2"
+      "dungeonnowloading:mob/silk_spider/silk_spider_ambient_0",
+      "dungeonnowloading:mob/silk_spider/silk_spider_ambient_1",
+      "dungeonnowloading:mob/silk_spider/silk_spider_ambient_2"
     ]
   },
-  "web_spitter_death": {
-    "subtitle": "sounds.dungeonnowloading.web_spitter_death",
+  "silk_spider_death": {
+    "subtitle": "sounds.dungeonnowloading.silk_spider_death",
     "sounds": [
-      "dungeonnowloading:mob/web_spitter/web_spitter_death_0",
-      "dungeonnowloading:mob/web_spitter/web_spitter_death_1"
+      "dungeonnowloading:mob/silk_spider/silk_spider_death_0",
+      "dungeonnowloading:mob/silk_spider/silk_spider_death_1"
     ]
   },
-  "web_spitter_hurt": {
-    "subtitle": "sounds.dungeonnowloading.web_spitter_hurt",
+  "silk_spider_hurt": {
+    "subtitle": "sounds.dungeonnowloading.silk_spider_hurt",
     "sounds": [
-      "dungeonnowloading:mob/web_spitter/web_spitter_hurt_0",
-      "dungeonnowloading:mob/web_spitter/web_spitter_hurt_1",
-      "dungeonnowloading:mob/web_spitter/web_spitter_hurt_2"
+      "dungeonnowloading:mob/silk_spider/silk_spider_hurt_0",
+      "dungeonnowloading:mob/silk_spider/silk_spider_hurt_1",
+      "dungeonnowloading:mob/silk_spider/silk_spider_hurt_2"
     ]
   },
-  "web_spitter_shoot": {
-    "subtitle": "sounds.dungeonnowloading.web_spitter_shoot",
+  "silk_spider_shoot": {
+    "subtitle": "sounds.dungeonnowloading.silk_spider_shoot",
     "sounds": [
-      "dungeonnowloading:mob/web_spitter/web_spitter_shoot_0",
-      "dungeonnowloading:mob/web_spitter/web_spitter_shoot_1",
-      "dungeonnowloading:mob/web_spitter/web_spitter_shoot_2"
+      "dungeonnowloading:mob/silk_spider/silk_spider_shoot_0",
+      "dungeonnowloading:mob/silk_spider/silk_spider_shoot_1",
+      "dungeonnowloading:mob/silk_spider/silk_spider_shoot_2"
     ]
   },
-  "web_spitter_step": {
-    "subtitle": "sounds.dungeonnowloading.web_spitter_step",
+  "silk_spider_step": {
+    "subtitle": "sounds.dungeonnowloading.silk_spider_step",
     "sounds": [
-      "dungeonnowloading:mob/web_spitter/web_spitter_step_0",
-      "dungeonnowloading:mob/web_spitter/web_spitter_step_1",
-      "dungeonnowloading:mob/web_spitter/web_spitter_step_2",
-      "dungeonnowloading:mob/web_spitter/web_spitter_step_3"
+      "dungeonnowloading:mob/silk_spider/silk_spider_step_0",
+      "dungeonnowloading:mob/silk_spider/silk_spider_step_1",
+      "dungeonnowloading:mob/silk_spider/silk_spider_step_2",
+      "dungeonnowloading:mob/silk_spider/silk_spider_step_3"
     ]
   },
   "sealed_chaos_bullet_hit": {

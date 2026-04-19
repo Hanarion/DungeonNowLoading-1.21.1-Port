@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.client.animation_duration;
 
-public class WebSpitterAnimationDuration {
+public class SilkSpiderAnimationDuration {
     public static final float IDLE = 2.0F;
     public static final float WALK = 1.0F;
     public static final float WALK_BACK = 1.25F;

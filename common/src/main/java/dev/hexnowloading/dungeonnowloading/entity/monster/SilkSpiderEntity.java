@@ -1,10 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
-import dev.hexnowloading.dungeonnowloading.entity.ai.WebSpitterRangedAttackGoal;
-import dev.hexnowloading.dungeonnowloading.entity.ai.WebSpitterRetreatGoal;
-import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.WebSpitterMoveControl;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.WebSpitterAnimationDuration;
-import dev.hexnowloading.dungeonnowloading.entity.projectile.WebWebProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.entity.ai.SilkSpiderRangedAttackGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.SilkSpiderRetreatGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.SilkSpiderMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.SilkSpiderAnimationDuration;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.WebSpitProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -35,18 +35,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 
-public class WebSpitterEntity extends Spider implements RangedAttackMob {
+public class SilkSpiderEntity extends Spider implements RangedAttackMob {
 
-    private static final EntityDataAccessor<Boolean> ANCHORED = SynchedEntityData.defineId(WebSpitterEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> BACKING_UP = SynchedEntityData.defineId(WebSpitterEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<WebSpitterAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(WebSpitterEntity.class, EntityStates.WEB_SPITTER_ANIMATION_STATE);
+    private static final EntityDataAccessor<Boolean> ANCHORED = SynchedEntityData.defineId(SilkSpiderEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> BACKING_UP = SynchedEntityData.defineId(SilkSpiderEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<SilkSpiderAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(SilkSpiderEntity.class, EntityStates.SILK_SPIDER_ANIMATION_STATE);
 
-    private AnimationChainer<WebSpitterAnimationState> animationChainer = new AnimationChainer<>();
+    private AnimationChainer<SilkSpiderAnimationState> animationChainer = new AnimationChainer<>();
 
     public final AnimationState shootAnimationState = new AnimationState();
 
-    private WebSpitterRangedAttackGoal rangedGoal;
-    private WebSpitterRetreatGoal retreatGoal;
+    private SilkSpiderRangedAttackGoal rangedGoal;
+    private SilkSpiderRetreatGoal retreatGoal;
 
     private static final double ANCHORED_BREAK_RANGE = 10.0D; // blocks
 
@@ -56,15 +56,19 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
 
     private static final float WALK_BACK_IN = 0.18F;
     private static final float WALK_BACK_OUT = 0.12F;
+    private static final double SIDE_STRAFE_SPEED = 0.6D;
+    private static final double BACK_STRAFE_SPEED = 0.6D;
+    private static final float WEB_SPIT_SPEED = 0.85F;
+    private static final float WEB_SPIT_CLOSE_SPEED = 0.65F;
 
-    public WebSpitterEntity(EntityType<? extends WebSpitterEntity> entityType, Level level) {
+    public SilkSpiderEntity(EntityType<? extends SilkSpiderEntity> entityType, Level level) {
         super(entityType, level);
-        this.moveControl = new WebSpitterMoveControl(this, 0.6D, 0.7d);
+        this.moveControl = new SilkSpiderMoveControl(this, SIDE_STRAFE_SPEED, BACK_STRAFE_SPEED);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Spider.createAttributes()
-                .add(Attributes.MAX_HEALTH, 30.0D)
+                .add(Attributes.MAX_HEALTH, 16.0D)
                 .add(Attributes.FOLLOW_RANGE, 32.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.30000001192092896)
                 .add(Attributes.ATTACK_DAMAGE, 6.0F);
@@ -77,7 +81,7 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         super.defineSynchedData();
         this.entityData.define(ANCHORED, Boolean.FALSE);
         this.entityData.define(BACKING_UP, Boolean.FALSE);
-        this.entityData.define(ANIMATION_STATE, WebSpitterAnimationState.IDLE);
+        this.entityData.define(ANIMATION_STATE, SilkSpiderAnimationState.IDLE);
     }
 
     public boolean isAnchored() {
@@ -121,8 +125,8 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         float maxDistance = 16.0F;
         double moveSpeed = 1.0D;
 
-        this.retreatGoal = new WebSpitterRetreatGoal(this, moveSpeed, minDistance);
-        this.rangedGoal = new WebSpitterRangedAttackGoal(this, moveSpeed, 40, minDistance, maxDistance);
+        this.retreatGoal = new SilkSpiderRetreatGoal(this, moveSpeed, minDistance);
+        this.rangedGoal = new SilkSpiderRangedAttackGoal(this, moveSpeed, 40, minDistance, maxDistance);
 
         this.goalSelector.addGoal(2, this.retreatGoal);
         this.goalSelector.addGoal(3, this.rangedGoal);
@@ -174,7 +178,7 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
 
     public void playShootAnimation() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WebSpitterAnimationState.SHOOT, WebSpitterAnimationDuration.SHOOT, null, () -> this.entityData.set(ANIMATION_STATE, WebSpitterAnimationState.IDLE)));
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(SilkSpiderAnimationState.SHOOT, SilkSpiderAnimationDuration.SHOOT, null, () -> this.entityData.set(ANIMATION_STATE, SilkSpiderAnimationState.IDLE)));
     }
 
 
@@ -184,9 +188,9 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
     public void performRangedAttack(LivingEntity target, float distanceFactor) {
         if (this.level().isClientSide) return;
 
-        this.playSound(DNLSounds.WEB_SPITTER_SHOOT.get(), 1.0F, 0.9F + this.random.nextFloat() * 0.2F);
+        this.playSound(DNLSounds.SILK_SPIDER_SHOOT.get(), 1.0F, 0.9F + this.random.nextFloat() * 0.2F);
 
-        WebWebProjectileEntity projectile = new WebWebProjectileEntity(this.level(), this);
+        WebSpitProjectileEntity projectile = new WebSpitProjectileEntity(this.level(), this);
         projectile.setPos(this.getX(), this.getEyeY() - 0.2F, this.getZ());
         projectile.setOwner(this);
 
@@ -200,14 +204,14 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         double dy = targetY - projectile.getY();
 
         if (dHorizontal < 0.001D) {
-            projectile.shoot(dx, dy, dz, 0.8F, 0.0F);
+            projectile.shoot(dx, dy, dz, WEB_SPIT_CLOSE_SPEED, 0.0F);
             this.level().addFreshEntity(projectile);
             return;
         }
 
-        float speed = 1.1F;
+        float speed = WEB_SPIT_SPEED;
         double v = speed;
-        double g = WebWebProjectileEntity.GRAVITY;
+        double g = WebSpitProjectileEntity.GRAVITY;
 
         double v2 = v * v;
         double d = dHorizontal;
@@ -262,28 +266,28 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return DNLSounds.WEB_SPITTER_AMBIENT.get();
+        return DNLSounds.SILK_SPIDER_AMBIENT.get();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return DNLSounds.WEB_SPITTER_HURT.get();
+        return DNLSounds.SILK_SPIDER_HURT.get();
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return DNLSounds.WEB_SPITTER_DEATH.get();
+        return DNLSounds.SILK_SPIDER_DEATH.get();
     }
 
     @Override
     protected void playStepSound(BlockPos pos, BlockState state) {
-        this.playSound(DNLSounds.WEB_SPITTER_STEP.get(), 0.15F, 1.0F);
+        this.playSound(DNLSounds.SILK_SPIDER_STEP.get(), 0.15F, 1.0F);
     }
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> entityDataAccessor) {
         if (ANIMATION_STATE.equals(entityDataAccessor)) {
-            WebSpitterAnimationState animationState = this.getAnimationState();
+            SilkSpiderAnimationState animationState = this.getAnimationState();
             this.resetAnimation();
             switch (animationState) {
                 case SHOOT -> this.shootAnimationState.startIfStopped(this.tickCount);
@@ -292,13 +296,13 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         super.onSyncedDataUpdated(entityDataAccessor);
     }
 
-    public WebSpitterEntity transitionTo(WebSpitterAnimationState animationState) {
+    public SilkSpiderEntity transitionTo(SilkSpiderAnimationState animationState) {
         switch (animationState) {
             case IDLE:
-                this.entityData.set(ANIMATION_STATE, WebSpitterAnimationState.IDLE);
+                this.entityData.set(ANIMATION_STATE, SilkSpiderAnimationState.IDLE);
                 break;
             case SHOOT:
-                this.entityData.set(ANIMATION_STATE, WebSpitterAnimationState.SHOOT);
+                this.entityData.set(ANIMATION_STATE, SilkSpiderAnimationState.SHOOT);
                 break;
         }
         return this;
@@ -320,11 +324,11 @@ public class WebSpitterEntity extends Spider implements RangedAttackMob {
         this.entityData.set(BACKING_UP, backingUp);
     }
 
-    public WebSpitterAnimationState getAnimationState() {
+    public SilkSpiderAnimationState getAnimationState() {
         return this.entityData.get(ANIMATION_STATE);
     }
 
-    public enum WebSpitterAnimationState {
+    public enum SilkSpiderAnimationState {
         IDLE,
         SHOOT
     }

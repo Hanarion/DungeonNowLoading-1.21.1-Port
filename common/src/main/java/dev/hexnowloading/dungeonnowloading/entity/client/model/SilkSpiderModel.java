@@ -3,8 +3,8 @@ package dev.hexnowloading.dungeonnowloading.entity.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.hexnowloading.dungeonnowloading.entity.client.animation.WebSpitterAnimation;
-import dev.hexnowloading.dungeonnowloading.entity.monster.WebSpitterEntity;
+import dev.hexnowloading.dungeonnowloading.entity.client.animation.SilkSpiderAnimation;
+import dev.hexnowloading.dungeonnowloading.entity.monster.SilkSpiderEntity;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.KeyframeAnimations;
 import net.minecraft.client.model.HierarchicalModel;
@@ -17,8 +17,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AnimationState;
 import org.joml.Vector3f;
 
-public class WebSpitterModel <T extends WebSpitterEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "web_spitter"), "main");
+public class SilkSpiderModel <T extends SilkSpiderEntity> extends HierarchicalModel<T> {
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "silk_spider"), "main");
 
     private final ModelPart root;
     private final ModelPart Spider;
@@ -33,7 +33,7 @@ public class WebSpitterModel <T extends WebSpitterEntity> extends HierarchicalMo
     private final ModelPart bone4;
     private final ModelPart leg2;
 
-    public WebSpitterModel(ModelPart root) {
+    public SilkSpiderModel(ModelPart root) {
         this.root = root;
         this.Spider = root.getChild("Spider");
         this.head = this.Spider.getChild("head");
@@ -128,18 +128,18 @@ public class WebSpitterModel <T extends WebSpitterEntity> extends HierarchicalMo
     }
 
     @Override
-    public void setupAnim(WebSpitterEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(SilkSpiderEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root.getAllParts().forEach(ModelPart::resetPose);
 
         this.idleLoop.startIfStopped(entity.tickCount);
-        this.animate(idleLoop, WebSpitterAnimation.IDLE, ageInTicks);
+        this.animate(idleLoop, SilkSpiderAnimation.IDLE, ageInTicks);
 
         float pt = partialTickFromAge(ageInTicks);
         float walkBack = Mth.lerp(pt, entity.clientWalkBackBlendO, entity.clientWalkBackBlend);
         walkBack = walkBack * walkBack * (3.0F - 2.0F * walkBack);
-        this.animateWalkWeighted(WebSpitterAnimation.WALK, limbSwing, limbSwingAmount, 1.0F, 1.0F, 1.0F - walkBack);
-        this.animateWalkWeighted(WebSpitterAnimation.WALK_BACK, limbSwing, limbSwingAmount, 2.0F, 1.0F, walkBack);
-        this.animate(entity.shootAnimationState, WebSpitterAnimation.SHOOT, ageInTicks);
+        this.animateWalkWeighted(SilkSpiderAnimation.WALK, limbSwing, limbSwingAmount, 2.0F, 1.0F, 1.0F - walkBack);
+        this.animateWalkWeighted(SilkSpiderAnimation.WALK_BACK, limbSwing, limbSwingAmount, 3.0F, 1.0F, walkBack);
+        this.animate(entity.shootAnimationState, SilkSpiderAnimation.SHOOT, ageInTicks);
 
         this.animateHeadLookTarget(netHeadYaw, headPitch);
     }

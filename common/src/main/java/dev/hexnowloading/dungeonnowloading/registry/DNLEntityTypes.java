@@ -44,7 +44,7 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<BrokenGarholdEntity>> BROKEN_GARHOLD = register("broken_garhold", () -> EntityType.Builder.of(BrokenGarholdEntity::new, MobCategory.MONSTER).sized(1.2F, 2.5F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "broken_garhold").toString()));
     public static final Supplier<EntityType<WispEntity>> WISP = register("wisp", () -> EntityType.Builder.of(WispEntity::new, MobCategory.MONSTER).sized(0.5F, 0.5F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "wisp").toString()));
     public static final Supplier<EntityType<WispLanternEntity>> WISP_LANTERN = register("wisp_lantern", () -> EntityType.Builder.of(WispLanternEntity::new, MobCategory.MONSTER).sized(0.9F, 0.9F).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "wisp_lantern").toString()));
-    public static final Supplier<EntityType<WebSpitterEntity>> WEB_SPITTER = register("web_spitter", () -> EntityType.Builder.of(WebSpitterEntity::new, MobCategory.MONSTER).sized(1.4F, 0.9F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "web_spitter").toString()));
+    public static final Supplier<EntityType<SilkSpiderEntity>> SILK_SPIDER = register("silk_spider", () -> EntityType.Builder.of(SilkSpiderEntity::new, MobCategory.MONSTER).sized(1.4F, 0.9F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "silk_spider").toString()));
     public static final Supplier<EntityType<ReaperSpiderEntity>> REAPER_SPIDER = register("reaper_spider", () -> EntityType.Builder.of(ReaperSpiderEntity::new, MobCategory.MONSTER).sized(1.8F, 1.8F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "reaper_spider").toString()));
 
     // Passive
@@ -61,7 +61,7 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<VertexOrbProjectileEntity>> VERTEX_ORB_PROJECTILE = register("vertex_orb_projectile", () -> EntityType.Builder.<VertexOrbProjectileEntity>of(VertexOrbProjectileEntity::new, MobCategory.MISC).sized(0.75F, 0.75F).clientTrackingRange(4).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "vertex_orb_projectile").toString()));
     public static final Supplier<EntityType<VertexDomainProjectileEntity>> VERTEX_DOMAIN_PROJECTILE = register("vertex_domain_projectile", () -> EntityType.Builder.<VertexDomainProjectileEntity>of(VertexDomainProjectileEntity::new, MobCategory.MISC).sized(2.0F, 2.0F).clientTrackingRange(4).fireImmune().build(new ResourceLocation(DungeonNowLoading.MOD_ID, "vertex_domain_projectile").toString()));
     public static final Supplier<EntityType<BorusArrowEntity>> BORUS_ARROW = register("borus_arrow", () -> EntityType.Builder.<BorusArrowEntity>of(BorusArrowEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "borus_arrow").toString()));
-    public static final Supplier<EntityType<WebWebProjectileEntity>> WEB_BALL = register("web_ball", () -> EntityType.Builder.<WebWebProjectileEntity>of(WebWebProjectileEntity::new, MobCategory.MISC).sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "web_ball").toString()));
+    public static final Supplier<EntityType<WebSpitProjectileEntity>> WEB_SPIT_PROJECTILE = register("web_spit_projectile", () -> EntityType.Builder.<WebSpitProjectileEntity>of(WebSpitProjectileEntity::new, MobCategory.MISC).sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "web_spit_projectile").toString()));
     public static final Supplier<EntityType<GasCloudEntity>> GAS_CLOUD = register("gas_cloud", () -> EntityType.Builder.<GasCloudEntity>of(GasCloudEntity::new, MobCategory.MISC).sized(1.0f, 1.0f).clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "gas_cloud").toString()));
 
     // Misc
@@ -96,7 +96,7 @@ public class DNLEntityTypes {
         map.put(BROKEN_GARHOLD.get(), BrokenGarholdEntity.createAttributes().build());
         map.put(WISP.get(), WispEntity.createAttributes().build());
         map.put(WISP_LANTERN.get(), WispLanternEntity.createAttributes().build());
-        map.put(WEB_SPITTER.get(), WebSpitterEntity.createAttributes().build());
+        map.put(SILK_SPIDER.get(), SilkSpiderEntity.createAttributes().build());
         map.put(REAPER_SPIDER.get(), ReaperSpiderEntity.createAttributes().build());
 
         // Passive
