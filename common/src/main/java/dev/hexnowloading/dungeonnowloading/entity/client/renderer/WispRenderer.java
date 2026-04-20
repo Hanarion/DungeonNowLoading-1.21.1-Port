@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 public class WispRenderer<T extends WispEntity> extends MobRenderer<T, WispModel<T>> {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wisp/wisp.png");
+    private static final float MODEL_SCALE = 1.5F;
 
     public WispRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new WispModel<>(renderManager.bakeLayer(WispModel.LAYER_LOCATION)), 0.5F);
@@ -22,7 +23,8 @@ public class WispRenderer<T extends WispEntity> extends MobRenderer<T, WispModel
     @Override
     public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
-        poseStack.translate(0.0D, -0.25D, 0.0D);
+        poseStack.translate(0.0D, -0.45D, 0.0D);
+        poseStack.scale(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
         super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);
         poseStack.popPose();
     }

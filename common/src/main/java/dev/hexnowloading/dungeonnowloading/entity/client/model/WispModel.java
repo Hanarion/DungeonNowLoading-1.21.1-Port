@@ -39,7 +39,7 @@ public class WispModel<T extends WispEntity> extends HierarchicalModel<T> {
     private final AnimationState idleLoop = new AnimationState();
 
     @Override
-    public void setupAnim(WispEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root.getAllParts().forEach(ModelPart::resetPose);
 
         this.idleLoop.startIfStopped(entity.tickCount);

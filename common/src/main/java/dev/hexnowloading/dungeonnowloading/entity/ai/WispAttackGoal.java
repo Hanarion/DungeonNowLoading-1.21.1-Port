@@ -2,6 +2,10 @@ package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.WispAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WispEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.WispProjectileEntity;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -13,17 +17,7 @@ public class WispAttackGoal extends Goal {
     private final WispEntity wisp;
     private LivingEntity target;
 
-    // windup config
-    private static final int WINDUP_DURATION_TICKS = reducedTickDelay((int) ((WispAnimationDuration.FLARE_UP + WispAnimationDuration.TACKLE_START) * 20)); // 1 second at 20 tps
-
-    // release config
-    private static final double RELEASE_DISTANCE = 5.0;
-    private static final double MIN_CRUISE_SPEED = 0.15;
-
-    // state
-    private boolean released = false;
-    private Vec3 cruiseDir = Vec3.ZERO;
-    private double cruiseSpeed = 0.0;
+    private static final int WINDUP_DURATION_TICKS = reducedTickDelay((int) ((WispAnimationDuration.FLARE_UP + WispAnimationDuration.TACKLE_START) * 20));
 
     private int windupTicks = 0;
 
@@ -42,15 +36,11 @@ public class WispAttackGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        // keep going while target is alive; release glide is handled inside tick()
-        return (target != null && target.isAlive());
+        return target != null && target.isAlive();
     }
 
     @Override
     public void start() {
-        released = false;
-        cruiseDir = Vec3.ZERO;
-        cruiseSpeed = 0.0;
         windupTicks = 0;
         wisp.setNoGravity(true);
     }
@@ -58,12 +48,7 @@ public class WispAttackGoal extends Goal {
     @Override
     public void stop() {
         target = null;
-        released = false;
-        cruiseDir = Vec3.ZERO;
-        cruiseSpeed = 0.0;
         windupTicks = 0;
-
-        // stop steering
         wisp.getMoveControl().setWantedPosition(wisp.getX(), wisp.getY(), wisp.getZ(), 0);
         wisp.setDeltaMovement(Vec3.ZERO);
     }
@@ -72,61 +57,56 @@ public class WispAttackGoal extends Goal {
     public void tick() {
         if (target == null) return;
 
-        // Always keep looking at the target if possible
         wisp.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
-        // If we’re in the released phase, just cruise straight
-        if (released) {
-            if (cruiseSpeed > 0 && !cruiseDir.equals(Vec3.ZERO)) {
-                wisp.setDeltaMovement(cruiseDir.scale(cruiseSpeed));
-            }
-            return;
-        }
-
-        // --- WINDUP PHASE: stand still for a while before lunging ---
         if (windupTicks < WINDUP_DURATION_TICKS) {
             if (windupTicks <= 0) {
                 this.wisp.playFlareUpAnimation();
             }
             windupTicks++;
 
-            // Force it to stay in place during windup
             wisp.getMoveControl().setWantedPosition(wisp.getX(), wisp.getY(), wisp.getZ(), 0.0D);
             wisp.setDeltaMovement(Vec3.ZERO);
-
-            // You can trigger a windup animation or state here if you want:
-            // wisp.setCharging(true);
-
             return;
         }
 
-        // --- HOMING PHASE (your original logic) ---
-        Vec3 targetPos = target.position().add(0, target.getBbHeight() * 0.5, 0);
-        Vec3 to = targetPos.subtract(wisp.position());
-        double dist = to.length();
-        if (dist < 1.0e-6) return;
+        Vec3 targetPos = target.position().add(0, target.getBbHeight() * 0.5D, 0);
+        Vec3 direction = targetPos.subtract(wisp.position());
+        if (direction.lengthSqr() < 1.0e-6D) return;
 
-        // If close enough -> RELEASE: capture current travel vector & speed, then stop steering
-        if (dist <= RELEASE_DISTANCE) {
-            released = true;
+        double speed = wisp.getAttributeValue(Attributes.FLYING_SPEED);
+        this.spawnProjectileWisp(direction.normalize(), speed);
+    }
 
-            Vec3 v = wisp.getDeltaMovement();
-            if (v.lengthSqr() < 1.0e-6) {
-                // fallback to current direction toward target if we're nearly stationary
-                v = to.normalize().scale(wisp.getAttributeValue(Attributes.FLYING_SPEED));
-            }
-
-            cruiseDir = v.normalize();
-            // clamp cruise to something reasonable around the flying speed
-            double base = wisp.getAttributeValue(Attributes.FLYING_SPEED);
-            cruiseSpeed = Math.max(MIN_CRUISE_SPEED, Math.min(v.length(), base * 1.25));
-
-            // stop giving MoveControl targets so it won’t re-steer
-            wisp.getMoveControl().setWantedPosition(wisp.getX(), wisp.getY(), wisp.getZ(), 0);
+    private void spawnProjectileWisp(Vec3 direction, double speed) {
+        if (wisp.level().isClientSide) {
             return;
         }
 
-        // keep homing while far
-        wisp.getMoveControl().setWantedPosition(targetPos.x, targetPos.y, targetPos.z, 1.0);
+        Entity owner = wisp.getOwner();
+        LivingEntity projectileOwner = owner instanceof LivingEntity livingOwner ? livingOwner : wisp;
+        WispProjectileEntity projectile = new WispProjectileEntity(wisp.level(), projectileOwner);
+        projectile.setPos(wisp.getX(), wisp.getY(), wisp.getZ());
+        projectile.setDamage((float) wisp.getAttributeValue(Attributes.ATTACK_DAMAGE));
+        projectile.setHomingTarget(target);
+        projectile.shoot(direction.x, direction.y, direction.z, (float) speed, 0.0F);
+
+        wisp.level().addFreshEntity(projectile);
+        this.spawnTransitionBurst();
+        wisp.discard();
+    }
+
+    private void spawnTransitionBurst() {
+        if (!(wisp.level() instanceof ServerLevel server)) {
+            return;
+        }
+
+        double x = wisp.getX();
+        double y = wisp.getY() + wisp.getBbHeight() * 0.5D;
+        double z = wisp.getZ();
+
+        server.sendParticles(ParticleTypes.FLAME, x, y, z, 18, 0.22D, 0.22D, 0.22D, 0.05D);
+        server.sendParticles(ParticleTypes.SMOKE, x, y, z, 8, 0.18D, 0.18D, 0.18D, 0.02D);
+        server.sendParticles(ParticleTypes.POOF, x, y, z, 6, 0.12D, 0.12D, 0.12D, 0.02D);
     }
 }
