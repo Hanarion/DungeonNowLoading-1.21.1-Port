@@ -17,7 +17,9 @@ public class WispAttackGoal extends Goal {
     private final WispEntity wisp;
     private LivingEntity target;
 
-    private static final int WINDUP_DURATION_TICKS = reducedTickDelay((int) ((WispAnimationDuration.FLARE_UP + WispAnimationDuration.TACKLE_START) * 20));
+    private static final int WINDUP_DURATION_TICKS = reducedTickDelay((int) ((WispAnimationDuration.FLARE_UP) * 20));
+    private static final float WINDUP_MAX_YAW_CHANGE = 24.0F;
+    private static final float WINDUP_MAX_PITCH_CHANGE = 18.0F;
 
     private int windupTicks = 0;
 
@@ -58,6 +60,7 @@ public class WispAttackGoal extends Goal {
         if (target == null) return;
 
         wisp.getLookControl().setLookAt(target, 30.0F, 30.0F);
+        this.rotateWispTowardTarget();
 
         if (windupTicks < WINDUP_DURATION_TICKS) {
             if (windupTicks <= 0) {
@@ -75,7 +78,51 @@ public class WispAttackGoal extends Goal {
         if (direction.lengthSqr() < 1.0e-6D) return;
 
         double speed = wisp.getAttributeValue(Attributes.FLYING_SPEED);
-        this.spawnProjectileWisp(direction.normalize(), speed);
+        Vec3 normalizedDirection = direction.normalize();
+        this.alignWispRotation(normalizedDirection);
+        this.spawnProjectileWisp(normalizedDirection, speed);
+    }
+
+    private void rotateWispTowardTarget() {
+        Vec3 targetPos = target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D);
+        Vec3 direction = targetPos.subtract(wisp.position());
+        if (direction.lengthSqr() > 1.0E-6D) {
+            this.rotateWispToward(direction.normalize());
+        }
+    }
+
+    private void rotateWispToward(Vec3 direction) {
+        double horizontalDistance = direction.horizontalDistance();
+        float targetYaw = (float) Math.toDegrees(Math.atan2(direction.x, direction.z));
+        float targetPitch = (float) Math.toDegrees(Math.atan2(direction.y, horizontalDistance));
+        float yaw = this.rotateToward(wisp.getYRot(), targetYaw, WINDUP_MAX_YAW_CHANGE);
+        float pitch = this.rotateToward(wisp.getXRot(), targetPitch, WINDUP_MAX_PITCH_CHANGE);
+
+        wisp.setYRot(yaw);
+        wisp.setYHeadRot(yaw);
+        wisp.setYBodyRot(yaw);
+        wisp.setXRot(pitch);
+    }
+
+    private void alignWispRotation(Vec3 direction) {
+        double horizontalDistance = direction.horizontalDistance();
+        float yaw = (float) Math.toDegrees(Math.atan2(direction.x, direction.z));
+        float pitch = (float) Math.toDegrees(Math.atan2(direction.y, horizontalDistance));
+
+        wisp.setYRot(yaw);
+        wisp.setYHeadRot(yaw);
+        wisp.setYBodyRot(yaw);
+        wisp.yRotO = yaw;
+        wisp.yHeadRotO = yaw;
+        wisp.yBodyRotO = yaw;
+        wisp.setXRot(pitch);
+        wisp.xRotO = pitch;
+    }
+
+    private float rotateToward(float current, float target, float maxChange) {
+        float delta = net.minecraft.util.Mth.wrapDegrees(target - current);
+        delta = net.minecraft.util.Mth.clamp(delta, -maxChange, maxChange);
+        return current + delta;
     }
 
     private void spawnProjectileWisp(Vec3 direction, double speed) {
@@ -90,6 +137,10 @@ public class WispAttackGoal extends Goal {
         projectile.setDamage((float) wisp.getAttributeValue(Attributes.ATTACK_DAMAGE));
         projectile.setHomingTarget(target);
         projectile.shoot(direction.x, direction.y, direction.z, (float) speed, 0.0F);
+        projectile.setXRot(wisp.getXRot());
+        projectile.setYRot(wisp.getYRot());
+        projectile.xRotO = wisp.xRotO;
+        projectile.yRotO = wisp.yRotO;
 
         wisp.level().addFreshEntity(projectile);
         this.spawnTransitionBurst();

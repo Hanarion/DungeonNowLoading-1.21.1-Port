@@ -120,6 +120,8 @@ public class WispLanternModel<T extends WispLanternEntity> extends HierarchicalM
 
         this.idleLoop.startIfStopped(entity.tickCount);
         this.animate(idleLoop, WispLanternAnimation.IDLE, ageInTicks);
+        this.animate(entity.lookAroundAnimationState, WispLanternAnimation.LOOK_AROUND, ageInTicks);
+        this.animate(entity.summonWispAnimationState, WispLanternAnimation.SUMMON_WISP, ageInTicks);
 
     }
 

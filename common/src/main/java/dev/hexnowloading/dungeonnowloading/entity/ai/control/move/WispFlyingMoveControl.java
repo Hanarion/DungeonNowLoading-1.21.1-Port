@@ -32,10 +32,15 @@ public class WispFlyingMoveControl extends MoveControl {
 
     private void lookTowardTarget() {
         double directionX = this.wantedX - this.mob.getX();
+        double directionY = this.wantedY - this.mob.getY();
         double directionZ = this.wantedZ - this.mob.getZ();
-        double yaw = Math.toDegrees(Math.atan2(directionZ, directionX)) - 90.0;
+        double horizontalDistance = Math.sqrt(directionX * directionX + directionZ * directionZ);
+        double yaw = Math.toDegrees(Math.atan2(directionX, directionZ));
+        double pitch = Math.toDegrees(Math.atan2(directionY, horizontalDistance));
 
         this.mob.setYRot((float) yaw);
         this.mob.yBodyRot = (float) yaw;
+        this.mob.yHeadRot = (float) yaw;
+        this.mob.setXRot((float) pitch);
     }
 }

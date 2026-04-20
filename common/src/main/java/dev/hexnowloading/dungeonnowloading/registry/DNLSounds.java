@@ -84,6 +84,9 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> WHIMPER_AMBIENT = registerSoundEvent("whimper_ambient");
     public static final Supplier<SoundEvent> WHIMPER_HURT = registerSoundEvent("whimper_hurt");
     public static final Supplier<SoundEvent> WHIMPER_DEATH = registerSoundEvent("whimper_death");
+    public static final Supplier<SoundEvent> WISP_DEATH = registerSoundEvent("wisp_death");
+    public static final Supplier<SoundEvent> WISP_FLARE_UP = registerSoundEvent("wisp_flare_up");
+    public static final Supplier<SoundEvent> WISP_TACKLE = registerSoundEvent("wisp_tackle");
     public static final Supplier<SoundEvent> SCUTTLE_WAKING = registerSoundEvent("scuttle_waking");
     public static final Supplier<SoundEvent> SCUTTLE_STEP = registerSoundEvent("scuttle_step");
     public static final Supplier<SoundEvent> SCUTTLE_AMBIENT = registerSoundEvent("scuttle_idle");

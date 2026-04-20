@@ -1139,5 +1139,29 @@
       "dungeonnowloading:mob/garhold/garhold_teleport_0",
       "dungeonnowloading:mob/garhold/garhold_teleport_1"
     ]
+  },
+  "wisp_death": {
+    "subtitle": "sounds.dungeonnowloading.wisp_death",
+    "sounds": [
+      "dungeonnowloading:mob/wisp/wisp_death_0",
+      "dungeonnowloading:mob/wisp/wisp_death_1",
+      "dungeonnowloading:mob/wisp/wisp_death_2"
+    ]
+  },
+  "wisp_flare_up": {
+    "subtitle": "sounds.dungeonnowloading.wisp_flare_up",
+    "sounds": [
+      "dungeonnowloading:mob/wisp/wisp_flare_up_0",
+      "dungeonnowloading:mob/wisp/wisp_flare_up_1",
+      "dungeonnowloading:mob/wisp/wisp_flare_up_2"
+    ]
+  },
+  "wisp_tackle": {
+    "subtitle": "sounds.dungeonnowloading.wisp_tackle",
+    "sounds": [
+      "dungeonnowloading:mob/wisp/wisp_tackle_0",
+      "dungeonnowloading:mob/wisp/wisp_tackle_1",
+      "dungeonnowloading:mob/wisp/wisp_tackle_2"
+    ]
   }
 }

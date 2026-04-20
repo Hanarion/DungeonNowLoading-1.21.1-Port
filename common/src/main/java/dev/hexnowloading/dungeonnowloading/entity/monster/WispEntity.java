@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.WispFlyingMove
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.WispAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -14,6 +15,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,12 +28,14 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -76,7 +80,7 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new WispAttackGoal(this));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, false, false, this::hasClearTargetLine));
     }
 
     @Override
@@ -125,6 +129,11 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
 
             super.tick();
 
+            if (!this.level().isClientSide && this.isInWaterOrBubble()) {
+                this.discardWithWaterExtinguish();
+                return;
+            }
+
             this.tickProjectile();
 
         } else {
@@ -137,8 +146,11 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     public void playFlareUpAnimation() {
         this.animationChainer.reset();
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.FLARE_UP, WispAnimationDuration.FLARE_UP));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.TACKLE_START, WispAnimationDuration.TACKLE_START));
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(WispAnimationState.TACKLE, 0));
+        //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.TACKLE_START, WispAnimationDuration.TACKLE_START));
+        //this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(WispAnimationState.TACKLE, 0));
+        if (!this.level().isClientSide) {
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.WISP_FLARE_UP.get(), SoundSource.HOSTILE, 0.9F, 0.95F + this.random.nextFloat() * 0.1F);
+        }
     }
 
     public void playTackleAnimation() {
@@ -165,6 +177,13 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
             this.ownerUUID = entity.getUUID();
             this.cachedOwner = entity;
         }
+    }
+
+    public boolean hasClearTargetLine(LivingEntity target) {
+        Vec3 from = this.getEyePosition();
+        Vec3 to = target.getEyePosition();
+        HitResult hitResult = this.level().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.WATER, this));
+        return hitResult.getType() == HitResult.Type.MISS;
     }
 
     protected boolean checkLeftOwner() {
@@ -303,7 +322,7 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
         server.sendParticles(ParticleTypes.EXPLOSION, cx, cy, cz, 1, 0.0, 0.0, 0.0, 0.0);
         server.sendParticles(ParticleTypes.FLAME, cx, cy, cz, 24, 0.35, 0.35, 0.35, 0.08);
         server.sendParticles(ParticleTypes.SMOKE, cx, cy, cz, 12, 0.30, 0.30, 0.30, 0.03);
-        this.playSound(SoundEvents.FIRE_EXTINGUISH, 0.7f, 1.6f);
+        this.level().playSound(null, cx, cy, cz, DNLSounds.WISP_DEATH.get(), SoundSource.HOSTILE, 0.9F, 0.95F + this.random.nextFloat() * 0.1F);
         this.gameEvent(GameEvent.ENTITY_DIE);
 
         // 🔥 Place fire on surfaces in a 3x3x3 around impact
@@ -336,6 +355,21 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
             }
         }
 
+        this.discard();
+    }
+
+    private void discardWithWaterExtinguish() {
+        if (!(this.level() instanceof ServerLevel server) || this.isRemoved()) {
+            return;
+        }
+
+        double cx = this.getX();
+        double cy = this.getY() + this.getBbHeight() * 0.5D;
+        double cz = this.getZ();
+
+        server.sendParticles(ParticleTypes.SMOKE, cx, cy, cz, 18, 0.25D, 0.25D, 0.25D, 0.03D);
+        this.level().playSound(null, cx, cy, cz, SoundEvents.FIRE_EXTINGUISH, SoundSource.HOSTILE, 0.7F, 1.4F + this.random.nextFloat() * 0.3F);
+        this.level().playSound(null, cx, cy, cz, DNLSounds.WISP_DEATH.get(), SoundSource.HOSTILE, 0.75F, 0.95F + this.random.nextFloat() * 0.1F);
         this.discard();
     }
 

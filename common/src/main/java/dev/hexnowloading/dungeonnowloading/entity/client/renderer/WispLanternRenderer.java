@@ -13,9 +13,10 @@ import net.minecraft.resources.ResourceLocation;
 public class WispLanternRenderer<T extends WispLanternEntity> extends MobRenderer<T, WispLanternModel<T>> {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wisp_lantern/wisp_lantern.png");
+    private static final float MODEL_SCALE = 1.25F;
 
     public WispLanternRenderer(EntityRendererProvider.Context renderManager) {
-        super(renderManager, new WispLanternModel<>(renderManager.bakeLayer(WispLanternModel.LAYER_LOCATION)), 1.0F);
+        super(renderManager, new WispLanternModel<>(renderManager.bakeLayer(WispLanternModel.LAYER_LOCATION)), 1.25F);
         this.addLayer(new WispLanternLayer<>(this));
     }
 
@@ -23,6 +24,7 @@ public class WispLanternRenderer<T extends WispLanternEntity> extends MobRendere
     public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.translate(0.0D, -1.0D, 0.0D);
+        poseStack.scale(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
         super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);
         poseStack.popPose();
     }

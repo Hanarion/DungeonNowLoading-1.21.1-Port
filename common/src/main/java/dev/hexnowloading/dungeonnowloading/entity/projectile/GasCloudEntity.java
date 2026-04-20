@@ -525,6 +525,7 @@ public class GasCloudEntity extends Entity {
                                 || e instanceof SmallFireball
                                 || e instanceof DragonFireball
                                 || e instanceof FlameProjectileEntity // your custom one
+                                || e instanceof WispProjectileEntity
         );
 
         if (hits.isEmpty()) {
@@ -544,7 +545,8 @@ public class GasCloudEntity extends Entity {
             if (e instanceof Fireball
                     || e instanceof SmallFireball
                     || e instanceof DragonFireball
-                    || e instanceof FlameProjectileEntity) {
+                    || e instanceof FlameProjectileEntity
+                    || e instanceof WispProjectileEntity) {
                 this.ignite();
                 return;
             }
