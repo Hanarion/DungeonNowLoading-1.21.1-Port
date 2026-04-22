@@ -670,6 +670,13 @@
       "dungeonnowloading:mob/silk_spider/silk_spider_shoot_2"
     ]
   },
+  "silk_spider_web_spit_land": {
+    "subtitle": "sounds.dungeonnowloading.silk_spider_web_spit_land",
+    "sounds": [
+      "dungeonnowloading:mob/silk_spider/web_spit_land_0",
+      "dungeonnowloading:mob/silk_spider/web_spit_land_1"
+    ]
+  },
   "silk_spider_step": {
     "subtitle": "sounds.dungeonnowloading.silk_spider_step",
     "sounds": [

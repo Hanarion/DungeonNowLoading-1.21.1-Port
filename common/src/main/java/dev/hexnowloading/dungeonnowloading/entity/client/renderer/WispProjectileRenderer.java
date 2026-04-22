@@ -21,6 +21,7 @@ public class WispProjectileRenderer extends EntityRenderer<WispProjectileEntity>
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TEXTURE);
     private static final RenderType EMISSIVE_RENDER_TYPE = RenderType.entityTranslucentEmissive(TEXTURE_EMISSIVE, true);
     private static final float MODEL_SCALE = 1.5F;
+    private static final float LIVING_MODEL_Y_OFFSET = -1.501F;
 
     private final WispProjectileModel model;
 
@@ -38,15 +39,16 @@ public class WispProjectileRenderer extends EntityRenderer<WispProjectileEntity>
         float xRot = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot());
         if (motion.lengthSqr() > 1.0E-7D) {
             double horizontalDistance = motion.horizontalDistance();
-            yRot = (float)(Mth.atan2(motion.x, motion.z) * (double)(180F / (float)Math.PI));
-            xRot = (float)(Mth.atan2(motion.y, horizontalDistance) * (double)(180F / (float)Math.PI));
+            yRot = (float)(Mth.atan2(motion.z, motion.x) * (double)(180F / (float)Math.PI)) - 90.0F;
+            xRot = (float)(-(Mth.atan2(motion.y, horizontalDistance) * (double)(180F / (float)Math.PI)));
         }
         poseStack.translate(0.0D, -0.45D, 0.0D);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F + yRot));
-        poseStack.mulPose(Axis.XP.rotationDegrees(xRot));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yRot));
+        poseStack.mulPose(Axis.XP.rotationDegrees(-xRot));
         poseStack.scale(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
+        // Mirror the extra transform that MobRenderer/LivingEntityRenderer applies before rendering the model.
         poseStack.scale(-1.0F, -1.0F, 1.0F);
-        poseStack.translate(0.0F, -1.5F, 0.0F);
+        poseStack.translate(0.0D, LIVING_MODEL_Y_OFFSET, 0.0D);
 
         int emissiveLight = 0xF000F0;
         this.model.setupAnim(entity, 0.0F, 0.0F, entity.tickCount + partialTicks, entityYaw, 0.0F);

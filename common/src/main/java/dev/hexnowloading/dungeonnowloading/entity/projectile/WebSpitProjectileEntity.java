@@ -3,13 +3,13 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 import dev.hexnowloading.dungeonnowloading.entity.monster.SilkSpiderEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -145,6 +145,7 @@ public class WebSpitProjectileEntity extends ThrowableItemProjectile {
         if (!this.level().isClientSide) {
             if (result.getType() == HitResult.Type.BLOCK) {
                 this.spawnWebBreakParticles();
+                this.playLandingSound();
             }
             spawnWebField(result);
             this.discard();
@@ -184,6 +185,8 @@ public class WebSpitProjectileEntity extends ThrowableItemProjectile {
                     true   // show icon
             ));
         }
+
+        this.playLandingSound();
     }
 
     @Override
@@ -202,7 +205,7 @@ public class WebSpitProjectileEntity extends ThrowableItemProjectile {
         this.level().playSound(
                 null,
                 this.getX(), this.getY(), this.getZ(),
-                SoundEvents.SLIME_SQUISH_SMALL,
+                DNLSounds.SILK_SPIDER_WEB_SPIT_LAND.get(),
                 this.getSoundSource(),
                 0.7F,
                 1.2F + (this.random.nextFloat() - 0.5F) * 0.3F
@@ -223,6 +226,17 @@ public class WebSpitProjectileEntity extends ThrowableItemProjectile {
                     0.02D
             );
         }
+    }
+
+    private void playLandingSound() {
+        this.level().playSound(
+                null,
+                this.getX(), this.getY(), this.getZ(),
+                DNLSounds.SILK_SPIDER_WEB_SPIT_LAND.get(),
+                this.getSoundSource(),
+                0.9F,
+                0.95F + this.random.nextFloat() * 0.1F
+        );
     }
 
     @Override

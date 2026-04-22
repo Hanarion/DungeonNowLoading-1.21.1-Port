@@ -103,6 +103,7 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> SILK_SPIDER_DEATH = registerSoundEvent("silk_spider_death");
     public static final Supplier<SoundEvent> SILK_SPIDER_HURT = registerSoundEvent("silk_spider_hurt");
     public static final Supplier<SoundEvent> SILK_SPIDER_SHOOT = registerSoundEvent("silk_spider_shoot");
+    public static final Supplier<SoundEvent> SILK_SPIDER_WEB_SPIT_LAND = registerSoundEvent("silk_spider_web_spit_land");
     public static final Supplier<SoundEvent> SILK_SPIDER_STEP = registerSoundEvent("silk_spider_step");
     public static final Supplier<SoundEvent> SEALED_CHAOS_BULLET_HIT = registerSoundEvent("sealed_chaos_bullet_hit");
     public static final Supplier<SoundEvent> SEALED_CHAOS_BULLET_SHOOT = registerSoundEvent("sealed_chaos_bullet_shoot");

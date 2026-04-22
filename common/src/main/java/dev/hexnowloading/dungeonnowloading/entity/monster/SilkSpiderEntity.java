@@ -324,6 +324,12 @@ public class SilkSpiderEntity extends Spider implements RangedAttackMob {
         this.entityData.set(BACKING_UP, backingUp);
     }
 
+    @Nullable
+    @Override
+    public LivingEntity getControllingPassenger() {
+        return null;
+    }
+
     public SilkSpiderAnimationState getAnimationState() {
         return this.entityData.get(ANIMATION_STATE);
     }

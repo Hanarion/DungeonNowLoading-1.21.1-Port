@@ -33,7 +33,7 @@ import java.util.List;
 public class WebCarpetBlock extends MultifaceBlock {
 
     private final MultifaceSpreader spreader = new MultifaceSpreader(this);
-    private static final Vec3 ENTITY_SLOWDOWN = new Vec3(0.95D, 0.65D, 0.95D);
+    private static final Vec3 ENTITY_SLOWDOWN = new Vec3(0.9999D, 0.9999D, 0.9999D);
 
     private static final BooleanProperty FACE_UP    = MultifaceBlock.getFaceProperty(Direction.UP);
     private static final BooleanProperty FACE_DOWN  = MultifaceBlock.getFaceProperty(Direction.DOWN);

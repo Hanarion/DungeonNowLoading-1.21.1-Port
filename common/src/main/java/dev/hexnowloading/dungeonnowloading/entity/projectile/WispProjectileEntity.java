@@ -114,7 +114,9 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
 
         this.playTackleSound();
-        this.spawnTrailParticles();
+        if (this.tickCount > 1) {
+            this.spawnTrailParticles();
+        }
 
         if (this.tickCount > MAX_LIFE) {
             this.hitEntity = null;
@@ -163,8 +165,8 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
 
         double horizontalDistance = motion.horizontalDistance();
-        this.setXRot((float)(Mth.atan2(motion.y, horizontalDistance) * (double)(180F / (float)Math.PI)));
-        this.setYRot((float)(Mth.atan2(motion.x, motion.z) * (double)(180F / (float)Math.PI)));
+        this.setXRot((float)(-(Mth.atan2(motion.y, horizontalDistance) * (double)(180F / (float)Math.PI))));
+        this.setYRot((float)(Mth.atan2(motion.z, motion.x) * (double)(180F / (float)Math.PI)) - 90.0F);
         this.xRotO = this.getXRot();
         this.yRotO = this.getYRot();
     }

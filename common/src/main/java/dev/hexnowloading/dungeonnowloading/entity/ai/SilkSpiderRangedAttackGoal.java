@@ -234,4 +234,5 @@ public class SilkSpiderRangedAttackGoal extends Goal {
         mob.yBodyRot = newYaw;     // body render yaw
         mob.yBodyRotO = newYaw;    // previous body yaw (helps avoid jitter)
     }
+
 }

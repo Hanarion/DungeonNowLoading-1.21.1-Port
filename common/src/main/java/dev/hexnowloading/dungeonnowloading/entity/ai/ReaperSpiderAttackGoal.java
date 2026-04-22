@@ -513,4 +513,5 @@ public class ReaperSpiderAttackGoal extends Goal {
         mob.yBodyRot = newYaw;
         mob.yBodyRotO = newYaw;
     }
+
 }

@@ -1,7 +1,10 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
 import dev.hexnowloading.dungeonnowloading.entity.ai.WispAttackGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.WispLightBlocksGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.WispWanderGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.WispFlyingMoveControl;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.pathfinding.WispPathNavigation;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.WispAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
@@ -16,6 +19,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -24,6 +28,9 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
@@ -46,6 +53,7 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
 
     private AnimationChainer<WispAnimationState> animationChainer = new AnimationChainer<>();
 
+    public final AnimationState idleAnimationState = new AnimationState();
     public final AnimationState flareUpAnimationState = new AnimationState();
     public final AnimationState tackleStartAnimationState = new AnimationState();
     public final AnimationState tackleAnimationState = new AnimationState();
@@ -64,7 +72,11 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
         this.moveControl = new WispFlyingMoveControl(this);
         //this.moveControl = new RampFlyingMoveControl(this, 90, true);
         this.setNoGravity(true);
-        this.noPhysics = true;
+        this.noPhysics = false;
+        this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, 0.0F);
+        this.setPathfindingMalus(BlockPathTypes.DAMAGE_FIRE, 0.0F);
+        this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
+        this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, -1.0F);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -77,9 +89,20 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     }
 
     @Override
+    protected PathNavigation createNavigation(Level level) {
+        FlyingPathNavigation nav = new WispPathNavigation(this, level);
+        nav.setCanFloat(false);
+        nav.setCanOpenDoors(false);
+        nav.setCanPassDoors(true);
+        return nav;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new WispAttackGoal(this));
+        this.goalSelector.addGoal(2, new WispLightBlocksGoal(this));
+        this.goalSelector.addGoal(3, new WispWanderGoal(this));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, false, false, this::hasClearTargetLine));
     }
 
@@ -117,6 +140,9 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
 
     @Override
     public void tick() {
+        if (this.level().isClientSide) {
+            this.idleAnimationState.startIfStopped(this.tickCount);
+        }
         if (!this.hasBeenShot) {
             this.gameEvent(GameEvent.PROJECTILE_SHOOT, this.getOwner());
             this.hasBeenShot = true;
@@ -148,15 +174,20 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.FLARE_UP, WispAnimationDuration.FLARE_UP));
         //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.TACKLE_START, WispAnimationDuration.TACKLE_START));
         //this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(WispAnimationState.TACKLE, 0));
-        if (!this.level().isClientSide) {
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.WISP_FLARE_UP.get(), SoundSource.HOSTILE, 0.9F, 0.95F + this.random.nextFloat() * 0.1F);
-        }
+        this.playFlareUpSound();
     }
 
     public void playTackleAnimation() {
         this.animationChainer.reset();
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.TACKLE_START, WispAnimationDuration.TACKLE_START));
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(WispAnimationState.TACKLE, 0));
+        this.playFlareUpSound();
+    }
+
+    private void playFlareUpSound() {
+        if (!this.level().isClientSide) {
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.WISP_FLARE_UP.get(), SoundSource.HOSTILE, 0.9F, 0.95F + this.random.nextFloat() * 0.1F);
+        }
     }
 
     @Nullable
@@ -184,6 +215,50 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
         Vec3 to = target.getEyePosition();
         HitResult hitResult = this.level().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.WATER, this));
         return hitResult.getType() == HitResult.Type.MISS;
+    }
+
+    public void steerTowards(Vec3 targetPos, double xzDriftSpeed, double yDriftSpeed, double steerStrength, float turnSpeed) {
+        Vec3 toTarget = targetPos.subtract(this.position());
+        Vec3 motion = this.getDeltaMovement();
+
+        double targetX = Mth.sign(toTarget.x) * xzDriftSpeed;
+        double targetY = Mth.sign(toTarget.y) * yDriftSpeed;
+        double targetZ = Mth.sign(toTarget.z) * xzDriftSpeed;
+
+        Vec3 newMotion = motion.add(
+                (targetX - motion.x) * steerStrength,
+                (targetY - motion.y) * steerStrength,
+                (targetZ - motion.z) * steerStrength
+        );
+        this.setDeltaMovement(newMotion);
+        this.rotateTowardMotion(newMotion, turnSpeed);
+    }
+
+    public void rotateTowardMotion(Vec3 motion, float maxTurnSpeed) {
+        double horizontalMotion = motion.horizontalDistance();
+        if (horizontalMotion > 1.0E-4D) {
+            float targetYaw = (float) (Mth.atan2(motion.z, motion.x) * (180.0D / Math.PI)) - 90.0F;
+            float yaw = this.rotateToward(this.getYRot(), targetYaw, maxTurnSpeed);
+            this.setYRot(yaw);
+            this.setYHeadRot(yaw);
+            this.yRotO = yaw;
+            this.yHeadRotO = yaw;
+        }
+
+        float targetPitch = (float) (-(Mth.atan2(motion.y, horizontalMotion) * (180.0D / Math.PI)));
+        float pitch = this.rotateToward(this.getXRot(), targetPitch, maxTurnSpeed);
+        this.setXRot(pitch);
+        this.xRotO = pitch;
+    }
+
+    public float rotateToward(float current, float target, float maxChange) {
+        float delta = Mth.wrapDegrees(target - current);
+        return current + Mth.clamp(delta, -maxChange, maxChange);
+    }
+
+    public Vec3 getNavigationAnchorPos() {
+        Vec3 center = this.getBoundingBox().getCenter();
+        return new Vec3(center.x, this.getY() - (1.0D - this.getBbHeight()) / 2.0D, center.z);
     }
 
     protected boolean checkLeftOwner() {
@@ -274,6 +349,7 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     @Override
     public void recreateFromPacket(ClientboundAddEntityPacket recreateFromPacket) {
         super.recreateFromPacket(recreateFromPacket);
+        this.idleAnimationState.start(this.tickCount);
     }
 
     private float getContactDamage() {
@@ -399,6 +475,7 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
             WispAnimationState animationState = this.getAnimationState();
             this.resetAnimation();
             switch (animationState) {
+                case IDLE -> this.idleAnimationState.startIfStopped(this.tickCount);
                 case FLARE_UP -> this.flareUpAnimationState.startIfStopped(this.tickCount);
                 case TACKLE_START -> this.tackleStartAnimationState.startIfStopped(this.tickCount);
                 case TACKLE -> this.tackleAnimationState.startIfStopped(this.tickCount);
@@ -427,6 +504,7 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     }
 
     private void resetAnimation() {
+        this.idleAnimationState.stop();
         this.flareUpAnimationState.stop();
         this.tackleStartAnimationState.stop();
         this.tackleAnimationState.stop();

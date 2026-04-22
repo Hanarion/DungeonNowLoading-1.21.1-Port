@@ -14,10 +14,12 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 
 public class WispAttackGoal extends Goal {
+    private static final float START_TACKLE_ANGLE_DEGREES = 30.0F;
+
     private final WispEntity wisp;
     private LivingEntity target;
 
-    private static final int WINDUP_DURATION_TICKS = reducedTickDelay((int) ((WispAnimationDuration.FLARE_UP) * 20));
+    private static final int WINDUP_DURATION_TICKS = reducedTickDelay((int) (WispAnimationDuration.FLARE_UP * 20));
     private static final float WINDUP_MAX_YAW_CHANGE = 24.0F;
     private static final float WINDUP_MAX_PITCH_CHANGE = 18.0F;
 
@@ -62,6 +64,12 @@ public class WispAttackGoal extends Goal {
         wisp.getLookControl().setLookAt(target, 30.0F, 30.0F);
         this.rotateWispTowardTarget();
 
+        if (windupTicks <= 0 && !this.isFacingTarget()) {
+            wisp.getMoveControl().setWantedPosition(wisp.getX(), wisp.getY(), wisp.getZ(), 0.0D);
+            wisp.setDeltaMovement(Vec3.ZERO);
+            return;
+        }
+
         if (windupTicks < WINDUP_DURATION_TICKS) {
             if (windupTicks <= 0) {
                 this.wisp.playFlareUpAnimation();
@@ -93,8 +101,8 @@ public class WispAttackGoal extends Goal {
 
     private void rotateWispToward(Vec3 direction) {
         double horizontalDistance = direction.horizontalDistance();
-        float targetYaw = (float) Math.toDegrees(Math.atan2(direction.x, direction.z));
-        float targetPitch = (float) Math.toDegrees(Math.atan2(direction.y, horizontalDistance));
+        float targetYaw = (float) Math.toDegrees(Math.atan2(direction.z, direction.x)) - 90.0F;
+        float targetPitch = (float) -Math.toDegrees(Math.atan2(direction.y, horizontalDistance));
         float yaw = this.rotateToward(wisp.getYRot(), targetYaw, WINDUP_MAX_YAW_CHANGE);
         float pitch = this.rotateToward(wisp.getXRot(), targetPitch, WINDUP_MAX_PITCH_CHANGE);
 
@@ -104,10 +112,23 @@ public class WispAttackGoal extends Goal {
         wisp.setXRot(pitch);
     }
 
+    private boolean isFacingTarget() {
+        Vec3 targetPos = target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D);
+        Vec3 direction = targetPos.subtract(wisp.position());
+        if (direction.lengthSqr() <= 1.0E-6D) {
+            return true;
+        }
+
+        float targetYaw = (float) Math.toDegrees(Math.atan2(direction.z, direction.x)) - 90.0F;
+        float targetPitch = (float) -Math.toDegrees(Math.atan2(direction.y, direction.horizontalDistance()));
+        return net.minecraft.util.Mth.degreesDifferenceAbs(wisp.getYRot(), targetYaw) <= START_TACKLE_ANGLE_DEGREES
+                && net.minecraft.util.Mth.degreesDifferenceAbs(wisp.getXRot(), targetPitch) <= START_TACKLE_ANGLE_DEGREES;
+    }
+
     private void alignWispRotation(Vec3 direction) {
         double horizontalDistance = direction.horizontalDistance();
-        float yaw = (float) Math.toDegrees(Math.atan2(direction.x, direction.z));
-        float pitch = (float) Math.toDegrees(Math.atan2(direction.y, horizontalDistance));
+        float yaw = (float) Math.toDegrees(Math.atan2(direction.z, direction.x)) - 90.0F;
+        float pitch = (float) -Math.toDegrees(Math.atan2(direction.y, horizontalDistance));
 
         wisp.setYRot(yaw);
         wisp.setYHeadRot(yaw);
