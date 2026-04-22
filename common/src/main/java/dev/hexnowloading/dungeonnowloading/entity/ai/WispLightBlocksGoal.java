@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 
 public class WispLightBlocksGoal extends Goal {
-    private static final int HORIZONTAL_SEARCH_RANGE = 8;
-    private static final int VERTICAL_SEARCH_RANGE = 4;
+    public static final int HORIZONTAL_SEARCH_RANGE = 16;
+    public static final int VERTICAL_SEARCH_RANGE = 8;
     private static final int TARGET_REFRESH_INTERVAL = 20;
     private static final int RETRY_DELAY_TICKS = 30;
     private static final double TARGET_REACHED_DISTANCE_SQR = 1.3D * 1.3D;
@@ -175,7 +175,7 @@ public class WispLightBlocksGoal extends Goal {
         return best;
     }
 
-    private boolean isValidLightTarget(Level level, BlockPos pos) {
+    public static boolean isValidLightTarget(Level level, BlockPos pos) {
         if (!level.isInWorldBounds(pos) || !level.getWorldBorder().isWithinBounds(pos)) {
             return false;
         }
@@ -256,8 +256,8 @@ public class WispLightBlocksGoal extends Goal {
         return this.wisp.level().getBlockState(pos).getBlock() instanceof FireBlock;
     }
 
-    private Vec3 getApproachPos(BlockPos pos) {
-        BlockState state = this.wisp.level().getBlockState(pos);
+    public static Vec3 getApproachPos(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
 
         if (block instanceof CampfireBlock) {
@@ -275,6 +275,10 @@ public class WispLightBlocksGoal extends Goal {
         }
 
         return Vec3.atCenterOf(pos).add(0.0D, 0.25D, 0.0D);
+    }
+
+    private Vec3 getApproachPos(BlockPos pos) {
+        return getApproachPos(this.wisp.level(), pos);
     }
 
     private boolean canPathTo(BlockPos pos) {

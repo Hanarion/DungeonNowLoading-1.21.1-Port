@@ -11,7 +11,6 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.AnimationState;
 
 public class WispLanternModel<T extends WispLanternEntity> extends HierarchicalModel<T> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "wisp_lantern"), "main");
@@ -112,14 +111,12 @@ public class WispLanternModel<T extends WispLanternEntity> extends HierarchicalM
         return LayerDefinition.create(meshdefinition, 128, 128);
     }
 
-    private final AnimationState idleLoop = new AnimationState();
-
     @Override
     public void setupAnim(WispLanternEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root.getAllParts().forEach(ModelPart::resetPose);
 
-        this.idleLoop.startIfStopped(entity.tickCount);
-        this.animate(idleLoop, WispLanternAnimation.IDLE, ageInTicks);
+        entity.idleAnimationState.startIfStopped(entity.tickCount);
+        this.animate(entity.idleAnimationState, WispLanternAnimation.IDLE, ageInTicks);
         this.animate(entity.lookAroundAnimationState, WispLanternAnimation.LOOK_AROUND, ageInTicks);
         this.animate(entity.summonWispAnimationState, WispLanternAnimation.SUMMON_WISP, ageInTicks);
 

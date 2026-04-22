@@ -48,6 +48,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
+    private static final float FLARE_UP_PARTICLE_TIME_SECONDS = 1.0F;
+    private static final float FLARE_UP_PARTICLE_PROGRESS = FLARE_UP_PARTICLE_TIME_SECONDS / WispAnimationDuration.FLARE_UP;
 
     private static final EntityDataAccessor<WispAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(WispEntity.class, EntityStates.WISP_ANIMATION_STATE);
 
@@ -64,6 +66,7 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     protected Entity cachedOwner;
     protected boolean leftOwner;
     protected boolean hasBeenShot;
+    private boolean flareUpParticlesSpawned;
 
     Entity hitEntity = null;
 
@@ -171,7 +174,19 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
 
     public void playFlareUpAnimation() {
         this.animationChainer.reset();
-        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.FLARE_UP, WispAnimationDuration.FLARE_UP));
+        this.flareUpParticlesSpawned = false;
+        this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
+                WispAnimationState.FLARE_UP,
+                WispAnimationDuration.FLARE_UP,
+                () -> this.flareUpParticlesSpawned = false,
+                null,
+                (animation, progress) -> {
+                    if (!this.flareUpParticlesSpawned && progress >= FLARE_UP_PARTICLE_PROGRESS) {
+                        this.flareUpParticlesSpawned = true;
+                        this.spawnFlareUpParticles();
+                    }
+                }
+        ));
         //this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(WispAnimationState.TACKLE_START, WispAnimationDuration.TACKLE_START));
         //this.animationChainer.enqueue(AnimationChainer.AnimationStep.looping(WispAnimationState.TACKLE, 0));
         this.playFlareUpSound();
@@ -188,6 +203,18 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
         if (!this.level().isClientSide) {
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.WISP_FLARE_UP.get(), SoundSource.HOSTILE, 0.9F, 0.95F + this.random.nextFloat() * 0.1F);
         }
+    }
+
+    private void spawnFlareUpParticles() {
+        if (!(this.level() instanceof ServerLevel server)) {
+            return;
+        }
+
+        Vec3 center = this.getBoundingBox().getCenter();
+        double centerX = center.x;
+        double centerY = center.y + 0.3D;
+        double centerZ = center.z;
+        server.sendParticles(ParticleTypes.FLAME, centerX, centerY, centerZ, 16, 0.18D, 0.18D, 0.18D, 0.12D);
     }
 
     @Nullable
