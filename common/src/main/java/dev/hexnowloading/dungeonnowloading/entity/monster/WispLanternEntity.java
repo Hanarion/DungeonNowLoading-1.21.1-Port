@@ -18,7 +18,6 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.FlyingMob;
@@ -385,8 +384,8 @@ public class WispLanternEntity extends FlyingMob implements Enemy {
         }
 
         if (this.level() instanceof ServerLevel server) {
-            server.sendParticles(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.6D, this.getZ(), 18, 0.25D, 0.25D, 0.25D, 0.03D);
-            server.sendParticles(ParticleTypes.POOF, this.getX(), this.getY() + 0.6D, this.getZ(), 8, 0.18D, 0.18D, 0.18D, 0.01D);
+            server.sendParticles(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.6D, this.getZ(), 8, 0.25D, 0.25D, 0.25D, 0.03D);
+            server.sendParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY() + 0.6D, this.getZ(), 3, 0.18D, 0.18D, 0.18D, 0.01D);
         }
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.HOSTILE, 0.9F, 1.1F + this.random.nextFloat() * 0.1F);
         this.spawnAtLocation(new ItemStack(Blocks.COAL_BLOCK));
