@@ -23,7 +23,7 @@ public class WispLanternRenderer<T extends WispLanternEntity> extends MobRendere
     @Override
     public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
-        poseStack.translate(0.0D, -1.0D, 0.0D);
+        poseStack.translate(0.0D, -1.3D, 0.0D);
         poseStack.scale(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
         super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);
         poseStack.popPose();
