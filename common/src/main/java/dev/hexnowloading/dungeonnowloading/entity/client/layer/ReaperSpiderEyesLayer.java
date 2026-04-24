@@ -8,8 +8,8 @@ import dev.hexnowloading.dungeonnowloading.entity.client.renderer.ReaperSpiderRe
 import dev.hexnowloading.dungeonnowloading.entity.monster.ReaperSpiderEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
 public class ReaperSpiderEyesLayer<T extends ReaperSpiderEntity, M extends ReaperSpiderModel<T>> extends RenderLayer<T, M> {
@@ -22,8 +22,12 @@ public class ReaperSpiderEyesLayer<T extends ReaperSpiderEntity, M extends Reape
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLightIn, ReaperSpiderEntity body, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE_EMISSIVE, true));
-        this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 0xF00000, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        boolean emissive = body.areEyesEmissive(partialTicks);
+        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(emissive
+                ? RenderType.entityTranslucentEmissive(TEXTURE_EMISSIVE, true)
+                : RenderType.entityTranslucent(TEXTURE_EMISSIVE));
+        float strength = body.getEyesAlpha(partialTicks);
+        int light = emissive ? 0xF00000 : packedLightIn;
+        this.getParentModel().renderToBuffer(poseStack, vertexConsumer, light, LivingEntityRenderer.getOverlayCoords(body, 0.0F), strength, strength, strength, strength);
     }
 }
-

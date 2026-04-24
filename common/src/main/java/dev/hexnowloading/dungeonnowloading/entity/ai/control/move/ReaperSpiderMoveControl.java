@@ -11,96 +11,92 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.NodeEvaluator;
 
 public class ReaperSpiderMoveControl extends MoveControl {
-
     private final ReaperSpiderEntity reaperSpider;
     private final double sideStrafeSpeed;
     private final double backStrafeSpeed;
 
-    private float strafeForward;
-    private float strafeRight;
-    private boolean hasStrafeCommand = false;
+    private float strafeSideMagnitude = 0.0F;
+    private int strafeDir = 1;
+    private int strafeDirTimer = 0;
 
-    public ReaperSpiderMoveControl(ReaperSpiderEntity mob,
-                                   double sideStrafeSpeed,
-                                   double backStrafeSpeed) {
+    public ReaperSpiderMoveControl(ReaperSpiderEntity mob, double sideStrafeSpeed, double backStrafeSpeed) {
         super(mob);
         this.reaperSpider = mob;
         this.sideStrafeSpeed = sideStrafeSpeed;
         this.backStrafeSpeed = backStrafeSpeed;
     }
 
-    /**
-     * Called from the attack goal to request a strafe move.
-     */
-    public void setStrafe(float forward, float right, double speedModifier) {
-        this.operation = Operation.STRAFE;
-        this.strafeForward = forward;
-        this.strafeRight = right;
-        this.hasStrafeCommand = true;
-
-        if (forward < 0.0F && right == 0.0F) {
-            this.speedModifier = this.backStrafeSpeed;
-        } else {
-            this.speedModifier = speedModifier <= 0 ? this.sideStrafeSpeed : speedModifier;
-        }
-    }
-
     @Override
     public void strafe(float forward, float right) {
-        // vanilla-compatible fallback if something else calls it
-        setStrafe(forward, right, this.sideStrafeSpeed);
+        this.operation = Operation.STRAFE;
+        this.strafeForwards = forward;
+        this.strafeSideMagnitude = Math.abs(right);
+
+        if (forward < 0.0F && this.strafeSideMagnitude == 0.0F) {
+            this.speedModifier = this.backStrafeSpeed;
+        } else {
+            this.speedModifier = this.sideStrafeSpeed;
+        }
+
+        if (this.strafeSideMagnitude > 0.0F && this.strafeDirTimer <= 0) {
+            this.strafeDirTimer = 20 + this.mob.getRandom().nextInt(20);
+        }
+
+        if (this.strafeDir == 0) {
+            this.strafeDir = this.mob.getRandom().nextBoolean() ? 1 : -1;
+        }
     }
 
     @Override
     public void tick() {
-        if (this.operation != Operation.STRAFE || !this.hasStrafeCommand) {
-            this.hasStrafeCommand = false;
+        if (this.operation != Operation.STRAFE) {
             super.tick();
             return;
         }
 
-        float forward = this.strafeForward;
-        float right = this.strafeRight;
+        float forward = this.strafeForwards;
+        float right = 0.0F;
 
-        float len = Mth.sqrt(forward * forward + right * right);
-        if (len < 1.0E-4F) {
-            this.mob.setZza(0.0F);
-            this.mob.setXxa(0.0F);
-            this.operation = Operation.WAIT;
-            this.hasStrafeCommand = false;
-            return;
+        if (this.strafeSideMagnitude <= 0.0F && forward < 0.0F) {
+            if (!this.isStrafeDirectionSafe(forward, 0.0F)) {
+                float sideTestMag = 0.5F;
+
+                boolean rightSafe = this.isStrafeDirectionSafe(forward, sideTestMag);
+                boolean leftSafe = this.isStrafeDirectionSafe(forward, -sideTestMag);
+
+                if (rightSafe || leftSafe) {
+                    this.strafeSideMagnitude = sideTestMag;
+                    this.speedModifier = this.sideStrafeSpeed;
+                    this.strafeDir = rightSafe && !leftSafe ? 1 : !rightSafe && leftSafe ? -1 : this.mob.getRandom().nextBoolean() ? 1 : -1;
+                    this.strafeDirTimer = 20 + this.mob.getRandom().nextInt(20);
+                }
+            }
         }
 
-        forward /= len;
-        right /= len;
+        if (this.strafeSideMagnitude > 0.0F) {
+            if (--this.strafeDirTimer <= 0) {
+                this.strafeDirTimer = 20 + this.mob.getRandom().nextInt(20);
+                this.strafeDir = -this.strafeDir;
+            }
 
-        if (!isStrafeDirectionSafe(forward, right)) {
-            // can't move safely in this direction; stand still this tick
-            this.mob.setZza(0.0F);
-            this.mob.setXxa(0.0F);
-            this.operation = Operation.WAIT;
-            this.hasStrafeCommand = false;
-            return;
+            right = this.strafeSideMagnitude * this.strafeDir;
+
+            if (!this.isStrafeDirectionSafe(forward, right)) {
+                int oldDir = this.strafeDir;
+                this.strafeDir = -this.strafeDir;
+                right = this.strafeSideMagnitude * this.strafeDir;
+
+                if (!this.isStrafeDirectionSafe(forward, right)) {
+                    this.strafeDir = oldDir;
+                    right = 0.0F;
+                }
+            }
         }
 
         float baseSpeed = (float) this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED);
         this.mob.setSpeed((float) this.speedModifier * baseSpeed);
         this.mob.setZza(forward);
         this.mob.setXxa(right);
-
-        // consume this command; goal must resend next tick
-        this.hasStrafeCommand = false;
-    }
-
-    public boolean isStrafeDirectionSafe(float forward, float right) {
-        float yawRad = this.mob.getYRot() * (Mth.PI / 180.0F);
-        float sin = Mth.sin(yawRad);
-        float cos = Mth.cos(yawRad);
-
-        float dx = right * cos - forward * sin;
-        float dz = forward * cos + right * sin;
-
-        return isSafeStrafe(dx, dz);
     }
 
     private boolean isSafeStrafe(float worldOffsetX, float worldOffsetZ) {
@@ -111,16 +107,13 @@ public class ReaperSpiderMoveControl extends MoveControl {
         int y = this.mob.getBlockY();
         BlockPos pos = new BlockPos(x, y, z);
 
-        // fluids
-        if (this.mob.level().getFluidState(pos).is(FluidTags.WATER)
-                || this.mob.level().getFluidState(pos).is(FluidTags.LAVA)) {
+        if (this.mob.level().getFluidState(pos).is(FluidTags.WATER) || this.mob.level().getFluidState(pos).is(FluidTags.LAVA)) {
             return false;
         }
 
         for (int i = 1; i <= 3; i++) {
             BlockPos below = pos.below(i);
-            if (this.mob.level().getFluidState(below).is(FluidTags.WATER)
-                    || this.mob.level().getFluidState(below).is(FluidTags.LAVA)) {
+            if (this.mob.level().getFluidState(below).is(FluidTags.WATER) || this.mob.level().getFluidState(below).is(FluidTags.LAVA)) {
                 return false;
             }
         }
@@ -130,8 +123,12 @@ public class ReaperSpiderMoveControl extends MoveControl {
 
         if (eval != null) {
             BlockPathTypes feetType = eval.getBlockPathType(this.mob.level(), x, y, z);
-            if (isDangerous(feetType)) return false;
-            if (feetType == BlockPathTypes.WALKABLE) return true;
+            if (this.isDangerous(feetType)) {
+                return false;
+            }
+            if (feetType == BlockPathTypes.WALKABLE) {
+                return true;
+            }
 
             var stateFeet = this.mob.level().getBlockState(pos);
             if (!stateFeet.getCollisionShape(this.mob.level(), pos).isEmpty()) {
@@ -140,17 +137,20 @@ public class ReaperSpiderMoveControl extends MoveControl {
 
             for (int depth = 1; depth <= 3; depth++) {
                 BlockPathTypes typeBelow = eval.getBlockPathType(this.mob.level(), x, y - depth, z);
-                if (isDangerous(typeBelow)) return false;
-                if (typeBelow == BlockPathTypes.WALKABLE) return true;
+                if (this.isDangerous(typeBelow)) {
+                    return false;
+                }
+                if (typeBelow == BlockPathTypes.WALKABLE) {
+                    return true;
+                }
             }
 
             return false;
         }
 
-        // fallback: any solid floor within 3 blocks below
         for (int i = 0; i <= 3; i++) {
-            BlockPos fp = pos.below(i);
-            if (!this.mob.level().getBlockState(fp).getCollisionShape(this.mob.level(), fp).isEmpty()) {
+            BlockPos floorPos = pos.below(i);
+            if (!this.mob.level().getBlockState(floorPos).getCollisionShape(this.mob.level(), floorPos).isEmpty()) {
                 return true;
             }
         }
@@ -158,12 +158,32 @@ public class ReaperSpiderMoveControl extends MoveControl {
         return false;
     }
 
+    public boolean isStrafeDirectionSafe(float forward, float right) {
+        float len = Mth.sqrt(forward * forward + right * right);
+        if (len <= 1.0E-4F) {
+            return true;
+        }
+
+        forward /= len;
+        right /= len;
+
+        float yawRad = this.mob.getYRot() * (Mth.PI / 180.0F);
+        float sin = Mth.sin(yawRad);
+        float cos = Mth.cos(yawRad);
+
+        float dx = right * cos - forward * sin;
+        float dz = forward * cos + right * sin;
+
+        return this.isSafeStrafe(dx, dz);
+    }
+
     private boolean isDangerous(BlockPathTypes type) {
-        if (type == null) return false;
+        if (type == null) {
+            return false;
+        }
+
         return switch (type) {
-            case LAVA, DAMAGE_FIRE, DAMAGE_OTHER,
-                 DANGER_FIRE, DANGER_OTHER,
-                 WATER -> true;
+            case LAVA, DAMAGE_FIRE, DAMAGE_OTHER, DANGER_FIRE, DANGER_OTHER, WATER -> true;
             default -> false;
         };
     }

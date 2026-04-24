@@ -5,13 +5,17 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation.ReaperSpiderAnimation;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ReaperSpiderEntity;
+import net.minecraft.client.animation.AnimationDefinition;
+import net.minecraft.client.animation.KeyframeAnimations;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AnimationState;
+import org.joml.Vector3f;
 
 public class ReaperSpiderModel <T extends ReaperSpiderEntity> extends HierarchicalModel<T> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "reaper_spider"), "main");
@@ -185,6 +189,26 @@ public class ReaperSpiderModel <T extends ReaperSpiderEntity> extends Hierarchic
     }
 
     private final AnimationState idleLoop = new AnimationState();
+    private static final Vector3f ANIM_VEC_CACHE = new Vector3f();
+
+    protected void animateWalkWeighted(AnimationDefinition animationDefinition, float limbSwing, float limbSwingAmount, float maxAnimationSpeed, float animationScaleFactor, float weight) {
+        float blend = Mth.clamp(weight, 0.0F, 1.0F);
+        if (blend <= 0.0001F) {
+            return;
+        }
+
+        long time = (long) (limbSwing * 50.0F * maxAnimationSpeed);
+        float scale = Math.min(limbSwingAmount * animationScaleFactor, 1.0F) * blend;
+        if (scale <= 0.0001F) {
+            return;
+        }
+
+        KeyframeAnimations.animate(this, animationDefinition, time, scale, ANIM_VEC_CACHE);
+    }
+
+    private static float partialTickFromAge(float ageInTicks) {
+        return ageInTicks - (float) Math.floor(ageInTicks);
+    }
 
     @Override
     public void setupAnim(ReaperSpiderEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
@@ -199,6 +223,10 @@ public class ReaperSpiderModel <T extends ReaperSpiderEntity> extends Hierarchic
         this.animate(entity.recoveryAnimationState, ReaperSpiderAnimation.RECOVERY, ageInTicks);
         this.animate(entity.windUpAnimationState, ReaperSpiderAnimation.WIND_UP, ageInTicks);
 
-        this.animateWalk(ReaperSpiderAnimation.WALK, limbSwing, limbSwingAmount, 1.0F, 1.0F);
+        float pt = partialTickFromAge(ageInTicks);
+        float walkBack = Mth.lerp(pt, entity.clientWalkBackBlendO, entity.clientWalkBackBlend);
+        walkBack = walkBack * walkBack * (3.0F - 2.0F * walkBack);
+        this.animateWalkWeighted(ReaperSpiderAnimation.WALK, limbSwing, limbSwingAmount, 1.0F, 1.0F, 1.0F - walkBack);
+        this.animateWalkWeighted(ReaperSpiderAnimation.WALK_BACK, limbSwing, limbSwingAmount, 3.0F, 1.0F, walkBack);
     }
 }
