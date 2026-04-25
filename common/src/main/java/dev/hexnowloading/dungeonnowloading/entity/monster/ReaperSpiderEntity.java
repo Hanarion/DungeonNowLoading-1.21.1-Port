@@ -70,6 +70,7 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
     public final AnimationState doubleSlashAnimationState = new AnimationState();
     public final AnimationState recoveryAnimationState = new AnimationState();
     public final AnimationState singleSlashAnimationState = new AnimationState();
+    public final AnimationState singleSlash2AnimationState = new AnimationState();
 
     private boolean fastClimb;
     private boolean revealed = false;
@@ -79,6 +80,7 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
     private boolean pendingRevealTackle;
     private boolean locomotionLocked;
     private boolean lockedBackpedaling;
+    private boolean nextSingleSlashUsesAlt;
     private int lockedBackpedalSideDir;
     private int lockedBackpedalSideTimer;
     private ReaperSpiderAttackGoal attackGoal;
@@ -580,10 +582,17 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
 
         // Tracks if we've already applied damage in this animation's window.
         final boolean[] hasHitInWindow = new boolean[] { false };
+        ReaperSpiderAnimationState slashAnimation = this.nextSingleSlashUsesAlt
+                ? ReaperSpiderAnimationState.SINGLE_SLASH_2
+                : ReaperSpiderAnimationState.SINGLE_SLASH;
+        float slashDuration = this.nextSingleSlashUsesAlt
+                ? ReaperSpiderAnimationDuration.SINGLE_SLASH_2
+                : ReaperSpiderAnimationDuration.SINGLE_SLASH;
+        this.nextSingleSlashUsesAlt = !this.nextSingleSlashUsesAlt;
 
         this.animationChainer.enqueue(AnimationChainer.AnimationStep.of(
-                ReaperSpiderAnimationState.SINGLE_SLASH,
-                ReaperSpiderAnimationDuration.SINGLE_SLASH,
+                slashAnimation,
+                slashDuration,
                 null, // onStart
                 () -> this.entityData.set(ANIMATION_STATE, ReaperSpiderAnimationState.IDLE), // onComplete
                 (anim, progress) -> {
@@ -772,6 +781,7 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
                 case DOUBLE_SLASH -> this.doubleSlashAnimationState.startIfStopped(this.tickCount);
                 case RECOVERY -> this.recoveryAnimationState.startIfStopped(this.tickCount);
                 case SINGLE_SLASH -> this.singleSlashAnimationState.startIfStopped(this.tickCount);
+                case SINGLE_SLASH_2 -> this.singleSlash2AnimationState.startIfStopped(this.tickCount);
             }
         }
         super.onSyncedDataUpdated(entityDataAccessor);
@@ -797,6 +807,9 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
             case SINGLE_SLASH:
                 this.entityData.set(ANIMATION_STATE, ReaperSpiderAnimationState.SINGLE_SLASH);
                 break;
+            case SINGLE_SLASH_2:
+                this.entityData.set(ANIMATION_STATE, ReaperSpiderAnimationState.SINGLE_SLASH_2);
+                break;
         }
         return this;
     }
@@ -805,6 +818,7 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
         this.tacklingAnimationState.stop();
         this.doubleSlashAnimationState.stop();
         this.singleSlashAnimationState.stop();
+        this.singleSlash2AnimationState.stop();
         this.recoveryAnimationState.stop();
         this.windUpAnimationState.stop();
     }
@@ -823,7 +837,8 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
         TACKLING,
         DOUBLE_SLASH,
         RECOVERY,
-        SINGLE_SLASH
+        SINGLE_SLASH,
+        SINGLE_SLASH_2
     }
 
     public enum BehaviorState {

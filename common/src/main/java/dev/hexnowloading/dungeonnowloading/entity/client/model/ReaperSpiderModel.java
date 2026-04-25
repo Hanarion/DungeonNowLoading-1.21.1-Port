@@ -219,6 +219,7 @@ public class ReaperSpiderModel <T extends ReaperSpiderEntity> extends Hierarchic
 
         this.animate(entity.doubleSlashAnimationState, ReaperSpiderAnimation.DOUBLE_SLASH, ageInTicks);
         this.animate(entity.singleSlashAnimationState, ReaperSpiderAnimation.SINGLE_SLASH, ageInTicks);
+        this.animate(entity.singleSlash2AnimationState, ReaperSpiderAnimation.SINGLE_SLASH_2, ageInTicks);
         this.animate(entity.tacklingAnimationState, ReaperSpiderAnimation.TACKLING, ageInTicks);
         this.animate(entity.recoveryAnimationState, ReaperSpiderAnimation.RECOVERY, ageInTicks);
         this.animate(entity.windUpAnimationState, ReaperSpiderAnimation.WIND_UP, ageInTicks);
