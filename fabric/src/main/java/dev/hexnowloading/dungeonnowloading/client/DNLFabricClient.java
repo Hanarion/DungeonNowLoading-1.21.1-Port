@@ -11,6 +11,7 @@ import dev.hexnowloading.dungeonnowloading.entity.client.model.seeping_soul.Seep
 import dev.hexnowloading.dungeonnowloading.entity.client.model.seeping_soul.SeepingSoulSerpentCallerModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
+import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.PlayerStatueItemRenderer;
@@ -26,6 +27,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -219,6 +221,24 @@ public class DNLFabricClient implements ClientModInitializer {
 
         ItemProperties.register(DNLItems.REPULSOR.get(), new ResourceLocation("golden_mode"),
                 (stack, level, entity, seed) -> RepulsorItem.isGoldenMode(stack) ? 1.0F : 0.0F);
+
+        String[] mimiclingForms = {"base", "pickaxe", "axe", "shovel", "hoe", "sword"};
+        int[] mimiclingFrameCounts = {10, 9, 9, 8, 8, 8};
+        for (int formIndex = 0; formIndex < mimiclingForms.length; formIndex++) {
+            String form = mimiclingForms[formIndex];
+            int frameCount = mimiclingFrameCounts[formIndex];
+            ItemProperties.register(DNLItems.MIMICLING.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_form_" + form),
+                    (stack, level, entity, seed) -> MimiclingItem.isForm(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, form) ? 1.0F : 0.0F);
+
+            for (int frame = 0; frame < frameCount; frame++) {
+                int currentFrame = frame;
+                ItemProperties.register(DNLItems.MIMICLING.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_" + form + "_frame_" + currentFrame),
+                        (stack, level, entity, seed) -> MimiclingItem.isTransitionFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, form, currentFrame, frameCount) ? 1.0F : 0.0F);
+            }
+        }
+
+        ItemProperties.register(DNLItems.MIMICLING.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "mucus"),
+                (stack, level, entity, seed) -> MimiclingItem.isMucus(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L) ? 1.0F : 0.0F);
     }
 
     private void registerModelLayers() {

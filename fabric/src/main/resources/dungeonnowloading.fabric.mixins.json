@@ -48,6 +48,7 @@
     "client.MinecraftClientTickMixin",
     "client.MusicManagerMixin",
     "client.LivingEntityRendererMixin",
+    "MixinMinecraft",
     "MaxHealthAttributeMixin",
     "items.ItemInHandRendererMixin",
     "MixinTitleScreen"

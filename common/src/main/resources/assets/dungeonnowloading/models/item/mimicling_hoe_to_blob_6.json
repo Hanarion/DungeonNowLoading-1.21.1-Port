@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "dungeonnowloading:item/mimicling/hoe/mimicling_hoe_to_blob_6"
+  }
+}

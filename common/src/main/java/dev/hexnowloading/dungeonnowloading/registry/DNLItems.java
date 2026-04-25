@@ -57,6 +57,7 @@ public class DNLItems {
     public static final Supplier<Item> MENDSTONE_CHALK = register("mendstone_chalk", () -> new MendstoneChalkItem(new Item.Properties().rarity(Rarity.COMMON).durability(15), DNLBlocks.MENDSTONE_CHALK_MARK.get()));
     public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new ZoneWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
     public static final Supplier<Item> MIMICART = register("mimicart", () -> new MimicartItem(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
+    public static final Supplier<Item> MIMICLING = register("mimicling", () -> new MimiclingItem(new Item.Properties().durability(Tiers.DIAMOND.getUses()).rarity(Rarity.COMMON)));
 
     // ITEMS - MUSIC DISC
     public static final Supplier<Item> MUSIC_DISC_HELLSPAWN = register("music_disc_hellspawn", () -> new DNLRecordItem(15, DNLSounds.DISC_HELLSPAWN.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 140));
