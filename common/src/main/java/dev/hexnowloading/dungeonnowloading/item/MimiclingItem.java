@@ -398,6 +398,10 @@ public class MimiclingItem extends Item {
         return FORM_BASE.equals(getStoredForm(stack));
     }
 
+    public static boolean isBaseStorageForm(ItemStack stack) {
+        return stack.getItem() instanceof MimiclingItem && canUseStorage(stack);
+    }
+
     public static boolean isFeedableTool(ItemStack stack) {
         return getDedicatedSlot(stack) >= 0;
     }

@@ -157,6 +157,12 @@ public class DNLForgeClientEvents {
         ItemProperties.register(DNLItems.REPULSOR.get(), new ResourceLocation("golden_mode"),
                 (stack, level, entity, seed) -> RepulsorItem.isGoldenMode(stack) ? 1.0F : 0.0F);
 
+        for (int frame = 0; frame < 4; frame++) {
+            int currentFrame = frame;
+            ItemProperties.register(DNLItems.MIMICLING.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_open_frame_" + currentFrame),
+                    (stack, level, entity, seed) -> MimiclingFeedHintHandler.isOpenFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
+        }
+
         String[] mimiclingForms = {"base", "pickaxe", "axe", "shovel", "hoe", "sword"};
         int[] mimiclingFrameCounts = {10, 9, 9, 8, 8, 8};
         for (int formIndex = 0; formIndex < mimiclingForms.length; formIndex++) {

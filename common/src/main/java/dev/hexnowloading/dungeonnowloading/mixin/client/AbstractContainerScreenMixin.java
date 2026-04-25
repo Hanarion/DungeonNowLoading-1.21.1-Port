@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.client;
 
+import dev.hexnowloading.dungeonnowloading.client.MimiclingFeedHintHandler;
 import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.network.packets.C2SMimiclingSelectSlotPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
@@ -28,6 +29,12 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     protected Slot hoveredSlot;
 
     @Shadow
+    protected int leftPos;
+
+    @Shadow
+    protected int topPos;
+
+    @Shadow
     protected abstract List<Component> getTooltipFromContainerItem(ItemStack stack);
 
     @Override
@@ -42,6 +49,18 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         }
 
         return this.getChildAt(mouseX, mouseY).filter(child -> child.mouseScrolled(mouseX, mouseY, amount)).isPresent();
+    }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void dungeonnowloading$updateMimiclingFeedHint(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+        Slot hovered = getHoveredSlot(mouseX, mouseY);
+        ItemStack hoveredStack = hovered != null && hovered.hasItem() ? hovered.getItem() : ItemStack.EMPTY;
+        MimiclingFeedHintHandler.update(hoveredStack, menu.getCarried(), Minecraft.getInstance().player);
+    }
+
+    @Inject(method = "removed", at = @At("HEAD"))
+    private void dungeonnowloading$clearMimiclingFeedHint(CallbackInfo ci) {
+        MimiclingFeedHintHandler.clear();
     }
 
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
@@ -63,5 +82,22 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
                 ci.cancel();
             }
         }
+    }
+
+    private Slot getHoveredSlot(double mouseX, double mouseY) {
+        for (Slot slot : menu.slots) {
+            if (slot.isActive() && isHovering(slot, mouseX, mouseY)) {
+                return slot;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isHovering(Slot slot, double mouseX, double mouseY) {
+        return mouseX >= leftPos + slot.x
+                && mouseX < leftPos + slot.x + 16
+                && mouseY >= topPos + slot.y
+                && mouseY < topPos + slot.y + 16;
     }
 }

@@ -6,6 +6,30 @@
   "overrides": [
     {
       "predicate": {
+        "dungeonnowloading:mimicling_open_frame_0": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_open_0"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_open_frame_1": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_open_1"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_open_frame_2": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_open_2"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_open_frame_3": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_open_3"
+    },
+    {
+      "predicate": {
         "dungeonnowloading:mimicling_base_frame_0": 1.0
       },
       "model": "dungeonnowloading:item/mimicling_to_blob_0"
