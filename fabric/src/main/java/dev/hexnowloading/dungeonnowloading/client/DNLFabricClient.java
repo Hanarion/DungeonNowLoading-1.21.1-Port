@@ -228,7 +228,7 @@ public class DNLFabricClient implements ClientModInitializer {
                     (stack, level, entity, seed) -> MimiclingItem.isChewingFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
         }
 
-        for (int frame = 0; frame < 4; frame++) {
+        for (int frame = 0; frame < 3; frame++) {
             int currentFrame = frame;
             ItemProperties.register(DNLItems.MIMICLING.get(), new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_open_frame_" + currentFrame),
                     (stack, level, entity, seed) -> MimiclingFeedHintHandler.isOpenFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
