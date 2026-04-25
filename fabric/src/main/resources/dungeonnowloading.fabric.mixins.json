@@ -41,6 +41,9 @@
   "client": [
     "client.ClientPacketListenerMixin",
     "client.HumanoidModelMixin",
+    "client.AbstractContainerScreenMixin",
+    "client.CreativeModeInventoryScreenMixin",
+    "client.ClientTooltipComponentMixin",
     "client.ClientPacketListenerMixin",
     "client.PlayerRendererMixin",
     "client.AbstractClientPlayerMixin",

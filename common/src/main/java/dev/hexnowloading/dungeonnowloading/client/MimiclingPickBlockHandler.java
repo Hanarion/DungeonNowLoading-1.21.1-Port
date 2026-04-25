@@ -52,7 +52,7 @@ public class MimiclingPickBlockHandler {
             return MimiclingItem.getBestFormFor(minecraft.level.getBlockState(blockHitResult.getBlockPos()));
         }
 
-        return null;
+        return MimiclingItem.getBaseForm();
     }
 
     private static boolean isLookingAtLivingEntity(Minecraft minecraft) {

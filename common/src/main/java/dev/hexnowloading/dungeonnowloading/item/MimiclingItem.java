@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -13,32 +14,106 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Optional;
+import java.util.stream.Stream;
+
 public class MimiclingItem extends Item {
     private static final String FORM_TAG = "MimiclingForm";
     private static final String TRANSITION_START_TAG = "MimiclingTransitionStart";
     private static final String TRANSITION_FROM_TAG = "MimiclingTransitionFrom";
     private static final String TRANSITION_TO_TAG = "MimiclingTransitionTo";
+    private static final String STORED_ITEMS_TAG = "MimiclingItems";
+    private static final String SELECTED_SLOT_TAG = "MimiclingSelectedSlot";
     private static final String FORM_BASE = "base";
     private static final String FORM_PICKAXE = "pickaxe";
     private static final String FORM_AXE = "axe";
     private static final String FORM_SHOVEL = "shovel";
     private static final String FORM_HOE = "hoe";
     private static final String FORM_SWORD = "sword";
+    private static final int MAX_STORED_ITEMS = 5;
     private static final int TRANSITION_DURATION = 20;
     private static final int FIRST_PHASE_TICKS = 10;
 
     public MimiclingItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction clickAction, Player player) {
+        if (clickAction != ClickAction.SECONDARY || !canUseStorage(stack)) {
+            return false;
+        }
+
+        ItemStack slotStack = slot.getItem();
+        if (slotStack.isEmpty()) {
+            removeSelected(stack).ifPresent(removed -> {
+                playRemoveOneSound(player);
+                ItemStack remainder = slot.safeInsert(removed);
+                if (!remainder.isEmpty()) {
+                    storeInDedicatedSlot(stack, remainder);
+                }
+            });
+            return true;
+        }
+
+        if (isFeedableTool(slotStack) && slot.allowModification(player)) {
+            ItemStack taken = slot.safeTake(1, 1, player);
+            if (!taken.isEmpty()) {
+                ItemStack removed = storeInDedicatedSlot(stack, taken);
+                slot.safeInsert(removed);
+                playInsertSound(player);
+            }
+            return true;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack carriedStack, Slot slot, ClickAction clickAction, Player player, SlotAccess carriedSlot) {
+        if (clickAction != ClickAction.SECONDARY || !slot.allowModification(player) || !canUseStorage(stack)) {
+            return false;
+        }
+
+        if (carriedStack.isEmpty()) {
+            removeSelected(stack).ifPresent(removed -> {
+                playRemoveOneSound(player);
+                carriedSlot.set(removed);
+            });
+            return true;
+        }
+
+        if (!isFeedableTool(carriedStack)) {
+            return true;
+        }
+
+        ItemStack inserted = carriedStack.copyWithCount(1);
+        ItemStack removed = storeInDedicatedSlot(stack, inserted);
+        carriedStack.shrink(1);
+        carriedSlot.set(removed.isEmpty() ? carriedStack : removed);
+        playInsertSound(player);
+        return true;
     }
 
     @Override
@@ -94,6 +169,21 @@ public class MimiclingItem extends Item {
         return super.useOn(context);
     }
 
+    @Override
+    public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+        if (!canUseStorage(stack)) {
+            return Optional.empty();
+        }
+
+        NonNullList<ItemStack> contents = getTooltipContents(stack);
+        return Optional.of(new MimiclingTooltip(contents, getSelectedSlot(stack)));
+    }
+
+    @Override
+    public void onDestroyed(ItemEntity itemEntity) {
+        ItemUtils.onContainerDestroyed(itemEntity, getStoredItems(itemEntity.getItem()));
+    }
+
     public static boolean tryTransformToForm(ItemStack stack, Player player, InteractionHand hand, String targetForm) {
         Level level = player.level();
         if (!(stack.getItem() instanceof MimiclingItem) || !isValidForm(targetForm) || isTransitioning(stack, level.getGameTime())) {
@@ -134,8 +224,71 @@ public class MimiclingItem extends Item {
         return FORM_SWORD;
     }
 
+    public static String getBaseForm() {
+        return FORM_BASE;
+    }
+
     public static boolean isValidForm(String form) {
         return FORM_BASE.equals(form) || FORM_PICKAXE.equals(form) || FORM_AXE.equals(form) || FORM_SHOVEL.equals(form) || FORM_HOE.equals(form) || FORM_SWORD.equals(form);
+    }
+
+    public static boolean tryScrollSelectedSlot(ItemStack stack, int delta) {
+        if (!(stack.getItem() instanceof MimiclingItem) || !canUseStorage(stack)) {
+            return false;
+        }
+
+        if (getStoredItemCount(stack) == 0) {
+            return false;
+        }
+
+        int currentSelected = getSelectedSlot(stack);
+        int selected = currentSelected;
+        for (int i = 0; i < MAX_STORED_ITEMS; i++) {
+            selected = Math.floorMod(selected + delta, MAX_STORED_ITEMS);
+            if (!getStoredItem(stack, selected).isEmpty()) {
+                if (selected == currentSelected) {
+                    return false;
+                }
+
+                stack.getOrCreateTag().putInt(SELECTED_SLOT_TAG, selected);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean trySelectDedicatedSlot(ItemStack stack, ItemStack toolStack) {
+        int slot = getDedicatedSlot(toolStack);
+        if (!(stack.getItem() instanceof MimiclingItem) || !canUseStorage(stack) || slot < 0) {
+            return false;
+        }
+
+        if (getSelectedSlot(stack) == slot) {
+            return false;
+        }
+
+        stack.getOrCreateTag().putInt(SELECTED_SLOT_TAG, slot);
+        return true;
+    }
+
+    public static boolean trySelectNextOccupiedSlotIfSelectedEmpty(ItemStack stack) {
+        if (!(stack.getItem() instanceof MimiclingItem) || !canUseStorage(stack) || getStoredItemCount(stack) == 0) {
+            return false;
+        }
+
+        int selected = getSelectedSlot(stack);
+        if (!getStoredItem(stack, selected).isEmpty()) {
+            return false;
+        }
+
+        int nextSelected = getSelectedOccupiedSlotOrNext(getStoredItemsList(stack), selected);
+        if (nextSelected == selected) {
+            return false;
+        }
+
+        stack.getOrCreateTag().putInt(SELECTED_SLOT_TAG, nextSelected);
+        return true;
     }
 
     private static void startTransition(ItemStack stack, String fromForm, String toForm, long gameTime) {
@@ -241,6 +394,173 @@ public class MimiclingItem extends Item {
         return form.isEmpty() ? FORM_BASE : form;
     }
 
+    private static boolean canUseStorage(ItemStack stack) {
+        return FORM_BASE.equals(getStoredForm(stack));
+    }
+
+    public static boolean isFeedableTool(ItemStack stack) {
+        return getDedicatedSlot(stack) >= 0;
+    }
+
+    private static int getDedicatedSlot(ItemStack stack) {
+        Item item = stack.getItem();
+        if (item instanceof SwordItem) {
+            return 0;
+        }
+        if (item instanceof PickaxeItem) {
+            return 1;
+        }
+        if (item instanceof AxeItem) {
+            return 2;
+        }
+        if (item instanceof ShovelItem) {
+            return 3;
+        }
+        if (item instanceof HoeItem) {
+            return 4;
+        }
+        return -1;
+    }
+
+    private static int getStoredItemCount(ItemStack stack) {
+        int count = 0;
+        ListTag items = getStoredItemsList(stack);
+        for (int i = 0; i < MAX_STORED_ITEMS; i++) {
+            if (i < items.size() && !ItemStack.of(items.getCompound(i)).isEmpty()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static ListTag getStoredItemsList(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        return tag == null ? new ListTag() : tag.getList(STORED_ITEMS_TAG, 10);
+    }
+
+    private static Stream<ItemStack> getStoredItems(ItemStack stack) {
+        NonNullList<ItemStack> items = NonNullList.create();
+        for (int i = 0; i < MAX_STORED_ITEMS; i++) {
+            ItemStack stored = getStoredItem(stack, i);
+            if (!stored.isEmpty()) {
+                items.add(stored);
+            }
+        }
+        return items.stream();
+    }
+
+    private static NonNullList<ItemStack> getTooltipContents(ItemStack stack) {
+        NonNullList<ItemStack> contents = NonNullList.create();
+        for (int i = 0; i < MAX_STORED_ITEMS; i++) {
+            contents.add(getStoredItem(stack, i));
+        }
+        return contents;
+    }
+
+    private static ItemStack storeInDedicatedSlot(ItemStack stack, ItemStack itemToStore) {
+        int slot = getDedicatedSlot(itemToStore);
+        if (itemToStore.isEmpty() || slot < 0) {
+            return ItemStack.EMPTY;
+        }
+
+        CompoundTag tag = stack.getOrCreateTag();
+        ListTag items = getOrCreateFixedStoredItems(stack);
+        ItemStack removed = ItemStack.of(items.getCompound(slot));
+        ItemStack stored = itemToStore.copyWithCount(1);
+        CompoundTag storedTag = new CompoundTag();
+        stored.save(storedTag);
+        items.set(slot, storedTag);
+        tag.put(STORED_ITEMS_TAG, items);
+        tag.putInt(SELECTED_SLOT_TAG, slot);
+        return removed;
+    }
+
+    private static Optional<ItemStack> removeSelected(ItemStack stack) {
+        CompoundTag tag = stack.getOrCreateTag();
+        if (!tag.contains(STORED_ITEMS_TAG)) {
+            return Optional.empty();
+        }
+
+        ListTag items = tag.getList(STORED_ITEMS_TAG, 10);
+        if (items.isEmpty()) {
+            return Optional.empty();
+        }
+
+        int selected = getSelectedSlot(stack);
+        if (selected >= items.size()) {
+            return Optional.empty();
+        }
+
+        ItemStack removed = ItemStack.of(items.getCompound(selected));
+        if (removed.isEmpty()) {
+            return Optional.empty();
+        }
+
+        items.set(selected, new CompoundTag());
+        cleanupStoredItemsTag(stack, items);
+        return Optional.of(removed);
+    }
+
+    private static int getSelectedSlot(ItemStack stack) {
+        if (!stack.hasTag()) {
+            return 0;
+        }
+
+        int selected = stack.getTag().getInt(SELECTED_SLOT_TAG);
+        return Math.max(0, Math.min(selected, MAX_STORED_ITEMS - 1));
+    }
+
+    private static void cleanupStoredItemsTag(ItemStack stack, ListTag items) {
+        CompoundTag tag = stack.getOrCreateTag();
+        boolean hasStoredItem = false;
+        for (int i = 0; i < items.size(); i++) {
+            if (!ItemStack.of(items.getCompound(i)).isEmpty()) {
+                hasStoredItem = true;
+                break;
+            }
+        }
+
+        if (!hasStoredItem) {
+            tag.remove(STORED_ITEMS_TAG);
+            tag.remove(SELECTED_SLOT_TAG);
+            return;
+        }
+
+        tag.put(STORED_ITEMS_TAG, items);
+        tag.putInt(SELECTED_SLOT_TAG, getSelectedOccupiedSlotOrNext(items, getSelectedSlot(stack)));
+    }
+
+    private static ItemStack getStoredItem(ItemStack stack, int slot) {
+        ListTag items = getStoredItemsList(stack);
+        if (slot < 0 || slot >= items.size()) {
+            return ItemStack.EMPTY;
+        }
+        return ItemStack.of(items.getCompound(slot));
+    }
+
+    private static int getSelectedOccupiedSlotOrNext(ListTag items, int selectedSlot) {
+        if (selectedSlot < items.size() && !ItemStack.of(items.getCompound(selectedSlot)).isEmpty()) {
+            return selectedSlot;
+        }
+
+        for (int i = 1; i <= MAX_STORED_ITEMS; i++) {
+            int slot = Math.floorMod(selectedSlot + i, MAX_STORED_ITEMS);
+            if (slot < items.size() && !ItemStack.of(items.getCompound(slot)).isEmpty()) {
+                return slot;
+            }
+        }
+
+        return selectedSlot;
+    }
+
+    private static ListTag getOrCreateFixedStoredItems(ItemStack stack) {
+        ListTag items = stack.getOrCreateTag().getList(STORED_ITEMS_TAG, 10);
+        while (items.size() < MAX_STORED_ITEMS) {
+            items.add(new CompoundTag());
+        }
+        return items;
+    }
+
     private static boolean isMineableByForm(BlockState state, String form) {
         return FORM_PICKAXE.equals(form) && state.is(BlockTags.MINEABLE_WITH_PICKAXE)
                 || FORM_AXE.equals(form) && state.is(BlockTags.MINEABLE_WITH_AXE)
@@ -288,5 +608,13 @@ public class MimiclingItem extends Item {
         tag.putString("AttributeName", net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE.getKey(attribute).toString());
         tag.putString("Slot", EquipmentSlot.MAINHAND.getName());
         return tag;
+    }
+
+    private static void playRemoveOneSound(LivingEntity entity) {
+        entity.playSound(SoundEvents.BUNDLE_REMOVE_ONE, 0.8F, 0.8F + entity.level().getRandom().nextFloat() * 0.4F);
+    }
+
+    private static void playInsertSound(LivingEntity entity) {
+        entity.playSound(SoundEvents.BUNDLE_INSERT, 0.8F, 0.8F + entity.level().getRandom().nextFloat() * 0.4F);
     }
 }

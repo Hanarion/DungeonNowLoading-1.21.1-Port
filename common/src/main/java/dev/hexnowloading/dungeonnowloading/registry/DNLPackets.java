@@ -10,6 +10,7 @@ public class DNLPackets {
         Services.NETWORK.register("serverbound_pedestal_edit", C2SPedestalEditPacket.class, C2SPedestalEditPacket::decode);
         Services.NETWORK.register("serverbound_pedestal_update", C2SPedestalUpdatePacket.class, C2SPedestalUpdatePacket::decode);
         Services.NETWORK.register("serverbound_mimicling_transform", C2SMimiclingTransformPacket.class, C2SMimiclingTransformPacket::decode);
+        Services.NETWORK.register("serverbound_mimicling_select_slot", C2SMimiclingSelectSlotPacket.class, C2SMimiclingSelectSlotPacket::decode);
     }
 
     public static void registerClientbound() {
