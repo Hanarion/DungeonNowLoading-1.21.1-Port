@@ -55,6 +55,10 @@ public class ReaperSpiderAttackGoal extends Goal {
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
     }
 
+    public boolean isDashOrDoubleSlashSequenceActive() {
+        return this.state == State.ATTACK_DASH || this.state == State.POST_ATTACK_DELAY;
+    }
+
     @Override
     public boolean canUse() {
         LivingEntity livingEntity = this.mob.getTarget();
@@ -337,14 +341,16 @@ public class ReaperSpiderAttackGoal extends Goal {
 
         var damageSource = this.mob.damageSources().mobAttack(this.mob);
         float damage = (float) this.mob.getAttributeValue(Attributes.ATTACK_DAMAGE) * damageMultiplier;
-        boolean blocked = this.disableShieldIfBlocked(this.target, damageSource);
+        boolean blocked = this.isBlockedByShield(this.target, damageSource);
         if (this.target.hurt(damageSource, damage)) {
             this.mob.applyTackleKnockback(this.target);
             this.mob.applyAttackEffects(this.target, reducedTickDelay(300));
             this.mob.destroyBlocksInSlashArea(SLASH_CENTER_OFFSET, DOUBLE_SLASH_HORIZONTAL_RADIUS, SLASH_VERTICAL_RADIUS);
             this.chasingTicksRemaining -= DOUBLE_SLASH_CHASE_REDUCTION;
-        } else if (blocked) {
+        } else if (blocked && this.disableShield(this.target)) {
             this.mob.destroyBlocksInSlashArea(SLASH_CENTER_OFFSET, DOUBLE_SLASH_HORIZONTAL_RADIUS, SLASH_VERTICAL_RADIUS);
+        } else if (blocked) {
+            this.disableShield(this.target);
         }
     }
 
@@ -357,20 +363,26 @@ public class ReaperSpiderAttackGoal extends Goal {
 
         var damageSource = this.mob.damageSources().mobAttack(this.mob);
         float damage = (float) this.mob.getAttributeValue(Attributes.ATTACK_DAMAGE) * SINGLE_SLASH_DAMAGE_MULTIPLIER;
-        this.disableShieldIfBlocked(this.target, damageSource);
+        boolean blocked = this.isBlockedByShield(this.target, damageSource);
         if (this.target.hurt(damageSource, damage)) {
             this.mob.applySingleSlashKnockback(this.target);
             this.mob.applyAttackEffects(this.target, SINGLE_SLASH_POISON_TICKS);
             this.chasingTicksRemaining -= SINGLE_SLASH_CHASE_REDUCTION;
+        } else if (blocked) {
+            this.disableShield(this.target);
         }
     }
 
-    private boolean disableShieldIfBlocked(LivingEntity target, net.minecraft.world.damagesource.DamageSource damageSource) {
+    private boolean isBlockedByShield(LivingEntity target, net.minecraft.world.damagesource.DamageSource damageSource) {
         if (!(target instanceof Player player)) {
             return false;
         }
 
-        if (!player.isBlocking() || !player.isDamageSourceBlocked(damageSource)) {
+        return player.isBlocking() && player.isDamageSourceBlocked(damageSource);
+    }
+
+    private boolean disableShield(LivingEntity target) {
+        if (!(target instanceof Player player)) {
             return false;
         }
 

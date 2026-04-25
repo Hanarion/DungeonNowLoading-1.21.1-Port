@@ -227,6 +227,6 @@ public class ReaperSpiderModel <T extends ReaperSpiderEntity> extends Hierarchic
         float walkBack = Mth.lerp(pt, entity.clientWalkBackBlendO, entity.clientWalkBackBlend);
         walkBack = walkBack * walkBack * (3.0F - 2.0F * walkBack);
         this.animateWalkWeighted(ReaperSpiderAnimation.WALK, limbSwing, limbSwingAmount, 1.0F, 1.0F, 1.0F - walkBack);
-        this.animateWalkWeighted(ReaperSpiderAnimation.WALK_BACK, limbSwing, limbSwingAmount, 3.0F, 1.0F, walkBack);
+        this.animateWalkWeighted(ReaperSpiderAnimation.WALK_BACK, limbSwing, limbSwingAmount, 1.5F, 1.0F, walkBack);
     }
 }

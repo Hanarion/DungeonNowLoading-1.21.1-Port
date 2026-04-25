@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.monster;
 import dev.hexnowloading.dungeonnowloading.entity.ai.ReaperSpiderAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.ReaperSpiderRecoveryGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.ReaperSpiderStalkGoal;
+import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.ReaperSpiderMoveControl;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.ReaperSpiderAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
@@ -27,7 +28,6 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.CaveSpider;
 import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
@@ -41,15 +41,21 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
     private static final double STALK_SPEED_MULTIPLIER = 0.7D;
     private static final double REVEAL_RANGE = 5.0D;
     private static final double TACKLE_MIN_RANGE = 4.0D;
-    private static final double CAVE_SPIDER_SEARCH_RANGE = 16.0D;
     private static final double BLOCK_BREAK_SLASH_CENTER_OFFSET = 1.0D;
     private static final double BLOCK_BREAK_SLASH_HORIZONTAL_RADIUS = 1.9D;
     private static final double BLOCK_BREAK_SLASH_VERTICAL_RADIUS = 1.6D;
     private static final int PLAYER_STARE_REVEAL_TICKS = 5;
     private static final int POISON_DURATION_TICKS = 15 * 20;
     private static final int POISON_AMPLIFIER = 2;
+    private static final int VISIBLE_RESISTANCE_DURATION_TICKS = 40;
+    private static final int VISIBLE_RESISTANCE_AMPLIFIER = 2;
     private static final int BLOCK_BREAK_COOLDOWN_TICKS = 10;
     private static final float REVEAL_FADE_STEP = 0.1F;
+    private static final double SIDE_STRAFE_SPEED = 0.6D;
+    private static final double BACK_STRAFE_SPEED = 0.6D;
+    private static final double LOCKED_BACKPEDAL_SPEED = 0.24D;
+    private static final float LOCKED_BACKPEDAL_FORWARD = -1.0F;
+    private static final float LOCKED_BACKPEDAL_SIDE = 0.5F;
 
     private static final EntityDataAccessor<ReaperSpiderAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(ReaperSpiderEntity.class, EntityStates.REAPER_SPIDER_ANIMATION_STATE);
     private static final EntityDataAccessor<Boolean> REVEALED_STATE = SynchedEntityData.defineId(ReaperSpiderEntity.class, EntityDataSerializers.BOOLEAN);
@@ -72,6 +78,10 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
     private int blockBreakCooldown;
     private boolean pendingRevealTackle;
     private boolean locomotionLocked;
+    private boolean lockedBackpedaling;
+    private int lockedBackpedalSideDir;
+    private int lockedBackpedalSideTimer;
+    private ReaperSpiderAttackGoal attackGoal;
     public float clientRevealAlpha = 1.0F;
     public float clientRevealAlphaO = 1.0F;
     private boolean clientLastRevealed = false;
@@ -81,11 +91,12 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
 
     public ReaperSpiderEntity(EntityType<? extends ReaperSpiderEntity> entityType, Level level) {
         super(entityType, level);
+        this.moveControl = new ReaperSpiderMoveControl(this, SIDE_STRAFE_SPEED, BACK_STRAFE_SPEED);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Spider.createAttributes()
-                .add(Attributes.MAX_HEALTH, 100.0D)
+                .add(Attributes.MAX_HEALTH, 32.0D)
                 .add(Attributes.FOLLOW_RANGE, 32.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.4)
                 .add(Attributes.ATTACK_DAMAGE, 19.0D)
@@ -104,9 +115,10 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
 
     @Override
     protected void registerGoals() {
+        this.attackGoal = new ReaperSpiderAttackGoal(this);
         //this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new ReaperSpiderRecoveryGoal(this));
-        this.goalSelector.addGoal(2, new ReaperSpiderAttackGoal(this));
+        this.goalSelector.addGoal(2, this.attackGoal);
         this.goalSelector.addGoal(3, new ReaperSpiderStalkGoal(this));
 
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
@@ -125,10 +137,24 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
             this.walkBackAnimation();
             return;
         }
-        this.updateEmergencyFeedingTarget();
         this.updateStealthState();
+        this.updateVisibleResistance();
         this.tryBreakBlocksTowardTarget();
         this.animationChainer.tick(this::transitionTo);
+    }
+
+    private void updateVisibleResistance() {
+        if (this.isRevealed()) {
+            this.addEffect(new MobEffectInstance(
+                    MobEffects.DAMAGE_RESISTANCE,
+                    VISIBLE_RESISTANCE_DURATION_TICKS,
+                    VISIBLE_RESISTANCE_AMPLIFIER,
+                    false,
+                    false
+            ));
+        } else {
+            this.removeEffect(MobEffects.DAMAGE_RESISTANCE);
+        }
     }
 
     private void tickClientRevealAlpha() {
@@ -150,42 +176,6 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
         }
     }
 
-    private void updateEmergencyFeedingTarget() {
-        if (!this.shouldHuntCaveSpiders()) {
-            if (this.getTarget() instanceof CaveSpider) {
-                this.setTarget(null);
-            }
-            return;
-        }
-
-        if (this.getTarget() instanceof CaveSpider caveSpider && caveSpider.isAlive()) {
-            return;
-        }
-
-        if (this.tickCount % 20 != 0) {
-            return;
-        }
-
-        CaveSpider nearest = null;
-        double bestDistance = Double.MAX_VALUE;
-
-        for (CaveSpider caveSpider : this.level().getEntitiesOfClass(CaveSpider.class, this.getBoundingBox().inflate(CAVE_SPIDER_SEARCH_RANGE))) {
-            if (!caveSpider.isAlive()) {
-                continue;
-            }
-
-            double distance = this.distanceToSqr(caveSpider);
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                nearest = caveSpider;
-            }
-        }
-
-        if (nearest != null) {
-            this.setTarget(nearest);
-        }
-    }
-
     private void updateStealthState() {
         LivingEntity target = this.getTarget();
         if (target == null) {
@@ -198,7 +188,7 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
             return;
         }
 
-        if (!(target instanceof Player player) || !player.isAlive() || player.getAbilities().instabuild || this.shouldHuntCaveSpiders()) {
+        if (!(target instanceof Player player) || !player.isAlive() || player.getAbilities().instabuild) {
             this.stalkingTargetId = -1;
             this.staredAtTicks = 0;
             this.setRevealedState(true);
@@ -258,6 +248,14 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
     }
 
     private void tryBreakBlocksTowardTarget() {
+        if (this.getBehaviorState() == BehaviorState.RECOVERY) {
+            return;
+        }
+
+        if (this.attackGoal != null && this.attackGoal.isDashOrDoubleSlashSequenceActive()) {
+            return;
+        }
+
         LivingEntity target = this.getTarget();
         if (!(target instanceof Player) || !target.isAlive()) {
             return;
@@ -429,7 +427,7 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
     public void walkBackAnimation() {
         this.clientWalkBackBlendO = this.clientWalkBackBlend;
         this.walkBackTarget = this.isBackingUp() ? 1.0F : 0.0F;
-        float rate = (this.walkBackTarget > this.clientWalkBackBlend) ? 0.18F : 0.12F;
+        float rate = (this.walkBackTarget > this.clientWalkBackBlend) ? 0.1F : 0.08F;
         this.clientWalkBackBlend += (this.walkBackTarget - this.clientWalkBackBlend) * rate;
         this.clientWalkBackBlend = Mth.clamp(this.clientWalkBackBlend, 0.0F, 1.0F);
     }
@@ -512,45 +510,8 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
         this.pendingRevealTackle = true;
     }
 
-    public boolean needsEmergencyFeeding() {
-        return this.getHealth() <= this.getMaxHealth() * 0.2F;
-    }
-
-    public boolean shouldHuntCaveSpiders() {
-        if (this.getHealth() >= this.getMaxHealth()) {
-            return false;
-        }
-
-        LivingEntity target = this.getTarget();
-        return target == null || target instanceof CaveSpider;
-    }
-
     public void applyAttackEffects(LivingEntity victim, int poisonDurationTicks) {
         victim.addEffect(new MobEffectInstance(MobEffects.POISON, poisonDurationTicks, POISON_AMPLIFIER), this);
-        if (victim instanceof CaveSpider && !victim.isAlive()) {
-            float healAmount = (float) (this.getMaxHealth() * 0.3F);
-            this.heal(healAmount);
-            this.spawnHealParticles(healAmount);
-        }
-    }
-
-    private void spawnHealParticles(float healAmount) {
-        if (!(this.level() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-
-        int particleCount = Math.max(1, Math.round(healAmount));
-        serverLevel.sendParticles(
-                ParticleTypes.HEART,
-                this.getX(),
-                this.getY() + this.getBbHeight() * 0.8D,
-                this.getZ(),
-                particleCount,
-                this.getBbWidth() * 0.35D,
-                this.getBbHeight() * 0.25D,
-                this.getBbWidth() * 0.35D,
-                0.0D
-        );
     }
 
     @Override
@@ -674,12 +635,14 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
     public void aiStep() {
         super.aiStep();
         this.tickLocomotionLock();
+        this.applyLockedBackpedal();
     }
 
     @Override
     public void travel(Vec3 travelVector) {
         if (this.isLocomotionLocked()) {
-            super.travel(Vec3.ZERO);
+            // Prevents the Reaper's spider movement/nav from creeping forward during locked states.
+            super.travel(new Vec3(0.0D, travelVector.y, 0.0D));
             return;
         }
 
@@ -699,9 +662,96 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
 
     public void setLocomotionLocked(boolean locomotionLocked) {
         this.locomotionLocked = locomotionLocked;
+        if (!locomotionLocked) {
+            this.lockedBackpedaling = false;
+        }
         if (locomotionLocked) {
             this.applyLocomotionLock();
         }
+    }
+
+    public void setLockedBackpedaling(boolean lockedBackpedaling) {
+        this.lockedBackpedaling = lockedBackpedaling;
+        if (!lockedBackpedaling) {
+            this.lockedBackpedalSideDir = 0;
+            this.lockedBackpedalSideTimer = 0;
+        }
+    }
+
+    private void applyLockedBackpedal() {
+        if (this.level().isClientSide || !this.isLocomotionLocked() || !this.lockedBackpedaling || !this.isBackingUp()) {
+            return;
+        }
+
+        LivingEntity target = this.getTarget();
+        if (target == null || !target.isAlive()) {
+            return;
+        }
+
+        float forward = LOCKED_BACKPEDAL_FORWARD;
+        float right = this.getSafeLockedBackpedalSide();
+        if (Float.isNaN(right)) {
+            return;
+        }
+
+        Vec3 direction = this.getStrafeWorldDirection(forward, right);
+        if (direction.lengthSqr() < 1.0E-4D) {
+            return;
+        }
+
+        Vec3 motion = this.getDeltaMovement();
+        this.setDeltaMovement(direction.x * LOCKED_BACKPEDAL_SPEED, motion.y, direction.z * LOCKED_BACKPEDAL_SPEED);
+        this.hasImpulse = true;
+    }
+
+    private float getSafeLockedBackpedalSide() {
+        if (!(this.getMoveControl() instanceof ReaperSpiderMoveControl moveControl)) {
+            return 0.0F;
+        }
+
+        if (moveControl.isStrafeDirectionSafe(LOCKED_BACKPEDAL_FORWARD, 0.0F)) {
+            this.lockedBackpedalSideDir = 0;
+            this.lockedBackpedalSideTimer = 0;
+            return 0.0F;
+        }
+
+        if (this.lockedBackpedalSideTimer > 0 && this.lockedBackpedalSideDir != 0) {
+            float side = LOCKED_BACKPEDAL_SIDE * this.lockedBackpedalSideDir;
+            if (moveControl.isStrafeDirectionSafe(LOCKED_BACKPEDAL_FORWARD, side)) {
+                this.lockedBackpedalSideTimer--;
+                return side;
+            }
+        }
+
+        boolean rightSafe = moveControl.isStrafeDirectionSafe(LOCKED_BACKPEDAL_FORWARD, LOCKED_BACKPEDAL_SIDE);
+        boolean leftSafe = moveControl.isStrafeDirectionSafe(LOCKED_BACKPEDAL_FORWARD, -LOCKED_BACKPEDAL_SIDE);
+        if (!rightSafe && !leftSafe) {
+            this.lockedBackpedalSideDir = 0;
+            this.lockedBackpedalSideTimer = 0;
+            return Float.NaN;
+        }
+
+        this.lockedBackpedalSideDir = rightSafe && !leftSafe ? 1 : !rightSafe ? -1 : this.random.nextBoolean() ? 1 : -1;
+        this.lockedBackpedalSideTimer = 20 + this.random.nextInt(20);
+        return LOCKED_BACKPEDAL_SIDE * this.lockedBackpedalSideDir;
+    }
+
+    private Vec3 getStrafeWorldDirection(float forward, float right) {
+        float length = Mth.sqrt(forward * forward + right * right);
+        if (length <= 1.0E-4F) {
+            return Vec3.ZERO;
+        }
+
+        forward /= length;
+        right /= length;
+
+        float yawRad = this.getYRot() * (Mth.PI / 180.0F);
+        float sin = Mth.sin(yawRad);
+        float cos = Mth.cos(yawRad);
+
+        double dx = right * cos - forward * sin;
+        double dz = forward * cos + right * sin;
+        return new Vec3(dx, 0.0D, dz);
     }
 
     @Override
