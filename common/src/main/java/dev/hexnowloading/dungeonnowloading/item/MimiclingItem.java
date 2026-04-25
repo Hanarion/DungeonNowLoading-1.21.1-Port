@@ -45,6 +45,7 @@ public class MimiclingItem extends Item {
     private static final String TRANSITION_TO_TAG = "MimiclingTransitionTo";
     private static final String STORED_ITEMS_TAG = "MimiclingItems";
     private static final String SELECTED_SLOT_TAG = "MimiclingSelectedSlot";
+    private static final String CHEWING_START_TAG = "MimiclingChewingStart";
     private static final String FORM_BASE = "base";
     private static final String FORM_PICKAXE = "pickaxe";
     private static final String FORM_AXE = "axe";
@@ -54,6 +55,8 @@ public class MimiclingItem extends Item {
     private static final int MAX_STORED_ITEMS = 5;
     private static final int TRANSITION_DURATION = 20;
     private static final int FIRST_PHASE_TICKS = 10;
+    private static final int CHEWING_FRAME_COUNT = 15;
+    private static final int CHEWING_TICKS_PER_FRAME = 2;
 
     public MimiclingItem(Properties properties) {
         super(properties);
@@ -81,6 +84,7 @@ public class MimiclingItem extends Item {
             ItemStack taken = slot.safeTake(1, 1, player);
             if (!taken.isEmpty()) {
                 ItemStack removed = storeInDedicatedSlot(stack, taken);
+                startChewing(stack, player.level().getGameTime());
                 slot.safeInsert(removed);
                 playInsertSound(player);
             }
@@ -110,6 +114,7 @@ public class MimiclingItem extends Item {
 
         ItemStack inserted = carriedStack.copyWithCount(1);
         ItemStack removed = storeInDedicatedSlot(stack, inserted);
+        startChewing(stack, player.level().getGameTime());
         carriedStack.shrink(1);
         carriedSlot.set(removed.isEmpty() ? carriedStack : removed);
         playInsertSound(player);
@@ -332,6 +337,15 @@ public class MimiclingItem extends Item {
         return isTransitioning(stack, gameTime) && gameTime - stack.getTag().getLong(TRANSITION_START_TAG) == FIRST_PHASE_TICKS;
     }
 
+    public static boolean isChewingFrame(ItemStack stack, long gameTime, int frame) {
+        if (!isBaseStorageForm(stack) || !stack.hasTag() || !stack.getTag().contains(CHEWING_START_TAG)) {
+            return false;
+        }
+
+        long elapsed = gameTime - stack.getTag().getLong(CHEWING_START_TAG);
+        return elapsed >= 0 && elapsed < CHEWING_FRAME_COUNT * CHEWING_TICKS_PER_FRAME && elapsed / CHEWING_TICKS_PER_FRAME == frame;
+    }
+
     public static boolean isForm(ItemStack stack, long gameTime, String form) {
         return !isTransitioning(stack, gameTime) && getCurrentForm(stack, gameTime).equals(form);
     }
@@ -396,6 +410,10 @@ public class MimiclingItem extends Item {
 
     private static boolean canUseStorage(ItemStack stack) {
         return FORM_BASE.equals(getStoredForm(stack));
+    }
+
+    private static void startChewing(ItemStack stack, long gameTime) {
+        stack.getOrCreateTag().putLong(CHEWING_START_TAG, gameTime);
     }
 
     public static boolean isBaseStorageForm(ItemStack stack) {

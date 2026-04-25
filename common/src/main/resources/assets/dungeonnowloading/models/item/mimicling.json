@@ -6,6 +6,96 @@
   "overrides": [
     {
       "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_0": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_0"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_1": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_1"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_2": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_2"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_3": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_3"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_4": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_4"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_5": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_5"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_6": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_6"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_7": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_7"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_8": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_8"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_9": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_9"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_10": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_10"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_11": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_11"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_12": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_12"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_13": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_13"
+    },
+    {
+      "predicate": {
+        "dungeonnowloading:mimicling_chewing_frame_14": 1.0
+      },
+      "model": "dungeonnowloading:item/mimicling_chewing_14"
+    },
+    {
+      "predicate": {
         "dungeonnowloading:mimicling_open_frame_0": 1.0
       },
       "model": "dungeonnowloading:item/mimicling_open_0"

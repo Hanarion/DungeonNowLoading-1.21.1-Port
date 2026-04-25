@@ -25,12 +25,22 @@ public final class MimiclingFeedHintHandler {
     }
 
     public static boolean isOpenFrame(ItemStack stack, long gameTime, int frame) {
-        if ((!hoveringFeedableItem && !carryingFeedableItem) || !MimiclingItem.isBaseStorageForm(stack)) {
+        if ((!hoveringFeedableItem && !carryingFeedableItem) || !MimiclingItem.isBaseStorageForm(stack) || isChewing(stack, gameTime)) {
             return false;
         }
 
         int ticksPerFrame = carryingFeedableItem ? CARRIED_TICKS_PER_FRAME : HOVER_TICKS_PER_FRAME;
         return ((int) (gameTime / ticksPerFrame) % OPEN_FRAME_COUNT) == frame;
+    }
+
+    private static boolean isChewing(ItemStack stack, long gameTime) {
+        for (int frame = 0; frame < 15; frame++) {
+            if (MimiclingItem.isChewingFrame(stack, gameTime, frame)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static boolean hasBaseMimicling(Player player) {
