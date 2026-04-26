@@ -2,6 +2,9 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.Tier;
@@ -20,6 +23,11 @@ public class MimiclingPickaxeItem extends PickaxeItem implements MimiclingFormIt
     @Override
     public String getMimiclingForm() {
         return MimiclingItem.getPickaxeForm();
+    }
+
+    @Override
+    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack carriedStack, Slot slot, ClickAction clickAction, Player player, net.minecraft.world.entity.SlotAccess carriedSlot) {
+        return MimiclingItem.tryTemporarilyOpenForInventoryFeed(stack, carriedStack, slot, clickAction, player);
     }
 
     @Override

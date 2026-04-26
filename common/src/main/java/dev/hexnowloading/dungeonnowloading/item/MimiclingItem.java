@@ -49,6 +49,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static final String STORED_ITEMS_TAG = "MimiclingItems";
     private static final String SELECTED_SLOT_TAG = "MimiclingSelectedSlot";
     private static final String CHEWING_START_TAG = "MimiclingChewingStart";
+    private static final String TEMPORARY_INVENTORY_FORM_TAG = "MimiclingTemporaryInventoryForm";
     private static final String FORM_BASE = "base";
     private static final String FORM_PICKAXE = "pickaxe";
     private static final String FORM_AXE = "axe";
@@ -214,6 +215,77 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         playTransformSound(level, player);
         player.swing(hand);
         return true;
+    }
+
+    public static boolean tryTemporarilyOpenForInventoryFeed(ItemStack stack, ItemStack carriedStack, Slot slot, ClickAction clickAction, Player player) {
+        if (clickAction != ClickAction.SECONDARY) {
+            return false;
+        }
+
+        return tryTemporarilyOpenForInventoryFeed(stack, slot, player);
+    }
+
+    public static boolean tryTemporarilyOpenForInventoryFeed(ItemStack stack, ItemStack carriedStack, Slot slot, Player player) {
+        if (carriedStack.isEmpty() || !isFeedableTool(carriedStack)) {
+            return false;
+        }
+
+        return tryTemporarilyOpenForInventoryFeed(stack, slot, player);
+    }
+
+    public static boolean tryTemporarilyOpenForInventoryFeed(ItemStack stack, Slot slot, Player player) {
+        if (!slot.allowModification(player)) {
+            return false;
+        }
+
+        String currentForm = getStoredForm(stack);
+        if (!(stack.getItem() instanceof MimiclingFormItem) || FORM_BASE.equals(currentForm)) {
+            return false;
+        }
+
+        ItemStack opened = copyWithForm(stack, FORM_BASE);
+        CompoundTag tag = opened.getOrCreateTag();
+        tag.putString(TEMPORARY_INVENTORY_FORM_TAG, currentForm);
+        startTransition(opened, currentForm, FORM_BASE, player.level().getGameTime());
+        slot.set(opened);
+        slot.setChanged();
+        playTransformSound(player.level(), player);
+        return true;
+    }
+
+    public static ItemStack restoreTemporaryInventoryForm(ItemStack stack) {
+        return restoreTemporaryInventoryForm(stack, 0L, false);
+    }
+
+    public static ItemStack restoreTemporaryInventoryForm(ItemStack stack, long gameTime) {
+        return restoreTemporaryInventoryForm(stack, gameTime, true);
+    }
+
+    private static ItemStack restoreTemporaryInventoryForm(ItemStack stack, long gameTime, boolean animate) {
+        if (!isBaseStorageForm(stack) || !stack.hasTag() || !stack.getTag().contains(TEMPORARY_INVENTORY_FORM_TAG)) {
+            return stack;
+        }
+
+        String originalForm = stack.getTag().getString(TEMPORARY_INVENTORY_FORM_TAG);
+        if (!canTransformToForm(stack, originalForm)) {
+            stack.getTag().remove(TEMPORARY_INVENTORY_FORM_TAG);
+            stack.getTag().putString(FORM_TAG, FORM_BASE);
+            syncActiveEnchantmentTags(stack, FORM_BASE);
+            return stack;
+        }
+
+        ItemStack restored = copyWithForm(stack, originalForm);
+        CompoundTag tag = restored.getOrCreateTag();
+        tag.remove(TEMPORARY_INVENTORY_FORM_TAG);
+        if (animate) {
+            startTransition(restored, FORM_BASE, originalForm, gameTime);
+        } else {
+            tag.putString(FORM_TAG, originalForm);
+            clearTransitionData(restored);
+            removeStaleAttributeModifierTags(restored);
+            syncActiveEnchantmentTags(restored, originalForm);
+        }
+        return restored;
     }
 
     public static String getBestFormFor(BlockState state) {
@@ -448,6 +520,13 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         tag.putLong(TRANSITION_START_TAG, gameTime);
         removeStaleAttributeModifierTags(stack);
         syncActiveEnchantmentTags(stack, toForm);
+    }
+
+    private static void clearTransitionData(ItemStack stack) {
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.remove(TRANSITION_START_TAG);
+        tag.remove(TRANSITION_FROM_TAG);
+        tag.remove(TRANSITION_TO_TAG);
     }
 
     private static ItemStack copyWithForm(ItemStack stack, String targetForm) {

@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class DNLItems {
+    private static final int MIMICLING_DURABILITY = 1000;
     private static final HashMap<ResourceKey<CreativeModeTab>, ArrayList<ResourceLocation>> ITEM_TABS = new HashMap<>();
     private static final Map<DungeonBannerBlock.DungeonBannerVariant, Supplier<Item>> BANNER_ITEMS = new EnumMap<>(DungeonBannerBlock.DungeonBannerVariant.class);
 
@@ -256,11 +257,11 @@ public class DNLItems {
     }
 
     private static Item.Properties mimiclingProperties() {
-        return new Item.Properties().durability(Tiers.DIAMOND.getUses()).rarity(Rarity.COMMON);
+        return new Item.Properties().durability(MIMICLING_DURABILITY).rarity(Rarity.COMMON);
     }
 
     private static Item.Properties mimiclingToolProperties() {
-        return new Item.Properties().rarity(Rarity.COMMON);
+        return new Item.Properties().durability(MIMICLING_DURABILITY).rarity(Rarity.COMMON);
     }
 
     public static Item[] getMimiclingItems() {

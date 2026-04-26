@@ -2,6 +2,9 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.Tier;
@@ -20,6 +23,11 @@ public class MimiclingShovelItem extends ShovelItem implements MimiclingFormItem
     @Override
     public String getMimiclingForm() {
         return MimiclingItem.getShovelForm();
+    }
+
+    @Override
+    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack carriedStack, Slot slot, ClickAction clickAction, Player player, net.minecraft.world.entity.SlotAccess carriedSlot) {
+        return MimiclingItem.tryTemporarilyOpenForInventoryFeed(stack, carriedStack, slot, clickAction, player);
     }
 
     @Override
