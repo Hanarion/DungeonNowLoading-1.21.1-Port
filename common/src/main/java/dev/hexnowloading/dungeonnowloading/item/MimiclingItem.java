@@ -374,7 +374,12 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     public static String getBestCombatForm(ItemStack stack) {
-        if (!getStoredToolForForm(stack, FORM_SWORD).isEmpty()) {
+        boolean hasSword = !getStoredToolForForm(stack, FORM_SWORD).isEmpty();
+        boolean hasAxe = !getStoredToolForForm(stack, FORM_AXE).isEmpty();
+        if (hasSword && hasAxe) {
+            return getCycledUseForm(stack, FORM_SWORD, FORM_AXE);
+        }
+        if (hasSword) {
             return FORM_SWORD;
         }
 
