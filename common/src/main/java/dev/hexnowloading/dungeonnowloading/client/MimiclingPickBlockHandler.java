@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -26,7 +27,8 @@ public class MimiclingPickBlockHandler {
             return false;
         }
 
-        String targetForm = getTargetForm(minecraft);
+        ItemStack heldMimicling = getHeldMimicling(minecraft.player);
+        String targetForm = getTargetForm(minecraft, heldMimicling);
         if (targetForm != null && canHeldMimiclingTransformTo(minecraft.player, targetForm)) {
             Services.NETWORK.sendToServer(new C2SMimiclingTransformPacket(targetForm));
         }
@@ -38,22 +40,32 @@ public class MimiclingPickBlockHandler {
         return player.getMainHandItem().getItem() instanceof MimiclingFormItem || player.getOffhandItem().getItem() instanceof MimiclingFormItem;
     }
 
+    private static ItemStack getHeldMimicling(Player player) {
+        if (player.getMainHandItem().getItem() instanceof MimiclingFormItem) {
+            return player.getMainHandItem();
+        }
+        if (player.getOffhandItem().getItem() instanceof MimiclingFormItem) {
+            return player.getOffhandItem();
+        }
+        return ItemStack.EMPTY;
+    }
+
     private static boolean canHeldMimiclingTransformTo(Player player, String targetForm) {
         return MimiclingItem.canTransformToForm(player.getMainHandItem(), targetForm) || MimiclingItem.canTransformToForm(player.getOffhandItem(), targetForm);
     }
 
-    private static String getTargetForm(Minecraft minecraft) {
+    private static String getTargetForm(Minecraft minecraft, ItemStack heldMimicling) {
         if (isLookingAtLivingEntity(minecraft)) {
-            return MimiclingItem.getSwordForm();
+            return MimiclingItem.getBestCombatForm(heldMimicling);
         }
 
         HitResult hitResult = minecraft.hitResult;
         if (hitResult instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof LivingEntity livingEntity && !(livingEntity instanceof Player)) {
-            return MimiclingItem.getSwordForm();
+            return MimiclingItem.getBestCombatForm(heldMimicling);
         }
 
         if (hitResult instanceof BlockHitResult blockHitResult && hitResult.getType() == HitResult.Type.BLOCK) {
-            return MimiclingItem.getBestFormFor(minecraft.level.getBlockState(blockHitResult.getBlockPos()));
+            return MimiclingItem.getBestFormFor(heldMimicling, minecraft.level.getBlockState(blockHitResult.getBlockPos()));
         }
 
         return MimiclingItem.getBaseForm();

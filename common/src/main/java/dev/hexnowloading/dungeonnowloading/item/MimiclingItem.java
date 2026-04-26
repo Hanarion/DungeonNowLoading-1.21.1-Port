@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
+import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.SlotAccess;
@@ -57,6 +60,8 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static final int FIRST_PHASE_TICKS = 10;
     private static final int CHEWING_FRAME_COUNT = 15;
     private static final int CHEWING_TICKS_PER_FRAME = 2;
+    private static final String[] BLOCK_TIE_BREAKER_FORMS = {FORM_SWORD, FORM_HOE, FORM_SHOVEL, FORM_AXE, FORM_PICKAXE};
+    private static final String[] COMBAT_FALLBACK_FORMS = {FORM_AXE, FORM_PICKAXE, FORM_SHOVEL, FORM_HOE};
     private final String form;
 
     public MimiclingItem(Properties properties) {
@@ -228,6 +233,95 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return FORM_HOE;
         }
         return FORM_BASE;
+    }
+
+    public static String getBestFormFor(ItemStack stack, BlockState state) {
+        if (isHoeHarvestCropBlock(state) && !getStoredToolForForm(stack, FORM_HOE).isEmpty()) {
+            return FORM_HOE;
+        }
+
+        String cycledUseForm = getCycledUseFormFor(stack, state);
+        if (cycledUseForm != null) {
+            return cycledUseForm;
+        }
+
+        String bestForm = FORM_BASE;
+        int bestTierLevel = Integer.MIN_VALUE;
+        int bestTieBreaker = Integer.MAX_VALUE;
+
+        for (String form : BLOCK_TIE_BREAKER_FORMS) {
+            ItemStack storedTool = getStoredToolForForm(stack, form);
+            if (storedTool.isEmpty() || !isFormEffectiveForBlock(form, state)) {
+                continue;
+            }
+
+            int tierLevel = getToolTierLevel(storedTool);
+            int tieBreaker = getBlockTieBreaker(form);
+            if (tierLevel > bestTierLevel || tierLevel == bestTierLevel && tieBreaker < bestTieBreaker) {
+                bestForm = form;
+                bestTierLevel = tierLevel;
+                bestTieBreaker = tieBreaker;
+            }
+        }
+
+        return bestForm;
+    }
+
+    public static String getCycledUseFormFor(ItemStack stack, BlockState state) {
+        if (state.is(DNLTags.MIMICLING_CAMPFIRE_AXE_SHOVEL_CYCLE)) {
+            return getCycledUseForm(stack, FORM_AXE, FORM_SHOVEL);
+        }
+        if (state.is(DNLTags.MIMICLING_WAXED_PICKAXE_AXE_CYCLE)) {
+            return getCycledUseForm(stack, FORM_PICKAXE, FORM_AXE);
+        }
+        if (state.is(DNLTags.MIMICLING_SHOVEL_HOE_CYCLE)) {
+            return getCycledUseForm(stack, FORM_SHOVEL, FORM_HOE);
+        }
+
+        return null;
+    }
+
+    private static String getCycledUseForm(ItemStack stack, String priorityForm, String alternateForm) {
+        boolean hasPriority = !getStoredToolForForm(stack, priorityForm).isEmpty();
+        boolean hasAlternate = !getStoredToolForForm(stack, alternateForm).isEmpty();
+        if (!hasPriority && !hasAlternate) {
+            return FORM_BASE;
+        }
+
+        String currentForm = getStoredForm(stack);
+        if (priorityForm.equals(currentForm) && hasAlternate) {
+            return alternateForm;
+        }
+        if (alternateForm.equals(currentForm) && hasPriority) {
+            return priorityForm;
+        }
+        if (hasPriority) {
+            return priorityForm;
+        }
+        return alternateForm;
+    }
+
+    public static String getBestCombatForm(ItemStack stack) {
+        if (!getStoredToolForForm(stack, FORM_SWORD).isEmpty()) {
+            return FORM_SWORD;
+        }
+
+        String bestForm = FORM_BASE;
+        double bestAttackDamage = Double.NEGATIVE_INFINITY;
+        for (String form : COMBAT_FALLBACK_FORMS) {
+            ItemStack storedTool = getStoredToolForForm(stack, form);
+            if (storedTool.isEmpty()) {
+                continue;
+            }
+
+            double attackDamage = getToolAttackDamage(storedTool);
+            if (attackDamage > bestAttackDamage) {
+                bestForm = form;
+                bestAttackDamage = attackDamage;
+            }
+        }
+
+        return bestForm;
     }
 
     public static String getSwordForm() {
@@ -776,6 +870,52 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static ItemStack getStoredToolForForm(ItemStack stack, String form) {
         int slot = getDedicatedSlot(form);
         return slot < 0 ? ItemStack.EMPTY : getStoredItem(stack, slot);
+    }
+
+    private static boolean isFormEffectiveForBlock(String form, BlockState state) {
+        if (FORM_SWORD.equals(form)) {
+            return state.is(Blocks.COBWEB);
+        }
+        if (FORM_PICKAXE.equals(form)) {
+            return state.is(BlockTags.MINEABLE_WITH_PICKAXE);
+        }
+        if (FORM_AXE.equals(form)) {
+            return state.is(BlockTags.MINEABLE_WITH_AXE);
+        }
+        if (FORM_SHOVEL.equals(form)) {
+            return state.is(BlockTags.MINEABLE_WITH_SHOVEL);
+        }
+        if (FORM_HOE.equals(form)) {
+            return state.is(BlockTags.MINEABLE_WITH_HOE);
+        }
+        return false;
+    }
+
+    private static boolean isHoeHarvestCropBlock(BlockState state) {
+        return state.is(DNLTags.MIMICLING_HOE_HARVESTABLE);
+    }
+
+    private static int getToolTierLevel(ItemStack stack) {
+        return stack.getItem() instanceof TieredItem tieredItem ? tieredItem.getTier().getLevel() : -1;
+    }
+
+    private static int getBlockTieBreaker(String form) {
+        for (int i = 0; i < BLOCK_TIE_BREAKER_FORMS.length; i++) {
+            if (BLOCK_TIE_BREAKER_FORMS[i].equals(form)) {
+                return i;
+            }
+        }
+        return BLOCK_TIE_BREAKER_FORMS.length;
+    }
+
+    private static double getToolAttackDamage(ItemStack stack) {
+        double attackDamage = 0.0D;
+        for (AttributeModifier modifier : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE)) {
+            if (modifier.getOperation() == AttributeModifier.Operation.ADDITION) {
+                attackDamage += modifier.getAmount();
+            }
+        }
+        return attackDamage;
     }
 
     private static void syncActiveEnchantmentTags(ItemStack stack, String form) {
