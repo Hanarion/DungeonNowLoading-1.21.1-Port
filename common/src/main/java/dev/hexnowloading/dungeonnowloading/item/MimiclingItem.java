@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.core.BlockPos;
@@ -10,10 +11,8 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.SlotAccess;
@@ -25,10 +24,11 @@ import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -38,7 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class MimiclingItem extends Item {
+public class MimiclingItem extends Item implements MimiclingFormItem {
     private static final String FORM_TAG = "MimiclingForm";
     private static final String TRANSITION_START_TAG = "MimiclingTransitionStart";
     private static final String TRANSITION_FROM_TAG = "MimiclingTransitionFrom";
@@ -57,9 +57,20 @@ public class MimiclingItem extends Item {
     private static final int FIRST_PHASE_TICKS = 10;
     private static final int CHEWING_FRAME_COUNT = 15;
     private static final int CHEWING_TICKS_PER_FRAME = 2;
+    private final String form;
 
     public MimiclingItem(Properties properties) {
+        this(properties, FORM_BASE);
+    }
+
+    public MimiclingItem(Properties properties, String form) {
         super(properties);
+        this.form = isValidForm(form) ? form : FORM_BASE;
+    }
+
+    @Override
+    public String getMimiclingForm() {
+        return form;
     }
 
     @Override
@@ -123,24 +134,8 @@ public class MimiclingItem extends Item {
 
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
-        String form = getStoredForm(stack);
-        if (FORM_SWORD.equals(form)) {
-            if (state.is(Blocks.COBWEB)) {
-                return 15.0F;
-            }
-            return state.is(BlockTags.SWORD_EFFICIENT) ? 1.5F : 1.0F;
-        }
-
-        return isMineableByForm(state, form) ? Tiers.DIAMOND.getSpeed() : 1.0F;
-    }
-
-    @Override
-    public boolean isCorrectToolForDrops(BlockState state) {
-        return state.is(Blocks.COBWEB)
-                || state.is(BlockTags.MINEABLE_WITH_PICKAXE)
-                || state.is(BlockTags.MINEABLE_WITH_AXE)
-                || state.is(BlockTags.MINEABLE_WITH_SHOVEL)
-                || state.is(BlockTags.MINEABLE_WITH_HOE);
+        ItemStack storedTool = getStoredToolForCurrentForm(stack);
+        return storedTool.isEmpty() ? super.getDestroySpeed(stack, state) : storedTool.getDestroySpeed(state);
     }
 
     @Override
@@ -160,18 +155,26 @@ public class MimiclingItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        String form = getStoredForm(context.getItemInHand());
-        if (FORM_AXE.equals(form)) {
-            return Items.DIAMOND_AXE.useOn(context);
-        }
-        if (FORM_SHOVEL.equals(form)) {
-            return Items.DIAMOND_SHOVEL.useOn(context);
-        }
-        if (FORM_HOE.equals(form)) {
-            return Items.DIAMOND_HOE.useOn(context);
+        ItemStack storedTool = getStoredToolForCurrentForm(context.getItemInHand());
+        if (!storedTool.isEmpty() && (storedTool.getItem() instanceof AxeItem || storedTool.getItem() instanceof ShovelItem || storedTool.getItem() instanceof HoeItem)) {
+            return storedTool.getItem().useOn(context);
         }
 
         return super.useOn(context);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        if (!level.isClientSide) {
+            removeStaleAttributeModifierTags(stack);
+            syncActiveEnchantmentTags(stack, getStoredForm(stack));
+        }
+    }
+
+    @Override
+    public boolean isFoil(ItemStack stack) {
+        ItemStack storedTool = getStoredToolForCurrentForm(stack);
+        return !storedTool.isEmpty() && storedTool.hasFoil();
     }
 
     @Override
@@ -191,7 +194,7 @@ public class MimiclingItem extends Item {
 
     public static boolean tryTransformToForm(ItemStack stack, Player player, InteractionHand hand, String targetForm) {
         Level level = player.level();
-        if (!(stack.getItem() instanceof MimiclingItem) || !isValidForm(targetForm) || isTransitioning(stack, level.getGameTime())) {
+        if (!canTransformToForm(stack, targetForm) || isTransitioning(stack, level.getGameTime())) {
             return false;
         }
 
@@ -200,7 +203,9 @@ public class MimiclingItem extends Item {
             return false;
         }
 
-        startTransition(stack, currentForm, targetForm, level.getGameTime());
+        ItemStack transformed = copyWithForm(stack, targetForm);
+        startTransition(transformed, currentForm, targetForm, level.getGameTime());
+        player.setItemInHand(hand, transformed);
         playTransformSound(level, player);
         player.swing(hand);
         return true;
@@ -233,12 +238,57 @@ public class MimiclingItem extends Item {
         return FORM_BASE;
     }
 
+    public static String getPickaxeForm() {
+        return FORM_PICKAXE;
+    }
+
+    public static String getAxeForm() {
+        return FORM_AXE;
+    }
+
+    public static String getShovelForm() {
+        return FORM_SHOVEL;
+    }
+
+    public static String getHoeForm() {
+        return FORM_HOE;
+    }
+
     public static boolean isValidForm(String form) {
         return FORM_BASE.equals(form) || FORM_PICKAXE.equals(form) || FORM_AXE.equals(form) || FORM_SHOVEL.equals(form) || FORM_HOE.equals(form) || FORM_SWORD.equals(form);
     }
 
+    public static boolean canTransformToForm(ItemStack stack, String targetForm) {
+        if (!(stack.getItem() instanceof MimiclingFormItem) || !isValidForm(targetForm)) {
+            return false;
+        }
+
+        if (FORM_BASE.equals(targetForm)) {
+            return true;
+        }
+
+        int slot = getDedicatedSlot(targetForm);
+        return slot >= 0 && !getStoredItem(stack, slot).isEmpty();
+    }
+
+    public static void tickMimiclingInventory(ItemStack stack, Level level) {
+        if (!level.isClientSide) {
+            removeStaleAttributeModifierTags(stack);
+            syncActiveEnchantmentTags(stack, getStoredForm(stack));
+        }
+    }
+
+    public static boolean isMimiclingFoil(ItemStack stack) {
+        ItemStack storedTool = getStoredToolForCurrentForm(stack);
+        return !storedTool.isEmpty() && storedTool.hasFoil();
+    }
+
+    public static void onMimiclingDestroyed(ItemEntity itemEntity) {
+        ItemUtils.onContainerDestroyed(itemEntity, getStoredItems(itemEntity.getItem()));
+    }
+
     public static boolean tryScrollSelectedSlot(ItemStack stack, int delta) {
-        if (!(stack.getItem() instanceof MimiclingItem) || !canUseStorage(stack)) {
+        if (!(stack.getItem() instanceof MimiclingFormItem) || !canUseStorage(stack)) {
             return false;
         }
 
@@ -265,7 +315,7 @@ public class MimiclingItem extends Item {
 
     public static boolean trySelectDedicatedSlot(ItemStack stack, ItemStack toolStack) {
         int slot = getDedicatedSlot(toolStack);
-        if (!(stack.getItem() instanceof MimiclingItem) || !canUseStorage(stack) || slot < 0) {
+        if (!(stack.getItem() instanceof MimiclingFormItem) || !canUseStorage(stack) || slot < 0) {
             return false;
         }
 
@@ -278,7 +328,7 @@ public class MimiclingItem extends Item {
     }
 
     public static boolean trySelectNextOccupiedSlotIfSelectedEmpty(ItemStack stack) {
-        if (!(stack.getItem() instanceof MimiclingItem) || !canUseStorage(stack) || getStoredItemCount(stack) == 0) {
+        if (!(stack.getItem() instanceof MimiclingFormItem) || !canUseStorage(stack) || getStoredItemCount(stack) == 0) {
             return false;
         }
 
@@ -302,7 +352,120 @@ public class MimiclingItem extends Item {
         tag.putString(TRANSITION_FROM_TAG, fromForm);
         tag.putString(TRANSITION_TO_TAG, toForm);
         tag.putLong(TRANSITION_START_TAG, gameTime);
-        applyAttributeModifiers(stack, toForm);
+        removeStaleAttributeModifierTags(stack);
+        syncActiveEnchantmentTags(stack, toForm);
+    }
+
+    private static ItemStack copyWithForm(ItemStack stack, String targetForm) {
+        ItemStack transformed = new ItemStack(getItemForForm(stack, targetForm), stack.getCount());
+        if (stack.hasTag()) {
+            transformed.setTag(stack.getTag().copy());
+        }
+        transformed.setDamageValue(Math.min(stack.getDamageValue(), transformed.getMaxDamage()));
+        return transformed;
+    }
+
+    private static Item getItemForForm(ItemStack stack, String form) {
+        Tiers tier = getClosestVanillaTier(getStoredToolForForm(stack, form));
+        if (FORM_PICKAXE.equals(form)) {
+            return getPickaxeItemForTier(tier);
+        }
+        if (FORM_AXE.equals(form)) {
+            return getAxeItemForTier(tier);
+        }
+        if (FORM_SHOVEL.equals(form)) {
+            return getShovelItemForTier(tier);
+        }
+        if (FORM_HOE.equals(form)) {
+            return getHoeItemForTier(tier);
+        }
+        if (FORM_SWORD.equals(form)) {
+            return getSwordItemForTier(tier);
+        }
+        return DNLItems.MIMICLING.get();
+    }
+
+    private static Item getPickaxeItemForTier(Tiers tier) {
+        return switch (tier) {
+            case WOOD -> DNLItems.MIMICLING_WOODEN_PICKAXE.get();
+            case STONE -> DNLItems.MIMICLING_STONE_PICKAXE.get();
+            case IRON -> DNLItems.MIMICLING_IRON_PICKAXE.get();
+            case GOLD -> DNLItems.MIMICLING_GOLDEN_PICKAXE.get();
+            case NETHERITE -> DNLItems.MIMICLING_NETHERITE_PICKAXE.get();
+            default -> DNLItems.MIMICLING_PICKAXE.get();
+        };
+    }
+
+    private static Item getAxeItemForTier(Tiers tier) {
+        return switch (tier) {
+            case WOOD -> DNLItems.MIMICLING_WOODEN_AXE.get();
+            case STONE -> DNLItems.MIMICLING_STONE_AXE.get();
+            case IRON -> DNLItems.MIMICLING_IRON_AXE.get();
+            case GOLD -> DNLItems.MIMICLING_GOLDEN_AXE.get();
+            case NETHERITE -> DNLItems.MIMICLING_NETHERITE_AXE.get();
+            default -> DNLItems.MIMICLING_AXE.get();
+        };
+    }
+
+    private static Item getShovelItemForTier(Tiers tier) {
+        return switch (tier) {
+            case WOOD -> DNLItems.MIMICLING_WOODEN_SHOVEL.get();
+            case STONE -> DNLItems.MIMICLING_STONE_SHOVEL.get();
+            case IRON -> DNLItems.MIMICLING_IRON_SHOVEL.get();
+            case GOLD -> DNLItems.MIMICLING_GOLDEN_SHOVEL.get();
+            case NETHERITE -> DNLItems.MIMICLING_NETHERITE_SHOVEL.get();
+            default -> DNLItems.MIMICLING_SHOVEL.get();
+        };
+    }
+
+    private static Item getHoeItemForTier(Tiers tier) {
+        return switch (tier) {
+            case WOOD -> DNLItems.MIMICLING_WOODEN_HOE.get();
+            case STONE -> DNLItems.MIMICLING_STONE_HOE.get();
+            case IRON -> DNLItems.MIMICLING_IRON_HOE.get();
+            case GOLD -> DNLItems.MIMICLING_GOLDEN_HOE.get();
+            case NETHERITE -> DNLItems.MIMICLING_NETHERITE_HOE.get();
+            default -> DNLItems.MIMICLING_HOE.get();
+        };
+    }
+
+    private static Item getSwordItemForTier(Tiers tier) {
+        return switch (tier) {
+            case WOOD -> DNLItems.MIMICLING_WOODEN_SWORD.get();
+            case STONE -> DNLItems.MIMICLING_STONE_SWORD.get();
+            case IRON -> DNLItems.MIMICLING_IRON_SWORD.get();
+            case GOLD -> DNLItems.MIMICLING_GOLDEN_SWORD.get();
+            case NETHERITE -> DNLItems.MIMICLING_NETHERITE_SWORD.get();
+            default -> DNLItems.MIMICLING_SWORD.get();
+        };
+    }
+
+    private static Tiers getClosestVanillaTier(ItemStack storedTool) {
+        if (storedTool.getItem() instanceof TieredItem tieredItem) {
+            Tier tier = tieredItem.getTier();
+            if (tier instanceof Tiers vanillaTier) {
+                return vanillaTier;
+            }
+            return getClosestVanillaTier(tier);
+        }
+        return Tiers.DIAMOND;
+    }
+
+    private static Tiers getClosestVanillaTier(Tier tier) {
+        Tiers closest = Tiers.DIAMOND;
+        double closestScore = Double.MAX_VALUE;
+        for (Tiers candidate : Tiers.values()) {
+            double score = Math.abs(candidate.getLevel() - tier.getLevel()) * 100.0D
+                    + Math.abs(candidate.getSpeed() - tier.getSpeed())
+                    + Math.abs(candidate.getAttackDamageBonus() - tier.getAttackDamageBonus())
+                    + Math.abs(candidate.getUses() - tier.getUses()) / 1000.0D
+                    + Math.abs(candidate.getEnchantmentValue() - tier.getEnchantmentValue()) / 10.0D;
+            if (score < closestScore) {
+                closest = candidate;
+                closestScore = score;
+            }
+        }
+        return closest;
     }
 
     private static void playTransformSound(Level level, Player player) {
@@ -377,12 +540,7 @@ public class MimiclingItem extends Item {
             return elapsed >= TRANSITION_DURATION ? getTransitionTo(stack) : getTransitionFrom(stack);
         }
 
-        if (!stack.hasTag()) {
-            return FORM_BASE;
-        }
-
-        String form = stack.getTag().getString(FORM_TAG);
-        return form.isEmpty() ? FORM_BASE : form;
+        return getStoredForm(stack);
     }
 
     private static boolean hasTransitionData(ItemStack stack) {
@@ -400,12 +558,18 @@ public class MimiclingItem extends Item {
     }
 
     private static String getStoredForm(ItemStack stack) {
-        if (!stack.hasTag()) {
-            return FORM_BASE;
+        if (stack.getItem() instanceof MimiclingFormItem mimiclingFormItem && !FORM_BASE.equals(mimiclingFormItem.getMimiclingForm())) {
+            return mimiclingFormItem.getMimiclingForm();
         }
 
-        String form = stack.getTag().getString(FORM_TAG);
-        return form.isEmpty() ? FORM_BASE : form;
+        if (stack.hasTag()) {
+            String legacyForm = stack.getTag().getString(FORM_TAG);
+            if (!legacyForm.isEmpty()) {
+                return legacyForm;
+            }
+        }
+
+        return FORM_BASE;
     }
 
     private static boolean canUseStorage(ItemStack stack) {
@@ -417,7 +581,7 @@ public class MimiclingItem extends Item {
     }
 
     public static boolean isBaseStorageForm(ItemStack stack) {
-        return stack.getItem() instanceof MimiclingItem && canUseStorage(stack);
+        return stack.getItem() instanceof MimiclingFormItem && canUseStorage(stack);
     }
 
     public static boolean isFeedableTool(ItemStack stack) {
@@ -426,6 +590,9 @@ public class MimiclingItem extends Item {
 
     private static int getDedicatedSlot(ItemStack stack) {
         Item item = stack.getItem();
+        if (item instanceof MimiclingFormItem) {
+            return -1;
+        }
         if (item instanceof SwordItem) {
             return 0;
         }
@@ -439,6 +606,25 @@ public class MimiclingItem extends Item {
             return 3;
         }
         if (item instanceof HoeItem) {
+            return 4;
+        }
+        return -1;
+    }
+
+    private static int getDedicatedSlot(String form) {
+        if (FORM_SWORD.equals(form)) {
+            return 0;
+        }
+        if (FORM_PICKAXE.equals(form)) {
+            return 1;
+        }
+        if (FORM_AXE.equals(form)) {
+            return 2;
+        }
+        if (FORM_SHOVEL.equals(form)) {
+            return 3;
+        }
+        if (FORM_HOE.equals(form)) {
             return 4;
         }
         return -1;
@@ -583,53 +769,36 @@ public class MimiclingItem extends Item {
         return items;
     }
 
-    private static boolean isMineableByForm(BlockState state, String form) {
-        return FORM_PICKAXE.equals(form) && state.is(BlockTags.MINEABLE_WITH_PICKAXE)
-                || FORM_AXE.equals(form) && state.is(BlockTags.MINEABLE_WITH_AXE)
-                || FORM_SHOVEL.equals(form) && state.is(BlockTags.MINEABLE_WITH_SHOVEL)
-                || FORM_HOE.equals(form) && state.is(BlockTags.MINEABLE_WITH_HOE);
+    private static ItemStack getStoredToolForCurrentForm(ItemStack stack) {
+        return getStoredToolForForm(stack, getStoredForm(stack));
     }
 
-    private static void applyAttributeModifiers(ItemStack stack, String form) {
+    private static ItemStack getStoredToolForForm(ItemStack stack, String form) {
+        int slot = getDedicatedSlot(form);
+        return slot < 0 ? ItemStack.EMPTY : getStoredItem(stack, slot);
+    }
+
+    private static void syncActiveEnchantmentTags(ItemStack stack, String form) {
         CompoundTag tag = stack.getOrCreateTag();
-        tag.remove("AttributeModifiers");
-
-        if (FORM_BASE.equals(form)) {
+        ItemStack storedTool = getStoredToolForForm(stack, form);
+        if (storedTool.isEmpty()) {
+            tag.remove("Enchantments");
             return;
         }
 
-        double attackDamage;
-        double attackSpeed;
-        if (FORM_SWORD.equals(form)) {
-            attackDamage = 6.0D;
-            attackSpeed = -2.4D;
-        } else if (FORM_PICKAXE.equals(form)) {
-            attackDamage = 4.0D;
-            attackSpeed = -2.8D;
-        } else if (FORM_AXE.equals(form)) {
-            attackDamage = 8.0D;
-            attackSpeed = -3.0D;
-        } else if (FORM_SHOVEL.equals(form)) {
-            attackDamage = 4.5D;
-            attackSpeed = -3.0D;
-        } else if (FORM_HOE.equals(form)) {
-            attackDamage = 0.0D;
-            attackSpeed = 0.0D;
-        } else {
+        ListTag enchantments = storedTool.getEnchantmentTags();
+        if (enchantments.isEmpty()) {
+            tag.remove("Enchantments");
             return;
         }
 
-        ListTag modifiers = new ListTag();
-        modifiers.add(createModifier(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", attackDamage, AttributeModifier.Operation.ADDITION)));
-        modifiers.add(createModifier(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", attackSpeed, AttributeModifier.Operation.ADDITION)));
-        tag.put("AttributeModifiers", modifiers);
+        tag.put("Enchantments", enchantments.copy());
     }
 
-    private static CompoundTag createModifier(Attribute attribute, AttributeModifier modifier) {
-        CompoundTag tag = modifier.save();
-        tag.putString("AttributeName", net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE.getKey(attribute).toString());
-        tag.putString("Slot", EquipmentSlot.MAINHAND.getName());
-        return tag;
+    private static void removeStaleAttributeModifierTags(ItemStack stack) {
+        if (stack.hasTag()) {
+            stack.getTag().remove("AttributeModifiers");
+        }
     }
 
     private static void playRemoveOneSound(LivingEntity entity) {

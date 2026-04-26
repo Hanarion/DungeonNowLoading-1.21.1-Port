@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
+import dev.hexnowloading.dungeonnowloading.item.MimiclingFormItem;
 import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.network.packets.C2SMimiclingTransformPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
@@ -26,16 +27,19 @@ public class MimiclingPickBlockHandler {
         }
 
         String targetForm = getTargetForm(minecraft);
-        if (targetForm != null) {
+        if (targetForm != null && canHeldMimiclingTransformTo(minecraft.player, targetForm)) {
             Services.NETWORK.sendToServer(new C2SMimiclingTransformPacket(targetForm));
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     private static boolean isHoldingMimicling(Player player) {
-        return player.getMainHandItem().getItem() instanceof MimiclingItem || player.getOffhandItem().getItem() instanceof MimiclingItem;
+        return player.getMainHandItem().getItem() instanceof MimiclingFormItem || player.getOffhandItem().getItem() instanceof MimiclingFormItem;
+    }
+
+    private static boolean canHeldMimiclingTransformTo(Player player, String targetForm) {
+        return MimiclingItem.canTransformToForm(player.getMainHandItem(), targetForm) || MimiclingItem.canTransformToForm(player.getOffhandItem(), targetForm);
     }
 
     private static String getTargetForm(Minecraft minecraft) {

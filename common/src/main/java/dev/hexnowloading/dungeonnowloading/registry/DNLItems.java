@@ -57,7 +57,37 @@ public class DNLItems {
     public static final Supplier<Item> MENDSTONE_CHALK = register("mendstone_chalk", () -> new MendstoneChalkItem(new Item.Properties().rarity(Rarity.COMMON).durability(15), DNLBlocks.MENDSTONE_CHALK_MARK.get()));
     public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new ZoneWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
     public static final Supplier<Item> MIMICART = register("mimicart", () -> new MimicartItem(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
-    public static final Supplier<Item> MIMICLING = register("mimicling", () -> new MimiclingItem(new Item.Properties().durability(Tiers.DIAMOND.getUses()).rarity(Rarity.COMMON)));
+    public static final Supplier<Item> MIMICLING = register("mimicling", () -> new MimiclingItem(mimiclingProperties(), MimiclingItem.getBaseForm()));
+    public static final Supplier<Item> MIMICLING_WOODEN_PICKAXE = register("mimicling_wooden_pickaxe", () -> new MimiclingPickaxeItem(Tiers.WOOD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_STONE_PICKAXE = register("mimicling_stone_pickaxe", () -> new MimiclingPickaxeItem(Tiers.STONE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_IRON_PICKAXE = register("mimicling_iron_pickaxe", () -> new MimiclingPickaxeItem(Tiers.IRON, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_GOLDEN_PICKAXE = register("mimicling_golden_pickaxe", () -> new MimiclingPickaxeItem(Tiers.GOLD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_PICKAXE = register("mimicling_pickaxe", () -> new MimiclingPickaxeItem(mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_NETHERITE_PICKAXE = register("mimicling_netherite_pickaxe", () -> new MimiclingPickaxeItem(Tiers.NETHERITE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_WOODEN_AXE = register("mimicling_wooden_axe", () -> new MimiclingAxeItem(Tiers.WOOD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_STONE_AXE = register("mimicling_stone_axe", () -> new MimiclingAxeItem(Tiers.STONE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_IRON_AXE = register("mimicling_iron_axe", () -> new MimiclingAxeItem(Tiers.IRON, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_GOLDEN_AXE = register("mimicling_golden_axe", () -> new MimiclingAxeItem(Tiers.GOLD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_AXE = register("mimicling_axe", () -> new MimiclingAxeItem(mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_NETHERITE_AXE = register("mimicling_netherite_axe", () -> new MimiclingAxeItem(Tiers.NETHERITE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_WOODEN_SHOVEL = register("mimicling_wooden_shovel", () -> new MimiclingShovelItem(Tiers.WOOD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_STONE_SHOVEL = register("mimicling_stone_shovel", () -> new MimiclingShovelItem(Tiers.STONE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_IRON_SHOVEL = register("mimicling_iron_shovel", () -> new MimiclingShovelItem(Tiers.IRON, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_GOLDEN_SHOVEL = register("mimicling_golden_shovel", () -> new MimiclingShovelItem(Tiers.GOLD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_SHOVEL = register("mimicling_shovel", () -> new MimiclingShovelItem(mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_NETHERITE_SHOVEL = register("mimicling_netherite_shovel", () -> new MimiclingShovelItem(Tiers.NETHERITE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_WOODEN_HOE = register("mimicling_wooden_hoe", () -> new MimiclingHoeItem(Tiers.WOOD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_STONE_HOE = register("mimicling_stone_hoe", () -> new MimiclingHoeItem(Tiers.STONE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_IRON_HOE = register("mimicling_iron_hoe", () -> new MimiclingHoeItem(Tiers.IRON, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_GOLDEN_HOE = register("mimicling_golden_hoe", () -> new MimiclingHoeItem(Tiers.GOLD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_HOE = register("mimicling_hoe", () -> new MimiclingHoeItem(mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_NETHERITE_HOE = register("mimicling_netherite_hoe", () -> new MimiclingHoeItem(Tiers.NETHERITE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_WOODEN_SWORD = register("mimicling_wooden_sword", () -> new MimiclingSwordItem(Tiers.WOOD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_STONE_SWORD = register("mimicling_stone_sword", () -> new MimiclingSwordItem(Tiers.STONE, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_IRON_SWORD = register("mimicling_iron_sword", () -> new MimiclingSwordItem(Tiers.IRON, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_GOLDEN_SWORD = register("mimicling_golden_sword", () -> new MimiclingSwordItem(Tiers.GOLD, mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_SWORD = register("mimicling_sword", () -> new MimiclingSwordItem(mimiclingToolProperties()));
+    public static final Supplier<Item> MIMICLING_NETHERITE_SWORD = register("mimicling_netherite_sword", () -> new MimiclingSwordItem(Tiers.NETHERITE, mimiclingToolProperties()));
 
     // ITEMS - MUSIC DISC
     public static final Supplier<Item> MUSIC_DISC_HELLSPAWN = register("music_disc_hellspawn", () -> new DNLRecordItem(15, DNLSounds.DISC_HELLSPAWN.get(), (new Item.Properties().stacksTo(1).rarity(Rarity.RARE)), 140));
@@ -223,6 +253,25 @@ public class DNLItems {
 
     private static <T extends Item> Supplier<T> register(String name, Supplier<T> itemSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ITEM, name, itemSupplier);
+    }
+
+    private static Item.Properties mimiclingProperties() {
+        return new Item.Properties().durability(Tiers.DIAMOND.getUses()).rarity(Rarity.COMMON);
+    }
+
+    private static Item.Properties mimiclingToolProperties() {
+        return new Item.Properties().rarity(Rarity.COMMON);
+    }
+
+    public static Item[] getMimiclingItems() {
+        return new Item[] {
+                MIMICLING.get(),
+                MIMICLING_WOODEN_PICKAXE.get(), MIMICLING_STONE_PICKAXE.get(), MIMICLING_IRON_PICKAXE.get(), MIMICLING_GOLDEN_PICKAXE.get(), MIMICLING_PICKAXE.get(), MIMICLING_NETHERITE_PICKAXE.get(),
+                MIMICLING_WOODEN_AXE.get(), MIMICLING_STONE_AXE.get(), MIMICLING_IRON_AXE.get(), MIMICLING_GOLDEN_AXE.get(), MIMICLING_AXE.get(), MIMICLING_NETHERITE_AXE.get(),
+                MIMICLING_WOODEN_SHOVEL.get(), MIMICLING_STONE_SHOVEL.get(), MIMICLING_IRON_SHOVEL.get(), MIMICLING_GOLDEN_SHOVEL.get(), MIMICLING_SHOVEL.get(), MIMICLING_NETHERITE_SHOVEL.get(),
+                MIMICLING_WOODEN_HOE.get(), MIMICLING_STONE_HOE.get(), MIMICLING_IRON_HOE.get(), MIMICLING_GOLDEN_HOE.get(), MIMICLING_HOE.get(), MIMICLING_NETHERITE_HOE.get(),
+                MIMICLING_WOODEN_SWORD.get(), MIMICLING_STONE_SWORD.get(), MIMICLING_IRON_SWORD.get(), MIMICLING_GOLDEN_SWORD.get(), MIMICLING_SWORD.get(), MIMICLING_NETHERITE_SWORD.get()
+        };
     }
 
     public static Map<ResourceKey<CreativeModeTab>, ArrayList<ResourceLocation>> getItemTabs() {
