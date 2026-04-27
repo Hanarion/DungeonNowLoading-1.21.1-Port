@@ -41,6 +41,11 @@ public class MimiclingShovelItem extends ShovelItem implements MimiclingFormItem
     }
 
     @Override
+    public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
+        return false;
+    }
+
+    @Override
     public void onDestroyed(ItemEntity itemEntity) {
         MimiclingItem.onMimiclingDestroyed(itemEntity);
     }

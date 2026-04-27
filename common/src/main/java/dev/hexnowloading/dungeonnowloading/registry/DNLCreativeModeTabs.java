@@ -54,6 +54,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.REPULSOR.get());
                 output.accept(DNLItems.MIMICART.get());
+                output.accept(DNLItems.MIMIC_MUCUS.get());
                 output.accept(DNLItems.MIMICLING.get());
                 // Items - Tools
                 output.accept(DNLItems.MENDSTONE_CHALK.get());

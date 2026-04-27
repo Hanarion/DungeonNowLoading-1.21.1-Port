@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.items;
 
+import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.item.ScrapItem;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import net.minecraft.world.InteractionHand;
@@ -22,6 +23,11 @@ public abstract class ItemStackBreakProtectionMixin {
     private void dnl$convertToScrapOnBreak(int amount, LivingEntity entity, Consumer<LivingEntity> onBroken, CallbackInfo ci) {
         ItemStack self = (ItemStack)(Object)this;
         if (!self.isDamageableItem()) return;
+        if (MimiclingItem.tryTransformBrokenToolFormToBase(self, entity)) {
+            ci.cancel();
+            return;
+        }
+
         // Only intercept if the item has our Break Protection enchantment
         if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.BREAK_PROTECTION.get(), self) <= 0) return;
 

@@ -41,6 +41,11 @@ public class MimiclingPickaxeItem extends PickaxeItem implements MimiclingFormIt
     }
 
     @Override
+    public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
+        return false;
+    }
+
+    @Override
     public void onDestroyed(ItemEntity itemEntity) {
         MimiclingItem.onMimiclingDestroyed(itemEntity);
     }

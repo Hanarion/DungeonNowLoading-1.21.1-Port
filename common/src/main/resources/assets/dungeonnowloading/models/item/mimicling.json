@@ -434,31 +434,31 @@
       "predicate": {
         "dungeonnowloading:mimicling_form_pickaxe": 1.0
       },
-      "model": "dungeonnowloading:item/mimicling_pickaxe"
+      "model": "dungeonnowloading:item/mimicling_diamond_pickaxe"
     },
     {
       "predicate": {
         "dungeonnowloading:mimicling_form_axe": 1.0
       },
-      "model": "dungeonnowloading:item/mimicling_axe"
+      "model": "dungeonnowloading:item/mimicling_diamond_axe"
     },
     {
       "predicate": {
         "dungeonnowloading:mimicling_form_shovel": 1.0
       },
-      "model": "dungeonnowloading:item/mimicling_shovel"
+      "model": "dungeonnowloading:item/mimicling_diamond_shovel"
     },
     {
       "predicate": {
         "dungeonnowloading:mimicling_form_hoe": 1.0
       },
-      "model": "dungeonnowloading:item/mimicling_hoe"
+      "model": "dungeonnowloading:item/mimicling_diamond_hoe"
     },
     {
       "predicate": {
         "dungeonnowloading:mimicling_form_sword": 1.0
       },
-      "model": "dungeonnowloading:item/mimicling_sword"
+      "model": "dungeonnowloading:item/mimicling_diamond_sword"
     }
   ]
 }

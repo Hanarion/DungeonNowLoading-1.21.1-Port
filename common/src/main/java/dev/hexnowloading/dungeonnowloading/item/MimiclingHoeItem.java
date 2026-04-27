@@ -70,6 +70,11 @@ public class MimiclingHoeItem extends HoeItem implements MimiclingFormItem {
     }
 
     @Override
+    public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
+        return false;
+    }
+
+    @Override
     public void onDestroyed(ItemEntity itemEntity) {
         MimiclingItem.onMimiclingDestroyed(itemEntity);
     }

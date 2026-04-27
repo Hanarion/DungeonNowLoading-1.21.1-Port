@@ -2,10 +2,12 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -33,11 +35,14 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -49,6 +54,8 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static final String STORED_ITEMS_TAG = "MimiclingItems";
     private static final String SELECTED_SLOT_TAG = "MimiclingSelectedSlot";
     private static final String CHEWING_START_TAG = "MimiclingChewingStart";
+    private static final String CAPACITY_TAG = "MimiclingCapacity";
+    private static final String MUCUS_FED_TAG = "MimiclingMucusFed";
     private static final String TEMPORARY_INVENTORY_FORM_TAG = "MimiclingTemporaryInventoryForm";
     private static final String FORM_BASE = "base";
     private static final String FORM_PICKAXE = "pickaxe";
@@ -57,6 +64,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static final String FORM_HOE = "hoe";
     private static final String FORM_SWORD = "sword";
     private static final int MAX_STORED_ITEMS = 5;
+    private static final int INITIAL_CAPACITY = 2;
+    private static final int MUCUS_PER_CAPACITY_UPGRADE = 2;
+    private static final int MUCUS_LOCKED_HEAL_AMOUNT = 10;
+    private static final int MUCUS_UNLOCKED_HEAL_AMOUNT = 100;
     private static final int TRANSITION_DURATION = 20;
     private static final int FIRST_PHASE_TICKS = 10;
     private static final int CHEWING_FRAME_COUNT = 15;
@@ -97,10 +108,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return true;
         }
 
-        if (isFeedableTool(slotStack) && slot.allowModification(player)) {
+        if (isFeedableTool(slotStack) && slot.allowModification(player) && canAcceptFeed(stack, slotStack)) {
             ItemStack taken = slot.safeTake(1, 1, player);
             if (!taken.isEmpty()) {
-                ItemStack removed = storeInDedicatedSlot(stack, taken);
+                ItemStack removed = feedOne(stack, taken);
                 startChewing(stack, player.level().getGameTime());
                 slot.safeInsert(removed);
                 playInsertSound(player);
@@ -129,8 +140,12 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return true;
         }
 
+        if (!canAcceptFeed(stack, carriedStack)) {
+            return true;
+        }
+
         ItemStack inserted = carriedStack.copyWithCount(1);
-        ItemStack removed = storeInDedicatedSlot(stack, inserted);
+        ItemStack removed = feedOne(stack, inserted);
         startChewing(stack, player.level().getGameTime());
         carriedStack.shrink(1);
         carriedSlot.set(removed.isEmpty() ? carriedStack : removed);
@@ -184,13 +199,26 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     @Override
+    public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
+        return false;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, level, components, tooltipFlag);
+        if (canUseStorage(stack)) {
+            components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.capacity", getStoredItemCount(stack), getStorageCapacity(stack)).withStyle(ChatFormatting.GRAY));
+        }
+    }
+
+    @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
         if (!canUseStorage(stack)) {
             return Optional.empty();
         }
 
         NonNullList<ItemStack> contents = getTooltipContents(stack);
-        return Optional.of(new MimiclingTooltip(contents, getSelectedSlot(stack)));
+        return Optional.of(new MimiclingTooltip(contents, getSelectedSlot(stack), getStorageCapacity(stack)));
     }
 
     @Override
@@ -217,16 +245,33 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return true;
     }
 
+    public static boolean tryTransformBrokenToolFormToBase(ItemStack stack, LivingEntity entity) {
+        String currentForm = getStoredForm(stack);
+        if (!(stack.getItem() instanceof MimiclingFormItem) || FORM_BASE.equals(currentForm)) {
+            return false;
+        }
+
+        ItemStack transformed = copyWithForm(stack, FORM_BASE);
+        transformed.setDamageValue(transformed.getMaxDamage());
+        startTransition(transformed, currentForm, FORM_BASE, entity.level().getGameTime());
+        if (!replaceHeldOrEquippedStack(stack, transformed, entity)) {
+            return false;
+        }
+
+        playTransformSound(entity.level(), entity);
+        return true;
+    }
+
     public static boolean tryTemporarilyOpenForInventoryFeed(ItemStack stack, ItemStack carriedStack, Slot slot, ClickAction clickAction, Player player) {
         if (clickAction != ClickAction.SECONDARY) {
             return false;
         }
 
-        return tryTemporarilyOpenForInventoryFeed(stack, slot, player);
+        return tryTemporarilyOpenForInventoryFeed(stack, carriedStack, slot, player);
     }
 
     public static boolean tryTemporarilyOpenForInventoryFeed(ItemStack stack, ItemStack carriedStack, Slot slot, Player player) {
-        if (carriedStack.isEmpty() || !isFeedableTool(carriedStack)) {
+        if (carriedStack.isEmpty() || !isFeedableTool(carriedStack) || !canAcceptFeed(stack, carriedStack)) {
             return false;
         }
 
@@ -438,6 +483,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return true;
         }
 
+        if (isDurabilityExhausted(stack)) {
+            return false;
+        }
+
         int slot = getDedicatedSlot(targetForm);
         return slot >= 0 && !getStoredItem(stack, slot).isEmpty();
     }
@@ -543,6 +592,40 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return transformed;
     }
 
+    private static boolean replaceHeldOrEquippedStack(ItemStack original, ItemStack replacement, LivingEntity entity) {
+        if (entity instanceof Player player) {
+            if (player.getMainHandItem() == original) {
+                player.setItemInHand(InteractionHand.MAIN_HAND, replacement);
+                return true;
+            }
+            if (player.getOffhandItem() == original) {
+                player.setItemInHand(InteractionHand.OFF_HAND, replacement);
+                return true;
+            }
+            for (int i = 0; i < player.getInventory().items.size(); i++) {
+                if (player.getInventory().items.get(i) == original) {
+                    player.getInventory().items.set(i, replacement);
+                    return true;
+                }
+            }
+            for (int i = 0; i < player.getInventory().offhand.size(); i++) {
+                if (player.getInventory().offhand.get(i) == original) {
+                    player.getInventory().offhand.set(i, replacement);
+                    return true;
+                }
+            }
+        }
+
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (entity.getItemBySlot(slot) == original) {
+                entity.setItemSlot(slot, replacement);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static Item getItemForForm(ItemStack stack, String form) {
         Tiers tier = getClosestVanillaTier(getStoredToolForForm(stack, form));
         if (FORM_PICKAXE.equals(form)) {
@@ -570,7 +653,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             case IRON -> DNLItems.MIMICLING_IRON_PICKAXE.get();
             case GOLD -> DNLItems.MIMICLING_GOLDEN_PICKAXE.get();
             case NETHERITE -> DNLItems.MIMICLING_NETHERITE_PICKAXE.get();
-            default -> DNLItems.MIMICLING_PICKAXE.get();
+            default -> DNLItems.MIMICLING_DIAMOND_PICKAXE.get();
         };
     }
 
@@ -581,7 +664,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             case IRON -> DNLItems.MIMICLING_IRON_AXE.get();
             case GOLD -> DNLItems.MIMICLING_GOLDEN_AXE.get();
             case NETHERITE -> DNLItems.MIMICLING_NETHERITE_AXE.get();
-            default -> DNLItems.MIMICLING_AXE.get();
+            default -> DNLItems.MIMICLING_DIAMOND_AXE.get();
         };
     }
 
@@ -592,7 +675,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             case IRON -> DNLItems.MIMICLING_IRON_SHOVEL.get();
             case GOLD -> DNLItems.MIMICLING_GOLDEN_SHOVEL.get();
             case NETHERITE -> DNLItems.MIMICLING_NETHERITE_SHOVEL.get();
-            default -> DNLItems.MIMICLING_SHOVEL.get();
+            default -> DNLItems.MIMICLING_DIAMOND_SHOVEL.get();
         };
     }
 
@@ -603,7 +686,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             case IRON -> DNLItems.MIMICLING_IRON_HOE.get();
             case GOLD -> DNLItems.MIMICLING_GOLDEN_HOE.get();
             case NETHERITE -> DNLItems.MIMICLING_NETHERITE_HOE.get();
-            default -> DNLItems.MIMICLING_HOE.get();
+            default -> DNLItems.MIMICLING_DIAMOND_HOE.get();
         };
     }
 
@@ -614,7 +697,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             case IRON -> DNLItems.MIMICLING_IRON_SWORD.get();
             case GOLD -> DNLItems.MIMICLING_GOLDEN_SWORD.get();
             case NETHERITE -> DNLItems.MIMICLING_NETHERITE_SWORD.get();
-            default -> DNLItems.MIMICLING_SWORD.get();
+            default -> DNLItems.MIMICLING_DIAMOND_SWORD.get();
         };
     }
 
@@ -649,6 +732,12 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static void playTransformSound(Level level, Player player) {
         if (!level.isClientSide) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SLIME_BLOCK_PLACE, SoundSource.PLAYERS, 0.8F, 1.1F);
+        }
+    }
+
+    private static void playTransformSound(Level level, LivingEntity entity) {
+        if (!level.isClientSide) {
+            level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.SLIME_BLOCK_PLACE, SoundSource.PLAYERS, 0.8F, 1.1F);
         }
     }
 
@@ -763,7 +852,29 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     public static boolean isFeedableTool(ItemStack stack) {
-        return getDedicatedSlot(stack) >= 0;
+        return isMimicMucus(stack) || MimiclingFoods.getRepairAmount(stack) > 0 || getDedicatedSlot(stack) >= 0;
+    }
+
+    private static boolean canAcceptFeed(ItemStack stack, ItemStack itemToFeed) {
+        if (isMimicMucus(itemToFeed)) {
+            return getStorageCapacity(stack) < MAX_STORED_ITEMS || stack.getDamageValue() > 0;
+        }
+
+        if (MimiclingFoods.getRepairAmount(itemToFeed) > 0) {
+            return stack.getDamageValue() > 0;
+        }
+
+        int slot = getDedicatedSlot(itemToFeed);
+        if (slot < 0) {
+            return false;
+        }
+
+        ItemStack existing = getStoredItem(stack, slot);
+        return !existing.isEmpty() || getStoredItemCount(stack) < getStorageCapacity(stack);
+    }
+
+    private static boolean isMimicMucus(ItemStack stack) {
+        return stack.is(DNLItems.MIMIC_MUCUS.get());
     }
 
     private static int getDedicatedSlot(ItemStack stack) {
@@ -843,6 +954,49 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return contents;
     }
 
+    private static ItemStack feedOne(ItemStack stack, ItemStack itemToFeed) {
+        if (isMimicMucus(itemToFeed)) {
+            feedMimicMucus(stack);
+            return ItemStack.EMPTY;
+        }
+
+        int foodRepairAmount = MimiclingFoods.getRepairAmount(itemToFeed);
+        if (foodRepairAmount > 0) {
+            repairDurability(stack, foodRepairAmount);
+            return ItemStack.EMPTY;
+        }
+
+        return storeInDedicatedSlot(stack, itemToFeed);
+    }
+
+    private static void feedMimicMucus(ItemStack stack) {
+        int capacity = getStorageCapacity(stack);
+        int healAmount = capacity >= MAX_STORED_ITEMS ? MUCUS_UNLOCKED_HEAL_AMOUNT : MUCUS_LOCKED_HEAL_AMOUNT;
+        repairDurability(stack, healAmount);
+
+        if (capacity >= MAX_STORED_ITEMS) {
+            return;
+        }
+
+        CompoundTag tag = stack.getOrCreateTag();
+        int mucusFed = tag.getInt(MUCUS_FED_TAG) + 1;
+        if (mucusFed >= MUCUS_PER_CAPACITY_UPGRADE) {
+            tag.putInt(CAPACITY_TAG, Math.min(MAX_STORED_ITEMS, capacity + 1));
+            tag.putInt(MUCUS_FED_TAG, 0);
+            return;
+        }
+
+        tag.putInt(MUCUS_FED_TAG, mucusFed);
+    }
+
+    private static void repairDurability(ItemStack stack, int amount) {
+        if (amount <= 0 || !stack.isDamageableItem()) {
+            return;
+        }
+
+        stack.setDamageValue(Math.max(0, stack.getDamageValue() - amount));
+    }
+
     private static ItemStack storeInDedicatedSlot(ItemStack stack, ItemStack itemToStore) {
         int slot = getDedicatedSlot(itemToStore);
         if (itemToStore.isEmpty() || slot < 0) {
@@ -852,6 +1006,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         CompoundTag tag = stack.getOrCreateTag();
         ListTag items = getOrCreateFixedStoredItems(stack);
         ItemStack removed = ItemStack.of(items.getCompound(slot));
+        if (removed.isEmpty() && getStoredItemCount(stack) >= getStorageCapacity(stack)) {
+            return ItemStack.EMPTY;
+        }
+
         ItemStack stored = itemToStore.copyWithCount(1);
         CompoundTag storedTag = new CompoundTag();
         stored.save(storedTag);
@@ -885,6 +1043,14 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         items.set(selected, new CompoundTag());
         cleanupStoredItemsTag(stack, items);
         return Optional.of(removed);
+    }
+
+    private static int getStorageCapacity(ItemStack stack) {
+        if (!stack.hasTag() || !stack.getTag().contains(CAPACITY_TAG)) {
+            return INITIAL_CAPACITY;
+        }
+
+        return Math.max(INITIAL_CAPACITY, Math.min(stack.getTag().getInt(CAPACITY_TAG), MAX_STORED_ITEMS));
     }
 
     private static int getSelectedSlot(ItemStack stack) {
@@ -1000,6 +1166,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             }
         }
         return attackDamage;
+    }
+
+    private static boolean isDurabilityExhausted(ItemStack stack) {
+        return stack.isDamageableItem() && stack.getDamageValue() >= stack.getMaxDamage();
     }
 
     private static void syncActiveEnchantmentTags(ItemStack stack, String form) {

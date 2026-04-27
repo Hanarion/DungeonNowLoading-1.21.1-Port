@@ -19,10 +19,12 @@ public class ClientMimiclingTooltip implements ClientTooltipComponent {
     private static final int MARGIN_Y = 4;
     private final NonNullList<ItemStack> items;
     private final int selectedSlot;
+    private final int capacity;
 
     public ClientMimiclingTooltip(MimiclingTooltip tooltip) {
         this.items = tooltip.getItems();
         this.selectedSlot = tooltip.getSelectedSlot();
+        this.capacity = tooltip.getCapacity();
     }
 
     @Override
@@ -40,8 +42,8 @@ public class ClientMimiclingTooltip implements ClientTooltipComponent {
         for (int i = 0; i < SLOT_COUNT; i++) {
             int slotX = x + i * SLOT_WIDTH + 1;
             int slotY = y + 1;
-            blitSlot(guiGraphics, slotX, slotY, i);
             ItemStack stack = i < items.size() ? items.get(i) : ItemStack.EMPTY;
+            blitSlot(guiGraphics, slotX, slotY, i, stack.isEmpty() && isBellyFull());
             if (!stack.isEmpty()) {
                 guiGraphics.renderItem(stack, slotX + 1, slotY + 1, i);
                 guiGraphics.renderItemDecorations(font, stack, slotX + 1, slotY + 1);
@@ -63,8 +65,20 @@ public class ClientMimiclingTooltip implements ClientTooltipComponent {
         return false;
     }
 
-    private void blitSlot(GuiGraphics guiGraphics, int x, int y, int dedicatedSlot) {
-        guiGraphics.blit(MIMICLING_TEXTURE_LOCATION, x, y, 0, (dedicatedSlot + 1) * SLOT_WIDTH, 0, SLOT_WIDTH, SLOT_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+    private boolean isBellyFull() {
+        int storedCount = 0;
+        for (ItemStack item : items) {
+            if (!item.isEmpty()) {
+                storedCount++;
+            }
+        }
+
+        return storedCount >= capacity;
+    }
+
+    private void blitSlot(GuiGraphics guiGraphics, int x, int y, int dedicatedSlot, boolean disabled) {
+        int textureY = disabled ? SLOT_HEIGHT : 0;
+        guiGraphics.blit(MIMICLING_TEXTURE_LOCATION, x, y, 0, (dedicatedSlot + 1) * SLOT_WIDTH, textureY, SLOT_WIDTH, SLOT_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
     private void drawBorder(int x, int y, GuiGraphics guiGraphics) {
