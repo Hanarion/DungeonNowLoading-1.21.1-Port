@@ -7,6 +7,8 @@
     "mixins": [
       "ServerLevelMixin",
       "block.BlockDestroyCancelMixin",
+      "block.MimiclingBlockSmeltTransformMixin",
+      "block.MimiclingBlockDropsMixin",
       "block.PlayerBlockDestroyCancelMixin",
       "block.EnchantmentHelperMixin",
       "block.ExplosionMixin",
@@ -21,6 +23,8 @@
       "items.ShearsItemMixin",
       "items.SwordItemMixin",
       "entities.EntityAvoidBlockMixin",
+      "entities.MimiclingLivingEntityMixin",
+      "entities.MimiclingPlayerMixin",
       "entities.ServerPlayerMixin",
       "entities.PlayerMixin",
       "entities.MobMixin",

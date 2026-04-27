@@ -2,63 +2,388 @@
   "entries": [
     {
       "item": "minecraft:porkchop",
-      "durability": 80
+      "durability": 80,
+      "usage_count": 0
     },
     {
       "item": "minecraft:cooked_porkchop",
-      "durability": 80
+      "durability": 80,
+      "usage_count": 0
     },
     {
       "item": "minecraft:beef",
-      "durability": 80
+      "durability": 80,
+      "usage_count": 0
     },
     {
       "item": "minecraft:cooked_beef",
-      "durability": 80
+      "durability": 80,
+      "usage_count": 0
     },
     {
       "item": "minecraft:chicken",
-      "durability": 60
+      "durability": 60,
+      "usage_count": 0
     },
     {
       "item": "minecraft:cooked_chicken",
-      "durability": 60
+      "durability": 60,
+      "usage_count": 0
     },
     {
       "item": "minecraft:mutton",
-      "durability": 60
+      "durability": 60,
+      "usage_count": 0
     },
     {
       "item": "minecraft:cooked_mutton",
-      "durability": 60
+      "durability": 60,
+      "usage_count": 0
     },
     {
       "item": "minecraft:salmon",
-      "durability": 60
+      "durability": 60,
+      "usage_count": 0
     },
     {
       "item": "minecraft:cooked_salmon",
-      "durability": 60
+      "durability": 60,
+      "usage_count": 0
     },
     {
       "item": "minecraft:cod",
-      "durability": 50
+      "durability": 50,
+      "usage_count": 0
     },
     {
       "item": "minecraft:cooked_cod",
-      "durability": 50
+      "durability": 50,
+      "usage_count": 0
     },
     {
       "item": "minecraft:rabbit",
-      "durability": 50
+      "durability": 50,
+      "usage_count": 0
     },
     {
       "item": "minecraft:cooked_rabbit",
-      "durability": 50
+      "durability": 50,
+      "usage_count": 0
     },
     {
       "item": "minecraft:rotten_flesh",
-      "durability": 20
+      "durability": 20,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:rabbit_stew",
+      "durability": 50,
+      "usage_count": 0,
+      "effects": [
+        {
+          "type": "on_fed",
+          "action": "return_item",
+          "return_item": "dungeonnowloading:rabbitless_rabbit_stew"
+        }
+      ]
+    },
+    {
+      "item": "dungeonnowloading:mimic_mucus",
+      "durability": 10,
+      "usage_count": 0,
+      "effects": [
+        {
+          "type": "on_fed",
+          "action": "increase_capacity",
+          "required_count": 2,
+          "full_capacity_durability": 100
+        }
+      ]
+    },
+    {
+      "item": "minecraft:zombie_head",
+      "durability": 500,
+      "usage_count": 0,
+      "effects": [
+        {
+          "type": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:skeleton_skull"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:player_head",
+      "durability": 500,
+      "usage_count": 0,
+      "effects": [
+        {
+          "type": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:skeleton_skull"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:tropical_fish",
+      "durability": 1,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "on_break",
+          "action": "auto_switch_unsuited_tool"
+        },
+        {
+          "type": "on_attack",
+          "action": "auto_switch_unsuited_tool"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:honey_bottle",
+      "durability": 10,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:glass_bottle"
+        },
+        {
+          "type": "while_in_hand",
+          "action": "apply_potion_effect",
+          "effect": "minecraft:haste",
+          "amplifier": 0
+        }
+      ]
+    },
+    {
+      "item": "minecraft:sea_pickle",
+      "durability": 10,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "while_in_hand",
+          "action": "remove_underwater_mining_penalty"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:pufferfish",
+      "durability": 10,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "apply_potion_effect",
+          "id": "pufferfish_poison_attack",
+          "effects": [
+            { "effect": "minecraft:poison", "amplifier": 1, "duration": 200 },
+            { "effect": "minecraft:hunger", "amplifier": 2, "duration": 200 },
+            { "effect": "minecraft:nausea", "amplifier": 0, "duration": 200 }
+          ]
+        },
+        {
+          "type": "change_drop",
+          "id": "pufferfish_potato_drop",
+          "target_blocks": ["minecraft:potatoes"],
+          "loot_table": "dungeonnowloading:mimicling/pufferfish_potatoes",
+          "replace": true
+        },
+        {
+          "type": "change_break_area",
+          "mode": "same_or_softer_neighbors",
+          "forms": ["pickaxe", "axe", "shovel", "hoe"]
+        }
+      ],
+      "synergy_effects": [
+        {
+          "with_item": "minecraft:spider_eye",
+          "disable": ["pufferfish_poison_attack", "pufferfish_potato_drop", "spider_eye_poison_attack", "spider_eye_potato_drop"],
+          "effects": [
+            {
+              "type": "apply_potion_effect",
+              "id": "pufferfish_spider_eye_poison_attack",
+              "effects": [
+                { "effect": "minecraft:poison", "amplifier": 2, "duration": 300 },
+                { "effect": "minecraft:hunger", "amplifier": 2, "duration": 300 },
+                { "effect": "minecraft:nausea", "amplifier": 0, "duration": 300 }
+              ]
+            },
+            {
+              "type": "change_drop",
+              "id": "pufferfish_spider_eye_potato_drop",
+              "target_blocks": ["minecraft:potatoes"],
+              "loot_table": "dungeonnowloading:mimicling/pufferfish_spider_eye_potatoes",
+              "replace": true
+            }
+          ]
+        },
+        {
+          "with_item": "minecraft:magma_cream",
+          "disable": ["pufferfish_potato_drop"],
+          "effects": [
+            {
+              "type": "change_drop",
+              "id": "pufferfish_magma_cream_potato_drop",
+              "target_blocks": ["minecraft:potatoes"],
+              "loot_table": "dungeonnowloading:mimicling/pufferfish_magma_cream_potatoes",
+              "replace": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:piglin_head",
+      "durability": 500,
+      "usage_count": 500,
+      "effects": [
+        {
+          "type": "change_drop",
+          "id": "piglin_head_gold_bartering_drop",
+          "forms": ["pickaxe"],
+          "target_blocks": ["minecraft:gold_ore", "minecraft:deepslate_gold_ore", "minecraft:nether_gold_ore"],
+          "loot_table": "minecraft:gameplay/piglin_bartering",
+          "replace": true
+        }
+      ]
+    },
+    {
+      "item": "minecraft:spider_eye",
+      "durability": 10,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "apply_potion_effect",
+          "id": "spider_eye_poison_attack",
+          "effects": [
+            { "effect": "minecraft:poison", "amplifier": 0, "duration": 100 }
+          ]
+        },
+        {
+          "type": "change_drop",
+          "id": "spider_eye_potato_drop",
+          "target_blocks": ["minecraft:potatoes"],
+          "loot_table": "dungeonnowloading:mimicling/spider_eye_potatoes",
+          "replace": true
+        }
+      ],
+      "synergy_effects": [
+        {
+          "with_item": "minecraft:magma_cream",
+          "disable": ["spider_eye_potato_drop"],
+          "effects": [
+            {
+              "type": "change_drop",
+              "id": "spider_eye_magma_cream_potato_drop",
+              "target_blocks": ["minecraft:potatoes"],
+              "loot_table": "dungeonnowloading:mimicling/spider_eye_magma_cream_potatoes",
+              "replace": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:rabbit_foot",
+      "durability": 10,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "apply_non_potion_effect",
+          "action": "jump_up",
+          "blocks": 5
+        },
+        {
+          "type": "apply_potion_effect",
+          "effects": [
+            { "effect": "minecraft:jump_boost", "amplifier": 1, "duration": 600 }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:phantom_membrane",
+      "durability": 10,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "apply_potion_effect",
+          "effects": [
+            { "effect": "minecraft:slow_falling", "amplifier": 0, "duration": 600 }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:magma_cream",
+      "durability": 10,
+      "usage_count": 50,
+      "effects": [
+        {
+          "type": "while_in_hand",
+          "id": "magma_cream_fire_aspect",
+          "forms": ["sword", "axe"],
+          "action": "modify_enchantment",
+          "enchantment": "minecraft:fire_aspect",
+          "operation": "add",
+          "level": 1
+        },
+        {
+          "type": "change_drop",
+          "id": "magma_cream_auto_smelt",
+          "forms": ["pickaxe", "axe", "shovel", "hoe"],
+          "action": "auto_smelt"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:fermented_spider_eye",
+      "durability": 10,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "reference_potion_effect",
+          "action": "invert_potion_effect"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:ender_pearl",
+      "durability": 10,
+      "usage_count": 10,
+      "effects": [
+        {
+          "type": "memorize_position",
+          "id": "teleport_destination",
+          "forms": ["pickaxe", "axe", "shovel", "hoe"],
+          "particle": "minecraft:portal"
+        },
+        {
+          "type": "change_mob_position",
+          "action": "teleport_to_memorized_position",
+          "memory": "teleport_destination",
+          "fallback": "random_teleport",
+          "radius": 16,
+          "immune_entities": [
+            "minecraft:ender_dragon",
+            "dungeonnowloading:fairkeeper_boros",
+            "dungeonnowloading:fairkeeper_ouros",
+            "dungeonnowloading:chaos_spawner"
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:dragon_head",
+      "durability": 1000,
+      "usage_count": 1000,
+      "effects": [
+        {
+          "type": "reference_potion_effect",
+          "action": "death_effect_cloud"
+        }
+      ]
     }
   ]
 }

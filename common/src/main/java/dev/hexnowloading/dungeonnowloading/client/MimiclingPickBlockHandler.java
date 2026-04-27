@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.item.MimiclingFormItem;
+import dev.hexnowloading.dungeonnowloading.item.MimiclingFoods;
 import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.network.packets.C2SMimiclingTransformPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
@@ -56,15 +57,24 @@ public class MimiclingPickBlockHandler {
 
     private static String getTargetForm(Minecraft minecraft, ItemStack heldMimicling) {
         if (isLookingAtLivingEntity(minecraft)) {
+            if (MimiclingFoods.hasActiveEffect(heldMimicling, "on_attack", "auto_switch_unsuited_tool")) {
+                return MimiclingItem.getWorstCombatForm(heldMimicling);
+            }
             return MimiclingItem.getBestCombatForm(heldMimicling);
         }
 
         HitResult hitResult = minecraft.hitResult;
         if (hitResult instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof LivingEntity livingEntity && !(livingEntity instanceof Player)) {
+            if (MimiclingFoods.hasActiveEffect(heldMimicling, "on_attack", "auto_switch_unsuited_tool")) {
+                return MimiclingItem.getWorstCombatForm(heldMimicling);
+            }
             return MimiclingItem.getBestCombatForm(heldMimicling);
         }
 
         if (hitResult instanceof BlockHitResult blockHitResult && hitResult.getType() == HitResult.Type.BLOCK) {
+            if (MimiclingFoods.hasActiveEffect(heldMimicling, "on_break", "auto_switch_unsuited_tool")) {
+                return MimiclingItem.getWorstFormFor(heldMimicling, minecraft.level.getBlockState(blockHitResult.getBlockPos()));
+            }
             return MimiclingItem.getBestFormFor(heldMimicling, minecraft.level.getBlockState(blockHitResult.getBlockPos()));
         }
 

@@ -6,7 +6,11 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "FireBlockAccessor",
+    "block.MimiclingBlockSmeltTransformMixin",
+    "block.MimiclingBlockDropsMixin",
     "inventory.AnvilMenuMixin",
+    "entities.MimiclingLivingEntityMixin",
+    "entities.MimiclingPlayerMixin",
     "items.ItemStackBreakProtectionMixin"
   ],
   "client": [

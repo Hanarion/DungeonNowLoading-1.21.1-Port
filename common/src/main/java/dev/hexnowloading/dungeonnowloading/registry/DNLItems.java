@@ -59,6 +59,7 @@ public class DNLItems {
     public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new ZoneWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
     public static final Supplier<Item> MIMICART = register("mimicart", () -> new MimicartItem(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
     public static final Supplier<Item> MIMIC_MUCUS = register("mimic_mucus", () -> new Item(new Item.Properties().rarity(Rarity.COMMON)));
+    public static final Supplier<Item> RABBITLESS_RABBIT_STEW = register("rabbitless_rabbit_stew", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
     public static final Supplier<Item> MIMICLING = register("mimicling", () -> new MimiclingItem(mimiclingProperties(), MimiclingItem.getBaseForm()));
     public static final Supplier<Item> MIMICLING_WOODEN_PICKAXE = register("mimicling_wooden_pickaxe", () -> new MimiclingPickaxeItem(Tiers.WOOD, mimiclingToolProperties()));
     public static final Supplier<Item> MIMICLING_STONE_PICKAXE = register("mimicling_stone_pickaxe", () -> new MimiclingPickaxeItem(Tiers.STONE, mimiclingToolProperties()));

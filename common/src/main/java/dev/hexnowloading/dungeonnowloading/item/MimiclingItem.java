@@ -148,7 +148,8 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         ItemStack removed = feedOne(stack, inserted);
         startChewing(stack, player.level().getGameTime());
         carriedStack.shrink(1);
-        carriedSlot.set(removed.isEmpty() ? carriedStack : removed);
+        carriedSlot.set(carriedStack);
+        giveReturnedFeedItem(player, removed);
         playInsertSound(player);
         return true;
     }
@@ -161,9 +162,13 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
     @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity entity) {
-        if (!level.isClientSide && state.getDestroySpeed(level, pos) != 0.0F) {
+        if (!level.isClientSide && !state.isAir()) {
             int damage = FORM_SWORD.equals(getStoredForm(stack)) ? 2 : 1;
-            stack.hurtAndBreak(damage, entity, livingEntity -> livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+            MimiclingFoodEffects.onBreak(stack, level, pos, state, entity);
+            if (state.getDestroySpeed(level, pos) != 0.0F) {
+                stack.hurtAndBreak(damage, entity, livingEntity -> livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+            }
+            MimiclingFoods.consumeUsage(stack);
         }
         return true;
     }
@@ -171,6 +176,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         stack.hurtAndBreak(FORM_SWORD.equals(getStoredForm(stack)) ? 1 : 2, attacker, livingEntity -> livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+        if (!attacker.level().isClientSide) {
+            MimiclingFoodEffects.onAttack(stack, target, attacker);
+            MimiclingFoods.consumeUsage(stack);
+        }
         return true;
     }
 
@@ -189,13 +198,14 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         if (!level.isClientSide) {
             removeStaleAttributeModifierTags(stack);
             syncActiveEnchantmentTags(stack, getStoredForm(stack));
+            MimiclingFoodEffects.tickHeld(stack, level, entity);
         }
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
         ItemStack storedTool = getStoredToolForCurrentForm(stack);
-        return !storedTool.isEmpty() && storedTool.hasFoil();
+        return !stack.getEnchantmentTags().isEmpty() || !storedTool.isEmpty() && storedTool.hasFoil();
     }
 
     @Override
@@ -208,6 +218,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         super.appendHoverText(stack, level, components, tooltipFlag);
         if (canUseStorage(stack)) {
             components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.capacity", getStoredItemCount(stack), getStorageCapacity(stack)).withStyle(ChatFormatting.GRAY));
+            appendActiveFoodTooltip(stack, components);
         }
     }
 
@@ -446,6 +457,79 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return bestForm;
     }
 
+    public static String getWorstFormFor(ItemStack stack, BlockState state) {
+        String worstForm = FORM_BASE;
+        int worstTierLevel = Integer.MAX_VALUE;
+        int worstTieBreaker = Integer.MIN_VALUE;
+
+        for (String form : BLOCK_TIE_BREAKER_FORMS) {
+            ItemStack storedTool = getStoredToolForForm(stack, form);
+            if (storedTool.isEmpty() || isFormEffectiveForBlock(form, state)) {
+                continue;
+            }
+
+            int tierLevel = getToolTierLevel(storedTool);
+            int tieBreaker = getBlockTieBreaker(form);
+            if (tierLevel < worstTierLevel || tierLevel == worstTierLevel && tieBreaker > worstTieBreaker) {
+                worstForm = form;
+                worstTierLevel = tierLevel;
+                worstTieBreaker = tieBreaker;
+            }
+        }
+
+        return FORM_BASE.equals(worstForm) ? getWorstCombatForm(stack) : worstForm;
+    }
+
+    public static String getWorstCombatForm(ItemStack stack) {
+        String worstForm = FORM_BASE;
+        double worstAttackDamage = Double.POSITIVE_INFINITY;
+        for (String form : BLOCK_TIE_BREAKER_FORMS) {
+            ItemStack storedTool = getStoredToolForForm(stack, form);
+            if (storedTool.isEmpty()) {
+                continue;
+            }
+
+            double attackDamage = getToolAttackDamage(storedTool);
+            if (attackDamage < worstAttackDamage) {
+                worstForm = form;
+                worstAttackDamage = attackDamage;
+            }
+        }
+
+        return worstForm;
+    }
+
+    public static boolean tryTransformHeldOrEquippedToForm(ItemStack stack, LivingEntity entity, String targetForm) {
+        return tryTransformHeldOrEquippedToForm(stack, entity, targetForm, 0, false);
+    }
+
+    public static boolean tryTransformHeldOrEquippedToForm(ItemStack stack, LivingEntity entity, String targetForm, int durabilityDamage, boolean consumeUsage) {
+        if (!canTransformToForm(stack, targetForm) || targetForm.equals(getStoredForm(stack))) {
+            return false;
+        }
+
+        ItemStack transformed = copyWithForm(stack, targetForm);
+        if (consumeUsage) {
+            MimiclingFoods.consumeUsage(transformed);
+        }
+        applyDurabilityDamage(transformed, entity, durabilityDamage);
+        startTransition(transformed, getStoredForm(stack), targetForm, entity.level().getGameTime());
+        if (!replaceHeldOrEquippedStack(stack, transformed, entity)) {
+            return false;
+        }
+
+        playTransformSound(entity.level(), entity);
+        return true;
+    }
+
+    public static int getBlockUseDurabilityCost(ItemStack stack) {
+        return FORM_SWORD.equals(getStoredForm(stack)) ? 2 : 1;
+    }
+
+    public static int getAttackUseDurabilityCost(ItemStack stack) {
+        return FORM_SWORD.equals(getStoredForm(stack)) ? 1 : 2;
+    }
+
     public static String getSwordForm() {
         return FORM_SWORD;
     }
@@ -495,6 +579,27 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         if (!level.isClientSide) {
             removeStaleAttributeModifierTags(stack);
             syncActiveEnchantmentTags(stack, getStoredForm(stack));
+        }
+    }
+
+    public static void tickMimiclingInventory(ItemStack stack, Level level, Entity entity) {
+        tickMimiclingInventory(stack, level);
+        if (!level.isClientSide) {
+            MimiclingFoodEffects.tickHeld(stack, level, entity);
+        }
+    }
+
+    public static void onMimiclingMineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity entity) {
+        if (!level.isClientSide && !state.isAir()) {
+            MimiclingFoodEffects.onBreak(stack, level, pos, state, entity);
+            MimiclingFoods.consumeUsage(stack);
+        }
+    }
+
+    public static void onMimiclingHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        if (!attacker.level().isClientSide) {
+            MimiclingFoodEffects.onAttack(stack, target, attacker);
+            MimiclingFoods.consumeUsage(stack);
         }
     }
 
@@ -860,8 +965,9 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return getStorageCapacity(stack) < MAX_STORED_ITEMS || stack.getDamageValue() > 0;
         }
 
-        if (MimiclingFoods.getRepairAmount(itemToFeed) > 0) {
-            return stack.getDamageValue() > 0;
+        MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(itemToFeed);
+        if (food != null) {
+            return stack.getDamageValue() > 0 || MimiclingFoods.shouldRemember(food) || !MimiclingFoods.getOnFedReturnStack(food).isEmpty();
         }
 
         int slot = getDedicatedSlot(itemToFeed);
@@ -960,13 +1066,47 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return ItemStack.EMPTY;
         }
 
-        int foodRepairAmount = MimiclingFoods.getRepairAmount(itemToFeed);
-        if (foodRepairAmount > 0) {
-            repairDurability(stack, foodRepairAmount);
-            return ItemStack.EMPTY;
+        MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(itemToFeed);
+        if (food != null) {
+            repairDurability(stack, food.durability());
+            MimiclingFoods.rememberFood(stack, food, itemToFeed);
+            return MimiclingFoods.getOnFedReturnStack(food);
         }
 
         return storeInDedicatedSlot(stack, itemToFeed);
+    }
+
+    private static void giveReturnedFeedItem(Player player, ItemStack returnedItem) {
+        if (returnedItem.isEmpty()) {
+            return;
+        }
+
+        if (!player.getInventory().add(returnedItem)) {
+            player.drop(returnedItem, false);
+        }
+    }
+
+    private static void applyDurabilityDamage(ItemStack stack, LivingEntity entity, int amount) {
+        if (amount <= 0 || !stack.isDamageableItem()) {
+            return;
+        }
+
+        stack.hurtAndBreak(amount, entity, livingEntity -> livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+    }
+
+    public static void appendActiveFoodTooltip(ItemStack stack, List<Component> components) {
+        List<MimiclingFoods.ActiveFood> activeFoods = MimiclingFoods.getActiveFoodEntries(stack);
+        if (activeFoods.isEmpty()) {
+            return;
+        }
+
+        components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.active_foods").withStyle(ChatFormatting.DARK_GRAY));
+        for (MimiclingFoods.ActiveFood activeFood : activeFoods) {
+            Component displayName = activeFood.displayStack().isEmpty()
+                    ? Component.literal(activeFood.food().id())
+                    : activeFood.displayStack().getHoverName();
+            components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.active_food", displayName, activeFood.uses()).withStyle(ChatFormatting.GRAY));
+        }
     }
 
     private static void feedMimicMucus(ItemStack stack) {
@@ -1180,13 +1320,14 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return;
         }
 
-        ListTag enchantments = storedTool.getEnchantmentTags();
+        ListTag enchantments = storedTool.getEnchantmentTags().copy();
+        MimiclingFoodEffects.applyTemporaryEnchantmentModifiers(stack, enchantments);
         if (enchantments.isEmpty()) {
             tag.remove("Enchantments");
             return;
         }
 
-        tag.put("Enchantments", enchantments.copy());
+        tag.put("Enchantments", enchantments);
     }
 
     private static void removeStaleAttributeModifierTags(ItemStack stack) {
