@@ -1,0 +1,64 @@
+{
+  "entries": [
+    {
+      "item": "minecraft:porkchop",
+      "durability": 80
+    },
+    {
+      "item": "minecraft:cooked_porkchop",
+      "durability": 80
+    },
+    {
+      "item": "minecraft:beef",
+      "durability": 80
+    },
+    {
+      "item": "minecraft:cooked_beef",
+      "durability": 80
+    },
+    {
+      "item": "minecraft:chicken",
+      "durability": 60
+    },
+    {
+      "item": "minecraft:cooked_chicken",
+      "durability": 60
+    },
+    {
+      "item": "minecraft:mutton",
+      "durability": 60
+    },
+    {
+      "item": "minecraft:cooked_mutton",
+      "durability": 60
+    },
+    {
+      "item": "minecraft:salmon",
+      "durability": 60
+    },
+    {
+      "item": "minecraft:cooked_salmon",
+      "durability": 60
+    },
+    {
+      "item": "minecraft:cod",
+      "durability": 50
+    },
+    {
+      "item": "minecraft:cooked_cod",
+      "durability": 50
+    },
+    {
+      "item": "minecraft:rabbit",
+      "durability": 50
+    },
+    {
+      "item": "minecraft:cooked_rabbit",
+      "durability": 50
+    },
+    {
+      "item": "minecraft:rotten_flesh",
+      "durability": 20
+    }
+  ]
+}
