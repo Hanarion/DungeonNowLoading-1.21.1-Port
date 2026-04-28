@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -30,6 +31,8 @@ public final class MimiclingFoods {
     private static final String ACTIVE_FOOD_ID_TAG = "Food";
     private static final String ACTIVE_FOOD_ITEM_TAG = "Item";
     private static final String ACTIVE_FOOD_USES_TAG = "Uses";
+    private static final String USAGE_HANDLED_FOODS_TAG = "MimiclingUsageHandledFoods";
+    private static final int INFINITE_USES = -1;
     private static final int MAX_ACTIVE_FOODS = 2;
     private static final Map<String, FoodDefinition> FOODS_BY_ID = new HashMap<>();
     private static final Map<Item, FoodDefinition> ITEM_FOODS = new HashMap<>();
@@ -64,12 +67,13 @@ public final class MimiclingFoods {
     }
 
     public static boolean shouldRemember(FoodDefinition food) {
-        return food.usageCount() > 0 && food.hasLastingEffects();
+        return (food.infiniteUsage() || food.usageCount() > 0) && food.hasLastingEffects();
     }
 
-    public static void rememberFood(ItemStack mimicling, FoodDefinition food, ItemStack fedStack) {
+    public static List<ItemStack> rememberFood(ItemStack mimicling, FoodDefinition food, ItemStack fedStack) {
+        List<ItemStack> returnedItems = new ArrayList<>();
         if (!shouldRemember(food)) {
-            return;
+            return returnedItems;
         }
 
         CompoundTag tag = mimicling.getOrCreateTag();
@@ -81,7 +85,7 @@ public final class MimiclingFoods {
             CompoundTag activeFood = activeFoods.getCompound(i).copy();
             if (food.id().equals(activeFood.getString(ACTIVE_FOOD_ID_TAG))) {
                 activeFood.putString(ACTIVE_FOOD_ITEM_TAG, BuiltInRegistries.ITEM.getKey(fedStack.getItem()).toString());
-                activeFood.putInt(ACTIVE_FOOD_USES_TAG, activeFood.getInt(ACTIVE_FOOD_USES_TAG) + food.usageCount());
+                activeFood.putInt(ACTIVE_FOOD_USES_TAG, getRememberedUses(activeFood, food));
                 mergedExistingFood = true;
             }
             updatedFoods.add(activeFood);
@@ -90,19 +94,41 @@ public final class MimiclingFoods {
         if (mergedExistingFood) {
             tag.put(ACTIVE_FOODS_TAG, updatedFoods);
             MimiclingFoodEffects.retainMemoriesForActiveFoods(mimicling, getActiveFoods(mimicling));
-            return;
+            return returnedItems;
         }
 
         CompoundTag activeFood = new CompoundTag();
         activeFood.putString(ACTIVE_FOOD_ID_TAG, food.id());
         activeFood.putString(ACTIVE_FOOD_ITEM_TAG, BuiltInRegistries.ITEM.getKey(fedStack.getItem()).toString());
-        activeFood.putInt(ACTIVE_FOOD_USES_TAG, food.usageCount());
+        activeFood.putInt(ACTIVE_FOOD_USES_TAG, food.infiniteUsage() ? INFINITE_USES : food.usageCount());
         updatedFoods.add(activeFood);
         while (updatedFoods.size() > MAX_ACTIVE_FOODS) {
+            CompoundTag removedFood = updatedFoods.getCompound(0).copy();
+            collectReplacementReturn(removedFood, returnedItems);
             updatedFoods.remove(0);
         }
         tag.put(ACTIVE_FOODS_TAG, updatedFoods);
         MimiclingFoodEffects.retainMemoriesForActiveFoods(mimicling, getActiveFoods(mimicling));
+        return returnedItems;
+    }
+
+    private static int getRememberedUses(CompoundTag activeFood, FoodDefinition food) {
+        if (food.infiniteUsage() || activeFood.getInt(ACTIVE_FOOD_USES_TAG) == INFINITE_USES) {
+            return INFINITE_USES;
+        }
+        return activeFood.getInt(ACTIVE_FOOD_USES_TAG) + food.usageCount();
+    }
+
+    private static void collectReplacementReturn(CompoundTag activeFood, List<ItemStack> returnedItems) {
+        FoodDefinition food = FOODS_BY_ID.get(activeFood.getString(ACTIVE_FOOD_ID_TAG));
+        if (food == null || !food.returnOnReplacement()) {
+            return;
+        }
+
+        ItemStack returnStack = getDisplayStack(activeFood, food);
+        if (!returnStack.isEmpty()) {
+            returnedItems.add(returnStack);
+        }
     }
 
     public static List<FoodDefinition> getActiveFoods(ItemStack mimicling) {
@@ -195,10 +221,22 @@ public final class MimiclingFoods {
         }
 
         CompoundTag tag = mimicling.getOrCreateTag();
+        Set<String> handledFoods = getHandledUsageFoods(tag);
+        Set<String> actionManagedFoods = getActionManagedUsageFoods(mimicling);
         ListTag activeFoods = tag.getList(ACTIVE_FOODS_TAG, 10);
         ListTag remainingFoods = new ListTag();
         for (int i = 0; i < activeFoods.size(); i++) {
             CompoundTag activeFood = activeFoods.getCompound(i).copy();
+            String foodId = activeFood.getString(ACTIVE_FOOD_ID_TAG);
+            if (handledFoods.contains(foodId) || actionManagedFoods.contains(foodId)) {
+                remainingFoods.add(activeFood);
+                continue;
+            }
+            if (activeFood.getInt(ACTIVE_FOOD_USES_TAG) == INFINITE_USES) {
+                remainingFoods.add(activeFood);
+                continue;
+            }
+
             int uses = activeFood.getInt(ACTIVE_FOOD_USES_TAG) - 1;
             if (uses > 0) {
                 activeFood.putInt(ACTIVE_FOOD_USES_TAG, uses);
@@ -211,7 +249,81 @@ public final class MimiclingFoods {
         } else {
             tag.put(ACTIVE_FOODS_TAG, remainingFoods);
         }
+        tag.remove(USAGE_HANDLED_FOODS_TAG);
         MimiclingFoodEffects.retainMemoriesForActiveFoods(mimicling, getActiveFoods(mimicling));
+    }
+
+    private static Set<String> getActionManagedUsageFoods(ItemStack mimicling) {
+        Set<String> actionManagedFoods = new HashSet<>();
+        for (EffectDefinition effect : getActiveEffects(mimicling)) {
+            if (effect.matches("while_in_hand", "remove_underwater_mining_penalty")
+                    || effect.matches("change_drop", "auto_smelt")) {
+                actionManagedFoods.add(effect.ownerId());
+            }
+        }
+        return actionManagedFoods;
+    }
+
+    public static boolean consumeUsage(ItemStack mimicling, String foodId, int amount) {
+        if (amount <= 0 || !mimicling.hasTag()) {
+            return false;
+        }
+
+        CompoundTag tag = mimicling.getOrCreateTag();
+        ListTag activeFoods = tag.getList(ACTIVE_FOODS_TAG, 10);
+        ListTag remainingFoods = new ListTag();
+        boolean consumed = false;
+        for (int i = 0; i < activeFoods.size(); i++) {
+            CompoundTag activeFood = activeFoods.getCompound(i).copy();
+            if (foodId.equals(activeFood.getString(ACTIVE_FOOD_ID_TAG))) {
+                if (activeFood.getInt(ACTIVE_FOOD_USES_TAG) == INFINITE_USES) {
+                    remainingFoods.add(activeFood);
+                    consumed = true;
+                    continue;
+                }
+                int uses = activeFood.getInt(ACTIVE_FOOD_USES_TAG) - amount;
+                consumed = true;
+                if (uses > 0) {
+                    activeFood.putInt(ACTIVE_FOOD_USES_TAG, uses);
+                    remainingFoods.add(activeFood);
+                }
+            } else {
+                remainingFoods.add(activeFood);
+            }
+        }
+
+        if (remainingFoods.isEmpty()) {
+            tag.remove(ACTIVE_FOODS_TAG);
+        } else {
+            tag.put(ACTIVE_FOODS_TAG, remainingFoods);
+        }
+        MimiclingFoodEffects.retainMemoriesForActiveFoods(mimicling, getActiveFoods(mimicling));
+        return consumed;
+    }
+
+    public static void markUsageHandled(ItemStack mimicling, String foodId) {
+        CompoundTag tag = mimicling.getOrCreateTag();
+        Set<String> handledFoods = getHandledUsageFoods(tag);
+        if (handledFoods.contains(foodId)) {
+            return;
+        }
+
+        ListTag handled = tag.getList(USAGE_HANDLED_FOODS_TAG, 8);
+        handled.add(StringTag.valueOf(foodId));
+        tag.put(USAGE_HANDLED_FOODS_TAG, handled);
+    }
+
+    public static boolean isUsageHandled(ItemStack mimicling, String foodId) {
+        return mimicling.hasTag() && getHandledUsageFoods(mimicling.getTag()).contains(foodId);
+    }
+
+    private static Set<String> getHandledUsageFoods(CompoundTag tag) {
+        Set<String> handledFoods = new HashSet<>();
+        ListTag handled = tag.getList(USAGE_HANDLED_FOODS_TAG, 8);
+        for (int i = 0; i < handled.size(); i++) {
+            handledFoods.add(handled.getString(i));
+        }
+        return handledFoods;
     }
 
     private static void replaceAll(Map<String, FoodDefinition> foodsById, Map<Item, FoodDefinition> itemFoods, List<TagFoodEntry> tagFoods) {
@@ -223,10 +335,10 @@ public final class MimiclingFoods {
         TAG_FOODS.addAll(tagFoods);
     }
 
-    public record FoodDefinition(String id, int durability, int usageCount, Item returnItem, List<EffectDefinition> effects, List<SynergyEffectDefinition> synergyEffects) {
+    public record FoodDefinition(String id, int durability, int usageCount, boolean infiniteUsage, boolean returnOnReplacement, Item returnItem, List<EffectDefinition> effects, List<SynergyEffectDefinition> synergyEffects) {
         public boolean hasLastingEffects() {
             for (EffectDefinition effect : effects) {
-                if (!"on_fed".equals(effect.type())) {
+                if (!"on_fed".equals(effect.trigger())) {
                     return true;
                 }
             }
@@ -241,13 +353,14 @@ public final class MimiclingFoods {
             }
             return false;
         }
+
     }
 
     public record ActiveFood(FoodDefinition food, ItemStack displayStack, int uses) {}
 
-    public record EffectDefinition(String type, @Nullable String action, JsonObject data) {
-        public boolean matches(String type, @Nullable String action) {
-            return this.type.equals(type) && (action == null || action.equals(this.action));
+    public record EffectDefinition(String ownerId, String trigger, String action, JsonObject data) {
+        public boolean matches(String trigger, @Nullable String action) {
+            return this.trigger.equals(trigger) && (action == null || action.equals(this.action));
         }
 
         public String id() {
@@ -309,8 +422,8 @@ public final class MimiclingFoods {
 
         private void parseEntry(ResourceLocation fileId, JsonObject object, Map<String, FoodDefinition> foodsById, Map<Item, FoodDefinition> itemFoods, List<TagFoodEntry> tagFoods) {
             int repairAmount = object.has("durability") ? object.get("durability").getAsInt() : 0;
-            if (repairAmount <= 0) {
-                logger.warn("Mimicling food {} has non-positive durability.", fileId);
+            if (repairAmount < 0) {
+                logger.warn("Mimicling food {} has negative durability.", fileId);
                 return;
             }
 
@@ -340,10 +453,12 @@ public final class MimiclingFoods {
 
         private FoodDefinition parseFoodDefinition(String id, ResourceLocation fileId, JsonObject object, int repairAmount) {
             int usageCount = object.has("usage_count") ? object.get("usage_count").getAsInt() : 0;
-            List<EffectDefinition> effects = parseEffects(object);
-            List<SynergyEffectDefinition> synergyEffects = parseSynergyEffects(object);
+            boolean infiniteUsage = object.has("infinite_usage") && object.get("infinite_usage").getAsBoolean();
+            boolean returnOnReplacement = object.has("return_on_replacement") ? object.get("return_on_replacement").getAsBoolean() : infiniteUsage;
+            List<EffectDefinition> effects = parseEffects(object, id);
+            List<SynergyEffectDefinition> synergyEffects = parseSynergyEffects(object, id);
             Item returnItem = parseReturnItem(fileId, object, effects);
-            return new FoodDefinition(id, repairAmount, Math.max(0, usageCount), returnItem, effects, synergyEffects);
+            return new FoodDefinition(id, repairAmount, Math.max(0, usageCount), infiniteUsage, returnOnReplacement, returnItem, effects, synergyEffects);
         }
 
         private Item parseReturnItem(ResourceLocation fileId, JsonObject object, List<EffectDefinition> effects) {
@@ -373,12 +488,12 @@ public final class MimiclingFoods {
             return item;
         }
 
-        private List<EffectDefinition> parseEffects(JsonObject object) {
+        private List<EffectDefinition> parseEffects(JsonObject object, String ownerId) {
             List<EffectDefinition> effects = new ArrayList<>();
             if (!object.has("effects") || !object.get("effects").isJsonArray()) {
                 if (object.has("on_fed")) {
                     JsonObject data = object.getAsJsonObject("on_fed");
-                    effects.add(new EffectDefinition("on_fed", data.has("action") ? data.get("action").getAsString() : "return_item", data));
+                    effects.add(new EffectDefinition(ownerId, "on_fed", data.has("action") ? data.get("action").getAsString() : "return_item", data));
                 }
                 return effects;
             }
@@ -389,10 +504,11 @@ public final class MimiclingFoods {
                 }
 
                 JsonObject effect = effectElement.getAsJsonObject();
-                if (effect.has("type")) {
+                if (effect.has("trigger") && effect.has("action")) {
                     effects.add(new EffectDefinition(
-                            effect.get("type").getAsString(),
-                            effect.has("action") ? effect.get("action").getAsString() : null,
+                            ownerId,
+                            effect.get("trigger").getAsString(),
+                            effect.get("action").getAsString(),
                             effect.deepCopy()
                     ));
                 }
@@ -400,7 +516,7 @@ public final class MimiclingFoods {
             return effects;
         }
 
-        private List<SynergyEffectDefinition> parseSynergyEffects(JsonObject object) {
+        private List<SynergyEffectDefinition> parseSynergyEffects(JsonObject object, String ownerId) {
             List<SynergyEffectDefinition> synergyEffects = new ArrayList<>();
             if (!object.has("synergy_effects") || !object.get("synergy_effects").isJsonArray()) {
                 return synergyEffects;
@@ -418,7 +534,7 @@ public final class MimiclingFoods {
                 synergyEffects.add(new SynergyEffectDefinition(
                         synergy.get("with_item").getAsString(),
                         parseDisabledEffectIds(synergy),
-                        parseEffects(synergy)
+                        parseEffects(synergy, ownerId)
                 ));
             }
             return synergyEffects;

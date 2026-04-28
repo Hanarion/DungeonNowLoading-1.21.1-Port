@@ -10,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
@@ -43,6 +45,7 @@ import java.util.Set;
 public final class MimiclingFoodEffects {
     private static final String MEMORY_TAG = "MimiclingFoodEffectMemory";
     private static final String TELEPORT_DESTINATION_TAG = "teleport_destination";
+    private static final String MAGMA_CREAM_ID = "minecraft:magma_cream";
     private static final int HELD_EFFECT_TICKS = 40;
 
     private MimiclingFoodEffects() {}
@@ -69,6 +72,10 @@ public final class MimiclingFoodEffects {
                 MimiclingItem.tryTransformHeldOrEquippedToForm(stack, entity, MimiclingItem.getWorstFormFor(stack, state), MimiclingItem.getBlockUseDurabilityCost(stack), true);
             } else if (effect.matches("change_break_area", null) && formsMatch(stack, effect.data())) {
                 breakMatchingNeighborBlocks(stack, level, pos, state, entity, effect.data());
+            } else if (effect.matches("change_drop", "auto_smelt") && formsMatch(stack, effect.data())) {
+                consumeAutoSmeltUsageAfterBreak(stack, level, state);
+            } else if (effect.matches("while_in_hand", "remove_underwater_mining_penalty")) {
+                consumeUnderwaterMiningPenaltyUsage(stack, entity, effect);
             }
         }
     }
@@ -85,16 +92,25 @@ public final class MimiclingFoodEffects {
                 MimiclingItem.tryTransformHeldOrEquippedToForm(stack, attacker, MimiclingItem.getWorstCombatForm(stack), MimiclingItem.getAttackUseDurabilityCost(stack), true);
             } else if (effect.matches("apply_non_potion_effect", "jump_up")) {
                 jumpTarget(target, effect.data());
-            } else if (effect.matches("apply_potion_effect", null)) {
-                applyPotionEffects(target, effect.data());
-            } else if (effect.matches("reference_potion_effect", "invert_potion_effect")) {
-                invertPotionEffects(target);
+            } else if (effect.matches("apply_potion_effect", "inflict_status_effect")) {
+                inflictStatusEffects(stack, target, effect.data());
             }
         }
+        convertActiveStatusEffects(stack, target);
     }
 
     public static boolean hasUnderwaterMiningSpeedEffect(Player player) {
         return hasMimiclingEffect(player.getMainHandItem(), "while_in_hand", "remove_underwater_mining_penalty");
+    }
+
+    private static void consumeUnderwaterMiningPenaltyUsage(ItemStack stack, LivingEntity entity, MimiclingFoods.EffectDefinition effect) {
+        if (entity instanceof Player player
+                && player.getMainHandItem() == stack
+                && player.isEyeInFluid(FluidTags.WATER)
+                && !EnchantmentHelper.hasAquaAffinity(player)) {
+            MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1);
+        }
+        MimiclingFoods.markUsageHandled(stack, effect.ownerId());
     }
 
     public static boolean tryTransformSmeltedBlockBeforeBreak(ServerLevel level, BlockPos pos, ItemStack tool) {
@@ -109,6 +125,9 @@ public final class MimiclingFoodEffects {
         if (state.isAir() || state.getDestroySpeed(level, pos) < 0.0F) {
             return false;
         }
+        if (state.is(Blocks.CLAY)) {
+            return false;
+        }
 
         ItemStack input = new ItemStack(state.getBlock());
         if (input.isEmpty()) {
@@ -116,10 +135,14 @@ public final class MimiclingFoodEffects {
         }
 
         SimpleContainer container = new SimpleContainer(input);
-        return level.getRecipeManager()
+        boolean transformed = level.getRecipeManager()
                 .getRecipeFor(RecipeType.SMELTING, container, level)
                 .map(recipe -> applyBlockSmeltingTransform(level, pos, tool, container, recipe))
                 .orElse(false);
+        if (transformed) {
+            consumeAutoSmeltUsage(tool, true);
+        }
+        return transformed;
     }
 
     public static List<ItemStack> transformBlockDrops(BlockState state, LootParams.Builder builder, List<ItemStack> originalDrops) {
@@ -148,15 +171,58 @@ public final class MimiclingFoodEffects {
 
             String action = data.has("action") ? data.get("action").getAsString() : "";
             if ("auto_smelt".equals(action)) {
-                List<ItemStack> blockDrops = smeltBlockItemDrop(level, origin, state, drops);
+                List<ItemStack> blockDrops = smeltBlockItemDrop(level, origin, state, tool, drops);
                 if (blockDrops != drops) {
+                    consumeAutoSmeltUsage(tool, true);
                     return blockDrops;
                 }
-                return smeltDrops(level, origin, drops);
+                SmeltedDropResult smeltedDrops = smeltDrops(level, origin, drops);
+                consumeAutoSmeltUsage(tool, smeltedDrops.changed());
+                return smeltedDrops.drops();
             }
         }
 
         return drops;
+    }
+
+    private static void consumeAutoSmeltUsage(ItemStack tool, boolean changedDrops) {
+        if (changedDrops) {
+            if (MimiclingFoods.consumeUsage(tool, MAGMA_CREAM_ID, 1)) {
+                MimiclingFoods.markUsageHandled(tool, MAGMA_CREAM_ID);
+            }
+        }
+    }
+
+    private static void consumeAutoSmeltUsageAfterBreak(ItemStack stack, Level level, BlockState state) {
+        if (!(level instanceof ServerLevel serverLevel) || MimiclingFoods.isUsageHandled(stack, MAGMA_CREAM_ID)) {
+            return;
+        }
+
+        if (wouldAutoSmeltDrop(serverLevel, new ItemStack(state.getBlock()))) {
+            consumeAutoSmeltUsage(stack, true);
+            return;
+        }
+
+        for (ItemStack drop : Block.getDrops(state, serverLevel, BlockPos.ZERO, null, null, ItemStack.EMPTY)) {
+            if (wouldAutoSmeltDrop(serverLevel, drop)) {
+                consumeAutoSmeltUsage(stack, true);
+                return;
+            }
+        }
+
+        consumeAutoSmeltUsage(stack, false);
+    }
+
+    private static boolean wouldAutoSmeltDrop(ServerLevel level, ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+
+        SimpleContainer container = new SimpleContainer(stack.copyWithCount(1));
+        return level.getRecipeManager()
+                .getRecipeFor(RecipeType.SMELTING, container, level)
+                .map(recipe -> !recipe.getResultItem(level.registryAccess()).isEmpty())
+                .orElse(false);
     }
 
     public static boolean shouldSuppressVanillaBlockExperience(BlockState state, ItemStack tool) {
@@ -289,10 +355,22 @@ public final class MimiclingFoodEffects {
         memory.putLong(id, pos.asLong());
         stack.getOrCreateTag().put(MEMORY_TAG, memory);
 
-        if (level instanceof ServerLevel serverLevel && data.has("particle")) {
-            ParticleOptions particle = (ParticleOptions) BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(data.get("particle").getAsString()));
-            serverLevel.sendParticles(particle, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 16, 0.35D, 0.35D, 0.35D, 0.02D);
+        spawnMemorySetParticles(level, data, pos);
+    }
+
+    private static void spawnMemorySetParticles(Level level, JsonObject data, BlockPos pos) {
+        if (!(level instanceof ServerLevel serverLevel) || !data.has("particle")) {
+            return;
         }
+
+        ParticleOptions particle = (ParticleOptions) BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(data.get("particle").getAsString()));
+        int count = data.has("particle_count") ? data.get("particle_count").getAsInt() : 16;
+        double spread = data.has("particle_spread") ? data.get("particle_spread").getAsDouble() : 0.35D;
+        double xSpread = data.has("particle_spread_x") ? data.get("particle_spread_x").getAsDouble() : spread;
+        double ySpread = data.has("particle_spread_y") ? data.get("particle_spread_y").getAsDouble() : spread;
+        double zSpread = data.has("particle_spread_z") ? data.get("particle_spread_z").getAsDouble() : spread;
+        double speed = data.has("particle_speed") ? data.get("particle_speed").getAsDouble() : 0.02D;
+        serverLevel.sendParticles(particle, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, count, xSpread, ySpread, zSpread, speed);
     }
 
     private static String getMemoryId(JsonObject data) {
@@ -344,7 +422,7 @@ public final class MimiclingFoodEffects {
         target.hasImpulse = true;
     }
 
-    private static void applyPotionEffects(LivingEntity target, JsonObject data) {
+    private static void inflictStatusEffects(ItemStack stack, LivingEntity target, JsonObject data) {
         if (!data.has("effects") || !data.get("effects").isJsonArray()) {
             return;
         }
@@ -362,46 +440,67 @@ public final class MimiclingFoodEffects {
         }
     }
 
-    private static void invertPotionEffects(LivingEntity target) {
-        MobEffectInstance strength = target.getEffect(MobEffects.DAMAGE_BOOST);
-        if (strength != null) {
-            target.removeEffect(MobEffects.DAMAGE_BOOST);
-            target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, strength.getDuration(), strength.getAmplifier()));
-            return;
-        }
+    private static void convertActiveStatusEffects(ItemStack stack, LivingEntity target) {
+        for (MobEffectInstance activeEffect : new ArrayList<>(target.getActiveEffects())) {
+            JsonObject conversion = findStatusEffectConversion(stack, BuiltInRegistries.MOB_EFFECT.getKey(activeEffect.getEffect()).toString());
+            if (conversion == null) {
+                continue;
+            }
 
-        MobEffectInstance speed = target.getEffect(MobEffects.MOVEMENT_SPEED);
-        MobEffectInstance jump = target.getEffect(MobEffects.JUMP);
-        MobEffectInstance source = speed != null ? speed : jump;
-        if (source != null) {
-            target.removeEffect(speed != null ? MobEffects.MOVEMENT_SPEED : MobEffects.JUMP);
-            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, source.getDuration(), source.getAmplifier()));
-            return;
-        }
+            MobEffect convertedEffect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(conversion.get("to").getAsString()));
+            int duration = activeEffect.getDuration();
+            if (conversion.has("copy_duration") && !conversion.get("copy_duration").getAsBoolean()) {
+                duration = conversion.has("duration") ? conversion.get("duration").getAsInt() : 1;
+            }
+            int amplifier = activeEffect.getAmplifier();
+            if (conversion.has("copy_amplifier") && !conversion.get("copy_amplifier").getAsBoolean()) {
+                amplifier = conversion.has("amplifier") ? conversion.get("amplifier").getAsInt() : 0;
+            }
 
-        MobEffectInstance nightVision = target.getEffect(MobEffects.NIGHT_VISION);
-        if (nightVision != null) {
-            target.removeEffect(MobEffects.NIGHT_VISION);
-            target.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, nightVision.getDuration(), nightVision.getAmplifier()));
-            return;
+            target.removeEffect(activeEffect.getEffect());
+            target.addEffect(new MobEffectInstance(convertedEffect, duration, amplifier));
         }
+    }
 
-        target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 600, 0));
+    private static JsonObject findStatusEffectConversion(ItemStack stack, String sourceEffectId) {
+        for (MimiclingFoods.EffectDefinition converter : MimiclingFoods.getActiveEffects(stack)) {
+            if (!converter.matches("reference_potion_effect", "convert_potion_effect") || !converter.data().has("conversions")) {
+                continue;
+            }
+
+            for (JsonElement conversionElement : converter.data().getAsJsonArray("conversions")) {
+                if (!conversionElement.isJsonObject()) {
+                    continue;
+                }
+
+                JsonObject conversion = conversionElement.getAsJsonObject();
+                if (!conversion.has("from") || !conversion.has("to") || !sourceEffectId.equals(conversion.get("from").getAsString())) {
+                    continue;
+                }
+
+                return conversion;
+            }
+        }
+        return null;
     }
 
     private static void breakMatchingNeighborBlocks(ItemStack stack, Level level, BlockPos origin, BlockState originalState, LivingEntity entity, JsonObject data) {
-        if (!(level instanceof ServerLevel serverLevel) || !data.has("mode")) {
+        if (!(level instanceof ServerLevel serverLevel) || !data.has("action")) {
             return;
         }
 
-        String mode = data.get("mode").getAsString();
+        String mode = data.get("action").getAsString();
         if (!"same_block_neighbors".equals(mode) && !"same_or_softer_neighbors".equals(mode)) {
             return;
         }
 
         float originalHardness = originalState.getDestroySpeed(level, origin);
+        BreakArea breakArea = getBreakArea(data);
         Set<BlockPos> broken = new HashSet<>();
-        for (BlockPos candidate : BlockPos.betweenClosed(origin.offset(-1, -1, -1), origin.offset(1, 1, 1))) {
+        for (BlockPos candidate : BlockPos.betweenClosed(
+                origin.offset(-breakArea.xRadius(), -breakArea.yRadius(), -breakArea.zRadius()),
+                origin.offset(breakArea.xRadius(), breakArea.yRadius(), breakArea.zRadius())
+        )) {
             BlockPos candidatePos = candidate.immutable();
             if (candidatePos.equals(origin) || broken.contains(candidatePos)) {
                 continue;
@@ -418,6 +517,26 @@ public final class MimiclingFoodEffects {
         }
     }
 
+    private static BreakArea getBreakArea(JsonObject data) {
+        if (!data.has("area") || !data.get("area").isJsonObject()) {
+            return new BreakArea(1, 1, 1);
+        }
+
+        JsonObject area = data.getAsJsonObject("area");
+        int radius = getNonNegativeInt(area, "radius", 1);
+        int xRadius = getNonNegativeInt(area, "x", radius);
+        int yRadius = getNonNegativeInt(area, "y", radius);
+        int zRadius = getNonNegativeInt(area, "z", radius);
+        return new BreakArea(xRadius, yRadius, zRadius);
+    }
+
+    private static int getNonNegativeInt(JsonObject data, String field, int fallback) {
+        if (!data.has(field)) {
+            return fallback;
+        }
+        return Math.max(0, data.get(field).getAsInt());
+    }
+
     private static boolean canBreakAreaCandidate(Level level, BlockPos candidatePos, BlockState candidateState, BlockState originalState, float originalHardness, String mode) {
         if (candidateState.isAir() || candidateState.getDestroySpeed(level, candidatePos) < 0.0F) {
             return false;
@@ -427,6 +546,8 @@ public final class MimiclingFoodEffects {
         }
         return "same_or_softer_neighbors".equals(mode) && originalHardness >= 0.0F && candidateState.getDestroySpeed(level, candidatePos) <= originalHardness;
     }
+
+    private record BreakArea(int xRadius, int yRadius, int zRadius) {}
 
     private static DropTransformResult applyConfiguredDropEffects(ItemStack stack, BlockState state, ServerLevel level, List<ItemStack> originalDrops) {
         List<MimiclingFoods.EffectDefinition> matchingEffects = new ArrayList<>();
@@ -448,6 +569,7 @@ public final class MimiclingFoodEffects {
         for (MimiclingFoods.EffectDefinition effect : matchingEffects) {
             JsonObject data = effect.data();
             List<ItemStack> rolledDrops = rollConfiguredLootTable(level, stack, state, data);
+            consumeRollLootTableUsage(stack, effect);
             if (data.has("replace") && data.get("replace").getAsBoolean()) {
                 drops = rolledDrops;
                 replacedOriginal = true;
@@ -457,6 +579,11 @@ public final class MimiclingFoodEffects {
         }
 
         return new DropTransformResult(drops, replacedOriginal);
+    }
+
+    private static void consumeRollLootTableUsage(ItemStack tool, MimiclingFoods.EffectDefinition effect) {
+        MimiclingFoods.consumeUsage(tool, effect.ownerId(), 1);
+        MimiclingFoods.markUsageHandled(tool, effect.ownerId());
     }
 
     private static List<ItemStack> rollConfiguredLootTable(ServerLevel level, ItemStack tool, BlockState state, JsonObject data) {
@@ -602,8 +729,11 @@ public final class MimiclingFoodEffects {
         return !resultState.getDrops(builder).isEmpty();
     }
 
-    private static List<ItemStack> smeltBlockItemDrop(ServerLevel level, Vec3 origin, BlockState state, List<ItemStack> originalDrops) {
+    private static List<ItemStack> smeltBlockItemDrop(ServerLevel level, Vec3 origin, BlockState state, ItemStack tool, List<ItemStack> originalDrops) {
         if (originalDrops.isEmpty()) {
+            return originalDrops;
+        }
+        if (state.is(Blocks.CLAY)) {
             return originalDrops;
         }
 
@@ -615,6 +745,10 @@ public final class MimiclingFoodEffects {
 
         ItemStack result = recipe.getResultItem(level.registryAccess()).copy();
         if (result.isEmpty() || !(result.getItem() instanceof BlockItem)) {
+            return originalDrops;
+        }
+        BlockState resultState = ((BlockItem)result.getItem()).getBlock().defaultBlockState();
+        if (!wouldDropAfterTransform(level, BlockPos.containing(origin), tool, resultState)) {
             return originalDrops;
         }
 
@@ -630,9 +764,10 @@ public final class MimiclingFoodEffects {
         return List.of(result);
     }
 
-    private static List<ItemStack> smeltDrops(ServerLevel level, Vec3 origin, List<ItemStack> originalDrops) {
+    private static SmeltedDropResult smeltDrops(ServerLevel level, Vec3 origin, List<ItemStack> originalDrops) {
         List<ItemStack> transformed = new ArrayList<>();
         float experience = 0.0F;
+        boolean changed = false;
 
         for (ItemStack drop : originalDrops) {
             SimpleContainer container = new SimpleContainer(drop.copyWithCount(1));
@@ -646,6 +781,7 @@ public final class MimiclingFoodEffects {
             result.setCount(result.getCount() * drop.getCount());
             transformed.add(result);
             experience += recipe.getExperience() * drop.getCount();
+            changed = true;
         }
 
         int wholeExperience = Mth.floor(experience);
@@ -656,7 +792,9 @@ public final class MimiclingFoodEffects {
             ExperienceOrb.award(level, origin, wholeExperience);
         }
 
-        return transformed;
+        return new SmeltedDropResult(transformed, changed);
     }
+
+    private record SmeltedDropResult(List<ItemStack> drops, boolean changed) {}
 
 }

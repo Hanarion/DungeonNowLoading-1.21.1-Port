@@ -466,6 +466,7 @@
   "item.dungeonnowloading.mimicling.tooltip.capacity": "Belly Space: %s/%s",
   "item.dungeonnowloading.mimicling.tooltip.active_foods": "Active Food Effects:",
   "item.dungeonnowloading.mimicling.tooltip.active_food": " %s: %s uses",
+  "item.dungeonnowloading.mimicling.tooltip.active_food_infinite": " %s: infinite uses",
   "item.dungeonnowloading.mimicling.tooltip.empty": "It looks hungry...",
   "item.dungeonnowloading.mimicling.tooltip.tools": "Stored tools:",
   "item.dungeonnowloading.mimicling.tooltip.controls": "Controls:",

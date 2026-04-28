@@ -111,9 +111,9 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         if (isFeedableTool(slotStack) && slot.allowModification(player) && canAcceptFeed(stack, slotStack)) {
             ItemStack taken = slot.safeTake(1, 1, player);
             if (!taken.isEmpty()) {
-                ItemStack removed = feedOne(stack, taken);
+                List<ItemStack> removed = feedOne(stack, taken);
                 startChewing(stack, player.level().getGameTime());
-                slot.safeInsert(removed);
+                giveReturnedFeedItems(player, slot, removed);
                 playInsertSound(player);
             }
             return true;
@@ -145,11 +145,11 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         }
 
         ItemStack inserted = carriedStack.copyWithCount(1);
-        ItemStack removed = feedOne(stack, inserted);
+        List<ItemStack> removed = feedOne(stack, inserted);
         startChewing(stack, player.level().getGameTime());
         carriedStack.shrink(1);
         carriedSlot.set(carriedStack);
-        giveReturnedFeedItem(player, removed);
+        giveReturnedFeedItems(player, removed);
         playInsertSound(player);
         return true;
     }
@@ -605,7 +605,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
     public static boolean isMimiclingFoil(ItemStack stack) {
         ItemStack storedTool = getStoredToolForCurrentForm(stack);
-        return !storedTool.isEmpty() && storedTool.hasFoil();
+        return !stack.getEnchantmentTags().isEmpty() || !storedTool.isEmpty() && storedTool.hasFoil();
     }
 
     public static void onMimiclingDestroyed(ItemEntity itemEntity) {
@@ -957,7 +957,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     public static boolean isFeedableTool(ItemStack stack) {
-        return isMimicMucus(stack) || MimiclingFoods.getRepairAmount(stack) > 0 || getDedicatedSlot(stack) >= 0;
+        return isMimicMucus(stack) || MimiclingFoods.getFood(stack) != null || getDedicatedSlot(stack) >= 0;
     }
 
     private static boolean canAcceptFeed(ItemStack stack, ItemStack itemToFeed) {
@@ -1060,20 +1060,38 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return contents;
     }
 
-    private static ItemStack feedOne(ItemStack stack, ItemStack itemToFeed) {
+    private static List<ItemStack> feedOne(ItemStack stack, ItemStack itemToFeed) {
         if (isMimicMucus(itemToFeed)) {
             feedMimicMucus(stack);
-            return ItemStack.EMPTY;
+            return List.of();
         }
 
         MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(itemToFeed);
         if (food != null) {
             repairDurability(stack, food.durability());
-            MimiclingFoods.rememberFood(stack, food, itemToFeed);
-            return MimiclingFoods.getOnFedReturnStack(food);
+            List<ItemStack> returnedItems = new java.util.ArrayList<>(MimiclingFoods.rememberFood(stack, food, itemToFeed));
+            ItemStack onFedReturn = MimiclingFoods.getOnFedReturnStack(food);
+            if (!onFedReturn.isEmpty()) {
+                returnedItems.add(onFedReturn);
+            }
+            return returnedItems;
         }
 
-        return storeInDedicatedSlot(stack, itemToFeed);
+        ItemStack removed = storeInDedicatedSlot(stack, itemToFeed);
+        return removed.isEmpty() ? List.of() : List.of(removed);
+    }
+
+    private static void giveReturnedFeedItems(Player player, Slot preferredSlot, List<ItemStack> returnedItems) {
+        for (ItemStack returnedItem : returnedItems) {
+            ItemStack remainder = preferredSlot.safeInsert(returnedItem);
+            giveReturnedFeedItem(player, remainder);
+        }
+    }
+
+    private static void giveReturnedFeedItems(Player player, List<ItemStack> returnedItems) {
+        for (ItemStack returnedItem : returnedItems) {
+            giveReturnedFeedItem(player, returnedItem);
+        }
     }
 
     private static void giveReturnedFeedItem(Player player, ItemStack returnedItem) {
@@ -1105,7 +1123,11 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             Component displayName = activeFood.displayStack().isEmpty()
                     ? Component.literal(activeFood.food().id())
                     : activeFood.displayStack().getHoverName();
-            components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.active_food", displayName, activeFood.uses()).withStyle(ChatFormatting.GRAY));
+            if (activeFood.food().infiniteUsage() || activeFood.uses() < 0) {
+                components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.active_food_infinite", displayName).withStyle(ChatFormatting.GRAY));
+            } else {
+                components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.active_food", displayName, activeFood.uses()).withStyle(ChatFormatting.GRAY));
+            }
         }
     }
 
