@@ -79,6 +79,7 @@
       "item": "minecraft:rabbit_stew",
       "durability": 50,
       "usage_count": 0,
+      "description": ["Returns Rabbitless Rabbit Stew."],
       "effects": [
         {
           "trigger": "on_fed",
@@ -91,6 +92,7 @@
       "item": "dungeonnowloading:mimic_mucus",
       "durability": 10,
       "usage_count": 0,
+      "description": ["2 mucus increase Belly Space by 1.", "At max Belly Space, restores 100 durability."],
       "effects": [
         {
           "trigger": "on_fed",
@@ -104,6 +106,7 @@
       "item": "minecraft:zombie_head",
       "durability": 500,
       "usage_count": 0,
+      "description": ["Returns a Skeleton Skull."],
       "effects": [
         {
           "trigger": "on_fed",
@@ -116,6 +119,7 @@
       "item": "minecraft:player_head",
       "durability": 500,
       "usage_count": 0,
+      "description": ["Returns a Skeleton Skull."],
       "effects": [
         {
           "trigger": "on_fed",
@@ -128,6 +132,7 @@
       "item": "minecraft:tropical_fish",
       "durability": 1,
       "usage_count": 10,
+      "description": ["On break or attack, switches to the least suitable form."],
       "effects": [
         {
           "trigger": "on_break",
@@ -143,6 +148,7 @@
       "item": "minecraft:honey_bottle",
       "durability": 10,
       "usage_count": 10,
+      "description": ["Returns a Glass Bottle.", "While held in main hand, grants Haste I."],
       "effects": [
         {
           "trigger": "on_fed",
@@ -161,6 +167,7 @@
       "item": "minecraft:sea_pickle",
       "durability": 10,
       "usage_count": 10,
+      "description": ["While held in main hand, removes underwater mining penalty."],
       "effects": [
         {
           "trigger": "while_in_hand",
@@ -172,6 +179,7 @@
       "item": "minecraft:pufferfish",
       "durability": 10,
       "usage_count": 10,
+      "description": ["On attack, inflicts Poison II, Hunger III, and Nausea.", "Breaks nearby same-or-softer blocks.", "Potatoes become poisonous potato loot."],
       "effects": [
         {
           "trigger": "apply_potion_effect",
@@ -247,6 +255,7 @@
       "item": "minecraft:piglin_head",
       "durability": 500,
       "usage_count": 500,
+      "description": ["Gold ores drop piglin bartering loot."],
       "effects": [
         {
           "trigger": "change_drop",
@@ -263,6 +272,7 @@
       "item": "minecraft:spider_eye",
       "durability": 10,
       "usage_count": 10,
+      "description": ["On attack, inflicts Poison I.", "Potatoes become poisonous potato loot."],
       "effects": [
         {
           "trigger": "apply_potion_effect",
@@ -302,6 +312,7 @@
       "item": "minecraft:rabbit_foot",
       "durability": 10,
       "usage_count": 10,
+      "description": ["On attack, launches the target upward.", "Inflicts Jump Boost II for 30 seconds."],
       "effects": [
         {
           "trigger": "apply_non_potion_effect",
@@ -321,6 +332,7 @@
       "item": "minecraft:phantom_membrane",
       "durability": 10,
       "usage_count": 10,
+      "description": ["On attack, inflicts Slow Falling for 30 seconds."],
       "effects": [
         {
           "trigger": "apply_potion_effect",
@@ -335,6 +347,7 @@
       "item": "minecraft:magma_cream",
       "durability": 10,
       "usage_count": 50,
+      "description": ["Sword and axe gain Fire Aspect +1.", "Smelts block drops when smelting is possible."],
       "effects": [
         {
           "trigger": "while_in_hand",
@@ -357,6 +370,7 @@
       "item": "minecraft:fermented_spider_eye",
       "durability": 10,
       "usage_count": 10,
+      "description": ["Converts matching status effects into inverted effects."],
       "effects": [
         {
           "trigger": "reference_potion_effect",
@@ -391,6 +405,7 @@
       "item": "minecraft:ender_pearl",
       "durability": 10,
       "usage_count": 10,
+      "description": ["Breaking blocks stores a teleport destination.", "Attacked mobs teleport to that destination or nearby."],
       "effects": [
         {
           "trigger": "memorize_position",
@@ -422,6 +437,7 @@
       "durability": 0,
       "usage_count": 0,
       "infinite_usage": true,
+      "description": ["Infinite uses.", "Killed mobs spawn a cloud of their status effects.", "Returns when replaced."],
       "effects": [
         {
           "trigger": "reference_potion_effect",

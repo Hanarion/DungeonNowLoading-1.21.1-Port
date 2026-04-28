@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.mixin.client;
 
 import dev.hexnowloading.dungeonnowloading.client.MimiclingFeedHintHandler;
+import dev.hexnowloading.dungeonnowloading.item.MimiclingFormItem;
 import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.network.packets.C2SMimiclingSelectSlotPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
@@ -39,10 +40,14 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        if (hoveredSlot != null && menu.getCarried().isEmpty()) {
+        if (hoveredSlot != null) {
             ItemStack stack = hoveredSlot.getItem();
             int delta = amount < 0.0D ? 1 : -1;
-            if (stack.getItem() instanceof MimiclingItem && MimiclingItem.tryScrollSelectedSlot(stack, delta)) {
+            ItemStack carriedStack = menu.getCarried();
+            boolean changed = carriedStack.isEmpty()
+                    ? MimiclingItem.tryScrollSelectedSlot(stack, delta)
+                    : MimiclingItem.tryScrollSelectedFoodSlot(stack, carriedStack, delta);
+            if (stack.getItem() instanceof MimiclingFormItem && changed) {
                 Services.NETWORK.sendToServer(new C2SMimiclingSelectSlotPacket(menu.containerId, hoveredSlot.index, delta));
                 return true;
             }
@@ -74,11 +79,11 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
 
         if (!menu.getCarried().isEmpty() && hoveredSlot != null && hoveredSlot.hasItem()) {
             ItemStack stack = hoveredSlot.getItem();
-            if (stack.getItem() instanceof MimiclingItem) {
+            if (stack.getItem() instanceof MimiclingFormItem) {
                 if (MimiclingItem.trySelectDedicatedSlot(stack, menu.getCarried())) {
                     Services.NETWORK.sendToServer(new C2SMimiclingSelectSlotPacket(menu.containerId, hoveredSlot.index, 0));
                 }
-                guiGraphics.renderTooltip(Minecraft.getInstance().font, getTooltipFromContainerItem(stack), stack.getTooltipImage(), mouseX, mouseY);
+                guiGraphics.renderTooltip(Minecraft.getInstance().font, getTooltipFromContainerItem(stack), MimiclingItem.getTooltipImageForCarried(stack, menu.getCarried()), mouseX, mouseY);
                 ci.cancel();
             }
         }

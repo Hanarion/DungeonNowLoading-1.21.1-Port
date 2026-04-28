@@ -45,12 +45,19 @@ public class C2SMimiclingSelectSlotPacket implements DNLPacket {
 
         Slot slot = sender.containerMenu.slots.get(slotIndex);
         ItemStack stack = slot.getItem();
+        ItemStack carriedStack = sender.containerMenu.getCarried();
         boolean changed = delta == 0
-                ? selectHoveredSlot(stack, sender.containerMenu.getCarried())
-                : MimiclingItem.tryScrollSelectedSlot(stack, delta);
+                ? selectHoveredSlot(stack, carriedStack)
+                : scrollSelectedSlot(stack, carriedStack);
         if (changed) {
             slot.setChanged();
         }
+    }
+
+    private boolean scrollSelectedSlot(ItemStack stack, ItemStack carriedStack) {
+        return carriedStack.isEmpty()
+                ? MimiclingItem.tryScrollSelectedSlot(stack, delta)
+                : MimiclingItem.tryScrollSelectedFoodSlot(stack, carriedStack, delta);
     }
 
     private boolean selectHoveredSlot(ItemStack stack, ItemStack carriedStack) {

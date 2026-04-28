@@ -53,6 +53,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static final String TRANSITION_TO_TAG = "MimiclingTransitionTo";
     private static final String STORED_ITEMS_TAG = "MimiclingItems";
     private static final String SELECTED_SLOT_TAG = "MimiclingSelectedSlot";
+    private static final String SELECTED_FOOD_SLOT_TAG = "MimiclingSelectedFoodSlot";
     private static final String CHEWING_START_TAG = "MimiclingChewingStart";
     private static final String CAPACITY_TAG = "MimiclingCapacity";
     private static final String MUCUS_FED_TAG = "MimiclingMucusFed";
@@ -111,7 +112,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         if (isFeedableTool(slotStack) && slot.allowModification(player) && canAcceptFeed(stack, slotStack)) {
             ItemStack taken = slot.safeTake(1, 1, player);
             if (!taken.isEmpty()) {
-                List<ItemStack> removed = feedOne(stack, taken);
+                List<ItemStack> removed = feedOne(stack, taken, getSelectedFoodReplacementSlot(stack, taken));
                 startChewing(stack, player.level().getGameTime());
                 giveReturnedFeedItems(player, slot, removed);
                 playInsertSound(player);
@@ -145,7 +146,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         }
 
         ItemStack inserted = carriedStack.copyWithCount(1);
-        List<ItemStack> removed = feedOne(stack, inserted);
+        List<ItemStack> removed = feedOne(stack, inserted, getSelectedFoodReplacementSlot(stack, inserted));
         startChewing(stack, player.level().getGameTime());
         carriedStack.shrink(1);
         carriedSlot.set(carriedStack);
@@ -218,7 +219,6 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         super.appendHoverText(stack, level, components, tooltipFlag);
         if (canUseStorage(stack)) {
             components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.capacity", getStoredItemCount(stack), getStorageCapacity(stack)).withStyle(ChatFormatting.GRAY));
-            appendActiveFoodTooltip(stack, components);
         }
     }
 
@@ -228,8 +228,36 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return Optional.empty();
         }
 
+        return getTooltipImage(stack, -1);
+    }
+
+    public static Optional<TooltipComponent> getTooltipImageForCarried(ItemStack stack, ItemStack carriedStack) {
+        if (!canUseStorage(stack)) {
+            return Optional.empty();
+        }
+
+        ItemStack previewFood = isFeedableFood(carriedStack) ? carriedStack.copyWithCount(1) : ItemStack.EMPTY;
+        return getTooltipImage(
+                stack,
+                previewFood,
+                MimiclingFoods.getPreviewDescription(previewFood),
+                getCarriedFoodHighlightSlot(stack, carriedStack),
+                !isFeedableFood(carriedStack)
+        );
+    }
+
+    private static Optional<TooltipComponent> getTooltipImage(ItemStack stack, int selectedFoodSlot) {
+        return getTooltipImage(stack, selectedFoodSlot, true);
+    }
+
+    private static Optional<TooltipComponent> getTooltipImage(ItemStack stack, int selectedFoodSlot, boolean showSelectedToolSlot) {
         NonNullList<ItemStack> contents = getTooltipContents(stack);
-        return Optional.of(new MimiclingTooltip(contents, getSelectedSlot(stack), getStorageCapacity(stack)));
+        return Optional.of(new MimiclingTooltip(contents, getTooltipActiveFoods(stack), showSelectedToolSlot ? getSelectedSlot(stack) : -1, selectedFoodSlot, getStorageCapacity(stack)));
+    }
+
+    private static Optional<TooltipComponent> getTooltipImage(ItemStack stack, ItemStack previewFood, List<String> previewFoodLines, int selectedFoodSlot, boolean showSelectedToolSlot) {
+        NonNullList<ItemStack> contents = getTooltipContents(stack);
+        return Optional.of(new MimiclingTooltip(contents, getTooltipActiveFoods(stack), previewFood, previewFoodLines, showSelectedToolSlot ? getSelectedSlot(stack) : -1, selectedFoodSlot, getStorageCapacity(stack)));
     }
 
     @Override
@@ -638,6 +666,52 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return false;
     }
 
+    public static boolean tryScrollSelectedFoodSlot(ItemStack stack, ItemStack foodStack, int delta) {
+        if (!canSelectFoodReplacement(stack, foodStack)) {
+            return false;
+        }
+
+        int activeFoodCount = MimiclingFoods.getActiveFoodEntries(stack).size();
+        int currentSelected = getSelectedFoodSlot(stack);
+        int selected = Math.floorMod(currentSelected + delta, activeFoodCount);
+        if (selected == currentSelected) {
+            return false;
+        }
+
+        stack.getOrCreateTag().putInt(SELECTED_FOOD_SLOT_TAG, selected);
+        return true;
+    }
+
+    public static boolean canSelectFoodReplacement(ItemStack stack, ItemStack foodStack) {
+        if (!(stack.getItem() instanceof MimiclingFormItem) || !canUseStorage(stack)) {
+            return false;
+        }
+
+        MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(foodStack);
+        if (food == null || !MimiclingFoods.shouldRemember(food)) {
+            return false;
+        }
+
+        return !MimiclingFoods.hasActiveFood(stack, food.id())
+                && MimiclingFoods.getActiveFoodEntries(stack).size() >= 2;
+    }
+
+    private static int getCarriedFoodHighlightSlot(ItemStack stack, ItemStack foodStack) {
+        MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(foodStack);
+        if (food == null || !MimiclingFoods.shouldRemember(food)) {
+            return -1;
+        }
+
+        List<MimiclingFoods.ActiveFood> activeFoods = MimiclingFoods.getActiveFoodEntries(stack);
+        for (int i = 0; i < activeFoods.size(); i++) {
+            if (food.id().equals(activeFoods.get(i).food().id())) {
+                return i;
+            }
+        }
+
+        return canSelectFoodReplacement(stack, foodStack) ? getSelectedFoodSlot(stack) : -1;
+    }
+
     public static boolean trySelectDedicatedSlot(ItemStack stack, ItemStack toolStack) {
         int slot = getDedicatedSlot(toolStack);
         if (!(stack.getItem() instanceof MimiclingFormItem) || !canUseStorage(stack) || slot < 0) {
@@ -960,6 +1034,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return isMimicMucus(stack) || MimiclingFoods.getFood(stack) != null || getDedicatedSlot(stack) >= 0;
     }
 
+    private static boolean isFeedableFood(ItemStack stack) {
+        return isMimicMucus(stack) || MimiclingFoods.getFood(stack) != null;
+    }
+
     private static boolean canAcceptFeed(ItemStack stack, ItemStack itemToFeed) {
         if (isMimicMucus(itemToFeed)) {
             return getStorageCapacity(stack) < MAX_STORED_ITEMS || stack.getDamageValue() > 0;
@@ -967,7 +1045,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
         MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(itemToFeed);
         if (food != null) {
-            return stack.getDamageValue() > 0 || MimiclingFoods.shouldRemember(food) || !MimiclingFoods.getOnFedReturnStack(food).isEmpty();
+            return MimiclingFoods.canAcceptFood(stack, food, stack.getDamageValue() > 0 && food.durability() > 0);
         }
 
         int slot = getDedicatedSlot(itemToFeed);
@@ -1061,6 +1139,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static List<ItemStack> feedOne(ItemStack stack, ItemStack itemToFeed) {
+        return feedOne(stack, itemToFeed, -1);
+    }
+
+    private static List<ItemStack> feedOne(ItemStack stack, ItemStack itemToFeed, int preferredFoodReplacementIndex) {
         if (isMimicMucus(itemToFeed)) {
             feedMimicMucus(stack);
             return List.of();
@@ -1069,7 +1151,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(itemToFeed);
         if (food != null) {
             repairDurability(stack, food.durability());
-            List<ItemStack> returnedItems = new java.util.ArrayList<>(MimiclingFoods.rememberFood(stack, food, itemToFeed));
+            List<ItemStack> returnedItems = new java.util.ArrayList<>(MimiclingFoods.rememberFood(stack, food, itemToFeed, preferredFoodReplacementIndex));
             ItemStack onFedReturn = MimiclingFoods.getOnFedReturnStack(food);
             if (!onFedReturn.isEmpty()) {
                 returnedItems.add(onFedReturn);
@@ -1112,23 +1194,32 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         stack.hurtAndBreak(amount, entity, livingEntity -> livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
     }
 
+    public static Optional<TooltipComponent> getActiveFoodTooltipImage(ItemStack stack) {
+        List<MimiclingTooltip.ActiveFood> activeFoods = getTooltipActiveFoods(stack);
+        return activeFoods.isEmpty()
+                ? Optional.empty()
+                : Optional.of(new MimiclingTooltip(NonNullList.create(), activeFoods, -1, -1, 0));
+    }
+
     public static void appendActiveFoodTooltip(ItemStack stack, List<Component> components) {
+    }
+
+    private static List<MimiclingTooltip.ActiveFood> getTooltipActiveFoods(ItemStack stack) {
         List<MimiclingFoods.ActiveFood> activeFoods = MimiclingFoods.getActiveFoodEntries(stack);
         if (activeFoods.isEmpty()) {
-            return;
+            return List.of();
         }
 
-        components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.active_foods").withStyle(ChatFormatting.DARK_GRAY));
+        List<MimiclingTooltip.ActiveFood> tooltipFoods = new java.util.ArrayList<>();
         for (MimiclingFoods.ActiveFood activeFood : activeFoods) {
-            Component displayName = activeFood.displayStack().isEmpty()
-                    ? Component.literal(activeFood.food().id())
-                    : activeFood.displayStack().getHoverName();
-            if (activeFood.food().infiniteUsage() || activeFood.uses() < 0) {
-                components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.active_food_infinite", displayName).withStyle(ChatFormatting.GRAY));
-            } else {
-                components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.active_food", displayName, activeFood.uses()).withStyle(ChatFormatting.GRAY));
-            }
+            tooltipFoods.add(new MimiclingTooltip.ActiveFood(
+                    activeFood.displayStack(),
+                    activeFood.uses(),
+                    activeFood.maxUses(),
+                    activeFood.food().infiniteUsage() || activeFood.uses() < 0
+            ));
         }
+        return tooltipFoods;
     }
 
     private static void feedMimicMucus(ItemStack stack) {
@@ -1222,6 +1313,24 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
         int selected = stack.getTag().getInt(SELECTED_SLOT_TAG);
         return Math.max(0, Math.min(selected, MAX_STORED_ITEMS - 1));
+    }
+
+    private static int getSelectedFoodSlot(ItemStack stack) {
+        if (!stack.hasTag()) {
+            return 0;
+        }
+
+        int activeFoodCount = MimiclingFoods.getActiveFoodEntries(stack).size();
+        if (activeFoodCount <= 0) {
+            return 0;
+        }
+
+        int selected = stack.getTag().getInt(SELECTED_FOOD_SLOT_TAG);
+        return Math.max(0, Math.min(selected, activeFoodCount - 1));
+    }
+
+    private static int getSelectedFoodReplacementSlot(ItemStack stack, ItemStack foodStack) {
+        return canSelectFoodReplacement(stack, foodStack) ? getSelectedFoodSlot(stack) : -1;
     }
 
     private static void cleanupStoredItemsTag(ItemStack stack, ListTag items) {

@@ -6,6 +6,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
+import java.util.Optional;
 
 public class MimiclingPickaxeItem extends PickaxeItem implements MimiclingFormItem {
     public MimiclingPickaxeItem(Properties properties) {
@@ -63,6 +65,11 @@ public class MimiclingPickaxeItem extends PickaxeItem implements MimiclingFormIt
     public void appendHoverText(ItemStack stack, Level level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, level, components, tooltipFlag);
         MimiclingItem.appendActiveFoodTooltip(stack, components);
+    }
+
+    @Override
+    public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+        return MimiclingItem.getActiveFoodTooltipImage(stack);
     }
 
     @Override
