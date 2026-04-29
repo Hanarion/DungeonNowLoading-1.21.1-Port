@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.particle.type.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,6 +26,12 @@ public class DNLParticleTypes {
     public static final Supplier<SimpleParticleType> MENDING_RUNE_PARTICLE = register("mending_rune", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<SimpleParticleType> MENDING_RUNE_SHORT_PARTICLE = register("mending_rune_short", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<MendingFadeParticleType> MENDING_FADE_PARTICLE = register("mending_fade", () -> new MendingFadeParticleType(false));
+    public static final Supplier<ParticleType<BlockParticleOption>> MIMICLING_IMPACT_BLOCK_PARTICLE = register("mimicling_impact_block", () -> new ParticleType<BlockParticleOption>(false, BlockParticleOption.DESERIALIZER) {
+        @Override
+        public com.mojang.serialization.Codec<BlockParticleOption> codec() {
+            return BlockParticleOption.codec(this);
+        }
+    });
 
 
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> VERTEX_SPARK_PARTICLE = register("vertex_spark", () -> new ScalableParticleType(false));

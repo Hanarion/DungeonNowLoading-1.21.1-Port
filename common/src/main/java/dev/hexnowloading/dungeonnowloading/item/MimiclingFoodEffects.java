@@ -4,8 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
+import dev.hexnowloading.dungeonnowloading.entity.misc.MimiclingFallingBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.TagParser;
@@ -30,6 +32,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -42,6 +45,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -54,6 +58,7 @@ public final class MimiclingFoodEffects {
     private static final String TELEPORT_DESTINATION_TAG = "teleport_destination";
     private static final String MAGMA_CREAM_ID = "minecraft:magma_cream";
     private static final int HELD_EFFECT_TICKS = 40;
+    private static final double DEFAULT_REACH_DISTANCE = 4.5D;
 
     private MimiclingFoodEffects() {}
 
@@ -83,6 +88,14 @@ public final class MimiclingFoodEffects {
                 consumeAutoSmeltUsageAfterBreak(stack, level, state);
             } else if (effect.matches("while_in_hand", "remove_underwater_mining_penalty") && formsMatch(stack, effect.data())) {
                 consumeUnderwaterMiningPenaltyUsage(stack, entity, effect);
+            } else if (effect.matches("on_break", "grant_air") && formsMatch(stack, effect.data())) {
+                if (grantAir(entity, effect.data())) {
+                    consumeEffectUsage(stack, effect);
+                }
+            } else if (effect.matches("on_break", "trail_to_matching_block") && formsMatch(stack, effect.data())) {
+                if (spawnTrailToMatchingBlock(level, pos, state, effect.data())) {
+                    consumeEffectUsage(stack, effect);
+                }
             }
         }
     }
@@ -118,6 +131,31 @@ public final class MimiclingFoodEffects {
         return hasMimiclingEffect(player.getMainHandItem(), "while_in_hand", "remove_underwater_mining_penalty");
     }
 
+    public static double getMimiclingReachDistance(Player player) {
+        ItemStack stack = player.getMainHandItem();
+        if (!isMimiclingStack(stack)) {
+            return DEFAULT_REACH_DISTANCE;
+        }
+
+        double reach = DEFAULT_REACH_DISTANCE;
+        for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
+            if (effect.matches("while_in_hand", "extend_reach") && formsMatch(stack, effect.data())) {
+                double configuredReach = effect.data().has("range") ? effect.data().get("range").getAsDouble() : 16.0D;
+                reach = Math.max(reach, Math.max(DEFAULT_REACH_DISTANCE, configuredReach));
+            }
+        }
+        return reach;
+    }
+
+    public static double getMimiclingReachDistanceSqr(Player player) {
+        double reach = getMimiclingReachDistance(player);
+        return reach * reach;
+    }
+
+    public static boolean hasExtendedReach(Player player) {
+        return getMimiclingReachDistance(player) > DEFAULT_REACH_DISTANCE;
+    }
+
     public static float getUnderwaterMiningSpeedMultiplier(Player player) {
         ItemStack stack = player.getMainHandItem();
         if (!isMimiclingStack(stack)) {
@@ -141,9 +179,10 @@ public final class MimiclingFoodEffects {
                 && player.getMainHandItem() == stack
                 && player.isEyeInFluid(FluidTags.WATER)
                 && !EnchantmentHelper.hasAquaAffinity(player)) {
-            MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1);
+            if (MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1)) {
+                MimiclingFoods.markUsageHandled(stack, effect.ownerId());
+            }
         }
-        MimiclingFoods.markUsageHandled(stack, effect.ownerId());
     }
 
     private static void consumeEffectUsage(ItemStack stack, MimiclingFoods.EffectDefinition effect) {
@@ -197,6 +236,9 @@ public final class MimiclingFoodEffects {
         DropTransformResult configuredDrops = applyConfiguredDropEffects(tool, state, builder.getLevel(), originalDrops);
         List<ItemStack> drops = configuredDrops.drops();
         if (configuredDrops.replacedOriginal()) {
+            if (dropLootAsFallingBlocksIfConfigured(tool, state, builder, drops)) {
+                return List.of();
+            }
             return collectDropsToInventoryIfConfigured(tool, builder, drops);
         }
 
@@ -217,14 +259,23 @@ public final class MimiclingFoodEffects {
                 List<ItemStack> blockDrops = smeltBlockItemDrop(level, origin, state, tool, drops);
                 if (blockDrops != drops) {
                     consumeAutoSmeltUsage(tool, true);
+                    if (dropLootAsFallingBlocksIfConfigured(tool, state, builder, blockDrops)) {
+                        return List.of();
+                    }
                     return collectDropsToInventoryIfConfigured(tool, builder, blockDrops);
                 }
                 SmeltedDropResult smeltedDrops = smeltDrops(level, origin, drops);
                 consumeAutoSmeltUsage(tool, smeltedDrops.changed());
+                if (dropLootAsFallingBlocksIfConfigured(tool, state, builder, smeltedDrops.drops())) {
+                    return List.of();
+                }
                 return collectDropsToInventoryIfConfigured(tool, builder, smeltedDrops.drops());
             }
         }
 
+        if (dropLootAsFallingBlocksIfConfigured(tool, state, builder, drops)) {
+            return List.of();
+        }
         return collectDropsToInventoryIfConfigured(tool, builder, drops);
     }
 
@@ -294,9 +345,266 @@ public final class MimiclingFoodEffects {
                     if (trySummonEntitiesAtDeath(target, level, effect.data())) {
                         consumeEffectUsage(mimicling, effect);
                     }
+                } else if (effect.matches("on_kill", "trail_to_matching_entity")) {
+                    if (spawnTrailToMatchingEntity(level, target, effect.data())) {
+                        consumeEffectUsage(mimicling, effect);
+                    }
                 }
             }
         }
+    }
+
+    private static boolean grantAir(LivingEntity entity, JsonObject data) {
+        int bubbles = data.has("bubbles") ? Math.max(1, data.get("bubbles").getAsInt()) : 3;
+        int ticks = bubbles * 30;
+        int currentAir = entity.getAirSupply();
+        int updatedAir = Math.min(entity.getMaxAirSupply(), currentAir + ticks);
+        if (updatedAir <= currentAir) {
+            return false;
+        }
+
+        entity.setAirSupply(updatedAir);
+        return true;
+    }
+
+    private static boolean dropLootAsFallingBlocksIfConfigured(ItemStack tool, BlockState minedState, LootParams.Builder builder, List<ItemStack> drops) {
+        MimiclingFoods.EffectDefinition effect = getConfiguredEffect(tool, "change_drop", "drop_loot_as_falling_blocks");
+        if (effect == null || minedState.isAir() || drops.isEmpty()) {
+            return false;
+        }
+
+        Entity entity = builder.getOptionalParameter(LootContextParams.THIS_ENTITY);
+        Vec3 origin = builder.getOptionalParameter(LootContextParams.ORIGIN);
+        if (!(entity instanceof Player player) || origin == null) {
+            return false;
+        }
+
+        ServerLevel level = builder.getLevel();
+        float damage = Math.max(1.0F, minedState.getDestroySpeed(level, BlockPos.containing(origin)));
+        List<FallingLootPayload> payloads = getFallingLootPayloads(minedState, drops);
+        if (payloads.isEmpty()) {
+            return false;
+        }
+
+        JsonObject data = effect.data();
+        int radius = data.has("radius") ? Math.max(1, data.get("radius").getAsInt()) : 32;
+        List<Mob> candidates = getMobsTargetingPlayer(level, player, radius);
+        int spawned = 0;
+        spawnFallingBlockTeleportEffects(level, origin);
+        for (FallingLootPayload payload : payloads) {
+            BlockPos spawnPos = findFallingSpawnPos(level, player, candidates, data, spawned);
+            if (spawnPos == null) {
+                if (spawned > 0) {
+                    consumeEffectUsage(tool, effect);
+                }
+                return spawned > 0;
+            }
+            float payloadDamage = Math.max(damage, payload.visualState().getDestroySpeed(level, spawnPos));
+            level.addFreshEntity(new MimiclingFallingBlockEntity(level, spawnPos, payload.visualState(), payloadDamage, payload.drops()));
+            spawnFallingBlockTeleportEffects(level, Vec3.atCenterOf(spawnPos));
+            level.playSound(null, spawnPos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 0.65F, 1.0F);
+            spawned++;
+        }
+        consumeEffectUsage(tool, effect);
+        return spawned > 0;
+    }
+
+    private static void spawnFallingBlockTeleportEffects(ServerLevel level, Vec3 pos) {
+        level.sendParticles(ParticleTypes.PORTAL, pos.x, pos.y + 0.5D, pos.z, 24, 0.35D, 0.45D, 0.35D, 0.08D);
+    }
+
+    private static List<FallingLootPayload> getFallingLootPayloads(BlockState minedState, List<ItemStack> drops) {
+        List<FallingLootPayload> payloads = new ArrayList<>();
+        List<ItemStack> itemDrops = new ArrayList<>();
+        for (ItemStack drop : drops) {
+            if (drop.isEmpty()) {
+                continue;
+            }
+            if (drop.getItem() instanceof BlockItem blockItem) {
+                for (int i = 0; i < drop.getCount(); i++) {
+                    payloads.add(new FallingLootPayload(blockItem.getBlock().defaultBlockState(), List.of(drop.copyWithCount(1))));
+                }
+            } else {
+                itemDrops.add(drop.copy());
+            }
+        }
+        if (!itemDrops.isEmpty()) {
+            payloads.add(new FallingLootPayload(minedState, itemDrops));
+        }
+        return payloads;
+    }
+
+    private static List<Mob> getMobsTargetingPlayer(ServerLevel level, Player player, int radius) {
+        AABB area = player.getBoundingBox().inflate(radius);
+        return new ArrayList<>(level.getEntitiesOfClass(Mob.class, area, mob -> mob.isAlive() && mob.getTarget() == player));
+    }
+
+    private static BlockPos findFallingSpawnPos(ServerLevel level, Player player, List<Mob> candidates, JsonObject data, int spawnIndex) {
+        if (!candidates.isEmpty()) {
+            int start = level.random.nextInt(candidates.size());
+            for (int i = 0; i < candidates.size(); i++) {
+                Mob target = candidates.get((start + i) % candidates.size());
+                if (!target.isAlive() || target.getTarget() != player) {
+                    continue;
+                }
+                BlockPos predicted = predictTargetBlockPos(target, data);
+                BlockPos spawnPos = findVerticalDropSpace(level, predicted, data);
+                if (spawnPos != null) {
+                    return offsetOverlappingSpawn(level, spawnPos, spawnIndex);
+                }
+            }
+        }
+
+        return findRandomFallingSpawnPos(level, player, data, spawnIndex);
+    }
+
+    private static BlockPos predictTargetBlockPos(Mob target, JsonObject data) {
+        int minHeight = getInt(data, "min_height", 5);
+        int maxHeight = Math.max(minHeight, getInt(data, "max_height", 10));
+        int height = (minHeight + maxHeight) / 2;
+        double fallTicks = Math.sqrt(height / 0.02D);
+        Vec3 movement = target.getDeltaMovement();
+        double maxLead = data.has("max_lead") ? Math.max(0.0D, data.get("max_lead").getAsDouble()) : 6.0D;
+        double leadX = Mth.clamp(movement.x * fallTicks, -maxLead, maxLead);
+        double leadZ = Mth.clamp(movement.z * fallTicks, -maxLead, maxLead);
+        return BlockPos.containing(target.getX() + leadX, target.getY(), target.getZ() + leadZ);
+    }
+
+    private static BlockPos findVerticalDropSpace(ServerLevel level, BlockPos targetPos, JsonObject data) {
+        int preferredMin = getInt(data, "min_height", 5);
+        int preferredMax = Math.max(preferredMin, getInt(data, "max_height", 10));
+        int fallbackMin = Math.min(preferredMin, getInt(data, "fallback_min_height", 3));
+        int maxHeight = Math.min(level.getMaxBuildHeight() - targetPos.getY() - 1, preferredMax);
+        for (int height = maxHeight; height >= fallbackMin; height--) {
+            BlockPos pos = targetPos.above(height);
+            if (canSpawnFallingBlockAt(level, pos)) {
+                return pos;
+            }
+        }
+        return null;
+    }
+
+    private static BlockPos findRandomFallingSpawnPos(ServerLevel level, Player player, JsonObject data, int spawnIndex) {
+        int radius = getInt(data, "random_radius", 16);
+        for (int attempts = 0; attempts < 32; attempts++) {
+            int x = Mth.floor(player.getX()) + level.random.nextInt(radius * 2 + 1) - radius;
+            int z = Mth.floor(player.getZ()) + level.random.nextInt(radius * 2 + 1) - radius;
+            int y = Mth.floor(player.getY()) + level.random.nextInt(9) - 4;
+            BlockPos target = new BlockPos(x, y, z);
+            BlockPos spawnPos = findVerticalDropSpace(level, target, data);
+            if (spawnPos != null) {
+                return offsetOverlappingSpawn(level, spawnPos, spawnIndex);
+            }
+        }
+        return null;
+    }
+
+    private static BlockPos offsetOverlappingSpawn(ServerLevel level, BlockPos pos, int spawnIndex) {
+        if (spawnIndex <= 0) {
+            return pos;
+        }
+        for (int attempts = 0; attempts < 8; attempts++) {
+            int distance = 1 + level.random.nextInt(2);
+            int x = level.random.nextBoolean() ? distance : -distance;
+            int z = level.random.nextBoolean() ? distance : -distance;
+            int y = Math.min(3, spawnIndex + attempts / 4);
+            BlockPos offset = pos.offset(x, y, z);
+            if (canSpawnFallingBlockAt(level, offset)) {
+                return offset;
+            }
+        }
+        BlockPos raised = pos.above(Math.min(3, spawnIndex));
+        return canSpawnFallingBlockAt(level, raised) ? raised : pos;
+    }
+
+    private static boolean canSpawnFallingBlockAt(ServerLevel level, BlockPos pos) {
+        if (pos.getY() <= level.getMinBuildHeight() || pos.getY() >= level.getMaxBuildHeight()) {
+            return false;
+        }
+        return level.getBlockState(pos).isAir() && level.getBlockState(pos.below()).isAir();
+    }
+
+    private static int getInt(JsonObject data, String field, int fallback) {
+        if (!data.has(field)) {
+            return fallback;
+        }
+        return data.get(field).getAsInt();
+    }
+
+    private record FallingLootPayload(BlockState visualState, List<ItemStack> drops) {}
+
+    private static boolean spawnTrailToMatchingBlock(Level level, BlockPos origin, BlockState state, JsonObject data) {
+        if (!(level instanceof ServerLevel serverLevel) || state.isAir()) {
+            return false;
+        }
+
+        int horizontalRange = data.has("horizontal_range") ? Math.max(1, data.get("horizontal_range").getAsInt()) : 16;
+        int verticalRange = data.has("vertical_range") ? Math.max(1, data.get("vertical_range").getAsInt()) : 10;
+        BlockPos target = null;
+        double bestDistance = Double.MAX_VALUE;
+        for (BlockPos candidate : BlockPos.betweenClosed(origin.offset(-horizontalRange, -verticalRange, -horizontalRange), origin.offset(horizontalRange, verticalRange, horizontalRange))) {
+            if (candidate.equals(origin)) {
+                continue;
+            }
+            BlockState candidateState = level.getBlockState(candidate);
+            if (candidateState.is(state.getBlock())) {
+                double distance = candidate.distSqr(origin);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    target = candidate.immutable();
+                }
+            }
+        }
+
+        if (target == null) {
+            return false;
+        }
+
+        spawnTrailParticles(serverLevel, Vec3.atCenterOf(origin), Vec3.atCenterOf(target), data);
+        return true;
+    }
+
+    private static boolean spawnTrailToMatchingEntity(ServerLevel level, LivingEntity killed, JsonObject data) {
+        int horizontalRange = data.has("horizontal_range") ? Math.max(1, data.get("horizontal_range").getAsInt()) : 64;
+        int verticalRange = data.has("vertical_range") ? Math.max(1, data.get("vertical_range").getAsInt()) : 64;
+        AABB area = killed.getBoundingBox().inflate(horizontalRange, verticalRange, horizontalRange);
+        LivingEntity target = null;
+        double bestDistance = Double.MAX_VALUE;
+        for (LivingEntity candidate : level.getEntitiesOfClass(LivingEntity.class, area, entity -> entity.isAlive() && entity.getType() == killed.getType() && entity != killed)) {
+            double distance = candidate.distanceToSqr(killed);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                target = candidate;
+            }
+        }
+
+        if (target == null) {
+            return false;
+        }
+
+        spawnTrailParticles(level, killed.position().add(0.0D, killed.getBbHeight() * 0.5D, 0.0D), target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D), data);
+        return true;
+    }
+
+    private static void spawnTrailParticles(ServerLevel level, Vec3 start, Vec3 end, JsonObject data) {
+        ParticleOptions particle = getConfiguredParticle(data, ParticleTypes.HAPPY_VILLAGER);
+        int steps = data.has("steps") ? Math.max(2, data.get("steps").getAsInt()) : 24;
+        double spread = data.has("spread") ? data.get("spread").getAsDouble() : 0.03D;
+        double speed = data.has("speed") ? data.get("speed").getAsDouble() : 0.01D;
+        Vec3 delta = end.subtract(start);
+        for (int i = 0; i <= steps; i++) {
+            double progress = i / (double)steps;
+            Vec3 point = start.add(delta.scale(progress));
+            level.sendParticles(particle, point.x, point.y, point.z, 1, spread, spread, spread, speed);
+        }
+    }
+
+    private static ParticleOptions getConfiguredParticle(JsonObject data, ParticleOptions fallback) {
+        if (!data.has("particle")) {
+            return fallback;
+        }
+
+        return (ParticleOptions)BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(data.get("particle").getAsString()));
     }
 
     public static void applyTemporaryEnchantmentModifiers(ItemStack stack, ListTag enchantments) {

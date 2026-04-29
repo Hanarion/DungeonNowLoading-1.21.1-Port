@@ -196,6 +196,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.MIMICART.get(), MimicartRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.MIMICLING_FALLING_BLOCK.get(), MimiclingFallingBlockRenderer::new);
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
@@ -329,6 +330,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        registry.register(DNLParticleTypes.MIMICLING_IMPACT_BLOCK_PARTICLE.get(), new MimiclingImpactBlockParticle.Factory());
     }
 
     private static void addDnlEnchantmentDescriptions(ItemStack stack, List<Component> lines) {

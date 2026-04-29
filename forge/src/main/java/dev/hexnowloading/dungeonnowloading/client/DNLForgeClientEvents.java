@@ -131,6 +131,7 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.MIMICART.get(), MimicartRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.MIMICLING_FALLING_BLOCK.get(), MimiclingFallingBlockRenderer::new);
         // Block Entities
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
@@ -212,6 +213,7 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        event.registerSpecial(DNLParticleTypes.MIMICLING_IMPACT_BLOCK_PARTICLE.get(), new MimiclingImpactBlockParticle.Factory());
     }
 
     public static void onRegisterBlockRenderTypes(FMLClientSetupEvent event) {

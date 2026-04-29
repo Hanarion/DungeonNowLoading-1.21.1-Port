@@ -339,8 +339,12 @@ public final class MimiclingFoods {
         Set<String> actionManagedFoods = new HashSet<>();
         for (EffectDefinition effect : getActiveEffects(mimicling)) {
             if (effect.matches("while_in_hand", "remove_underwater_mining_penalty")
+                    || effect.matches("on_break", "grant_air")
+                    || effect.matches("on_break", "trail_to_matching_block")
                     || effect.matches("change_drop", "auto_smelt")
                     || effect.matches("change_drop", "collect_drops_to_inventory")
+                    || effect.matches("change_drop", "drop_loot_as_falling_blocks")
+                    || effect.matches("on_kill", "trail_to_matching_entity")
                     || effect.matches("on_kill", "summon_entities_at_death")
                     || effect.matches("on_kill", "roll_effect_group")) {
                 actionManagedFoods.add(effect.ownerId());
@@ -708,19 +712,33 @@ public final class MimiclingFoods {
 
         private void syncFoodDefinitions(Map<String, FoodDefinition> foodsById, Map<Item, FoodDefinition> itemFoods, List<TagFoodEntry> tagFoods) {
             for (Map.Entry<Item, FoodDefinition> entry : itemFoods.entrySet()) {
-                FoodDefinition updated = foodsById.get(entry.getValue().id());
-                if (updated != null) {
-                    entry.setValue(updated);
+                FoodDefinition shared = foodsById.get(entry.getValue().id());
+                if (shared != null) {
+                    entry.setValue(withSharedSynergies(entry.getValue(), shared));
                 }
             }
 
             for (int i = 0; i < tagFoods.size(); i++) {
                 TagFoodEntry entry = tagFoods.get(i);
-                FoodDefinition updated = foodsById.get(entry.food().id());
-                if (updated != null) {
-                    tagFoods.set(i, new TagFoodEntry(entry.tag(), updated));
+                FoodDefinition shared = foodsById.get(entry.food().id());
+                if (shared != null) {
+                    tagFoods.set(i, new TagFoodEntry(entry.tag(), withSharedSynergies(entry.food(), shared)));
                 }
             }
+        }
+
+        private FoodDefinition withSharedSynergies(FoodDefinition food, FoodDefinition shared) {
+            return new FoodDefinition(
+                    food.id(),
+                    food.durability(),
+                    food.usageCount(),
+                    food.infiniteUsage(),
+                    food.returnOnReplacement(),
+                    food.returnItem(),
+                    food.description(),
+                    food.effects(),
+                    shared.synergyEffects()
+            );
         }
 
         private Set<String> parseDisabledEffectIds(JsonObject object) {

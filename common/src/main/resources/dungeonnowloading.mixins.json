@@ -8,13 +8,17 @@
     "FireBlockAccessor",
     "block.MimiclingBlockSmeltTransformMixin",
     "block.MimiclingBlockDropsMixin",
+    "block.MimiclingReachServerGameModeMixin",
     "inventory.AnvilMenuMixin",
     "entities.MimiclingLivingEntityMixin",
     "entities.MimiclingPlayerMixin",
+    "entities.MimiclingReachServerPacketMixin",
     "items.ItemStackBreakProtectionMixin"
   ],
   "client": [
-    "MixinMinecraft"
+    "MixinMinecraft",
+    "client.MimiclingReachGameRendererMixin",
+    "client.MimiclingReachClientGameModeMixin"
   ],
   "server": [
   ],

@@ -104,6 +104,30 @@
       "usage_count": 0
     },
     {
+      "item": "minecraft:egg",
+      "durability": 30,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:turtle_egg",
+      "durability": 50,
+      "usage_count": 50,
+      "description": ["All forms: removes underwater mining penalty.", "On break, restores 3 oxygen bubbles."],
+      "effects": [
+        {
+          "trigger": "while_in_hand",
+          "action": "remove_underwater_mining_penalty",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "penalty_reduction": 1.0
+        },
+        {
+          "trigger": "on_break",
+          "action": "grant_air",
+          "bubbles": 3
+        }
+      ]
+    },
+    {
       "item": "minecraft:axolotl_bucket",
       "durability": 14,
       "usage_count": 0,
@@ -582,6 +606,19 @@
       ]
     },
     {
+      "item": "minecraft:ender_eye",
+      "durability": 10,
+      "usage_count": 1,
+      "description": ["While held in main hand, Mimicling reach becomes 12 blocks."],
+      "effects": [
+        {
+          "trigger": "while_in_hand",
+          "action": "extend_reach",
+          "range": 12
+        }
+      ]
+    },
+    {
       "item": "minecraft:ender_pearl",
       "durability": 10,
       "usage_count": 10,
@@ -608,6 +645,49 @@
         {
           "trigger": "reference_potion_effect",
           "action": "death_effect_cloud"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:dragon_egg",
+      "durability": 0,
+      "usage_count": 0,
+      "infinite_usage": true,
+      "description": ["Infinite uses.", "Mined loot falls above an enemy targeting you within 32 blocks.", "Returns when replaced."],
+      "effects": [
+        {
+          "trigger": "change_drop",
+          "action": "drop_loot_as_falling_blocks",
+          "radius": 32,
+          "min_height": 5,
+          "max_height": 10,
+          "fallback_min_height": 3,
+          "random_radius": 16,
+          "max_lead": 6
+        }
+      ]
+    },
+    {
+      "item": "minecraft:sniffer_egg",
+      "durability": 500,
+      "usage_count": 100,
+      "description": ["On break, trails toward a nearby matching block.", "On kill, trails toward a nearby matching entity."],
+      "effects": [
+        {
+          "trigger": "on_break",
+          "action": "trail_to_matching_block",
+          "horizontal_range": 16,
+          "vertical_range": 10,
+          "particle": "minecraft:happy_villager",
+          "steps": 24
+        },
+        {
+          "trigger": "on_kill",
+          "action": "trail_to_matching_entity",
+          "horizontal_range": 64,
+          "vertical_range": 64,
+          "particle": "minecraft:happy_villager",
+          "steps": 32
         }
       ]
     }

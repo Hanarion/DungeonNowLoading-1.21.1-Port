@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.registry;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.GreatExperienceBottleEntity;
+import dev.hexnowloading.dungeonnowloading.entity.misc.MimiclingFallingBlockEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
@@ -70,6 +71,7 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<RepulsorEntity>> REPULSOR = register("repulsor", () -> EntityType.Builder.<RepulsorEntity>of(RepulsorEntity::new, MobCategory.MISC).sized(0.99F, 0.3F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "command_pylon").toString()));
     public static final Supplier<EntityType<SeepingSoulEntity>> SEEPING_SOUL = register("seeping_soul", () -> EntityType.Builder.<SeepingSoulEntity>of(SeepingSoulEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "seeping_soul").toString()));
     public static final Supplier<EntityType<MimicartEntity>> MIMICART = register("mimicart", () -> EntityType.Builder.<MimicartEntity>of(MimicartEntity::new, MobCategory.MISC).sized(0.98F, 0.7F).clientTrackingRange(8).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "wayward_lantern_minecart").toString()));
+    public static final Supplier<EntityType<MimiclingFallingBlockEntity>> MIMICLING_FALLING_BLOCK = register("mimicling_falling_block", () -> EntityType.Builder.<MimiclingFallingBlockEntity>of(MimiclingFallingBlockEntity::new, MobCategory.MISC).sized(0.98F, 0.98F).clientTrackingRange(10).updateInterval(20).build(new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_falling_block").toString()));
 
     private static <T extends EntityType<?>> Supplier<T> register(String name, Supplier<T> entityTypeSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ENTITY_TYPE, name, entityTypeSupplier);
