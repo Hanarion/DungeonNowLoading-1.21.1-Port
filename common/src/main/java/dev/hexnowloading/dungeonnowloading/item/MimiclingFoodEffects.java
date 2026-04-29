@@ -1,17 +1,21 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -19,6 +23,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.BlockItem;
@@ -74,7 +81,7 @@ public final class MimiclingFoodEffects {
                 breakMatchingNeighborBlocks(stack, level, pos, state, entity, effect.data());
             } else if (effect.matches("change_drop", "auto_smelt") && formsMatch(stack, effect.data())) {
                 consumeAutoSmeltUsageAfterBreak(stack, level, state);
-            } else if (effect.matches("while_in_hand", "remove_underwater_mining_penalty")) {
+            } else if (effect.matches("while_in_hand", "remove_underwater_mining_penalty") && formsMatch(stack, effect.data())) {
                 consumeUnderwaterMiningPenaltyUsage(stack, entity, effect);
             }
         }
@@ -88,12 +95,20 @@ public final class MimiclingFoodEffects {
         for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
             if (effect.matches("change_mob_position", "teleport_to_memorized_position")) {
                 teleportTarget(stack, target, effect.data());
+                consumeEffectUsage(stack, effect);
+            } else if (effect.matches("change_mob_position", "swap_positions")) {
+                if (swapPositions(attacker, target)) {
+                    consumeEffectUsage(stack, effect);
+                }
             } else if (effect.matches("on_attack", "auto_switch_unsuited_tool")) {
                 MimiclingItem.tryTransformHeldOrEquippedToForm(stack, attacker, MimiclingItem.getWorstCombatForm(stack), MimiclingItem.getAttackUseDurabilityCost(stack), true);
-            } else if (effect.matches("apply_non_potion_effect", "jump_up")) {
+                consumeEffectUsage(stack, effect);
+            } else if (effect.matches("apply_non_potion_effect", "jump_up") && formsMatch(stack, effect.data())) {
                 jumpTarget(target, effect.data());
-            } else if (effect.matches("apply_potion_effect", "inflict_status_effect")) {
+                consumeEffectUsage(stack, effect);
+            } else if (effect.matches("apply_potion_effect", "inflict_status_effect") && formsMatch(stack, effect.data())) {
                 inflictStatusEffects(stack, target, effect.data());
+                consumeEffectUsage(stack, effect);
             }
         }
         convertActiveStatusEffects(stack, target);
@@ -101,6 +116,24 @@ public final class MimiclingFoodEffects {
 
     public static boolean hasUnderwaterMiningSpeedEffect(Player player) {
         return hasMimiclingEffect(player.getMainHandItem(), "while_in_hand", "remove_underwater_mining_penalty");
+    }
+
+    public static float getUnderwaterMiningSpeedMultiplier(Player player) {
+        ItemStack stack = player.getMainHandItem();
+        if (!isMimiclingStack(stack)) {
+            return 1.0F;
+        }
+
+        float multiplier = 1.0F;
+        for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
+            if (!effect.matches("while_in_hand", "remove_underwater_mining_penalty") || !formsMatch(stack, effect.data())) {
+                continue;
+            }
+
+            float reduction = effect.data().has("penalty_reduction") ? effect.data().get("penalty_reduction").getAsFloat() : 1.0F;
+            multiplier = Math.max(multiplier, 1.0F + Mth.clamp(reduction, 0.0F, 1.0F) * 4.0F);
+        }
+        return multiplier;
     }
 
     private static void consumeUnderwaterMiningPenaltyUsage(ItemStack stack, LivingEntity entity, MimiclingFoods.EffectDefinition effect) {
@@ -111,6 +144,16 @@ public final class MimiclingFoodEffects {
             MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1);
         }
         MimiclingFoods.markUsageHandled(stack, effect.ownerId());
+    }
+
+    private static void consumeEffectUsage(ItemStack stack, MimiclingFoods.EffectDefinition effect) {
+        if (MimiclingFoods.isUsageHandled(stack, effect.ownerId())) {
+            return;
+        }
+
+        if (MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1)) {
+            MimiclingFoods.markUsageHandled(stack, effect.ownerId());
+        }
     }
 
     public static boolean tryTransformSmeltedBlockBeforeBreak(ServerLevel level, BlockPos pos, ItemStack tool) {
@@ -154,7 +197,7 @@ public final class MimiclingFoodEffects {
         DropTransformResult configuredDrops = applyConfiguredDropEffects(tool, state, builder.getLevel(), originalDrops);
         List<ItemStack> drops = configuredDrops.drops();
         if (configuredDrops.replacedOriginal()) {
-            return drops;
+            return collectDropsToInventoryIfConfigured(tool, builder, drops);
         }
 
         ServerLevel level = builder.getLevel();
@@ -174,15 +217,15 @@ public final class MimiclingFoodEffects {
                 List<ItemStack> blockDrops = smeltBlockItemDrop(level, origin, state, tool, drops);
                 if (blockDrops != drops) {
                     consumeAutoSmeltUsage(tool, true);
-                    return blockDrops;
+                    return collectDropsToInventoryIfConfigured(tool, builder, blockDrops);
                 }
                 SmeltedDropResult smeltedDrops = smeltDrops(level, origin, drops);
                 consumeAutoSmeltUsage(tool, smeltedDrops.changed());
-                return smeltedDrops.drops();
+                return collectDropsToInventoryIfConfigured(tool, builder, smeltedDrops.drops());
             }
         }
 
-        return drops;
+        return collectDropsToInventoryIfConfigured(tool, builder, drops);
     }
 
     private static void consumeAutoSmeltUsage(ItemStack tool, boolean changedDrops) {
@@ -239,8 +282,33 @@ public final class MimiclingFoodEffects {
             return;
         }
 
-        ItemStack mimicling = getActiveMimiclingWithEffect(livingAttacker, "reference_potion_effect", "death_effect_cloud");
-        if (mimicling.isEmpty() || target.getActiveEffects().isEmpty()) {
+        for (ItemStack mimicling : getActiveMimiclingStacks(livingAttacker)) {
+            for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(mimicling)) {
+                if (effect.matches("reference_potion_effect", "death_effect_cloud")) {
+                    spawnDeathEffectCloud(target, livingAttacker, level);
+                } else if (effect.matches("on_kill", "roll_effect_group")) {
+                    if (rollDeathEffectGroup(mimicling, target, level, effect)) {
+                        consumeEffectUsage(mimicling, effect);
+                    }
+                } else if (effect.matches("on_kill", "summon_entities_at_death")) {
+                    if (trySummonEntitiesAtDeath(target, level, effect.data())) {
+                        consumeEffectUsage(mimicling, effect);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void applyTemporaryEnchantmentModifiers(ItemStack stack, ListTag enchantments) {
+        for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
+            if (effect.matches("while_in_hand", "modify_enchantment") && formsMatch(stack, effect.data())) {
+                applyTemporaryEnchantmentModifier(enchantments, effect.data());
+            }
+        }
+    }
+
+    private static void spawnDeathEffectCloud(LivingEntity target, LivingEntity livingAttacker, ServerLevel level) {
+        if (target.getActiveEffects().isEmpty()) {
             return;
         }
 
@@ -251,18 +319,289 @@ public final class MimiclingFoodEffects {
         cloud.setWaitTime(10);
         cloud.setDuration(200);
         cloud.setRadiusPerTick(-cloud.getRadius() / cloud.getDuration());
-        for (MobEffectInstance effect : target.getActiveEffects()) {
-            cloud.addEffect(new MobEffectInstance(effect));
+        for (MobEffectInstance activeEffect : target.getActiveEffects()) {
+            cloud.addEffect(new MobEffectInstance(activeEffect));
         }
         level.addFreshEntity(cloud);
     }
 
-    public static void applyTemporaryEnchantmentModifiers(ItemStack stack, ListTag enchantments) {
-        for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
-            if (effect.matches("while_in_hand", "modify_enchantment") && formsMatch(stack, effect.data())) {
-                applyTemporaryEnchantmentModifier(enchantments, effect.data());
+    private static boolean rollDeathEffectGroup(ItemStack mimicling, LivingEntity target, ServerLevel level, MimiclingFoods.EffectDefinition effect) {
+        JsonObject data = effect.data();
+        if (!data.has("entries") || !data.get("entries").isJsonArray()) {
+            return false;
+        }
+
+        int rolls = data.has("rolls") ? Math.max(1, data.get("rolls").getAsInt()) : 1;
+        boolean succeeded = false;
+        JsonArray entries = data.getAsJsonArray("entries");
+        for (int i = 0; i < rolls; i++) {
+            JsonObject rolledEffect = rollEffectEntry(entries, level);
+            if (rolledEffect != null && applyDeathEffect(target, level, rolledEffect)) {
+                succeeded = true;
             }
         }
+        return succeeded;
+    }
+
+    private static JsonObject rollEffectEntry(JsonArray entries, ServerLevel level) {
+        int totalWeight = 0;
+        for (JsonElement element : entries) {
+            if (element.isJsonObject()) {
+                JsonObject entry = element.getAsJsonObject();
+                totalWeight += entry.has("weight") ? Math.max(0, entry.get("weight").getAsInt()) : 1;
+            }
+        }
+        if (totalWeight <= 0) {
+            return null;
+        }
+
+        int roll = level.random.nextInt(totalWeight);
+        for (JsonElement element : entries) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+
+            JsonObject entry = element.getAsJsonObject();
+            int weight = entry.has("weight") ? Math.max(0, entry.get("weight").getAsInt()) : 1;
+            if (roll < weight) {
+                return entry.has("effect") && entry.get("effect").isJsonObject() ? entry.getAsJsonObject("effect") : entry;
+            }
+            roll -= weight;
+        }
+        return null;
+    }
+
+    private static boolean applyDeathEffect(LivingEntity target, ServerLevel level, JsonObject effect) {
+        if (!effect.has("action")) {
+            return false;
+        }
+
+        String action = effect.get("action").getAsString();
+        if ("summon_entities_at_death".equals(action)) {
+            return trySummonEntitiesAtDeath(target, level, effect);
+        }
+        return false;
+    }
+
+    private static boolean trySummonEntitiesAtDeath(LivingEntity target, ServerLevel level, JsonObject data) {
+        if (isBabyLikeSplitTarget(target)) {
+            return false;
+        }
+
+        float chance = data.has("chance") ? data.get("chance").getAsFloat() : 1.0F;
+        if (level.random.nextFloat() >= chance) {
+            return false;
+        }
+
+        int count = data.has("count") ? Math.max(1, data.get("count").getAsInt()) : 1;
+        JsonArray entities = data.has("entities") && data.get("entities").isJsonArray() ? data.getAsJsonArray("entities") : new JsonArray();
+        if (entities.isEmpty()) {
+            JsonObject killedEntity = new JsonObject();
+            killedEntity.addProperty("type", "killed_entity");
+            entities.add(killedEntity);
+        }
+
+        List<LivingEntity> summoned = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            JsonObject entityData = getEntityEntry(entities, i);
+            LivingEntity entity = createConfiguredEntity(entityData, target, level);
+            if (entity == null) {
+                return false;
+            }
+            summoned.add(entity);
+        }
+
+        Vec3[] motions = getSummonMotions(level, data, summoned.size());
+        Vec3 center = target.position();
+        for (int i = 0; i < summoned.size(); i++) {
+            LivingEntity entity = summoned.get(i);
+            entity.moveTo(center.x, center.y, center.z, target.getYRot(), target.getXRot());
+            entity.setDeltaMovement(motions[i]);
+            entity.hasImpulse = true;
+            copyStatusEffectsFromKilledEntity(entity, target, data);
+            level.addFreshEntity(entity);
+        }
+        return true;
+    }
+
+    private static boolean isBabyLikeSplitTarget(LivingEntity target) {
+        if (target.isBaby()) {
+            return true;
+        }
+
+        if (target.getType() == EntityType.SLIME || target.getType() == EntityType.MAGMA_CUBE) {
+            CompoundTag tag = new CompoundTag();
+            target.saveWithoutId(tag);
+            return tag.contains("Size") && tag.getInt("Size") <= 0;
+        }
+
+        return false;
+    }
+
+    private static void copyStatusEffectsFromKilledEntity(LivingEntity summoned, LivingEntity killedEntity, JsonObject data) {
+        if (!data.has("copy_status_effects") || killedEntity.getActiveEffects().isEmpty()) {
+            return;
+        }
+
+        JsonObject copy = data.get("copy_status_effects").isJsonObject() ? data.getAsJsonObject("copy_status_effects") : new JsonObject();
+        double durationMultiplier = copy.has("duration_multiplier") ? copy.get("duration_multiplier").getAsDouble() : 0.5D;
+        double levelMultiplier = copy.has("level_multiplier") ? copy.get("level_multiplier").getAsDouble() : 0.5D;
+        int minDuration = copy.has("min_duration") ? copy.get("min_duration").getAsInt() : 1;
+        for (MobEffectInstance activeEffect : killedEntity.getActiveEffects()) {
+            int duration = Math.max(minDuration, (int)Math.ceil(activeEffect.getDuration() * durationMultiplier));
+            int level = activeEffect.getAmplifier() + 1;
+            int copiedLevel = Math.max(1, (int)Math.ceil(level * levelMultiplier));
+            summoned.addEffect(new MobEffectInstance(
+                    activeEffect.getEffect(),
+                    duration,
+                    copiedLevel - 1,
+                    activeEffect.isAmbient(),
+                    activeEffect.isVisible(),
+                    activeEffect.showIcon()
+            ));
+        }
+    }
+
+    private static JsonObject getEntityEntry(JsonArray entities, int index) {
+        JsonElement element = entities.get(Math.min(index, entities.size() - 1));
+        return element.isJsonObject() ? element.getAsJsonObject() : new JsonObject();
+    }
+
+    private static LivingEntity createConfiguredEntity(JsonObject data, LivingEntity target, ServerLevel level) {
+        Entity entity;
+        String type = data.has("type") ? data.get("type").getAsString() : "killed_entity";
+        if ("killed_entity".equals(type)) {
+            entity = target.getType().create(level);
+        } else {
+            entity = EntityType.byString(type).map(entityType -> entityType.create(level)).orElse(null);
+        }
+        if (!(entity instanceof LivingEntity livingEntity)) {
+            return null;
+        }
+
+        if (livingEntity instanceof Mob mob) {
+            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(target.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+        }
+        if (!applyEntityNbt(livingEntity, data, target)) {
+            return null;
+        }
+
+        livingEntity.setHealth(livingEntity.getMaxHealth());
+        return livingEntity;
+    }
+
+    private static boolean applyEntityNbt(LivingEntity entity, JsonObject data, LivingEntity killedEntity) {
+        if (data.has("nbt")) {
+            applyEntityNbt(entity, data.get("nbt").getAsString());
+        }
+
+        if (!data.has("nbt_overrides") || !data.get("nbt_overrides").isJsonArray()) {
+            return true;
+        }
+
+        ResourceLocation killedEntityId = BuiltInRegistries.ENTITY_TYPE.getKey(killedEntity.getType());
+        for (JsonElement element : data.getAsJsonArray("nbt_overrides")) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+
+            JsonObject override = element.getAsJsonObject();
+            if (!override.has("when_killed")) {
+                continue;
+            }
+
+            if (killedEntityId.equals(new ResourceLocation(override.get("when_killed").getAsString()))) {
+                if (override.has("nbt")) {
+                    applyEntityNbt(entity, override.get("nbt").getAsString());
+                }
+                return applyCopiedKilledEntityNbt(entity, killedEntity, override);
+            }
+        }
+        return true;
+    }
+
+    private static boolean applyCopiedKilledEntityNbt(LivingEntity entity, LivingEntity killedEntity, JsonObject data) {
+        if (!data.has("copy_killed_nbt") || !data.get("copy_killed_nbt").isJsonArray()) {
+            return true;
+        }
+
+        CompoundTag killedNbt = new CompoundTag();
+        killedEntity.saveWithoutId(killedNbt);
+        CompoundTag entityNbt = new CompoundTag();
+        entity.saveWithoutId(entityNbt);
+        for (JsonElement element : data.getAsJsonArray("copy_killed_nbt")) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+
+            JsonObject copy = element.getAsJsonObject();
+            if (!copy.has("from") || !copy.has("to") || !killedNbt.contains(copy.get("from").getAsString())) {
+                if (copy.has("fail_unmapped") && copy.get("fail_unmapped").getAsBoolean()) {
+                    return false;
+                }
+                continue;
+            }
+
+            String from = copy.get("from").getAsString();
+            String to = copy.get("to").getAsString();
+            int value = killedNbt.getInt(from);
+            if (copy.has("map") && copy.get("map").isJsonObject()) {
+                JsonObject map = copy.getAsJsonObject("map");
+                String key = Integer.toString(value);
+                if (map.has(key)) {
+                    value = map.get(key).getAsInt();
+                } else if (copy.has("fail_unmapped") && copy.get("fail_unmapped").getAsBoolean()) {
+                    return false;
+                }
+            }
+            if (copy.has("subtract")) {
+                value -= copy.get("subtract").getAsInt();
+            }
+            if (copy.has("add")) {
+                value += copy.get("add").getAsInt();
+            }
+            if (copy.has("min")) {
+                value = Math.max(copy.get("min").getAsInt(), value);
+            }
+            if (copy.has("max")) {
+                value = Math.min(copy.get("max").getAsInt(), value);
+            }
+            entityNbt.putInt(to, value);
+        }
+        entity.load(entityNbt);
+        return true;
+    }
+
+    private static void applyEntityNbt(LivingEntity entity, String rawNbt) {
+        try {
+            entity.load(TagParser.parseTag(rawNbt));
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static Vec3[] getSummonMotions(ServerLevel level, JsonObject data, int count) {
+        JsonObject motion = data.has("motion") && data.get("motion").isJsonObject() ? data.getAsJsonObject("motion") : new JsonObject();
+        double upward = motion.has("upward") ? motion.get("upward").getAsDouble() : 0.25D;
+        double horizontal = motion.has("horizontal") ? motion.get("horizontal").getAsDouble() : 0.18D;
+        boolean oppositePairs = !motion.has("opposite_pairs") || motion.get("opposite_pairs").getAsBoolean();
+        Vec3[] motions = new Vec3[count];
+        double angle = level.random.nextDouble() * Math.PI * 2.0D;
+        Vec3 base = new Vec3(Math.cos(angle) * horizontal, upward, Math.sin(angle) * horizontal);
+        for (int i = 0; i < count; i++) {
+            if (oppositePairs && i % 2 == 1) {
+                motions[i] = new Vec3(-motions[i - 1].x, upward, -motions[i - 1].z);
+            } else if (oppositePairs) {
+                motions[i] = i == 0 ? base : rotateHorizontal(base, level.random.nextDouble() * Math.PI * 2.0D);
+            } else {
+                motions[i] = rotateHorizontal(base, level.random.nextDouble() * Math.PI * 2.0D);
+            }
+        }
+        return motions;
+    }
+
+    private static Vec3 rotateHorizontal(Vec3 vector, double angle) {
+        double horizontal = Math.sqrt(vector.x * vector.x + vector.z * vector.z);
+        return new Vec3(Math.cos(angle) * horizontal, vector.y, Math.sin(angle) * horizontal);
     }
 
     private static void applyTemporaryEnchantmentModifier(ListTag enchantments, JsonObject data) {
@@ -399,6 +738,41 @@ public final class MimiclingFoodEffects {
                 target.getZ() + (target.getRandom().nextDouble() - 0.5D) * radius * 2.0D,
                 true
         );
+    }
+
+    private static boolean swapPositions(LivingEntity attacker, LivingEntity target) {
+        if (attacker.level() != target.level() || attacker.isPassenger() || target.isPassenger()) {
+            return false;
+        }
+
+        double attackerX = attacker.getX();
+        double attackerY = attacker.getY();
+        double attackerZ = attacker.getZ();
+        float attackerYRot = attacker.getYRot();
+        float attackerXRot = attacker.getXRot();
+        Vec3 attackerMovement = attacker.getDeltaMovement();
+
+        double targetX = target.getX();
+        double targetY = target.getY();
+        double targetZ = target.getZ();
+        float targetYRot = target.getYRot();
+        float targetXRot = target.getXRot();
+        Vec3 targetMovement = target.getDeltaMovement();
+
+        attacker.teleportTo(targetX, targetY, targetZ);
+        attacker.setYRot(targetYRot);
+        attacker.setXRot(targetXRot);
+        attacker.setDeltaMovement(targetMovement);
+        attacker.hasImpulse = true;
+
+        target.teleportTo(attackerX, attackerY, attackerZ);
+        target.setYRot(attackerYRot);
+        target.setXRot(attackerXRot);
+        target.setDeltaMovement(attackerMovement);
+        target.hasImpulse = true;
+        attacker.level().playSound(null, attackerX, attackerY, attackerZ, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
+        attacker.level().playSound(null, targetX, targetY, targetZ, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
+        return true;
     }
 
     private static boolean isTeleportImmune(LivingEntity target, JsonObject data) {
@@ -631,6 +1005,58 @@ public final class MimiclingFoodEffects {
         return drops;
     }
 
+    private static List<ItemStack> collectDropsToInventoryIfConfigured(ItemStack tool, LootParams.Builder builder, List<ItemStack> drops) {
+        MimiclingFoods.EffectDefinition collectEffect = getConfiguredEffect(tool, "change_drop", "collect_drops_to_inventory");
+        if (drops.isEmpty() || collectEffect == null) {
+            return drops;
+        }
+
+        Entity entity = builder.getOptionalParameter(LootContextParams.THIS_ENTITY);
+        if (!(entity instanceof Player player) || player.level().isClientSide) {
+            return drops;
+        }
+
+        List<ItemStack> remainingDrops = new ArrayList<>();
+        int insertedCount = 0;
+        for (ItemStack drop : drops) {
+            ItemStack remaining = drop.copy();
+            int beforeCount = remaining.getCount();
+            boolean fullyInserted = player.getInventory().add(remaining);
+            insertedCount += beforeCount - remaining.getCount();
+            if (!fullyInserted && !remaining.isEmpty()) {
+                remainingDrops.add(remaining);
+            }
+        }
+        if (insertedCount > 0) {
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.45F, 1.35F);
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+            ItemStack usageStack = getHeldMimiclingForDropEffect(player, tool, "change_drop", "collect_drops_to_inventory");
+            MimiclingFoods.EffectDefinition usageEffect = getConfiguredEffect(usageStack, "change_drop", "collect_drops_to_inventory");
+            if (usageEffect == null) {
+                usageStack = tool;
+                usageEffect = collectEffect;
+            }
+            if (MimiclingFoods.consumeUsage(usageStack, usageEffect.ownerId(), 1)) {
+                MimiclingFoods.markUsageHandled(usageStack, usageEffect.ownerId());
+            }
+        }
+        return remainingDrops;
+    }
+
+    private static ItemStack getHeldMimiclingForDropEffect(Player player, ItemStack fallback, String trigger, String action) {
+        ItemStack mainHand = player.getMainHandItem();
+        if (isMimiclingStack(mainHand) && getConfiguredEffect(mainHand, trigger, action) != null && getForm(mainHand).equals(getForm(fallback))) {
+            return mainHand;
+        }
+
+        ItemStack offhand = player.getOffhandItem();
+        if (isMimiclingStack(offhand) && getConfiguredEffect(offhand, trigger, action) != null && getForm(offhand).equals(getForm(fallback))) {
+            return offhand;
+        }
+
+        return fallback;
+    }
+
     private record DropTransformResult(List<ItemStack> drops, boolean replacedOriginal) {}
 
     private static boolean hasMimiclingEffect(ItemStack stack, String type, String action) {
@@ -638,12 +1064,16 @@ public final class MimiclingFoodEffects {
     }
 
     private static boolean hasConfiguredEffect(ItemStack stack, String type, String action) {
+        return getConfiguredEffect(stack, type, action) != null;
+    }
+
+    private static MimiclingFoods.EffectDefinition getConfiguredEffect(ItemStack stack, String type, String action) {
         for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
             if (effect.matches(type, action) && formsMatch(stack, effect.data())) {
-                return true;
+                return effect;
             }
         }
-        return false;
+        return null;
     }
 
     private static boolean isMimiclingStack(ItemStack stack) {
@@ -677,14 +1107,15 @@ public final class MimiclingFoodEffects {
         return false;
     }
 
-    private static ItemStack getActiveMimiclingWithEffect(LivingEntity entity, String type, String action) {
-        if (hasMimiclingEffect(entity.getMainHandItem(), type, action)) {
-            return entity.getMainHandItem();
+    private static List<ItemStack> getActiveMimiclingStacks(LivingEntity entity) {
+        List<ItemStack> stacks = new ArrayList<>(2);
+        if (isMimiclingStack(entity.getMainHandItem())) {
+            stacks.add(entity.getMainHandItem());
         }
-        if (hasMimiclingEffect(entity.getOffhandItem(), type, action)) {
-            return entity.getOffhandItem();
+        if (isMimiclingStack(entity.getOffhandItem()) && entity.getOffhandItem() != entity.getMainHandItem()) {
+            stacks.add(entity.getOffhandItem());
         }
-        return ItemStack.EMPTY;
+        return stacks;
     }
 
     private static boolean isOre(BlockState state) {

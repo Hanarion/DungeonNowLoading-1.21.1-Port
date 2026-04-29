@@ -13,8 +13,9 @@ public class MimiclingPlayerMixin {
     @Inject(method = "getDestroySpeed", at = @At("RETURN"), cancellable = true)
     private void dnl$removeMimiclingUnderwaterMiningPenalty(BlockState state, CallbackInfoReturnable<Float> cir) {
         Player player = (Player)(Object)this;
-        if (player.isEyeInFluid(net.minecraft.tags.FluidTags.WATER) && !net.minecraft.world.item.enchantment.EnchantmentHelper.hasAquaAffinity(player) && MimiclingFoodEffects.hasUnderwaterMiningSpeedEffect(player)) {
-            cir.setReturnValue(cir.getReturnValue() * 5.0F);
+        float multiplier = MimiclingFoodEffects.getUnderwaterMiningSpeedMultiplier(player);
+        if (player.isEyeInFluid(net.minecraft.tags.FluidTags.WATER) && !net.minecraft.world.item.enchantment.EnchantmentHelper.hasAquaAffinity(player) && multiplier > 1.0F) {
+            cir.setReturnValue(cir.getReturnValue() * multiplier);
         }
     }
 }

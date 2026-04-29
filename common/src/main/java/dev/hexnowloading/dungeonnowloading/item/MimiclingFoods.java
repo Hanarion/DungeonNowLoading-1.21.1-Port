@@ -339,7 +339,10 @@ public final class MimiclingFoods {
         Set<String> actionManagedFoods = new HashSet<>();
         for (EffectDefinition effect : getActiveEffects(mimicling)) {
             if (effect.matches("while_in_hand", "remove_underwater_mining_penalty")
-                    || effect.matches("change_drop", "auto_smelt")) {
+                    || effect.matches("change_drop", "auto_smelt")
+                    || effect.matches("change_drop", "collect_drops_to_inventory")
+                    || effect.matches("on_kill", "summon_entities_at_death")
+                    || effect.matches("on_kill", "roll_effect_group")) {
                 actionManagedFoods.add(effect.ownerId());
             }
         }
@@ -452,6 +455,8 @@ public final class MimiclingFoods {
 
     public record SynergyEffectDefinition(String withItem, Set<String> disabledEffectIds, List<EffectDefinition> effects) {}
 
+    private record PendingSynergyDefinition(String ownerId, String withItem, Set<String> disabledEffectIds, List<EffectDefinition> effects) {}
+
     public record TagFoodEntry(TagKey<Item> tag, FoodDefinition food) {}
 
     public static class ReloadListener extends SimpleJsonResourceReloadListener {
@@ -467,10 +472,13 @@ public final class MimiclingFoods {
             Map<Item, FoodDefinition> itemFoods = new HashMap<>();
             Map<String, FoodDefinition> foodsById = new HashMap<>();
             List<TagFoodEntry> tagFoods = new ArrayList<>();
+            List<PendingSynergyDefinition> pendingSynergies = new ArrayList<>();
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : jsonMap.entrySet()) {
                 String path = entry.getKey().getPath();
-                if (!path.equals("mimicling") && !path.startsWith("mimicling/")) {
+                boolean isFoodFile = path.equals("mimicling") || path.startsWith("mimicling/");
+                boolean isSynergyFile = path.equals("mimicling_synergies") || path.startsWith("mimicling_synergies/");
+                if (!isFoodFile && !isSynergyFile) {
                     continue;
                 }
 
@@ -482,6 +490,11 @@ public final class MimiclingFoods {
                     }
 
                     JsonObject object = element.getAsJsonObject();
+                    if (isSynergyFile) {
+                        parseSynergyFile(entry.getKey(), object, pendingSynergies);
+                        continue;
+                    }
+
                     if (object.has("entries") && object.get("entries").isJsonArray()) {
                         JsonArray entries = object.getAsJsonArray("entries");
                         for (JsonElement foodElement : entries) {
@@ -498,8 +511,10 @@ public final class MimiclingFoods {
                 }
             }
 
+            applyPendingSynergies(foodsById, pendingSynergies);
+            syncFoodDefinitions(foodsById, itemFoods, tagFoods);
             replaceAll(foodsById, itemFoods, tagFoods);
-            logger.info("Loaded {} Mimicling food item entries and {} tag entries.", itemFoods.size(), tagFoods.size());
+            logger.info("Loaded {} Mimicling food item entries, {} tag entries, and {} synergies.", itemFoods.size(), tagFoods.size(), pendingSynergies.size());
         }
 
         private void parseEntry(ResourceLocation fileId, JsonObject object, Map<String, FoodDefinition> foodsById, Map<Item, FoodDefinition> itemFoods, List<TagFoodEntry> tagFoods) {
@@ -516,7 +531,7 @@ public final class MimiclingFoods {
                     logger.warn("Mimicling food {} references unknown item {}.", fileId, itemId);
                     return;
                 }
-                FoodDefinition food = parseFoodDefinition(itemId.toString(), fileId, object, repairAmount);
+                FoodDefinition food = parseFoodDefinition(getFoodId(object, itemId.toString()), fileId, object, repairAmount);
                 foodsById.put(food.id(), food);
                 itemFoods.put(item, food);
                 return;
@@ -524,13 +539,17 @@ public final class MimiclingFoods {
 
             if (object.has("tag")) {
                 ResourceLocation tagId = new ResourceLocation(object.get("tag").getAsString());
-                FoodDefinition food = parseFoodDefinition("#" + tagId, fileId, object, repairAmount);
+                FoodDefinition food = parseFoodDefinition(getFoodId(object, "#" + tagId), fileId, object, repairAmount);
                 foodsById.put(food.id(), food);
                 tagFoods.add(new TagFoodEntry(TagKey.create(BuiltInRegistries.ITEM.key(), tagId), food));
                 return;
             }
 
             logger.warn("Mimicling food {} must define item or tag.", fileId);
+        }
+
+        private String getFoodId(JsonObject object, String fallback) {
+            return object.has("food_id") ? object.get("food_id").getAsString() : fallback;
         }
 
         private FoodDefinition parseFoodDefinition(String id, ResourceLocation fileId, JsonObject object, int repairAmount) {
@@ -638,6 +657,70 @@ public final class MimiclingFoods {
                 ));
             }
             return synergyEffects;
+        }
+
+        private void parseSynergyFile(ResourceLocation fileId, JsonObject object, List<PendingSynergyDefinition> pendingSynergies) {
+            if (!object.has("synergies") || !object.get("synergies").isJsonArray()) {
+                logger.warn("Mimicling synergy file {} must define a synergies array.", fileId);
+                return;
+            }
+
+            for (JsonElement synergyElement : object.getAsJsonArray("synergies")) {
+                if (!synergyElement.isJsonObject()) {
+                    continue;
+                }
+
+                JsonObject synergy = synergyElement.getAsJsonObject();
+                if (!synergy.has("items") || !synergy.get("items").isJsonArray() || synergy.getAsJsonArray("items").size() != 2) {
+                    logger.warn("Mimicling synergy {} must define exactly two items.", fileId);
+                    continue;
+                }
+
+                JsonArray items = synergy.getAsJsonArray("items");
+                String ownerId = items.get(0).getAsString();
+                String withItem = items.get(1).getAsString();
+                pendingSynergies.add(new PendingSynergyDefinition(
+                        ownerId,
+                        withItem,
+                        parseDisabledEffectIds(synergy),
+                        parseEffects(synergy, ownerId)
+                ));
+            }
+        }
+
+        private void applyPendingSynergies(Map<String, FoodDefinition> foodsById, List<PendingSynergyDefinition> pendingSynergies) {
+            for (PendingSynergyDefinition pending : pendingSynergies) {
+                FoodDefinition owner = foodsById.get(pending.ownerId());
+                if (owner == null) {
+                    logger.warn("Mimicling synergy references unknown owner food {}.", pending.ownerId());
+                    continue;
+                }
+                if (!foodsById.containsKey(pending.withItem())) {
+                    logger.warn("Mimicling synergy {} references unknown paired food {}.", pending.ownerId(), pending.withItem());
+                    continue;
+                }
+
+                List<SynergyEffectDefinition> synergies = new ArrayList<>(owner.synergyEffects());
+                synergies.add(new SynergyEffectDefinition(pending.withItem(), pending.disabledEffectIds(), pending.effects()));
+                foodsById.put(owner.id(), new FoodDefinition(owner.id(), owner.durability(), owner.usageCount(), owner.infiniteUsage(), owner.returnOnReplacement(), owner.returnItem(), owner.description(), owner.effects(), synergies));
+            }
+        }
+
+        private void syncFoodDefinitions(Map<String, FoodDefinition> foodsById, Map<Item, FoodDefinition> itemFoods, List<TagFoodEntry> tagFoods) {
+            for (Map.Entry<Item, FoodDefinition> entry : itemFoods.entrySet()) {
+                FoodDefinition updated = foodsById.get(entry.getValue().id());
+                if (updated != null) {
+                    entry.setValue(updated);
+                }
+            }
+
+            for (int i = 0; i < tagFoods.size(); i++) {
+                TagFoodEntry entry = tagFoods.get(i);
+                FoodDefinition updated = foodsById.get(entry.food().id());
+                if (updated != null) {
+                    tagFoods.set(i, new TagFoodEntry(entry.tag(), updated));
+                }
+            }
         }
 
         private Set<String> parseDisabledEffectIds(JsonObject object) {
