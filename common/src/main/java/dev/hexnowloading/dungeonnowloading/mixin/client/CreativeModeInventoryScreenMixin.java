@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.item.MimiclingFormItem;
 import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.network.packets.C2SMimiclingSelectSlotPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.network.chat.Component;
@@ -27,11 +28,14 @@ public abstract class CreativeModeInventoryScreenMixin extends EffectRenderingIn
             ItemStack stack = hoveredSlot.getItem();
             int delta = amount < 0.0D ? 1 : -1;
             ItemStack carriedStack = menu.getCarried();
-            boolean changed = carriedStack.isEmpty()
+            boolean foodMode = Screen.hasShiftDown();
+            boolean changed = foodMode
+                    ? MimiclingItem.tryScrollSelectedActiveFoodSlot(stack, delta)
+                    : carriedStack.isEmpty()
                     ? MimiclingItem.tryScrollSelectedSlot(stack, delta)
                     : MimiclingItem.tryScrollSelectedFoodSlot(stack, carriedStack, delta);
             if (stack.getItem() instanceof MimiclingFormItem && changed) {
-                Services.NETWORK.sendToServer(new C2SMimiclingSelectSlotPacket(menu.containerId, hoveredSlot.index, delta));
+                Services.NETWORK.sendToServer(new C2SMimiclingSelectSlotPacket(menu.containerId, hoveredSlot.index, delta, foodMode));
                 cir.setReturnValue(true);
             }
         }

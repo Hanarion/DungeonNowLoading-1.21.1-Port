@@ -225,11 +225,14 @@ public final class MimiclingFoodEffects {
     }
 
     private static void tickDurabilityDrainEffects(ItemStack stack, Level level) {
-        if (!stack.isDamageableItem()) {
+        if (!stack.isDamageableItem() || !stack.hasTag()) {
             return;
         }
 
         long gameTime = level.getGameTime();
+        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag timers = tag.getCompound(DURABILITY_DRAIN_TAG);
+        boolean timersChanged = false;
         for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
             if (!effect.matches("while_in_inventory", "drain_durability_over_time")) {
                 continue;
@@ -237,11 +240,10 @@ public final class MimiclingFoodEffects {
 
             int interval = effect.data().has("interval_ticks") ? Math.max(1, effect.data().get("interval_ticks").getAsInt()) : 20;
             String timerTag = effect.ownerId();
-            CompoundTag timers = stack.getOrCreateTag().getCompound(DURABILITY_DRAIN_TAG);
             long nextTick = timers.getLong(timerTag);
             if (nextTick <= 0L) {
                 timers.putLong(timerTag, gameTime + interval);
-                stack.getOrCreateTag().put(DURABILITY_DRAIN_TAG, timers);
+                timersChanged = true;
                 continue;
             }
             if (gameTime < nextTick) {
@@ -251,8 +253,11 @@ public final class MimiclingFoodEffects {
             int amount = effect.data().has("amount") ? Math.max(1, effect.data().get("amount").getAsInt()) : 1;
             stack.setDamageValue(Math.min(stack.getMaxDamage(), stack.getDamageValue() + amount));
             timers.putLong(timerTag, gameTime + interval);
-            stack.getOrCreateTag().put(DURABILITY_DRAIN_TAG, timers);
+            timersChanged = true;
             MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1);
+        }
+        if (timersChanged) {
+            tag.put(DURABILITY_DRAIN_TAG, timers);
         }
     }
 
@@ -1561,12 +1566,7 @@ public final class MimiclingFoodEffects {
     }
 
     private static boolean hasActiveFood(ItemStack stack, String foodId) {
-        for (MimiclingFoods.FoodDefinition food : MimiclingFoods.getActiveFoods(stack)) {
-            if (foodId.equals(food.id())) {
-                return true;
-            }
-        }
-        return false;
+        return MimiclingFoods.hasActiveFood(stack, foodId);
     }
 
     private static List<ItemStack> getActiveMimiclingStacks(LivingEntity entity) {

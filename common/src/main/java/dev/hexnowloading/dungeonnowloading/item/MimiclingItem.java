@@ -192,7 +192,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             int damage = FORM_SWORD.equals(getStoredForm(stack)) ? 2 : 1;
             MimiclingFoodEffects.onBreak(stack, level, pos, state, entity);
             if (state.getDestroySpeed(level, pos) != 0.0F) {
-                stack.hurtAndBreak(damage, entity, livingEntity -> livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+                applyDurabilityDamage(stack, entity, damage);
             }
             MimiclingFoods.consumeUsage(stack);
         }
@@ -201,7 +201,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        stack.hurtAndBreak(FORM_SWORD.equals(getStoredForm(stack)) ? 1 : 2, attacker, livingEntity -> livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+        applyDurabilityDamage(stack, attacker, FORM_SWORD.equals(getStoredForm(stack)) ? 1 : 2);
         if (!attacker.level().isClientSide) {
             MimiclingFoodEffects.onAttack(stack, target, attacker);
             MimiclingFoods.consumeUsage(stack);
@@ -702,6 +702,26 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         }
 
         int activeFoodCount = MimiclingFoods.getActiveFoodEntries(stack).size();
+        int currentSelected = getSelectedFoodSlot(stack);
+        int selected = Math.floorMod(currentSelected + delta, activeFoodCount);
+        if (selected == currentSelected) {
+            return false;
+        }
+
+        stack.getOrCreateTag().putInt(SELECTED_FOOD_SLOT_TAG, selected);
+        return true;
+    }
+
+    public static boolean tryScrollSelectedActiveFoodSlot(ItemStack stack, int delta) {
+        if (!(stack.getItem() instanceof MimiclingFormItem)) {
+            return false;
+        }
+
+        int activeFoodCount = MimiclingFoods.getActiveFoodEntries(stack).size();
+        if (activeFoodCount <= 1) {
+            return false;
+        }
+
         int currentSelected = getSelectedFoodSlot(stack);
         int selected = Math.floorMod(currentSelected + delta, activeFoodCount);
         if (selected == currentSelected) {
@@ -1221,7 +1241,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return;
         }
 
-        stack.hurtAndBreak(amount, entity, livingEntity -> livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+        stack.setDamageValue(Math.min(stack.getMaxDamage(), stack.getDamageValue() + amount));
     }
 
     public static Optional<TooltipComponent> getActiveFoodTooltipImage(ItemStack stack) {
@@ -1229,6 +1249,31 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return activeFoods.isEmpty()
                 ? Optional.empty()
                 : Optional.of(new MimiclingTooltip(NonNullList.create(), activeFoods, -1, -1, 0));
+    }
+
+    public static Optional<TooltipComponent> getTooltipImageForSelectedFood(ItemStack stack) {
+        if (!(stack.getItem() instanceof MimiclingFormItem)) {
+            return Optional.empty();
+        }
+
+        List<MimiclingFoods.ActiveFood> activeFoods = MimiclingFoods.getActiveFoodEntries(stack);
+        if (activeFoods.isEmpty()) {
+            return Optional.empty();
+        }
+
+        int selected = getSelectedFoodSlot(stack);
+        if (selected < 0 || selected >= activeFoods.size()) {
+            return Optional.empty();
+        }
+
+        MimiclingFoods.ActiveFood selectedFood = activeFoods.get(selected);
+        return getTooltipImage(
+                stack,
+                selectedFood.displayStack(),
+                selectedFood.food().description(),
+                selected,
+                !isFeedableFood(selectedFood.displayStack())
+        );
     }
 
     public static void appendActiveFoodTooltip(ItemStack stack, List<Component> components) {

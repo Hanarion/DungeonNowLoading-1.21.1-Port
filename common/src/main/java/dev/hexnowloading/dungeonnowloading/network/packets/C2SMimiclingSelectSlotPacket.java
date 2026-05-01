@@ -13,17 +13,24 @@ public class C2SMimiclingSelectSlotPacket implements DNLPacket {
     private final int containerId;
     private final int slotIndex;
     private final int delta;
+    private final boolean foodMode;
 
     public C2SMimiclingSelectSlotPacket(int containerId, int slotIndex, int delta) {
+        this(containerId, slotIndex, delta, false);
+    }
+
+    public C2SMimiclingSelectSlotPacket(int containerId, int slotIndex, int delta, boolean foodMode) {
         this.containerId = containerId;
         this.slotIndex = slotIndex;
         this.delta = delta;
+        this.foodMode = foodMode;
     }
 
     public C2SMimiclingSelectSlotPacket(FriendlyByteBuf buf) {
         this.containerId = buf.readVarInt();
         this.slotIndex = buf.readVarInt();
         this.delta = buf.readVarInt();
+        this.foodMode = buf.readBoolean();
     }
 
     @Override
@@ -31,6 +38,7 @@ public class C2SMimiclingSelectSlotPacket implements DNLPacket {
         buf.writeVarInt(containerId);
         buf.writeVarInt(slotIndex);
         buf.writeVarInt(delta);
+        buf.writeBoolean(foodMode);
     }
 
     public static C2SMimiclingSelectSlotPacket decode(FriendlyByteBuf buf) {
@@ -55,6 +63,10 @@ public class C2SMimiclingSelectSlotPacket implements DNLPacket {
     }
 
     private boolean scrollSelectedSlot(ItemStack stack, ItemStack carriedStack) {
+        if (foodMode) {
+            return MimiclingItem.tryScrollSelectedActiveFoodSlot(stack, delta);
+        }
+
         return carriedStack.isEmpty()
                 ? MimiclingItem.tryScrollSelectedSlot(stack, delta)
                 : MimiclingItem.tryScrollSelectedFoodSlot(stack, carriedStack, delta);

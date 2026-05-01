@@ -8,6 +8,7 @@ import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,15 +41,19 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        if (hoveredSlot != null) {
-            ItemStack stack = hoveredSlot.getItem();
+        Slot hovered = getHoveredSlot(mouseX, mouseY);
+        if (hovered != null) {
+            ItemStack stack = hovered.getItem();
             int delta = amount < 0.0D ? 1 : -1;
             ItemStack carriedStack = menu.getCarried();
-            boolean changed = carriedStack.isEmpty()
+            boolean foodMode = Screen.hasShiftDown();
+            boolean changed = foodMode
+                    ? MimiclingItem.tryScrollSelectedActiveFoodSlot(stack, delta)
+                    : carriedStack.isEmpty()
                     ? MimiclingItem.tryScrollSelectedSlot(stack, delta)
                     : MimiclingItem.tryScrollSelectedFoodSlot(stack, carriedStack, delta);
             if (stack.getItem() instanceof MimiclingFormItem && changed) {
-                Services.NETWORK.sendToServer(new C2SMimiclingSelectSlotPacket(menu.containerId, hoveredSlot.index, delta));
+                Services.NETWORK.sendToServer(new C2SMimiclingSelectSlotPacket(menu.containerId, hovered.index, delta, foodMode));
                 return true;
             }
         }
@@ -70,6 +75,16 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
 
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
     private void dungeonnowloading$renderMimiclingTooltipWithCarriedStack(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo ci) {
+        if (menu.getCarried().isEmpty() && hoveredSlot != null && hoveredSlot.hasItem()) {
+            ItemStack stack = hoveredSlot.getItem();
+            if (stack.getItem() instanceof MimiclingFormItem && Screen.hasShiftDown()) {
+                List<Component> tooltip = getTooltipFromContainerItem(stack);
+                guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltip, MimiclingItem.getTooltipImageForSelectedFood(stack), mouseX, mouseY);
+                ci.cancel();
+                return;
+            }
+        }
+
         if (menu.getCarried().isEmpty() && hoveredSlot != null && hoveredSlot.hasItem()) {
             ItemStack stack = hoveredSlot.getItem();
             if (stack.getItem() instanceof MimiclingItem && MimiclingItem.trySelectNextOccupiedSlotIfSelectedEmpty(stack)) {

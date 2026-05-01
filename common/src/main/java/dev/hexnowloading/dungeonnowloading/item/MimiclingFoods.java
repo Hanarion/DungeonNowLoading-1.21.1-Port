@@ -289,6 +289,10 @@ public final class MimiclingFoods {
     }
 
     public static boolean hasActiveEffect(ItemStack mimicling, String type, @Nullable String action) {
+        if (!mimicling.hasTag()) {
+            return false;
+        }
+
         for (EffectDefinition effect : getActiveEffects(mimicling)) {
             if (effect.matches(type, action)) {
                 return true;

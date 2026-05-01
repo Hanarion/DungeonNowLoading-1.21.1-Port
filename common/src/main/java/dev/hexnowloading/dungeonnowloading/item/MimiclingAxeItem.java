@@ -70,13 +70,13 @@ public class MimiclingAxeItem extends AxeItem implements MimiclingFormItem {
     @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity entity) {
         MimiclingItem.onMimiclingMineBlock(stack, level, state, pos, entity);
-        return super.mineBlock(stack, level, state, pos, entity);
+        return true;
     }
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         MimiclingItem.onMimiclingHurtEnemy(stack, target, attacker);
-        return super.hurtEnemy(stack, target, attacker);
+        return true;
     }
 
     @Override
