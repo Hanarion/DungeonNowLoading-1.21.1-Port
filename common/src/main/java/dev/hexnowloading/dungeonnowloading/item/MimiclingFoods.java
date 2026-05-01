@@ -339,6 +339,8 @@ public final class MimiclingFoods {
         Set<String> actionManagedFoods = new HashSet<>();
         for (EffectDefinition effect : getActiveEffects(mimicling)) {
             if (effect.matches("while_in_hand", "remove_underwater_mining_penalty")
+                    || effect.matches("while_in_hand", "extend_reach")
+                    || effect.matches("while_in_inventory", "drain_durability_over_time")
                     || effect.matches("on_break", "grant_air")
                     || effect.matches("on_break", "trail_to_matching_block")
                     || effect.matches("change_drop", "auto_smelt")

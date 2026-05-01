@@ -4,10 +4,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import dev.hexnowloading.dungeonnowloading.entity.misc.MimiclingFallingBlockEntity;
+import dev.hexnowloading.dungeonnowloading.particle.type.SnifferTrailParticleType;
+import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.TagParser;
@@ -55,15 +58,25 @@ import java.util.Set;
 
 public final class MimiclingFoodEffects {
     private static final String MEMORY_TAG = "MimiclingFoodEffectMemory";
+    private static final String DURABILITY_DRAIN_TAG = "MimiclingDurabilityDrainTimers";
     private static final String TELEPORT_DESTINATION_TAG = "teleport_destination";
     private static final String MAGMA_CREAM_ID = "minecraft:magma_cream";
+    private static final String ENDER_EYE_ID = "minecraft:ender_eye";
     private static final int HELD_EFFECT_TICKS = 40;
     private static final double DEFAULT_REACH_DISTANCE = 4.5D;
+    private static final double CREATIVE_REACH_DISTANCE = 5.0D;
+    private static final double DEFAULT_ENTITY_REACH_DISTANCE = 3.0D;
 
     private MimiclingFoodEffects() {}
 
     public static void tickHeld(ItemStack stack, Level level, Entity entity) {
-        if (level.isClientSide || !(entity instanceof Player player) || !isHeld(player, stack)) {
+        if (level.isClientSide || !(entity instanceof Player player)) {
+            return;
+        }
+
+        tickDurabilityDrainEffects(stack, level);
+
+        if (!isHeld(player, stack)) {
             return;
         }
 
@@ -77,11 +90,17 @@ public final class MimiclingFoodEffects {
             return;
         }
 
+        playEnderEyeUseEffects(stack, level, entity, Vec3.atCenterOf(pos), getVanillaBlockReachDistance(entity));
+
         for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
             if (effect.matches("memorize_position", null) && formsMatch(stack, effect.data())) {
                 memorizePosition(stack, level, effect.data(), pos);
             } else if (effect.matches("on_break", "auto_switch_unsuited_tool")) {
                 MimiclingItem.tryTransformHeldOrEquippedToForm(stack, entity, MimiclingItem.getWorstFormFor(stack, state), MimiclingItem.getBlockUseDurabilityCost(stack), true);
+            } else if (effect.matches("on_break", "trail_to_matching_block") && formsMatch(stack, effect.data())) {
+                if (spawnTrailToMatchingBlock(level, pos, state, effect.data())) {
+                    consumeEffectUsage(stack, effect);
+                }
             } else if (effect.matches("change_break_area", null) && formsMatch(stack, effect.data())) {
                 breakMatchingNeighborBlocks(stack, level, pos, state, entity, effect.data());
             } else if (effect.matches("change_drop", "auto_smelt") && formsMatch(stack, effect.data())) {
@@ -92,10 +111,6 @@ public final class MimiclingFoodEffects {
                 if (grantAir(entity, effect.data())) {
                     consumeEffectUsage(stack, effect);
                 }
-            } else if (effect.matches("on_break", "trail_to_matching_block") && formsMatch(stack, effect.data())) {
-                if (spawnTrailToMatchingBlock(level, pos, state, effect.data())) {
-                    consumeEffectUsage(stack, effect);
-                }
             }
         }
     }
@@ -104,6 +119,8 @@ public final class MimiclingFoodEffects {
         if (attacker.level().isClientSide) {
             return;
         }
+
+        playEnderEyeUseEffects(stack, attacker.level(), attacker, target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D), DEFAULT_ENTITY_REACH_DISTANCE);
 
         for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
             if (effect.matches("change_mob_position", "teleport_to_memorized_position")) {
@@ -152,8 +169,20 @@ public final class MimiclingFoodEffects {
         return reach * reach;
     }
 
+    public static double getMimiclingReachValidationDistanceSqr(Player player) {
+        double reach = getMimiclingReachDistance(player) + 1.0D;
+        return reach * reach;
+    }
+
     public static boolean hasExtendedReach(Player player) {
         return getMimiclingReachDistance(player) > DEFAULT_REACH_DISTANCE;
+    }
+
+    public static boolean hasEnderEyeReachEffect(Player player) {
+        ItemStack stack = player.getMainHandItem();
+        return isMimiclingStack(stack)
+                && hasActiveFood(stack, ENDER_EYE_ID)
+                && getConfiguredEffect(stack, "while_in_hand", "extend_reach") != null;
     }
 
     public static float getUnderwaterMiningSpeedMultiplier(Player player) {
@@ -192,6 +221,38 @@ public final class MimiclingFoodEffects {
 
         if (MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1)) {
             MimiclingFoods.markUsageHandled(stack, effect.ownerId());
+        }
+    }
+
+    private static void tickDurabilityDrainEffects(ItemStack stack, Level level) {
+        if (!stack.isDamageableItem()) {
+            return;
+        }
+
+        long gameTime = level.getGameTime();
+        for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
+            if (!effect.matches("while_in_inventory", "drain_durability_over_time")) {
+                continue;
+            }
+
+            int interval = effect.data().has("interval_ticks") ? Math.max(1, effect.data().get("interval_ticks").getAsInt()) : 20;
+            String timerTag = effect.ownerId();
+            CompoundTag timers = stack.getOrCreateTag().getCompound(DURABILITY_DRAIN_TAG);
+            long nextTick = timers.getLong(timerTag);
+            if (nextTick <= 0L) {
+                timers.putLong(timerTag, gameTime + interval);
+                stack.getOrCreateTag().put(DURABILITY_DRAIN_TAG, timers);
+                continue;
+            }
+            if (gameTime < nextTick) {
+                continue;
+            }
+
+            int amount = effect.data().has("amount") ? Math.max(1, effect.data().get("amount").getAsInt()) : 1;
+            stack.setDamageValue(Math.min(stack.getMaxDamage(), stack.getDamageValue() + amount));
+            timers.putLong(timerTag, gameTime + interval);
+            stack.getOrCreateTag().put(DURABILITY_DRAIN_TAG, timers);
+            MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1);
         }
     }
 
@@ -413,6 +474,45 @@ public final class MimiclingFoodEffects {
         level.sendParticles(ParticleTypes.PORTAL, pos.x, pos.y + 0.5D, pos.z, 24, 0.35D, 0.45D, 0.35D, 0.08D);
     }
 
+    private static void playEnderEyeUseEffects(ItemStack stack, Level level, LivingEntity entity, Vec3 target, double vanillaReach) {
+        MimiclingFoods.EffectDefinition effect = getConfiguredEffect(stack, "while_in_hand", "extend_reach");
+        Vec3 source = getEnderEyeParticleSource(entity);
+        if (!(level instanceof ServerLevel serverLevel) || !hasActiveFood(stack, ENDER_EYE_ID) || effect == null || source.distanceToSqr(target) <= vanillaReach * vanillaReach) {
+            return;
+        }
+
+        spawnPortalLine(serverLevel, source, target);
+        level.playSound(null, target.x, target.y, target.z, SoundEvents.ENDER_EYE_DEATH, SoundSource.PLAYERS, 0.75F, 1.0F);
+        consumeEffectUsage(stack, effect);
+    }
+
+    private static void spawnPortalLine(ServerLevel level, Vec3 source, Vec3 target) {
+        Vec3 delta = target.subtract(source);
+        double distance = delta.length();
+        if (distance < 0.01D) {
+            sendEnderEyePortalParticles(level, target, 8, 0.08D, 0.08D, 0.08D, 0.02D);
+            return;
+        }
+
+        int steps = Math.max(2, Mth.ceil(distance * 4.0D));
+        for (int i = 0; i <= steps; i++) {
+            Vec3 point = source.add(delta.scale(i / (double)steps));
+            sendEnderEyePortalParticles(level, point, 2, 0.035D, 0.035D, 0.035D, 0.01D);
+        }
+    }
+
+    private static void sendEnderEyePortalParticles(ServerLevel level, Vec3 pos, int count, double xSpread, double ySpread, double zSpread, double speed) {
+        level.sendParticles(ParticleTypes.PORTAL, pos.x, pos.y - 0.75D, pos.z, count, xSpread, ySpread, zSpread, speed);
+    }
+
+    private static double getVanillaBlockReachDistance(LivingEntity entity) {
+        return entity instanceof Player player && player.isCreative() ? CREATIVE_REACH_DISTANCE : DEFAULT_REACH_DISTANCE;
+    }
+
+    private static Vec3 getEnderEyeParticleSource(LivingEntity entity) {
+        return entity.getEyePosition(1.0F).subtract(0.0D, 0.22D, 0.0D);
+    }
+
     private static List<FallingLootPayload> getFallingLootPayloads(BlockState minedState, List<ItemStack> drops) {
         List<FallingLootPayload> payloads = new ArrayList<>();
         List<ItemStack> itemDrops = new ArrayList<>();
@@ -537,6 +637,9 @@ public final class MimiclingFoodEffects {
         if (!(level instanceof ServerLevel serverLevel) || state.isAir()) {
             return false;
         }
+        if (hasAdjacentMatchingBlock(level, origin, state)) {
+            return false;
+        }
 
         int horizontalRange = data.has("horizontal_range") ? Math.max(1, data.get("horizontal_range").getAsInt()) : 16;
         int verticalRange = data.has("vertical_range") ? Math.max(1, data.get("vertical_range").getAsInt()) : 10;
@@ -564,6 +667,15 @@ public final class MimiclingFoodEffects {
         return true;
     }
 
+    private static boolean hasAdjacentMatchingBlock(Level level, BlockPos origin, BlockState state) {
+        for (Direction direction : Direction.values()) {
+            if (level.getBlockState(origin.relative(direction)).is(state.getBlock())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean spawnTrailToMatchingEntity(ServerLevel level, LivingEntity killed, JsonObject data) {
         int horizontalRange = data.has("horizontal_range") ? Math.max(1, data.get("horizontal_range").getAsInt()) : 64;
         int verticalRange = data.has("vertical_range") ? Math.max(1, data.get("vertical_range").getAsInt()) : 64;
@@ -587,6 +699,12 @@ public final class MimiclingFoodEffects {
     }
 
     private static void spawnTrailParticles(ServerLevel level, Vec3 start, Vec3 end, JsonObject data) {
+        ResourceLocation particleId = data.has("particle") ? new ResourceLocation(data.get("particle").getAsString()) : null;
+        if (particleId != null && DNLParticleTypes.SNIFFER_TRAIL_PARTICLE.get() == BuiltInRegistries.PARTICLE_TYPE.get(particleId)) {
+            spawnSnifferTrailParticles(level, start, end, data);
+            return;
+        }
+
         ParticleOptions particle = getConfiguredParticle(data, ParticleTypes.HAPPY_VILLAGER);
         int steps = data.has("steps") ? Math.max(2, data.get("steps").getAsInt()) : 24;
         double spread = data.has("spread") ? data.get("spread").getAsDouble() : 0.03D;
@@ -597,6 +715,42 @@ public final class MimiclingFoodEffects {
             Vec3 point = start.add(delta.scale(progress));
             level.sendParticles(particle, point.x, point.y, point.z, 1, spread, spread, spread, speed);
         }
+    }
+
+    private static void spawnSnifferTrailParticles(ServerLevel level, Vec3 start, Vec3 end, JsonObject data) {
+        int emitterLifetime = data.has("particle_lifetime") ? Math.max(1, data.get("particle_lifetime").getAsInt()) : 200;
+        int particlesPerSecond = data.has("particles_per_second") ? Math.max(1, data.get("particles_per_second").getAsInt()) : 5;
+        int count = Math.max(data.has("steps") ? Math.max(1, data.get("steps").getAsInt()) : 1, Math.max(1, emitterLifetime * particlesPerSecond / 20));
+        double particleSpeed = data.has("particle_speed") ? Math.max(0.01D, data.get("particle_speed").getAsDouble()) : 0.175D;
+        double randomness = data.has("position_randomness") ? Math.max(0.0D, data.get("position_randomness").getAsDouble()) : 0.45D;
+        for (int i = 0; i < count; i++) {
+            Vec3 startOffset = randomBlockOffset(level, randomness);
+            Vec3 endOffset = randomBlockOffset(level, randomness);
+            Vec3 particleStart = start.add(startOffset);
+            Vec3 particleTarget = end.add(endOffset);
+            Vec3 targetOffset = particleTarget.subtract(particleStart);
+            int travelLifetime = data.has("particle_travel_lifetime")
+                    ? Math.max(1, data.get("particle_travel_lifetime").getAsInt())
+                    : Math.max(1, (int)Math.ceil(targetOffset.length() / particleSpeed));
+            int delay = count <= 1 ? 0 : Math.round(i * (emitterLifetime - 1) / (float)(count - 1));
+            ParticleOptions particle = new SnifferTrailParticleType.Data(
+                    DNLParticleTypes.SNIFFER_TRAIL_PARTICLE.get(),
+                    (float)targetOffset.x,
+                    (float)targetOffset.y,
+                    (float)targetOffset.z,
+                    travelLifetime,
+                    delay
+            );
+            level.sendParticles(particle, particleStart.x, particleStart.y, particleStart.z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        }
+    }
+
+    private static Vec3 randomBlockOffset(ServerLevel level, double amount) {
+        return new Vec3(
+                (level.random.nextDouble() - 0.5D) * amount,
+                (level.random.nextDouble() - 0.5D) * amount,
+                (level.random.nextDouble() - 0.5D) * amount
+        );
     }
 
     private static ParticleOptions getConfiguredParticle(JsonObject data, ParticleOptions fallback) {

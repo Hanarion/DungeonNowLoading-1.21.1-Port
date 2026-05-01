@@ -21,6 +21,6 @@ public class MimiclingReachServerGameModeMixin {
             )
     )
     private double dnl$extendMimiclingBlockBreakDistance() {
-        return MimiclingFoodEffects.hasExtendedReach(this.player) ? MimiclingFoodEffects.getMimiclingReachDistanceSqr(this.player) : ServerGamePacketListenerImpl.MAX_INTERACTION_DISTANCE;
+        return MimiclingFoodEffects.hasExtendedReach(this.player) ? MimiclingFoodEffects.getMimiclingReachValidationDistanceSqr(this.player) : ServerGamePacketListenerImpl.MAX_INTERACTION_DISTANCE;
     }
 }

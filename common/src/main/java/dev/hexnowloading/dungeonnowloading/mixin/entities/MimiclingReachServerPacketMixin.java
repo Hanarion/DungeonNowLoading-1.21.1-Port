@@ -22,11 +22,11 @@ public class MimiclingReachServerPacketMixin {
             )
     )
     private double dnl$extendMimiclingInteractionDistance() {
-        return MimiclingFoodEffects.hasExtendedReach(this.player) ? MimiclingFoodEffects.getMimiclingReachDistanceSqr(this.player) : ServerGamePacketListenerImpl.MAX_INTERACTION_DISTANCE;
+        return MimiclingFoodEffects.hasExtendedReach(this.player) ? MimiclingFoodEffects.getMimiclingReachValidationDistanceSqr(this.player) : ServerGamePacketListenerImpl.MAX_INTERACTION_DISTANCE;
     }
 
     @ModifyConstant(method = "handleUseItemOn", constant = @Constant(doubleValue = 64.0D))
     private double dnl$extendMimiclingUseOnCenterDistance(double original) {
-        return MimiclingFoodEffects.hasExtendedReach(this.player) ? MimiclingFoodEffects.getMimiclingReachDistanceSqr(this.player) : original;
+        return MimiclingFoodEffects.hasExtendedReach(this.player) ? MimiclingFoodEffects.getMimiclingReachValidationDistanceSqr(this.player) : original;
     }
 }

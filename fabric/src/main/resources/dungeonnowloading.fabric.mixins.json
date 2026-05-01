@@ -58,6 +58,7 @@
     "client.MinecraftClientTickMixin",
     "client.MusicManagerMixin",
     "client.LivingEntityRendererMixin",
+    "client.MimiclingEnderEyeOutlineMixin",
     "client.MimiclingReachGameRendererMixin",
     "client.MimiclingReachClientGameModeMixin",
     "MixinMinecraft",

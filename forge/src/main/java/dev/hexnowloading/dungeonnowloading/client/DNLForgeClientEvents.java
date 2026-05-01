@@ -213,6 +213,7 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.SNIFFER_TRAIL_PARTICLE.get(), SnifferTrailParticle.Factory::new);
         event.registerSpecial(DNLParticleTypes.MIMICLING_IMPACT_BLOCK_PARTICLE.get(), new MimiclingImpactBlockParticle.Factory());
     }
 

@@ -26,6 +26,7 @@ public class DNLParticleTypes {
     public static final Supplier<SimpleParticleType> MENDING_RUNE_PARTICLE = register("mending_rune", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<SimpleParticleType> MENDING_RUNE_SHORT_PARTICLE = register("mending_rune_short", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<MendingFadeParticleType> MENDING_FADE_PARTICLE = register("mending_fade", () -> new MendingFadeParticleType(false));
+    public static final Supplier<ParticleType<SnifferTrailParticleType.Data>> SNIFFER_TRAIL_PARTICLE = register("sniffer_trail", () -> new SnifferTrailParticleType(false));
     public static final Supplier<ParticleType<BlockParticleOption>> MIMICLING_IMPACT_BLOCK_PARTICLE = register("mimicling_impact_block", () -> new ParticleType<BlockParticleOption>(false, BlockParticleOption.DESERIALIZER) {
         @Override
         public com.mojang.serialization.Codec<BlockParticleOption> codec() {

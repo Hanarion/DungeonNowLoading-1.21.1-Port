@@ -85,6 +85,11 @@ public class MimiclingAxeItem extends AxeItem implements MimiclingFormItem {
     }
 
     @Override
+    public int getBarColor(ItemStack stack) {
+        return MimiclingFormItem.getMimiclingBarColor(stack);
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, level, components, tooltipFlag);
         MimiclingItem.appendActiveFoodTooltip(stack, components);

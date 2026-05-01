@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -156,6 +157,30 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (hand != InteractionHand.MAIN_HAND || !canUseStorage(stack)) {
+            return super.use(level, player, hand);
+        }
+
+        ItemStack foodStack = player.getOffhandItem();
+        if (!isFeedableFood(foodStack) || !canAcceptFeed(stack, foodStack)) {
+            return super.use(level, player, hand);
+        }
+
+        if (!level.isClientSide) {
+            ItemStack inserted = foodStack.copyWithCount(1);
+            List<ItemStack> returnedItems = feedOne(stack, inserted, getSelectedFoodReplacementSlot(stack, inserted));
+            startChewing(stack, level.getGameTime());
+            foodStack.shrink(1);
+            giveReturnedFeedItems(player, returnedItems);
+            playInsertSound(player);
+        }
+
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+    }
+
+    @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
         ItemStack storedTool = getStoredToolForCurrentForm(stack);
         return storedTool.isEmpty() ? super.getDestroySpeed(stack, state) : storedTool.getDestroySpeed(state);
@@ -207,6 +232,11 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     public boolean isFoil(ItemStack stack) {
         ItemStack storedTool = getStoredToolForCurrentForm(stack);
         return !stack.getEnchantmentTags().isEmpty() || !storedTool.isEmpty() && storedTool.hasFoil();
+    }
+
+    @Override
+    public int getBarColor(ItemStack stack) {
+        return MimiclingFormItem.getMimiclingBarColor(stack);
     }
 
     @Override

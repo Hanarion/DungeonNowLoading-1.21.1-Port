@@ -330,6 +330,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        registry.register(DNLParticleTypes.SNIFFER_TRAIL_PARTICLE.get(), SnifferTrailParticle.Factory::new);
         registry.register(DNLParticleTypes.MIMICLING_IMPACT_BLOCK_PARTICLE.get(), new MimiclingImpactBlockParticle.Factory());
     }
 

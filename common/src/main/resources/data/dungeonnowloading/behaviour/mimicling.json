@@ -101,7 +101,16 @@
     {
       "item": "minecraft:rotten_flesh",
       "durability": 20,
-      "usage_count": 0
+      "usage_count": 100,
+      "description": ["Drains 1 durability every 3 seconds for 5 minutes."],
+      "effects": [
+        {
+          "trigger": "while_in_inventory",
+          "action": "drain_durability_over_time",
+          "amount": 1,
+          "interval_ticks": 60
+        }
+      ]
     },
     {
       "item": "minecraft:egg",
@@ -245,13 +254,19 @@
     {
       "item": "minecraft:zombie_head",
       "durability": 500,
-      "usage_count": 0,
-      "description": ["Returns a Skeleton Skull."],
+      "usage_count": 900,
+      "description": ["Returns a Skeleton Skull.", "Drains 1 durability every second for 15 minutes."],
       "effects": [
         {
           "trigger": "on_fed",
           "action": "return_item",
           "return_item": "minecraft:skeleton_skull"
+        },
+        {
+          "trigger": "while_in_inventory",
+          "action": "drain_durability_over_time",
+          "amount": 1,
+          "interval_ticks": 20
         }
       ]
     },
@@ -608,7 +623,7 @@
     {
       "item": "minecraft:ender_eye",
       "durability": 10,
-      "usage_count": 1,
+      "usage_count": 5,
       "description": ["While held in main hand, Mimicling reach becomes 12 blocks."],
       "effects": [
         {
@@ -678,7 +693,8 @@
           "action": "trail_to_matching_block",
           "horizontal_range": 16,
           "vertical_range": 10,
-          "particle": "minecraft:happy_villager",
+          "particle": "dungeonnowloading:sniffer_trail",
+          "particle_lifetime": 200,
           "steps": 24
         },
         {
@@ -686,7 +702,8 @@
           "action": "trail_to_matching_entity",
           "horizontal_range": 64,
           "vertical_range": 64,
-          "particle": "minecraft:happy_villager",
+          "particle": "dungeonnowloading:sniffer_trail",
+          "particle_lifetime": 200,
           "steps": 32
         }
       ]
