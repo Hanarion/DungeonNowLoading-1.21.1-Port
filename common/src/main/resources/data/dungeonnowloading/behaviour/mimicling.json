@@ -50,7 +50,7 @@
       "food_id": "minecraft:salmon",
       "durability": 60,
       "usage_count": 0,
-      "description": ["Returns a Water Bucket."],
+      "description": ["item.dungeonnowloading.mimicling.food.return_water_bucket"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -74,7 +74,7 @@
       "food_id": "minecraft:cod",
       "durability": 50,
       "usage_count": 0,
-      "description": ["Returns a Water Bucket."],
+      "description": ["item.dungeonnowloading.mimicling.food.return_water_bucket"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -102,7 +102,7 @@
       "item": "minecraft:rotten_flesh",
       "durability": 20,
       "usage_count": 100,
-      "description": ["Drains 1 durability every 3 seconds for 5 minutes."],
+      "description": ["item.dungeonnowloading.mimicling.food.rotten_flesh"],
       "effects": [
         {
           "trigger": "while_in_inventory",
@@ -121,7 +121,7 @@
       "item": "minecraft:turtle_egg",
       "durability": 50,
       "usage_count": 50,
-      "description": ["All forms: removes underwater mining penalty.", "On break, restores 3 oxygen bubbles."],
+      "description": ["item.dungeonnowloading.mimicling.food.turtle_egg"],
       "effects": [
         {
           "trigger": "while_in_hand",
@@ -140,7 +140,7 @@
       "item": "minecraft:axolotl_bucket",
       "durability": 14,
       "usage_count": 0,
-      "description": ["Returns a Water Bucket."],
+      "description": ["item.dungeonnowloading.mimicling.food.axolotl_bucket"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -153,7 +153,7 @@
       "item": "minecraft:tadpole_bucket",
       "durability": 6,
       "usage_count": 0,
-      "description": ["Returns a Water Bucket."],
+      "description": ["item.dungeonnowloading.mimicling.food.tadpole_bucket"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -166,7 +166,7 @@
       "item": "minecraft:rabbit_stew",
       "durability": 50,
       "usage_count": 0,
-      "description": ["Returns Rabbitless Rabbit Stew."],
+      "description": ["item.dungeonnowloading.mimicling.food.return_rabbitless_rabbit_stew"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -179,21 +179,20 @@
       "item": "dungeonnowloading:mimic_mucus",
       "durability": 10,
       "usage_count": 0,
-      "description": ["2 mucus increase Belly Space by 1.", "At max Belly Space, restores 100 durability."],
+      "description": ["item.dungeonnowloading.mimicling.food.mimic_mucus"],
       "effects": [
-        {
-          "trigger": "on_fed",
-          "action": "increase_capacity",
-          "required_count": 2,
-          "full_capacity_durability": 100
-        }
+          {
+            "trigger": "on_fed",
+            "action": "increase_capacity",
+            "required_count": 2
+          }
       ]
     },
     {
       "item": "minecraft:slime_ball",
       "durability": 10,
       "usage_count": 10,
-      "description": ["On kill, 50% chance to summon 2 baby variants of the killed mob."],
+      "description": ["item.dungeonnowloading.mimicling.food.slime_ball"],
       "effects": [
         {
           "trigger": "on_kill",
@@ -255,7 +254,7 @@
       "item": "minecraft:zombie_head",
       "durability": 500,
       "usage_count": 900,
-      "description": ["Returns a Skeleton Skull.", "Drains 1 durability every second for 15 minutes."],
+      "description": ["item.dungeonnowloading.mimicling.food.zombie_head"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -274,7 +273,7 @@
       "item": "minecraft:player_head",
       "durability": 500,
       "usage_count": 0,
-      "description": ["Returns a Skeleton Skull."],
+      "description": ["item.dungeonnowloading.mimicling.food.return_skeleton_skull"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -287,7 +286,7 @@
       "item": "minecraft:tropical_fish",
       "durability": 1,
       "usage_count": 10,
-      "description": ["On break or attack, switches to the least suitable form."],
+      "description": ["item.dungeonnowloading.mimicling.food.tropical_fish"],
       "effects": [
         {
           "trigger": "on_break",
@@ -304,7 +303,7 @@
       "food_id": "minecraft:tropical_fish",
       "durability": 1,
       "usage_count": 10,
-      "description": ["Returns a Water Bucket.", "On break or attack, switches to the least suitable form."],
+      "description": ["item.dungeonnowloading.mimicling.food.tropical_fish_bucket"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -322,29 +321,10 @@
       ]
     },
     {
-      "item": "minecraft:honey_bottle",
-      "durability": 10,
-      "usage_count": 10,
-      "description": ["Returns a Glass Bottle.", "While held in main hand, grants Haste I."],
-      "effects": [
-        {
-          "trigger": "on_fed",
-          "action": "return_item",
-          "return_item": "minecraft:glass_bottle"
-        },
-        {
-          "trigger": "while_in_hand",
-          "action": "apply_potion_effect",
-          "effect": "minecraft:haste",
-          "amplifier": 0
-        }
-      ]
-    },
-    {
       "item": "minecraft:sea_pickle",
       "durability": 5,
       "usage_count": 5,
-      "description": ["All forms: reduces underwater mining penalty by 50%.", "All forms: inflicts Glowing for 3 seconds on attack."],
+      "description": ["item.dungeonnowloading.mimicling.food.sea_pickle"],
       "effects": [
         {
           "trigger": "while_in_hand",
@@ -367,7 +347,7 @@
       "item": "minecraft:ink_sac",
       "durability": 10,
       "usage_count": 10,
-      "description": ["All forms: removes underwater mining penalty.", "Sword and axe: inflicts Blindness on attack."],
+      "description": ["item.dungeonnowloading.mimicling.food.ink_sac"],
       "effects": [
         {
           "trigger": "while_in_hand",
@@ -389,7 +369,7 @@
       "item": "minecraft:glow_ink_sac",
       "durability": 10,
       "usage_count": 30,
-      "description": ["All forms: removes underwater mining penalty.", "All forms: inflicts Glowing for 30 seconds on attack."],
+      "description": ["item.dungeonnowloading.mimicling.food.glow_ink_sac"],
       "effects": [
         {
           "trigger": "while_in_hand",
@@ -412,7 +392,7 @@
       "item": "minecraft:pufferfish",
       "durability": 10,
       "usage_count": 10,
-      "description": ["On attack, inflicts Poison II, Hunger III, and Nausea.", "Breaks nearby same-or-softer blocks.", "Potatoes become poisonous potato loot."],
+      "description": ["item.dungeonnowloading.mimicling.food.pufferfish"],
       "effects": [
         {
           "trigger": "apply_potion_effect",
@@ -449,7 +429,7 @@
       "food_id": "minecraft:pufferfish",
       "durability": 10,
       "usage_count": 10,
-      "description": ["Returns a Water Bucket.", "On attack, inflicts Poison II, Hunger III, and Nausea.", "Breaks nearby same-or-softer blocks.", "Potatoes become poisonous potato loot."],
+      "description": ["item.dungeonnowloading.mimicling.food.pufferfish_bucket"],
       "effects": [
         {
           "trigger": "on_fed",
@@ -490,7 +470,7 @@
       "item": "minecraft:piglin_head",
       "durability": 500,
       "usage_count": 500,
-      "description": ["Gold ores drop piglin bartering loot."],
+      "description": ["item.dungeonnowloading.mimicling.food.piglin_head"],
       "effects": [
         {
           "trigger": "change_drop",
@@ -507,7 +487,7 @@
       "item": "minecraft:spider_eye",
       "durability": 10,
       "usage_count": 10,
-      "description": ["On attack, inflicts Poison I.", "Potatoes become poisonous potato loot."],
+      "description": ["item.dungeonnowloading.mimicling.food.spider_eye"],
       "effects": [
         {
           "trigger": "apply_potion_effect",
@@ -531,12 +511,12 @@
       "item": "minecraft:rabbit_foot",
       "durability": 10,
       "usage_count": 10,
-      "description": ["On attack, launches the target upward.", "Inflicts Jump Boost II for 30 seconds."],
+      "description": ["item.dungeonnowloading.mimicling.food.rabbit_foot"],
       "effects": [
         {
           "trigger": "apply_non_potion_effect",
           "action": "jump_up",
-          "blocks": 5
+          "blocks": 3
         },
         {
           "trigger": "apply_potion_effect",
@@ -551,7 +531,7 @@
       "item": "minecraft:phantom_membrane",
       "durability": 10,
       "usage_count": 10,
-      "description": ["On attack, inflicts Slow Falling for 30 seconds."],
+      "description": ["item.dungeonnowloading.mimicling.food.phantom_membrane"],
       "effects": [
         {
           "trigger": "apply_potion_effect",
@@ -566,7 +546,7 @@
       "item": "minecraft:magma_cream",
       "durability": 10,
       "usage_count": 50,
-      "description": ["Sword and axe gain Fire Aspect +1.", "Smelts block drops when smelting is possible."],
+      "description": ["item.dungeonnowloading.mimicling.food.magma_cream"],
       "effects": [
         {
           "trigger": "while_in_hand",
@@ -589,7 +569,7 @@
       "item": "minecraft:fermented_spider_eye",
       "durability": 10,
       "usage_count": 10,
-      "description": ["Converts matching status effects into inverted effects."],
+      "description": ["item.dungeonnowloading.mimicling.food.fermented_spider_eye"],
       "effects": [
         {
           "trigger": "reference_potion_effect",
@@ -624,7 +604,7 @@
       "item": "minecraft:ender_eye",
       "durability": 10,
       "usage_count": 5,
-      "description": ["While held in main hand, Mimicling reach becomes 12 blocks."],
+      "description": ["item.dungeonnowloading.mimicling.food.ender_eye"],
       "effects": [
         {
           "trigger": "while_in_hand",
@@ -637,7 +617,7 @@
       "item": "minecraft:ender_pearl",
       "durability": 10,
       "usage_count": 10,
-      "description": ["On attack, swaps places with the target.", "Mined block drops go directly into your inventory."],
+      "description": ["item.dungeonnowloading.mimicling.food.ender_pearl"],
       "effects": [
         {
           "trigger": "change_mob_position",
@@ -655,7 +635,7 @@
       "durability": 0,
       "usage_count": 0,
       "infinite_usage": true,
-      "description": ["Infinite uses.", "Killed mobs spawn a cloud of their status effects.", "Returns when replaced."],
+      "description": ["item.dungeonnowloading.mimicling.food.dragon_head"],
       "effects": [
         {
           "trigger": "reference_potion_effect",
@@ -668,7 +648,7 @@
       "durability": 0,
       "usage_count": 0,
       "infinite_usage": true,
-      "description": ["Infinite uses.", "Mined loot falls above an enemy targeting you within 32 blocks.", "Returns when replaced."],
+      "description": ["item.dungeonnowloading.mimicling.food.dragon_egg"],
       "effects": [
         {
           "trigger": "change_drop",
@@ -686,7 +666,7 @@
       "item": "minecraft:sniffer_egg",
       "durability": 500,
       "usage_count": 100,
-      "description": ["On break, trails toward a nearby matching block.", "On kill, trails toward a nearby matching entity."],
+      "description": ["item.dungeonnowloading.mimicling.food.sniffer_egg"],
       "effects": [
         {
           "trigger": "on_break",

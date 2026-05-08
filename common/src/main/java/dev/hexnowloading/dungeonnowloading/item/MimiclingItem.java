@@ -68,8 +68,6 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static final int MAX_STORED_ITEMS = 5;
     private static final int INITIAL_CAPACITY = 2;
     private static final int MUCUS_PER_CAPACITY_UPGRADE = 2;
-    private static final int MUCUS_LOCKED_HEAL_AMOUNT = 10;
-    private static final int MUCUS_UNLOCKED_HEAL_AMOUNT = 100;
     private static final int TRANSITION_DURATION = 20;
     private static final int FIRST_PHASE_TICKS = 10;
     private static final int CHEWING_FRAME_COUNT = 15;
@@ -247,9 +245,6 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, level, components, tooltipFlag);
-        if (canUseStorage(stack)) {
-            components.add(Component.translatable("item.dungeonnowloading.mimicling.tooltip.capacity", getStoredItemCount(stack), getStorageCapacity(stack)).withStyle(ChatFormatting.GRAY));
-        }
     }
 
     @Override
@@ -270,7 +265,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return getTooltipImage(
                 stack,
                 previewFood,
-                MimiclingFoods.getPreviewDescription(previewFood),
+                MimiclingFoods.getPreviewDescription(stack, previewFood),
                 getCarriedFoodHighlightSlot(stack, carriedStack),
                 !isFeedableFood(carriedStack)
         );
@@ -285,7 +280,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return Optional.of(new MimiclingTooltip(contents, getTooltipActiveFoods(stack), showSelectedToolSlot ? getSelectedSlot(stack) : -1, selectedFoodSlot, getStorageCapacity(stack)));
     }
 
-    private static Optional<TooltipComponent> getTooltipImage(ItemStack stack, ItemStack previewFood, List<String> previewFoodLines, int selectedFoodSlot, boolean showSelectedToolSlot) {
+    private static Optional<TooltipComponent> getTooltipImage(ItemStack stack, ItemStack previewFood, List<Component> previewFoodLines, int selectedFoodSlot, boolean showSelectedToolSlot) {
         NonNullList<ItemStack> contents = getTooltipContents(stack);
         return Optional.of(new MimiclingTooltip(contents, getTooltipActiveFoods(stack), previewFood, previewFoodLines, showSelectedToolSlot ? getSelectedSlot(stack) : -1, selectedFoodSlot, getStorageCapacity(stack)));
     }
@@ -365,10 +360,6 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         slot.setChanged();
         playTransformSound(player.level(), player);
         return true;
-    }
-
-    public static ItemStack restoreTemporaryInventoryForm(ItemStack stack) {
-        return restoreTemporaryInventoryForm(stack, 0L, false);
     }
 
     public static ItemStack restoreTemporaryInventoryForm(ItemStack stack, long gameTime) {
@@ -633,16 +624,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return slot >= 0 && !getStoredItem(stack, slot).isEmpty();
     }
 
-    public static void tickMimiclingInventory(ItemStack stack, Level level) {
+    public static void tickMimiclingInventory(ItemStack stack, Level level, Entity entity) {
         if (!level.isClientSide) {
             removeStaleAttributeModifierTags(stack);
             syncActiveEnchantmentTags(stack, getStoredForm(stack));
-        }
-    }
-
-    public static void tickMimiclingInventory(ItemStack stack, Level level, Entity entity) {
-        tickMimiclingInventory(stack, level);
-        if (!level.isClientSide) {
             MimiclingFoodEffects.tickHeld(stack, level, entity);
         }
     }
@@ -650,6 +635,9 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     public static void onMimiclingMineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity entity) {
         if (!level.isClientSide && !state.isAir()) {
             MimiclingFoodEffects.onBreak(stack, level, pos, state, entity);
+            if (state.getDestroySpeed(level, pos) != 0.0F) {
+                applyDurabilityDamage(stack, entity, getBlockUseDurabilityCost(stack));
+            }
             MimiclingFoods.consumeUsage(stack);
         }
     }
@@ -657,6 +645,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     public static void onMimiclingHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (!attacker.level().isClientSide) {
             MimiclingFoodEffects.onAttack(stack, target, attacker);
+            applyDurabilityDamage(stack, attacker, getAttackUseDurabilityCost(stack));
             MimiclingFoods.consumeUsage(stack);
         }
     }
@@ -958,12 +947,6 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return closest;
     }
 
-    private static void playTransformSound(Level level, Player player) {
-        if (!level.isClientSide) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SLIME_BLOCK_PLACE, SoundSource.PLAYERS, 0.8F, 1.1F);
-        }
-    }
-
     private static void playTransformSound(Level level, LivingEntity entity) {
         if (!level.isClientSide) {
             level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.SLIME_BLOCK_PLACE, SoundSource.PLAYERS, 0.8F, 1.1F);
@@ -1090,7 +1073,8 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
     private static boolean canAcceptFeed(ItemStack stack, ItemStack itemToFeed) {
         if (isMimicMucus(itemToFeed)) {
-            return getStorageCapacity(stack) < MAX_STORED_ITEMS || stack.getDamageValue() > 0;
+            MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(itemToFeed);
+            return getStorageCapacity(stack) < MAX_STORED_ITEMS || (stack.getDamageValue() > 0 && food != null && food.durability() > 0);
         }
 
         MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(itemToFeed);
@@ -1188,20 +1172,16 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return contents;
     }
 
-    private static List<ItemStack> feedOne(ItemStack stack, ItemStack itemToFeed) {
-        return feedOne(stack, itemToFeed, -1);
-    }
-
     private static List<ItemStack> feedOne(ItemStack stack, ItemStack itemToFeed, int preferredFoodReplacementIndex) {
         if (isMimicMucus(itemToFeed)) {
-            feedMimicMucus(stack);
+            feedMimicMucus(stack, MimiclingFoods.getFood(itemToFeed));
             return List.of();
         }
 
         MimiclingFoods.FoodDefinition food = MimiclingFoods.getFood(itemToFeed);
         if (food != null) {
-            repairDurability(stack, food.durability());
-            List<ItemStack> returnedItems = new java.util.ArrayList<>(MimiclingFoods.rememberFood(stack, food, itemToFeed, preferredFoodReplacementIndex));
+            int repaired = repairDurability(stack, food.durability());
+            List<ItemStack> returnedItems = new java.util.ArrayList<>(MimiclingFoods.rememberFood(stack, food, itemToFeed, preferredFoodReplacementIndex, repaired));
             ItemStack onFedReturn = MimiclingFoods.getOnFedReturnStack(food);
             if (!onFedReturn.isEmpty()) {
                 returnedItems.add(onFedReturn);
@@ -1270,13 +1250,10 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return getTooltipImage(
                 stack,
                 selectedFood.displayStack(),
-                selectedFood.food().description(),
+                MimiclingFoods.getPreviewDescription(selectedFood.food()),
                 selected,
                 !isFeedableFood(selectedFood.displayStack())
         );
-    }
-
-    public static void appendActiveFoodTooltip(ItemStack stack, List<Component> components) {
     }
 
     private static List<MimiclingTooltip.ActiveFood> getTooltipActiveFoods(ItemStack stack) {
@@ -1297,10 +1274,11 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return tooltipFoods;
     }
 
-    private static void feedMimicMucus(ItemStack stack) {
+    private static void feedMimicMucus(ItemStack stack, @Nullable MimiclingFoods.FoodDefinition food) {
         int capacity = getStorageCapacity(stack);
-        int healAmount = capacity >= MAX_STORED_ITEMS ? MUCUS_UNLOCKED_HEAL_AMOUNT : MUCUS_LOCKED_HEAL_AMOUNT;
-        repairDurability(stack, healAmount);
+        if (food != null) {
+            repairDurability(stack, food.durability());
+        }
 
         if (capacity >= MAX_STORED_ITEMS) {
             return;
@@ -1317,12 +1295,15 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         tag.putInt(MUCUS_FED_TAG, mucusFed);
     }
 
-    private static void repairDurability(ItemStack stack, int amount) {
+    private static int repairDurability(ItemStack stack, int amount) {
         if (amount <= 0 || !stack.isDamageableItem()) {
-            return;
+            return 0;
         }
 
-        stack.setDamageValue(Math.max(0, stack.getDamageValue() - amount));
+        int previousDamage = stack.getDamageValue();
+        int newDamage = Math.max(0, previousDamage - amount);
+        stack.setDamageValue(newDamage);
+        return previousDamage - newDamage;
     }
 
     private static ItemStack storeInDedicatedSlot(ItemStack stack, ItemStack itemToStore) {

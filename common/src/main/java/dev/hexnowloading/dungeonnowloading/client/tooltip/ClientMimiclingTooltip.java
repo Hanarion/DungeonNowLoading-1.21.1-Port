@@ -6,9 +6,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClientMimiclingTooltip implements ClientTooltipComponent {
@@ -20,16 +22,19 @@ public class ClientMimiclingTooltip implements ClientTooltipComponent {
     private static final int FOOD_ROW_HEIGHT = 14;
     private static final int FOOD_ICON_SIZE = 12;
     private static final int FOOD_TEXT_GAP = 3;
+    private static final int FOOD_TEXT_Y_OFFSET = 3;
     private static final int FOOD_SELECTION_PADDING = 1;
     private static final float FOOD_ICON_SCALE = 0.75F;
     private static final int PREVIEW_GAP = 3;
     private static final int PREVIEW_LINE_HEIGHT = 10;
+    private static final int FOOD_TEXT_COLOR = 0xAAAAAA;
+    private static final int FOOD_DESCRIPTION_COLOR = 0x777777;
     private static final int TEXTURE_SIZE = 128;
     private static final int MARGIN_Y = 4;
     private final NonNullList<ItemStack> items;
     private final List<MimiclingTooltip.ActiveFood> activeFoods;
     private final ItemStack previewFood;
-    private final List<String> previewFoodLines;
+    private final List<Component> previewFoodLines;
     private final int selectedSlot;
     private final int selectedFoodSlot;
     private final int capacity;
@@ -49,7 +54,7 @@ public class ClientMimiclingTooltip implements ClientTooltipComponent {
         int slotHeight = hasStorageSlots() ? SLOT_HEIGHT + 2 : 0;
         int foodHeight = activeFoods.size() * FOOD_ROW_HEIGHT;
         int gap = hasStorageSlots() && !activeFoods.isEmpty() ? MARGIN_Y : 0;
-        int previewHeight = hasPreviewFood() ? PREVIEW_GAP + Math.max(FOOD_ICON_SIZE, previewFoodLines.size() * PREVIEW_LINE_HEIGHT) : 0;
+        int previewHeight = hasPreviewFood() ? PREVIEW_GAP + Math.max(FOOD_ICON_SIZE, getPreviewLines().size() * PREVIEW_LINE_HEIGHT) : 0;
         return slotHeight + gap + foodHeight + previewHeight + MARGIN_Y;
     }
 
@@ -60,8 +65,8 @@ public class ClientMimiclingTooltip implements ClientTooltipComponent {
             width = Math.max(width, FOOD_ICON_SIZE + FOOD_TEXT_GAP + font.width(getFoodUsesText(activeFood)));
         }
         if (hasPreviewFood()) {
-            for (String line : previewFoodLines) {
-                width = Math.max(width, FOOD_ICON_SIZE + FOOD_TEXT_GAP + font.width(line));
+            for (PreviewLine line : getPreviewLines()) {
+                width = Math.max(width, FOOD_ICON_SIZE + FOOD_TEXT_GAP + font.width(line.component()));
             }
         }
         return width;
@@ -102,17 +107,40 @@ public class ClientMimiclingTooltip implements ClientTooltipComponent {
                         0x80FFFFFF
                 );
             }
-            guiGraphics.drawString(font, getFoodUsesText(activeFood), x + FOOD_ICON_SIZE + FOOD_TEXT_GAP, contentY + 3, 0xAAAAAA, false);
+            guiGraphics.drawString(font, getFoodUsesText(activeFood), x + FOOD_ICON_SIZE + FOOD_TEXT_GAP, contentY + FOOD_TEXT_Y_OFFSET, FOOD_TEXT_COLOR, false);
             contentY += FOOD_ROW_HEIGHT;
         }
 
         if (hasPreviewFood()) {
             contentY += PREVIEW_GAP;
             renderSmallItem(guiGraphics, previewFood, x, contentY);
-            for (int i = 0; i < previewFoodLines.size(); i++) {
-                guiGraphics.drawString(font, previewFoodLines.get(i), x + FOOD_ICON_SIZE + FOOD_TEXT_GAP, contentY + 1 + i * PREVIEW_LINE_HEIGHT, 0xAAAAAA, false);
+            List<PreviewLine> lines = getPreviewLines();
+            for (int i = 0; i < lines.size(); i++) {
+                PreviewLine line = lines.get(i);
+                int color = line.description() ? FOOD_DESCRIPTION_COLOR : FOOD_TEXT_COLOR;
+                guiGraphics.drawString(font, line.component(), x + FOOD_ICON_SIZE + FOOD_TEXT_GAP, contentY + FOOD_TEXT_Y_OFFSET + i * PREVIEW_LINE_HEIGHT, color, false);
             }
         }
+    }
+
+    private List<PreviewLine> getPreviewLines() {
+        List<PreviewLine> lines = new ArrayList<>();
+        for (int i = 0; i < previewFoodLines.size(); i++) {
+            Component component = previewFoodLines.get(i);
+            String text = component.getString();
+            String[] split = text.split("\\R", -1);
+            if (split.length == 1) {
+                lines.add(new PreviewLine(component, i > 0));
+                continue;
+            }
+            for (String line : split) {
+                lines.add(new PreviewLine(Component.literal(line).withStyle(component.getStyle()), i > 0));
+            }
+        }
+        return lines;
+    }
+
+    private record PreviewLine(Component component, boolean description) {
     }
 
     private boolean hasStorageSlots() {

@@ -8,6 +8,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -36,16 +39,12 @@ public final class MimiclingFoods {
     private static final int INFINITE_USES = -1;
     private static final int MAX_USAGE_STACKS = 3;
     private static final int MAX_ACTIVE_FOODS = 2;
+    private static final String FOOD_TOOLTIP_PREFIX = "item.dungeonnowloading.mimicling.tooltip.food.";
     private static final Map<String, FoodDefinition> FOODS_BY_ID = new HashMap<>();
     private static final Map<Item, FoodDefinition> ITEM_FOODS = new HashMap<>();
     private static final List<TagFoodEntry> TAG_FOODS = new ArrayList<>();
 
     private MimiclingFoods() {}
-
-    public static int getRepairAmount(ItemStack stack) {
-        FoodDefinition food = getFood(stack);
-        return food == null ? 0 : food.durability();
-    }
 
     public static FoodDefinition getFood(ItemStack stack) {
         FoodDefinition itemFood = ITEM_FOODS.get(stack.getItem());
@@ -68,18 +67,59 @@ public final class MimiclingFoods {
         return food.returnItem() == null ? ItemStack.EMPTY : new ItemStack(food.returnItem());
     }
 
-    public static List<String> getPreviewDescription(ItemStack stack) {
-        FoodDefinition food = getFood(stack);
+    public static List<Component> getPreviewDescription(ItemStack mimicling, ItemStack fedStack) {
+        FoodDefinition food = getFood(fedStack);
         if (food == null) {
             return List.of();
         }
 
-        List<String> lines = new ArrayList<>();
-        if (food.durability() > 0) {
-            lines.add("Restores " + food.durability() + " durability.");
+        int repairedDurability = food.durability() > 0 && mimicling.isDamageableItem() ? Math.min(food.durability(), mimicling.getDamageValue()) : food.durability();
+        int usesToAdd = getFedUsesToAdd(food, repairedDurability);
+        boolean reducedUses = !food.infiniteUsage() && food.durability() > 0 && usesToAdd < food.usageCount();
+        return getPreviewDescription(food, usesToAdd, reducedUses);
+    }
+
+    public static List<Component> getPreviewDescription(FoodDefinition food) {
+        return getPreviewDescription(food, food.infiniteUsage() ? INFINITE_USES : food.usageCount(), false);
+    }
+
+    private static List<Component> getPreviewDescription(FoodDefinition food, int usesToAdd, boolean reducedUses) {
+        List<Component> lines = new ArrayList<>();
+        lines.add(getPreviewStats(food, usesToAdd, reducedUses));
+        for (String description : food.description()) {
+            lines.add(toDescriptionComponent(description));
         }
-        lines.addAll(food.description());
         return lines;
+    }
+
+    private static Component getPreviewStats(FoodDefinition food, int usesToAdd, boolean reducedUses) {
+        Component durability = food.durability() > 0
+                ? Component.translatable(FOOD_TOOLTIP_PREFIX + "durability_amount", food.durability(), Component.translatable(FOOD_TOOLTIP_PREFIX + "durability"))
+                : Component.translatable(FOOD_TOOLTIP_PREFIX + "no_durability");
+        MutableComponent uses = food.infiniteUsage()
+                ? Component.translatable(FOOD_TOOLTIP_PREFIX + "infinite_uses", Component.translatable(FOOD_TOOLTIP_PREFIX + "uses"))
+                : Component.translatable(FOOD_TOOLTIP_PREFIX + "use_amount", Math.max(0, usesToAdd), Component.translatable(usesToAdd == 1 ? FOOD_TOOLTIP_PREFIX + "use" : FOOD_TOOLTIP_PREFIX + "uses"));
+        if (reducedUses) {
+            uses.withStyle(ChatFormatting.RED);
+        }
+
+        if (food.durability() <= 0 && (food.infiniteUsage() || food.usageCount() > 0)) {
+            return uses;
+        }
+        if (!food.infiniteUsage() && food.usageCount() <= 0) {
+            return durability;
+        }
+        return Component.translatable(FOOD_TOOLTIP_PREFIX + "stats", durability, uses);
+    }
+
+    private static Component toDescriptionComponent(String description) {
+        for (int i = 0; i < description.length(); i++) {
+            char character = description.charAt(i);
+            if (!(character == '.' || character == '_' || character == '-' || character == ':' || Character.isLetterOrDigit(character))) {
+                return Component.literal(description);
+            }
+        }
+        return Component.translatable(description);
     }
 
     public static boolean shouldRemember(FoodDefinition food) {
@@ -93,16 +133,20 @@ public final class MimiclingFoods {
         if (isAtUsageCap(mimicling, food)) {
             return canRepair;
         }
+        if (!food.infiniteUsage() && food.usageCount() > 0 && food.durability() > 0 && !canRepair) {
+            return false;
+        }
         return true;
     }
 
-    public static List<ItemStack> rememberFood(ItemStack mimicling, FoodDefinition food, ItemStack fedStack) {
-        return rememberFood(mimicling, food, fedStack, -1);
-    }
-
-    public static List<ItemStack> rememberFood(ItemStack mimicling, FoodDefinition food, ItemStack fedStack, int preferredReplacementIndex) {
+    public static List<ItemStack> rememberFood(ItemStack mimicling, FoodDefinition food, ItemStack fedStack, int preferredReplacementIndex, int repairedDurability) {
         List<ItemStack> returnedItems = new ArrayList<>();
         if (!shouldRemember(food)) {
+            return returnedItems;
+        }
+
+        int usesToAdd = getFedUsesToAdd(food, repairedDurability);
+        if (!food.infiniteUsage() && usesToAdd <= 0) {
             return returnedItems;
         }
 
@@ -115,7 +159,7 @@ public final class MimiclingFoods {
             CompoundTag activeFood = activeFoods.getCompound(i).copy();
             if (food.id().equals(activeFood.getString(ACTIVE_FOOD_ID_TAG))) {
                 activeFood.putString(ACTIVE_FOOD_ITEM_TAG, BuiltInRegistries.ITEM.getKey(fedStack.getItem()).toString());
-                activeFood.putInt(ACTIVE_FOOD_USES_TAG, getRememberedUses(activeFood, food));
+                activeFood.putInt(ACTIVE_FOOD_USES_TAG, getRememberedUses(activeFood, food, usesToAdd));
                 activeFood.putInt(ACTIVE_FOOD_MAX_USES_TAG, getMaxUses(food));
                 mergedExistingFood = true;
             }
@@ -131,7 +175,7 @@ public final class MimiclingFoods {
         CompoundTag activeFood = new CompoundTag();
         activeFood.putString(ACTIVE_FOOD_ID_TAG, food.id());
         activeFood.putString(ACTIVE_FOOD_ITEM_TAG, BuiltInRegistries.ITEM.getKey(fedStack.getItem()).toString());
-        activeFood.putInt(ACTIVE_FOOD_USES_TAG, food.infiniteUsage() ? INFINITE_USES : food.usageCount());
+        activeFood.putInt(ACTIVE_FOOD_USES_TAG, food.infiniteUsage() ? INFINITE_USES : usesToAdd);
         activeFood.putInt(ACTIVE_FOOD_MAX_USES_TAG, getMaxUses(food));
         if (updatedFoods.size() >= MAX_ACTIVE_FOODS && preferredReplacementIndex >= 0 && preferredReplacementIndex < updatedFoods.size()) {
             CompoundTag removedFood = updatedFoods.getCompound(preferredReplacementIndex).copy();
@@ -150,11 +194,22 @@ public final class MimiclingFoods {
         return returnedItems;
     }
 
-    private static int getRememberedUses(CompoundTag activeFood, FoodDefinition food) {
+    private static int getFedUsesToAdd(FoodDefinition food, int repairedDurability) {
+        if (food.infiniteUsage()) {
+            return INFINITE_USES;
+        }
+        if (food.durability() <= 0) {
+            return food.usageCount();
+        }
+        int usedDurability = Math.max(0, Math.min(food.durability(), repairedDurability));
+        return food.usageCount() * usedDurability / food.durability();
+    }
+
+    private static int getRememberedUses(CompoundTag activeFood, FoodDefinition food, int usesToAdd) {
         if (food.infiniteUsage() || activeFood.getInt(ACTIVE_FOOD_USES_TAG) == INFINITE_USES) {
             return INFINITE_USES;
         }
-        return Math.min(getMaxUses(food), activeFood.getInt(ACTIVE_FOOD_USES_TAG) + food.usageCount());
+        return Math.min(getMaxUses(food), activeFood.getInt(ACTIVE_FOOD_USES_TAG) + usesToAdd);
     }
 
     private static boolean isAtUsageCap(ItemStack mimicling, FoodDefinition food) {

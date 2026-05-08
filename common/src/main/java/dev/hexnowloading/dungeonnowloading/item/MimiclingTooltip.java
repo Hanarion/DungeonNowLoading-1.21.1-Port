@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 
@@ -10,7 +11,7 @@ public class MimiclingTooltip implements TooltipComponent {
     private final NonNullList<ItemStack> items;
     private final List<ActiveFood> activeFoods;
     private final ItemStack previewFood;
-    private final List<String> previewFoodLines;
+    private final List<Component> previewFoodLines;
     private final int selectedSlot;
     private final int selectedFoodSlot;
     private final int capacity;
@@ -23,7 +24,7 @@ public class MimiclingTooltip implements TooltipComponent {
         this(items, activeFoods, ItemStack.EMPTY, List.of(), selectedSlot, selectedFoodSlot, capacity);
     }
 
-    public MimiclingTooltip(NonNullList<ItemStack> items, List<ActiveFood> activeFoods, ItemStack previewFood, List<String> previewFoodLines, int selectedSlot, int selectedFoodSlot, int capacity) {
+    public MimiclingTooltip(NonNullList<ItemStack> items, List<ActiveFood> activeFoods, ItemStack previewFood, List<Component> previewFoodLines, int selectedSlot, int selectedFoodSlot, int capacity) {
         this.items = items;
         this.activeFoods = activeFoods;
         this.previewFood = previewFood;
@@ -45,7 +46,7 @@ public class MimiclingTooltip implements TooltipComponent {
         return previewFood;
     }
 
-    public List<String> getPreviewFoodLines() {
+    public List<Component> getPreviewFoodLines() {
         return previewFoodLines;
     }
 
