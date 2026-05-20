@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import dev.hexnowloading.dungeonnowloading.DNLClient;
 import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
 import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
@@ -46,6 +47,7 @@ public class DNLFabricClient implements ClientModInitializer {
         DNLPackets.registerServerbound();
         DNLPackets.registerClientbound();
 
+        DNLClient.registerItemModels();
         DNLClient.registerMenuScreens();
         registerItemModelLayers();
         registerItemRenderers();
@@ -130,6 +132,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDSTONE_CHALK_MARK.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WISP_BLOCK.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.ACACIA_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BAMBOO_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BIRCH_WOODEN_BOARD.get(), RenderType.cutout());
@@ -219,6 +222,7 @@ public class DNLFabricClient implements ClientModInitializer {
 
         ItemProperties.register(DNLItems.REPULSOR.get(), new ResourceLocation("golden_mode"),
                 (stack, level, entity, seed) -> RepulsorItem.isGoldenMode(stack) ? 1.0F : 0.0F);
+
     }
 
     private void registerModelLayers() {

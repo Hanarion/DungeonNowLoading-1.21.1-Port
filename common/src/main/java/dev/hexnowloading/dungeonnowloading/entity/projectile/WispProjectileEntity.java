@@ -25,6 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.MinecartFurnace;
@@ -73,6 +74,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
     private LivingEntity homingTarget;
     private double preservedSpeed;
     private BlockPos suppressFireAtBlockPos;
+    private boolean discardWhenTargetMissing = true;
 
     public WispProjectileEntity(EntityType<? extends WispProjectileEntity> entityType, Level level) {
         super(entityType, level);
@@ -107,7 +109,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
             return;
         }
 
-        if (this.getHomingTarget() == null) {
+        if (this.getHomingTarget() == null && this.discardWhenTargetMissing) {
             this.hitEntity = null;
             this.discardWithBurst();
             return;
@@ -204,9 +206,14 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
 
     @Override
     protected boolean canHitEntity(Entity entity) {
-        if (entity instanceof WispProjectileEntity || entity instanceof WispLanternEntity || entity instanceof WispEntity) {
+        if (entity instanceof WispProjectileEntity || entity instanceof WispEntity) {
             return false;
         }
+
+        if (entity instanceof WispLanternEntity && !(this.getOwner() instanceof Player)) {
+            return false;
+        }
+
         return super.canHitEntity(entity);
     }
 
@@ -247,6 +254,10 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
 
     public void setDamage(float damage) {
         this.damage = damage;
+    }
+
+    public void setDiscardWhenTargetMissing(boolean discardWhenTargetMissing) {
+        this.discardWhenTargetMissing = discardWhenTargetMissing;
     }
 
     public void setHomingTarget(LivingEntity homingTarget) {

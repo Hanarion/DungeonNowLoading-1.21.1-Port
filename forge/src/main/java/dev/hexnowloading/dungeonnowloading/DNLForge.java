@@ -51,6 +51,8 @@ public class DNLForge {
     }
 
     private void addModClientListeners(IEventBus bus) {
+        DNLClient.registerItemModels();
+        bus.addListener(DNLForgeClientEvents::onRegisterAdditionalModels);
         bus.addListener(DNLForgeClientEvents::onRegisterRenderer);
         bus.addListener(DNLForgeClientEvents::onRegisterLayers);
         bus.addListener(DNLForgeClientEvents::onRegisterParticleProviders);

@@ -50,6 +50,8 @@
       "client.SituationalMusicMixin",
       "client.MinecraftClientTickMixin",
       "client.MusicManagerMixin",
+      "client.ModelManagerAccessor",
+      "client.WisplightRodItemRendererMixin",
       "client.LivingEntityRendererMixin",
       "MixinTitleScreen",
       "MaxHealthAttributeMixin"

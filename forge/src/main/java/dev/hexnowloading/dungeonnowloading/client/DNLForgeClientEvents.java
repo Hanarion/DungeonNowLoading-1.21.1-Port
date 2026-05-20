@@ -11,6 +11,7 @@ import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
 import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
+import dev.hexnowloading.dungeonnowloading.platform.ForgeClientHelper;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -21,10 +22,14 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class DNLForgeClientEvents {
+    public static void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
+        ForgeClientHelper.ITEM_MODELS.forEach(event::register);
+    }
 
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         // Bosses
@@ -178,6 +183,7 @@ public class DNLForgeClientEvents {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.WISP_BLOCK.get(), RenderType.translucent());
         });
     }
 

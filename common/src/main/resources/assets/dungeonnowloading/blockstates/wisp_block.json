@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "dungeonnowloading:block/wisp_block" },
+    "facing=east": { "model": "dungeonnowloading:block/wisp_block", "y": 90 },
+    "facing=south": { "model": "dungeonnowloading:block/wisp_block", "y": 180 },
+    "facing=west": { "model": "dungeonnowloading:block/wisp_block", "y": 270 }
+  }
+}
