@@ -43,6 +43,7 @@ public class WisplightRodItem extends Item {
     private static final double ATTACK_DAMAGE_MODIFIER = 0.0D;
     private static final double ATTACK_SPEED_MODIFIER = -3.0D;
     private static final int BURN_SECONDS = 8;
+    private static final int SHOOT_COOLDOWN_TICKS = 20;
     private static final double TARGET_RANGE = 32.0D;
     private static final float PROJECTILE_SPEED = 1.1F;
     private static final float BLOCK_FUEL_CONSUME_CHANCE = 0.33F;
@@ -120,6 +121,10 @@ public class WisplightRodItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
+        if (player.getCooldowns().isOnCooldown(this)) {
+            return InteractionResultHolder.fail(stack);
+        }
+
         if (!this.hasFuel(player)) {
             return InteractionResultHolder.fail(stack);
         }
@@ -127,6 +132,7 @@ public class WisplightRodItem extends Item {
         if (!level.isClientSide) {
             this.consumeFuel(player);
             this.shootWisp(level, player, stack, hand);
+            player.getCooldowns().addCooldown(this, SHOOT_COOLDOWN_TICKS);
             player.awardStat(Stats.ITEM_USED.get(this));
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 0.75F, 1.1F + level.random.nextFloat() * 0.2F);
         }

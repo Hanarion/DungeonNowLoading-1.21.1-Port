@@ -20,6 +20,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class WispBlock extends HorizontalDirectionalBlock {
+    private static final double AMBIENT_PARTICLE_RANGE = 4.0D / 16.0D;
     private static final VoxelShape SHAPE = Shapes.or(
             Block.box(6.0D, 6.0D, 6.0D, 10.0D, 10.0D, 10.0D),
             Block.box(5.5D, 5.5D, 5.5D, 10.5D, 10.5D, 10.5D)
@@ -53,9 +54,9 @@ public class WispBlock extends HorizontalDirectionalBlock {
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        double x = pos.getX() + 0.5D;
-        double y = pos.getY() + 0.5D;
-        double z = pos.getZ() + 0.5D;
+        double x = pos.getX() + 0.5D + (random.nextDouble() * 2.0D - 1.0D) * AMBIENT_PARTICLE_RANGE;
+        double y = pos.getY() + 0.5D + (random.nextDouble() * 2.0D - 1.0D) * AMBIENT_PARTICLE_RANGE;
+        double z = pos.getZ() + 0.5D + (random.nextDouble() * 2.0D - 1.0D) * AMBIENT_PARTICLE_RANGE;
 
         level.addParticle(ParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D);
         if (random.nextFloat() < 0.35F) {
