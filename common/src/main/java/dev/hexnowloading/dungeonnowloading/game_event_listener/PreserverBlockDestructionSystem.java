@@ -446,16 +446,7 @@ public interface PreserverBlockDestructionSystem {
         }
 
         private boolean ignoreBlockTransformation(ServerLevel serverLevel, BlockPos eventBlockPos) {
-            BlockState blockState = serverLevel.getBlockState(eventBlockPos);
-            Block block = blockState.getBlock();
-            return blockState.isCollisionShapeFullBlock(serverLevel, eventBlockPos) ||
-                    blockState.is(DNLTags.NEAR_FULL_HEIGHT_BLOCKS) ||
-                    blockState.is(DNLTags.CHESTS) ||
-                    block instanceof IronBarsBlock ||
-                    block instanceof SlabBlock ||
-                    block instanceof StairBlock ||
-                    block instanceof FenceBlock ||
-                    block instanceof WallBlock;
+            return !serverLevel.getBlockState(eventBlockPos).isAir();
         }
 
         private void placeMendingBlock(ServerLevel serverLevel, BlockState originalBlockState, BlockPos eventBlockPos, GameEvent gameEvent) {
