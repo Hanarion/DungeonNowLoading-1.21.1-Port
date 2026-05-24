@@ -232,10 +232,7 @@ public interface PreserverBlockDestructionSystem {
                 //Note: Block Destruction cancel must be placed after placeMendingBlock to avoid the blockDestruction being reset before placing the mendstone block. Doesn't cause the bug when the player destroys the block, but located here just in case.
                 BlockDestructionManager.cancel();
 
-                if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
-                    blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.syncToClients(serverLevel, serverLevel.getBlockState(eventBlockPos));
-                }
+                storeMendingAuraBlock(serverLevel, eventBlockPos, originalBlockState, compoundTag);
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
                     preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
@@ -289,10 +286,7 @@ public interface PreserverBlockDestructionSystem {
                 //Note: Block Destruction cancel must be placed after placeMendingBlock to avoid the blockDestruction being reset before placing the mendstone block.
                 BlockDestructionManager.cancel();
 
-                if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
-                    blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.syncToClients(serverLevel, serverLevel.getBlockState(eventBlockPos));
-                }
+                storeMendingAuraBlock(serverLevel, eventBlockPos, originalBlockState, compoundTag);
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
                     preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
@@ -344,10 +338,7 @@ public interface PreserverBlockDestructionSystem {
                 //Note: Block Destruction cancel must be placed after placeMendingBlock to avoid the blockDestruction being reset before placing the mendstone block.
                 ExplosionDestructionManager.cancel();
 
-                if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
-                    blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.syncToClients(serverLevel, serverLevel.getBlockState(eventBlockPos));
-                }
+                storeMendingAuraBlock(serverLevel, eventBlockPos, originalBlockState, compoundTag);
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
                     preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
@@ -382,10 +373,7 @@ public interface PreserverBlockDestructionSystem {
 
                 placeMendingBlock(serverLevel, originalBlockState, eventBlockPos, gameEvent);
 
-                if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
-                    blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.syncToClients(serverLevel, serverLevel.getBlockState(eventBlockPos));
-                }
+                storeMendingAuraBlock(serverLevel, eventBlockPos, originalBlockState, compoundTag);
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
                     preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
@@ -419,10 +407,7 @@ public interface PreserverBlockDestructionSystem {
 
                 placeMendingBlock(serverLevel, originalBlockState, eventBlockPos, gameEvent);
 
-                if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
-                    blockEntity.setStoredBlock(originalBlockState, compoundTag);
-                    blockEntity.syncToClients(serverLevel, serverLevel.getBlockState(eventBlockPos));
-                }
+                storeMendingAuraBlock(serverLevel, eventBlockPos, originalBlockState, compoundTag);
 
                 if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
                     preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
@@ -449,14 +434,20 @@ public interface PreserverBlockDestructionSystem {
             return !serverLevel.getBlockState(eventBlockPos).isAir();
         }
 
+        private void storeMendingAuraBlock(ServerLevel serverLevel, BlockPos eventBlockPos, BlockState originalBlockState, CompoundTag compoundTag) {
+            if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
+                BlockState storedBlockState = MendingAuraBlock.refreshStoredConnections(originalBlockState, serverLevel, eventBlockPos);
+                blockEntity.setStoredBlock(storedBlockState, compoundTag);
+                MendingAuraBlock.refreshNeighboringStoredConnections(serverLevel, eventBlockPos);
+                blockEntity.syncToClients(serverLevel, serverLevel.getBlockState(eventBlockPos));
+            }
+        }
+
         private void placeMendingBlock(ServerLevel serverLevel, BlockState originalBlockState, BlockPos eventBlockPos, GameEvent gameEvent) {
             //Note: For some reason, this setblock resets the BlockDestructionManager when the event block has attachable blocks like torches and vines, so the BlockDestructionManager.cancel need to be ran after this setblock.
             serverLevel.setBlock(eventBlockPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
 
-            BlockState mendingAuraState = DNLBlocks.MENDING_AURA.get().defaultBlockState();
-            if (originalBlockState.hasProperty(BlockStateProperties.WATERLOGGED)) {
-                mendingAuraState = mendingAuraState.setValue(BlockStateProperties.WATERLOGGED, originalBlockState.getValue(BlockStateProperties.WATERLOGGED));
-            }
+            BlockState mendingAuraState = MendingAuraBlock.configureForStoredBlock(DNLBlocks.MENDING_AURA.get().defaultBlockState(), originalBlockState);
 
             serverLevel.setBlock(eventBlockPos, mendingAuraState, Block.UPDATE_CLIENTS);
             Block block = serverLevel.getBlockState(eventBlockPos).getBlock();

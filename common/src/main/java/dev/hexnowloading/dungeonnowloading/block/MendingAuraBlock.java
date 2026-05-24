@@ -7,10 +7,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -31,16 +33,84 @@ import java.util.List;
 public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty FENCE_LIKE = BooleanProperty.create("fence_like");
+    public static final BooleanProperty WALL_LIKE = BooleanProperty.create("wall_like");
     private static final SoundType SOUND_TYPE = new SoundType(1.0F, 1.0F, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP, DNLSounds.MENDING_AURA_POP.get(), SoundEvents.STONE_HIT, SoundEvents.STONE_FALL);
 
     public MendingAuraBlock(Properties $$0) {
         super($$0);
-        this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, Boolean.FALSE));
+        this.registerDefaultState(configureDefaultState(this.stateDefinition.any()));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WATERLOGGED);
+        builder.add(WATERLOGGED, FENCE_LIKE, WALL_LIKE);
+    }
+
+    public static BlockState configureForStoredBlock(BlockState auraState, BlockState storedState) {
+        if (auraState.hasProperty(FENCE_LIKE)) {
+            auraState = auraState.setValue(FENCE_LIKE, storedState.is(BlockTags.FENCES) || storedState.getBlock() instanceof FenceBlock);
+        }
+
+        if (auraState.hasProperty(WALL_LIKE)) {
+            auraState = auraState.setValue(WALL_LIKE, storedState.is(BlockTags.WALLS) || storedState.getBlock() instanceof WallBlock);
+        }
+
+        if (storedState.hasProperty(BlockStateProperties.WATERLOGGED)) {
+            auraState = auraState.setValue(WATERLOGGED, storedState.getValue(BlockStateProperties.WATERLOGGED));
+        }
+
+        return auraState;
+    }
+
+    public static BlockState refreshStoredConnections(BlockState storedState, LevelAccessor level, BlockPos pos) {
+        if (!hasRefreshableConnections(storedState)) {
+            return storedState;
+        }
+
+        for (Direction direction : Direction.values()) {
+            BlockPos neighborPos = pos.relative(direction);
+            storedState = storedState.updateShape(direction, level.getBlockState(neighborPos), level, pos, neighborPos);
+        }
+
+        return storedState;
+    }
+
+    public static void refreshNeighboringStoredConnections(LevelAccessor level, BlockPos pos) {
+        for (Direction direction : Direction.values()) {
+            BlockPos neighborPos = pos.relative(direction);
+            BlockEntity blockEntity = level.getBlockEntity(neighborPos);
+            if (blockEntity instanceof MendingAuraBlockEntity mendingAuraBlockEntity) {
+                BlockState storedState = mendingAuraBlockEntity.getStoredBlockState();
+                BlockState refreshedState = storedState != null ? refreshStoredConnections(storedState, level, neighborPos) : null;
+                if (refreshedState != null && refreshedState != storedState) {
+                    mendingAuraBlockEntity.setStoredBlock(refreshedState, mendingAuraBlockEntity.getStoredBlockNbt());
+                    if (level instanceof ServerLevel serverLevel) {
+                        mendingAuraBlockEntity.syncToClients(serverLevel, serverLevel.getBlockState(neighborPos));
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean hasRefreshableConnections(BlockState state) {
+        return state.is(BlockTags.FENCES) || state.is(BlockTags.WALLS) || state.getBlock() instanceof FenceBlock || state.getBlock() instanceof WallBlock;
+    }
+
+    private static BlockState configureDefaultState(BlockState state) {
+        if (state.hasProperty(WATERLOGGED)) {
+            state = state.setValue(WATERLOGGED, Boolean.FALSE);
+        }
+
+        if (state.hasProperty(FENCE_LIKE)) {
+            state = state.setValue(FENCE_LIKE, Boolean.FALSE);
+        }
+
+        if (state.hasProperty(WALL_LIKE)) {
+            state = state.setValue(WALL_LIKE, Boolean.FALSE);
+        }
+
+        return state;
     }
 
     @org.jetbrains.annotations.Nullable

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.block;
 
+import dev.hexnowloading.dungeonnowloading.block.MendingAuraBlock;
 import dev.hexnowloading.dungeonnowloading.block.MendingAuraFenceBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.FenceBlock;
@@ -14,9 +15,8 @@ public class FenceMixin {
 
     @Inject(method = "connectsTo", at = @At("HEAD"), cancellable = true)
     private void modifyConnectsTo(BlockState blockState, boolean bl, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (blockState.getBlock() instanceof MendingAuraFenceBlock) {
+        if (blockState.getBlock() instanceof MendingAuraFenceBlock || blockState.hasProperty(MendingAuraBlock.FENCE_LIKE) && blockState.getValue(MendingAuraBlock.FENCE_LIKE)) {
             cir.setReturnValue(true);
         }
     }
 }
-

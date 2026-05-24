@@ -54,6 +54,10 @@ public class MendingAuraBlockEntity extends BlockEntity {
         return this.storedBlockState;
     }
 
+    public CompoundTag getStoredBlockNbt() {
+        return this.storedBlockNbt != null ? this.storedBlockNbt.copy() : null;
+    }
+
     @Override
     protected void saveAdditional(CompoundTag compoundTag) {
         super.saveAdditional(compoundTag);

@@ -386,12 +386,14 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         // mirror your working mending placement behavior
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
 
-        BlockState auraState = DNLBlocks.MENDING_AURA.get().defaultBlockState();
+        BlockState auraState = MendingAuraBlock.configureForStoredBlock(DNLBlocks.MENDING_AURA.get().defaultBlockState(), originalState);
         level.setBlock(pos, auraState, Block.UPDATE_CLIENTS);
 
         BlockEntity newBe = level.getBlockEntity(pos);
         if (newBe instanceof MendingAuraBlockEntity auraBe) {
-            auraBe.setStoredBlock(originalState, tag);
+            BlockState storedState = MendingAuraBlock.refreshStoredConnections(originalState, level, pos);
+            auraBe.setStoredBlock(storedState, tag);
+            MendingAuraBlock.refreshNeighboringStoredConnections(level, pos);
             auraBe.syncToClients(level, level.getBlockState(pos));
             auraBe.setChanged();
         }
