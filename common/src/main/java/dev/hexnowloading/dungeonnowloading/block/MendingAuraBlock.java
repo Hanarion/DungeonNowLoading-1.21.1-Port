@@ -122,7 +122,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
     @Override
     public RenderShape getRenderShape(BlockState blockState) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     public void startRestoration(Level level, BlockPos pos) {
