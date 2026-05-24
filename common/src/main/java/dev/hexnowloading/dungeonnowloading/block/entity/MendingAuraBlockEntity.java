@@ -1,13 +1,19 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CMendingAuraSyncPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+
+import javax.annotation.Nullable;
 
 import java.util.Random;
 
@@ -25,6 +31,27 @@ public class MendingAuraBlockEntity extends BlockEntity {
     public void setStoredBlock(BlockState blockState, CompoundTag blockNbt) {
         this.storedBlockState = blockState;
         this.storedBlockNbt = blockNbt;
+        this.setChanged();
+    }
+
+    public void setStoredBlockStateClient(BlockState blockState) {
+        this.storedBlockState = blockState;
+    }
+
+    public void syncToClients(ServerLevel level, BlockState auraState) {
+        if (this.storedBlockState == null) {
+            return;
+        }
+        S2CMendingAuraSyncPacket packet = new S2CMendingAuraSyncPacket(this.worldPosition, auraState, this.storedBlockState);
+        for (ServerPlayer player : level.players()) {
+            if (player.blockPosition().closerThan(this.worldPosition, 128.0D)) {
+                Services.NETWORK.sendToPlayer(packet, player);
+            }
+        }
+    }
+
+    public BlockState getStoredBlockState() {
+        return this.storedBlockState;
     }
 
     @Override
@@ -57,6 +84,22 @@ public class MendingAuraBlockEntity extends BlockEntity {
         restoreTime = compoundTag.getInt("RestoreTime");
     }
 
+    @Nullable
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        CompoundTag compoundTag = new CompoundTag();
+        if (storedBlockState != null) {
+            compoundTag.put("StoredBlockState", BlockState.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, storedBlockState).result().orElseThrow());
+        }
+        compoundTag.putInt("RestoreTime", restoreTime);
+        return compoundTag;
+    }
+
     public int getRestoreTime() { return restoreTime; }
 
     public void restoreBlock(Level level, BlockPos pos, BlockState state) {
@@ -64,30 +107,7 @@ public class MendingAuraBlockEntity extends BlockEntity {
             level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             return;
         }
-        if (this.storedBlockState.getBlock() instanceof WallBlock) {
-            BlockState blockState = this.storedBlockState
-                    .setValue(BlockStateProperties.NORTH_WALL, state.getValue(BlockStateProperties.NORTH_WALL))
-                    .setValue(BlockStateProperties.EAST_WALL, state.getValue(BlockStateProperties.EAST_WALL))
-                    .setValue(BlockStateProperties.SOUTH_WALL, state.getValue(BlockStateProperties.SOUTH_WALL))
-                    .setValue(BlockStateProperties.WEST_WALL, state.getValue(BlockStateProperties.WEST_WALL));
-            level.setBlock(pos, blockState, Block.UPDATE_CLIENTS);
-        } else if (this.storedBlockState.getBlock() instanceof FenceBlock) {
-            BlockState blockState = this.storedBlockState
-                    .setValue(BlockStateProperties.NORTH, state.getValue(BlockStateProperties.NORTH))
-                    .setValue(BlockStateProperties.EAST, state.getValue(BlockStateProperties.EAST))
-                    .setValue(BlockStateProperties.SOUTH, state.getValue(BlockStateProperties.SOUTH))
-                    .setValue(BlockStateProperties.WEST, state.getValue(BlockStateProperties.WEST));
-            level.setBlock(pos, blockState, Block.UPDATE_CLIENTS);
-        } else if (this.storedBlockState.getBlock() instanceof IronBarsBlock) {
-            BlockState blockState = this.storedBlockState
-                    .setValue(BlockStateProperties.NORTH, state.getValue(BlockStateProperties.NORTH))
-                    .setValue(BlockStateProperties.EAST, state.getValue(BlockStateProperties.EAST))
-                    .setValue(BlockStateProperties.SOUTH, state.getValue(BlockStateProperties.SOUTH))
-                    .setValue(BlockStateProperties.WEST, state.getValue(BlockStateProperties.WEST));
-            level.setBlock(pos, blockState, Block.UPDATE_CLIENTS);
-        } else {
-            level.setBlock(pos, this.storedBlockState, Block.UPDATE_CLIENTS);
-        }
+        level.setBlock(pos, this.storedBlockState, Block.UPDATE_CLIENTS);
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null && this.storedBlockNbt != null) {

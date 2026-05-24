@@ -18,5 +18,6 @@ public class DNLPackets {
         Services.NETWORK.register("clientbound_fade_in_ticking_sound", S2CFadeInTickingSoundPacket.class, S2CFadeInTickingSoundPacket::decode);
         Services.NETWORK.register("clientbound_fade_out_background_music", S2CFadeOutBackgroundMusicSoundPacket.class, S2CFadeOutBackgroundMusicSoundPacket::decode);
         Services.NETWORK.register("clientbound_open_pedestal_editor", S2CPedestalOpenEditorPacket.class, S2CPedestalOpenEditorPacket::decode);
+        Services.NETWORK.register("clientbound_mending_aura_sync", S2CMendingAuraSyncPacket.class, S2CMendingAuraSyncPacket::decode);
     }
 }

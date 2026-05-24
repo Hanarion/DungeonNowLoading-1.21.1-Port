@@ -392,6 +392,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         BlockEntity newBe = level.getBlockEntity(pos);
         if (newBe instanceof MendingAuraBlockEntity auraBe) {
             auraBe.setStoredBlock(originalState, tag);
+            auraBe.syncToClients(level, level.getBlockState(pos));
             auraBe.setChanged();
         }
 

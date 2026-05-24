@@ -72,6 +72,48 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
         return Shapes.empty();
     }
 
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
+        BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        return storedState != null ? storedState.getShape(blockGetter, pos, context) : Shapes.empty();
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
+        BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        return storedState != null ? storedState.getCollisionShape(blockGetter, pos, context) : Shapes.empty();
+    }
+
+    @Override
+    public VoxelShape getInteractionShape(BlockState state, BlockGetter blockGetter, BlockPos pos) {
+        BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        return storedState != null ? storedState.getInteractionShape(blockGetter, pos) : Shapes.empty();
+    }
+
+    @Override
+    public VoxelShape getBlockSupportShape(BlockState state, BlockGetter blockGetter, BlockPos pos) {
+        BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        return storedState != null ? storedState.getBlockSupportShape(blockGetter, pos) : Shapes.empty();
+    }
+
+    @Override
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter blockGetter, BlockPos pos) {
+        BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        return storedState != null ? storedState.getOcclusionShape(blockGetter, pos) : Shapes.empty();
+    }
+
+    @Nullable
+    private BlockState getStoredBlockState(BlockGetter blockGetter, BlockPos pos) {
+        BlockEntity blockEntity = blockGetter.getBlockEntity(pos);
+        if (blockEntity instanceof MendingAuraBlockEntity mendingAuraBlockEntity) {
+            BlockState storedState = mendingAuraBlockEntity.getStoredBlockState();
+            if (storedState != null && !(storedState.getBlock() instanceof MendingAuraBlock)) {
+                return storedState;
+            }
+        }
+        return null;
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
