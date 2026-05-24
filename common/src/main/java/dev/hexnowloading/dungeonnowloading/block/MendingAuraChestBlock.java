@@ -37,7 +37,7 @@ public class MendingAuraChestBlock extends MendingAuraBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
         super.createBlockStateDefinition(b); // keep WATERLOGGED etc. from MendingAuraBlock
-        b.add(FACING, CHEST_TYPE);
+        b.add(CHEST_TYPE);
     }
 
     // --- geometry & lighting ---

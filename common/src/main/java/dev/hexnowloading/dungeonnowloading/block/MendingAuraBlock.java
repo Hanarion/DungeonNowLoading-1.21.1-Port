@@ -19,6 +19,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
@@ -35,6 +38,9 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty FENCE_LIKE = BooleanProperty.create("fence_like");
     public static final BooleanProperty WALL_LIKE = BooleanProperty.create("wall_like");
+    public static final BooleanProperty STAIR_LIKE = BooleanProperty.create("stair_like");
+    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Half> HALF = BlockStateProperties.HALF;
     private static final SoundType SOUND_TYPE = new SoundType(1.0F, 1.0F, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP, DNLSounds.MENDING_AURA_POP.get(), SoundEvents.STONE_HIT, SoundEvents.STONE_FALL);
 
     public MendingAuraBlock(Properties $$0) {
@@ -44,7 +50,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WATERLOGGED, FENCE_LIKE, WALL_LIKE);
+        builder.add(WATERLOGGED, FENCE_LIKE, WALL_LIKE, STAIR_LIKE, FACING, HALF);
     }
 
     public static BlockState configureForStoredBlock(BlockState auraState, BlockState storedState) {
@@ -54,6 +60,18 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
         if (auraState.hasProperty(WALL_LIKE)) {
             auraState = auraState.setValue(WALL_LIKE, storedState.is(BlockTags.WALLS) || storedState.getBlock() instanceof WallBlock);
+        }
+
+        if (auraState.hasProperty(STAIR_LIKE)) {
+            auraState = auraState.setValue(STAIR_LIKE, storedState.is(BlockTags.STAIRS) || storedState.getBlock() instanceof StairBlock);
+        }
+
+        if (auraState.hasProperty(FACING) && storedState.hasProperty(FACING)) {
+            auraState = auraState.setValue(FACING, storedState.getValue(FACING));
+        }
+
+        if (auraState.hasProperty(HALF) && storedState.hasProperty(HALF)) {
+            auraState = auraState.setValue(HALF, storedState.getValue(HALF));
         }
 
         if (storedState.hasProperty(BlockStateProperties.WATERLOGGED)) {
@@ -94,7 +112,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
     }
 
     private static boolean hasRefreshableConnections(BlockState state) {
-        return state.is(BlockTags.FENCES) || state.is(BlockTags.WALLS) || state.getBlock() instanceof FenceBlock || state.getBlock() instanceof WallBlock;
+        return state.is(BlockTags.FENCES) || state.is(BlockTags.WALLS) || state.is(BlockTags.STAIRS) || state.getBlock() instanceof FenceBlock || state.getBlock() instanceof WallBlock || state.getBlock() instanceof StairBlock;
     }
 
     private static BlockState configureDefaultState(BlockState state) {
@@ -108,6 +126,18 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
         if (state.hasProperty(WALL_LIKE)) {
             state = state.setValue(WALL_LIKE, Boolean.FALSE);
+        }
+
+        if (state.hasProperty(STAIR_LIKE)) {
+            state = state.setValue(STAIR_LIKE, Boolean.FALSE);
+        }
+
+        if (state.hasProperty(FACING)) {
+            state = state.setValue(FACING, Direction.NORTH);
+        }
+
+        if (state.hasProperty(HALF)) {
+            state = state.setValue(HALF, Half.BOTTOM);
         }
 
         return state;
