@@ -57,7 +57,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
     @Override
     public boolean skipRendering(BlockState p_53972_, BlockState p_53973_, Direction p_53974_) {
-        return p_53973_.is(this) ? true : super.skipRendering(p_53972_, p_53973_, p_53974_);
+        return super.skipRendering(p_53972_, p_53973_, p_53974_);
     }
 
     public float getShadeBrightness(BlockState p_48731_, BlockGetter p_48732_, BlockPos p_48733_) {
@@ -99,7 +99,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
     @Override
     public VoxelShape getOcclusionShape(BlockState state, BlockGetter blockGetter, BlockPos pos) {
         BlockState storedState = this.getStoredBlockState(blockGetter, pos);
-        return storedState != null ? storedState.getOcclusionShape(blockGetter, pos) : Shapes.empty();
+        return storedState != null && storedState.canOcclude() ? storedState.getOcclusionShape(blockGetter, pos) : Shapes.empty();
     }
 
     @Nullable
@@ -122,7 +122,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
     @Override
     public RenderShape getRenderShape(BlockState blockState) {
-        return RenderShape.INVISIBLE;
+        return RenderShape.MODEL;
     }
 
     public void startRestoration(Level level, BlockPos pos) {

@@ -2,6 +2,8 @@ package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
+import dev.hexnowloading.dungeonnowloading.client.model.MendingAuraForgeBakedModel;
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepButlerModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.copper_creep.CopperCreepModel;
@@ -29,6 +31,16 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class DNLForgeClientEvents {
     public static void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
         ForgeClientHelper.ITEM_MODELS.forEach(event::register);
+    }
+
+    public static void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        event.getModels().replaceAll((id, model) -> DungeonNowLoading.MOD_ID.equals(id.getNamespace()) && isMendingAuraModel(id.getPath())
+                ? new MendingAuraForgeBakedModel(model)
+                : model);
+    }
+
+    private static boolean isMendingAuraModel(String path) {
+        return path.equals("mending_aura") || path.startsWith("block/mending_aura_");
     }
 
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
@@ -139,7 +151,6 @@ public class DNLForgeClientEvents {
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.PLAYER_STATUE.get(), PlayerStatueRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DUNGEON_DIRECTOR.get(), DungeonDirectorRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DUNGEON_BANNER.get(), DungeonBannerBlockRenderer::new);
-        event.registerBlockEntityRenderer(DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntityRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {

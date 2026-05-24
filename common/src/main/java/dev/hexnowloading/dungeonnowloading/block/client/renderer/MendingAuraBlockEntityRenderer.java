@@ -41,6 +41,7 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
     private static final int VERTEX_STRIDE = 8;
     private static final int VERTEX_COUNT = 4;
     private static final int MAX_MASKED_PIXELS_PER_QUAD = 4096;
+    public static final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> GLOBAL_REMAPPED_QUAD_CACHE = new IdentityHashMap<>();
     private final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> remappedQuadCache = new IdentityHashMap<>();
 
     public MendingAuraBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -266,14 +267,16 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         );
     }
 
-    private static class AuraTextureModel implements BakedModel {
+    public static class AuraTextureModel implements BakedModel {
         private final BakedModel wrapped;
         private final TextureAtlasSprite auraSprite;
+        @Nullable
         private final BlockAndTintGetter level;
+        @Nullable
         private final BlockPos pos;
         private final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> remappedQuadCache;
 
-        private AuraTextureModel(BakedModel wrapped, TextureAtlasSprite auraSprite, BlockAndTintGetter level, BlockPos pos, Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> remappedQuadCache) {
+        public AuraTextureModel(BakedModel wrapped, TextureAtlasSprite auraSprite, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> remappedQuadCache) {
             this.wrapped = wrapped;
             this.auraSprite = auraSprite;
             this.level = level;
@@ -283,7 +286,7 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
 
         @Override
         public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction, RandomSource random) {
-            if (state != null && direction != null && !shouldRenderAuraFace(state, this.level, this.pos, direction)) {
+            if (state != null && direction != null && this.level != null && this.pos != null && !shouldRenderAgainstNeighborAura(state, this.level, this.pos, direction)) {
                 return Collections.emptyList();
             }
 
@@ -330,34 +333,32 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
             return this.wrapped.getOverrides();
         }
 
-        private static boolean shouldRenderAuraFace(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction direction) {
+        public static boolean shouldRenderAgainstNeighborAura(BlockState storedState, BlockAndTintGetter level, BlockPos pos, Direction direction) {
             BlockPos neighborPos = pos.relative(direction);
-            BlockState neighborState = getCullingState(level, neighborPos);
-            if (state.skipRendering(neighborState, direction)) {
-                return false;
-            }
-            if (!neighborState.canOcclude()) {
+            BlockEntity blockEntity = level.getBlockEntity(neighborPos);
+            if (!(blockEntity instanceof MendingAuraBlockEntity mendingAuraBlockEntity)) {
                 return true;
             }
 
-            VoxelShape shape = state.getFaceOcclusionShape(level, pos, direction);
+            BlockState neighborStoredState = mendingAuraBlockEntity.getStoredBlockState();
+            if (neighborStoredState == null || neighborStoredState.getBlock() instanceof MendingAuraBlock) {
+                return true;
+            }
+
+            if (storedState.skipRendering(neighborStoredState, direction)) {
+                return false;
+            }
+            if (!neighborStoredState.canOcclude()) {
+                return true;
+            }
+
+            VoxelShape shape = storedState.getFaceOcclusionShape(level, pos, direction);
             if (shape.isEmpty()) {
                 return true;
             }
 
-            VoxelShape neighborShape = neighborState.getFaceOcclusionShape(level, neighborPos, direction.getOpposite());
+            VoxelShape neighborShape = neighborStoredState.getFaceOcclusionShape(level, neighborPos, direction.getOpposite());
             return Shapes.joinIsNotEmpty(shape, neighborShape, BooleanOp.ONLY_FIRST);
-        }
-
-        private static BlockState getCullingState(BlockAndTintGetter level, BlockPos pos) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof MendingAuraBlockEntity mendingAuraBlockEntity) {
-                BlockState storedState = mendingAuraBlockEntity.getStoredBlockState();
-                if (storedState != null && !(storedState.getBlock() instanceof MendingAuraBlock)) {
-                    return storedState;
-                }
-            }
-            return level.getBlockState(pos);
         }
     }
 

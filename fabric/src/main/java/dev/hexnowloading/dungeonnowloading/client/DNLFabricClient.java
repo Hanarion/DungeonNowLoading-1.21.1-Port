@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.client;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.DNLClient;
 import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
+import dev.hexnowloading.dungeonnowloading.client.model.MendingAuraFabricBakedModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.*;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.model.*;
@@ -20,6 +21,7 @@ import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -52,6 +54,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registerItemModelLayers();
         registerItemRenderers();
         registerBlockRenderers();
+        registerModelModifiers();
         registerModelLayers();
         registerRenderers();
         registerParticleFactories();
@@ -150,6 +153,20 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WEB_CARPET.get(), RenderType.cutout());
     }
 
+    private void registerModelModifiers() {
+        ModelLoadingPlugin.register(context -> context.modifyModelAfterBake().register((model, modifierContext) -> {
+            ResourceLocation id = modifierContext.id();
+            if (model != null && DungeonNowLoading.MOD_ID.equals(id.getNamespace()) && isMendingAuraModel(id.getPath())) {
+                return new MendingAuraFabricBakedModel(model);
+            }
+            return model;
+        }));
+    }
+
+    private static boolean isMendingAuraModel(String path) {
+        return path.equals("mending_aura") || path.startsWith("block/mending_aura_");
+    }
+
     private void registerRenderers() {
         // Bosses
         EntityRendererRegistry.register(DNLEntityTypes.CHAOS_SPAWNER.get(), ChaosSpawnerRenderer::new);
@@ -203,7 +220,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockEntityRenderers.register(DNLBlockEntityTypes.PLAYER_STATUE.get(), PlayerStatueRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DUNGEON_DIRECTOR.get(), DungeonDirectorRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DUNGEON_BANNER.get(), DungeonBannerBlockRenderer::new);
-        BlockEntityRenderers.register(DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntityRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
