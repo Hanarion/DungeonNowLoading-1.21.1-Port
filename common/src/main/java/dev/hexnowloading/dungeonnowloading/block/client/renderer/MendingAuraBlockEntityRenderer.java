@@ -30,7 +30,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<MendingAuraBlockEntity> {
 
@@ -39,6 +41,7 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
     private static final int VERTEX_STRIDE = 8;
     private static final int VERTEX_COUNT = 4;
     private static final int MAX_MASKED_PIXELS_PER_QUAD = 4096;
+    private final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> remappedQuadCache = new IdentityHashMap<>();
 
     public MendingAuraBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -59,7 +62,7 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
             return;
         }
 
-        BakedModel auraModel = new AuraTextureModel(storedModel, auraSprite, blockEntity.getLevel(), blockEntity.getBlockPos());
+        BakedModel auraModel = new AuraTextureModel(storedModel, auraSprite, blockEntity.getLevel(), blockEntity.getBlockPos(), this.remappedQuadCache);
         dispatcher.getModelRenderer().renderModel(
                 poseStack.last(),
                 buffer.getBuffer(RenderType.translucent()),
@@ -91,20 +94,14 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
             return Collections.singletonList(remapFullQuad(quad, auraSprite));
         }
 
-        List<BakedQuad> maskedQuads = new ArrayList<>();
+        boolean[][] opaquePixels = new boolean[yEnd - yStart][xEnd - xStart];
         for (int y = yStart; y < yEnd; y++) {
             for (int x = xStart; x < xEnd; x++) {
-                if (!originalContents.isTransparent(0, x, y)) {
-                    float minU = x / (float) originalContents.width() * 16.0F;
-                    float maxU = (x + 1) / (float) originalContents.width() * 16.0F;
-                    float minV = y / (float) originalContents.height() * 16.0F;
-                    float maxV = (y + 1) / (float) originalContents.height() * 16.0F;
-                    maskedQuads.add(remapPixelQuad(quad, originalSprite, auraSprite, uvBounds, minU, maxU, minV, maxV));
-                }
+                opaquePixels[y - yStart][x - xStart] = !originalContents.isTransparent(0, x, y);
             }
         }
 
-        return maskedQuads;
+        return remapOpaqueRectangles(quad, originalSprite, auraSprite, uvBounds, originalContents, opaquePixels, xStart, yStart);
     }
 
     private static BakedQuad remapFullQuad(BakedQuad quad, TextureAtlasSprite auraSprite) {
@@ -149,6 +146,62 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         }
 
         return new BakedQuad(vertices, -1, quad.getDirection(), auraSprite, quad.isShade());
+    }
+
+    private static List<BakedQuad> remapOpaqueRectangles(BakedQuad quad, TextureAtlasSprite originalSprite, TextureAtlasSprite auraSprite, UvBounds uvBounds, SpriteContents originalContents, boolean[][] opaquePixels, int xStart, int yStart) {
+        List<BakedQuad> maskedQuads = new ArrayList<>();
+        boolean[][] usedPixels = new boolean[opaquePixels.length][opaquePixels[0].length];
+
+        for (int localY = 0; localY < opaquePixels.length; localY++) {
+            for (int localX = 0; localX < opaquePixels[localY].length; localX++) {
+                if (!opaquePixels[localY][localX] || usedPixels[localY][localX]) {
+                    continue;
+                }
+
+                int width = findRectangleWidth(opaquePixels, usedPixels, localX, localY);
+                int height = findRectangleHeight(opaquePixels, usedPixels, localX, localY, width);
+                markRectangleUsed(usedPixels, localX, localY, width, height);
+
+                int x = xStart + localX;
+                int y = yStart + localY;
+                float minU = x / (float) originalContents.width() * 16.0F;
+                float maxU = (x + width) / (float) originalContents.width() * 16.0F;
+                float minV = y / (float) originalContents.height() * 16.0F;
+                float maxV = (y + height) / (float) originalContents.height() * 16.0F;
+                maskedQuads.add(remapPixelQuad(quad, originalSprite, auraSprite, uvBounds, minU, maxU, minV, maxV));
+            }
+        }
+
+        return maskedQuads;
+    }
+
+    private static int findRectangleWidth(boolean[][] opaquePixels, boolean[][] usedPixels, int startX, int startY) {
+        int width = 0;
+        while (startX + width < opaquePixels[startY].length && opaquePixels[startY][startX + width] && !usedPixels[startY][startX + width]) {
+            width++;
+        }
+        return width;
+    }
+
+    private static int findRectangleHeight(boolean[][] opaquePixels, boolean[][] usedPixels, int startX, int startY, int width) {
+        int height = 1;
+        while (startY + height < opaquePixels.length) {
+            for (int x = startX; x < startX + width; x++) {
+                if (!opaquePixels[startY + height][x] || usedPixels[startY + height][x]) {
+                    return height;
+                }
+            }
+            height++;
+        }
+        return height;
+    }
+
+    private static void markRectangleUsed(boolean[][] usedPixels, int startX, int startY, int width, int height) {
+        for (int y = startY; y < startY + height; y++) {
+            for (int x = startX; x < startX + width; x++) {
+                usedPixels[y][x] = true;
+            }
+        }
     }
 
     private static boolean hasTransparentPixels(SpriteContents contents, UvBounds uvBounds) {
@@ -218,12 +271,14 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         private final TextureAtlasSprite auraSprite;
         private final BlockAndTintGetter level;
         private final BlockPos pos;
+        private final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> remappedQuadCache;
 
-        private AuraTextureModel(BakedModel wrapped, TextureAtlasSprite auraSprite, BlockAndTintGetter level, BlockPos pos) {
+        private AuraTextureModel(BakedModel wrapped, TextureAtlasSprite auraSprite, BlockAndTintGetter level, BlockPos pos, Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> remappedQuadCache) {
             this.wrapped = wrapped;
             this.auraSprite = auraSprite;
             this.level = level;
             this.pos = pos;
+            this.remappedQuadCache = remappedQuadCache;
         }
 
         @Override
@@ -233,8 +288,9 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
             }
 
             List<BakedQuad> remappedQuads = new ArrayList<>();
+            Map<BakedQuad, List<BakedQuad>> cachedQuadsBySource = this.remappedQuadCache.computeIfAbsent(this.auraSprite, sprite -> new IdentityHashMap<>());
             for (BakedQuad quad : this.wrapped.getQuads(state, direction, random)) {
-                remappedQuads.addAll(remapQuad(quad, this.auraSprite));
+                remappedQuads.addAll(cachedQuadsBySource.computeIfAbsent(quad, sourceQuad -> remapQuad(sourceQuad, this.auraSprite)));
             }
             return remappedQuads;
         }
