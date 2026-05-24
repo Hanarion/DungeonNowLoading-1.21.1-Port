@@ -69,12 +69,12 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
     private static final int FURNACE_MINECART_FUEL_TICKS = 200;
     private static final int FURNACE_BLOCK_FUEL_TICKS = 25;
 
-    private float damage = 10.0F;
-    private Entity hitEntity;
-    private LivingEntity homingTarget;
-    private double preservedSpeed;
-    private BlockPos suppressFireAtBlockPos;
-    private boolean discardWhenTargetMissing = true;
+    protected float damage = 10.0F;
+    protected Entity hitEntity;
+    protected LivingEntity homingTarget;
+    protected double preservedSpeed;
+    protected BlockPos suppressFireAtBlockPos;
+    protected boolean discardWhenTargetMissing = true;
 
     public WispProjectileEntity(EntityType<? extends WispProjectileEntity> entityType, Level level) {
         super(entityType, level);
@@ -82,6 +82,10 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
 
     public WispProjectileEntity(Level level, LivingEntity owner) {
         super(DNLEntityTypes.WISP_PROJECTILE.get(), owner, level);
+    }
+
+    protected WispProjectileEntity(EntityType<? extends WispProjectileEntity> entityType, Level level, LivingEntity owner) {
+        super(entityType, owner, level);
     }
 
     @Override
@@ -126,7 +130,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
     }
 
-    private void tickWithCenteredCollision() {
+    protected void tickWithCenteredCollision() {
         double centerOffset = this.getBbHeight() * 0.5D;
         this.setPos(this.getX(), this.getY() + centerOffset, this.getZ());
         super.tick();
@@ -160,7 +164,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         this.seedRotationFromMovement();
     }
 
-    private void seedRotationFromMovement() {
+    protected void seedRotationFromMovement() {
         Vec3 motion = this.getDeltaMovement();
         if (motion.lengthSqr() <= 1.0E-7D) {
             return;
@@ -181,27 +185,40 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
 
         if (hitResult.getType() == HitResult.Type.ENTITY) {
-            this.hitEntity = ((EntityHitResult) hitResult).getEntity();
-            this.suppressFireAtBlockPos = null;
-            if (this.hitEntity instanceof AbstractMinecart minecart) {
-                this.handleMinecartHit(minecart);
-                this.hitEntity = null;
-            }
-            this.level().gameEvent(GameEvent.PROJECTILE_LAND, hitResult.getLocation(), GameEvent.Context.of(this, (BlockState) null));
+            this.handleEntityHit((EntityHitResult) hitResult);
         } else if (hitResult.getType() == HitResult.Type.BLOCK) {
-            BlockHitResult blockHitResult = (BlockHitResult) hitResult;
-            BlockPos blockPos = blockHitResult.getBlockPos();
-            this.hitEntity = null;
-            this.suppressFireAtBlockPos = null;
-            if (this.breakThroughPowderSnow(blockPos)) {
-                this.level().gameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Context.of(this, Blocks.POWDER_SNOW.defaultBlockState()));
-                return;
-            }
-            this.heatBlock(blockPos);
-            this.level().gameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Context.of(this, this.level().getBlockState(blockPos)));
+            this.handleBlockHit((BlockHitResult) hitResult);
         }
 
-        this.discardWithBurst();
+        if (this.shouldDiscardAfterHit(hitResult)) {
+            this.discardWithBurst();
+        }
+    }
+
+    protected boolean shouldDiscardAfterHit(HitResult hitResult) {
+        return true;
+    }
+
+    protected void handleEntityHit(EntityHitResult hitResult) {
+        this.hitEntity = hitResult.getEntity();
+        this.suppressFireAtBlockPos = null;
+        if (this.hitEntity instanceof AbstractMinecart minecart) {
+            this.handleMinecartHit(minecart);
+            this.hitEntity = null;
+        }
+        this.level().gameEvent(GameEvent.PROJECTILE_LAND, hitResult.getLocation(), GameEvent.Context.of(this, (BlockState) null));
+    }
+
+    protected void handleBlockHit(BlockHitResult hitResult) {
+        BlockPos blockPos = hitResult.getBlockPos();
+        this.hitEntity = null;
+        this.suppressFireAtBlockPos = null;
+        if (this.breakThroughPowderSnow(blockPos)) {
+            this.level().gameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Context.of(this, Blocks.POWDER_SNOW.defaultBlockState()));
+            return;
+        }
+        this.heatBlock(blockPos);
+        this.level().gameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Context.of(this, this.level().getBlockState(blockPos)));
     }
 
     @Override
@@ -256,6 +273,10 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         this.damage = damage;
     }
 
+    public void setAttackDamage(float damage) {
+        this.setDamage(damage);
+    }
+
     public void setDiscardWhenTargetMissing(boolean discardWhenTargetMissing) {
         this.discardWhenTargetMissing = discardWhenTargetMissing;
     }
@@ -265,7 +286,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         this.entityData.set(HOMING_TARGET_ID, homingTarget == null ? 0 : homingTarget.getId());
     }
 
-    private void updateHoming() {
+    protected void updateHoming() {
         LivingEntity target = this.getHomingTarget();
         if (target == null || !target.isAlive() || target.isRemoved()) {
             return;
@@ -288,19 +309,19 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         this.setDeltaMovement(steered);
     }
 
-    private double getHomingStrength(double distance) {
+    protected double getHomingStrength(double distance) {
         double progress = Mth.clamp((distance - MIN_HOMING_DISTANCE) / (MAX_HOMING_DISTANCE - MIN_HOMING_DISTANCE), 0.0D, 1.0D);
         return Mth.lerp(progress, MIN_HOMING_STRENGTH, MAX_HOMING_STRENGTH);
     }
 
-    private void setPreservedSpeedFromMovement() {
+    protected void setPreservedSpeedFromMovement() {
         double speed = this.getDeltaMovement().length();
         if (speed > 1.0E-7D) {
             this.preservedSpeed = speed;
         }
     }
 
-    private void preserveSpeed() {
+    protected void preserveSpeed() {
         if (this.preservedSpeed <= 1.0E-7D) {
             this.setPreservedSpeedFromMovement();
             return;
@@ -314,7 +335,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         this.setDeltaMovement(motion.normalize().scale(this.preservedSpeed));
     }
 
-    private LivingEntity getHomingTarget() {
+    protected LivingEntity getHomingTarget() {
         if (this.homingTarget != null && this.homingTarget.isAlive() && !this.homingTarget.isRemoved()) {
             return this.homingTarget;
         }
@@ -329,7 +350,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         return null;
     }
 
-    private void spawnTrailParticles() {
+    protected void spawnTrailParticles() {
         if (!(this.level() instanceof ServerLevel server)) {
             return;
         }
@@ -355,45 +376,13 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
     }
 
-    private void discardWithBurst() {
+    protected void discardWithBurst() {
         if (this.level().isClientSide || this.isRemoved()) {
             return;
         }
 
         if (this.hitEntity != null) {
-            boolean hasFireRes = false;
-            if (this.hitEntity instanceof LivingEntity living) {
-                if (living.hasEffect(MobEffects.FIRE_RESISTANCE)) {
-                    hasFireRes = true;
-
-                    MobEffectInstance effect = living.getEffect(MobEffects.FIRE_RESISTANCE);
-                    int newDuration = Math.max(0, effect.getDuration() - 1200);
-                    living.removeEffect(MobEffects.FIRE_RESISTANCE);
-                    if (newDuration > 0) {
-                        living.addEffect(new MobEffectInstance(
-                                MobEffects.FIRE_RESISTANCE,
-                                newDuration,
-                                effect.getAmplifier(),
-                                effect.isAmbient(),
-                                effect.isVisible(),
-                                effect.showIcon()
-                        ));
-                    }
-                }
-            }
-
-            if (!hasFireRes) {
-                Entity owner = this.getOwner();
-                this.hitEntity.push(this);
-                if (this.hitEntity instanceof LivingEntity living) {
-                    living.setSecondsOnFire(4);
-                }
-                if (owner instanceof LivingEntity livingOwner) {
-                    this.hitEntity.hurt(this.damageSources().mobProjectile(this, livingOwner), this.damage);
-                } else {
-                    this.hitEntity.hurt(this.damageSources().generic(), this.damage);
-                }
-            }
+            this.applyEntityImpact(this.hitEntity);
         }
 
         ServerLevel server = (ServerLevel) this.level();
@@ -438,7 +427,43 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         this.discard();
     }
 
-    private void playTackleSound() {
+    protected void applyEntityImpact(Entity target) {
+        boolean hasFireRes = false;
+        if (target instanceof LivingEntity living && living.hasEffect(MobEffects.FIRE_RESISTANCE)) {
+            hasFireRes = true;
+
+            MobEffectInstance effect = living.getEffect(MobEffects.FIRE_RESISTANCE);
+            int newDuration = Math.max(0, effect.getDuration() - 1200);
+            living.removeEffect(MobEffects.FIRE_RESISTANCE);
+            if (newDuration > 0) {
+                living.addEffect(new MobEffectInstance(
+                        MobEffects.FIRE_RESISTANCE,
+                        newDuration,
+                        effect.getAmplifier(),
+                        effect.isAmbient(),
+                        effect.isVisible(),
+                        effect.showIcon()
+                ));
+            }
+        }
+
+        if (hasFireRes) {
+            return;
+        }
+
+        Entity owner = this.getOwner();
+        target.push(this);
+        if (target instanceof LivingEntity living) {
+            living.setSecondsOnFire(4);
+        }
+        if (owner instanceof LivingEntity livingOwner) {
+            target.hurt(this.damageSources().mobProjectile(this, livingOwner), this.damage);
+        } else {
+            target.hurt(this.damageSources().generic(), this.damage);
+        }
+    }
+
+    protected void playTackleSound() {
         if (this.tickCount % TACKLE_SOUND_INTERVAL != 0) {
             return;
         }
@@ -446,7 +471,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.WISP_TACKLE.get(), SoundSource.HOSTILE, 0.65F, 0.95F + this.random.nextFloat() * 0.1F);
     }
 
-    private void discardWithWaterExtinguish() {
+    protected void discardWithWaterExtinguish() {
         if (!(this.level() instanceof ServerLevel server) || this.isRemoved()) {
             return;
         }
@@ -461,7 +486,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         this.discard();
     }
 
-    private void handleMinecartHit(AbstractMinecart minecart) {
+    protected void handleMinecartHit(AbstractMinecart minecart) {
         if (this.level().isClientSide) {
             return;
         }
@@ -478,7 +503,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
     }
 
-    private void fuelFurnaceMinecart(MinecartFurnace furnaceMinecart) {
+    protected void fuelFurnaceMinecart(MinecartFurnace furnaceMinecart) {
         CompoundTag tag = new CompoundTag();
         furnaceMinecart.saveWithoutId(tag);
         int fuel = Math.min(32000, tag.getShort("Fuel") + FURNACE_MINECART_FUEL_TICKS);
@@ -498,7 +523,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
     }
 
-    private void explodeTntMinecart(MinecartTNT tntMinecart) {
+    protected void explodeTntMinecart(MinecartTNT tntMinecart) {
         if (!(this.level() instanceof ServerLevel server) || tntMinecart.isRemoved()) {
             return;
         }
@@ -518,7 +543,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         tntMinecart.discard();
     }
 
-    private boolean fuelFurnaceBlock(ServerLevel server, BlockPos blockPos) {
+    protected boolean fuelFurnaceBlock(ServerLevel server, BlockPos blockPos) {
         BlockEntity blockEntity = server.getBlockEntity(blockPos);
         if (!(blockEntity instanceof AbstractFurnaceBlockEntity furnace)) {
             return false;
@@ -538,7 +563,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         return true;
     }
 
-    private boolean tryApplyHeatFlavor(ServerLevel server, BlockPos blockPos, BlockState blockState) {
+    protected boolean tryApplyHeatFlavor(ServerLevel server, BlockPos blockPos, BlockState blockState) {
         if (blockState.is(Blocks.WATER_CAULDRON) && blockState.hasProperty(LayeredCauldronBlock.LEVEL)) {
             LayeredCauldronBlock.lowerFillLevel(blockState, server, blockPos);
             return true;
@@ -591,7 +616,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         return false;
     }
 
-    private void breakThroughPowderSnowAtCurrentPosition() {
+    protected void breakThroughPowderSnowAtCurrentPosition() {
         if (!(this.level() instanceof ServerLevel server)) {
             return;
         }
@@ -604,7 +629,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
     }
 
-    private boolean breakThroughPowderSnow(BlockPos blockPos) {
+    protected boolean breakThroughPowderSnow(BlockPos blockPos) {
         if (!(this.level() instanceof ServerLevel server)) {
             return false;
         }
@@ -618,7 +643,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         return server.destroyBlock(blockPos, false, this);
     }
 
-    private void heatBlock(BlockPos blockPos) {
+    protected void heatBlock(BlockPos blockPos) {
         if (!(this.level() instanceof ServerLevel server)) {
             return;
         }
@@ -649,7 +674,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         }
     }
 
-    private boolean tryTransformSmeltedBlock(ServerLevel server, BlockPos blockPos, BlockState blockState) {
+    protected boolean tryTransformSmeltedBlock(ServerLevel server, BlockPos blockPos, BlockState blockState) {
         ItemStack input = new ItemStack(blockState.getBlock());
         if (input.isEmpty()) {
             return false;
@@ -662,7 +687,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
                 .orElse(false);
     }
 
-    private boolean applyBlockSmeltingTransform(ServerLevel server, BlockPos blockPos, SimpleContainer container, SmeltingRecipe recipe) {
+    protected boolean applyBlockSmeltingTransform(ServerLevel server, BlockPos blockPos, SimpleContainer container, SmeltingRecipe recipe) {
         ItemStack result = recipe.assemble(container, server.registryAccess());
         if (result.isEmpty()) {
             return false;
@@ -679,7 +704,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         return false;
     }
 
-    private boolean trySmeltBlockDrops(ServerLevel server, BlockPos blockPos, BlockState blockState) {
+    protected boolean trySmeltBlockDrops(ServerLevel server, BlockPos blockPos, BlockState blockState) {
         BlockEntity blockEntity = server.getBlockEntity(blockPos);
         java.util.List<ItemStack> drops = Block.getDrops(blockState, server, blockPos, blockEntity, this, ItemStack.EMPTY);
         if (drops.isEmpty()) {
@@ -714,7 +739,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         return true;
     }
 
-    private ItemStack getSmeltedStack(ServerLevel server, ItemStack input) {
+    protected ItemStack getSmeltedStack(ServerLevel server, ItemStack input) {
         if (input.isEmpty()) {
             return ItemStack.EMPTY;
         }
@@ -737,7 +762,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
                 .orElse(ItemStack.EMPTY);
     }
 
-    private void dropItem(ServerLevel server, BlockPos blockPos, ItemStack drop) {
+    protected void dropItem(ServerLevel server, BlockPos blockPos, ItemStack drop) {
         if (drop.isEmpty()) {
             return;
         }

@@ -66,7 +66,7 @@ public class WispLanternEntity extends FlyingMob implements Enemy {
     public static AttributeSupplier.Builder createAttributes() {
         return LivingEntity.createLivingAttributes()
                 .add(Attributes.MAX_HEALTH, 20.0D)
-                .add(Attributes.ATTACK_DAMAGE, 0.0D)
+                .add(Attributes.ATTACK_DAMAGE, 10.0D)
                 .add(Attributes.FLYING_SPEED, 0.75D)
                 .add(Attributes.FOLLOW_RANGE, 32.0D);
     }
@@ -221,6 +221,9 @@ public class WispLanternEntity extends FlyingMob implements Enemy {
 
         wisp.setPos(spawnPos.getX() + 0.5D, spawnPos.getY(), spawnPos.getZ() + 0.5D);
         wisp.setOwner(this);
+        if (wisp.getAttribute(Attributes.ATTACK_DAMAGE) != null && this.getAttribute(Attributes.ATTACK_DAMAGE) != null) {
+            wisp.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+        }
         if (target != null) {
             wisp.setTarget(target);
 

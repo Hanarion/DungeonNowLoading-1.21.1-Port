@@ -181,6 +181,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.CHAOS_SPAWNER_PROJECTILE.get(), ChaosSpawnerProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FLAME_PROJECTILE.get(), ThrownItemRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WISP_PROJECTILE.get(), WispProjectileRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.LARGE_WISP_PROJECTILE.get(), WispProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), VertexArrowProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_PILLAR_PROJECTILE.get(), VertexPillarProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BALLISTA_ARROW.get(), BallistaArrowRenderer::new);

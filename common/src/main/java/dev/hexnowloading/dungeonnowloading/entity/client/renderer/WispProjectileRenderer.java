@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
-public class WispProjectileRenderer extends EntityRenderer<WispProjectileEntity> {
+public class WispProjectileRenderer<T extends WispProjectileEntity> extends EntityRenderer<T> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wisp/wisp.png");
     private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wisp/wisp_emissive.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TEXTURE);
@@ -31,7 +31,7 @@ public class WispProjectileRenderer extends EntityRenderer<WispProjectileEntity>
     }
 
     @Override
-    public void render(WispProjectileEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    public void render(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
 
         Vec3 motion = entity.getDeltaMovement();
@@ -45,7 +45,8 @@ public class WispProjectileRenderer extends EntityRenderer<WispProjectileEntity>
         poseStack.translate(0.0D, -0.45D, 0.0D);
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yRot));
         poseStack.mulPose(Axis.XP.rotationDegrees(-xRot));
-        poseStack.scale(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
+        float scale = MODEL_SCALE * (entity.getBbWidth() / 0.75F);
+        poseStack.scale(scale, scale, scale);
         // Mirror the extra transform that MobRenderer/LivingEntityRenderer applies before rendering the model.
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.translate(0.0D, LIVING_MODEL_Y_OFFSET, 0.0D);
@@ -64,7 +65,7 @@ public class WispProjectileRenderer extends EntityRenderer<WispProjectileEntity>
     }
 
     @Override
-    public ResourceLocation getTextureLocation(WispProjectileEntity entity) {
+    public ResourceLocation getTextureLocation(T entity) {
         return TEXTURE;
     }
 }

@@ -155,7 +155,7 @@ public class WispAttackGoal extends Goal {
         LivingEntity projectileOwner = owner instanceof LivingEntity livingOwner ? livingOwner : wisp;
         WispProjectileEntity projectile = new WispProjectileEntity(wisp.level(), projectileOwner);
         projectile.setPos(wisp.getX(), wisp.getY(), wisp.getZ());
-        projectile.setDamage((float) wisp.getAttributeValue(Attributes.ATTACK_DAMAGE));
+        projectile.setAttackDamage((float) wisp.getAttributeValue(Attributes.ATTACK_DAMAGE));
         projectile.setHomingTarget(target);
         projectile.shoot(direction.x, direction.y, direction.z, (float) speed, 0.0F);
         projectile.setXRot(wisp.getXRot());
