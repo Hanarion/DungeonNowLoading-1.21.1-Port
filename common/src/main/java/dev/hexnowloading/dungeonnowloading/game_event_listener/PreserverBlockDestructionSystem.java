@@ -431,7 +431,8 @@ public interface PreserverBlockDestructionSystem {
         }
 
         private boolean ignoreBlockTransformation(ServerLevel serverLevel, BlockPos eventBlockPos) {
-            return !serverLevel.getBlockState(eventBlockPos).isAir();
+            BlockState state = serverLevel.getBlockState(eventBlockPos);
+            return !state.isAir() && !state.canBeReplaced();
         }
 
         private void storeMendingAuraBlock(ServerLevel serverLevel, BlockPos eventBlockPos, BlockState originalBlockState, CompoundTag compoundTag) {
