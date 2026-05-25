@@ -70,7 +70,7 @@ public class MendingAuraPaneBlock extends MendingAuraCrossCollisionBlock {
     }
 
     public final boolean attachsTo(BlockState blockState, boolean bl) {
-        return !isExceptionForConnection(blockState) && bl || blockState.getBlock() instanceof IronBarsBlock || blockState.getBlock() instanceof MendingAuraPaneBlock || blockState.is(BlockTags.WALLS);
+        return !isExceptionForConnection(blockState) && bl || blockState.getBlock() instanceof IronBarsBlock || blockState.getBlock() instanceof MendingAuraPaneBlock || blockState.hasProperty(MendingAuraBlock.PANE_LIKE) && blockState.getValue(MendingAuraBlock.PANE_LIKE) || blockState.is(BlockTags.WALLS);
     }
 
     @Override

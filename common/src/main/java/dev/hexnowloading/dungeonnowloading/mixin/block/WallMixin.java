@@ -19,7 +19,7 @@ public class WallMixin {
     private void modifyConnectsTo(BlockState state, boolean hasSolidSide, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         Block block = state.getBlock();
 
-        if (block instanceof MendingAuraWallBlock || block instanceof MendingAuraPaneBlock || state.hasProperty(MendingAuraBlock.WALL_LIKE) && state.getValue(MendingAuraBlock.WALL_LIKE)) {
+        if (block instanceof MendingAuraWallBlock || block instanceof MendingAuraPaneBlock || state.hasProperty(MendingAuraBlock.WALL_LIKE) && state.getValue(MendingAuraBlock.WALL_LIKE) || state.hasProperty(MendingAuraBlock.PANE_LIKE) && state.getValue(MendingAuraBlock.PANE_LIKE)) {
             cir.setReturnValue(true);
         }
     }

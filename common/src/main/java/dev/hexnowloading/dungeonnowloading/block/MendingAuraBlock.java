@@ -39,6 +39,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
     public static final BooleanProperty FENCE_LIKE = BooleanProperty.create("fence_like");
     public static final BooleanProperty WALL_LIKE = BooleanProperty.create("wall_like");
     public static final BooleanProperty STAIR_LIKE = BooleanProperty.create("stair_like");
+    public static final BooleanProperty PANE_LIKE = BooleanProperty.create("pane_like");
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final EnumProperty<Half> HALF = BlockStateProperties.HALF;
     private static final SoundType SOUND_TYPE = new SoundType(1.0F, 1.0F, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP, DNLSounds.MENDING_AURA_POP.get(), SoundEvents.STONE_HIT, SoundEvents.STONE_FALL);
@@ -50,7 +51,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WATERLOGGED, FENCE_LIKE, WALL_LIKE, STAIR_LIKE, FACING, HALF);
+        builder.add(WATERLOGGED, FENCE_LIKE, WALL_LIKE, STAIR_LIKE, PANE_LIKE, FACING, HALF);
     }
 
     public static BlockState configureForStoredBlock(BlockState auraState, BlockState storedState) {
@@ -64,6 +65,10 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
         if (auraState.hasProperty(STAIR_LIKE)) {
             auraState = auraState.setValue(STAIR_LIKE, storedState.is(BlockTags.STAIRS) || storedState.getBlock() instanceof StairBlock);
+        }
+
+        if (auraState.hasProperty(PANE_LIKE)) {
+            auraState = auraState.setValue(PANE_LIKE, storedState.getBlock() instanceof IronBarsBlock);
         }
 
         if (auraState.hasProperty(FACING) && storedState.hasProperty(FACING)) {
@@ -112,7 +117,7 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
     }
 
     private static boolean hasRefreshableConnections(BlockState state) {
-        return state.is(BlockTags.FENCES) || state.is(BlockTags.WALLS) || state.is(BlockTags.STAIRS) || state.getBlock() instanceof FenceBlock || state.getBlock() instanceof WallBlock || state.getBlock() instanceof StairBlock;
+        return state.is(BlockTags.FENCES) || state.is(BlockTags.WALLS) || state.is(BlockTags.STAIRS) || state.getBlock() instanceof FenceBlock || state.getBlock() instanceof WallBlock || state.getBlock() instanceof StairBlock || state.getBlock() instanceof IronBarsBlock;
     }
 
     private static BlockState configureDefaultState(BlockState state) {
@@ -130,6 +135,10 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
 
         if (state.hasProperty(STAIR_LIKE)) {
             state = state.setValue(STAIR_LIKE, Boolean.FALSE);
+        }
+
+        if (state.hasProperty(PANE_LIKE)) {
+            state = state.setValue(PANE_LIKE, Boolean.FALSE);
         }
 
         if (state.hasProperty(FACING)) {
