@@ -108,13 +108,6 @@ public class DNLBlocks {
     public static Supplier<Block> OVERCHARGED_REDSTONE_BLOCK;
     public static Supplier<Block> VERTEX_PILLAR;
     public static Supplier<Block> MENDING_AURA;
-    public static Supplier<Block> MENDING_AURA_STAIRS;
-    public static Supplier<Block> MENDING_AURA_SLAB;
-    public static Supplier<Block> MENDING_AURA_FENCE;
-    public static Supplier<Block> MENDING_AURA_WALL;
-    public static Supplier<Block> MENDING_AURA_PATH;
-    public static Supplier<Block> MENDING_AURA_PANE;
-    public static Supplier<Block> MENDING_AURA_CHEST;
     public static Supplier<Block> STONE_PRESERVER;
     public static Supplier<Block> REDSTONE_IDOL;
     public static Supplier<Block> MENDING_TABLE;
@@ -255,13 +248,6 @@ public class DNLBlocks {
         OVERCHARGED_REDSTONE_BLOCK = registerBlock("overcharged_redstone_block", () -> new OverchargedRedstoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).requiresCorrectToolForDrops().strength(5.0f, 6.0f).sound(SoundType.METAL).isRedstoneConductor(DNLBlocks::never).lightLevel((lightLevel) -> 15)));
         VERTEX_PILLAR = registerBlock("vertex_pillar", () -> new VertexPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).noOcclusion().noLootTable().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE)));
         MENDING_AURA = registerBlock("mending_aura", () -> new MendingAuraBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().dynamicShape().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
-        MENDING_AURA_STAIRS = registerBlock("mending_aura_stairs", () -> new MendingAuraStairBlock(MENDING_AURA.get().defaultBlockState(), BlockBehaviour.Properties.copy(MENDING_AURA.get()).noLootTable()));
-        MENDING_AURA_SLAB = registerBlock("mending_aura_slab", () -> new MendingAuraSlabBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
-        MENDING_AURA_FENCE = registerBlock("mending_aura_fence", () -> new MendingAuraFenceBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
-        MENDING_AURA_WALL = registerBlock("mending_aura_wall", () -> new MendingAuraWallBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
-        MENDING_AURA_PATH = registerBlock("mending_aura_path", () -> new MendingAuraNearFullHeightBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
-        MENDING_AURA_PANE = registerBlock("mending_aura_pane", () -> new MendingAuraPaneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
-        MENDING_AURA_CHEST = registerBlock("mending_aura_chest", () -> new MendingAuraChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.LAPIS).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 7)));
         STONE_PRESERVER = registerBlock("stone_preserver", () -> new PreserverBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(-1.0F, 3600000.0F).noOcclusion().pushReaction(PushReaction.IGNORE).noLootTable().sound(SoundType.STONE).emissiveRendering(DNLBlocks::always)));
         DURITE_QUELLER = registerBlock("durite_queller", () -> new DuriteQuellerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).strength(50F, 1200.0F).noOcclusion().pushReaction(PushReaction.IGNORE).sound(SoundType.STONE).requiresCorrectToolForDrops().emissiveRendering(DNLBlocks::always).lightLevel(lightLevel -> 10)));
         REDSTONE_IDOL = registerBlock("redstone_idol", () -> new RedstoneIdolBlock(BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).strength(5.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().isRedstoneConductor(DNLBlocks::never).noOcclusion()));

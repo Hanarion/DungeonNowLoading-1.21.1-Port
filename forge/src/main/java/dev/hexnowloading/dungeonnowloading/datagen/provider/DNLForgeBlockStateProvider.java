@@ -61,13 +61,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
-        fullyRotatedVarientStairsLikeBlockWithItem(DNLBlocks.MENDING_AURA_STAIRS.get(), DNLBlocks.MENDING_AURA.get());
-        fullyRotatedVarientSlabLikeBlockWithItem(DNLBlocks.MENDING_AURA_SLAB.get(), DNLBlocks.MENDING_AURA.get());
-        fullyRotatedVarientFenceLikeBlockWithItem(DNLBlocks.MENDING_AURA_FENCE.get(), DNLBlocks.MENDING_AURA.get());
-        fullyRotatedVarientWallLikeBlockWithItem(DNLBlocks.MENDING_AURA_WALL.get(), DNLBlocks.MENDING_AURA.get());
-        fullyRotatedVarientPathLikeBlockWithItem(DNLBlocks.MENDING_AURA_PATH.get(), DNLBlocks.MENDING_AURA.get());
-        fullyRotatedPaneLikeBlockWithItem(DNLBlocks.MENDING_AURA_PANE.get(), DNLBlocks.MENDING_AURA.get());
-        chestLikeRandomTexturedBlock(DNLBlocks.MENDING_AURA_CHEST.get(), DNLBlocks.MENDING_AURA.get(), MendingAuraChestBlock.FACING, MendingAuraChestBlock.CHEST_TYPE, BlockStateProperties.WATERLOGGED);
         stairsBlockWithItem((StairBlock) DNLBlocks.STONE_TILE_STAIRS.get(), DNLBlocks.STONE_TILES.get());
         slabBlockWithItems((SlabBlock) DNLBlocks.STONE_TILE_SLAB.get(), DNLBlocks.STONE_TILES.get());
         wallBlockWithItem((WallBlock) DNLBlocks.STONE_TILE_WALL.get(), DNLBlocks.STONE_TILES.get());
@@ -573,8 +566,8 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     private void chestLikeRandomTexturedBlock(
             Block block,
             Block textureParent,                          // where mending_aura_* textures come from
-            DirectionProperty facingProp,                 // e.g., MendingAuraChestBlock.FACING
-            EnumProperty<ChestType> typeProp,             // e.g., MendingAuraChestBlock.CHEST_TYPE
+            DirectionProperty facingProp,
+            EnumProperty<ChestType> typeProp,
             @Nullable BooleanProperty waterloggedProp) {
 
         // 4 texture variants taken from the "parent" block's base name
@@ -645,7 +638,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                 .texture("all", tex)
                 .texture("particle", tex);
 
-        // geometry matches your MendingAuraChestBlock SHAPE
+        // geometry matches a vanilla single chest shape
         b.element().from(1, 0, 1).to(15, 14, 15)
                 .face(Direction.NORTH).texture("#all").end()
                 .face(Direction.SOUTH).texture("#all").end()

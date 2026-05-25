@@ -185,12 +185,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.BALLISTA_GOLEM_STATUE.get());
                 output.accept(DNLItems.VERTEX_PILLAR.get());
                 output.accept(DNLItems.MENDING_AURA.get());
-                output.accept(DNLItems.MENDING_AURA_STAIRS.get());
-                output.accept(DNLItems.MENDING_AURA_SLAB.get());
-                output.accept(DNLItems.MENDING_AURA_FENCE.get());
-                output.accept(DNLItems.MENDING_AURA_WALL.get());
-                output.accept(DNLItems.MENDING_AURA_PATH.get());
-                output.accept(DNLItems.MENDING_AURA_PANE.get());
                 output.accept(DNLItems.STONE_PRESERVER.get());
                 output.accept(DNLItems.DURITE_CLUSTER.get());
                 output.accept(DNLItems.LARGE_DURITE_BUD.get());

@@ -83,16 +83,16 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
                 packedOverlay
         );
 
-        if (shouldRenderInteractionShapeOverlay(storedState, storedModel, blockEntity)) {
+        if (needsInteractionShapeOverlay(storedState, storedModel, blockEntity)) {
             renderInteractionShapeOverlay(storedState, blockEntity, poseStack, buffer.getBuffer(RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS, false)), auraSprite, packedOverlay);
         }
     }
 
-    private static boolean shouldRenderInteractionShapeOverlay(BlockState state, BakedModel model, MendingAuraBlockEntity blockEntity) {
-        return model.isCustomRenderer() || !hasBakedQuads(state, model, blockEntity.getLevel(), blockEntity.getBlockPos());
+    private static boolean needsInteractionShapeOverlay(BlockState state, BakedModel model, MendingAuraBlockEntity blockEntity) {
+        return model.isCustomRenderer() || !hasAnyBakedQuads(state, model, blockEntity.getBlockPos());
     }
 
-    private static boolean hasBakedQuads(BlockState state, BakedModel model, @Nullable BlockAndTintGetter level, BlockPos pos) {
+    private static boolean hasAnyBakedQuads(BlockState state, BakedModel model, BlockPos pos) {
         RandomSource random = RandomSource.create(state.getSeed(pos));
         for (Direction direction : Direction.values()) {
             if (!model.getQuads(state, direction, random).isEmpty()) {

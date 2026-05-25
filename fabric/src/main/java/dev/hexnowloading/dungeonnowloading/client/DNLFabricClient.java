@@ -120,18 +120,11 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BALLISTA_GOLEM_STATUE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BALLISTA_GOLEM_STATUE_PART.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA.get(), RenderType.translucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_STAIRS.get(), RenderType.translucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_SLAB.get(), RenderType.translucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_FENCE.get(), RenderType.translucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_WALL.get(), RenderType.translucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_PATH.get(), RenderType.translucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_PANE.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.PLAYER_STATUE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DURITE_CLUSTER.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.LARGE_DURITE_BUD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MEDIUM_DURITE_BUD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SMALL_DURITE_BUD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDING_AURA_CHEST.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDSTONE_CHALK_MARK.get(), RenderType.cutout());

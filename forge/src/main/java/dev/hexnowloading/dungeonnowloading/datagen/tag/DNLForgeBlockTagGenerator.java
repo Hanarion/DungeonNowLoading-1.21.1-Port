@@ -100,8 +100,7 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
 
         this.tag(BlockTags.WALLS).add(
                 DNLBlocks.COILING_STONE_PILLAR_WALL.get(),
-                DNLBlocks.STONE_TILE_WALL.get(),
-                DNLBlocks.MENDING_AURA_WALL.get()
+                DNLBlocks.STONE_TILE_WALL.get()
         );
 
         this.tag(BlockTags.INFINIBURN_OVERWORLD).add(
@@ -110,30 +109,12 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
 
         this.tag(BlockTags.WITHER_IMMUNE).add(
                 DNLBlocks.STONE_PRESERVER.get(),
-                DNLBlocks.MENDING_AURA.get(),
-                DNLBlocks.MENDING_AURA_STAIRS.get(),
-                DNLBlocks.MENDING_AURA_SLAB.get(),
-                DNLBlocks.MENDING_AURA_FENCE.get(),
-                DNLBlocks.MENDING_AURA_WALL.get(),
-                DNLBlocks.MENDING_AURA_PANE.get(),
-                DNLBlocks.MENDING_AURA_PATH.get(),
-                DNLBlocks.MENDING_AURA_CHEST.get()
+                DNLBlocks.MENDING_AURA.get()
         );
 
         this.tag(BlockTags.DRAGON_IMMUNE).add(
                 DNLBlocks.STONE_PRESERVER.get()
         );
 
-        this.tag(BlockTags.WOODEN_FENCES).add(
-                DNLBlocks.MENDING_AURA_FENCE.get()
-        );
-
-        this.tag(BlockTags.STAIRS).add(
-                DNLBlocks.MENDING_AURA_STAIRS.get()
-        );
-
-        this.tag(BlockTags.WOODEN_STAIRS).add(
-                DNLBlocks.MENDING_AURA_STAIRS.get()
-        );
     }
 }

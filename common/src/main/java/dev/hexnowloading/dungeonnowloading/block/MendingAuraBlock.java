@@ -117,7 +117,14 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
     }
 
     private static boolean hasRefreshableConnections(BlockState state) {
-        return state.is(BlockTags.FENCES) || state.is(BlockTags.WALLS) || state.is(BlockTags.STAIRS) || state.getBlock() instanceof FenceBlock || state.getBlock() instanceof WallBlock || state.getBlock() instanceof StairBlock || state.getBlock() instanceof IronBarsBlock;
+        Block block = state.getBlock();
+        return state.is(BlockTags.FENCES)
+                || state.is(BlockTags.WALLS)
+                || state.is(BlockTags.STAIRS)
+                || block instanceof FenceBlock
+                || block instanceof WallBlock
+                || block instanceof StairBlock
+                || block instanceof IronBarsBlock;
     }
 
     private static BlockState configureDefaultState(BlockState state) {
@@ -247,21 +254,6 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
             mendingAuraBlockEntity.restoreBlock(level, pos, state);
         }
     }
-
-    /*@org.jetbrains.annotations.Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntity::tick);
-    }*/
-
-    /*@Override
-    public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
-        BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
-
-        if (blockEntity instanceof MendingAuraBlockEntity mendingAuraBlockEntity) {
-            MendingAuraBlockEntity.tick(serverLevel, blockPos, blockState, mendingAuraBlockEntity);
-        }
-    }*/
 
     @Override
     public SoundType getSoundType(BlockState blockState) {
