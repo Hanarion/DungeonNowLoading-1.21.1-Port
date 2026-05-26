@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/template_farmland",
-  "render_type": "minecraft:cutout",
-  "textures": {
-    "dirt": "dungeonnowloading:block/mending_aura_90",
-    "top": "dungeonnowloading:block/mending_aura_90"
-  }
-}

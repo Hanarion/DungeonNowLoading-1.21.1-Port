@@ -8,6 +8,8 @@ import dev.hexnowloading.dungeonnowloading.block.entity.DuriteQuellerBlockEntity
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.MendstoneChalkMarkBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CInstantRepairOverlayPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLGameEvents;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -15,7 +17,6 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import dev.hexnowloading.dungeonnowloading.util.event_managers.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -33,6 +34,8 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public interface PreserverBlockDestructionSystem {
 
@@ -142,6 +145,8 @@ public interface PreserverBlockDestructionSystem {
 
     public static class Listener implements GameEventListener {
         private final PreserverBlockDestructionSystem system;
+        private static long lastInstantRepairEffectTick = Long.MIN_VALUE;
+        private static final Set<BlockPos> instantRepairEffectPositionsThisTick = new HashSet<>();
 
         public Listener(PreserverBlockDestructionSystem system) {
             this.system = system;
@@ -251,6 +256,10 @@ public interface PreserverBlockDestructionSystem {
                 return true;
             }
             if (gameEvent == DNLGameEvents.BLOCK_DESTROY_EARLY.get()) {
+                if (context.sourceEntity() instanceof Player) {
+                    return false;
+                }
+
                 if (serverLevel.getBlockState(eventBlockPos).isAir()) {
                     return false;
                 }
@@ -469,7 +478,7 @@ public interface PreserverBlockDestructionSystem {
             ContainerDropManager.cancel(eventBlockPos);
 
             serverLevel.setBlock(eventBlockPos, originalBlockState, Block.UPDATE_ALL);
-            DuriteQuellerBlockEntity.spawnPopBurst(serverLevel, eventBlockPos);
+            playInstantRepairEffects(serverLevel, eventBlockPos);
 
             if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
                 preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
@@ -479,7 +488,7 @@ public interface PreserverBlockDestructionSystem {
         }
 
         private boolean usesInstantRepair(BlockState state) {
-            return state.is(Blocks.REDSTONE_WIRE) || state.is(BlockTags.RAILS);
+            return state.is(DNLTags.PRESERVER_INSTANT_REPAIR);
         }
 
         private void cancelInstantRepairEvent(GameEvent gameEvent, BlockPos eventBlockPos) {
@@ -546,9 +555,35 @@ public interface PreserverBlockDestructionSystem {
                     if (gameEvent == DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION.get()) {
                         ExplosionDestructionManager.markBlockForUpdate(pos);
                     }
-                    DuriteQuellerBlockEntity.spawnPopBurst(serverLevel, pos);
+                    playInstantRepairEffects(serverLevel, pos);
                 }
             });
+        }
+
+        private void playInstantRepairEffects(ServerLevel serverLevel, BlockPos pos) {
+            if (!markInstantRepairEffect(serverLevel, pos)) {
+                return;
+            }
+
+            DuriteQuellerBlockEntity.spawnMendingPop(serverLevel, pos, 1.5F);
+            DuriteQuellerBlockEntity.spawnPopBurst(serverLevel, pos);
+            serverLevel.playSound(null, pos, DNLSounds.MENDING_AURA_POP.get(), SoundSource.BLOCKS, 1.0F, 1.2F);
+            S2CInstantRepairOverlayPacket packet = new S2CInstantRepairOverlayPacket(pos);
+            for (Player player : serverLevel.players()) {
+                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer && player.blockPosition().closerThan(pos, 128.0D)) {
+                    Services.NETWORK.sendToPlayer(packet, serverPlayer);
+                }
+            }
+        }
+
+        private boolean markInstantRepairEffect(ServerLevel serverLevel, BlockPos pos) {
+            long gameTime = serverLevel.getGameTime();
+            if (gameTime != lastInstantRepairEffectTick) {
+                instantRepairEffectPositionsThisTick.clear();
+                lastInstantRepairEffectTick = gameTime;
+            }
+
+            return instantRepairEffectPositionsThisTick.add(pos.immutable());
         }
     }
 }

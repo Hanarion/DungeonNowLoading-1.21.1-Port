@@ -1,9 +1,0 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "render_type": "minecraft:cutout",
-  "textures": {
-    "bottom": "dungeonnowloading:block/mending_aura_0",
-    "side": "dungeonnowloading:block/mending_aura_0",
-    "top": "dungeonnowloading:block/mending_aura_0"
-  }
-}

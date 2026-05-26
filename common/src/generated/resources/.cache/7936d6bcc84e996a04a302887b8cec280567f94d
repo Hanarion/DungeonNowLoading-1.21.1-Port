@@ -1,11 +1,8 @@
-// 1.20.1	2025-11-21T09:56:03.3027777	Tags for minecraft:block mod id dungeonnowloading
+// 1.20.1	2026-05-27T00:05:15.2944126	Tags for minecraft:block mod id dungeonnowloading
 28a2a9be631aa4b1fe168398677eed3cf9e7e3d4 data/minecraft/tags/blocks/dragon_immune.json
 21ae3c729cc319df8a0d5fcfc65b3ccbbcc48f1f data/minecraft/tags/blocks/fall_damage_resetting.json
 9d234881a09c002d8c931b3b43e8c9bbc711c8f4 data/minecraft/tags/blocks/infiniburn_overworld.json
-4f9f237f2ea25a9c028d37f969fd04c948124506 data/minecraft/tags/blocks/mineable/axe.json
-8c1fb69befc986db4c0844774d0936ec6155bcfa data/minecraft/tags/blocks/mineable/pickaxe.json
-690291dfce68a33c40050f616c3d26ea07bc6efc data/minecraft/tags/blocks/stairs.json
-03b21f55fced74dd19e76451b94e1df105f6f9b8 data/minecraft/tags/blocks/walls.json
-7dbfefcde075327c1526593d9b45d4006084afbe data/minecraft/tags/blocks/wither_immune.json
-de1e2855240b2549dae9ae9882a3627867ef3440 data/minecraft/tags/blocks/wooden_fences.json
-690291dfce68a33c40050f616c3d26ea07bc6efc data/minecraft/tags/blocks/wooden_stairs.json
+f21b4d01c1698096b5d774b40a8e0e4510985c30 data/minecraft/tags/blocks/mineable/axe.json
+a60df4df1fd67c4c440738f828fdf429fef4ebf2 data/minecraft/tags/blocks/mineable/pickaxe.json
+328ba56826e0ae3c483e05504c69ee0cb6f3048e data/minecraft/tags/blocks/walls.json
+a0f52fc18ee05855609e52d9d287cc6fd04af210 data/minecraft/tags/blocks/wither_immune.json

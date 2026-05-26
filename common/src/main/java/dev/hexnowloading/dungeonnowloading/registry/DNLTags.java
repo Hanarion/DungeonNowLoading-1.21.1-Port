@@ -34,6 +34,7 @@ public class DNLTags {
     public static final TagKey<Block> TORCH_BLOCKS = registerBlockTag("torch_blocks");
     public static final TagKey<Block> MENDING_AURAS = registerBlockTag("mending_auras");
     public static final TagKey<Block> CHESTS = registerBlockTag("chests");
+    public static final TagKey<Block> PRESERVER_INSTANT_REPAIR = registerBlockTag("preserver_instant_repair");
     public static final TagKey<Structure> NO_GEODES_TAG = registerStructureTag("no_geodes");
     public static final TagKey<Structure> TEMPLE_OF_DUALITY = registerStructureTag("temple_of_duality");
     public static final TagKey<Structure> LABYRINTH = registerStructureTag("labyrinth");

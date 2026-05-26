@@ -47,6 +47,7 @@
       "client.PlayerRendererMixin",
       "client.ClientPacketListenerMixin",
       "client.AbstractClientPlayerMixin",
+      "client.InstantRepairOverlayLevelRendererMixin",
       "client.SituationalMusicMixin",
       "client.MinecraftClientTickMixin",
       "client.MusicManagerMixin",

@@ -1,9 +1,0 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "render_type": "minecraft:cutout",
-  "textures": {
-    "bottom": "dungeonnowloading:block/mending_aura_180",
-    "side": "dungeonnowloading:block/mending_aura_180",
-    "top": "dungeonnowloading:block/mending_aura_180"
-  }
-}

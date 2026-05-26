@@ -5,10 +5,13 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -167,6 +170,19 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
     }
 
     @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof MendingAuraBlockEntity mendingAuraBlockEntity
+                && mendingAuraBlockEntity.getStoredBlockState() == null) {
+            mendingAuraBlockEntity.setStoredBlock(Blocks.AIR.defaultBlockState(), new CompoundTag());
+            if (level instanceof ServerLevel serverLevel) {
+                mendingAuraBlockEntity.syncToClients(serverLevel, state);
+            }
+        }
+    }
+
+    @Override
     public FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
@@ -191,24 +207,36 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
         BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        if (isManualPlaceholder(storedState)) {
+            return Shapes.block();
+        }
         return storedState != null ? storedState.getShape(blockGetter, pos, context) : Shapes.empty();
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
         BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        if (isManualPlaceholder(storedState)) {
+            return Shapes.block();
+        }
         return storedState != null ? storedState.getCollisionShape(blockGetter, pos, context) : Shapes.empty();
     }
 
     @Override
     public VoxelShape getInteractionShape(BlockState state, BlockGetter blockGetter, BlockPos pos) {
         BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        if (isManualPlaceholder(storedState)) {
+            return Shapes.block();
+        }
         return storedState != null ? storedState.getInteractionShape(blockGetter, pos) : Shapes.empty();
     }
 
     @Override
     public VoxelShape getBlockSupportShape(BlockState state, BlockGetter blockGetter, BlockPos pos) {
         BlockState storedState = this.getStoredBlockState(blockGetter, pos);
+        if (isManualPlaceholder(storedState)) {
+            return Shapes.block();
+        }
         return storedState != null ? storedState.getBlockSupportShape(blockGetter, pos) : Shapes.empty();
     }
 
@@ -228,6 +256,10 @@ public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterlogg
             }
         }
         return null;
+    }
+
+    private static boolean isManualPlaceholder(@Nullable BlockState storedState) {
+        return storedState != null && storedState.isAir();
     }
 
     @Nullable

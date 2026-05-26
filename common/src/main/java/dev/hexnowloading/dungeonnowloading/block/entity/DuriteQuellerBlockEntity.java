@@ -254,7 +254,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         }
     }
 
-    private void spawnMendingPop(ServerLevel level, BlockPos blockPos, float scale) {
+    public static void spawnMendingPop(ServerLevel level, BlockPos blockPos, float scale) {
         double x = blockPos.getX() + 0.5;
         double y = blockPos.getY() + 0.5; // slightly above the bottom face
         double z = blockPos.getZ() + 0.5;
