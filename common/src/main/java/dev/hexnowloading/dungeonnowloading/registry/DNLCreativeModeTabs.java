@@ -184,7 +184,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SCUTTLE_STATUE.get());
                 output.accept(DNLItems.BALLISTA_GOLEM_STATUE.get());
                 output.accept(DNLItems.VERTEX_PILLAR.get());
-                output.accept(DNLItems.MENDING_AURA.get());
                 output.accept(DNLItems.STONE_PRESERVER.get());
                 output.accept(DNLItems.DURITE_CLUSTER.get());
                 output.accept(DNLItems.LARGE_DURITE_BUD.get());
