@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.hexnowloading.dungeonnowloading.block.MendingAuraBlock;
 import dev.hexnowloading.dungeonnowloading.block.PreserverBlock;
+import dev.hexnowloading.dungeonnowloading.block.entity.DuriteQuellerBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.MendstoneChalkMarkBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
@@ -14,6 +15,7 @@ import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import dev.hexnowloading.dungeonnowloading.util.event_managers.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -28,6 +30,9 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import net.minecraft.world.level.gameevent.PositionSource;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public interface PreserverBlockDestructionSystem {
 
@@ -218,6 +223,10 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
+                if (tryInstantRepair(serverLevel, eventBlockPos, centerBlockPos, originalBlockState, gameEvent)) {
+                    return true;
+                }
+
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
@@ -273,6 +282,10 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
+                if (tryInstantRepair(serverLevel, eventBlockPos, centerBlockPos, originalBlockState, gameEvent)) {
+                    return true;
+                }
+
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
@@ -325,6 +338,10 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
+                if (tryInstantRepair(serverLevel, eventBlockPos, centerBlockPos, originalBlockState, gameEvent)) {
+                    return true;
+                }
+
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
@@ -362,6 +379,10 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
+                if (tryInstantRepair(serverLevel, eventBlockPos, centerBlockPos, originalBlockState, gameEvent)) {
+                    return true;
+                }
+
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
@@ -397,6 +418,10 @@ public interface PreserverBlockDestructionSystem {
                 }
 
                 BlockState originalBlockState = serverLevel.getBlockState(eventBlockPos);
+                if (tryInstantRepair(serverLevel, eventBlockPos, centerBlockPos, originalBlockState, gameEvent)) {
+                    return true;
+                }
+
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
@@ -435,6 +460,40 @@ public interface PreserverBlockDestructionSystem {
             return !state.isAir() && !state.canBeReplaced();
         }
 
+        private boolean tryInstantRepair(ServerLevel serverLevel, BlockPos eventBlockPos, BlockPos centerBlockPos, BlockState originalBlockState, GameEvent gameEvent) {
+            if (!usesInstantRepair(originalBlockState)) {
+                return false;
+            }
+
+            cancelInstantRepairEvent(gameEvent, eventBlockPos);
+            ContainerDropManager.cancel(eventBlockPos);
+
+            serverLevel.setBlock(eventBlockPos, originalBlockState, Block.UPDATE_ALL);
+            DuriteQuellerBlockEntity.spawnPopBurst(serverLevel, eventBlockPos);
+
+            if (serverLevel.getBlockState(centerBlockPos).getBlock() instanceof PreserverBlock preserverBlock) {
+                preserverBlock.setLitPreserverBlock(serverLevel, centerBlockPos);
+            }
+
+            return true;
+        }
+
+        private boolean usesInstantRepair(BlockState state) {
+            return state.is(Blocks.REDSTONE_WIRE) || state.is(BlockTags.RAILS);
+        }
+
+        private void cancelInstantRepairEvent(GameEvent gameEvent, BlockPos eventBlockPos) {
+            if (gameEvent == DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION.get()) {
+                ExplosionDestructionManager.cancel(eventBlockPos);
+            } else if (gameEvent == DNLGameEvents.BLOCK_BURNED.get()) {
+                BlockBurnManager.cancel();
+            } else if (gameEvent == DNLGameEvents.BLOCK_PUSHED_EARLY.get()) {
+                PistonPushManager.cancel();
+            } else {
+                BlockDestructionManager.cancel();
+            }
+        }
+
         private void storeMendingAuraBlock(ServerLevel serverLevel, BlockPos eventBlockPos, BlockState originalBlockState, CompoundTag compoundTag) {
             if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
                 BlockState storedBlockState = MendingAuraBlock.refreshStoredConnections(originalBlockState, serverLevel, eventBlockPos);
@@ -445,16 +504,51 @@ public interface PreserverBlockDestructionSystem {
         }
 
         private void placeMendingBlock(ServerLevel serverLevel, BlockState originalBlockState, BlockPos eventBlockPos, GameEvent gameEvent) {
+            Map<BlockPos, BlockState> instantRepairNeighbors = collectInstantRepairNeighbors(serverLevel, eventBlockPos);
+
             //Note: For some reason, this setblock resets the BlockDestructionManager when the event block has attachable blocks like torches and vines, so the BlockDestructionManager.cancel need to be ran after this setblock.
             serverLevel.setBlock(eventBlockPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
 
             BlockState mendingAuraState = MendingAuraBlock.configureForStoredBlock(DNLBlocks.MENDING_AURA.get().defaultBlockState(), originalBlockState);
 
             serverLevel.setBlock(eventBlockPos, mendingAuraState, Block.UPDATE_CLIENTS);
+            if (serverLevel.getBlockEntity(eventBlockPos) instanceof MendingAuraBlockEntity blockEntity) {
+                BlockState storedState = MendingAuraBlock.refreshStoredConnections(originalBlockState, serverLevel, eventBlockPos);
+                blockEntity.setStoredBlock(storedState, new CompoundTag());
+            }
+
+            restoreInstantRepairNeighbors(serverLevel, instantRepairNeighbors, gameEvent);
+
             Block block = serverLevel.getBlockState(eventBlockPos).getBlock();
             if (block instanceof MendingAuraBlock mendingAuraBlock) {
                 mendingAuraBlock.startRestoration(serverLevel, eventBlockPos);
             }
+        }
+
+        private Map<BlockPos, BlockState> collectInstantRepairNeighbors(ServerLevel serverLevel, BlockPos eventBlockPos) {
+            Map<BlockPos, BlockState> states = new HashMap<>();
+
+            for (Direction direction : Direction.values()) {
+                BlockPos neighborPos = eventBlockPos.relative(direction);
+                BlockState neighborState = serverLevel.getBlockState(neighborPos);
+                if (usesInstantRepair(neighborState)) {
+                    states.put(neighborPos.immutable(), neighborState);
+                }
+            }
+
+            return states;
+        }
+
+        private void restoreInstantRepairNeighbors(ServerLevel serverLevel, Map<BlockPos, BlockState> states, GameEvent gameEvent) {
+            states.forEach((pos, state) -> {
+                if (!serverLevel.getBlockState(pos).equals(state)) {
+                    serverLevel.setBlock(pos, state, Block.UPDATE_ALL);
+                    if (gameEvent == DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION.get()) {
+                        ExplosionDestructionManager.markBlockForUpdate(pos);
+                    }
+                    DuriteQuellerBlockEntity.spawnPopBurst(serverLevel, pos);
+                }
+            });
         }
     }
 }

@@ -339,7 +339,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
     }
 
 
-    private void spawnPopBurst(ServerLevel level, BlockPos pos) {
+    public static void spawnPopBurst(ServerLevel level, BlockPos pos) {
         Vec3 c = Vec3.atCenterOf(pos);
 
         final int count = 8;
