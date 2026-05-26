@@ -10,8 +10,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -25,9 +25,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MendingAuraOverlayRenderer {
     private static final int OVERLAY_TICKS = 40;
+    private static final float MODEL_OVERLAY_OFFSET = 0.002F;
     private static final float SHAPE_OVERLAY_EPSILON = 0.001F;
+    private static final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> OVERLAY_REMAPPED_QUAD_CACHE = new IdentityHashMap<>();
 
     private MendingAuraOverlayRenderer() {
     }
@@ -71,7 +77,8 @@ public class MendingAuraOverlayRenderer {
                     auraSprite,
                     level,
                     pos,
-                    MendingAuraBlockEntityRenderer.GLOBAL_REMAPPED_QUAD_CACHE
+                    OVERLAY_REMAPPED_QUAD_CACHE,
+                    MODEL_OVERLAY_OFFSET
             );
 
             poseStack.pushPose();

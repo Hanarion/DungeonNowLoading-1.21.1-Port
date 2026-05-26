@@ -30,7 +30,10 @@ import net.minecraft.world.level.gameevent.BlockPositionSource;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import net.minecraft.world.level.gameevent.PositionSource;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -565,8 +568,7 @@ public interface PreserverBlockDestructionSystem {
                 return;
             }
 
-            DuriteQuellerBlockEntity.spawnMendingPop(serverLevel, pos, 1.5F);
-            DuriteQuellerBlockEntity.spawnPopBurst(serverLevel, pos);
+            DuriteQuellerBlockEntity.spawnPopBurst(serverLevel, getShapeCenter(serverLevel, pos));
             serverLevel.playSound(null, pos, DNLSounds.MENDING_AURA_POP.get(), SoundSource.BLOCKS, 1.0F, 1.2F);
             S2CInstantRepairOverlayPacket packet = new S2CInstantRepairOverlayPacket(pos);
             for (Player player : serverLevel.players()) {
@@ -574,6 +576,21 @@ public interface PreserverBlockDestructionSystem {
                     Services.NETWORK.sendToPlayer(packet, serverPlayer);
                 }
             }
+        }
+
+        private Vec3 getShapeCenter(ServerLevel serverLevel, BlockPos pos) {
+            BlockState state = serverLevel.getBlockState(pos);
+            VoxelShape shape = state.getShape(serverLevel, pos, CollisionContext.empty());
+            if (shape.isEmpty()) {
+                return Vec3.atCenterOf(pos);
+            }
+
+            AABB bounds = shape.bounds();
+            return new Vec3(
+                    pos.getX() + (bounds.minX + bounds.maxX) * 0.5D,
+                    pos.getY() + (bounds.minY + bounds.maxY) * 0.5D,
+                    pos.getZ() + (bounds.minZ + bounds.maxZ) * 0.5D
+            );
         }
 
         private boolean markInstantRepairEffect(ServerLevel serverLevel, BlockPos pos) {
