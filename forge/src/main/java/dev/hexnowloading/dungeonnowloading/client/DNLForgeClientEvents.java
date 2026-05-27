@@ -154,6 +154,7 @@ public class DNLForgeClientEvents {
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DUNGEON_DIRECTOR.get(), DungeonDirectorRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DUNGEON_BANNER.get(), DungeonBannerBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(DNLBlockEntityTypes.WISP_BLOCK.get(), WispBlockRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {

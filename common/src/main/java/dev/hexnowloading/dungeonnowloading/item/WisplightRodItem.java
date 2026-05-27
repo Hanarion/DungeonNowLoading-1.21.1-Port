@@ -3,9 +3,11 @@ package dev.hexnowloading.dungeonnowloading.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import dev.hexnowloading.dungeonnowloading.block.WispBlock;
+import dev.hexnowloading.dungeonnowloading.block.entity.WispBlockEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.LargeWispProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.WispProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.world.WispBlockTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -41,8 +43,9 @@ import net.minecraft.world.phys.Vec3;
 import java.util.function.Predicate;
 
 public class WisplightRodItem extends Item {
-    private static final float NORMAL_PROJECTILE_DAMAGE = 8.0F;
-    private static final float LARGE_PROJECTILE_DAMAGE = 15.0F;
+    public static final float SMALL_WISP_DAMAGE = 2.0F;
+    public static final float NORMAL_PROJECTILE_DAMAGE = 4.0F;
+    private static final float LARGE_PROJECTILE_DAMAGE = 8.0F;
     private static final String FUEL_CONSUMED_TAG = "FuelConsumed";
     private static final String LARGE_FUEL_CONSUMED_TAG = "LargeFuelConsumed";
     private static final double ATTACK_DAMAGE_MODIFIER = 0.0D;
@@ -50,9 +53,9 @@ public class WisplightRodItem extends Item {
     private static final int BURN_SECONDS = 8;
     private static final int CHARGE_TIME_TICKS = 10;
     private static final int LARGE_CHARGE_TIME_TICKS = 30;
+    private static final int WISP_BLOCK_PLACE_COOLDOWN_TICKS = 10;
     private static final double TARGET_RANGE = 32.0D;
     private static final float PROJECTILE_SPEED = 1.1F;
-    private static final float BLOCK_FUEL_CONSUME_CHANCE = 0.33F;
 
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
@@ -112,12 +115,17 @@ public class WisplightRodItem extends Item {
             }
 
             if (level instanceof ServerLevel serverLevel) {
+                if (serverLevel.getBlockEntity(placePos) instanceof WispBlockEntity wispBlockEntity) {
+                    long placedGameTime = serverLevel.getGameTime();
+                    wispBlockEntity.setOwner(player.getUUID(), placedGameTime);
+                    WispBlockTracker.get(serverLevel).registerPlaced(serverLevel, placePos, player.getUUID(), placedGameTime);
+                }
                 WispBlock.playPlacementEffects(serverLevel, placePos);
             }
             level.gameEvent(player, GameEvent.BLOCK_PLACE, placePos);
             player.awardStat(Stats.ITEM_USED.get(this));
             stack.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(context.getHand()));
-            this.consumeFuelWithChance(player, BLOCK_FUEL_CONSUME_CHANCE);
+            player.getCooldowns().addCooldown(this, WISP_BLOCK_PLACE_COOLDOWN_TICKS);
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);
@@ -263,17 +271,6 @@ public class WisplightRodItem extends Item {
 
     private void consumeFuel(Player player) {
         if (player.getAbilities().instabuild) {
-            return;
-        }
-
-        ItemStack fuel = this.getFuel(player);
-        if (!fuel.isEmpty()) {
-            fuel.shrink(1);
-        }
-    }
-
-    private void consumeFuelWithChance(Player player, float chance) {
-        if (player.getAbilities().instabuild || player.getRandom().nextFloat() >= chance) {
             return;
         }
 

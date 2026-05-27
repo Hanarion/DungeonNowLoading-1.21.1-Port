@@ -1,8 +1,20 @@
 {
   "variants": {
-    "facing=north": { "model": "dungeonnowloading:block/wisp_block" },
-    "facing=east": { "model": "dungeonnowloading:block/wisp_block", "y": 90 },
-    "facing=south": { "model": "dungeonnowloading:block/wisp_block", "y": 180 },
-    "facing=west": { "model": "dungeonnowloading:block/wisp_block", "y": 270 }
+    "rotation=0": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=1": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=2": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=3": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=4": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=5": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=6": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=7": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=8": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=9": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=10": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=11": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=12": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=13": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=14": { "model": "dungeonnowloading:block/wisp_block" },
+    "rotation=15": { "model": "dungeonnowloading:block/wisp_block" }
   }
 }
