@@ -13,6 +13,7 @@ import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
 import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
+import dev.hexnowloading.dungeonnowloading.item.client.model.WisplightRodModel;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeClientHelper;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
@@ -91,6 +92,7 @@ public class DNLForgeClientEvents {
 
         // Item
         event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
+        event.registerLayerDefinition(WisplightRodModel.LAYER_LOCATION, WisplightRodModel::createBodyLayer);
 
         // Misc
         event.registerLayerDefinition(SeepingSoulChaosSpawnerModel.LAYER_LOCATION, SeepingSoulChaosSpawnerModel::createBodyLayer);

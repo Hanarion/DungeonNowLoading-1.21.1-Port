@@ -15,8 +15,10 @@ import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
 import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
+import dev.hexnowloading.dungeonnowloading.item.client.model.WisplightRodModel;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.PlayerStatueItemRenderer;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.ScorcherRenderer;
+import dev.hexnowloading.dungeonnowloading.item.client.renderer.WisplightRodRenderer;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.fabricmc.api.ClientModInitializer;
@@ -72,6 +74,7 @@ public class DNLFabricClient implements ClientModInitializer {
 
     private void registerItemModelLayers() {
         EntityModelLayerRegistry.registerModelLayer(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(WisplightRodModel.LAYER_LOCATION, WisplightRodModel::createBodyLayer);
     }
 
     private void registerItemRenderers() {
@@ -95,6 +98,7 @@ public class DNLFabricClient implements ClientModInitializer {
         // Item
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SOUL_SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
+        BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.WISPLIGHT_ROD.get(), WisplightRodRenderer.getInstance()::renderByItem);
         //BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), new DifferentProspectiveItemRenderer(DNLClientRegistry.SCORCHER_3D_MODEL, DNLClientRegistry.SCORCHER_3D_MODEL));
 
     }

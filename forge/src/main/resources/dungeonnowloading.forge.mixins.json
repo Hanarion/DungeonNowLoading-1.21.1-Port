@@ -43,6 +43,7 @@
       "forge.blockentities.FierceFairkeeperChestBlockItemMixin",
       "forge.blockentities.PlayerStatueBlockItemMixin",
       "forge.item.ScorcherItemMixin",
+      "forge.item.WisplightRodItemMixin",
       "client.HumanoidModelMixin",
       "client.PlayerRendererMixin",
       "client.ClientPacketListenerMixin",
