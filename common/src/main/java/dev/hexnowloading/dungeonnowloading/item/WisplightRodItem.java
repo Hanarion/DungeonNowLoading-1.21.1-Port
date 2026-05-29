@@ -208,7 +208,7 @@ public class WisplightRodItem extends Item {
 
     @Override
     public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BOW;
+        return UseAnim.NONE;
     }
 
     private void shootWisp(Level level, Player player, ItemStack stack, InteractionHand hand) {

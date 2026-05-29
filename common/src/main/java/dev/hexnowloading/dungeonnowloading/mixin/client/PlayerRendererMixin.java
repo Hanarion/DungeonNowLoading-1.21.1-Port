@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
+import dev.hexnowloading.dungeonnowloading.item.WisplightRodItem;
 import dev.hexnowloading.dungeonnowloading.item.client.DNLArmPose;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -22,6 +23,8 @@ public class PlayerRendererMixin {
             ItemStack itemStack = player.getUseItem();
             if (itemStack.getItem() instanceof ScorcherItem) {
                 Services.DATA.setArmPose(player, DNLArmPose.SCORCHER);
+            } else if (itemStack.getItem() instanceof WisplightRodItem) {
+                Services.DATA.setArmPose(player, DNLArmPose.WISPLIGHT_ROD);
             } else {
                 Services.DATA.setArmPose(player, DNLArmPose.EMPTY);
             }
