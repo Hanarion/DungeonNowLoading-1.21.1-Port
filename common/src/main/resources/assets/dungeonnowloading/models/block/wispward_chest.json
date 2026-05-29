@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "dungeonnowloading:block/wispward_chest",
+    "front": "dungeonnowloading:block/wispward_chest",
+    "side": "dungeonnowloading:block/wispward_chest"
+  }
+}

@@ -201,6 +201,9 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.RAIL_PLATFORM.get());
                 output.accept(DNLItems.WEB_CARPET.get());
                 output.accept(DNLItems.BURNACLE.get());
+                output.accept(DNLItems.WISPWARD_CHEST.get());
+                output.accept(DNLItems.WISPWARD_LANTERN.get());
+                output.accept(DNLItems.TIMED_WISPWARD_LANTERN.get());
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());

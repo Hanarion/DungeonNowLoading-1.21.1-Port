@@ -6,6 +6,7 @@ import dev.hexnowloading.dungeonnowloading.block.property.ChestStates;
 import dev.hexnowloading.dungeonnowloading.particle.FairkeeperBoundaryParticle;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProperties;
 import net.minecraft.core.BlockPos;
@@ -136,6 +137,10 @@ public class FairkeeperChestBlock extends BaseEntityBlock implements SimpleWater
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (player.getItemInHand(hand).is(DNLItems.ZONE_WAND.get())) {
+            return InteractionResult.PASS;
+        }
+
         if (level.isClientSide) {
             return InteractionResult.sidedSuccess(level.isClientSide());
         }

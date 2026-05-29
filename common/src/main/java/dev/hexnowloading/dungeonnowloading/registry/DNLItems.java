@@ -183,9 +183,12 @@ public class DNLItems {
 
     public static final Supplier<Item> BRITTLESTONE = register("brittlestone", () -> new BlockItem(DNLBlocks.BRITTLESTONE.get(), new Item.Properties()));
     public static final Supplier<Item> DEEPSTEEL_BLOCK = register("deepsteel_block", () -> new BlockItem(DNLBlocks.DEEPSTEEL_BLOCK.get(), new Item.Properties()));
+    public static final Supplier<Item> WISPWARD_LANTERN = register("wispward_lantern", () -> new BlockItem(DNLBlocks.WISPWARD_LANTERN.get(), new Item.Properties()));
+    public static final Supplier<Item> TIMED_WISPWARD_LANTERN = register("timed_wispward_lantern", () -> new BlockItem(DNLBlocks.TIMED_WISPWARD_LANTERN.get(), new Item.Properties()));
     public static final Supplier<Item> RAIL_PLATFORM = register("rail_platform", () -> new BlockItem(DNLBlocks.RAIL_PLATFORM.get(), new Item.Properties()));
     public static final Supplier<Item> WEB_CARPET = register("web_carpet", () -> new BlockItem(DNLBlocks.WEB_CARPET.get(), new Item.Properties()));
     public static final Supplier<Item> BURNACLE = register("burnacle", () -> new BlockItem(DNLBlocks.BURNACLE.get(), new Item.Properties()));
+    public static final Supplier<Item> WISPWARD_CHEST = register("wispward_chest", () -> new BlockItem(DNLBlocks.WISPWARD_CHEST.get(), new Item.Properties()));
 
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));

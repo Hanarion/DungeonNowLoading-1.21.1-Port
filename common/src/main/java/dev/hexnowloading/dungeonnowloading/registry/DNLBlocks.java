@@ -133,10 +133,13 @@ public class DNLBlocks {
     public static Supplier<Block> SPAWN_NODE;
     public static Supplier<Block> BRITTLESTONE;
     public static Supplier<Block> DEEPSTEEL_BLOCK;
+    public static Supplier<Block> WISPWARD_LANTERN;
+    public static Supplier<Block> TIMED_WISPWARD_LANTERN;
     public static Supplier<Block> RAIL_PLATFORM;
     public static Supplier<Block> WEB_CARPET;
     public static Supplier<Block> BURNACLE;
     public static Supplier<Block> WISP_BLOCK;
+    public static Supplier<Block> WISPWARD_CHEST;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -262,10 +265,13 @@ public class DNLBlocks {
 
         BRITTLESTONE = registerBlock("brittlestone", () -> new BrittlestoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0f, 6.0f).noOcclusion()));
         DEEPSTEEL_BLOCK = registerBlock("deepsteel_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F)));
+        WISPWARD_LANTERN = registerBlock("wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission)));
+        TIMED_WISPWARD_LANTERN = registerBlock("timed_wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission), true));
         RAIL_PLATFORM = registerBlock("rail_platform", () -> new RailPlatformBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).noOcclusion()));
         WEB_CARPET = registerBlock("web_carpet", () -> new WebCarpetBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).forceSolidOn().noCollission().requiresCorrectToolForDrops().strength(4.0F).pushReaction(PushReaction.DESTROY)));
         BURNACLE = registerBlock("burnacle", () -> new BurnacleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).pushReaction(PushReaction.DESTROY).noOcclusion()));
         WISP_BLOCK = registerBlock("wisp_block", () -> new WispBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).instabreak().noCollission().noOcclusion().noLootTable().sound(SoundType.EMPTY).lightLevel(state -> 14).pushReaction(PushReaction.DESTROY)));
+        WISPWARD_CHEST = registerBlock("wispward_chest", () -> new WispwardChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.METAL).noOcclusion()));
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
         TEMPLE_OF_DUALITY_TROPHY = registerBlock("temple_of_duality_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));

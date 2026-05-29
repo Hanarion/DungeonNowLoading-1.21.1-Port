@@ -89,6 +89,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(PlayerStatueModel.LAYER_LOCATION, PlayerStatueModel::createBodyLayer);
         event.registerLayerDefinition(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         event.registerLayerDefinition(DungeonBannerBlockModel.LAYER_LOCATION, DungeonBannerBlockModel::createBodyLayer);
+        event.registerLayerDefinition(WispwardChestModel.LAYER_LOCATION, WispwardChestModel::createBodyLayer);
 
         // Item
         event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
@@ -155,6 +156,7 @@ public class DNLForgeClientEvents {
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DUNGEON_BANNER.get(), DungeonBannerBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.WISP_BLOCK.get(), WispBlockRenderer::new);
+        event.registerBlockEntityRenderer(DNLBlockEntityTypes.WISPWARD_CHEST.get(), WispwardChestBlockRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
@@ -193,6 +195,7 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.WISPWARD_FLAME_TRAVEL_PARTICLE.get(), WispwardFlameTravelParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
     }
 
@@ -201,6 +204,8 @@ public class DNLForgeClientEvents {
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.WISP_BLOCK.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.WISPWARD_LANTERN.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.TIMED_WISPWARD_LANTERN.get(), RenderType.translucent());
         });
     }
 

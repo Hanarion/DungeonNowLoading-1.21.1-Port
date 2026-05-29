@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import dev.hexnowloading.dungeonnowloading.block.WispwardLanternBlock;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WispEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WispLanternEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
@@ -113,6 +114,10 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
             return;
         }
 
+        if (this.lightWispwardLanternAtCurrentPosition()) {
+            return;
+        }
+
         if (this.getHomingTarget() == null && this.discardWhenTargetMissing) {
             this.hitEntity = null;
             this.discardWithBurst();
@@ -137,6 +142,27 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         if (!this.isRemoved()) {
             this.setPos(this.getX(), this.getY() - centerOffset, this.getZ());
         }
+    }
+
+    protected boolean lightWispwardLanternAtCurrentPosition() {
+        if (!(this.level() instanceof ServerLevel server)) {
+            return false;
+        }
+
+        BlockPos pos = BlockPos.containing(this.getX(), this.getY() + this.getBbHeight() * 0.5D, this.getZ());
+        BlockState state = server.getBlockState(pos);
+        if (!(state.getBlock() instanceof WispwardLanternBlock)) {
+            return false;
+        }
+
+        boolean lit = WispwardLanternBlock.lightFromWisp(server, pos, state);
+        if (lit && !(this instanceof LargeWispProjectileEntity)) {
+            this.hitEntity = null;
+            this.suppressFireAtBlockPos = pos.immutable();
+            this.discardWithBurst();
+            return true;
+        }
+        return false;
     }
 
     @Override

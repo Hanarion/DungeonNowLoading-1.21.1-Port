@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import dev.hexnowloading.dungeonnowloading.block.WispBlock;
+import dev.hexnowloading.dungeonnowloading.block.WispwardLanternBlock;
 import dev.hexnowloading.dungeonnowloading.block.entity.WispBlockEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.LargeWispProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.WispProjectileEntity;
@@ -92,6 +93,21 @@ public class WisplightRodItem extends Item {
         }
 
         Level level = context.getLevel();
+        BlockPos clickedPos = context.getClickedPos();
+        BlockState clickedState = level.getBlockState(clickedPos);
+        if (clickedState.getBlock() instanceof WispwardLanternBlock) {
+            if (level.isClientSide) {
+                return InteractionResult.SUCCESS;
+            }
+
+            if (level instanceof ServerLevel serverLevel && WispwardLanternBlock.lightFromWisp(serverLevel, clickedPos, clickedState)) {
+                level.gameEvent(player, GameEvent.BLOCK_CHANGE, clickedPos);
+                player.awardStat(Stats.ITEM_USED.get(this));
+                stack.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(context.getHand()));
+            }
+            return InteractionResult.CONSUME;
+        }
+
         BlockPlaceContext placeContext = new BlockPlaceContext(context);
         BlockPos placePos = placeContext.getClickedPos();
         BlockState replacedState = level.getBlockState(placePos);

@@ -133,6 +133,8 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDSTONE_CHALK_MARK.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WISP_BLOCK.get(), RenderType.translucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WISPWARD_LANTERN.get(), RenderType.translucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.TIMED_WISPWARD_LANTERN.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.ACACIA_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BAMBOO_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BIRCH_WOODEN_BOARD.get(), RenderType.cutout());
@@ -219,6 +221,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockEntityRenderers.register(DNLBlockEntityTypes.DUNGEON_BANNER.get(), DungeonBannerBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntityRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.WISP_BLOCK.get(), WispBlockRenderer::new);
+        BlockEntityRenderers.register(DNLBlockEntityTypes.WISPWARD_CHEST.get(), WispwardChestBlockRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
@@ -287,6 +290,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(PlayerStatueModel.LAYER_LOCATION, PlayerStatueModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(DungeonBannerBlockModel.LAYER_LOCATION, DungeonBannerBlockModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(WispwardChestModel.LAYER_LOCATION, WispwardChestModel::createBodyLayer);
 
         // Misc
         EntityModelLayerRegistry.registerModelLayer(SeepingSoulChaosSpawnerModel.LAYER_LOCATION, SeepingSoulChaosSpawnerModel::createBodyLayer);
@@ -310,6 +314,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
+        registry.register(DNLParticleTypes.WISPWARD_FLAME_TRAVEL_PARTICLE.get(), WispwardFlameTravelParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
     }
 

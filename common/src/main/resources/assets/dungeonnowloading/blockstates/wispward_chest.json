@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "dungeonnowloading:block/wispward_chest"
+    },
+    "facing=east": {
+      "model": "dungeonnowloading:block/wispward_chest",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "dungeonnowloading:block/wispward_chest",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "dungeonnowloading:block/wispward_chest",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "dungeonnowloading:block/wispward_chest"
+    },
+    "facing=down": {
+      "model": "dungeonnowloading:block/wispward_chest"
+    }
+  }
+}
