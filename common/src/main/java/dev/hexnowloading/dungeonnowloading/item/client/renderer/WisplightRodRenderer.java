@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class WisplightRodRenderer extends BlockEntityWithoutLevelRenderer {
     private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/wisplight_rod/wisplight_rod_handheld_emissive.png");
+    private static final RenderType RENDER_TYPE_TRANSLUCENT = RenderType.entityTranslucent(WisplightRodModel.TEXTURE);
     private static final RenderType RENDER_TYPE_EMISSIVE = RenderType.entityTranslucent(TEXTURE_EMISSIVE);
 
     private WisplightRodModel model;
@@ -56,10 +57,13 @@ public class WisplightRodRenderer extends BlockEntityWithoutLevelRenderer {
         }
 
         VertexConsumer vertexConsumer = bufferSource.getBuffer(this.model.renderType(WisplightRodModel.TEXTURE));
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderSolidToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+
+        VertexConsumer translucentConsumer = bufferSource.getBuffer(RENDER_TYPE_TRANSLUCENT);
+        this.model.renderTranslucentToBuffer(poseStack, translucentConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
 
         VertexConsumer emissiveConsumer = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE);
-        this.model.renderToBuffer(poseStack, emissiveConsumer, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderTranslucentToBuffer(poseStack, emissiveConsumer, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
         poseStack.popPose();
     }
 

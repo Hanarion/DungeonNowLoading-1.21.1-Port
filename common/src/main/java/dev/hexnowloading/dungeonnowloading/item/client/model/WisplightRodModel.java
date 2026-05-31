@@ -39,8 +39,8 @@ public class WisplightRodModel extends AnimatedItemModel {
         this.root = root;
         this.All = root.getChild("All");
         this.Wand = this.All.getChild("Wand");
-        this.UppperPart = this.All.getChild("Uppper Part");
-        this.FireBall = this.All.getChild("Fire Ball");
+        this.UppperPart = this.All.getChild("UppperPart");
+        this.FireBall = this.All.getChild("FireBall");
         this.Baller = this.FireBall.getChild("Baller");
         this.core = this.Baller.getChild("core");
     }
@@ -66,7 +66,7 @@ public class WisplightRodModel extends AnimatedItemModel {
 
         PartDefinition cube_r4 = Wand.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(33, 0).addBox(-1.0F, -4.0F, 0.0F, 3.0F, 7.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(2.8F, -8.6F, -2.8F, 0.0F, 0.7418F, 0.0F));
 
-        PartDefinition UppperPart = All.addOrReplaceChild("Uppper Part", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -1.25F, -4.0F, 8.0F, 2.0F, 8.0F, new CubeDeformation(-0.2F))
+        PartDefinition UppperPart = All.addOrReplaceChild("UppperPart", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -1.25F, -4.0F, 8.0F, 2.0F, 8.0F, new CubeDeformation(-0.2F))
                 .texOffs(25, 11).addBox(-3.5F, -6.05F, 0.0F, 7.0F, 5.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -15.55F, 0.0F));
 
         PartDefinition cube_r5 = UppperPart.addOrReplaceChild("cube_r5", CubeListBuilder.create().texOffs(18, 29).addBox(-2.0F, -1.0F, 0.0F, 4.0F, 6.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-3.8F, -1.05F, 3.8F, 0.0F, 0.7854F, 0.0F));
@@ -77,14 +77,16 @@ public class WisplightRodModel extends AnimatedItemModel {
 
         PartDefinition cube_r8 = UppperPart.addOrReplaceChild("cube_r8", CubeListBuilder.create().texOffs(26, 22).addBox(-2.0F, -1.0F, 0.0F, 4.0F, 6.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(3.8F, -1.05F, -3.8F, 0.0F, 0.7854F, 0.0F));
 
-        PartDefinition FireBall = All.addOrReplaceChild("Fire Ball", CubeListBuilder.create(), PartPose.offset(0.0F, -12.0F, 0.0F));
+        PartDefinition FireBall = All.addOrReplaceChild("FireBall", CubeListBuilder.create(), PartPose.offset(0.0F, -12.0F, 0.0F));
 
         PartDefinition Baller = FireBall.addOrReplaceChild("Baller", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        PartDefinition core = Baller.addOrReplaceChild("core", CubeListBuilder.create().texOffs(36, 30).addBox(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.2F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition core = Baller.addOrReplaceChild("core", CubeListBuilder.create().texOffs(36, 30).addBox(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.2F))
+                .texOffs(45, 30).addBox(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.5F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
         return LayerDefinition.create(meshdefinition, 64, 64);
     }
+
 
     public void setupAnim(WisplightRodItem item, Player player, ItemStack stack, float partialTicks) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
@@ -117,6 +119,21 @@ public class WisplightRodModel extends AnimatedItemModel {
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         All.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    }
+
+    public void renderSolidToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        poseStack.pushPose();
+        this.All.translateAndRotate(poseStack);
+        this.Wand.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        this.UppperPart.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        poseStack.popPose();
+    }
+
+    public void renderTranslucentToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        poseStack.pushPose();
+        this.All.translateAndRotate(poseStack);
+        this.FireBall.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        poseStack.popPose();
     }
 
     @Override
