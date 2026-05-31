@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.Mth;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -37,6 +38,13 @@ public class WisplightRodRenderer extends BlockEntityWithoutLevelRenderer {
             this.model = new WisplightRodModel(ClientUtil.getClient().getEntityModels().bakeLayer(WisplightRodModel.LAYER_LOCATION));
         }
 
+        if (isFirstPerson(itemDisplayContext) && itemStack.getItem() instanceof WisplightRodItem) {
+            Player player = ClientUtil.getClientPlayer();
+            if (player != null && player.isUsingItem() && ItemStack.isSameItemSameTags(player.getUseItem(), itemStack)) {
+                applyBowPullStretch(poseStack, player, getPartialTick());
+            }
+        }
+
         poseStack.translate(0.5, 1.5, 0.5);
         poseStack.scale(-1.0F, -1.0F, 1.0F);
 
@@ -60,6 +68,26 @@ public class WisplightRodRenderer extends BlockEntityWithoutLevelRenderer {
                 || itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
                 || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
                 || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
+    }
+
+    private static boolean isFirstPerson(ItemDisplayContext itemDisplayContext) {
+        return itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+                || itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
+    }
+
+    private static void applyBowPullStretch(PoseStack poseStack, Player player, float partialTick) {
+        float useTicks = player.getTicksUsingItem() + partialTick;
+        float pull = useTicks / 20.0F;
+        pull = (pull * pull + pull * 2.0F) / 3.0F;
+        pull = Mth.clamp(pull, 0.0F, 1.0F);
+
+        if (pull > 0.1F) {
+            float shake = Mth.sin((useTicks - 0.1F) * 1.3F) * (pull - 0.1F);
+            poseStack.translate(0.0F, shake * 0.004F, 0.0F);
+        }
+
+        poseStack.translate(0.0F, 0.0F, pull * 0.04F);
+        poseStack.scale(1.0F, 1.0F, 1.0F + pull * 0.2F);
     }
 
     private float getPartialTick() {

@@ -17,9 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HumanoidModel.class)
 public abstract class HumanoidModelMixin<T extends LivingEntity> {
-    private static final float BOW_ARM_X_ROT = -1.5707964F;
-    private static final float FREE_ARM_X_ROT = 0.17453292F;
-    private static final float FREE_ARM_AWAY_ROT = 0.5235988F;
+    private static final float WISPLIGHT_ROD_ARM_X_ROT = -1.2217305F;
+    private static final float WISPLIGHT_ROD_OFF_ARM_X_ROT = -0.87266463F;
+    private static final float CENTERED_ROD_ARM_Y_ROT = 0.52F;
+    private static final float CENTERED_ROD_ARM_Z_ROT = 0.0F;
 
     @Shadow @Final public ModelPart rightArm;
 
@@ -79,21 +80,21 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> {
     private void applyWisplightRodPose(Player player) {
         HumanoidArm usedArm = this.getUsedArm(player);
         if (usedArm == HumanoidArm.RIGHT) {
-            this.rightArm.yRot = -0.1F + this.head.yRot;
-            this.rightArm.xRot = BOW_ARM_X_ROT + this.head.xRot;
-            this.rightArm.zRot = 0.0F;
+            this.rightArm.yRot = -CENTERED_ROD_ARM_Y_ROT + this.head.yRot;
+            this.rightArm.xRot = WISPLIGHT_ROD_ARM_X_ROT + this.head.xRot;
+            this.rightArm.zRot = CENTERED_ROD_ARM_Z_ROT;
 
-            this.leftArm.xRot = FREE_ARM_X_ROT;
-            this.leftArm.yRot = 0.0F;
-            this.leftArm.zRot = -FREE_ARM_AWAY_ROT;
+            this.leftArm.xRot = WISPLIGHT_ROD_OFF_ARM_X_ROT + this.head.xRot;
+            this.leftArm.yRot = CENTERED_ROD_ARM_Y_ROT + this.head.yRot;
+            this.leftArm.zRot = -CENTERED_ROD_ARM_Z_ROT;
         } else {
-            this.leftArm.yRot = 0.1F + this.head.yRot;
-            this.leftArm.xRot = BOW_ARM_X_ROT + this.head.xRot;
-            this.leftArm.zRot = 0.0F;
+            this.leftArm.yRot = CENTERED_ROD_ARM_Y_ROT + this.head.yRot;
+            this.leftArm.xRot = WISPLIGHT_ROD_ARM_X_ROT + this.head.xRot;
+            this.leftArm.zRot = -CENTERED_ROD_ARM_Z_ROT;
 
-            this.rightArm.xRot = FREE_ARM_X_ROT;
-            this.rightArm.yRot = 0.0F;
-            this.rightArm.zRot = FREE_ARM_AWAY_ROT;
+            this.rightArm.xRot = WISPLIGHT_ROD_OFF_ARM_X_ROT + this.head.xRot;
+            this.rightArm.yRot = -CENTERED_ROD_ARM_Y_ROT + this.head.yRot;
+            this.rightArm.zRot = CENTERED_ROD_ARM_Z_ROT;
         }
     }
 
