@@ -60,6 +60,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(GarholdModel.LAYER_LOCATION, GarholdModel::createBodyLayer);
         event.registerLayerDefinition(BrokenGarholdModel.LAYER_LOCATION, BrokenGarholdModel::createBodyLayer);
         event.registerLayerDefinition(WispModel.LAYER_LOCATION, WispModel::createBodyLayer);
+        event.registerLayerDefinition(LargeWispModel.LAYER_LOCATION, LargeWispModel::createBodyLayer);
         event.registerLayerDefinition(WispLanternModel.LAYER_LOCATION, WispLanternModel::createBodyLayer);
         event.registerLayerDefinition(SilkSpiderModel.LAYER_LOCATION, SilkSpiderModel::createBodyLayer);
         event.registerLayerDefinition(ReaperSpiderModel.LAYER_LOCATION, ReaperSpiderModel::createBodyLayer);
@@ -75,6 +76,7 @@ public class DNLForgeClientEvents {
         // Projectiles
         event.registerLayerDefinition(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
         event.registerLayerDefinition(WispProjectileModel.LAYER_LOCATION, WispProjectileModel::createBodyLayer);
+        event.registerLayerDefinition(LargeWispProjectileModel.LAYER_LOCATION, LargeWispProjectileModel::createBodyLayer);
         event.registerLayerDefinition(VertexArrowProjectileModel.LAYER_LOCATION, VertexArrowProjectileModel::createBodyLayer);
         event.registerLayerDefinition(VertexPillarProjectileModel.LAYER_LOCATION, VertexPillarProjectileModel::createBodyLayer);
         event.registerLayerDefinition(BallistaArrowModel.LAYER_LOCATION, BallistaArrowModel::createBodyLayer);
@@ -117,6 +119,7 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.GARHOLD.get(), GarholdRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BROKEN_GARHOLD.get(), BrokenGarholdRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.WISP.get(), WispRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.LARGE_WISP.get(), LargeWispRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.WISP_LANTERN.get(), WispLanternRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.SILK_SPIDER.get(), SilkSpiderRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.REAPER_SPIDER.get(), ReaperSpiderRenderer::new);
@@ -130,7 +133,7 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.CHAOS_SPAWNER_PROJECTILE.get(), ChaosSpawnerProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.FLAME_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.WISP_PROJECTILE.get(), WispProjectileRenderer::new);
-        event.registerEntityRenderer(DNLEntityTypes.LARGE_WISP_PROJECTILE.get(), WispProjectileRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.LARGE_WISP_PROJECTILE.get(), LargeWispProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), VertexArrowProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.VERTEX_PILLAR_PROJECTILE.get(), VertexPillarProjectileRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.BALLISTA_ARROW.get(), BallistaArrowRenderer::new);

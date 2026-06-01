@@ -9,6 +9,7 @@
     "minecraft:wither_skull",
     "dungeonnowloading:chaos_spawner_projectile",
     "dungeonnowloading:wisp_projectile",
+    "dungeonnowloading:large_wisp_projectile",
     "dungeonnowloading:vertex_pillar_projectile",
     "dungeonnowloading:vertex_orb_projectile"
   ]

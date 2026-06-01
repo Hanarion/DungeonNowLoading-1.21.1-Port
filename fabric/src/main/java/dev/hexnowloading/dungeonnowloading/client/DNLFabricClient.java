@@ -183,6 +183,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.GARHOLD.get(), GarholdRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BROKEN_GARHOLD.get(), BrokenGarholdRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WISP.get(), WispRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.LARGE_WISP.get(), LargeWispRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WISP_LANTERN.get(), WispLanternRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SILK_SPIDER.get(), SilkSpiderRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.REAPER_SPIDER.get(), ReaperSpiderRenderer::new);
@@ -197,7 +198,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.CHAOS_SPAWNER_PROJECTILE.get(), ChaosSpawnerProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FLAME_PROJECTILE.get(), ThrownItemRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WISP_PROJECTILE.get(), WispProjectileRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.LARGE_WISP_PROJECTILE.get(), WispProjectileRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.LARGE_WISP_PROJECTILE.get(), LargeWispProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), VertexArrowProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_PILLAR_PROJECTILE.get(), VertexPillarProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BALLISTA_ARROW.get(), BallistaArrowRenderer::new);
@@ -262,6 +263,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(GarholdModel.LAYER_LOCATION, GarholdModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BrokenGarholdModel.LAYER_LOCATION, BrokenGarholdModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WispModel.LAYER_LOCATION, WispModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(LargeWispModel.LAYER_LOCATION, LargeWispModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WispLanternModel.LAYER_LOCATION, WispLanternModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(SilkSpiderModel.LAYER_LOCATION, SilkSpiderModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ReaperSpiderModel.LAYER_LOCATION, ReaperSpiderModel::createBodyLayer);
@@ -277,6 +279,7 @@ public class DNLFabricClient implements ClientModInitializer {
         //Projectiles
         EntityModelLayerRegistry.registerModelLayer(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WispProjectileModel.LAYER_LOCATION, WispProjectileModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(LargeWispProjectileModel.LAYER_LOCATION, LargeWispProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(VertexArrowProjectileModel.LAYER_LOCATION, VertexArrowProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(VertexPillarProjectileModel.LAYER_LOCATION, VertexPillarProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BallistaArrowModel.LAYER_LOCATION, BallistaArrowModel::createBodyLayer);

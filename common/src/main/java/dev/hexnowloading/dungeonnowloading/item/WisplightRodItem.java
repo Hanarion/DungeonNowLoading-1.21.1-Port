@@ -57,6 +57,7 @@ public class WisplightRodItem extends Item {
     private static final int WISP_BLOCK_PLACE_COOLDOWN_TICKS = 10;
     private static final double TARGET_RANGE = 32.0D;
     private static final float PROJECTILE_SPEED = 1.1F;
+    private static final float LARGE_PROJECTILE_SPEED = PROJECTILE_SPEED * 0.75F;
 
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
@@ -230,7 +231,7 @@ public class WisplightRodItem extends Item {
     private void shootWisp(Level level, Player player, ItemStack stack, InteractionHand hand) {
         WispProjectileEntity projectile = new WispProjectileEntity(level, player);
         projectile.setAttackDamage(NORMAL_PROJECTILE_DAMAGE);
-        this.configureShotProjectile(level, player, projectile);
+        this.configureShotProjectile(level, player, projectile, PROJECTILE_SPEED);
         level.addFreshEntity(projectile);
         stack.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(hand));
     }
@@ -238,12 +239,12 @@ public class WisplightRodItem extends Item {
     private void shootLargeWisp(Level level, Player player, ItemStack stack, InteractionHand hand) {
         LargeWispProjectileEntity projectile = new LargeWispProjectileEntity(level, player);
         projectile.setAttackDamage(LARGE_PROJECTILE_DAMAGE);
-        this.configureShotProjectile(level, player, projectile);
+        this.configureShotProjectile(level, player, projectile, LARGE_PROJECTILE_SPEED);
         level.addFreshEntity(projectile);
         stack.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(hand));
     }
 
-    private void configureShotProjectile(Level level, Player player, WispProjectileEntity projectile) {
+    private void configureShotProjectile(Level level, Player player, WispProjectileEntity projectile, float projectileSpeed) {
         Vec3 eyePosition = player.getEyePosition();
         Vec3 viewVector = player.getViewVector(1.0F);
         LivingEntity target = this.findLookTarget(level, player, eyePosition, viewVector);
@@ -251,7 +252,7 @@ public class WisplightRodItem extends Item {
         projectile.setPos(player.getX(), player.getEyeY() - 0.3D, player.getZ());
         projectile.setDiscardWhenTargetMissing(false);
         projectile.setHomingTarget(target);
-        projectile.shoot(viewVector.x, viewVector.y, viewVector.z, PROJECTILE_SPEED, 0.0F);
+        projectile.shoot(viewVector.x, viewVector.y, viewVector.z, projectileSpeed, 0.0F);
         projectile.setXRot(player.getXRot());
         projectile.setYRot(player.getYRot());
         projectile.xRotO = player.xRotO;

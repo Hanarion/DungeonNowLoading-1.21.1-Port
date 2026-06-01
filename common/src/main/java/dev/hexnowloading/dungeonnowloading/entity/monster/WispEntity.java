@@ -383,6 +383,10 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
         return (float) (this.getAttributeValue(Attributes.ATTACK_DAMAGE));
     }
 
+    public float getProjectileDamage() {
+        return 4.0F;
+    }
+
     private boolean isSolidForWisp(net.minecraft.world.level.block.state.BlockState state) {
         return state.canOcclude() || state.isSolid();
     }

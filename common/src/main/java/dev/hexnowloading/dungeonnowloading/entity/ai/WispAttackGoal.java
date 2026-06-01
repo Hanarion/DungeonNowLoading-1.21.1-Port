@@ -1,7 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.WispAnimationDuration;
+import dev.hexnowloading.dungeonnowloading.entity.monster.LargeWispEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WispEntity;
+import dev.hexnowloading.dungeonnowloading.entity.projectile.LargeWispProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.WispProjectileEntity;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -153,9 +155,9 @@ public class WispAttackGoal extends Goal {
 
         Entity owner = wisp.getOwner();
         LivingEntity projectileOwner = owner instanceof LivingEntity livingOwner ? livingOwner : wisp;
-        WispProjectileEntity projectile = new WispProjectileEntity(wisp.level(), projectileOwner);
+        WispProjectileEntity projectile = this.createProjectile(projectileOwner);
         projectile.setPos(wisp.getX(), wisp.getY(), wisp.getZ());
-        projectile.setAttackDamage((float) wisp.getAttributeValue(Attributes.ATTACK_DAMAGE));
+        projectile.setAttackDamage(wisp.getProjectileDamage());
         projectile.setHomingTarget(target);
         projectile.shoot(direction.x, direction.y, direction.z, (float) speed, 0.0F);
         projectile.setXRot(wisp.getXRot());
@@ -166,6 +168,13 @@ public class WispAttackGoal extends Goal {
         wisp.level().addFreshEntity(projectile);
         this.spawnTransitionBurst();
         wisp.discard();
+    }
+
+    private WispProjectileEntity createProjectile(LivingEntity projectileOwner) {
+        if (this.wisp instanceof LargeWispEntity) {
+            return new LargeWispProjectileEntity(this.wisp.level(), projectileOwner);
+        }
+        return new WispProjectileEntity(this.wisp.level(), projectileOwner);
     }
 
     private void spawnTransitionBurst() {

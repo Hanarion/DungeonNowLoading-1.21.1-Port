@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
+import dev.hexnowloading.dungeonnowloading.util.DNLCustomExplosion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -25,6 +26,8 @@ public class LargeWispProjectileEntity extends WispProjectileEntity {
     private static final double IMPACT_HEAT_INFLATION = 0.5D;
     private static final int MAX_TRANSFORMED_BLOCKS = 5;
     private static final double PARTICLE_MULTIPLIER = 1.4D;
+    private static final float IMPACT_EXPLOSION_RADIUS = 3.0F;
+    private static final float IMPACT_EXPLOSION_DAMAGE = 8.0F;
 
     public LargeWispProjectileEntity(EntityType<? extends LargeWispProjectileEntity> entityType, Level level) {
         super(entityType, level);
@@ -131,6 +134,7 @@ public class LargeWispProjectileEntity extends WispProjectileEntity {
         double cy = this.getY() + this.getBbHeight() * 0.5D;
         double cz = this.getZ();
 
+        this.applyCappedImpactExplosion(server, cx, cy, cz);
         server.sendParticles(ParticleTypes.EXPLOSION, cx, cy, cz, scaledCount(1), 0.0D, 0.0D, 0.0D, 0.0D);
         server.sendParticles(ParticleTypes.FLAME, cx, cy, cz, scaledCount(24), 0.35D, 0.35D, 0.35D, 0.08D);
         server.sendParticles(ParticleTypes.SMOKE, cx, cy, cz, scaledCount(12), 0.30D, 0.30D, 0.30D, 0.03D);
@@ -166,6 +170,16 @@ public class LargeWispProjectileEntity extends WispProjectileEntity {
         }
 
         this.discard();
+    }
+
+    private void applyCappedImpactExplosion(ServerLevel server, double x, double y, double z) {
+        DNLCustomExplosion.explode(server, new Vec3(x, y, z), DNLCustomExplosion.settings(IMPACT_EXPLOSION_RADIUS)
+                .source(this)
+                .damageSource(this.damageSources().explosion(this, this.getOwner()))
+                .explosionInteraction(Level.ExplosionInteraction.NONE)
+                .cappedDamage(IMPACT_EXPLOSION_DAMAGE)
+                .particle(null, 0)
+                .sound(null));
     }
 
     private boolean tryHeatBlock(BlockPos blockPos) {
