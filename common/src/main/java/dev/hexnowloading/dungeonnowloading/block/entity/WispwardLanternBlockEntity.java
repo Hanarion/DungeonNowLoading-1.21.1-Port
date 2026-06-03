@@ -11,8 +11,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class WispwardLanternBlockEntity extends BlockEntity {
-    private static final int MIN_TIMER_SECONDS = 1;
-    private static final int MAX_TIMER_SECONDS = 15;
+    public static final int MIN_TIMER_SECONDS = 1;
+    public static final int MAX_TIMER_SECONDS = 15;
 
     private int timerSeconds = MIN_TIMER_SECONDS;
     private long litUntilGameTime = 0L;
@@ -26,10 +26,14 @@ public class WispwardLanternBlockEntity extends BlockEntity {
         return this.timerSeconds;
     }
 
-    public int cycleTimerSeconds() {
-        this.timerSeconds = this.timerSeconds >= MAX_TIMER_SECONDS ? MIN_TIMER_SECONDS : this.timerSeconds + 1;
+    public void setTimerSeconds(int timerSeconds) {
+        this.timerSeconds = Math.max(MIN_TIMER_SECONDS, Math.min(MAX_TIMER_SECONDS, timerSeconds));
         this.setChanged();
         this.syncToClients();
+    }
+
+    public int cycleTimerSeconds() {
+        this.setTimerSeconds(this.timerSeconds >= MAX_TIMER_SECONDS ? MIN_TIMER_SECONDS : this.timerSeconds + 1);
         return this.timerSeconds;
     }
 

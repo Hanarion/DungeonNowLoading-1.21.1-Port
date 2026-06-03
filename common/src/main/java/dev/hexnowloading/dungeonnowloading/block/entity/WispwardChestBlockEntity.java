@@ -2,11 +2,13 @@ package dev.hexnowloading.dungeonnowloading.block.entity;
 
 import dev.hexnowloading.dungeonnowloading.block.WispwardLanternBlock;
 import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.WispwardLanternCartEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.MendingFadeParticleType;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -30,11 +32,13 @@ import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Iterator;
@@ -58,6 +62,8 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
     private boolean lanternIndexInitialized = false;
     private int cachedLanterns = 0;
     private int cachedLitLanterns = 0;
+    private int requiredLitLanterns = -1;
+    private ResourceLocation configuredLootTable = DEFAULT_LOOT_TABLE;
     private int flameStreamCooldown = 0;
     private int lootSpewDelayTicks = -1;
     private int lootSpewCooldown = 0;
@@ -73,9 +79,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
             return;
         }
 
-        if (!blockEntity.lanternIndexInitialized) {
-            blockEntity.refreshLanternCache(server);
-        }
+        blockEntity.refreshLanternCache(server);
 
         blockEntity.tickLitLanternFlames(server);
         blockEntity.tickLootSpew(server);
@@ -119,15 +123,87 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
         this.setChanged();
     }
 
-    public boolean areAllLanternsLit() {
+    public boolean hasRequiredLanternsLit() {
         return this.getLanternProgress() >= 1.0F;
     }
 
     public float getLanternProgress() {
-        return this.cachedLanterns == 0 ? 1.0F : (float) this.cachedLitLanterns / (float) this.cachedLanterns;
+        if (this.lootSpewed) {
+            return 1.0F;
+        }
+
+        int required = this.getEffectiveRequiredLitLanterns();
+        return required <= 0 ? 1.0F : Math.min(1.0F, (float) this.cachedLitLanterns / (float) required);
+    }
+
+    public int getRequiredLitLanterns() {
+        return this.requiredLitLanterns;
+    }
+
+    public int getCachedLanterns() {
+        return this.cachedLanterns;
+    }
+
+    public int getEffectiveRequiredLitLanterns() {
+        return this.requiredLitLanterns > 0 ? this.requiredLitLanterns : this.cachedLanterns;
+    }
+
+    public int cycleRequiredLitLanterns(ServerLevel level, boolean backwards) {
+        this.refreshLanternCache(level);
+        int max = Math.max(1, this.cachedLanterns);
+        int current = this.requiredLitLanterns > 0 ? this.requiredLitLanterns : max;
+
+        current += backwards ? -1 : 1;
+        if (current < 1) {
+            current = max;
+        } else if (current > max) {
+            current = 1;
+        }
+
+        this.requiredLitLanterns = current;
+        this.refreshLanternCache(level);
+        this.setChanged();
+        this.syncToClients();
+        return this.requiredLitLanterns;
+    }
+
+    public ResourceLocation getConfiguredLootTable() {
+        return this.configuredLootTable;
+    }
+
+    public void applyCreativeConfig(ServerLevel level, ResourceLocation lootTable, int requiredLitLanterns) {
+        this.configuredLootTable = lootTable == null ? DEFAULT_LOOT_TABLE : lootTable;
+        this.requiredLitLanterns = Math.max(1, requiredLitLanterns);
+        this.setLootTable(this.configuredLootTable, level.random.nextLong());
+        this.refreshLanternCache(level);
+        this.setChanged();
+        this.syncToClients();
+    }
+
+    public void resetReward(ServerLevel level) {
+        this.lootSpewing = false;
+        this.lootSpewed = false;
+        this.lootSpewDelayTicks = -1;
+        this.lootSpewCooldown = 0;
+        for (int i = 0; i < this.items.size(); i++) {
+            this.items.set(i, ItemStack.EMPTY);
+        }
+        this.setLootTable(this.configuredLootTable, level.random.nextLong());
+        this.refreshLanternCache(level);
+        this.setChanged();
+        this.syncToClients();
+    }
+
+    public void initializeLootTable(ServerLevel level) {
+        this.configuredLootTable = DEFAULT_LOOT_TABLE;
+        this.setLootTable(this.configuredLootTable, level.random.nextLong());
+        this.setChanged();
+        this.syncToClients();
     }
 
     public void destroySavedLanterns(ServerLevel level) {
+        this.replacePreserversInRegion(level);
+
         for (BlockPos offset : Set.copyOf(this.lanternOffsets)) {
             BlockPos lanternPos = this.storedOffsetToWorld(level, offset);
             BlockState state = level.getBlockState(lanternPos);
@@ -136,11 +212,38 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
             }
         }
 
+        for (WispwardLanternCartEntity cart : this.getWispwardLanternCartsInRegion(level)) {
+            cart.discard();
+        }
+
         this.lanternOffsets.clear();
         this.cachedLanterns = 0;
         this.cachedLitLanterns = 0;
         this.setChanged();
         this.syncToClients();
+    }
+
+    private void replacePreserversInRegion(ServerLevel level) {
+        RegionBounds bounds = this.getRegionBounds(level);
+        Block preserver = DNLBlocks.STONE_PRESERVER.get();
+        BlockState replaceState = Blocks.CHISELED_STONE_BRICKS.defaultBlockState();
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+
+        for (int y = bounds.minY; y <= bounds.maxY; y++) {
+            for (int x = bounds.minX; x <= bounds.maxX; x++) {
+                for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
+                    cursor.set(x, y, z);
+                    if (!level.getBlockState(cursor).is(preserver)) {
+                        continue;
+                    }
+
+                    BlockPos preserverPos = cursor.immutable();
+                    PreserverBlockEntity.spawnPopBurst(level, preserverPos);
+                    level.setBlock(preserverPos, replaceState, Block.UPDATE_ALL);
+                    level.playSound(null, preserverPos, DNLSounds.DURITE_QUELLER_REPLACE_PRESERVER.get(), SoundSource.BLOCKS, 1.0F, 0.5F);
+                }
+            }
+        }
     }
 
     public void refreshLanternCache(ServerLevel level) {
@@ -204,8 +307,15 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
             }
         }
 
-        boolean isFullyLit = lanterns > 0 && lanterns == litLanterns;
-        if (isFullyLit) {
+        for (WispwardLanternCartEntity cart : this.getWispwardLanternCartsInRegion(level)) {
+            lanterns++;
+            if (cart.isLit()) {
+                litLanterns++;
+            }
+        }
+
+        boolean hasRequiredLitLanterns = lanterns > 0 && litLanterns >= this.getRequiredLitLanternsFor(lanterns);
+        if (hasRequiredLitLanterns) {
             this.lockTimedLanterns(level);
             this.scheduleLootSpew();
         }
@@ -302,6 +412,11 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
     }
 
     private void tickLitLanternFlames(ServerLevel level) {
+        if (this.lootSpewed) {
+            this.flameStreamCooldown = 0;
+            return;
+        }
+
         if (this.cachedLitLanterns <= 0) {
             this.flameStreamCooldown = 0;
             return;
@@ -342,6 +457,29 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
             );
             level.sendParticles(data, start.x + jitterX, start.y + jitterY, start.z + jitterZ, 1, 0.0D, 0.0D, 0.0D, 0.0D);
         }
+
+        for (WispwardLanternCartEntity cart : this.getWispwardLanternCartsInRegion(level)) {
+            if (!cart.isLit()) {
+                continue;
+            }
+
+            Vec3 start = cart.getLightPosition();
+            Vec3 velocity = target.subtract(start).scale(1.0D / FLAME_TRAVEL_TICKS);
+
+            double jitterX = (level.random.nextDouble() - 0.5D) * 0.18D;
+            double jitterY = (level.random.nextDouble() - 0.5D) * 0.18D;
+            double jitterZ = (level.random.nextDouble() - 0.5D) * 0.18D;
+            MendingFadeParticleType.Data data = new MendingFadeParticleType.Data(
+                    DNLParticleTypes.WISPWARD_FLAME_TRAVEL_PARTICLE.get(),
+                    (float) velocity.x,
+                    (float) velocity.y,
+                    (float) velocity.z,
+                    4,
+                    8,
+                    FLAME_TRAVEL_TICKS
+            );
+            level.sendParticles(data, start.x + jitterX, start.y + jitterY, start.z + jitterZ, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        }
     }
 
     private void lockTimedLanterns(ServerLevel level) {
@@ -352,6 +490,12 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
                     && state.getValue(WispwardLanternBlock.LIT)
                     && level.getBlockEntity(lanternPos) instanceof WispwardLanternBlockEntity lantern) {
                 lantern.lockLit();
+            }
+        }
+
+        for (WispwardLanternCartEntity cart : this.getWispwardLanternCartsInRegion(level)) {
+            if (cart.isTimed() && cart.isLit()) {
+                cart.lockLit();
             }
         }
     }
@@ -378,20 +522,32 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
     }
 
     private boolean isInRegion(Level level, BlockPos pos) {
+        RegionBounds bounds = this.getRegionBounds(level);
+
+        return pos.getX() >= bounds.minX && pos.getX() <= bounds.maxX
+                && pos.getY() >= bounds.minY && pos.getY() <= bounds.maxY
+                && pos.getZ() >= bounds.minZ && pos.getZ() <= bounds.maxZ;
+    }
+
+    private java.util.List<WispwardLanternCartEntity> getWispwardLanternCartsInRegion(ServerLevel level) {
+        RegionBounds bounds = this.getRegionBounds(level);
+        AABB searchArea = new AABB(bounds.minX, bounds.minY, bounds.minZ, bounds.maxX + 1.0D, bounds.maxY + 1.0D, bounds.maxZ + 1.0D).inflate(1.0D);
+        return level.getEntitiesOfClass(WispwardLanternCartEntity.class, searchArea, cart -> !cart.isRemoved() && this.isInRegion(level, cart.blockPosition()));
+    }
+
+    private RegionBounds getRegionBounds(Level level) {
         BlockPos center = this.getBlockPos();
         BlockPos absCornerA = center.offset(rotateOffset(level, center, this.cornerA, this.authoredFacing));
         BlockPos absCornerB = center.offset(rotateOffset(level, center, this.cornerB, this.authoredFacing));
 
-        int minX = Math.min(absCornerA.getX(), absCornerB.getX());
-        int minY = Math.min(absCornerA.getY(), absCornerB.getY());
-        int minZ = Math.min(absCornerA.getZ(), absCornerB.getZ());
-        int maxX = Math.max(absCornerA.getX(), absCornerB.getX());
-        int maxY = Math.max(absCornerA.getY(), absCornerB.getY());
-        int maxZ = Math.max(absCornerA.getZ(), absCornerB.getZ());
-
-        return pos.getX() >= minX && pos.getX() <= maxX
-                && pos.getY() >= minY && pos.getY() <= maxY
-                && pos.getZ() >= minZ && pos.getZ() <= maxZ;
+        return new RegionBounds(
+                Math.min(absCornerA.getX(), absCornerB.getX()),
+                Math.min(absCornerA.getY(), absCornerB.getY()),
+                Math.min(absCornerA.getZ(), absCornerB.getZ()),
+                Math.max(absCornerA.getX(), absCornerB.getX()),
+                Math.max(absCornerA.getY(), absCornerB.getY()),
+                Math.max(absCornerA.getZ(), absCornerB.getZ())
+        );
     }
 
     private BlockPos storedOffsetToWorld(Level level, BlockPos offset) {
@@ -427,7 +583,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
 
         for (int x = chunkX - LANTERN_NOTIFY_CHUNK_RADIUS; x <= chunkX + LANTERN_NOTIFY_CHUNK_RADIUS; x++) {
             for (int z = chunkZ - LANTERN_NOTIFY_CHUNK_RADIUS; z <= chunkZ + LANTERN_NOTIFY_CHUNK_RADIUS; z++) {
-                for (BlockEntity blockEntity : level.getChunk(x, z).getBlockEntities().values()) {
+                for (BlockEntity blockEntity : java.util.List.copyOf(level.getChunk(x, z).getBlockEntities().values())) {
                     if (blockEntity instanceof WispwardChestBlockEntity chest) {
                         consumer.accept(chest);
                     }
@@ -534,6 +690,8 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
         tag.putBoolean("lanternIndexInitialized", this.lanternIndexInitialized);
         tag.putInt("cachedLanterns", this.cachedLanterns);
         tag.putInt("cachedLitLanterns", this.cachedLitLanterns);
+        tag.putInt("requiredLitLanterns", this.requiredLitLanterns);
+        tag.putString("configuredLootTable", this.configuredLootTable.toString());
         tag.putInt("lootSpewDelayTicks", this.lootSpewDelayTicks);
         tag.putInt("lootSpewCooldown", this.lootSpewCooldown);
         tag.putBoolean("lootSpewing", this.lootSpewing);
@@ -558,6 +716,10 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
         this.lanternIndexInitialized = tag.getBoolean("lanternIndexInitialized");
         this.cachedLanterns = tag.getInt("cachedLanterns");
         this.cachedLitLanterns = tag.getInt("cachedLitLanterns");
+        this.requiredLitLanterns = tag.contains("requiredLitLanterns", Tag.TAG_INT) ? tag.getInt("requiredLitLanterns") : -1;
+        this.configuredLootTable = tag.contains("configuredLootTable", Tag.TAG_STRING)
+                ? new ResourceLocation(tag.getString("configuredLootTable"))
+                : DEFAULT_LOOT_TABLE;
         this.lootSpewDelayTicks = tag.contains("lootSpewDelayTicks", Tag.TAG_INT) ? tag.getInt("lootSpewDelayTicks") : -1;
         this.lootSpewCooldown = tag.getInt("lootSpewCooldown");
         this.lootSpewing = tag.getBoolean("lootSpewing");
@@ -582,5 +744,12 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
 
     private static boolean isWispwardLantern(BlockState state) {
         return state.is(DNLBlocks.WISPWARD_LANTERN.get()) || state.is(DNLBlocks.TIMED_WISPWARD_LANTERN.get());
+    }
+
+    private int getRequiredLitLanternsFor(int lanterns) {
+        return this.requiredLitLanterns > 0 ? this.requiredLitLanterns : lanterns;
+    }
+
+    private record RegionBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
     }
 }

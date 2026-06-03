@@ -72,6 +72,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(CopperCreepButlerModel.LAYER_LOCATION, CopperCreepButlerModel::createBodyLayer);
         event.registerLayerDefinition(RepulsorModel.LAYER_LOCATION, RepulsorModel::createBodyLayer);
         event.registerLayerDefinition(MimicartModel.LAYER_LOCATION, MimicartModel::createBodyLayer);
+        event.registerLayerDefinition(WispwardLanternModel.LAYER_LOCATION, WispwardLanternModel::createBodyLayer);
 
         // Projectiles
         event.registerLayerDefinition(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
@@ -151,6 +152,7 @@ public class DNLForgeClientEvents {
         event.registerEntityRenderer(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
         event.registerEntityRenderer(DNLEntityTypes.MIMICART.get(), MimicartRenderer::new);
+        event.registerEntityRenderer(DNLEntityTypes.WISPWARD_LANTERN_CART.get(), WispwardLanternCartRenderer::new);
         // Block Entities
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);

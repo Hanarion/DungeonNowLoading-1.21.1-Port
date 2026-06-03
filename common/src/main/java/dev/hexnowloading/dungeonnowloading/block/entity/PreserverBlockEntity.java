@@ -4,15 +4,18 @@ import com.mojang.logging.LogUtils;
 import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.game_event_listener.PreserverBlockDestructionSystem;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
+import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEventListener;
+import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
@@ -83,6 +86,41 @@ public class PreserverBlockEntity extends BlockEntity implements GameEventListen
     // Check if the block is player-placed
     public boolean isPlayerPlaced(BlockPos pos) {
         return playerPlacedBlocks.contains(pos);
+    }
+
+    public static void spawnPopBurst(ServerLevel level, BlockPos pos) {
+        spawnPopBurst(level, Vec3.atCenterOf(pos));
+    }
+
+    public static void spawnPopBurst(ServerLevel level, Vec3 center) {
+        final int count = 8;
+        final int fadeIn = 0;
+        final int fadeOut = 8;
+        final int lifetime = 12;
+        final float speed = 0.22f;
+
+        for (int i = 0; i < count; i++) {
+            double rx = level.random.nextDouble() * 2.0 - 1.0;
+            double ry = level.random.nextDouble() * 2.0 - 1.0;
+            double rz = level.random.nextDouble() * 2.0 - 1.0;
+            Vec3 direction = new Vec3(rx, ry, rz);
+            if (direction.lengthSqr() < 1.0e-6) {
+                direction = new Vec3(0.0D, 1.0D, 0.0D);
+            }
+            direction = direction.normalize().scale(speed);
+
+            var data = new dev.hexnowloading.dungeonnowloading.particle.type.MendingFadeParticleType.Data(
+                    DNLParticleTypes.MENDING_FADE_PARTICLE.get(),
+                    (float) direction.x, (float) direction.y, (float) direction.z,
+                    fadeIn, fadeOut, lifetime
+            );
+
+            double px = center.x + (level.random.nextDouble() - 0.5D) * 0.25D;
+            double py = center.y + (level.random.nextDouble() - 0.5D) * 0.25D;
+            double pz = center.z + (level.random.nextDouble() - 0.5D) * 0.25D;
+
+            level.sendParticles(data, px, py, pz, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        }
     }
 
     private static ListTag saveBlockPosSet(Set<BlockPos> positions) {

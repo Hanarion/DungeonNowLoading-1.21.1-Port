@@ -1,12 +1,16 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.WispwardChestBlockEntity;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CWispwardChestOpenConfigPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -77,8 +81,8 @@ public class WispwardChestBlock extends BaseEntityBlock {
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof WispwardChestBlockEntity chest) {
-            chest.setLootTable(WispwardChestBlockEntity.DEFAULT_LOOT_TABLE, level.random.nextLong());
+        if (level instanceof ServerLevel server && level.getBlockEntity(pos) instanceof WispwardChestBlockEntity chest) {
+            chest.initializeLootTable(server);
         }
     }
 
@@ -105,19 +109,29 @@ public class WispwardChestBlock extends BaseEntityBlock {
         }
 
         if (!(level.getBlockEntity(pos) instanceof WispwardChestBlockEntity chest)) {
-            return locked(level, player, pos);
+            return locked(level, player, pos, 1);
         }
 
-        if (!chest.areAllLanternsLit()) {
-            return locked(level, player, pos);
+        if (player.getAbilities().instabuild && level instanceof ServerLevel server && player instanceof ServerPlayer serverPlayer) {
+            chest.refreshLanternCache(server);
+            Services.NETWORK.sendToPlayer(new S2CWispwardChestOpenConfigPacket(pos, chest.getConfiguredLootTable(), Math.max(1, chest.getEffectiveRequiredLitLanterns())), serverPlayer);
+            return InteractionResult.SUCCESS;
+        }
+
+        if (level instanceof ServerLevel server) {
+            chest.refreshLanternCache(server);
+        }
+
+        if (!chest.hasRequiredLanternsLit()) {
+            return locked(level, player, pos, Math.max(1, chest.getEffectiveRequiredLitLanterns()));
         }
 
         player.displayClientMessage(Component.translatable("warning.dungeonnowloading.cannot_open_wispward_chest"), true);
         return InteractionResult.CONSUME;
     }
 
-    private static InteractionResult locked(Level level, Player player, BlockPos pos) {
-        player.displayClientMessage(Component.translatable("warning.dungeonnowloading.cannot_open_wispward_chest"), true);
+    private static InteractionResult locked(Level level, Player player, BlockPos pos, int requiredLitLanterns) {
+        player.displayClientMessage(Component.translatable("warning.dungeonnowloading.cannot_open_wispward_chest", requiredLitLanterns), true);
         playSound(level, pos, SoundEvents.CHEST_LOCKED);
         return InteractionResult.SUCCESS;
     }

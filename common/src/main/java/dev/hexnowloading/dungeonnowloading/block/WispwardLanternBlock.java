@@ -2,11 +2,13 @@ package dev.hexnowloading.dungeonnowloading.block;
 
 import dev.hexnowloading.dungeonnowloading.block.entity.WispwardChestBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.WispwardLanternBlockEntity;
+import dev.hexnowloading.dungeonnowloading.network.packets.S2CWispwardLanternOpenConfigPacket;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -88,18 +90,13 @@ public class WispwardLanternBlock extends BaseEntityBlock {
         }
 
         if (level.isClientSide) {
-            return InteractionResult.SUCCESS;
+            return InteractionResult.sidedSuccess(true);
         }
 
-        if (level.getBlockEntity(pos) instanceof WispwardLanternBlockEntity lantern) {
-            int seconds = lantern.cycleTimerSeconds();
-            if (state.getValue(LIT) && level instanceof ServerLevel server) {
-                lantern.markLit(server.getGameTime());
-                server.scheduleTick(pos, this, seconds * 20);
-            }
-            player.displayClientMessage(Component.literal("Timed Wispward Lantern: " + seconds + "s"), true);
+        if (level.getBlockEntity(pos) instanceof WispwardLanternBlockEntity lantern && player instanceof ServerPlayer serverPlayer) {
+            Services.NETWORK.sendToPlayer(new S2CWispwardLanternOpenConfigPacket(pos, lantern.getTimerSeconds()), serverPlayer);
         }
-        return InteractionResult.CONSUME;
+        return InteractionResult.SUCCESS;
     }
 
     @Override

@@ -214,6 +214,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.MIMICART.get(), MimicartRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.WISPWARD_LANTERN_CART.get(), WispwardLanternCartRenderer::new);
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
@@ -275,6 +276,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(CopperCreepButlerModel.LAYER_LOCATION, CopperCreepButlerModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(RepulsorModel.LAYER_LOCATION, RepulsorModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(MimicartModel.LAYER_LOCATION, MimicartModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(WispwardLanternModel.LAYER_LOCATION, WispwardLanternModel::createBodyLayer);
 
         //Projectiles
         EntityModelLayerRegistry.registerModelLayer(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);

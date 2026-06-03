@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.hexnowloading.dungeonnowloading.block.MendingAuraBlock;
 import dev.hexnowloading.dungeonnowloading.block.PreserverBlock;
-import dev.hexnowloading.dungeonnowloading.block.entity.DuriteQuellerBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.MendstoneChalkMarkBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
@@ -568,7 +567,7 @@ public interface PreserverBlockDestructionSystem {
                 return;
             }
 
-            DuriteQuellerBlockEntity.spawnPopBurst(serverLevel, getShapeCenter(serverLevel, pos));
+            PreserverBlockEntity.spawnPopBurst(serverLevel, getShapeCenter(serverLevel, pos));
             serverLevel.playSound(null, pos, DNLSounds.MENDING_AURA_POP.get(), SoundSource.BLOCKS, 1.0F, 1.2F);
             S2CInstantRepairOverlayPacket packet = new S2CInstantRepairOverlayPacket(pos);
             for (Player player : serverLevel.players()) {

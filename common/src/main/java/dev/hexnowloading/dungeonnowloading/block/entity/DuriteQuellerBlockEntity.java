@@ -162,7 +162,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         BlockPos startPos = this.getBlockPos().above();
         BlockState state = level.getBlockState(startPos);
 
-        spawnPopBurst(level, startPos);
+        PreserverBlockEntity.spawnPopBurst(level, startPos);
 
         Block small   = DNLBlocks.SMALL_DURITE_BUD.get();
         Block medium  = DNLBlocks.MEDIUM_DURITE_BUD.get();
@@ -329,7 +329,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
 
             if (!level.getBlockState(p).is(preserver)) continue;
 
-            spawnPopBurst(level, p);
+            PreserverBlockEntity.spawnPopBurst(level, p);
 
             level.setBlock(p, replaceState, Block.UPDATE_ALL);
 
@@ -338,43 +338,6 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         }
     }
 
-
-    public static void spawnPopBurst(ServerLevel level, BlockPos pos) {
-        spawnPopBurst(level, Vec3.atCenterOf(pos));
-    }
-
-    public static void spawnPopBurst(ServerLevel level, Vec3 c) {
-        final int count = 8;
-        final int fadeIn = 0;
-        final int fadeOut = 8;
-        final int lifetime = 12;
-        final float speed = 0.22f;
-
-        for (int i = 0; i < count; i++) {
-            // random direction
-            double rx = (level.random.nextDouble() * 2.0 - 1.0);
-            double ry = (level.random.nextDouble() * 2.0 - 1.0);
-            double rz = (level.random.nextDouble() * 2.0 - 1.0);
-            Vec3 dir = new Vec3(rx, ry, rz);
-            if (dir.lengthSqr() < 1.0e-6) {
-                dir = new Vec3(0, 1, 0);
-            }
-            dir = dir.normalize().scale(speed);
-
-            var data = new dev.hexnowloading.dungeonnowloading.particle.type.MendingFadeParticleType.Data(
-                    DNLParticleTypes.MENDING_FADE_PARTICLE.get(),
-                    (float) dir.x, (float) dir.y, (float) dir.z,
-                    fadeIn, fadeOut, lifetime
-            );
-
-            // tiny jitter so it looks like a pop, not a point
-            double px = c.x + (level.random.nextDouble() - 0.5) * 0.25;
-            double py = c.y + (level.random.nextDouble() - 0.5) * 0.25;
-            double pz = c.z + (level.random.nextDouble() - 0.5) * 0.25;
-
-            level.sendParticles(data, px, py, pz, 1, 0, 0, 0, 0);
-        }
-    }
 
     public void tryReplaceSelfWithMendingAura(ServerLevel level) {
         if (!hasAnyPreserverInRegion(level)) return;

@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 import dev.hexnowloading.dungeonnowloading.block.WispwardLanternBlock;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WispEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WispLanternEntity;
+import dev.hexnowloading.dungeonnowloading.entity.monster.WispwardLanternCartEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
@@ -514,6 +515,11 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
 
     protected void handleMinecartHit(AbstractMinecart minecart) {
         if (this.level().isClientSide) {
+            return;
+        }
+
+        if (minecart instanceof WispwardLanternCartEntity lanternCart) {
+            lanternCart.lightFromWisp();
             return;
         }
 
