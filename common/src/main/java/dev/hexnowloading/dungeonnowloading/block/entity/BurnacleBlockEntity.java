@@ -18,12 +18,20 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class BurnacleBlockEntity extends BlockEntity {
+    public static final int SPRAY_ANIMATION_EVENT = 1;
+    public static final float SPRAY_ANIMATION_LENGTH_SECONDS = 2.6667F;
+    public static final int SPRAY_ANIMATION_TICKS = Math.round(SPRAY_ANIMATION_LENGTH_SECONDS * 20.0F);
+    private static final float GAS_EJECTION_ANIMATION_MARK_SECONDS = 0.75F;
+    private static final int GAS_EJECTION_DELAY_TICKS = Math.round(GAS_EJECTION_ANIMATION_MARK_SECONDS * 20.0F);
 
     private int cycleTime;
     private int cycleOffset;
     private double initialGasSpeed;
     private double playerRange;
     private CompoundTag gasEntityNbt;
+    private int pendingGasEmissionTicks = -1;
+    private int sprayAnimationTicks = 0;
+    private int previousSprayAnimationTicks = 0;
 
     private static final Map<Stage, StageBehaviorSettings> STAGE_BEHAVIOR = new EnumMap<>(Stage.class);
     public record StageBehaviorSettings(
@@ -66,6 +74,18 @@ public class BurnacleBlockEntity extends BlockEntity {
         if (level.isClientSide) return;
         if (!(state.getBlock() instanceof BurnacleBlock)) return;
 
+        if (be.pendingGasEmissionTicks >= 0) {
+            if (be.pendingGasEmissionTicks > 0) {
+                be.pendingGasEmissionTicks--;
+            }
+
+            if (be.pendingGasEmissionTicks == 0) {
+                be.emitGas(level, pos, state);
+                be.pendingGasEmissionTicks = -1;
+                be.setChanged();
+            }
+        }
+
         if (be.cycleTime <= 0) {
             // 0 or negative means "no emission"
             return;
@@ -89,7 +109,38 @@ public class BurnacleBlockEntity extends BlockEntity {
             }
         }
 
-        be.emitGas(level, pos, state);
+        be.startSprayAnimation(level, pos, state);
+    }
+
+    public static void clientTick(Level level, BlockPos pos, BlockState state, BurnacleBlockEntity be) {
+        be.previousSprayAnimationTicks = be.sprayAnimationTicks;
+        if (be.sprayAnimationTicks > 0) {
+            be.sprayAnimationTicks--;
+        }
+    }
+
+    private void startSprayAnimation(Level level, BlockPos pos, BlockState state) {
+        this.pendingGasEmissionTicks = GAS_EJECTION_DELAY_TICKS;
+        this.setChanged();
+        level.blockEvent(pos, state.getBlock(), SPRAY_ANIMATION_EVENT, 0);
+    }
+
+    public void startClientSprayAnimation() {
+        this.previousSprayAnimationTicks = SPRAY_ANIMATION_TICKS;
+        this.sprayAnimationTicks = SPRAY_ANIMATION_TICKS;
+    }
+
+    public float getSprayAnimationProgress(float partialTick) {
+        if (this.sprayAnimationTicks <= 0 && this.previousSprayAnimationTicks <= 0) {
+            return 1.0F;
+        }
+
+        float ticksRemaining = this.previousSprayAnimationTicks + (this.sprayAnimationTicks - this.previousSprayAnimationTicks) * partialTick;
+        return 1.0F - Math.max(0.0F, Math.min(1.0F, ticksRemaining / SPRAY_ANIMATION_TICKS));
+    }
+
+    public boolean isSpraying() {
+        return this.sprayAnimationTicks > 0 || this.previousSprayAnimationTicks > 0;
     }
 
 
@@ -176,6 +227,7 @@ public class BurnacleBlockEntity extends BlockEntity {
         tag.putInt("CycleOffset", this.cycleOffset);
         tag.putDouble("InitialGasSpeed", this.initialGasSpeed);
         tag.putDouble("PlayerRange", this.playerRange);
+        tag.putInt("PendingGasEmissionTicks", this.pendingGasEmissionTicks);
 
         if (this.gasEntityNbt != null && !this.gasEntityNbt.isEmpty()) {
             tag.put("GasEntity", this.gasEntityNbt.copy());
@@ -200,12 +252,25 @@ public class BurnacleBlockEntity extends BlockEntity {
         if (tag.contains("PlayerRange")) {
             this.playerRange = tag.getDouble("PlayerRange");
         }
+        if (tag.contains("PendingGasEmissionTicks")) {
+            this.pendingGasEmissionTicks = tag.getInt("PendingGasEmissionTicks");
+        }
 
         if (tag.contains("GasEntity", Tag.TAG_COMPOUND)) {
             this.gasEntityNbt = tag.getCompound("GasEntity").copy();
         } else {
             this.gasEntityNbt = null;
         }
+    }
+
+    @Override
+    public boolean triggerEvent(int id, int type) {
+        if (id == SPRAY_ANIMATION_EVENT) {
+            this.startClientSprayAnimation();
+            return true;
+        }
+
+        return super.triggerEvent(id, type);
     }
 
 

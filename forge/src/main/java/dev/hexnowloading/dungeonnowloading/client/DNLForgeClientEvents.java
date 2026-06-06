@@ -93,6 +93,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         event.registerLayerDefinition(DungeonBannerBlockModel.LAYER_LOCATION, DungeonBannerBlockModel::createBodyLayer);
         event.registerLayerDefinition(WispwardChestModel.LAYER_LOCATION, WispwardChestModel::createBodyLayer);
+        event.registerLayerDefinition(BurnacleMatureModel.LAYER_LOCATION, BurnacleMatureModel::createBodyLayer);
 
         // Item
         event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
@@ -162,6 +163,7 @@ public class DNLForgeClientEvents {
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.WISP_BLOCK.get(), WispBlockRenderer::new);
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.WISPWARD_CHEST.get(), WispwardChestBlockRenderer::new);
+        event.registerBlockEntityRenderer(DNLBlockEntityTypes.BURNACLE.get(), BurnacleBlockRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {

@@ -224,6 +224,7 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockEntityRenderers.register(DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntityRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.WISP_BLOCK.get(), WispBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.WISPWARD_CHEST.get(), WispwardChestBlockRenderer::new);
+        BlockEntityRenderers.register(DNLBlockEntityTypes.BURNACLE.get(), BurnacleBlockRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
@@ -296,6 +297,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(DungeonBannerBlockModel.LAYER_LOCATION, DungeonBannerBlockModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WispwardChestModel.LAYER_LOCATION, WispwardChestModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(BurnacleMatureModel.LAYER_LOCATION, BurnacleMatureModel::createBodyLayer);
 
         // Misc
         EntityModelLayerRegistry.registerModelLayer(SeepingSoulChaosSpawnerModel.LAYER_LOCATION, SeepingSoulChaosSpawnerModel::createBodyLayer);

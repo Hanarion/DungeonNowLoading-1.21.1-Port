@@ -373,12 +373,18 @@ public class BurnacleBlock extends Block implements EntityBlock {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level,
                                                                   BlockState state,
                                                                   BlockEntityType<T> type) {
-        // Only tick on the server
-        if (level.isClientSide) return null;
-
         return type == DNLBlockEntityTypes.BURNACLE.get()
-                ? (lvl, pos, st, be) -> BurnacleBlockEntity.serverTick(lvl, pos, st, (BurnacleBlockEntity) be)
+                ? level.isClientSide
+                ? (lvl, pos, st, be) -> BurnacleBlockEntity.clientTick(lvl, pos, st, (BurnacleBlockEntity) be)
+                : (lvl, pos, st, be) -> BurnacleBlockEntity.serverTick(lvl, pos, st, (BurnacleBlockEntity) be)
                 : null;
+    }
+
+    @Override
+    public boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int type) {
+        super.triggerEvent(state, level, pos, id, type);
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        return blockEntity != null && blockEntity.triggerEvent(id, type);
     }
 
     /* -------------------------------------------------------------------------
