@@ -40,9 +40,11 @@
   ],
   "client": [
     "client.ClientPacketListenerMixin",
+    "client.AnimatedBlockDestroyOverlayLevelRendererMixin",
     "client.HumanoidModelMixin",
     "client.ClientPacketListenerMixin",
     "client.InstantRepairOverlayLevelRendererMixin",
+    "client.LevelRendererAccessor",
     "client.PlayerRendererMixin",
     "client.AbstractClientPlayerMixin",
     "client.SituationalMusicMixin",

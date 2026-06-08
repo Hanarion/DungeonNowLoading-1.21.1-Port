@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -279,6 +280,11 @@ public class BurnacleBlock extends Block implements EntityBlock {
                                   BlockPos pos,
                                   PathComputationType type) {
         return false;
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return state.getValue(STAGE) == Stage.MATURE ? RenderShape.INVISIBLE : RenderShape.MODEL;
     }
 
 
