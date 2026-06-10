@@ -26,6 +26,7 @@ public class DNLParticleTypes {
     public static final Supplier<SimpleParticleType> MENDING_RUNE_SHORT_PARTICLE = register("mending_rune_short", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<MendingFadeParticleType> MENDING_FADE_PARTICLE = register("mending_fade", () -> new MendingFadeParticleType(false));
     public static final Supplier<MendingFadeParticleType> WISPWARD_FLAME_TRAVEL_PARTICLE = register("wispward_flame_travel", () -> new MendingFadeParticleType(false));
+    public static final Supplier<SimpleParticleType> BURNACLE_GAS_PARTICLE = register("burnacle_gas", () -> new SimpleParticleTypeOverride(false));
 
 
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> VERTEX_SPARK_PARTICLE = register("vertex_spark", () -> new ScalableParticleType(false));

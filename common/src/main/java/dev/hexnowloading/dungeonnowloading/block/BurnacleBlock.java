@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.block.entity.BurnacleBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -41,21 +43,20 @@ public class BurnacleBlock extends Block implements EntityBlock {
     // Burnacle faces outward from this direction (away from the supporting block).
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
     public static final EnumProperty<Stage> STAGE = EnumProperty.create("stage", Stage.class);
+    public static final IntegerProperty ROTATION = IntegerProperty.create("rotation", 0, 3);
 
     private static final Map<Stage, Map<Direction, VoxelShape>> STAGE_SHAPES = new EnumMap<>(Stage.class);
 
-    /** Size presets per stage (same idea as DuriteCluster's HitboxPreset). */
+    /** Size presets per stage. Dimensions are in voxel units. */
     public enum HitboxPreset {
-        // height, cross
-        BUD      (8,  10),  // ~0.5 tall, ~0.375 wide
-        JUVENILE (14, 5), // ~0.875 tall, ~0.75 wide
-        MATURE   (16, 0); // full cube
+        BUD      (14, 7, 14),
+        JUVENILE (14, 9, 14),
+        MATURE   (14, 11, 14);
 
         final Map<Direction, VoxelShape> oriented;
 
-        HitboxPreset(int height, int cross) {
-            int arm = cross / 2;
-            this.oriented = buildAmethystLikeShapes(height, arm);
+        HitboxPreset(int width, int height, int depth) {
+            this.oriented = buildOrientedShapes(width, height, depth);
         }
     }
     /**
@@ -181,6 +182,7 @@ public class BurnacleBlock extends Block implements EntityBlock {
                 this.stateDefinition.any()
                         .setValue(FACING, Direction.UP)
                         .setValue(STAGE, Stage.BUD)
+                        .setValue(ROTATION, 0)
         );
     }
 
@@ -190,7 +192,7 @@ public class BurnacleBlock extends Block implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, STAGE);
+        builder.add(FACING, STAGE, ROTATION);
     }
 
     @Override
@@ -200,7 +202,13 @@ public class BurnacleBlock extends Block implements EntityBlock {
         Direction face = context.getClickedFace();
         return this.defaultBlockState()
                 .setValue(FACING, face)
-                .setValue(STAGE, Stage.BUD);
+                .setValue(STAGE, Stage.BUD)
+                .setValue(ROTATION, getRotationForPos(context.getClickedPos()));
+    }
+
+    private static int getRotationForPos(BlockPos pos) {
+        long seed = Mth.getSeed(pos.getX(), pos.getY(), pos.getZ());
+        return (int) Math.floorMod(seed, 4L);
     }
 
     @Override
@@ -284,24 +292,27 @@ public class BurnacleBlock extends Block implements EntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return state.getValue(STAGE) == Stage.MATURE ? RenderShape.INVISIBLE : RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
 
 
-    private static Map<Direction, VoxelShape> buildAmethystLikeShapes(int height, int arm) {
+    private static Map<Direction, VoxelShape> buildOrientedShapes(int width, int height, int depth) {
         Map<Direction, VoxelShape> m = new EnumMap<>(Direction.class);
 
-        int a = arm;
-        int invA = 16 - arm;
-        int invH = 16 - height;
+        double minX = (16.0D - width) / 2.0D;
+        double maxX = minX + width;
+        double minY = (16.0D - width) / 2.0D;
+        double maxY = minY + width;
+        double minZ = (16.0D - depth) / 2.0D;
+        double maxZ = minZ + depth;
 
-        VoxelShape up    = Block.box(a, 0,     a,    invA, height, invA);
-        VoxelShape down  = Block.box(a, invH,  a,    invA, 16,     invA);
-        VoxelShape north = Block.box(a, a,     invH, invA, invA,   16);
-        VoxelShape south = Block.box(a, a,     0,    invA, invA,   height);
-        VoxelShape east  = Block.box(0, a,     a,    height, invA, invA);
-        VoxelShape west  = Block.box(invH, a,  a,    16,     invA, invA);
+        VoxelShape up    = Block.box(minX, 0.0D,       minZ, maxX, height,      maxZ);
+        VoxelShape down  = Block.box(minX, 16.0D - height, minZ, maxX, 16.0D,      maxZ);
+        VoxelShape north = Block.box(minX, minY, 16.0D - height, maxX, maxY, 16.0D);
+        VoxelShape south = Block.box(minX, minY, 0.0D,       maxX, maxY, height);
+        VoxelShape east  = Block.box(0.0D, minY, minZ, height,      maxY, maxZ);
+        VoxelShape west  = Block.box(16.0D - height, minY, minZ, 16.0D,      maxY, maxZ);
 
         m.put(Direction.UP,    up);
         m.put(Direction.DOWN,  down);

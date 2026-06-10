@@ -93,6 +93,8 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         event.registerLayerDefinition(DungeonBannerBlockModel.LAYER_LOCATION, DungeonBannerBlockModel::createBodyLayer);
         event.registerLayerDefinition(WispwardChestModel.LAYER_LOCATION, WispwardChestModel::createBodyLayer);
+        event.registerLayerDefinition(BurnacleBudModel.LAYER_LOCATION, BurnacleBudModel::createBodyLayer);
+        event.registerLayerDefinition(BurnacleJuvenileModel.LAYER_LOCATION, BurnacleJuvenileModel::createBodyLayer);
         event.registerLayerDefinition(BurnacleMatureModel.LAYER_LOCATION, BurnacleMatureModel::createBodyLayer);
 
         // Item
@@ -204,6 +206,7 @@ public class DNLForgeClientEvents {
         event.registerSpriteSet(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.WISPWARD_FLAME_TRAVEL_PARTICLE.get(), WispwardFlameTravelParticle.Factory::new);
         event.registerSpriteSet(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        event.registerSpriteSet(DNLParticleTypes.BURNACLE_GAS_PARTICLE.get(), BurnacleGasParticle.Factory::new);
     }
 
     public static void onRegisterBlockRenderTypes(FMLClientSetupEvent event) {

@@ -47,7 +47,7 @@ public class AnimatedBlockDestroyOverlayLevelRendererMixin {
 
             BlockPos pos = progressSet.first().getPos();
             BlockState state = this.level.getBlockState(pos);
-            if (state.getBlock() instanceof BurnacleBlock && state.getValue(BurnacleBlock.STAGE) == BurnacleBlock.Stage.MATURE) {
+            if (state.getBlock() instanceof BurnacleBlock) {
                 this.dungeonnowloading$removedDestroyProgress.add(new RemovedDestroyProgress(entry.getLongKey(), progressSet));
                 return true;
             }

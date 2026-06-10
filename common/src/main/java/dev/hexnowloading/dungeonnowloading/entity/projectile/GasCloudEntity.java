@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
 import dev.hexnowloading.dungeonnowloading.block.DungeonWallTorch;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
@@ -158,7 +159,7 @@ public class GasCloudEntity extends Entity {
         double cz = c.z;
 
         double radius = getPoisonRadius();
-        int particleCount = (int) Math.max(4, radius * radius * 3);
+        int particleCount = (int) Math.max(4, radius * radius * 1.5D);
 
         // One cheap check: is the gas hitbox intersecting water at all?
         boolean hitWater = this.isInWaterOrBubble(); // or isInWater() if you prefer
@@ -221,9 +222,9 @@ public class GasCloudEntity extends Entity {
 
             // Air behavior (not in water at this particle position)
             if (state == GasState.DEFAULT) {
-                this.level().addParticle(ParticleTypes.SMOKE, px, py, pz, mx, my, mz);
+                this.level().addParticle(DNLParticleTypes.BURNACLE_GAS_PARTICLE.get(), px, py, pz, mx, my, mz);
             } else if (state == GasState.LIT || state == GasState.IGNITING) {
-                this.level().addParticle(ParticleTypes.SMOKE, px, py, pz, mx, my, mz);
+                this.level().addParticle(DNLParticleTypes.BURNACLE_GAS_PARTICLE.get(), px, py, pz, mx, my, mz);
                 this.level().addParticle(ParticleTypes.FLAME, px, py, pz, mx, my, mz);
             }
         }

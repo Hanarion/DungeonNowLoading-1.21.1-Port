@@ -297,6 +297,8 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(DungeonBannerBlockModel.LAYER_LOCATION, DungeonBannerBlockModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(WispwardChestModel.LAYER_LOCATION, WispwardChestModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(BurnacleBudModel.LAYER_LOCATION, BurnacleBudModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(BurnacleJuvenileModel.LAYER_LOCATION, BurnacleJuvenileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BurnacleMatureModel.LAYER_LOCATION, BurnacleMatureModel::createBodyLayer);
 
         // Misc
@@ -323,6 +325,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         registry.register(DNLParticleTypes.WISPWARD_FLAME_TRAVEL_PARTICLE.get(), WispwardFlameTravelParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
+        registry.register(DNLParticleTypes.BURNACLE_GAS_PARTICLE.get(), BurnacleGasParticle.Factory::new);
     }
 
     private static void addDnlEnchantmentDescriptions(ItemStack stack, List<Component> lines) {
