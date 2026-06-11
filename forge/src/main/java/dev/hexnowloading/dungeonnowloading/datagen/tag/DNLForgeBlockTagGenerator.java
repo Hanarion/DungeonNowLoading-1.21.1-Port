@@ -82,7 +82,23 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.DURITE_QUELLER.get(),
                 DNLBlocks.BRITTLESTONE.get(),
                 DNLBlocks.RAIL_PLATFORM.get(),
-                DNLBlocks.DEEPSTEEL_BLOCK.get()
+                DNLBlocks.DEEPSTEEL_BLOCK.get(),
+                DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(),
+                DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(),
+                DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(),
+                DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(),
+                DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(),
+                DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(),
+                DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(),
+                DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(),
+                DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get()
+        );
+
+        this.tag(BlockTags.RAILS).add(
+                DNLBlocks.DEEPSTEEL_MOUNTED_RAIL.get(),
+                DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get(),
+                DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get(),
+                DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(

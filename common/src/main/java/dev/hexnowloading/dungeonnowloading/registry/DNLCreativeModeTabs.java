@@ -200,6 +200,15 @@ public class DNLCreativeModeTabs {
 
                 output.accept(DNLItems.BRITTLESTONE.get());
                 output.accept(DNLItems.DEEPSTEEL_BLOCK.get());
+                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FRAME.get());
+                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FLOATING.get());
+                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get());
+                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FRAME_TOP.get());
+                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get());
+                output.accept(DNLItems.DEEPSTEEL_PLATFORM_SUSPENDED.get());
+                output.accept(DNLItems.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get());
+                output.accept(DNLItems.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get());
+                output.accept(DNLItems.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
                 output.accept(DNLItems.RAIL_PLATFORM.get());
                 output.accept(DNLItems.WEB_CARPET.get());
                 output.accept(DNLItems.BURNACLE.get());

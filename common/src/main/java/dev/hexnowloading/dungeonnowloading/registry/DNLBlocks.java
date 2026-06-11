@@ -4,6 +4,7 @@ import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -12,6 +13,8 @@ import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.Supplier;
 
@@ -133,6 +136,19 @@ public class DNLBlocks {
     public static Supplier<Block> SPAWN_NODE;
     public static Supplier<Block> BRITTLESTONE;
     public static Supplier<Block> DEEPSTEEL_BLOCK;
+    public static Supplier<Block> DEEPSTEEL_PLATFORM_FRAME;
+    public static Supplier<Block> DEEPSTEEL_PLATFORM_FLOATING;
+    public static Supplier<Block> DEEPSTEEL_PLATFORM_FLOATING_RAIL;
+    public static Supplier<Block> DEEPSTEEL_PLATFORM_FRAME_TOP;
+    public static Supplier<Block> DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL;
+    public static Supplier<Block> DEEPSTEEL_PLATFORM_SUSPENDED;
+    public static Supplier<Block> DEEPSTEEL_PLATFORM_SUSPENDED_RAIL;
+    public static Supplier<Block> DEEPSTEEL_SLOPED_PLATFORM_FLOATING;
+    public static Supplier<Block> DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL;
+    public static Supplier<Block> DEEPSTEEL_MOUNTED_RAIL;
+    public static Supplier<Block> DEEPSTEEL_MOUNTED_POWERED_RAIL;
+    public static Supplier<Block> DEEPSTEEL_MOUNTED_DETECTOR_RAIL;
+    public static Supplier<Block> DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL;
     public static Supplier<Block> WISPWARD_LANTERN;
     public static Supplier<Block> TIMED_WISPWARD_LANTERN;
     public static Supplier<Block> RAIL_PLATFORM;
@@ -265,6 +281,19 @@ public class DNLBlocks {
 
         BRITTLESTONE = registerBlock("brittlestone", () -> new BrittlestoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0f, 6.0f).noOcclusion()));
         DEEPSTEEL_BLOCK = registerBlock("deepsteel_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F)));
+        DEEPSTEEL_PLATFORM_FRAME = registerBlock("deepsteel_platform_frame", () -> axisDeepsteelPlatformBlock(deepsteelFrameShape()));
+        DEEPSTEEL_PLATFORM_FLOATING = registerBlock("deepsteel_platform_floating", () -> deepsteelPlatformBlock(deepsteelFloatingShape()));
+        DEEPSTEEL_PLATFORM_FLOATING_RAIL = registerBlock("deepsteel_platform_floating_rail", () -> axisDeepsteelPlatformBlock(deepsteelFloatingRailShape()));
+        DEEPSTEEL_PLATFORM_FRAME_TOP = registerBlock("deepsteel_platform_frame_top", () -> axisDeepsteelPlatformBlock(deepsteelFrameTopShape()));
+        DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL = registerBlock("deepsteel_platform_frame_top_rail", () -> axisDeepsteelPlatformBlock(deepsteelFrameShape()));
+        DEEPSTEEL_PLATFORM_SUSPENDED = registerBlock("deepsteel_platform_suspended", () -> suspendedDeepsteelPlatformBlock(deepsteelFloatingShape()));
+        DEEPSTEEL_PLATFORM_SUSPENDED_RAIL = registerBlock("deepsteel_platform_suspended_rail", () -> suspendedDeepsteelPlatformBlock(deepsteelFloatingRailShape()));
+        DEEPSTEEL_SLOPED_PLATFORM_FLOATING = registerBlock("deepsteel_sloped_platform_floating", () -> directionalDeepsteelPlatformBlock(deepsteelStairsShape()));
+        DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL = registerBlock("deepsteel_sloped_platform_floating_rail", () -> directionalDeepsteelPlatformBlock(deepsteelStairsRailShape()));
+        DEEPSTEEL_MOUNTED_RAIL = registerBlock("deepsteel_mounted_rail", () -> new DeepsteelMountedRailBlock(DeepsteelMountedRailBlock.properties(), Items.RAIL));
+        DEEPSTEEL_MOUNTED_POWERED_RAIL = registerBlock("deepsteel_mounted_powered_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.properties(), Items.POWERED_RAIL));
+        DEEPSTEEL_MOUNTED_DETECTOR_RAIL = registerBlock("deepsteel_mounted_detector_rail", () -> new DeepsteelMountedDetectorRailBlock(DeepsteelMountedRailBlock.properties(), Items.DETECTOR_RAIL));
+        DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL = registerBlock("deepsteel_mounted_activator_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.properties(), Items.ACTIVATOR_RAIL));
         WISPWARD_LANTERN = registerBlock("wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission)));
         TIMED_WISPWARD_LANTERN = registerBlock("timed_wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission), true));
         RAIL_PLATFORM = registerBlock("rail_platform", () -> new RailPlatformBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).noOcclusion()));
@@ -284,6 +313,68 @@ public class DNLBlocks {
 
     public static <T extends Block> Supplier<T> registerBlock(String name, Supplier<T> blockSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.BLOCK, name, blockSupplier);
+    }
+
+    private static Block deepsteelPlatformBlock(VoxelShape shape) {
+        return new DeepsteelStaticPlatformBlock(deepsteelPlatformProperties(), shape);
+    }
+
+    private static Block directionalDeepsteelPlatformBlock(VoxelShape shape) {
+        return new DeepsteelPlatformBlock(deepsteelPlatformProperties(), shape, DeepsteelPlatformBlock.ShapeRotation.FULL);
+    }
+
+    private static Block axisDeepsteelPlatformBlock(VoxelShape shape) {
+        return new DeepsteelPlatformBlock(deepsteelPlatformProperties(), shape, DeepsteelPlatformBlock.ShapeRotation.AXIS);
+    }
+
+    private static Block suspendedDeepsteelPlatformBlock(VoxelShape shape) {
+        return new DeepsteelSuspendedPlatformBlock(deepsteelPlatformProperties(), shape);
+    }
+
+    private static BlockBehaviour.Properties deepsteelPlatformProperties() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).noOcclusion();
+    }
+
+    private static VoxelShape deepsteelFrameShape() {
+        return Shapes.or(
+                Block.box(0, 0, 0, 2, 16, 16),
+                Block.box(14, 0, 0, 16, 16, 16)
+        );
+    }
+
+    private static VoxelShape deepsteelFloatingShape() {
+        return Block.box(0, 13, 0, 16, 16, 16);
+    }
+
+    private static VoxelShape deepsteelFloatingRailShape() {
+        return Shapes.or(
+                Block.box(0, 13, 0, 2, 16, 16),
+                Block.box(14, 13, 0, 16, 16, 16)
+        );
+    }
+
+    private static VoxelShape deepsteelFrameTopShape() {
+        return Shapes.or(
+                Block.box(0, 0, 0, 2, 13, 16),
+                Block.box(14, 0, 0, 16, 13, 16),
+                Block.box(0, 13, 0, 16, 16, 16)
+        );
+    }
+
+    private static VoxelShape deepsteelStairsShape() {
+        return Shapes.or(
+                Block.box(0, 0, 0, 16, 8, 8),
+                Block.box(0, 8, 8, 16, 16, 16)
+        );
+    }
+
+    private static VoxelShape deepsteelStairsRailShape() {
+        return Shapes.or(
+                Block.box(0, 0, 0, 2, 8, 8),
+                Block.box(14, 0, 0, 16, 8, 8),
+                Block.box(0, 8, 8, 2, 16, 16),
+                Block.box(14, 8, 8, 16, 16, 16)
+        );
     }
 
     private static int laneLight(BlockState blockState) {

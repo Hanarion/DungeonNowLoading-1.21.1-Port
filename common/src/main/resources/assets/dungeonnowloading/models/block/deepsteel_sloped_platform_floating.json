@@ -1,0 +1,14 @@
+{
+  "parent": "dungeonnowloading:block/deepsteel_platform_slope",
+  "textures": {
+    "8": "dungeonnowloading:block/deepsteel_sloped_platform_floating",
+    "particle": "dungeonnowloading:block/deepsteel_platform_platform_particle"
+  },
+  "display": {
+    "gui": {
+      "rotation": [30, -135, 0],
+      "translation": [0, 0.5, 0],
+      "scale": [0.55, 0.55, 0.55]
+    }
+  }
+}
