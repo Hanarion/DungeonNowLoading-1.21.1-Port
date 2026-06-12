@@ -28,6 +28,7 @@
     "entities.EntityAvoidBlockMixin",
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",
+    "entities.AbstractMinecartMixin",
     "entities.PlayerMixin",
     "entities.MobMixin",
     "entities.AbstractArrowMixin",

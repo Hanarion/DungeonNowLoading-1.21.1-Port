@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.DetectorRailBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class DeepsteelMountedDetectorRailBlock extends DetectorRailBlock {
@@ -31,12 +30,12 @@ public class DeepsteelMountedDetectorRailBlock extends DetectorRailBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return Shapes.or(super.getShape(state, level, pos, context), DeepsteelMountedRailBlock.platformShape(state)).optimize();
+        return DeepsteelMountedRailBlock.platformShape(state);
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return DeepsteelMountedRailBlock.platformShape(state);
+        return DeepsteelMountedRailBlock.collisionShapeFor(state, context);
     }
 
     @Override

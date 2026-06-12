@@ -85,6 +85,7 @@ public abstract class BaseRailBlockMixin {
             if (lockedState != state) {
                 level.setBlock(pos, lockedState, Block.UPDATE_ALL);
             }
+            this.updateState(lockedState, level, pos, lockedState.getBlock());
             ci.cancel();
         }
     }

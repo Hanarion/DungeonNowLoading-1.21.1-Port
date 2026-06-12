@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.block;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -27,7 +29,14 @@ public class DeepsteelMountedRailBlock extends RailBlock {
             Block.box(0, 8, 8, 2, 16, 16),
             Block.box(14, 8, 8, 16, 16, 16)
     ).optimize();
+    protected static final VoxelShape NORTH_SOUTH_REVERSED_PLATFORM_SHAPE = Shapes.or(
+            Block.box(0, 0, 8, 2, 8, 16),
+            Block.box(14, 0, 8, 16, 8, 16),
+            Block.box(0, 8, 0, 2, 16, 8),
+            Block.box(14, 8, 0, 16, 16, 8)
+    ).optimize();
     protected static final VoxelShape EAST_WEST_PLATFORM_SHAPE = rotateY(NORTH_SOUTH_PLATFORM_SHAPE);
+    protected static final VoxelShape EAST_WEST_REVERSED_PLATFORM_SHAPE = rotateY(NORTH_SOUTH_REVERSED_PLATFORM_SHAPE);
 
     private final Item railDrop;
 
@@ -43,12 +52,12 @@ public class DeepsteelMountedRailBlock extends RailBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return Shapes.or(super.getShape(state, level, pos, context), platformShape(state)).optimize();
+        return platformShape(state);
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return platformShape(state);
+        return collisionShapeFor(state, context);
     }
 
     @Override
@@ -87,7 +96,20 @@ public class DeepsteelMountedRailBlock extends RailBlock {
 
     protected static VoxelShape platformShape(BlockState state) {
         RailShape shape = state.getValue(((BaseRailBlock) state.getBlock()).getShapeProperty());
-        return shape == RailShape.ASCENDING_EAST || shape == RailShape.ASCENDING_WEST ? EAST_WEST_PLATFORM_SHAPE : NORTH_SOUTH_PLATFORM_SHAPE;
+        return switch (shape) {
+            case ASCENDING_NORTH -> NORTH_SOUTH_REVERSED_PLATFORM_SHAPE;
+            case ASCENDING_EAST -> EAST_WEST_REVERSED_PLATFORM_SHAPE;
+            case ASCENDING_WEST -> EAST_WEST_PLATFORM_SHAPE;
+            default -> NORTH_SOUTH_PLATFORM_SHAPE;
+        };
+    }
+
+    protected static VoxelShape collisionShapeFor(BlockState state, CollisionContext context) {
+        if (context instanceof EntityCollisionContext entityContext && entityContext.getEntity() instanceof AbstractMinecart) {
+            return Shapes.empty();
+        }
+
+        return platformShape(state);
     }
 
     public static BlockState platformStateFromRail(BlockState railState) {
