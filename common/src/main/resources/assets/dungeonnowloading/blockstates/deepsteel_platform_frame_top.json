@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_platform_frame_top" },
+    "facing=north,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_platform_frame_top" },
+    "facing=east,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_platform_frame_top_90" },
+    "facing=east,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_platform_frame_top_90" },
+    "facing=south,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_platform_frame_top" },
+    "facing=south,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_platform_frame_top" },
+    "facing=west,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_platform_frame_top_90" },
+    "facing=west,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_platform_frame_top_90" }
+  }
+}

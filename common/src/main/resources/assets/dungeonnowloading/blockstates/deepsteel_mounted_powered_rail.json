@@ -1,0 +1,20 @@
+{
+  "multipart": [
+    { "when": { "powered": "false", "shape": "ascending_east" }, "apply": { "model": "minecraft:block/powered_rail_raised_ne", "y": 90 } },
+    { "when": { "powered": "false", "shape": "ascending_north" }, "apply": { "model": "minecraft:block/powered_rail_raised_ne" } },
+    { "when": { "powered": "false", "shape": "ascending_south" }, "apply": { "model": "minecraft:block/powered_rail_raised_sw" } },
+    { "when": { "powered": "false", "shape": "ascending_west" }, "apply": { "model": "minecraft:block/powered_rail_raised_sw", "y": 90 } },
+    { "when": { "powered": "false", "shape": "east_west" }, "apply": { "model": "minecraft:block/powered_rail", "y": 90 } },
+    { "when": { "powered": "false", "shape": "north_south" }, "apply": { "model": "minecraft:block/powered_rail" } },
+    { "when": { "powered": "true", "shape": "ascending_east" }, "apply": { "model": "minecraft:block/powered_rail_on_raised_ne", "y": 90 } },
+    { "when": { "powered": "true", "shape": "ascending_north" }, "apply": { "model": "minecraft:block/powered_rail_on_raised_ne" } },
+    { "when": { "powered": "true", "shape": "ascending_south" }, "apply": { "model": "minecraft:block/powered_rail_on_raised_sw" } },
+    { "when": { "powered": "true", "shape": "ascending_west" }, "apply": { "model": "minecraft:block/powered_rail_on_raised_sw", "y": 90 } },
+    { "when": { "powered": "true", "shape": "east_west" }, "apply": { "model": "minecraft:block/powered_rail_on", "y": 90 } },
+    { "when": { "powered": "true", "shape": "north_south" }, "apply": { "model": "minecraft:block/powered_rail_on" } },
+    { "when": { "shape": "ascending_south" }, "apply": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating_rail" } },
+    { "when": { "shape": "ascending_west" }, "apply": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating_rail", "y": 90 } },
+    { "when": { "shape": "ascending_north" }, "apply": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating_rail", "y": 180 } },
+    { "when": { "shape": "ascending_east" }, "apply": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating_rail", "y": 270 } }
+  ]
+}

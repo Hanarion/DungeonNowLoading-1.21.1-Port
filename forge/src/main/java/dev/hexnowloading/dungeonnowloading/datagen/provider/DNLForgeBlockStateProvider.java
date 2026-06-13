@@ -58,6 +58,15 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(ForgeRegistries.BLOCKS.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
         simpleBlockWithItem(DNLBlocks.BRITTLESTONE.get());
         simpleBlockWithItem(DNLBlocks.DEEPSTEEL_BLOCK.get());
+        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), "deepsteel_platform_frame");
+        waterloggedModelFromParent(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_floating"));
+        axisHorizontalModelFromParent(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_floating_rail"));
+        axisHorizontalModelFromParent(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_frame_top"));
+        axisHorizontalModelFromParent(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_frame_top_rail"));
+        horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_suspended"));
+        horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_suspended_rail"));
+        horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), "deepsteel_platform_slope", "8", modLoc("block/deepsteel_sloped_platform_floating"));
+        horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), "deepsteel_platform_slope", "8", modLoc("block/deepsteel_sloped_platform_floating_rail"));
 
         dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
@@ -1227,8 +1236,53 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         itemModels().withExistingParent(n, modLoc("block/" + n));
     }
 
+    private void waterloggedModelFromParent(Block block, String parentModelName, String textureKey, ResourceLocation texture) {
+        String n = name(block);
+
+        ModelFile mf = models()
+                .withExistingParent(n, modLoc("block/" + parentModelName))
+                .texture(textureKey, texture)
+                .texture("particle", texture);
+
+        getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
+                .modelFile(mf)
+                .build());
+        simpleBlockItem(block, mf);
+    }
+
     private void horizontalModelFromParent(Block block, String parentModelName, String textureKey, ResourceLocation blockTexture) {
         horizontalModelFromParent(block, parentModelName, textureKey, blockTexture, (ResourceLocation[]) null);
+    }
+
+    private void horizontalModelFromParentRotated180(Block block, String parentModelName, String textureKey, ResourceLocation blockTexture) {
+        String n = name(block);
+
+        ModelFile mf = models()
+                .withExistingParent(n, modLoc("block/" + parentModelName))
+                .texture(textureKey, blockTexture)
+                .texture("particle", blockTexture);
+
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            int rotationY = ((int) direction.toYRot() + 180) % 360;
+            return ConfiguredModel.builder()
+                    .modelFile(mf)
+                    .rotationY(rotationY)
+                    .build();
+        });
+        simpleBlockItem(block, mf);
+    }
+
+    private void axisHorizontalModelFromParent(Block block, String parentModelName, String textureKey, ResourceLocation blockTexture) {
+        String n = name(block);
+
+        ModelFile mf = models()
+                .withExistingParent(n, modLoc("block/" + parentModelName))
+                .texture(textureKey, blockTexture)
+                .texture("particle", blockTexture);
+
+        axisHorizontalBlock(block, mf);
+        simpleBlockItem(block, mf);
     }
 
     private void horizontalModelFromParent(Block block,
@@ -1302,6 +1356,35 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         );
 
         horizontalBlock(block, existingModel);
+    }
+
+    private void horizontalExistingModelWithItem(Block block, String existingBlockModelName) {
+        ModelFile existingModel = models().getExistingFile(
+                modLoc("block/" + existingBlockModelName)
+        );
+
+        horizontalBlock(block, existingModel);
+        simpleBlockItem(block, existingModel);
+    }
+
+    private void axisHorizontalExistingModelWithItem(Block block, String existingBlockModelName) {
+        ModelFile existingModel = models().getExistingFile(
+                modLoc("block/" + existingBlockModelName)
+        );
+
+        axisHorizontalBlock(block, existingModel);
+        simpleBlockItem(block, existingModel);
+    }
+
+    private void axisHorizontalBlock(Block block, ModelFile model) {
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            int rotationY = direction.getAxis() == Direction.Axis.X ? 90 : 0;
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationY(rotationY)
+                    .build();
+        });
     }
 
     private void particleOnlyModel(Block block) {

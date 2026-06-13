@@ -185,6 +185,15 @@ public class DNLItems {
 
     public static final Supplier<Item> BRITTLESTONE = register("brittlestone", () -> new BlockItem(DNLBlocks.BRITTLESTONE.get(), new Item.Properties()));
     public static final Supplier<Item> DEEPSTEEL_BLOCK = register("deepsteel_block", () -> new BlockItem(DNLBlocks.DEEPSTEEL_BLOCK.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FRAME = register("deepsteel_platform_frame", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FLOATING = register("deepsteel_platform_floating", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FLOATING_RAIL = register("deepsteel_platform_floating_rail", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FRAME_TOP = register("deepsteel_platform_frame_top", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL = register("deepsteel_platform_frame_top_rail", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_PLATFORM_SUSPENDED = register("deepsteel_platform_suspended", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_PLATFORM_SUSPENDED_RAIL = register("deepsteel_platform_suspended_rail", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_SLOPED_PLATFORM_FLOATING = register("deepsteel_sloped_platform_floating", () -> new BlockItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), new Item.Properties()));
+    public static final Supplier<Item> DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL = register("deepsteel_sloped_platform_floating_rail", () -> new BlockItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), new Item.Properties()));
     public static final Supplier<Item> WISPWARD_LANTERN = register("wispward_lantern", () -> new BlockItem(DNLBlocks.WISPWARD_LANTERN.get(), new Item.Properties()));
     public static final Supplier<Item> TIMED_WISPWARD_LANTERN = register("timed_wispward_lantern", () -> new BlockItem(DNLBlocks.TIMED_WISPWARD_LANTERN.get(), new Item.Properties()));
     public static final Supplier<Item> RAIL_PLATFORM = register("rail_platform", () -> new BlockItem(DNLBlocks.RAIL_PLATFORM.get(), new Item.Properties()));

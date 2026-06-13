@@ -1,0 +1,14 @@
+{
+  "parent": "dungeonnowloading:block/deepsteel_platform_frame",
+  "textures": {
+    "2": "dungeonnowloading:block/deepsteel_platform_floating_rail",
+    "particle": "dungeonnowloading:block/deepsteel_platform_railing_particle"
+  },
+  "display": {
+    "gui": {
+      "rotation": [30, -135, 0],
+      "translation": [0, -7, 0],
+      "scale": [0.625, 0.625, 0.625]
+    }
+  }
+}

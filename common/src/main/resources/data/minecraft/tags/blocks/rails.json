@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "dungeonnowloading:deepsteel_mounted_rail",
+    "dungeonnowloading:deepsteel_mounted_powered_rail",
+    "dungeonnowloading:deepsteel_mounted_detector_rail",
+    "dungeonnowloading:deepsteel_mounted_activator_rail"
+  ]
+}
