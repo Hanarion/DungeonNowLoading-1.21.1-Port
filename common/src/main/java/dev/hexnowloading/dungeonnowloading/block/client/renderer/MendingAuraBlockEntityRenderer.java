@@ -207,20 +207,24 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
     private static BakedQuad remapFullQuad(BakedQuad quad, TextureAtlasSprite auraSprite, float normalOffset) {
         int[] vertices = quad.getVertices().clone();
         TextureAtlasSprite originalSprite = quad.getSprite();
-        offsetVertices(vertices, quad.getDirection(), normalOffset);
+        UvBounds uvBounds = UvBounds.from(quad, originalSprite);
+        QuadAuraUvMapper auraUvMapper = QuadAuraUvMapper.from(quad, originalSprite, uvBounds);
 
         for (int vertex = 0; vertex < VERTEX_COUNT; vertex++) {
             int vertexOffset = vertex * VERTEX_STRIDE;
             int uIndex = vertexOffset + U_OFFSET;
             int vIndex = vertexOffset + V_OFFSET;
-            float originalU = Float.intBitsToFloat(vertices[uIndex]);
-            float originalV = Float.intBitsToFloat(vertices[vIndex]);
-            float localU = originalSprite.getUOffset(originalU);
-            float localV = originalSprite.getVOffset(originalV);
+            Vec3f position = new Vec3f(
+                    Float.intBitsToFloat(vertices[vertexOffset]),
+                    Float.intBitsToFloat(vertices[vertexOffset + 1]),
+                    Float.intBitsToFloat(vertices[vertexOffset + 2])
+            );
+            Vec2f auraUv = auraUvMapper.map(position);
 
-            vertices[uIndex] = Float.floatToRawIntBits(auraSprite.getU(localU));
-            vertices[vIndex] = Float.floatToRawIntBits(auraSprite.getV(localV));
+            vertices[uIndex] = Float.floatToRawIntBits(auraSprite.getU(auraUv.u));
+            vertices[vIndex] = Float.floatToRawIntBits(auraSprite.getV(auraUv.v));
         }
+        offsetVertices(vertices, quad.getDirection(), normalOffset);
 
         return new BakedQuad(vertices, -1, quad.getDirection(), auraSprite, quad.isShade());
     }
@@ -229,6 +233,7 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         int[] sourceVertices = quad.getVertices();
         int[] vertices = sourceVertices.clone();
         Direction direction = quad.getDirection();
+        QuadAuraUvMapper auraUvMapper = QuadAuraUvMapper.from(quad, originalSprite, uvBounds);
 
         for (int vertex = 0; vertex < VERTEX_COUNT; vertex++) {
             int vertexOffset = vertex * VERTEX_STRIDE;
@@ -244,8 +249,9 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
             vertices[vertexOffset + 1] = Float.floatToRawIntBits(position.y);
             vertices[vertexOffset + 2] = Float.floatToRawIntBits(position.z);
             offsetVertex(vertices, vertexOffset, direction, normalOffset);
-            vertices[vertexOffset + U_OFFSET] = Float.floatToRawIntBits(auraSprite.getU(targetU));
-            vertices[vertexOffset + V_OFFSET] = Float.floatToRawIntBits(auraSprite.getV(targetV));
+            Vec2f auraUv = auraUvMapper.map(position);
+            vertices[vertexOffset + U_OFFSET] = Float.floatToRawIntBits(auraSprite.getU(auraUv.u));
+            vertices[vertexOffset + V_OFFSET] = Float.floatToRawIntBits(auraSprite.getV(auraUv.v));
         }
 
         return new BakedQuad(vertices, -1, quad.getDirection(), auraSprite, quad.isShade());
@@ -514,6 +520,45 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         private boolean isDegenerate() {
             return this.maxU <= this.minU || this.maxV <= this.minV;
         }
+    }
+
+    private record QuadAuraUvMapper(Vec3f origin, Vec3f uAxis, Vec3f vAxis, float uLength, float vLength, float uLengthSquared, float vLengthSquared) {
+        private static QuadAuraUvMapper from(BakedQuad quad, TextureAtlasSprite sprite, UvBounds uvBounds) {
+            Vec3f origin = findNearestPosition(quad, sprite, uvBounds.minU, uvBounds.minV);
+            Vec3f uEnd = findNearestPosition(quad, sprite, uvBounds.maxU, uvBounds.minV);
+            Vec3f vEnd = findNearestPosition(quad, sprite, uvBounds.minU, uvBounds.maxV);
+            Vec3f uAxis = subtract(uEnd, origin);
+            Vec3f vAxis = subtract(vEnd, origin);
+            float uLengthSquared = lengthSquared(uAxis);
+            float vLengthSquared = lengthSquared(vAxis);
+            return new QuadAuraUvMapper(origin, uAxis, vAxis, (float) Math.sqrt(uLengthSquared), (float) Math.sqrt(vLengthSquared), uLengthSquared, vLengthSquared);
+        }
+
+        private Vec2f map(Vec3f position) {
+            Vec3f relative = subtract(position, this.origin);
+            float u = this.uLengthSquared == 0.0F ? 0.0F : dot(relative, this.uAxis) / this.uLengthSquared * this.uLength * 16.0F;
+            float v = this.vLengthSquared == 0.0F ? 0.0F : dot(relative, this.vAxis) / this.vLengthSquared * this.vLength * 16.0F;
+            return new Vec2f(clampSpriteCoordinate(u), clampSpriteCoordinate(v));
+        }
+    }
+
+    private static Vec3f subtract(Vec3f value, Vec3f subtrahend) {
+        return new Vec3f(value.x - subtrahend.x, value.y - subtrahend.y, value.z - subtrahend.z);
+    }
+
+    private static float dot(Vec3f a, Vec3f b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+
+    private static float lengthSquared(Vec3f value) {
+        return dot(value, value);
+    }
+
+    private static float clampSpriteCoordinate(float value) {
+        return Math.max(0.0F, Math.min(16.0F, value));
+    }
+
+    private record Vec2f(float u, float v) {
     }
 
     private record Vec3f(float x, float y, float z) {
