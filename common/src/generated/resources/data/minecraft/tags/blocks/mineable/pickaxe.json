@@ -61,7 +61,6 @@
     "dungeonnowloading:large_durite_bud",
     "dungeonnowloading:durite_queller",
     "dungeonnowloading:brittlestone",
-    "dungeonnowloading:rail_platform",
     "dungeonnowloading:deepsteel_block",
     "dungeonnowloading:burnacle",
     "dungeonnowloading:deepsteel_block",
@@ -73,6 +72,7 @@
     "dungeonnowloading:deepsteel_platform_suspended",
     "dungeonnowloading:deepsteel_platform_suspended_rail",
     "dungeonnowloading:deepsteel_sloped_platform_floating",
-    "dungeonnowloading:deepsteel_sloped_platform_floating_rail"
+    "dungeonnowloading:deepsteel_sloped_platform_floating_rail",
+    "dungeonnowloading:deepsteel_platform_enclosed_stairs"
   ]
 }

@@ -51,7 +51,8 @@ public class BurnacleBlock extends Block implements EntityBlock {
     public enum HitboxPreset {
         BUD      (14, 7, 14),
         JUVENILE (14, 9, 14),
-        MATURE   (14, 11, 14);
+        MATURE   (14, 11, 14),
+        ELDER    (14, 16, 14);
 
         final Map<Direction, VoxelShape> oriented;
 
@@ -154,6 +155,26 @@ public class BurnacleBlock extends Block implements EntityBlock {
                 3,      // gasSize
                 40,     // growthTime
                 1.5f,   // gasSpread
+                0.02f,  // gasSpeed
+                0.1f,  // airResistance
+                100,    // life
+                0.4f,   // explosionMultiplier
+                5,      // chainDelay
+                10,     // ignitionDelay
+                25,     // explosionDelay
+
+                // --- behavior ---
+                160,    // cycleTime
+                0,      // cycleOffset
+                0.2D, // initialGasSpeed
+                16.0D   // playerRange
+        ));
+
+        // ELDER preset
+        STAGE_PRESETS.put(Stage.ELDER, new StagePreset(
+                4,      // gasSize
+                40,     // growthTime
+                2.0f,   // gasSpread
                 0.02f,  // gasSpeed
                 0.1f,  // airResistance
                 100,    // life
@@ -330,6 +351,7 @@ public class BurnacleBlock extends Block implements EntityBlock {
         STAGE_SHAPES.put(Stage.BUD,      HitboxPreset.BUD.oriented);
         STAGE_SHAPES.put(Stage.JUVENILE, HitboxPreset.JUVENILE.oriented);
         STAGE_SHAPES.put(Stage.MATURE,   HitboxPreset.MATURE.oriented);
+        STAGE_SHAPES.put(Stage.ELDER,    HitboxPreset.ELDER.oriented);
     }
 
 
@@ -355,7 +377,7 @@ public class BurnacleBlock extends Block implements EntityBlock {
         Stage stage = state.getValue(STAGE);
 
         // Already max size → let other interactions handle it
-        if (stage == Stage.MATURE) {
+        if (stage == Stage.ELDER) {
             return super.use(state, level, pos, player, hand, hit);
         }
 
@@ -364,7 +386,8 @@ public class BurnacleBlock extends Block implements EntityBlock {
             Stage next = switch (stage) {
                 case BUD -> Stage.JUVENILE;
                 case JUVENILE -> Stage.MATURE;
-                case MATURE -> Stage.MATURE; // unreachable due to early return, but safe
+                case MATURE -> Stage.ELDER;
+                case ELDER -> Stage.ELDER; // unreachable due to early return, but safe
             };
 
             BlockState newState = state.setValue(STAGE, next);
@@ -415,7 +438,8 @@ public class BurnacleBlock extends Block implements EntityBlock {
     public enum Stage implements StringRepresentable {
         BUD("bud"),
         JUVENILE("juvenile"),
-        MATURE("mature");
+        MATURE("mature"),
+        ELDER("elder");
 
         private final String name;
 

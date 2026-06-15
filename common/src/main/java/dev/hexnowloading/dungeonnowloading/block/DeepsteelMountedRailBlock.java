@@ -23,6 +23,17 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class DeepsteelMountedRailBlock extends RailBlock {
+    protected static final VoxelShape NORTH_SOUTH_FULL_PLATFORM_SHAPE = Shapes.or(
+            Block.box(0, 0, 0, 16, 8, 8),
+            Block.box(0, 8, 8, 16, 16, 16)
+    ).optimize();
+    protected static final VoxelShape NORTH_SOUTH_REVERSED_FULL_PLATFORM_SHAPE = Shapes.or(
+            Block.box(0, 0, 8, 16, 8, 16),
+            Block.box(0, 8, 0, 16, 16, 8)
+    ).optimize();
+    protected static final VoxelShape EAST_WEST_FULL_PLATFORM_SHAPE = rotateY(NORTH_SOUTH_FULL_PLATFORM_SHAPE);
+    protected static final VoxelShape EAST_WEST_REVERSED_FULL_PLATFORM_SHAPE = rotateY(NORTH_SOUTH_REVERSED_FULL_PLATFORM_SHAPE);
+
     protected static final VoxelShape NORTH_SOUTH_PLATFORM_SHAPE = Shapes.or(
             Block.box(0, 0, 0, 2, 8, 8),
             Block.box(14, 0, 0, 16, 8, 8),
@@ -52,7 +63,7 @@ public class DeepsteelMountedRailBlock extends RailBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return platformShape(state);
+        return fullPlatformShape(state);
     }
 
     @Override
@@ -101,6 +112,16 @@ public class DeepsteelMountedRailBlock extends RailBlock {
             case ASCENDING_EAST -> EAST_WEST_REVERSED_PLATFORM_SHAPE;
             case ASCENDING_WEST -> EAST_WEST_PLATFORM_SHAPE;
             default -> NORTH_SOUTH_PLATFORM_SHAPE;
+        };
+    }
+
+    protected static VoxelShape fullPlatformShape(BlockState state) {
+        RailShape shape = state.getValue(((BaseRailBlock) state.getBlock()).getShapeProperty());
+        return switch (shape) {
+            case ASCENDING_NORTH -> NORTH_SOUTH_REVERSED_FULL_PLATFORM_SHAPE;
+            case ASCENDING_EAST -> EAST_WEST_REVERSED_FULL_PLATFORM_SHAPE;
+            case ASCENDING_WEST -> EAST_WEST_FULL_PLATFORM_SHAPE;
+            default -> NORTH_SOUTH_FULL_PLATFORM_SHAPE;
         };
     }
 

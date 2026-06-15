@@ -96,6 +96,7 @@ public class DNLForgeClientEvents {
         event.registerLayerDefinition(BurnacleBudModel.LAYER_LOCATION, BurnacleBudModel::createBodyLayer);
         event.registerLayerDefinition(BurnacleJuvenileModel.LAYER_LOCATION, BurnacleJuvenileModel::createBodyLayer);
         event.registerLayerDefinition(BurnacleMatureModel.LAYER_LOCATION, BurnacleMatureModel::createBodyLayer);
+        event.registerLayerDefinition(BurnacleElderModel.LAYER_LOCATION, BurnacleElderModel::createBodyLayer);
 
         // Item
         event.registerLayerDefinition(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
@@ -225,6 +226,7 @@ public class DNLForgeClientEvents {
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_RAIL.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get(), RenderType.cutout());

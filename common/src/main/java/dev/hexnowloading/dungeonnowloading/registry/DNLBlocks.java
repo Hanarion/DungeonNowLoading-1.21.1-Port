@@ -145,13 +145,13 @@ public class DNLBlocks {
     public static Supplier<Block> DEEPSTEEL_PLATFORM_SUSPENDED_RAIL;
     public static Supplier<Block> DEEPSTEEL_SLOPED_PLATFORM_FLOATING;
     public static Supplier<Block> DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL;
+    public static Supplier<Block> DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_POWERED_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_DETECTOR_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL;
     public static Supplier<Block> WISPWARD_LANTERN;
     public static Supplier<Block> TIMED_WISPWARD_LANTERN;
-    public static Supplier<Block> RAIL_PLATFORM;
     public static Supplier<Block> WEB_CARPET;
     public static Supplier<Block> BURNACLE;
     public static Supplier<Block> WISP_BLOCK;
@@ -290,13 +290,13 @@ public class DNLBlocks {
         DEEPSTEEL_PLATFORM_SUSPENDED_RAIL = registerBlock("deepsteel_platform_suspended_rail", () -> suspendedDeepsteelPlatformBlock(deepsteelFloatingRailShape()));
         DEEPSTEEL_SLOPED_PLATFORM_FLOATING = registerBlock("deepsteel_sloped_platform_floating", () -> directionalDeepsteelPlatformBlock(deepsteelStairsShape()));
         DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL = registerBlock("deepsteel_sloped_platform_floating_rail", () -> directionalDeepsteelPlatformBlock(deepsteelStairsRailShape()));
+        DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS = registerBlock("deepsteel_platform_enclosed_stairs", () -> directionalDeepsteelPlatformBlock(deepsteelEnclosedStairsShape()));
         DEEPSTEEL_MOUNTED_RAIL = registerBlock("deepsteel_mounted_rail", () -> new DeepsteelMountedRailBlock(DeepsteelMountedRailBlock.properties(), Items.RAIL));
         DEEPSTEEL_MOUNTED_POWERED_RAIL = registerBlock("deepsteel_mounted_powered_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.properties(), Items.POWERED_RAIL));
         DEEPSTEEL_MOUNTED_DETECTOR_RAIL = registerBlock("deepsteel_mounted_detector_rail", () -> new DeepsteelMountedDetectorRailBlock(DeepsteelMountedRailBlock.properties(), Items.DETECTOR_RAIL));
         DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL = registerBlock("deepsteel_mounted_activator_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.properties(), Items.ACTIVATOR_RAIL));
         WISPWARD_LANTERN = registerBlock("wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission)));
         TIMED_WISPWARD_LANTERN = registerBlock("timed_wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission), true));
-        RAIL_PLATFORM = registerBlock("rail_platform", () -> new RailPlatformBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).noOcclusion()));
         WEB_CARPET = registerBlock("web_carpet", () -> new WebCarpetBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).forceSolidOn().noCollission().requiresCorrectToolForDrops().strength(4.0F).pushReaction(PushReaction.DESTROY)));
         BURNACLE = registerBlock("burnacle", () -> new BurnacleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).pushReaction(PushReaction.DESTROY).noOcclusion()));
         WISP_BLOCK = registerBlock("wisp_block", () -> new WispBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).instabreak().noCollission().noOcclusion().noLootTable().sound(SoundType.EMPTY).lightLevel(state -> 14).pushReaction(PushReaction.DESTROY)));
@@ -365,6 +365,13 @@ public class DNLBlocks {
         return Shapes.or(
                 Block.box(0, 0, 0, 16, 8, 8),
                 Block.box(0, 8, 8, 16, 16, 16)
+        );
+    }
+
+    private static VoxelShape deepsteelEnclosedStairsShape() {
+        return Shapes.or(
+                deepsteelStairsShape(),
+                deepsteelFrameShape()
         );
     }
 

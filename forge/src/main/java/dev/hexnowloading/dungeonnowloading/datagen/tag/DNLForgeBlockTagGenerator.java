@@ -81,7 +81,6 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.LARGE_DURITE_BUD.get(),
                 DNLBlocks.DURITE_QUELLER.get(),
                 DNLBlocks.BRITTLESTONE.get(),
-                DNLBlocks.RAIL_PLATFORM.get(),
                 DNLBlocks.DEEPSTEEL_BLOCK.get(),
                 DNLBlocks.BURNACLE.get(),
                 DNLBlocks.DEEPSTEEL_BLOCK.get(),
@@ -93,7 +92,8 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(),
                 DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(),
                 DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(),
-                DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get()
+                DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(),
+                DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get()
         );
 
         this.tag(BlockTags.RAILS).add(

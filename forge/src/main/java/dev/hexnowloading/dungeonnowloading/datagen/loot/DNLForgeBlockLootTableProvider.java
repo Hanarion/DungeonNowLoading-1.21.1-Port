@@ -142,7 +142,6 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         add(bannerBlock, table);
 
         this.dropWhenSilkTouch(DNLBlocks.BRITTLESTONE.get());
-        this.dropSelf(DNLBlocks.RAIL_PLATFORM.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_BLOCK.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get());
@@ -153,6 +152,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
+        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
         this.add(DNLBlocks.WEB_CARPET.get(), this::addWebCarpetDrop);
         this.dropSelf(DNLBlocks.BURNACLE.get());
     }

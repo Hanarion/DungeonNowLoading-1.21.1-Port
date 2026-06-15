@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.BurnacleBlock;
 import dev.hexnowloading.dungeonnowloading.block.client.model.BurnacleBudModel;
+import dev.hexnowloading.dungeonnowloading.block.client.model.BurnacleElderModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.BurnacleJuvenileModel;
 import dev.hexnowloading.dungeonnowloading.block.client.model.BurnacleMatureModel;
 import dev.hexnowloading.dungeonnowloading.block.entity.BurnacleBlockEntity;
@@ -23,6 +24,7 @@ public class BurnacleBlockRenderer implements BlockEntityRenderer<BurnacleBlockE
     private static final ResourceLocation BUD_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/burnacle_bud.png");
     private static final ResourceLocation JUVENILE_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/burnacle_juvenile.png");
     private static final ResourceLocation MATURE_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/burnacle_mature.png");
+    private static final ResourceLocation ELDER_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/burnacle_elder.png");
     private static final ResourceLocation[] DESTROY_STAGES = new ResourceLocation[] {
             new ResourceLocation("textures/block/destroy_stage_0.png"),
             new ResourceLocation("textures/block/destroy_stage_1.png"),
@@ -39,11 +41,13 @@ public class BurnacleBlockRenderer implements BlockEntityRenderer<BurnacleBlockE
     private final BurnacleBudModel budModel;
     private final BurnacleJuvenileModel juvenileModel;
     private final BurnacleMatureModel matureModel;
+    private final BurnacleElderModel elderModel;
 
     public BurnacleBlockRenderer(BlockEntityRendererProvider.Context context) {
         this.budModel = new BurnacleBudModel(context.bakeLayer(BurnacleBudModel.LAYER_LOCATION));
         this.juvenileModel = new BurnacleJuvenileModel(context.bakeLayer(BurnacleJuvenileModel.LAYER_LOCATION));
         this.matureModel = new BurnacleMatureModel(context.bakeLayer(BurnacleMatureModel.LAYER_LOCATION));
+        this.elderModel = new BurnacleElderModel(context.bakeLayer(BurnacleElderModel.LAYER_LOCATION));
     }
 
     @Override
@@ -99,6 +103,7 @@ public class BurnacleBlockRenderer implements BlockEntityRenderer<BurnacleBlockE
                 case BUD -> new BurnacleRenderStage(renderer.budModel, BUD_TEXTURE, 32, 32, renderer.budModel::setupAnim);
                 case JUVENILE -> new BurnacleRenderStage(renderer.juvenileModel, JUVENILE_TEXTURE, 64, 64, renderer.juvenileModel::setupAnim);
                 case MATURE -> new BurnacleRenderStage(renderer.matureModel, MATURE_TEXTURE, 64, 64, renderer.matureModel::setupAnim);
+                case ELDER -> new BurnacleRenderStage(renderer.elderModel, ELDER_TEXTURE, 64, 64, renderer.elderModel::setupAnim);
             };
         }
 

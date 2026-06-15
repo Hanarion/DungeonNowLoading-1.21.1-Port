@@ -59,7 +59,6 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         booleanPropertyItem(DNLItems.COPPER_DETONATOR.get(), "mode_switch", "copper_detonator", "copper_detonator_switched");
         booleanPropertyItem(DNLItems.REPULSOR.get(), "golden_mode", "repulsor", "repulsor_golden");
         PlayerStatueItemWithDisplay(DNLItems.PLAYER_STATUE.get());
-        itemFromExistingModel(DNLItems.RAIL_PLATFORM.get(), "block/rail_platform");
     }
 
     private void simpleItem(Item item) {

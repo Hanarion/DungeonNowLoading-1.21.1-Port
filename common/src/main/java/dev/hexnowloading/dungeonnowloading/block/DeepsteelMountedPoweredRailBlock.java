@@ -29,7 +29,7 @@ public class DeepsteelMountedPoweredRailBlock extends PoweredRailBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return DeepsteelMountedRailBlock.platformShape(state);
+        return DeepsteelMountedRailBlock.fullPlatformShape(state);
     }
 
     @Override

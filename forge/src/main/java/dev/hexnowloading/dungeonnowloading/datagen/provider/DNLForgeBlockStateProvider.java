@@ -67,6 +67,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_suspended_rail"));
         horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), "deepsteel_platform_slope", "8", modLoc("block/deepsteel_sloped_platform_floating"));
         horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), "deepsteel_platform_slope", "8", modLoc("block/deepsteel_sloped_platform_floating_rail"));
+        deepsteelPlatformEnclosedStairs(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
 
         dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
@@ -120,7 +121,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN.get());
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
-        railPlatformStates(DNLBlocks.RAIL_PLATFORM.get());
         multifaceWebCarpet(DNLBlocks.WEB_CARPET.get());
         burnacleSixWayWithStages(DNLBlocks.BURNACLE.get());
     }
@@ -1146,6 +1146,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                 case BUD      -> "burnacle_bud";
                 case JUVENILE -> "burnacle_juvenile";
                 case MATURE   -> "burnacle_mature";
+                case ELDER    -> "burnacle_elder";
             };
 
             ModelFile model = models().getExistingFile(modLoc("block/" + modelName));
@@ -1167,8 +1168,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
                     .build();
         });
 
-        // Item model: use burnacle_bud block model as parent (has handheld transforms)
-        simpleBlockItem(block, models().getExistingFile(modLoc("block/burnacle_bud")));
+        // Item model: use the dedicated flat item texture.
+        itemModels()
+                .withExistingParent(ModelProvider.ITEM_FOLDER + "/" + name(block), mcLoc(ModelProvider.ITEM_FOLDER + "/generated"))
+                .texture("layer0", ModelProvider.ITEM_FOLDER + "/" + name(block));
     }
 
 
@@ -1273,6 +1276,27 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, mf);
     }
 
+    private void deepsteelPlatformEnclosedStairs(Block block) {
+        ModelFile north = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs"));
+        ModelFile east = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs_90"));
+        ModelFile south = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs_180"));
+        ModelFile west = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs_270"));
+
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            ModelFile model = switch (direction) {
+                case EAST -> east;
+                case SOUTH -> south;
+                case WEST -> west;
+                default -> north;
+            };
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .build();
+        });
+        simpleBlockItem(block, north);
+    }
+
     private void axisHorizontalModelFromParent(Block block, String parentModelName, String textureKey, ResourceLocation blockTexture) {
         String n = name(block);
 
@@ -1330,27 +1354,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, normal);
     }
 
-    private void railPlatformStates(Block block) {
-        ModelFile normal = models().getExistingFile(modLoc("block/rail_platform"));
-        ModelFile raised = models().getExistingFile(modLoc("block/rail_platform_raised"));
-
-        getVariantBuilder(block).forAllStates(state -> {
-            Direction dir = state.getValue(RailPlatformBlock.FACING);
-            boolean isRaised = state.getValue(RailPlatformBlock.RAISED);
-
-            ModelFile model = isRaised ? raised : normal;
-
-            return ConfiguredModel.builder()
-                    .modelFile(model)
-                    .rotationY((int) dir.toYRot())
-                    .build();
-        });
-    }
-
-
     private void horizontalExistingModel(Block block, String existingBlockModelName) {
-        String n = name(block); // usually the registry path, ex: "rail_platform"
-
         ModelFile existingModel = models().getExistingFile(
                 modLoc("block/" + existingBlockModelName)
         );

@@ -410,6 +410,25 @@ public class BurnacleBlockEntity extends BlockEntity {
                 0.03D,  // initialGasSpeed
                 16.0D   // playerRange
         ));
+
+        // ELDER preset
+        STAGE_PRESETS.put(Stage.ELDER, new StagePreset(
+                4,      // GasSize:4
+                20,     // GrowthTime:20
+                2.5f,   // GasSpread:2.5f
+                0.03f,  // GasSpeed:0.03f
+                0.10f,  // AirResistance:0.1f
+                200,    // Life:200
+                0.5f,   // ExplosionMultiplier:0.5f
+                5,      // ChainDelay:5
+                10,     // IgnitionDelay:10
+                25,     // ExplosionDelay:25
+
+                40,     // cycleTime
+                15,     // cycleOffset
+                0.035D, // initialGasSpeed
+                18.0D   // playerRange
+        ));
     }
 
     // Helper for BE

@@ -1,80 +1,418 @@
 {
   "variants": {
-    "facing=down,stage=bud": {
+    "facing=down,rotation=0,stage=bud": {
       "model": "dungeonnowloading:block/burnacle_bud",
       "x": 180
     },
-    "facing=down,stage=juvenile": {
+    "facing=down,rotation=0,stage=juvenile": {
       "model": "dungeonnowloading:block/burnacle_juvenile",
       "x": 180
     },
-    "facing=down,stage=mature": {
+    "facing=down,rotation=0,stage=mature": {
       "model": "dungeonnowloading:block/burnacle_mature",
       "x": 180
     },
-    "facing=east,stage=bud": {
+    "facing=down,rotation=0,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 180
+    },
+    "facing=down,rotation=1,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 180
+    },
+    "facing=down,rotation=1,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 180
+    },
+    "facing=down,rotation=1,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 180
+    },
+    "facing=down,rotation=1,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 180
+    },
+    "facing=down,rotation=2,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 180
+    },
+    "facing=down,rotation=2,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 180
+    },
+    "facing=down,rotation=2,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 180
+    },
+    "facing=down,rotation=2,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 180
+    },
+    "facing=down,rotation=3,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 180
+    },
+    "facing=down,rotation=3,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 180
+    },
+    "facing=down,rotation=3,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 180
+    },
+    "facing=down,rotation=3,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 180
+    },
+    "facing=east,rotation=0,stage=bud": {
       "model": "dungeonnowloading:block/burnacle_bud",
       "x": 90,
       "y": 90
     },
-    "facing=east,stage=juvenile": {
+    "facing=east,rotation=0,stage=juvenile": {
       "model": "dungeonnowloading:block/burnacle_juvenile",
       "x": 90,
       "y": 90
     },
-    "facing=east,stage=mature": {
+    "facing=east,rotation=0,stage=mature": {
       "model": "dungeonnowloading:block/burnacle_mature",
       "x": 90,
       "y": 90
     },
-    "facing=north,stage=bud": {
+    "facing=east,rotation=0,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=1,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=1,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=1,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=1,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=2,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=2,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=2,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=2,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=3,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=3,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=3,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,rotation=3,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,rotation=0,stage=bud": {
       "model": "dungeonnowloading:block/burnacle_bud",
       "x": 90
     },
-    "facing=north,stage=juvenile": {
+    "facing=north,rotation=0,stage=juvenile": {
       "model": "dungeonnowloading:block/burnacle_juvenile",
       "x": 90
     },
-    "facing=north,stage=mature": {
+    "facing=north,rotation=0,stage=mature": {
       "model": "dungeonnowloading:block/burnacle_mature",
       "x": 90
     },
-    "facing=south,stage=bud": {
+    "facing=north,rotation=0,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90
+    },
+    "facing=north,rotation=1,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90
+    },
+    "facing=north,rotation=1,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90
+    },
+    "facing=north,rotation=1,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90
+    },
+    "facing=north,rotation=1,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90
+    },
+    "facing=north,rotation=2,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90
+    },
+    "facing=north,rotation=2,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90
+    },
+    "facing=north,rotation=2,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90
+    },
+    "facing=north,rotation=2,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90
+    },
+    "facing=north,rotation=3,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90
+    },
+    "facing=north,rotation=3,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90
+    },
+    "facing=north,rotation=3,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90
+    },
+    "facing=north,rotation=3,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90
+    },
+    "facing=south,rotation=0,stage=bud": {
       "model": "dungeonnowloading:block/burnacle_bud",
       "x": 90,
       "y": 180
     },
-    "facing=south,stage=juvenile": {
+    "facing=south,rotation=0,stage=juvenile": {
       "model": "dungeonnowloading:block/burnacle_juvenile",
       "x": 90,
       "y": 180
     },
-    "facing=south,stage=mature": {
+    "facing=south,rotation=0,stage=mature": {
       "model": "dungeonnowloading:block/burnacle_mature",
       "x": 90,
       "y": 180
     },
-    "facing=up,stage=bud": {
+    "facing=south,rotation=0,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=1,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=1,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=1,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=1,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=2,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=2,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=2,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=2,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=3,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=3,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=3,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,rotation=3,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,rotation=0,stage=bud": {
       "model": "dungeonnowloading:block/burnacle_bud"
     },
-    "facing=up,stage=juvenile": {
+    "facing=up,rotation=0,stage=juvenile": {
       "model": "dungeonnowloading:block/burnacle_juvenile"
     },
-    "facing=up,stage=mature": {
+    "facing=up,rotation=0,stage=mature": {
       "model": "dungeonnowloading:block/burnacle_mature"
     },
-    "facing=west,stage=bud": {
+    "facing=up,rotation=0,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder"
+    },
+    "facing=up,rotation=1,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud"
+    },
+    "facing=up,rotation=1,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile"
+    },
+    "facing=up,rotation=1,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature"
+    },
+    "facing=up,rotation=1,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder"
+    },
+    "facing=up,rotation=2,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud"
+    },
+    "facing=up,rotation=2,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile"
+    },
+    "facing=up,rotation=2,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature"
+    },
+    "facing=up,rotation=2,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder"
+    },
+    "facing=up,rotation=3,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud"
+    },
+    "facing=up,rotation=3,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile"
+    },
+    "facing=up,rotation=3,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature"
+    },
+    "facing=up,rotation=3,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder"
+    },
+    "facing=west,rotation=0,stage=bud": {
       "model": "dungeonnowloading:block/burnacle_bud",
       "x": 90,
       "y": 270
     },
-    "facing=west,stage=juvenile": {
+    "facing=west,rotation=0,stage=juvenile": {
       "model": "dungeonnowloading:block/burnacle_juvenile",
       "x": 90,
       "y": 270
     },
-    "facing=west,stage=mature": {
+    "facing=west,rotation=0,stage=mature": {
       "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=0,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=1,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=1,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=1,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=1,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=2,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=2,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=2,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=2,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=3,stage=bud": {
+      "model": "dungeonnowloading:block/burnacle_bud",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=3,stage=juvenile": {
+      "model": "dungeonnowloading:block/burnacle_juvenile",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=3,stage=mature": {
+      "model": "dungeonnowloading:block/burnacle_mature",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,rotation=3,stage=elder": {
+      "model": "dungeonnowloading:block/burnacle_elder",
       "x": 90,
       "y": 270
     }

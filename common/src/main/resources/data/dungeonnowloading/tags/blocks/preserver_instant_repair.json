@@ -52,7 +52,6 @@
     "dungeonnowloading:redstone_lane_l",
     "dungeonnowloading:redstone_lane_t",
     "dungeonnowloading:rotator_pressure_plate",
-    "dungeonnowloading:signal_gate",
-    "dungeonnowloading:rail_platform"
+    "dungeonnowloading:signal_gate"
   ]
 }
