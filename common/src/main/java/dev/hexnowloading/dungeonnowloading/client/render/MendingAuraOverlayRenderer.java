@@ -85,6 +85,16 @@ public class MendingAuraOverlayRenderer {
             poseStack.translate(pos.getX() - cameraX, pos.getY() - cameraY, pos.getZ() - cameraZ);
             VertexConsumer alphaConsumer = new AlphaVertexConsumer(translucentConsumer, overlay.alpha());
             if (needsShapeOverlay(state, storedModel, pos)) {
+                if (level.getBlockEntity(pos) != null) {
+                    minecraft.getBlockEntityRenderDispatcher().render(
+                            level.getBlockEntity(pos),
+                            partialTick,
+                            poseStack,
+                            new MendingAuraBlockEntityOverlayBuffer(bufferSource, overlay.alpha())
+                    );
+                    poseStack.popPose();
+                    continue;
+                }
                 renderShapeOverlay(state, level, pos, poseStack, alphaConsumer, auraSprite);
             } else {
                 dispatcher.getModelRenderer().renderModel(
@@ -103,6 +113,7 @@ public class MendingAuraOverlayRenderer {
         }
 
         bufferSource.endBatch(RenderType.translucent());
+        bufferSource.endBatch(MendingAuraBlockEntityOverlayBuffer.RENDER_TYPE);
     }
 
     private static boolean needsShapeOverlay(BlockState state, BakedModel model, BlockPos pos) {

@@ -50,6 +50,21 @@ public class MendingAuraOverlayClientState {
         return activeOverlays;
     }
 
+    public static float getAlpha(Level level, BlockPos pos, float partialTick) {
+        Overlay overlay = OVERLAYS.get(pos);
+        if (overlay == null) {
+            return 0.0F;
+        }
+
+        float age = (level.getGameTime() - overlay.startTick()) + partialTick;
+        if (age >= overlay.durationTicks()) {
+            OVERLAYS.remove(pos, overlay);
+            return 0.0F;
+        }
+
+        return Mth.clamp(1.0F - age / overlay.durationTicks(), 0.0F, 1.0F);
+    }
+
     public record ActiveOverlay(BlockPos pos, float alpha) {
     }
 
