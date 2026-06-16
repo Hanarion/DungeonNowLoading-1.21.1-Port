@@ -17,6 +17,8 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -84,10 +86,18 @@ public class MendingAuraOverlayRenderer {
             poseStack.pushPose();
             poseStack.translate(pos.getX() - cameraX, pos.getY() - cameraY, pos.getZ() - cameraZ);
             VertexConsumer alphaConsumer = new AlphaVertexConsumer(translucentConsumer, overlay.alpha());
-            if (needsShapeOverlay(state, storedModel, pos)) {
-                if (level.getBlockEntity(pos) != null) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (shouldUseBlockEntityOverlay(state, storedModel, pos, blockEntity)) {
+                minecraft.getBlockEntityRenderDispatcher().render(
+                        blockEntity,
+                        partialTick,
+                        poseStack,
+                        new MendingAuraBlockEntityOverlayBuffer(bufferSource, overlay.alpha())
+                );
+            } else if (needsShapeOverlay(state, storedModel, pos)) {
+                if (blockEntity != null) {
                     minecraft.getBlockEntityRenderDispatcher().render(
-                            level.getBlockEntity(pos),
+                            blockEntity,
                             partialTick,
                             poseStack,
                             new MendingAuraBlockEntityOverlayBuffer(bufferSource, overlay.alpha())
@@ -114,6 +124,10 @@ public class MendingAuraOverlayRenderer {
 
         bufferSource.endBatch(RenderType.translucent());
         bufferSource.endBatch(MendingAuraBlockEntityOverlayBuffer.RENDER_TYPE);
+    }
+
+    private static boolean shouldUseBlockEntityOverlay(BlockState state, BakedModel model, BlockPos pos, BlockEntity blockEntity) {
+        return blockEntity != null && (state.getRenderShape() != RenderShape.MODEL || needsShapeOverlay(state, model, pos));
     }
 
     private static boolean needsShapeOverlay(BlockState state, BakedModel model, BlockPos pos) {

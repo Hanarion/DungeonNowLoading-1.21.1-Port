@@ -490,7 +490,7 @@ public interface PreserverBlockDestructionSystem {
         }
 
         private boolean usesInstantRepair(BlockState state) {
-            return state.is(DNLTags.PRESERVER_INSTANT_REPAIR);
+            return state.is(DNLTags.PRESERVER_INSTANT_REPAIR) || state.hasBlockEntity();
         }
 
         private void cancelInstantRepairEvent(GameEvent gameEvent, BlockPos eventBlockPos) {
