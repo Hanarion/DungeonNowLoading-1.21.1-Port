@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "facing=down,part=1": { "model": "dungeonnowloading:block/suspended_web_1" },
+    "facing=down,part=2": { "model": "dungeonnowloading:block/suspended_web_2" },
+    "facing=down,part=3": { "model": "dungeonnowloading:block/suspended_web_3" },
+    "facing=down,part=4": { "model": "dungeonnowloading:block/suspended_web_4" },
+    "facing=down,part=5": { "model": "dungeonnowloading:block/suspended_web_5" },
+    "facing=down,part=6": { "model": "dungeonnowloading:block/suspended_web_6" },
+    "facing=down,part=a": { "model": "dungeonnowloading:block/suspended_web_a" },
+    "facing=down,part=b": { "model": "dungeonnowloading:block/suspended_web_b" },
+    "facing=down,part=c": { "model": "dungeonnowloading:block/suspended_web_c" },
+    "facing=south,part=1": { "model": "dungeonnowloading:block/suspended_web_1", "x": 90 },
+    "facing=south,part=2": { "model": "dungeonnowloading:block/suspended_web_2", "x": 90 },
+    "facing=south,part=3": { "model": "dungeonnowloading:block/suspended_web_3", "x": 90 },
+    "facing=south,part=4": { "model": "dungeonnowloading:block/suspended_web_4", "x": 90 },
+    "facing=south,part=5": { "model": "dungeonnowloading:block/suspended_web_5", "x": 90 },
+    "facing=south,part=6": { "model": "dungeonnowloading:block/suspended_web_6", "x": 90 },
+    "facing=south,part=a": { "model": "dungeonnowloading:block/suspended_web_a", "x": 90 },
+    "facing=south,part=b": { "model": "dungeonnowloading:block/suspended_web_b", "x": 90 },
+    "facing=south,part=c": { "model": "dungeonnowloading:block/suspended_web_c", "x": 90 },
+    "facing=west,part=1": { "model": "dungeonnowloading:block/suspended_web_1", "x": 90, "y": 90 },
+    "facing=west,part=2": { "model": "dungeonnowloading:block/suspended_web_2", "x": 90, "y": 90 },
+    "facing=west,part=3": { "model": "dungeonnowloading:block/suspended_web_3", "x": 90, "y": 90 },
+    "facing=west,part=4": { "model": "dungeonnowloading:block/suspended_web_4", "x": 90, "y": 90 },
+    "facing=west,part=5": { "model": "dungeonnowloading:block/suspended_web_5", "x": 90, "y": 90 },
+    "facing=west,part=6": { "model": "dungeonnowloading:block/suspended_web_6", "x": 90, "y": 90 },
+    "facing=west,part=a": { "model": "dungeonnowloading:block/suspended_web_a", "x": 90, "y": 90 },
+    "facing=west,part=b": { "model": "dungeonnowloading:block/suspended_web_b", "x": 90, "y": 90 },
+    "facing=west,part=c": { "model": "dungeonnowloading:block/suspended_web_c", "x": 90, "y": 90 }
+  }
+}

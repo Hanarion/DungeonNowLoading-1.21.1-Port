@@ -3,6 +3,7 @@ package dev.hexnowloading.dungeonnowloading.datagen.provider;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.block.property.RedstoneLaneMode;
+import dev.hexnowloading.dungeonnowloading.block.property.SuspendedWebPart;
 import dev.hexnowloading.dungeonnowloading.datagen.provider.blockitemstategenerators.BannerBlockItemGen;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
@@ -122,6 +123,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
         multifaceWebCarpet(DNLBlocks.WEB_CARPET.get());
+        suspendedWeb(DNLBlocks.SUSPENDED_WEB.get());
         burnacleSixWayWithStages(DNLBlocks.BURNACLE.get());
     }
 
@@ -1135,6 +1137,53 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         // === Item model generation ===
         simpleItem(block);
+    }
+
+    private void suspendedWeb(Block block) {
+        String blockName = key(block).getPath();
+        Map<SuspendedWebPart, ModelFile> modelsByPart = Map.of(
+                SuspendedWebPart.ONE, suspendedWebModel("1"),
+                SuspendedWebPart.TWO, suspendedWebModel("2"),
+                SuspendedWebPart.THREE, suspendedWebModel("3"),
+                SuspendedWebPart.FOUR, suspendedWebModel("4"),
+                SuspendedWebPart.FIVE, suspendedWebModel("5"),
+                SuspendedWebPart.SIX, suspendedWebModel("6"),
+                SuspendedWebPart.A, suspendedWebModel("a"),
+                SuspendedWebPart.B, suspendedWebModel("b"),
+                SuspendedWebPart.C, suspendedWebModel("c")
+        );
+
+        getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
+                .modelFile(modelsByPart.get(state.getValue(SuspendedWebBlock.PART)))
+                .rotationX(suspendedWebXRotation(state.getValue(SuspendedWebBlock.FACING)))
+                .rotationY(suspendedWebYRotation(state.getValue(SuspendedWebBlock.FACING)))
+                .build());
+
+        itemModels()
+                .withExistingParent(ModelProvider.ITEM_FOLDER + "/" + blockName, mcLoc(ModelProvider.ITEM_FOLDER + "/generated"))
+                .texture("layer0", modLoc("block/suspended_web_1"));
+    }
+
+    private ModelFile suspendedWebModel(String suffix) {
+        return models()
+                .withExistingParent("suspended_web_" + suffix, mcLoc("block/cross"))
+                .texture("cross", modLoc("block/suspended_web_" + suffix))
+                .texture("particle", modLoc("block/suspended_web_" + suffix))
+                .renderType("cutout");
+    }
+
+    private int suspendedWebXRotation(Direction facing) {
+        return switch (facing) {
+            case SOUTH, WEST -> 90;
+            default -> 0;
+        };
+    }
+
+    private int suspendedWebYRotation(Direction facing) {
+        return switch (facing) {
+            case WEST -> 90;
+            default -> 0;
+        };
     }
 
     private void burnacleSixWayWithStages(Block block) {

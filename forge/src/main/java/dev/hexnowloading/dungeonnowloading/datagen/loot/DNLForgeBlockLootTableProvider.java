@@ -9,6 +9,8 @@ import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -21,6 +23,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
@@ -154,6 +157,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
         this.add(DNLBlocks.WEB_CARPET.get(), this::addWebCarpetDrop);
+        this.add(DNLBlocks.SUSPENDED_WEB.get(), this::addSuspendedWebDrop);
         this.dropSelf(DNLBlocks.BURNACLE.get());
     }
 
@@ -371,5 +375,28 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         }
 
         return table;
+    }
+
+    private LootTable.Builder addSuspendedWebDrop(Block block) {
+        LootItemCondition.Builder noShears = InvertedLootItemCondition.invert(HAS_SHEARS);
+
+        return LootTable.lootTable()
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(HAS_SHEARS)
+                        .when(ExplosionCondition.survivesExplosion())
+                        .add(LootItem.lootTableItem(DNLItems.SUSPENDED_WEB.get())))
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(noShears)
+                        .when(ExplosionCondition.survivesExplosion())
+                        .add(LootItem.lootTableItem(Items.STRING)));
+    }
+
+    private static LootItemCondition.Builder destroyedByPlayer() {
+        return LootItemEntityPropertyCondition.hasProperties(
+                LootContext.EntityTarget.THIS,
+                EntityPredicate.Builder.entity().of(EntityType.PLAYER)
+        );
     }
 }

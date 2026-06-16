@@ -153,6 +153,7 @@ public class DNLBlocks {
     public static Supplier<Block> WISPWARD_LANTERN;
     public static Supplier<Block> TIMED_WISPWARD_LANTERN;
     public static Supplier<Block> WEB_CARPET;
+    public static Supplier<Block> SUSPENDED_WEB;
     public static Supplier<Block> BURNACLE;
     public static Supplier<Block> WISP_BLOCK;
     public static Supplier<Block> WISPWARD_CHEST;
@@ -298,6 +299,7 @@ public class DNLBlocks {
         WISPWARD_LANTERN = registerBlock("wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission)));
         TIMED_WISPWARD_LANTERN = registerBlock("timed_wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission), true));
         WEB_CARPET = registerBlock("web_carpet", () -> new WebCarpetBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).forceSolidOn().noCollission().requiresCorrectToolForDrops().strength(4.0F).pushReaction(PushReaction.DESTROY)));
+        SUSPENDED_WEB = registerBlock("suspended_web", () -> new SuspendedWebBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).noCollission().noOcclusion().strength(4.0F).pushReaction(PushReaction.DESTROY)));
         BURNACLE = registerBlock("burnacle", () -> new BurnacleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).pushReaction(PushReaction.DESTROY).noOcclusion()));
         WISP_BLOCK = registerBlock("wisp_block", () -> new WispBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).instabreak().noCollission().noOcclusion().noLootTable().sound(SoundType.EMPTY).lightLevel(state -> 14).pushReaction(PushReaction.DESTROY)));
         WISPWARD_CHEST = registerBlock("wispward_chest", () -> new WispwardChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.METAL).noOcclusion()));

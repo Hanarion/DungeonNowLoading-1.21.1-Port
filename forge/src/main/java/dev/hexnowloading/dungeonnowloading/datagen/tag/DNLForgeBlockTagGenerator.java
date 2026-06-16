@@ -4,14 +4,19 @@ import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
 public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
+    private static final TagKey<Block> MINEABLE_WITH_SHEARS = BlockTags.create(new ResourceLocation("minecraft", "mineable/shears"));
+    private static final TagKey<Block> MINEABLE_WITH_SWORD = BlockTags.create(new ResourceLocation("minecraft", "mineable/sword"));
 
     public DNLForgeBlockTagGenerator(DataGenerator generator, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
         super(generator.getPackOutput(), lookupProvider, DungeonNowLoading.MOD_ID, existingFileHelper);
@@ -112,8 +117,17 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.FAIRKEEEPER_SPAWNER.get()
         );
 
+        this.tag(MINEABLE_WITH_SHEARS).add(
+                DNLBlocks.SUSPENDED_WEB.get()
+        );
+
+        this.tag(MINEABLE_WITH_SWORD).add(
+                DNLBlocks.SUSPENDED_WEB.get()
+        );
+
         this.tag(BlockTags.FALL_DAMAGE_RESETTING).add(
-                DNLBlocks.WEB_CARPET.get()
+                DNLBlocks.WEB_CARPET.get(),
+                DNLBlocks.SUSPENDED_WEB.get()
         );
 
         this.tag(BlockTags.WALLS).add(
