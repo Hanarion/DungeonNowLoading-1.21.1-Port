@@ -58,15 +58,15 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(ForgeRegistries.BLOCKS.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
         simpleBlockWithItem(DNLBlocks.BRITTLESTONE.get());
         simpleBlockWithItem(DNLBlocks.DEEPSTEEL_BLOCK.get());
-        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), "deepsteel_platform_frame");
-        waterloggedModelFromParent(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_floating"));
-        axisHorizontalModelFromParent(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_floating_rail"));
-        axisHorizontalModelFromParent(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_frame_top"));
-        axisHorizontalModelFromParent(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_frame_top_rail"));
-        horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_suspended"));
-        horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), "deepsteel_platform_frame", "2", modLoc("block/deepsteel_platform_suspended_rail"));
-        horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), "deepsteel_platform_slope", "8", modLoc("block/deepsteel_sloped_platform_floating"));
-        horizontalModelFromParentRotated180(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), "deepsteel_platform_slope", "8", modLoc("block/deepsteel_sloped_platform_floating_rail"));
+        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), "deepsteel_shaft");
+        waterloggedExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), "deepsteel_hanging_platform");
+        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), "deepsteel_hanging_rail");
+        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(), "deepsteel_shaft_platform");
+        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), "deepsteel_shaft_rail");
+        horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), "deepsteel_braced_platform");
+        horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), "deepsteel_braced_rail");
+        horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), "deepsteel_stairs");
+        horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), "deepsteel_slope");
         deepsteelPlatformEnclosedStairs(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
 
         dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
@@ -1377,6 +1377,33 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         );
 
         axisHorizontalBlock(block, existingModel);
+        simpleBlockItem(block, existingModel);
+    }
+
+    private void waterloggedExistingModelWithItem(Block block, String existingBlockModelName) {
+        ModelFile existingModel = models().getExistingFile(
+                modLoc("block/" + existingBlockModelName)
+        );
+
+        getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
+                .modelFile(existingModel)
+                .build());
+        simpleBlockItem(block, existingModel);
+    }
+
+    private void horizontalExistingModelRotated180WithItem(Block block, String existingBlockModelName) {
+        ModelFile existingModel = models().getExistingFile(
+                modLoc("block/" + existingBlockModelName)
+        );
+
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            int rotationY = ((int) direction.toYRot() + 180) % 360;
+            return ConfiguredModel.builder()
+                    .modelFile(existingModel)
+                    .rotationY(rotationY)
+                    .build();
+        });
         simpleBlockItem(block, existingModel);
     }
 

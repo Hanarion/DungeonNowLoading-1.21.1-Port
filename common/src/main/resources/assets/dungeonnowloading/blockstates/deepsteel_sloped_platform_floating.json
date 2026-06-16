@@ -1,12 +1,12 @@
 {
   "variants": {
-    "facing=north,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating" },
-    "facing=north,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating" },
-    "facing=east,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating", "y": 90 },
-    "facing=east,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating", "y": 90 },
-    "facing=south,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating", "y": 180 },
-    "facing=south,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating", "y": 180 },
-    "facing=west,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating", "y": 270 },
-    "facing=west,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating", "y": 270 }
+    "facing=north,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_stairs" },
+    "facing=north,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_stairs" },
+    "facing=east,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_stairs", "y": 90 },
+    "facing=east,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_stairs", "y": 90 },
+    "facing=south,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_stairs", "y": 180 },
+    "facing=south,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_stairs", "y": 180 },
+    "facing=west,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_stairs", "y": 270 },
+    "facing=west,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_stairs", "y": 270 }
   }
 }

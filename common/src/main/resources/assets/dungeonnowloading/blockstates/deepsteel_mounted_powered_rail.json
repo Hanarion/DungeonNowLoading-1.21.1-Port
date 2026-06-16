@@ -12,9 +12,9 @@
     { "when": { "powered": "true", "shape": "ascending_west" }, "apply": { "model": "minecraft:block/powered_rail_on_raised_sw", "y": 90 } },
     { "when": { "powered": "true", "shape": "east_west" }, "apply": { "model": "minecraft:block/powered_rail_on", "y": 90 } },
     { "when": { "powered": "true", "shape": "north_south" }, "apply": { "model": "minecraft:block/powered_rail_on" } },
-    { "when": { "shape": "ascending_south" }, "apply": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating_rail" } },
-    { "when": { "shape": "ascending_west" }, "apply": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating_rail", "y": 90 } },
-    { "when": { "shape": "ascending_north" }, "apply": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating_rail", "y": 180 } },
-    { "when": { "shape": "ascending_east" }, "apply": { "model": "dungeonnowloading:block/deepsteel_sloped_platform_floating_rail", "y": 270 } }
+    { "when": { "shape": "ascending_south" }, "apply": { "model": "dungeonnowloading:block/deepsteel_slope" } },
+    { "when": { "shape": "ascending_west" }, "apply": { "model": "dungeonnowloading:block/deepsteel_slope", "y": 90 } },
+    { "when": { "shape": "ascending_north" }, "apply": { "model": "dungeonnowloading:block/deepsteel_slope", "y": 180 } },
+    { "when": { "shape": "ascending_east" }, "apply": { "model": "dungeonnowloading:block/deepsteel_slope", "y": 270 } }
   ]
 }
