@@ -231,6 +231,8 @@ public class DNLForgeClientEvents {
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.WEBBING_BLOCK.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.WEBBING_NEST_BLOCK.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.SUSPENDED_WEB.get(), RenderType.cutout());
         });
     }

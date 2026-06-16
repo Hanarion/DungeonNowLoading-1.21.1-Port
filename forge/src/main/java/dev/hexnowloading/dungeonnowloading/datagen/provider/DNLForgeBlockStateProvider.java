@@ -123,6 +123,8 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
         multifaceWebCarpet(DNLBlocks.WEB_CARPET.get());
+        webbingBlock(DNLBlocks.WEBBING_BLOCK.get());
+        webbingNestBlock(DNLBlocks.WEBBING_NEST_BLOCK.get());
         suspendedWeb(DNLBlocks.SUSPENDED_WEB.get());
         burnacleSixWayWithStages(DNLBlocks.BURNACLE.get());
     }
@@ -1162,6 +1164,44 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         itemModels()
                 .withExistingParent(ModelProvider.ITEM_FOLDER + "/" + blockName, mcLoc(ModelProvider.ITEM_FOLDER + "/generated"))
                 .texture("layer0", modLoc("block/suspended_web_1"));
+    }
+
+    private void webbingBlock(Block block) {
+        ResourceLocation side = modLoc("block/webbing_block");
+        ResourceLocation top = modLoc("block/webbing_block_top");
+        ModelFile model = models()
+                .cubeBottomTop(name(block), side, top, top)
+                .renderType("cutout");
+
+        simpleBlock(block, model);
+        simpleBlockItem(block, model);
+    }
+
+    private void webbingNestBlock(Block block) {
+        ResourceLocation side = modLoc("block/webbing_block");
+        ResourceLocation top = modLoc("block/webbing_block_top");
+        ResourceLocation nest = modLoc("block/webbing_block_nest");
+        Map<Direction, ModelFile> modelsByFacing = Map.of(
+                Direction.DOWN, webbingNestModel(name(block) + "_down", top, top, nest, side, side, side),
+                Direction.UP, webbingNestModel(name(block) + "_up", top, top, nest, side, side, side),
+                Direction.NORTH, webbingNestModel(name(block) + "_north", top, top, nest, side, side, side),
+                Direction.SOUTH, webbingNestModel(name(block) + "_south", top, top, side, nest, side, side),
+                Direction.EAST, webbingNestModel(name(block) + "_east", top, top, side, side, nest, side),
+                Direction.WEST, webbingNestModel(name(block) + "_west", top, top, side, side, side, nest)
+        );
+
+        getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
+                .modelFile(modelsByFacing.get(state.getValue(WebbingNestBlock.FACING)))
+                .build());
+
+        simpleBlockItem(block, modelsByFacing.get(Direction.NORTH));
+    }
+
+    private ModelFile webbingNestModel(String modelName, ResourceLocation bottom, ResourceLocation top, ResourceLocation north, ResourceLocation south, ResourceLocation east, ResourceLocation west) {
+        return models()
+                .cube(modelName, bottom, top, north, south, east, west)
+                .texture("particle", north)
+                .renderType("cutout");
     }
 
     private ModelFile suspendedWebModel(String suffix) {

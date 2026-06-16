@@ -473,5 +473,7 @@
   "screen.dungeonnowloading.wispward_lantern_config.duration": "Duration",
   "screen.dungeonnowloading.wispward_lantern_cart_config": "Timed Wispward Lantern Cart",
   "screen.dungeonnowloading.wispward_lantern_cart_config.duration": "Duration",
+  "block.dungeonnowloading.webbing_block": "Webbing Block",
+  "block.dungeonnowloading.webbing_nest_block": "Webbing Nest Block",
   "block.dungeonnowloading.suspended_web": "Suspended Web"
 }

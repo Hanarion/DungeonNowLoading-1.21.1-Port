@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down": { "model": "dungeonnowloading:block/webbing_nest_block_down" },
+    "facing=east": { "model": "dungeonnowloading:block/webbing_nest_block_east" },
+    "facing=north": { "model": "dungeonnowloading:block/webbing_nest_block_north" },
+    "facing=south": { "model": "dungeonnowloading:block/webbing_nest_block_south" },
+    "facing=up": { "model": "dungeonnowloading:block/webbing_nest_block_up" },
+    "facing=west": { "model": "dungeonnowloading:block/webbing_nest_block_west" }
+  }
+}

@@ -157,6 +157,8 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
         this.add(DNLBlocks.WEB_CARPET.get(), this::addWebCarpetDrop);
+        this.dropSelf(DNLBlocks.WEBBING_BLOCK.get());
+        this.dropSelf(DNLBlocks.WEBBING_NEST_BLOCK.get());
         this.add(DNLBlocks.SUSPENDED_WEB.get(), this::addSuspendedWebDrop);
         this.dropSelf(DNLBlocks.BURNACLE.get());
     }

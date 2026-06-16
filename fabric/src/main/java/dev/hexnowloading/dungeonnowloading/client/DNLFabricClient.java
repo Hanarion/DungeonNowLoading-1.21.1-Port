@@ -163,6 +163,8 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WEB_CARPET.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WEBBING_BLOCK.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WEBBING_NEST_BLOCK.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SUSPENDED_WEB.get(), RenderType.cutout());
     }
 
