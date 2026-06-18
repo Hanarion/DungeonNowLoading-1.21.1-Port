@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hexnowloading.dungeonnowloading.block.MendingAuraBlock;
 import dev.hexnowloading.dungeonnowloading.block.client.renderer.MendingAuraBlockEntityRenderer;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -12,10 +11,12 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -35,6 +36,7 @@ public class MendingAuraOverlayRenderer {
     private static final int OVERLAY_TICKS = 40;
     private static final float MODEL_OVERLAY_OFFSET = 0.002F;
     private static final float SHAPE_OVERLAY_EPSILON = 0.001F;
+    private static final ResourceLocation MENDING_AURA_SPRITE = new ResourceLocation("dungeonnowloading", "block/mending_aura_0");
     private static final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> OVERLAY_REMAPPED_QUAD_CACHE = new IdentityHashMap<>();
 
     private MendingAuraOverlayRenderer() {
@@ -57,8 +59,7 @@ public class MendingAuraOverlayRenderer {
         }
 
         BlockRenderDispatcher dispatcher = minecraft.getBlockRenderer();
-        BakedModel mendingAuraModel = dispatcher.getBlockModel(DNLBlocks.MENDING_AURA.get().defaultBlockState());
-        TextureAtlasSprite auraSprite = mendingAuraModel.getParticleIcon();
+        TextureAtlasSprite auraSprite = minecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(MENDING_AURA_SPRITE);
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
         VertexConsumer translucentConsumer = bufferSource.getBuffer(RenderType.translucent());
 
@@ -87,7 +88,7 @@ public class MendingAuraOverlayRenderer {
             poseStack.translate(pos.getX() - cameraX, pos.getY() - cameraY, pos.getZ() - cameraZ);
             VertexConsumer alphaConsumer = new AlphaVertexConsumer(translucentConsumer, overlay.alpha());
             BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (shouldUseBlockEntityOverlay(state, storedModel, pos, blockEntity)) {
+            if (shouldUseOnlyBlockEntityOverlay(state, storedModel, pos, blockEntity)) {
                 minecraft.getBlockEntityRenderDispatcher().render(
                         blockEntity,
                         partialTick,
@@ -95,16 +96,6 @@ public class MendingAuraOverlayRenderer {
                         new MendingAuraBlockEntityOverlayBuffer(bufferSource, overlay.alpha())
                 );
             } else if (needsShapeOverlay(state, storedModel, pos)) {
-                if (blockEntity != null) {
-                    minecraft.getBlockEntityRenderDispatcher().render(
-                            blockEntity,
-                            partialTick,
-                            poseStack,
-                            new MendingAuraBlockEntityOverlayBuffer(bufferSource, overlay.alpha())
-                    );
-                    poseStack.popPose();
-                    continue;
-                }
                 renderShapeOverlay(state, level, pos, poseStack, alphaConsumer, auraSprite);
             } else {
                 dispatcher.getModelRenderer().renderModel(
@@ -118,6 +109,14 @@ public class MendingAuraOverlayRenderer {
                         LightTexture.FULL_BRIGHT,
                         0
                 );
+                if (blockEntity != null) {
+                    minecraft.getBlockEntityRenderDispatcher().render(
+                            blockEntity,
+                            partialTick,
+                            poseStack,
+                            new MendingAuraBlockEntityOverlayBuffer(bufferSource, overlay.alpha())
+                    );
+                }
             }
             poseStack.popPose();
         }
@@ -126,7 +125,7 @@ public class MendingAuraOverlayRenderer {
         bufferSource.endBatch(MendingAuraBlockEntityOverlayBuffer.RENDER_TYPE);
     }
 
-    private static boolean shouldUseBlockEntityOverlay(BlockState state, BakedModel model, BlockPos pos, BlockEntity blockEntity) {
+    private static boolean shouldUseOnlyBlockEntityOverlay(BlockState state, BakedModel model, BlockPos pos, BlockEntity blockEntity) {
         return blockEntity != null && (state.getRenderShape() != RenderShape.MODEL || needsShapeOverlay(state, model, pos));
     }
 
