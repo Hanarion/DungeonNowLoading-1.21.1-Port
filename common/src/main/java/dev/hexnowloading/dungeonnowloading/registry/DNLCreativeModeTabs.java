@@ -211,6 +211,9 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
                 output.accept(DNLItems.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
                 output.accept(DNLItems.WEB_CARPET.get());
+                output.accept(DNLItems.WEBBING_BLOCK.get());
+                output.accept(DNLItems.WEBBING_NEST_BLOCK.get());
+                output.accept(DNLItems.SUSPENDED_WEB.get());
                 output.accept(DNLItems.BURNACLE.get());
                 output.accept(DNLItems.WISPWARD_CHEST.get());
                 output.accept(DNLItems.WISPWARD_LANTERN.get());

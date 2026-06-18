@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:block/cube",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "down": "dungeonnowloading:block/webbing_block_top",
+    "east": "dungeonnowloading:block/webbing_block",
+    "north": "dungeonnowloading:block/webbing_block",
+    "particle": "dungeonnowloading:block/webbing_block_nest",
+    "south": "dungeonnowloading:block/webbing_block_nest",
+    "up": "dungeonnowloading:block/webbing_block_top",
+    "west": "dungeonnowloading:block/webbing_block"
+  }
+}

@@ -198,6 +198,9 @@ public class DNLItems {
     public static final Supplier<Item> WISPWARD_LANTERN = register("wispward_lantern", () -> new BlockItem(DNLBlocks.WISPWARD_LANTERN.get(), new Item.Properties()));
     public static final Supplier<Item> TIMED_WISPWARD_LANTERN = register("timed_wispward_lantern", () -> new BlockItem(DNLBlocks.TIMED_WISPWARD_LANTERN.get(), new Item.Properties()));
     public static final Supplier<Item> WEB_CARPET = register("web_carpet", () -> new BlockItem(DNLBlocks.WEB_CARPET.get(), new Item.Properties()));
+    public static final Supplier<Item> WEBBING_BLOCK = register("webbing_block", () -> new BlockItem(DNLBlocks.WEBBING_BLOCK.get(), new Item.Properties()));
+    public static final Supplier<Item> WEBBING_NEST_BLOCK = register("webbing_nest_block", () -> new BlockItem(DNLBlocks.WEBBING_NEST_BLOCK.get(), new Item.Properties()));
+    public static final Supplier<Item> SUSPENDED_WEB = register("suspended_web", SuspendedWebBlockItem::new);
     public static final Supplier<Item> BURNACLE = register("burnacle", () -> new BlockItem(DNLBlocks.BURNACLE.get(), new Item.Properties()));
     public static final Supplier<Item> WISPWARD_CHEST = register("wispward_chest", () -> new BlockItem(DNLBlocks.WISPWARD_CHEST.get(), new Item.Properties()));
 
