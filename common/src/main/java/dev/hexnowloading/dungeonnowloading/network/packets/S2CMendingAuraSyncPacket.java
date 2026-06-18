@@ -5,6 +5,7 @@ import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
 import dev.hexnowloading.dungeonnowloading.network.ClientUtil;
 import dev.hexnowloading.dungeonnowloading.network.DNLPacket;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -60,9 +61,17 @@ public class S2CMendingAuraSyncPacket implements DNLPacket {
             }
             if (level.getBlockState(pos).getBlock() instanceof MendingAuraBlock) {
                 level.sendBlockUpdated(pos, auraState, auraState, Block.UPDATE_CLIENTS);
-                level.setBlocksDirty(pos, auraState, auraState);
+                markRenderDirty(level, pos);
+                for (Direction direction : Direction.values()) {
+                    markRenderDirty(level, pos.relative(direction));
+                }
             }
         });
+    }
+
+    private static void markRenderDirty(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        level.setBlocksDirty(pos, state, state);
     }
 
     private static CompoundTag encodeBlockState(BlockState state) {
