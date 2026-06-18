@@ -32,7 +32,9 @@ public class DNLFabric implements ModInitializer {
         //DungeonNowLoading.LOGGER.info("Hello Fabric world!");
     }
 
-    private void registerEvents() { DNLFabricBlockEvents.init(); }
+    private void registerEvents() {
+        DNLFabricBlockEvents.init();
+    }
 
     private void registerEntityAttributes() {
         for (EntityType<? extends LivingEntity> type : DNLEntityTypes.getAllAttributes().keySet()) {

@@ -1,0 +1,692 @@
+{
+  "entries": [
+    {
+      "item": "minecraft:porkchop",
+      "durability": 80,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:cooked_porkchop",
+      "durability": 80,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:beef",
+      "durability": 80,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:cooked_beef",
+      "durability": 80,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:chicken",
+      "durability": 60,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:cooked_chicken",
+      "durability": 60,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:mutton",
+      "durability": 60,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:cooked_mutton",
+      "durability": 60,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:salmon",
+      "durability": 60,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:salmon_bucket",
+      "food_id": "minecraft:salmon",
+      "durability": 60,
+      "usage_count": 0,
+      "description": ["item.dungeonnowloading.mimicling.food.return_water_bucket"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:water_bucket"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:cooked_salmon",
+      "durability": 60,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:cod",
+      "durability": 50,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:cod_bucket",
+      "food_id": "minecraft:cod",
+      "durability": 50,
+      "usage_count": 0,
+      "description": ["item.dungeonnowloading.mimicling.food.return_water_bucket"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:water_bucket"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:cooked_cod",
+      "durability": 50,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:rabbit",
+      "durability": 50,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:cooked_rabbit",
+      "durability": 50,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:rotten_flesh",
+      "durability": 20,
+      "usage_count": 100,
+      "description": ["item.dungeonnowloading.mimicling.food.rotten_flesh"],
+      "effects": [
+        {
+          "trigger": "while_in_inventory",
+          "action": "drain_durability_over_time",
+          "amount": 1,
+          "interval_ticks": 60
+        }
+      ]
+    },
+    {
+      "item": "minecraft:egg",
+      "durability": 30,
+      "usage_count": 0
+    },
+    {
+      "item": "minecraft:turtle_egg",
+      "durability": 50,
+      "usage_count": 50,
+      "description": ["item.dungeonnowloading.mimicling.food.turtle_egg"],
+      "effects": [
+        {
+          "trigger": "while_in_hand",
+          "action": "remove_underwater_mining_penalty",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "penalty_reduction": 1.0
+        },
+        {
+          "trigger": "on_break",
+          "action": "grant_air",
+          "bubbles": 3
+        }
+      ]
+    },
+    {
+      "item": "minecraft:axolotl_bucket",
+      "durability": 14,
+      "usage_count": 0,
+      "description": ["item.dungeonnowloading.mimicling.food.axolotl_bucket"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:water_bucket"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:tadpole_bucket",
+      "durability": 6,
+      "usage_count": 0,
+      "description": ["item.dungeonnowloading.mimicling.food.tadpole_bucket"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:water_bucket"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:rabbit_stew",
+      "durability": 50,
+      "usage_count": 0,
+      "description": ["item.dungeonnowloading.mimicling.food.return_rabbitless_rabbit_stew"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "dungeonnowloading:rabbitless_rabbit_stew"
+        }
+      ]
+    },
+    {
+      "item": "dungeonnowloading:mimic_mucus",
+      "durability": 10,
+      "usage_count": 0,
+      "description": ["item.dungeonnowloading.mimicling.food.mimic_mucus"],
+      "effects": [
+          {
+            "trigger": "on_fed",
+            "action": "increase_capacity",
+            "required_count": 2
+          }
+      ]
+    },
+    {
+      "item": "minecraft:slime_ball",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.slime_ball"],
+      "effects": [
+        {
+          "trigger": "on_kill",
+          "action": "summon_entities_at_death",
+          "chance": 0.5,
+          "count": 2,
+          "motion": {
+            "upward": 0.25,
+            "horizontal": 0.18,
+            "opposite_pairs": true
+          },
+          "copy_status_effects": {
+            "duration_multiplier": 0.5,
+            "level_multiplier": 0.5,
+            "min_duration": 1
+          },
+          "entities": [
+            {
+              "type": "killed_entity",
+              "nbt": "{Age:-24000,IsBaby:1b}",
+              "nbt_overrides": [
+                {
+                  "when_killed": "minecraft:slime",
+                  "copy_killed_nbt": [
+                    {
+                      "from": "Size",
+                      "to": "Size",
+                      "map": {
+                        "3": 1,
+                        "1": 0
+                      },
+                      "fail_unmapped": true,
+                      "min": 0
+                    }
+                  ]
+                },
+                {
+                  "when_killed": "minecraft:magma_cube",
+                  "copy_killed_nbt": [
+                    {
+                      "from": "Size",
+                      "to": "Size",
+                      "map": {
+                        "3": 1,
+                        "1": 0
+                      },
+                      "fail_unmapped": true,
+                      "min": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:zombie_head",
+      "durability": 500,
+      "usage_count": 900,
+      "description": ["item.dungeonnowloading.mimicling.food.zombie_head"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:skeleton_skull"
+        },
+        {
+          "trigger": "while_in_inventory",
+          "action": "drain_durability_over_time",
+          "amount": 1,
+          "interval_ticks": 20
+        }
+      ]
+    },
+    {
+      "item": "minecraft:player_head",
+      "durability": 500,
+      "usage_count": 0,
+      "description": ["item.dungeonnowloading.mimicling.food.return_skeleton_skull"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:skeleton_skull"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:tropical_fish",
+      "durability": 1,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.tropical_fish"],
+      "effects": [
+        {
+          "trigger": "on_break",
+          "action": "auto_switch_unsuited_tool"
+        },
+        {
+          "trigger": "on_attack",
+          "action": "auto_switch_unsuited_tool"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:tropical_fish_bucket",
+      "food_id": "minecraft:tropical_fish",
+      "durability": 1,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.tropical_fish_bucket"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:water_bucket"
+        },
+        {
+          "trigger": "on_break",
+          "action": "auto_switch_unsuited_tool"
+        },
+        {
+          "trigger": "on_attack",
+          "action": "auto_switch_unsuited_tool"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:sea_pickle",
+      "durability": 5,
+      "usage_count": 5,
+      "description": ["item.dungeonnowloading.mimicling.food.sea_pickle"],
+      "effects": [
+        {
+          "trigger": "while_in_hand",
+          "action": "remove_underwater_mining_penalty",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "penalty_reduction": 0.5
+        },
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "id": "sea_pickle_glowing_attack",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "effects": [
+            { "effect": "minecraft:glowing", "amplifier": 0, "duration": 60 }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:ink_sac",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.ink_sac"],
+      "effects": [
+        {
+          "trigger": "while_in_hand",
+          "action": "remove_underwater_mining_penalty",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "penalty_reduction": 1.0
+        },
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "forms": ["sword", "axe"],
+          "effects": [
+            { "effect": "minecraft:blindness", "amplifier": 0, "duration": 100 }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:glow_ink_sac",
+      "durability": 10,
+      "usage_count": 30,
+      "description": ["item.dungeonnowloading.mimicling.food.glow_ink_sac"],
+      "effects": [
+        {
+          "trigger": "while_in_hand",
+          "action": "remove_underwater_mining_penalty",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "penalty_reduction": 1.0
+        },
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "id": "glow_ink_sac_glowing_attack",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "effects": [
+            { "effect": "minecraft:glowing", "amplifier": 0, "duration": 600 }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:pufferfish",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.pufferfish"],
+      "effects": [
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "id": "pufferfish_poison_attack",
+          "effects": [
+            { "effect": "minecraft:poison", "amplifier": 1, "duration": 200 },
+            { "effect": "minecraft:hunger", "amplifier": 2, "duration": 200 },
+            { "effect": "minecraft:nausea", "amplifier": 0, "duration": 200 }
+          ]
+        },
+        {
+          "trigger": "change_drop",
+          "action": "roll_loot_table",
+          "id": "pufferfish_potato_drop",
+          "target_blocks": ["minecraft:potatoes"],
+          "loot_table": "dungeonnowloading:mimicling/pufferfish_potatoes",
+          "replace": true
+        },
+        {
+          "trigger": "change_break_area",
+          "action": "same_or_softer_neighbors",
+          "forms": ["pickaxe", "axe", "shovel", "hoe"],
+          "area": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        }
+      ]
+    },
+    {
+      "item": "minecraft:pufferfish_bucket",
+      "food_id": "minecraft:pufferfish",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.pufferfish_bucket"],
+      "effects": [
+        {
+          "trigger": "on_fed",
+          "action": "return_item",
+          "return_item": "minecraft:water_bucket"
+        },
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "id": "pufferfish_poison_attack",
+          "effects": [
+            { "effect": "minecraft:poison", "amplifier": 1, "duration": 200 },
+            { "effect": "minecraft:hunger", "amplifier": 2, "duration": 200 },
+            { "effect": "minecraft:nausea", "amplifier": 0, "duration": 200 }
+          ]
+        },
+        {
+          "trigger": "change_drop",
+          "action": "roll_loot_table",
+          "id": "pufferfish_potato_drop",
+          "target_blocks": ["minecraft:potatoes"],
+          "loot_table": "dungeonnowloading:mimicling/pufferfish_potatoes",
+          "replace": true
+        },
+        {
+          "trigger": "change_break_area",
+          "action": "same_or_softer_neighbors",
+          "forms": ["pickaxe", "axe", "shovel", "hoe"],
+          "area": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        }
+      ]
+    },
+    {
+      "item": "minecraft:piglin_head",
+      "durability": 500,
+      "usage_count": 500,
+      "description": ["item.dungeonnowloading.mimicling.food.piglin_head"],
+      "effects": [
+        {
+          "trigger": "change_drop",
+          "action": "roll_loot_table",
+          "id": "piglin_head_gold_bartering_drop",
+          "forms": ["pickaxe"],
+          "target_blocks": ["minecraft:gold_ore", "minecraft:deepslate_gold_ore", "minecraft:nether_gold_ore"],
+          "loot_table": "minecraft:gameplay/piglin_bartering",
+          "replace": true
+        }
+      ]
+    },
+    {
+      "item": "minecraft:spider_eye",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.spider_eye"],
+      "effects": [
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "id": "spider_eye_poison_attack",
+          "effects": [
+            { "effect": "minecraft:poison", "amplifier": 0, "duration": 100 }
+          ]
+        },
+        {
+          "trigger": "change_drop",
+          "action": "roll_loot_table",
+          "id": "spider_eye_potato_drop",
+          "target_blocks": ["minecraft:potatoes"],
+          "loot_table": "dungeonnowloading:mimicling/spider_eye_potatoes",
+          "replace": true
+        }
+      ]
+    },
+    {
+      "item": "minecraft:rabbit_foot",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.rabbit_foot"],
+      "effects": [
+        {
+          "trigger": "apply_non_potion_effect",
+          "action": "jump_up",
+          "blocks": 3
+        },
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "effects": [
+            { "effect": "minecraft:jump_boost", "amplifier": 1, "duration": 600 }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:phantom_membrane",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.phantom_membrane"],
+      "effects": [
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "effects": [
+            { "effect": "minecraft:slow_falling", "amplifier": 0, "duration": 600 }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:magma_cream",
+      "durability": 10,
+      "usage_count": 50,
+      "description": ["item.dungeonnowloading.mimicling.food.magma_cream"],
+      "effects": [
+        {
+          "trigger": "while_in_hand",
+          "id": "magma_cream_fire_aspect",
+          "forms": ["sword", "axe"],
+          "action": "modify_enchantment",
+          "enchantment": "minecraft:fire_aspect",
+          "operation": "add",
+          "level": 1
+        },
+        {
+          "trigger": "change_drop",
+          "id": "magma_cream_auto_smelt",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "action": "auto_smelt"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:fermented_spider_eye",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.fermented_spider_eye"],
+      "effects": [
+        {
+          "trigger": "reference_potion_effect",
+          "action": "convert_potion_effect",
+          "conversions": [
+            {
+              "from": "minecraft:strength",
+              "to": "minecraft:weakness"
+            },
+            {
+              "from": "minecraft:poison",
+              "to": "minecraft:instant_damage",
+              "copy_duration": false
+            },
+            {
+              "from": "minecraft:speed",
+              "to": "minecraft:slowness"
+            },
+            {
+              "from": "minecraft:jump_boost",
+              "to": "minecraft:slowness"
+            },
+            {
+              "from": "minecraft:night_vision",
+              "to": "minecraft:invisibility"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:ender_eye",
+      "durability": 10,
+      "usage_count": 5,
+      "description": ["item.dungeonnowloading.mimicling.food.ender_eye"],
+      "effects": [
+        {
+          "trigger": "while_in_hand",
+          "action": "extend_reach",
+          "range": 12
+        }
+      ]
+    },
+    {
+      "item": "minecraft:ender_pearl",
+      "durability": 10,
+      "usage_count": 10,
+      "description": ["item.dungeonnowloading.mimicling.food.ender_pearl"],
+      "effects": [
+        {
+          "trigger": "change_mob_position",
+          "action": "swap_positions"
+        },
+        {
+          "trigger": "change_drop",
+          "action": "collect_drops_to_inventory",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"]
+        }
+      ]
+    },
+    {
+      "item": "minecraft:dragon_head",
+      "durability": 0,
+      "usage_count": 0,
+      "infinite_usage": true,
+      "description": ["item.dungeonnowloading.mimicling.food.dragon_head"],
+      "effects": [
+        {
+          "trigger": "reference_potion_effect",
+          "action": "death_effect_cloud"
+        }
+      ]
+    },
+    {
+      "item": "minecraft:dragon_egg",
+      "durability": 0,
+      "usage_count": 0,
+      "infinite_usage": true,
+      "description": ["item.dungeonnowloading.mimicling.food.dragon_egg"],
+      "effects": [
+        {
+          "trigger": "change_drop",
+          "action": "drop_loot_as_falling_blocks",
+          "radius": 32,
+          "min_height": 5,
+          "max_height": 10,
+          "fallback_min_height": 3,
+          "random_radius": 16,
+          "max_lead": 6
+        }
+      ]
+    },
+    {
+      "item": "minecraft:sniffer_egg",
+      "durability": 500,
+      "usage_count": 100,
+      "description": ["item.dungeonnowloading.mimicling.food.sniffer_egg"],
+      "effects": [
+        {
+          "trigger": "on_break",
+          "action": "trail_to_matching_block",
+          "horizontal_range": 16,
+          "vertical_range": 10,
+          "particle": "dungeonnowloading:sniffer_trail",
+          "particle_lifetime": 200,
+          "steps": 24
+        },
+        {
+          "trigger": "on_kill",
+          "action": "trail_to_matching_entity",
+          "horizontal_range": 64,
+          "vertical_range": 64,
+          "particle": "dungeonnowloading:sniffer_trail",
+          "particle_lifetime": 200,
+          "steps": 32
+        }
+      ]
+    }
+  ]
+}

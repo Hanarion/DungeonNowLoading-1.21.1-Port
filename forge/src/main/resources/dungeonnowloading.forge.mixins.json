@@ -7,6 +7,9 @@
     "mixins": [
       "ServerLevelMixin",
       "block.BlockDestroyCancelMixin",
+      "block.MimiclingBlockSmeltTransformMixin",
+      "block.MimiclingBlockDropsMixin",
+      "block.MimiclingReachServerGameModeMixin",
       "block.PlayerBlockDestroyCancelMixin",
       "block.EnchantmentHelperMixin",
       "block.ExplosionMixin",
@@ -24,6 +27,9 @@
       "items.ShearsItemMixin",
       "items.SwordItemMixin",
       "entities.EntityAvoidBlockMixin",
+      "entities.MimiclingLivingEntityMixin",
+      "entities.MimiclingPlayerMixin",
+      "entities.MimiclingReachServerPacketMixin",
       "entities.ServerPlayerMixin",
       "entities.PlayerMixin",
       "entities.MobMixin",
@@ -38,6 +44,7 @@
       "forge.block.FlintAndSteelMixin",
       "forge.block.DNLFireBlockMixin",
       "forge.structures.StructurePoolMixin",
+      "inventory.AbstractContainerMenuMixin",
       "inventory.AnvilMenuMixin"
     ],
     "client": [
@@ -50,6 +57,9 @@
       "forge.item.WisplightRodItemMixin",
       "client.AnimatedBlockDestroyOverlayLevelRendererMixin",
       "client.HumanoidModelMixin",
+      "client.AbstractContainerScreenMixin",
+      "client.CreativeModeInventoryScreenMixin",
+      "client.ClientTooltipComponentMixin",
       "client.PlayerRendererMixin",
       "client.ClientPacketListenerMixin",
       "client.AbstractClientPlayerMixin",
@@ -61,6 +71,10 @@
       "client.ModelManagerAccessor",
       "client.WisplightRodItemRendererMixin",
       "client.LivingEntityRendererMixin",
+      "client.MimiclingEnderEyeOutlineMixin",
+      "client.MimiclingReachGameRendererMixin",
+      "client.MimiclingReachClientGameModeMixin",
+      "MixinMinecraft",
       "MixinTitleScreen",
       "MaxHealthAttributeMixin"
     ],

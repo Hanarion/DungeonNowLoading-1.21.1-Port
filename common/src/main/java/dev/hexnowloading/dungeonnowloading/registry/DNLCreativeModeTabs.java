@@ -57,6 +57,9 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.WISPWARD_LANTERN_CART.get());
                 output.accept(DNLItems.TIMED_WISPWARD_LANTERN_CART.get());
                 output.accept(DNLItems.WISPLIGHT_ROD.get());
+                output.accept(DNLItems.MIMIC_MUCUS.get());
+                output.accept(DNLItems.RABBITLESS_RABBIT_STEW.get());
+                output.accept(DNLItems.MIMICLING.get());
                 // Items - Tools
                 output.accept(DNLItems.MENDSTONE_CHALK.get());
                 output.accept(DNLItems.MENDSTONE_PICKAXE.get());

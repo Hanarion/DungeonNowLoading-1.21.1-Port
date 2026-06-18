@@ -13,6 +13,7 @@ import dev.hexnowloading.dungeonnowloading.entity.client.model.seeping_soul.Seep
 import dev.hexnowloading.dungeonnowloading.entity.client.model.seeping_soul.SeepingSoulSerpentCallerModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
+import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.item.client.model.WisplightRodModel;
@@ -31,6 +32,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -38,6 +40,7 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -230,6 +233,7 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.MIMICART.get(), MimicartRenderer::new);
+        EntityRendererRegistry.register(DNLEntityTypes.MIMICLING_FALLING_BLOCK.get(), MimiclingFallingBlockRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.WISPWARD_LANTERN_CART.get(), WispwardLanternCartRenderer::new);
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
@@ -262,6 +266,41 @@ public class DNLFabricClient implements ClientModInitializer {
         ItemProperties.register(DNLItems.REPULSOR.get(), new ResourceLocation("golden_mode"),
                 (stack, level, entity, seed) -> RepulsorItem.isGoldenMode(stack) ? 1.0F : 0.0F);
 
+        for (Item mimiclingItem : getMimiclingItems()) {
+            for (int frame = 0; frame < 15; frame++) {
+                int currentFrame = frame;
+                ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_chewing_frame_" + currentFrame),
+                        (stack, level, entity, seed) -> MimiclingItem.isChewingFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
+            }
+
+            for (int frame = 0; frame < 3; frame++) {
+                int currentFrame = frame;
+                ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_open_frame_" + currentFrame),
+                        (stack, level, entity, seed) -> MimiclingFeedHintHandler.isOpenFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
+            }
+
+            String[] mimiclingForms = {"base", "pickaxe", "axe", "shovel", "hoe", "sword"};
+            int[] mimiclingFrameCounts = {10, 9, 9, 8, 8, 8};
+            for (int formIndex = 0; formIndex < mimiclingForms.length; formIndex++) {
+                String form = mimiclingForms[formIndex];
+                int frameCount = mimiclingFrameCounts[formIndex];
+                ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_form_" + form),
+                        (stack, level, entity, seed) -> MimiclingItem.isForm(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, form) ? 1.0F : 0.0F);
+
+                for (int frame = 0; frame < frameCount; frame++) {
+                    int currentFrame = frame;
+                    ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_" + form + "_frame_" + currentFrame),
+                            (stack, level, entity, seed) -> MimiclingItem.isTransitionFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, form, currentFrame, frameCount) ? 1.0F : 0.0F);
+                }
+            }
+
+            ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mucus"),
+                    (stack, level, entity, seed) -> MimiclingItem.isMucus(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L) ? 1.0F : 0.0F);
+        }
+    }
+
+    private static Item[] getMimiclingItems() {
+        return DNLItems.getMimiclingItems();
     }
 
     private void registerModelLayers() {
@@ -343,6 +382,8 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.WISPWARD_FLAME_TRAVEL_PARTICLE.get(), WispwardFlameTravelParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
         registry.register(DNLParticleTypes.BURNACLE_GAS_PARTICLE.get(), BurnacleGasParticle.Factory::new);
+        registry.register(DNLParticleTypes.SNIFFER_TRAIL_PARTICLE.get(), SnifferTrailParticle.Factory::new);
+        registry.register(DNLParticleTypes.MIMICLING_IMPACT_BLOCK_PARTICLE.get(), new MimiclingImpactBlockParticle.Factory());
     }
 
     private static void addDnlEnchantmentDescriptions(ItemStack stack, List<Component> lines) {

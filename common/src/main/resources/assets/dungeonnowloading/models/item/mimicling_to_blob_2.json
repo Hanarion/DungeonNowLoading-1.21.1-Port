@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "dungeonnowloading:item/mimicling/base/mimicling_to_blob_2"
+  }
+}

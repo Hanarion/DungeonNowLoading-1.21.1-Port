@@ -1,0 +1,326 @@
+{
+    "parent":  "item/handheld",
+    "textures":  {
+                     "layer0":  "dungeonnowloading:item/mimicling/sword/mimicling_sword_static"
+                 },
+    "overrides":  [
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_0":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_0"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_1":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_1"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_2":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_2"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_3":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_3"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_4":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_4"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_5":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_5"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_6":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_6"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_7":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_7"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_8":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_8"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_base_frame_9":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_to_blob_9"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_0":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_0"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_1":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_1"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_2":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_2"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_3":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_3"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_4":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_4"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_5":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_5"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_6":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_6"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_7":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_7"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_pickaxe_frame_8":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_pickaxe_to_blob_8"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_0":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_0"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_1":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_1"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_2":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_2"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_3":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_3"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_4":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_4"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_5":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_5"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_6":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_6"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_7":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_7"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_axe_frame_8":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_axe_to_blob_8"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_shovel_frame_0":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_shovel_to_blob_0"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_shovel_frame_1":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_shovel_to_blob_1"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_shovel_frame_2":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_shovel_to_blob_2"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_shovel_frame_3":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_shovel_to_blob_3"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_shovel_frame_4":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_shovel_to_blob_4"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_shovel_frame_5":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_shovel_to_blob_5"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_shovel_frame_6":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_shovel_to_blob_6"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_shovel_frame_7":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_shovel_to_blob_7"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_hoe_frame_0":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_hoe_to_blob_0"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_hoe_frame_1":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_hoe_to_blob_1"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_hoe_frame_2":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_hoe_to_blob_2"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_hoe_frame_3":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_hoe_to_blob_3"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_hoe_frame_4":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_hoe_to_blob_4"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_hoe_frame_5":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_hoe_to_blob_5"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_hoe_frame_6":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_hoe_to_blob_6"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_hoe_frame_7":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_hoe_to_blob_7"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_sword_frame_0":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_sword_to_blob_0"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_sword_frame_1":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_sword_to_blob_1"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_sword_frame_2":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_sword_to_blob_2"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_sword_frame_3":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_sword_to_blob_3"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_sword_frame_4":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_sword_to_blob_4"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_sword_frame_5":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_sword_to_blob_5"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_sword_frame_6":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_sword_to_blob_6"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mimicling_sword_frame_7":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_sword_to_blob_7"
+                      },
+                      {
+                          "predicate":  {
+                                            "dungeonnowloading:mucus":  1.0
+                                        },
+                          "model":  "dungeonnowloading:item/mimicling_mucus"
+                      }
+                  ]
+}

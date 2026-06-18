@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.mixin;
 
 import dev.hexnowloading.dungeonnowloading.Constants;
+import dev.hexnowloading.dungeonnowloading.client.MimiclingPickBlockHandler;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,5 +16,12 @@ public class MixinMinecraft {
         
         Constants.LOG.info("This line is printed by an example mod common mixin!");
         Constants.LOG.info("MC Version: {}", Minecraft.getInstance().getVersionType());
+    }
+
+    @Inject(method = "pickBlock", at = @At("HEAD"), cancellable = true)
+    private void dnl$pickBlockWithMimicling(CallbackInfo info) {
+        if (MimiclingPickBlockHandler.handlePickBlock((Minecraft)(Object)this)) {
+            info.cancel();
+        }
     }
 }

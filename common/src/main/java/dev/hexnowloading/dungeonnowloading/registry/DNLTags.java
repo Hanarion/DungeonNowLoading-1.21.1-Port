@@ -35,6 +35,10 @@ public class DNLTags {
     public static final TagKey<Block> MENDING_AURAS = registerBlockTag("mending_auras");
     public static final TagKey<Block> CHESTS = registerBlockTag("chests");
     public static final TagKey<Block> PRESERVER_INSTANT_REPAIR = registerBlockTag("preserver_instant_repair");
+    public static final TagKey<Block> MIMICLING_HOE_HARVESTABLE = registerBlockTag("mimicling_hoe_harvestable");
+    public static final TagKey<Block> MIMICLING_SHOVEL_HOE_CYCLE = registerBlockTag("mimicling_shovel_hoe_cycle");
+    public static final TagKey<Block> MIMICLING_CAMPFIRE_AXE_SHOVEL_CYCLE = registerBlockTag("mimicling_campfire_axe_shovel_cycle");
+    public static final TagKey<Block> MIMICLING_WAXED_PICKAXE_AXE_CYCLE = registerBlockTag("mimicling_waxed_pickaxe_axe_cycle");
     public static final TagKey<Structure> NO_GEODES_TAG = registerStructureTag("no_geodes");
     public static final TagKey<Structure> TEMPLE_OF_DUALITY = registerStructureTag("temple_of_duality");
     public static final TagKey<Structure> LABYRINTH = registerStructureTag("labyrinth");

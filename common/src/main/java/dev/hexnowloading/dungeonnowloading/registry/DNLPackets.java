@@ -12,6 +12,8 @@ public class DNLPackets {
         Services.NETWORK.register("serverbound_wispward_chest_config", C2SWispwardChestConfigPacket.class, C2SWispwardChestConfigPacket::decode);
         Services.NETWORK.register("serverbound_wispward_lantern_config", C2SWispwardLanternConfigPacket.class, C2SWispwardLanternConfigPacket::decode);
         Services.NETWORK.register("serverbound_wispward_lantern_cart_config", C2SWispwardLanternCartConfigPacket.class, C2SWispwardLanternCartConfigPacket::decode);
+        Services.NETWORK.register("serverbound_mimicling_transform", C2SMimiclingTransformPacket.class, C2SMimiclingTransformPacket::decode);
+        Services.NETWORK.register("serverbound_mimicling_select_slot", C2SMimiclingSelectSlotPacket.class, C2SMimiclingSelectSlotPacket::decode);
     }
 
     public static void registerClientbound() {

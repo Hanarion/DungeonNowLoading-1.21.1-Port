@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.registry;
 
 import dev.hexnowloading.dungeonnowloading.particle.type.*;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,6 +28,13 @@ public class DNLParticleTypes {
     public static final Supplier<MendingFadeParticleType> MENDING_FADE_PARTICLE = register("mending_fade", () -> new MendingFadeParticleType(false));
     public static final Supplier<MendingFadeParticleType> WISPWARD_FLAME_TRAVEL_PARTICLE = register("wispward_flame_travel", () -> new MendingFadeParticleType(false));
     public static final Supplier<SimpleParticleType> BURNACLE_GAS_PARTICLE = register("burnacle_gas", () -> new SimpleParticleTypeOverride(false));
+    public static final Supplier<ParticleType<SnifferTrailParticleType.Data>> SNIFFER_TRAIL_PARTICLE = register("sniffer_trail", () -> new SnifferTrailParticleType(false));
+    public static final Supplier<ParticleType<BlockParticleOption>> MIMICLING_IMPACT_BLOCK_PARTICLE = register("mimicling_impact_block", () -> new ParticleType<BlockParticleOption>(false, BlockParticleOption.DESERIALIZER) {
+        @Override
+        public com.mojang.serialization.Codec<BlockParticleOption> codec() {
+            return BlockParticleOption.codec(this);
+        }
+    });
 
 
     public static final Supplier<ParticleType<ScalableParticleType.ScalableParticleData>> VERTEX_SPARK_PARTICLE = register("vertex_spark", () -> new ScalableParticleType(false));

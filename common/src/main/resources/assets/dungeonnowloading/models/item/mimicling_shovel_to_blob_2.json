@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "dungeonnowloading:item/mimicling/shovel/mimicling_shovel_to_blob_2"
+  }
+}

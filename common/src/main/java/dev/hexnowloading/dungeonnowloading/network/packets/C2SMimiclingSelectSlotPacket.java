@@ -1,0 +1,82 @@
+package dev.hexnowloading.dungeonnowloading.network.packets;
+
+import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
+import dev.hexnowloading.dungeonnowloading.network.DNLPacket;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
+import javax.annotation.Nullable;
+
+public class C2SMimiclingSelectSlotPacket implements DNLPacket {
+    private final int containerId;
+    private final int slotIndex;
+    private final int delta;
+    private final boolean foodMode;
+
+    public C2SMimiclingSelectSlotPacket(int containerId, int slotIndex, int delta) {
+        this(containerId, slotIndex, delta, false);
+    }
+
+    public C2SMimiclingSelectSlotPacket(int containerId, int slotIndex, int delta, boolean foodMode) {
+        this.containerId = containerId;
+        this.slotIndex = slotIndex;
+        this.delta = delta;
+        this.foodMode = foodMode;
+    }
+
+    public C2SMimiclingSelectSlotPacket(FriendlyByteBuf buf) {
+        this.containerId = buf.readVarInt();
+        this.slotIndex = buf.readVarInt();
+        this.delta = buf.readVarInt();
+        this.foodMode = buf.readBoolean();
+    }
+
+    @Override
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeVarInt(containerId);
+        buf.writeVarInt(slotIndex);
+        buf.writeVarInt(delta);
+        buf.writeBoolean(foodMode);
+    }
+
+    public static C2SMimiclingSelectSlotPacket decode(FriendlyByteBuf buf) {
+        return new C2SMimiclingSelectSlotPacket(buf);
+    }
+
+    @Override
+    public void handle(@Nullable ServerPlayer sender) {
+        if (sender == null || sender.containerMenu.containerId != containerId || slotIndex < 0 || slotIndex >= sender.containerMenu.slots.size()) {
+            return;
+        }
+
+        Slot slot = sender.containerMenu.slots.get(slotIndex);
+        ItemStack stack = slot.getItem();
+        ItemStack carriedStack = sender.containerMenu.getCarried();
+        boolean changed = delta == 0
+                ? selectHoveredSlot(stack, carriedStack)
+                : scrollSelectedSlot(stack, carriedStack);
+        if (changed) {
+            slot.setChanged();
+        }
+    }
+
+    private boolean scrollSelectedSlot(ItemStack stack, ItemStack carriedStack) {
+        if (foodMode) {
+            return MimiclingItem.tryScrollSelectedActiveFoodSlot(stack, delta);
+        }
+
+        return carriedStack.isEmpty()
+                ? MimiclingItem.tryScrollSelectedSlot(stack, delta)
+                : MimiclingItem.tryScrollSelectedFoodSlot(stack, carriedStack, delta);
+    }
+
+    private boolean selectHoveredSlot(ItemStack stack, ItemStack carriedStack) {
+        if (carriedStack.isEmpty()) {
+            return MimiclingItem.trySelectNextOccupiedSlotIfSelectedEmpty(stack);
+        }
+
+        return MimiclingItem.trySelectDedicatedSlot(stack, carriedStack);
+    }
+}

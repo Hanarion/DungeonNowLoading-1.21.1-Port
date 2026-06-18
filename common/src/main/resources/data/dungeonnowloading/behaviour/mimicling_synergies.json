@@ -1,0 +1,71 @@
+{
+  "synergies": [
+    {
+      "items": ["minecraft:pufferfish", "minecraft:spider_eye"],
+      "disable": ["pufferfish_poison_attack", "pufferfish_potato_drop", "spider_eye_poison_attack", "spider_eye_potato_drop"],
+      "effects": [
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "id": "pufferfish_spider_eye_poison_attack",
+          "effects": [
+            { "effect": "minecraft:poison", "amplifier": 2, "duration": 300 },
+            { "effect": "minecraft:hunger", "amplifier": 2, "duration": 300 },
+            { "effect": "minecraft:nausea", "amplifier": 0, "duration": 300 }
+          ]
+        },
+        {
+          "trigger": "change_drop",
+          "action": "roll_loot_table",
+          "id": "pufferfish_spider_eye_potato_drop",
+          "target_blocks": ["minecraft:potatoes"],
+          "loot_table": "dungeonnowloading:mimicling/pufferfish_spider_eye_potatoes",
+          "replace": true
+        }
+      ]
+    },
+    {
+      "items": ["minecraft:pufferfish", "minecraft:magma_cream"],
+      "disable": ["pufferfish_potato_drop"],
+      "effects": [
+        {
+          "trigger": "change_drop",
+          "action": "roll_loot_table",
+          "id": "pufferfish_magma_cream_potato_drop",
+          "target_blocks": ["minecraft:potatoes"],
+          "loot_table": "dungeonnowloading:mimicling/pufferfish_magma_cream_potatoes",
+          "replace": true
+        }
+      ]
+    },
+    {
+      "items": ["minecraft:spider_eye", "minecraft:magma_cream"],
+      "disable": ["spider_eye_potato_drop"],
+      "effects": [
+        {
+          "trigger": "change_drop",
+          "action": "roll_loot_table",
+          "id": "spider_eye_magma_cream_potato_drop",
+          "target_blocks": ["minecraft:potatoes"],
+          "loot_table": "dungeonnowloading:mimicling/spider_eye_magma_cream_potatoes",
+          "replace": true
+        }
+      ]
+    },
+    {
+      "items": ["minecraft:sea_pickle", "minecraft:glow_ink_sac"],
+      "disable": ["sea_pickle_glowing_attack", "glow_ink_sac_glowing_attack"],
+      "effects": [
+        {
+          "trigger": "apply_potion_effect",
+          "action": "inflict_status_effect",
+          "id": "sea_pickle_glow_ink_sac_glowing_attack",
+          "forms": ["sword", "pickaxe", "axe", "shovel", "hoe"],
+          "effects": [
+            { "effect": "minecraft:glowing", "amplifier": 0, "duration": 1200 }
+          ]
+        }
+      ]
+    }
+  ]
+}

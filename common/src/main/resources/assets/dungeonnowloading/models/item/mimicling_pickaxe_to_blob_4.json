@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "dungeonnowloading:item/mimicling/pickaxe/mimicling_pickaxe_to_blob_4"
+  }
+}
