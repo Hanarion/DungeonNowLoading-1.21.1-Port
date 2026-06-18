@@ -61,10 +61,10 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), "deepsteel_shaft");
         waterloggedExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), "deepsteel_hanging_platform");
         axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), "deepsteel_hanging_rail");
-        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(), "deepsteel_shaft_platform");
+        deepsteelShaftPlatform(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get());
         axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), "deepsteel_shaft_rail");
-        horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), "deepsteel_braced_platform");
-        horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), "deepsteel_braced_rail");
+        axisHorizontalDirectionalExistingModelsWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), "deepsteel_braced_platform");
+        deepsteelBracedRail(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get());
         horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), "deepsteel_stairs");
         horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), "deepsteel_slope");
         deepsteelPlatformEnclosedStairs(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
@@ -1277,24 +1277,63 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     }
 
     private void deepsteelPlatformEnclosedStairs(Block block) {
-        ModelFile north = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs"));
-        ModelFile east = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs_90"));
-        ModelFile south = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs_180"));
-        ModelFile west = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs_270"));
+        ModelFile model = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs"));
+
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            int rotationY = ((int) direction.toYRot() + 180) % 360;
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationY(rotationY)
+                    .build();
+        });
+        simpleBlockItem(block, model);
+    }
+
+    private void deepsteelBracedRail(Block block) {
+        ModelFile north = models().getExistingFile(modLoc("block/deepsteel_braced_rail_north"));
+        ModelFile east = models().getExistingFile(modLoc("block/deepsteel_braced_rail_east"));
+        ModelFile south = models().getExistingFile(modLoc("block/deepsteel_braced_rail_south"));
+        ModelFile west = models().getExistingFile(modLoc("block/deepsteel_braced_rail_west"));
 
         getVariantBuilder(block).forAllStates(state -> {
             Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
             ModelFile model = switch (direction) {
+                case NORTH -> north;
                 case EAST -> east;
-                case SOUTH -> south;
                 case WEST -> west;
-                default -> north;
+                default -> south;
             };
+            int rotationY = ((int) direction.toYRot() + 180) % 360;
             return ConfiguredModel.builder()
                     .modelFile(model)
+                    .rotationY(rotationY)
                     .build();
         });
-        simpleBlockItem(block, north);
+        simpleBlockItem(block, south);
+    }
+
+    private void deepsteelShaftPlatform(Block block) {
+        ModelFile north = models().getExistingFile(modLoc("block/deepsteel_shaft_platform_north"));
+        ModelFile east = models().getExistingFile(modLoc("block/deepsteel_shaft_platform_east"));
+        ModelFile south = models().getExistingFile(modLoc("block/deepsteel_shaft_platform_south"));
+        ModelFile west = models().getExistingFile(modLoc("block/deepsteel_shaft_platform_west"));
+
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            ModelFile model = switch (direction) {
+                case NORTH -> north;
+                case EAST -> east;
+                case WEST -> west;
+                default -> south;
+            };
+            int rotationY = ((int) direction.toYRot() + 180) % 360;
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationY(rotationY)
+                    .build();
+        });
+        simpleBlockItem(block, south);
     }
 
     private void axisHorizontalModelFromParent(Block block, String parentModelName, String textureKey, ResourceLocation blockTexture) {
@@ -1378,6 +1417,28 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         axisHorizontalBlock(block, existingModel);
         simpleBlockItem(block, existingModel);
+    }
+
+    private void axisHorizontalDirectionalExistingModelsWithItem(Block block, String existingBlockModelName) {
+        Map<Direction, ModelFile> modelsByDirection = Map.of(
+                Direction.NORTH, models().getExistingFile(modLoc("block/" + existingBlockModelName + "_north")),
+                Direction.EAST, models().getExistingFile(modLoc("block/" + existingBlockModelName + "_east")),
+                Direction.SOUTH, models().getExistingFile(modLoc("block/" + existingBlockModelName + "_south")),
+                Direction.WEST, models().getExistingFile(modLoc("block/" + existingBlockModelName + "_west"))
+        );
+
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            int rotationY = direction.getAxis() == Direction.Axis.X ? 90 : 0;
+            if (direction == Direction.NORTH || direction == Direction.EAST) {
+                rotationY = (rotationY + 180) % 360;
+            }
+            return ConfiguredModel.builder()
+                    .modelFile(modelsByDirection.get(direction))
+                    .rotationY(rotationY)
+                    .build();
+        });
+        simpleBlockItem(block, modelsByDirection.get(Direction.SOUTH));
     }
 
     private void waterloggedExistingModelWithItem(Block block, String existingBlockModelName) {

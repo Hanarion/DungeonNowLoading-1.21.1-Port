@@ -1,12 +1,12 @@
 {
   "variants": {
-    "facing=north,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_braced_rail" },
-    "facing=north,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_braced_rail" },
-    "facing=east,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_braced_rail", "y": 90 },
-    "facing=east,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_braced_rail", "y": 90 },
-    "facing=south,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_braced_rail", "y": 180 },
-    "facing=south,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_braced_rail", "y": 180 },
-    "facing=west,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_braced_rail", "y": 270 },
-    "facing=west,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_braced_rail", "y": 270 }
+    "facing=north,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_braced_rail_north", "y": 180 },
+    "facing=north,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_braced_rail_north", "y": 180 },
+    "facing=east,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_braced_rail_east", "y": 270 },
+    "facing=east,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_braced_rail_east", "y": 270 },
+    "facing=south,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_braced_rail_south" },
+    "facing=south,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_braced_rail_south" },
+    "facing=west,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_braced_rail_west", "y": 90 },
+    "facing=west,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_braced_rail_west", "y": 90 }
   }
 }

@@ -1,12 +1,12 @@
 {
   "variants": {
-    "facing=north,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_shaft_platform" },
-    "facing=north,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_shaft_platform" },
-    "facing=east,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_shaft_platform", "y": 90 },
-    "facing=east,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_shaft_platform", "y": 90 },
-    "facing=south,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_shaft_platform" },
-    "facing=south,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_shaft_platform" },
-    "facing=west,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_shaft_platform", "y": 90 },
-    "facing=west,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_shaft_platform", "y": 90 }
+    "facing=north,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_shaft_platform_north", "y": 180 },
+    "facing=north,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_shaft_platform_north", "y": 180 },
+    "facing=east,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_shaft_platform_east", "y": 270 },
+    "facing=east,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_shaft_platform_east", "y": 270 },
+    "facing=south,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_shaft_platform_south" },
+    "facing=south,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_shaft_platform_south" },
+    "facing=west,waterlogged=false": { "model": "dungeonnowloading:block/deepsteel_shaft_platform_west", "y": 90 },
+    "facing=west,waterlogged=true": { "model": "dungeonnowloading:block/deepsteel_shaft_platform_west", "y": 90 }
   }
 }

@@ -35,7 +35,7 @@ public abstract class BaseRailBlockMixin {
     @Inject(method = "getStateForPlacement", at = @At("RETURN"), cancellable = true)
     private void dungeonnowloading$placeRailsInDeepsteelPlatformRailDirection(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir) {
         BlockState state = cir.getReturnValue();
-        if (state == null) {
+        if (state == null || isMountedDeepsteelRail(state)) {
             return;
         }
 
@@ -47,6 +47,11 @@ public abstract class BaseRailBlockMixin {
 
     @Inject(method = "updateDir", at = @At("HEAD"), cancellable = true)
     private void dungeonnowloading$lockRailsOnDeepsteelPlatformRail(Level level, BlockPos pos, BlockState state, boolean forceUpdate, CallbackInfoReturnable<BlockState> cir) {
+        if (isMountedDeepsteelRail(state)) {
+            cir.setReturnValue(state);
+            return;
+        }
+
         BlockState supportState = level.getBlockState(pos.below());
         if (isDirectionLockingDeepsteelPlatformRail(supportState)) {
             cir.setReturnValue(lockRailShapeToPlatform(state, supportState));
@@ -55,7 +60,7 @@ public abstract class BaseRailBlockMixin {
 
     @Inject(method = "neighborChanged", at = @At("HEAD"), cancellable = true)
     private void dungeonnowloading$keepRailDirectionLockedOnDeepsteelPlatformRail(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
-        if (level.isClientSide) {
+        if (level.isClientSide || isMountedDeepsteelRail(state)) {
             return;
         }
 
@@ -75,7 +80,7 @@ public abstract class BaseRailBlockMixin {
 
     @Inject(method = "onPlace", at = @At("HEAD"), cancellable = true)
     private void dungeonnowloading$placeRailLockedOnDeepsteelPlatformRail(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
-        if (oldState.is(state.getBlock())) {
+        if (oldState.is(state.getBlock()) || isMountedDeepsteelRail(state)) {
             return;
         }
 
@@ -115,6 +120,13 @@ public abstract class BaseRailBlockMixin {
         return state.is(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get())
                 || state.is(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get())
                 || state.is(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get());
+    }
+
+    private boolean isMountedDeepsteelRail(BlockState state) {
+        return state.is(DNLBlocks.DEEPSTEEL_MOUNTED_RAIL.get())
+                || state.is(DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get())
+                || state.is(DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get())
+                || state.is(DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get());
     }
 
     private RailShape railShapeForPlatform(BlockState state) {
