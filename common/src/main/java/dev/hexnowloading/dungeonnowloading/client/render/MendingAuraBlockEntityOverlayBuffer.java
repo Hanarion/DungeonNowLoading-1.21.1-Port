@@ -2,7 +2,6 @@ package dev.hexnowloading.dungeonnowloading.client.render;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MendingAuraBlockEntityOverlayBuffer implements MultiBufferSource {
     public static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS);
+    private static final ResourceLocation MENDING_AURA_SPRITE = new ResourceLocation("dungeonnowloading", "block/mending_aura_0");
+    private static final float OVERLAY_OFFSET = 0.002F;
     private static final Map<ResourceLocation, TextureMask> TEXTURE_MASK_CACHE = new ConcurrentHashMap<>();
     private static Field compositeStateField;
     private static Field textureStateField;
@@ -240,7 +241,11 @@ public class MendingAuraBlockEntityOverlayBuffer implements MultiBufferSource {
         }
 
         private void emitVertex(VertexData vertex, float u, float v) {
-            this.delegate.vertex(vertex.x, vertex.y, vertex.z)
+            this.delegate.vertex(
+                            vertex.x + vertex.normalX * OVERLAY_OFFSET,
+                            vertex.y + vertex.normalY * OVERLAY_OFFSET,
+                            vertex.z + vertex.normalZ * OVERLAY_OFFSET
+                    )
                     .color(255, 255, 255, vertex.alpha)
                     .uv(this.auraSprite.getU(u * 16.0F), this.auraSprite.getV(v * 16.0F))
                     .overlayCoords(vertex.overlayU, vertex.overlayV)
@@ -306,9 +311,8 @@ public class MendingAuraBlockEntityOverlayBuffer implements MultiBufferSource {
 
     private static TextureAtlasSprite mendingAuraSprite() {
         return Minecraft.getInstance()
-                .getBlockRenderer()
-                .getBlockModel(DNLBlocks.MENDING_AURA.get().defaultBlockState())
-                .getParticleIcon();
+                .getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)
+                .apply(MENDING_AURA_SPRITE);
     }
 
     private static TextureMask textureMask(RenderType renderType) {

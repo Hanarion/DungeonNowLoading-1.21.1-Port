@@ -49,8 +49,6 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
     private static final int MAX_MASKED_PIXELS_PER_QUAD = 4096;
     private static final float SHAPE_OVERLAY_EPSILON = 0.001F;
     public static final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> GLOBAL_REMAPPED_QUAD_CACHE = new IdentityHashMap<>();
-    private final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> remappedQuadCache = new IdentityHashMap<>();
-
     public MendingAuraBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -69,19 +67,6 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         if (blockEntity.getLevel() == null) {
             return;
         }
-
-        BakedModel auraModel = new AuraTextureModel(storedModel, auraSprite, blockEntity.getLevel(), blockEntity.getBlockPos(), this.remappedQuadCache);
-        dispatcher.getModelRenderer().renderModel(
-                poseStack.last(),
-                buffer.getBuffer(RenderType.translucent()),
-                storedState,
-                auraModel,
-                1.0F,
-                1.0F,
-                1.0F,
-                LightTexture.FULL_BRIGHT,
-                packedOverlay
-        );
 
         if (needsInteractionShapeOverlay(storedState, storedModel, blockEntity)) {
             renderInteractionShapeOverlay(storedState, blockEntity, poseStack, buffer.getBuffer(RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS, false)), auraSprite, packedOverlay);

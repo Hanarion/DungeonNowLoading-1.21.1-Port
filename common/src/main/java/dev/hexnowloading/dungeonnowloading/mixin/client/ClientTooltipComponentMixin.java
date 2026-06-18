@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 public interface ClientTooltipComponentMixin {
     /**
      * @author HexNowLoading
-     * @reason Add the mimicling tooltip component to vanilla's closed tooltip component factory.
+     * Add the mimicling tooltip component to vanilla's closed tooltip component factory.
      */
     @Overwrite
     static ClientTooltipComponent create(TooltipComponent tooltipComponent) {
