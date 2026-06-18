@@ -1,7 +1,0 @@
-{
-  "parent": "dungeonnowloading:block/deepsteel_platform_frame",
-  "textures": {
-    "2": "dungeonnowloading:block/deepsteel_platform_frame_top_rail",
-    "particle": "dungeonnowloading:block/deepsteel_platform_frame_particle"
-  }
-}
