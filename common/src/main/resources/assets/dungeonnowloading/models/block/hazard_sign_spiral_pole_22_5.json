@@ -1,0 +1,7 @@
+﻿{
+    "parent":  "dungeonnowloading:block/warning_sign_pole_22_5",
+    "textures":  {
+                     "0":  "dungeonnowloading:block/hazard_sign_spiral",
+                     "particle":  "dungeonnowloading:block/hazard_sign_spiral"
+                 }
+}

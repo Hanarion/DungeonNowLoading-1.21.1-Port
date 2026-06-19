@@ -117,6 +117,15 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_EDGE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_BROKEN_EDGE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPIKES.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(),
+                DNLBlocks.HAZARD_SIGN_BOTTLE.get(), DNLBlocks.HAZARD_SIGN_BUBBLE.get(),
+                DNLBlocks.HAZARD_SIGN_CALTROP.get(), DNLBlocks.HAZARD_SIGN_DOWN.get(),
+                DNLBlocks.HAZARD_SIGN_EXCLAMATION.get(), DNLBlocks.HAZARD_SIGN_FIRE.get(),
+                DNLBlocks.HAZARD_SIGN_ICE.get(), DNLBlocks.HAZARD_SIGN_LEFT.get(),
+                DNLBlocks.HAZARD_SIGN_MONSTER.get(), DNLBlocks.HAZARD_SIGN_PICKAXE.get(),
+                DNLBlocks.HAZARD_SIGN_RIGHT.get(), DNLBlocks.HAZARD_SIGN_SOUND.get(),
+                DNLBlocks.HAZARD_SIGN_SPIKES.get(), DNLBlocks.HAZARD_SIGN_SPIRAL.get(),
+                DNLBlocks.HAZARD_SIGN_SWORD.get(), DNLBlocks.HAZARD_SIGN_UP.get());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MOSS.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.FAIRKEEPER_CHEST.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WISE_FAIRKEEPER_CHEST.get(), RenderType.cutout());

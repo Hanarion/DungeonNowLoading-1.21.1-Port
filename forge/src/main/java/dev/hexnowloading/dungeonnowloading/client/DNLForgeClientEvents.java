@@ -257,6 +257,22 @@ public class DNLForgeClientEvents {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_BOTTLE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_BUBBLE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_CALTROP.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_DOWN.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_EXCLAMATION.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_FIRE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_ICE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_LEFT.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_MONSTER.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_PICKAXE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_RIGHT.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_SOUND.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_SPIKES.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_SPIRAL.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_SWORD.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_UP.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.WISP_BLOCK.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.WISPWARD_LANTERN.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.TIMED_WISPWARD_LANTERN.get(), RenderType.translucent());

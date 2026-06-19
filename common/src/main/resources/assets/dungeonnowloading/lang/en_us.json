@@ -549,5 +549,21 @@
   "screen.dungeonnowloading.wispward_lantern_cart_config.duration": "Duration",
   "block.dungeonnowloading.webbing_block": "Webbing Block",
   "block.dungeonnowloading.webbing_nest_block": "Webbing Nest Block",
-  "block.dungeonnowloading.suspended_web": "Suspended Web"
+  "block.dungeonnowloading.suspended_web": "Suspended Web",
+  "block.dungeonnowloading.hazard_sign_bottle": "Bottle Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_bubble": "Bubble Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_caltrop": "Caltrop Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_down": "Down Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_exclamation": "Exclamation Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_fire": "Fire Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_ice": "Ice Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_left": "Left Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_monster": "Monster Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_pickaxe": "Pickaxe Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_right": "Right Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_sound": "Sound Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_spikes": "Spikes Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_spiral": "Spiral Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_sword": "Sword Hazard Sign",
+  "block.dungeonnowloading.hazard_sign_up": "Up Hazard Sign"
 }

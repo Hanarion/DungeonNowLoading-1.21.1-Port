@@ -152,6 +152,22 @@ public class DNLItems {
     public static final Supplier<Item> WOODEN_WALL_PLATFORM = register("wooden_wall_platform", () -> new BlockItem(DNLBlocks.WOODEN_WALL_PLATFORM.get(), new Item.Properties()));
 
     public static final Supplier<Item> SPIKES = register("spikes", () -> new BlockItem(DNLBlocks.SPIKES.get(), new Item.Properties()));
+    public static final Supplier<Item> HAZARD_SIGN_BOTTLE = warningSign("hazard_sign_bottle", DNLBlocks.HAZARD_SIGN_BOTTLE);
+    public static final Supplier<Item> HAZARD_SIGN_BUBBLE = warningSign("hazard_sign_bubble", DNLBlocks.HAZARD_SIGN_BUBBLE);
+    public static final Supplier<Item> HAZARD_SIGN_CALTROP = warningSign("hazard_sign_caltrop", DNLBlocks.HAZARD_SIGN_CALTROP);
+    public static final Supplier<Item> HAZARD_SIGN_DOWN = warningSign("hazard_sign_down", DNLBlocks.HAZARD_SIGN_DOWN);
+    public static final Supplier<Item> HAZARD_SIGN_EXCLAMATION = warningSign("hazard_sign_exclamation", DNLBlocks.HAZARD_SIGN_EXCLAMATION);
+    public static final Supplier<Item> HAZARD_SIGN_FIRE = warningSign("hazard_sign_fire", DNLBlocks.HAZARD_SIGN_FIRE);
+    public static final Supplier<Item> HAZARD_SIGN_ICE = warningSign("hazard_sign_ice", DNLBlocks.HAZARD_SIGN_ICE);
+    public static final Supplier<Item> HAZARD_SIGN_LEFT = warningSign("hazard_sign_left", DNLBlocks.HAZARD_SIGN_LEFT);
+    public static final Supplier<Item> HAZARD_SIGN_MONSTER = warningSign("hazard_sign_monster", DNLBlocks.HAZARD_SIGN_MONSTER);
+    public static final Supplier<Item> HAZARD_SIGN_PICKAXE = warningSign("hazard_sign_pickaxe", DNLBlocks.HAZARD_SIGN_PICKAXE);
+    public static final Supplier<Item> HAZARD_SIGN_RIGHT = warningSign("hazard_sign_right", DNLBlocks.HAZARD_SIGN_RIGHT);
+    public static final Supplier<Item> HAZARD_SIGN_SOUND = warningSign("hazard_sign_sound", DNLBlocks.HAZARD_SIGN_SOUND);
+    public static final Supplier<Item> HAZARD_SIGN_SPIKES = warningSign("hazard_sign_spikes", DNLBlocks.HAZARD_SIGN_SPIKES);
+    public static final Supplier<Item> HAZARD_SIGN_SPIRAL = warningSign("hazard_sign_spiral", DNLBlocks.HAZARD_SIGN_SPIRAL);
+    public static final Supplier<Item> HAZARD_SIGN_SWORD = warningSign("hazard_sign_sword", DNLBlocks.HAZARD_SIGN_SWORD);
+    public static final Supplier<Item> HAZARD_SIGN_UP = warningSign("hazard_sign_up", DNLBlocks.HAZARD_SIGN_UP);
 
     public static final Supplier<Item> CHAOS_SPAWNER_EDGE = register("chaos_spawner_edge", () -> new BlockItem(DNLBlocks.CHAOS_SPAWNER_EDGE.get(), new Item.Properties()));
     public static final Supplier<Item> CHAOS_SPAWNER_DIAMOND_EDGE = register("chaos_spawner_diamond_edge", () -> new BlockItem(DNLBlocks.CHAOS_SPAWNER_DIAMOND_EDGE.get(), new Item.Properties()));
@@ -267,6 +283,10 @@ public class DNLItems {
 
     private static <T extends Item> Supplier<T> register(String name, Supplier<T> itemSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ITEM, name, itemSupplier);
+    }
+
+    private static Supplier<Item> warningSign(String name, Supplier<Block> block) {
+        return register(name, () -> new WarningSignBlockItem(block.get(), new Item.Properties()));
     }
 
     private static Item.Properties mimiclingProperties() {

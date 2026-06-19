@@ -73,6 +73,22 @@
     "dungeonnowloading:deepsteel_platform_suspended_rail",
     "dungeonnowloading:deepsteel_sloped_platform_floating",
     "dungeonnowloading:deepsteel_sloped_platform_floating_rail",
-    "dungeonnowloading:deepsteel_platform_enclosed_stairs"
+    "dungeonnowloading:deepsteel_platform_enclosed_stairs",
+    "dungeonnowloading:hazard_sign_bottle",
+    "dungeonnowloading:hazard_sign_bubble",
+    "dungeonnowloading:hazard_sign_caltrop",
+    "dungeonnowloading:hazard_sign_down",
+    "dungeonnowloading:hazard_sign_exclamation",
+    "dungeonnowloading:hazard_sign_fire",
+    "dungeonnowloading:hazard_sign_ice",
+    "dungeonnowloading:hazard_sign_left",
+    "dungeonnowloading:hazard_sign_monster",
+    "dungeonnowloading:hazard_sign_pickaxe",
+    "dungeonnowloading:hazard_sign_right",
+    "dungeonnowloading:hazard_sign_sound",
+    "dungeonnowloading:hazard_sign_spikes",
+    "dungeonnowloading:hazard_sign_spiral",
+    "dungeonnowloading:hazard_sign_sword",
+    "dungeonnowloading:hazard_sign_up"
   ]
 }
