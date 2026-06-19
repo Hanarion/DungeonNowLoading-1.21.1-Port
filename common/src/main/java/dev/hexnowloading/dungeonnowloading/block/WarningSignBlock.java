@@ -12,18 +12,23 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class WarningSignBlock extends Block {
+public class WarningSignBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WALL = BooleanProperty.create("wall");
     public static final IntegerProperty ROTATION = IntegerProperty.create("rotation", 0, 15);
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private static final VoxelShape POLE_SHAPE = Block.box(6.0, 0.0, 6.0, 10.0, 16.0, 10.0);
     private static final VoxelShape NORTH_SHAPE = Block.box(0.0, 0.0, 15.0, 16.0, 16.0, 16.0);
@@ -33,7 +38,10 @@ public class WarningSignBlock extends Block {
 
     public WarningSignBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(WALL, false).setValue(ROTATION, 0));
+        registerDefaultState(defaultBlockState()
+                .setValue(WALL, false)
+                .setValue(ROTATION, 0)
+                .setValue(WATERLOGGED, false));
     }
 
     public static int rotationFor(float yaw) {
@@ -54,7 +62,8 @@ public class WarningSignBlock extends Block {
 
         BlockState state = defaultBlockState()
                 .setValue(WALL, true)
-                .setValue(ROTATION, rotationFor(face));
+                .setValue(ROTATION, rotationFor(face))
+                .setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
         return state.canSurvive(context.getLevel(), context.getClickedPos()) ? state : null;
     }
 
@@ -72,10 +81,13 @@ public class WarningSignBlock extends Block {
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
                                   LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        if (state.getValue(WATERLOGGED)) {
+            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
         if (state.getValue(WALL)
                 && direction == facingFor(state.getValue(ROTATION)).getOpposite()
                 && !state.canSurvive(level, pos)) {
-            return Blocks.AIR.defaultBlockState();
+            return state.getFluidState().createLegacyBlock();
         }
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
@@ -83,10 +95,14 @@ public class WarningSignBlock extends Block {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
-        if (!level.isClientSide && !state.getValue(WALL) && newState.isAir()) {
+        boolean wasWaterlogged = state.getValue(WATERLOGGED);
+        if (!level.isClientSide && !state.getValue(WALL)
+                && (newState.isAir() || newState.getFluidState().getType() == Fluids.WATER)) {
             level.getServer().execute(() -> {
-                if (level.getBlockState(pos).isAir()) {
-                    level.setBlock(pos, Blocks.IRON_BARS.defaultBlockState(), Block.UPDATE_ALL);
+                BlockState currentState = level.getBlockState(pos);
+                if (currentState.isAir() || currentState.getFluidState().getType() == Fluids.WATER) {
+                    level.setBlock(pos, Blocks.IRON_BARS.defaultBlockState()
+                            .setValue(BlockStateProperties.WATERLOGGED, wasWaterlogged), Block.UPDATE_ALL);
                 }
             });
         }
@@ -111,8 +127,13 @@ public class WarningSignBlock extends Block {
     }
 
     @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WALL, ROTATION);
+        builder.add(WALL, ROTATION, WATERLOGGED);
     }
 
     @Override

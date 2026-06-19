@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 public class WarningSignBlockItem extends BlockItem {
@@ -33,7 +34,8 @@ public class WarningSignBlockItem extends BlockItem {
 
         BlockState state = getBlock().defaultBlockState()
                 .setValue(WarningSignBlock.WALL, false)
-                .setValue(WarningSignBlock.ROTATION, WarningSignBlock.rotationFor(context.getRotation()));
+                .setValue(WarningSignBlock.ROTATION, WarningSignBlock.rotationFor(context.getRotation()))
+                .setValue(WarningSignBlock.WATERLOGGED, level.getFluidState(pos).getType() == Fluids.WATER);
         if (!level.setBlock(pos, state, Block.UPDATE_ALL_IMMEDIATE)) {
             return InteractionResult.FAIL;
         }
