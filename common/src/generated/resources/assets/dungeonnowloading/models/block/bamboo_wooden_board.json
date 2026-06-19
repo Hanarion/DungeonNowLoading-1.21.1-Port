@@ -1,7 +1,0 @@
-{
-  "parent": "dungeonnowloading:block/wooden_board",
-  "textures": {
-    "particle": "dungeonnowloading:block/bamboo_wooden_board",
-    "wooden_board": "dungeonnowloading:block/bamboo_wooden_board"
-  }
-}

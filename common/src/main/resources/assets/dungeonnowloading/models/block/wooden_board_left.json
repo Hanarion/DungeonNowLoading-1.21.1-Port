@@ -1,0 +1,58 @@
+{
+	"format_version": "1.21.6",
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 64],
+	"textures": {
+		"3": "dungeonnowloading:block/acacia_wooden_board",
+		"particle": "dungeonnowloading:block/wooden_board"
+	},
+	"elements": [
+		{
+			"from": [0, 2, 13.95],
+			"to": [16, 8, 15.95],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 9, 15.47]},
+			"faces": {
+				"north": {"uv": [0.25, 2.25, 4.25, 3.75], "texture": "#3"},
+				"east": {"uv": [0, 2.25, 0.5, 3.75], "texture": "#3"},
+				"south": {"uv": [4.25, 2.25, 0.25, 3.75], "texture": "#3"},
+				"west": {"uv": [4, 2.25, 4.5, 3.75], "texture": "#3"},
+				"up": {"uv": [4.25, 2, 0.25, 2.5], "texture": "#3"},
+				"down": {"uv": [4.25, 3.5, 0.25, 4], "texture": "#3"}
+			}
+		},
+		{
+			"from": [0, 0, 15.99],
+			"to": [16, 16, 15.99],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 9, 15.47]},
+			"faces": {
+				"north": {"uv": [0.25, 4, 4.25, 8], "texture": "#3"},
+				"east": {"uv": [0, 12, 0, 16], "texture": "#3"},
+				"south": {"uv": [4.25, 4, 0.25, 8], "texture": "#3"},
+				"west": {"uv": [0, 12, 0, 16], "texture": "#3"},
+				"up": {"uv": [4, 16, 0, 16], "texture": "#3"},
+				"down": {"uv": [4, 16, 0, 16], "texture": "#3"}
+			}
+		},
+		{
+			"from": [0, 10, 13.95],
+			"to": [16, 16, 15.95],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 9, 15.47]},
+			"faces": {
+				"north": {"uv": [0.25, 0.25, 4.25, 1.75], "texture": "#3"},
+				"east": {"uv": [0, 0.25, 0.5, 1.75], "texture": "#3"},
+				"south": {"uv": [4.25, 0.25, 0.25, 1.75], "texture": "#3"},
+				"west": {"uv": [4, 0.25, 4.5, 1.75], "texture": "#3"},
+				"up": {"uv": [4.25, 0.5, 0.25, 0], "texture": "#3"},
+				"down": {"uv": [4.25, 1.5, 0.25, 2], "texture": "#3"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "group",
+			"origin": [0, -8, 14],
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

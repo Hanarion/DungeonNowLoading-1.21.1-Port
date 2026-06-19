@@ -109,6 +109,18 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(
+                DNLBlocks.ACACIA_WOODEN_BOARD.get(),
+                DNLBlocks.BAMBOO_WOODEN_BOARD.get(),
+                DNLBlocks.BIRCH_WOODEN_BOARD.get(),
+                DNLBlocks.CHERRY_WOODEN_BOARD.get(),
+                DNLBlocks.CRIMSON_WOODEN_BOARD.get(),
+                DNLBlocks.DARK_OAK_WOODEN_BOARD.get(),
+                DNLBlocks.JUNGLE_WOODEN_BOARD.get(),
+                DNLBlocks.MANGROVE_WOODEN_BOARD.get(),
+                DNLBlocks.OAK_WOODEN_BOARD.get(),
+                DNLBlocks.PALE_OAK_WOODEN_BOARD.get(),
+                DNLBlocks.SPRUCE_WOODEN_BOARD.get(),
+                DNLBlocks.WARPED_WOODEN_BOARD.get(),
                 DNLBlocks.WOODEN_WALL_RACK.get(),
                 DNLBlocks.WOODEN_WALL_PLATFORM.get(),
                 DNLBlocks.FAIRKEEPER_CHEST.get(),

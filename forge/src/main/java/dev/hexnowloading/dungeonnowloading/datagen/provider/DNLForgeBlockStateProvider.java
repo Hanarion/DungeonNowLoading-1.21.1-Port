@@ -91,18 +91,18 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         facingSixWayWithExistingModel(DNLBlocks.LARGE_DURITE_BUD.get(), "large_durite_bud");
         facingSixWayWithExistingModel(DNLBlocks.MEDIUM_DURITE_BUD.get(), "medium_durite_bud");
         facingSixWayWithExistingModel(DNLBlocks.SMALL_DURITE_BUD.get(), "small_durite_bud");
-        horizontalModelFromParent(DNLBlocks.ACACIA_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/acacia_wooden_board"),    modLoc("item/acacia_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.BAMBOO_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/bamboo_wooden_board"),    modLoc("item/bamboo_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.BIRCH_WOODEN_BOARD.get(),     "wooden_board", "wooden_board", modLoc("block/birch_wooden_board"),     modLoc("item/birch_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.CHERRY_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/cherry_wooden_board"),    modLoc("item/cherry_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.CRIMSON_WOODEN_BOARD.get(),   "wooden_board", "wooden_board", modLoc("block/crimson_wooden_board"),   modLoc("item/crimson_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.DARK_OAK_WOODEN_BOARD.get(),  "wooden_board", "wooden_board", modLoc("block/dark_oak_wooden_board"),  modLoc("item/dark_oak_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.JUNGLE_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/jungle_wooden_board"),    modLoc("item/jungle_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.MANGROVE_WOODEN_BOARD.get(),  "wooden_board", "wooden_board", modLoc("block/mangrove_wooden_board"),  modLoc("item/mangrove_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.OAK_WOODEN_BOARD.get(),       "wooden_board", "wooden_board", modLoc("block/oak_wooden_board"),       modLoc("item/oak_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.PALE_OAK_WOODEN_BOARD.get(),  "wooden_board", "wooden_board", modLoc("block/pale_oak_wooden_board"),  modLoc("item/pale_oak_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.SPRUCE_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/spruce_wooden_board"),    modLoc("item/spruce_wooden_board"));
-        horizontalModelFromParent(DNLBlocks.WARPED_WOODEN_BOARD.get(),    "wooden_board", "wooden_board", modLoc("block/warped_wooden_board"),    modLoc("item/warped_wooden_board"));
+        woodenBoard(DNLBlocks.ACACIA_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.BAMBOO_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.BIRCH_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.CHERRY_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.CRIMSON_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.DARK_OAK_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.JUNGLE_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.MANGROVE_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.OAK_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.PALE_OAK_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.SPRUCE_WOODEN_BOARD.get());
+        woodenBoard(DNLBlocks.WARPED_WOODEN_BOARD.get());
         generateMendstoneChalkMarkModels((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK_MARK.get(), MendstoneChalkMarkBlock.OUTLINE);
         //faceBlockWithItem((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK.get());
 
@@ -1465,6 +1465,31 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
             // Fallback to the block model
             simpleBlockItem(block, mf);
         }
+    }
+
+    private void woodenBoard(Block block) {
+        String blockName = name(block);
+        ResourceLocation texture = modLoc("block/" + blockName);
+        Map<WoodenBoardBlock.Variant, ModelFile> variantModels = Map.of(
+                WoodenBoardBlock.Variant.SINGLE, woodenBoardModel(blockName, "single", "3", texture),
+                WoodenBoardBlock.Variant.LEFT, woodenBoardModel(blockName, "right", "2", texture),
+                WoodenBoardBlock.Variant.MIDDLE, woodenBoardModel(blockName, "middle", "2", texture),
+                WoodenBoardBlock.Variant.RIGHT, woodenBoardModel(blockName, "left", "3", texture)
+        );
+
+        getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
+                .modelFile(variantModels.get(state.getValue(WoodenBoardBlock.VARIANT)))
+                .rotationY(((int) state.getValue(WoodenBoardBlock.FACING).toYRot() + 180) % 360)
+                .build());
+
+        itemModels().withExistingParent(blockName, mcLoc("item/generated"))
+                .texture("layer0", modLoc("item/" + blockName));
+    }
+
+    private ModelFile woodenBoardModel(String blockName, String variant, String textureKey, ResourceLocation texture) {
+        return models().withExistingParent(blockName + "_" + variant, modLoc("block/wooden_board_" + variant))
+                .texture(textureKey, texture)
+                .texture("particle", texture);
     }
     private void dungeonDirectorBlock(Block block) {
         ModelFile normal = models()
