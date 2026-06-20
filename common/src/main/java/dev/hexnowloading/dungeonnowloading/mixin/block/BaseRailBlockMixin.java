@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.mixin.block;
 
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
+import dev.hexnowloading.dungeonnowloading.block.SignalRailBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -47,6 +48,11 @@ public abstract class BaseRailBlockMixin {
 
     @Inject(method = "updateDir", at = @At("HEAD"), cancellable = true)
     private void dungeonnowloading$lockRailsOnDeepsteelPlatformRail(Level level, BlockPos pos, BlockState state, boolean forceUpdate, CallbackInfoReturnable<BlockState> cir) {
+        if (SignalRailBlock.shouldKeepJunctionShape(level, pos, state)) {
+            cir.setReturnValue(state);
+            return;
+        }
+
         if (isMountedDeepsteelRail(state)) {
             cir.setReturnValue(state);
             return;

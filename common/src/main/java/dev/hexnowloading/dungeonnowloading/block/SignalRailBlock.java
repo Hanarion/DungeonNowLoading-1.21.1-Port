@@ -2,11 +2,14 @@ package dev.hexnowloading.dungeonnowloading.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RailBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -52,13 +55,16 @@ public class SignalRailBlock extends BaseRailBlock {
     }
 
     public void activate(ServerLevel level, BlockPos pos, int signal) {
-        if (!level.getBlockState(pos).is(this) || signal == OFF) {
+        BlockState sourceState = level.getBlockState(pos);
+        if (!sourceState.is(this) || signal == OFF) {
             return;
         }
 
-        for (BlockPos connectedPos : findConnectedRails(level, pos)) {
+        Set<BlockPos> connectedRails = findConnectedRails(level, pos);
+        for (BlockPos connectedPos : connectedRails) {
             activateSingle(level, connectedPos, signal);
         }
+        switchConnectedJunctions(level, connectedRails, getSelectedWorldSide(sourceState, signal));
     }
 
     private void activateSingle(ServerLevel level, BlockPos pos, int signal) {
@@ -66,7 +72,7 @@ public class SignalRailBlock extends BaseRailBlock {
         long expiry = level.getGameTime() + SIGNAL_TIMEOUT;
         EXPIRY_TIMES.computeIfAbsent(level, ignored -> new java.util.HashMap<>()).put(pos.immutable(), expiry);
         if (state.getValue(SIGNAL) != signal) {
-            level.setBlock(pos, state.setValue(SIGNAL, signal), UPDATE_ALL);
+            level.setBlock(pos, state.setValue(SIGNAL, signal), UPDATE_CLIENTS);
             updateSignalNeighbors(level, pos, state.getValue(SHAPE));
         }
         level.scheduleTick(pos, this, SIGNAL_TIMEOUT);
@@ -124,7 +130,11 @@ public class SignalRailBlock extends BaseRailBlock {
     private static Direction[] getRailDirections(RailShape shape) {
         return switch (shape) {
             case NORTH_SOUTH, ASCENDING_NORTH, ASCENDING_SOUTH -> new Direction[]{Direction.NORTH, Direction.SOUTH};
-            default -> new Direction[]{Direction.WEST, Direction.EAST};
+            case EAST_WEST, ASCENDING_EAST, ASCENDING_WEST -> new Direction[]{Direction.WEST, Direction.EAST};
+            case NORTH_EAST -> new Direction[]{Direction.NORTH, Direction.EAST};
+            case NORTH_WEST -> new Direction[]{Direction.NORTH, Direction.WEST};
+            case SOUTH_EAST -> new Direction[]{Direction.SOUTH, Direction.EAST};
+            case SOUTH_WEST -> new Direction[]{Direction.SOUTH, Direction.WEST};
         };
     }
 
@@ -147,6 +157,132 @@ public class SignalRailBlock extends BaseRailBlock {
         };
     }
 
+    private void switchConnectedJunctions(ServerLevel level, Set<BlockPos> connectedRails, Direction selectedSide) {
+        for (BlockPos railPos : connectedRails) {
+            BlockState signalState = level.getBlockState(railPos);
+            RailShape signalShape = signalState.getValue(SHAPE);
+            for (Direction endpointDirection : getRailDirections(signalShape)) {
+                BlockPos junctionPos = railPos.relative(endpointDirection)
+                        .above(endpointHeight(signalShape, endpointDirection));
+                BlockState junctionState = level.getBlockState(junctionPos);
+                if (!junctionState.is(Blocks.RAIL)) {
+                    continue;
+                }
+
+                RailShape currentShape = junctionState.getValue(RailBlock.SHAPE);
+                if (!isCurve(currentShape)) {
+                    continue;
+                }
+
+                Direction incomingSide = endpointDirection.getOpposite();
+                RailShape selectedShape = curveFor(incomingSide, selectedSide);
+                if (selectedShape != null && hasConnectedBranchRail(level, junctionPos, selectedSide)) {
+                    level.setBlock(junctionPos, junctionState.setValue(RailBlock.SHAPE, selectedShape), UPDATE_ALL);
+                }
+            }
+        }
+    }
+
+    private static boolean hasConnectedBranchRail(ServerLevel level, BlockPos junctionPos, Direction branchDirection) {
+        return hasConnectedRail(level, junctionPos, branchDirection);
+    }
+
+    private static boolean hasConnectedRail(Level level, BlockPos junctionPos, Direction branchDirection) {
+        for (int yOffset = -1; yOffset <= 1; yOffset++) {
+            BlockPos candidatePos = junctionPos.relative(branchDirection).offset(0, yOffset, 0);
+            if (!level.hasChunkAt(candidatePos)) {
+                continue;
+            }
+
+            BlockState candidateState = level.getBlockState(candidatePos);
+            if (!candidateState.is(BlockTags.RAILS) || !(candidateState.getBlock() instanceof BaseRailBlock railBlock)) {
+                continue;
+            }
+
+            RailShape candidateShape = candidateState.getValue(railBlock.getShapeProperty());
+            Direction towardJunction = branchDirection.getOpposite();
+            if (hasEndpoint(candidateShape, towardJunction)
+                    && yOffset + endpointHeight(candidateShape, towardJunction) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean shouldKeepJunctionShape(Level level, BlockPos junctionPos, BlockState state) {
+        if (!state.is(Blocks.RAIL)) {
+            return false;
+        }
+
+        RailShape shape = state.getValue(RailBlock.SHAPE);
+        if (!isCurve(shape)) {
+            return false;
+        }
+
+        boolean connectedToSignalRail = false;
+        for (Direction direction : getRailDirections(shape)) {
+            if (!hasConnectedRail(level, junctionPos, direction)) {
+                return false;
+            }
+            connectedToSignalRail |= hasConnectedSignalRail(level, junctionPos, direction);
+        }
+        return connectedToSignalRail;
+    }
+
+    private static boolean hasConnectedSignalRail(Level level, BlockPos junctionPos, Direction direction) {
+        for (int yOffset = -1; yOffset <= 1; yOffset++) {
+            BlockPos candidatePos = junctionPos.relative(direction).offset(0, yOffset, 0);
+            BlockState candidateState = level.getBlockState(candidatePos);
+            if (!(candidateState.getBlock() instanceof SignalRailBlock)) {
+                continue;
+            }
+
+            RailShape candidateShape = candidateState.getValue(SHAPE);
+            Direction towardJunction = direction.getOpposite();
+            if (hasEndpoint(candidateShape, towardJunction)
+                    && yOffset + endpointHeight(candidateShape, towardJunction) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isCurve(RailShape shape) {
+        return shape == RailShape.NORTH_EAST || shape == RailShape.NORTH_WEST
+                || shape == RailShape.SOUTH_EAST || shape == RailShape.SOUTH_WEST;
+    }
+
+    private static RailShape curveFor(Direction first, Direction second) {
+        if ((first == Direction.NORTH && second == Direction.EAST)
+                || (first == Direction.EAST && second == Direction.NORTH)) {
+            return RailShape.NORTH_EAST;
+        }
+        if ((first == Direction.NORTH && second == Direction.WEST)
+                || (first == Direction.WEST && second == Direction.NORTH)) {
+            return RailShape.NORTH_WEST;
+        }
+        if ((first == Direction.SOUTH && second == Direction.EAST)
+                || (first == Direction.EAST && second == Direction.SOUTH)) {
+            return RailShape.SOUTH_EAST;
+        }
+        if ((first == Direction.SOUTH && second == Direction.WEST)
+                || (first == Direction.WEST && second == Direction.SOUTH)) {
+            return RailShape.SOUTH_WEST;
+        }
+        return null;
+    }
+
+    private static Direction getSelectedWorldSide(BlockState state, int signal) {
+        RailShape shape = state.getValue(SHAPE);
+        boolean northSouth = shape == RailShape.NORTH_SOUTH
+                || shape == RailShape.ASCENDING_NORTH
+                || shape == RailShape.ASCENDING_SOUTH;
+        if (northSouth) {
+            return signal == LEFT_SIDE ? Direction.WEST : Direction.EAST;
+        }
+        return signal == LEFT_SIDE ? Direction.NORTH : Direction.SOUTH;
+    }
+
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         Map<BlockPos, Long> expiryTimes = EXPIRY_TIMES.get(level);
@@ -161,7 +297,7 @@ public class SignalRailBlock extends BaseRailBlock {
             expiryTimes.remove(pos);
         }
         if (state.getValue(SIGNAL) != OFF) {
-            level.setBlock(pos, state.setValue(SIGNAL, OFF), UPDATE_ALL);
+            level.setBlock(pos, state.setValue(SIGNAL, OFF), UPDATE_CLIENTS);
             updateSignalNeighbors(level, pos, state.getValue(SHAPE));
         }
     }
@@ -199,7 +335,6 @@ public class SignalRailBlock extends BaseRailBlock {
     }
 
     private void updateSignalNeighbors(Level level, BlockPos pos, RailShape shape) {
-        level.updateNeighborsAt(pos, this);
         if (shape == RailShape.NORTH_SOUTH || shape == RailShape.ASCENDING_NORTH || shape == RailShape.ASCENDING_SOUTH) {
             level.updateNeighborsAt(pos.west(), this);
             level.updateNeighborsAt(pos.east(), this);
