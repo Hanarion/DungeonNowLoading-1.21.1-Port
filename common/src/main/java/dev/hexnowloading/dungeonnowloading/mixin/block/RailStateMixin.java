@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RailState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(RailState.class)
@@ -49,6 +51,32 @@ public class RailStateMixin {
         state = state.setValue(block.getShapeProperty(), railShapeForPlatform(supportState));
         level.setBlock(pos, state, 3);
         ci.cancel();
+    }
+
+    @Redirect(
+            method = "getRail",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
+                    ordinal = 1
+            )
+    )
+    private BlockState dungeonnowloading$ignoreOverheadMountedRails(Level level, BlockPos candidatePos) {
+        BlockState candidateState = level.getBlockState(candidatePos);
+        return isMountedDeepsteelRail(candidateState) ? Blocks.AIR.defaultBlockState() : candidateState;
+    }
+
+    @Redirect(
+            method = {"place", "connectTo"},
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/block/BaseRailBlock;isRail(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Z"
+            )
+    )
+    private boolean dungeonnowloading$doNotSlopeTowardMountedRails(Level level, BlockPos candidatePos) {
+        BlockState candidateState = level.getBlockState(candidatePos);
+        return BaseRailBlock.isRail(candidateState)
+                && (candidatePos.getY() <= pos.getY() || isMountedDeepsteelRail(state) || !isMountedDeepsteelRail(candidateState));
     }
 
     private boolean isMountedDeepsteelRail(BlockState state) {
