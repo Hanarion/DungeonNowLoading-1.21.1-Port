@@ -55,7 +55,8 @@ public class RailStateMixin {
         return state.is(DNLBlocks.DEEPSTEEL_MOUNTED_RAIL.get())
                 || state.is(DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get())
                 || state.is(DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get())
-                || state.is(DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get());
+                || state.is(DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get())
+                || state.is(DNLBlocks.DEEPSTEEL_MOUNTED_SIGNAL_RAIL.get());
     }
 
     private boolean isDirectionLockingDeepsteelPlatformRail(BlockState state) {

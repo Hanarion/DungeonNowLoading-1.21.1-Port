@@ -69,13 +69,16 @@ public class SignalRailBlock extends BaseRailBlock {
 
     private void activateSingle(ServerLevel level, BlockPos pos, int signal) {
         BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof SignalRailBlock signalRail)) {
+            return;
+        }
         long expiry = level.getGameTime() + SIGNAL_TIMEOUT;
         EXPIRY_TIMES.computeIfAbsent(level, ignored -> new java.util.HashMap<>()).put(pos.immutable(), expiry);
         if (state.getValue(SIGNAL) != signal) {
             level.setBlock(pos, state.setValue(SIGNAL, signal), UPDATE_CLIENTS);
-            updateSignalNeighbors(level, pos, state.getValue(SHAPE));
+            signalRail.updateSignalNeighbors(level, pos, state.getValue(SHAPE));
         }
-        level.scheduleTick(pos, this, SIGNAL_TIMEOUT);
+        level.scheduleTick(pos, signalRail, SIGNAL_TIMEOUT);
     }
 
     private Set<BlockPos> findConnectedRails(ServerLevel level, BlockPos source) {
@@ -103,7 +106,7 @@ public class SignalRailBlock extends BaseRailBlock {
                     }
 
                     BlockState candidateState = level.getBlockState(candidatePos);
-                    if (!candidateState.is(this)) {
+                    if (!(candidateState.getBlock() instanceof SignalRailBlock)) {
                         continue;
                     }
 

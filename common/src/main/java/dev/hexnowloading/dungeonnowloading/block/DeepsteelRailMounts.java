@@ -69,6 +69,9 @@ public final class DeepsteelRailMounts {
         if (railBlock == Blocks.ACTIVATOR_RAIL) {
             return DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get();
         }
+        if (railBlock == DNLBlocks.SIGNAL_RAIL.get()) {
+            return DNLBlocks.DEEPSTEEL_MOUNTED_SIGNAL_RAIL.get();
+        }
         return null;
     }
 
