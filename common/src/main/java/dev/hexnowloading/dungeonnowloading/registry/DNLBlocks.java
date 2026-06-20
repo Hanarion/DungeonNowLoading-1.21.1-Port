@@ -147,6 +147,7 @@ public class DNLBlocks {
     public static Supplier<Block> DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL;
     public static Supplier<Block> DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_RAIL;
+    public static Supplier<Block> SIGNAL_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_POWERED_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_DETECTOR_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL;
@@ -330,6 +331,7 @@ public class DNLBlocks {
         DEEPSTEEL_MOUNTED_POWERED_RAIL = registerBlock("deepsteel_mounted_powered_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.properties(), Items.POWERED_RAIL));
         DEEPSTEEL_MOUNTED_DETECTOR_RAIL = registerBlock("deepsteel_mounted_detector_rail", () -> new DeepsteelMountedDetectorRailBlock(DeepsteelMountedRailBlock.properties(), Items.DETECTOR_RAIL));
         DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL = registerBlock("deepsteel_mounted_activator_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.properties(), Items.ACTIVATOR_RAIL));
+        SIGNAL_RAIL = registerBlock("signal_rail", () -> new SignalRailBlock(BlockBehaviour.Properties.copy(Blocks.RAIL)));
         WISPWARD_LANTERN = registerBlock("wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission)));
         TIMED_WISPWARD_LANTERN = registerBlock("timed_wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission), true));
         WEB_CARPET = registerBlock("web_carpet", () -> new WebCarpetBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).forceSolidOn().noCollission().requiresCorrectToolForDrops().strength(4.0F).pushReaction(PushReaction.DESTROY)));

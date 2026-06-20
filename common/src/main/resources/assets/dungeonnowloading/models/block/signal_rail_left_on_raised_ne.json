@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/rail_raised_ne",
+  "textures": {
+    "rail": "dungeonnowloading:block/signal_rail_left_on"
+  }
+}

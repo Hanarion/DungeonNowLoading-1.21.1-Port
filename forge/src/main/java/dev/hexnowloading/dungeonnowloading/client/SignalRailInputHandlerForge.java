@@ -1,0 +1,17 @@
+package dev.hexnowloading.dungeonnowloading.client;
+
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+
+@Mod.EventBusSubscriber(value = Dist.CLIENT)
+public class SignalRailInputHandlerForge {
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            SignalRailInputHandler.handleClientTick(Minecraft.getInstance());
+        }
+    }
+}

@@ -204,6 +204,7 @@ public class DNLItems {
     public static final Supplier<Item> DIAMOND_STONE_NOTCH = register("diamond_stone_notch", () -> new BlockItem(DNLBlocks.DIAMOND_STONE_NOTCH.get(), new Item.Properties()));
     public static final Supplier<Item> NETHERITE_STONE_NOTCH = register("netherite_stone_notch", () -> new BlockItem(DNLBlocks.NETHERITE_STONE_NOTCH.get(), new Item.Properties()));
     public static final Supplier<Item> SIGNAL_GATE = register("signal_gate", () -> new BlockItem(DNLBlocks.SIGNAL_GATE.get(), new Item.Properties()));
+    public static final Supplier<Item> SIGNAL_RAIL = register("signal_rail", () -> new BlockItem(DNLBlocks.SIGNAL_RAIL.get(), new Item.Properties()));
     public static final Supplier<Item> SCUTTLE_STATUE = register("scuttle_statue", () -> new BlockItem(DNLBlocks.SCUTTLE_STATUE.get(), new Item.Properties()));
     public static final Supplier<Item> BALLISTA_GOLEM_STATUE = register("ballista_golem_statue", () -> new BlockItem(DNLBlocks.BALLISTA_GOLEM_STATUE.get(), new Item.Properties()));
     public static final Supplier<Item> OVERCHARGED_REDSTONE_BLOCK = register("overcharged_redstone_block", () -> new BlockItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get(), new Item.Properties()));

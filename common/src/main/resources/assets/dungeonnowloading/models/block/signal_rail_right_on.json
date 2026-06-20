@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/rail_flat",
+  "textures": {
+    "rail": "dungeonnowloading:block/signal_rail_right_on"
+  }
+}

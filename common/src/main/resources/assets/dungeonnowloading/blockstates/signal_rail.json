@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "shape=ascending_east,signal=0": { "model": "dungeonnowloading:block/signal_rail_raised_ne", "y": 90 },
+    "shape=ascending_east,signal=1": { "model": "dungeonnowloading:block/signal_rail_left_on_raised_ne", "y": 90 },
+    "shape=ascending_east,signal=2": { "model": "dungeonnowloading:block/signal_rail_right_on_raised_ne", "y": 90 },
+    "shape=ascending_north,signal=0": { "model": "dungeonnowloading:block/signal_rail_raised_ne" },
+    "shape=ascending_north,signal=1": { "model": "dungeonnowloading:block/signal_rail_left_on_raised_ne" },
+    "shape=ascending_north,signal=2": { "model": "dungeonnowloading:block/signal_rail_right_on_raised_ne" },
+    "shape=ascending_south,signal=0": { "model": "dungeonnowloading:block/signal_rail_raised_sw" },
+    "shape=ascending_south,signal=1": { "model": "dungeonnowloading:block/signal_rail_left_on_raised_sw" },
+    "shape=ascending_south,signal=2": { "model": "dungeonnowloading:block/signal_rail_right_on_raised_sw" },
+    "shape=ascending_west,signal=0": { "model": "dungeonnowloading:block/signal_rail_raised_sw", "y": 90 },
+    "shape=ascending_west,signal=1": { "model": "dungeonnowloading:block/signal_rail_left_on_raised_sw", "y": 90 },
+    "shape=ascending_west,signal=2": { "model": "dungeonnowloading:block/signal_rail_right_on_raised_sw", "y": 90 },
+    "shape=east_west,signal=0": { "model": "dungeonnowloading:block/signal_rail", "y": 90 },
+    "shape=east_west,signal=1": { "model": "dungeonnowloading:block/signal_rail_left_on", "y": 90 },
+    "shape=east_west,signal=2": { "model": "dungeonnowloading:block/signal_rail_right_on", "y": 90 },
+    "shape=north_south,signal=0": { "model": "dungeonnowloading:block/signal_rail" },
+    "shape=north_south,signal=1": { "model": "dungeonnowloading:block/signal_rail_left_on" },
+    "shape=north_south,signal=2": { "model": "dungeonnowloading:block/signal_rail_right_on" }
+  }
+}
