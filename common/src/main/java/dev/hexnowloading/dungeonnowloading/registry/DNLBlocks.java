@@ -148,6 +148,7 @@ public class DNLBlocks {
     public static Supplier<Block> DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_RAIL;
     public static Supplier<Block> SIGNAL_RAIL;
+    public static Supplier<Block> CHAINED_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_SIGNAL_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_POWERED_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_DETECTOR_RAIL;
@@ -333,6 +334,7 @@ public class DNLBlocks {
         DEEPSTEEL_MOUNTED_DETECTOR_RAIL = registerBlock("deepsteel_mounted_detector_rail", () -> new DeepsteelMountedDetectorRailBlock(DeepsteelMountedRailBlock.properties(), Items.DETECTOR_RAIL));
         DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL = registerBlock("deepsteel_mounted_activator_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.properties(), Items.ACTIVATOR_RAIL));
         SIGNAL_RAIL = registerBlock("signal_rail", () -> new SignalRailBlock(BlockBehaviour.Properties.copy(Blocks.RAIL)));
+        CHAINED_RAIL = registerBlock("chained_rail", () -> new ChainedRailBlock(BlockBehaviour.Properties.copy(Blocks.POWERED_RAIL)));
         DEEPSTEEL_MOUNTED_SIGNAL_RAIL = registerBlock("deepsteel_mounted_signal_rail", () -> new DeepsteelMountedSignalRailBlock(DeepsteelMountedRailBlock.properties()));
         WISPWARD_LANTERN = registerBlock("wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission)));
         TIMED_WISPWARD_LANTERN = registerBlock("timed_wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission), true));

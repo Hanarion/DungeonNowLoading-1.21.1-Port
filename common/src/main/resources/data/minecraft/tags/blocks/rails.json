@@ -6,6 +6,7 @@
     "dungeonnowloading:deepsteel_mounted_detector_rail",
     "dungeonnowloading:deepsteel_mounted_activator_rail",
     "dungeonnowloading:signal_rail",
-    "dungeonnowloading:deepsteel_mounted_signal_rail"
+    "dungeonnowloading:deepsteel_mounted_signal_rail",
+    "dungeonnowloading:chained_rail"
   ]
 }

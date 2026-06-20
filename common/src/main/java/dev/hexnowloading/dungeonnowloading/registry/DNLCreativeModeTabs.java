@@ -203,6 +203,7 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.NETHERITE_STONE_NOTCH.get());
                 output.accept(DNLItems.SIGNAL_GATE.get());
                 output.accept(DNLItems.SIGNAL_RAIL.get());
+                output.accept(DNLItems.CHAINED_RAIL.get());
                 output.accept(DNLItems.SCUTTLE_STATUE.get());
                 output.accept(DNLItems.BALLISTA_GOLEM_STATUE.get());
                 output.accept(DNLItems.VERTEX_PILLAR.get());

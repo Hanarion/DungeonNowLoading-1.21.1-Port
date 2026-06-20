@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/rail_flat",
+  "textures": { "rail": "dungeonnowloading:block/chained_rail_on_sw_01" }
+}
