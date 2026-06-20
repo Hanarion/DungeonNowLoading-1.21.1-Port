@@ -110,7 +110,8 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get(),
                 DNLBlocks.SIGNAL_RAIL.get(),
                 DNLBlocks.DEEPSTEEL_MOUNTED_SIGNAL_RAIL.get(),
-                DNLBlocks.CHAINED_RAIL.get()
+                DNLBlocks.CHAINED_RAIL.get(),
+                DNLBlocks.DEEPSTEEL_MOUNTED_CHAINED_RAIL.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(

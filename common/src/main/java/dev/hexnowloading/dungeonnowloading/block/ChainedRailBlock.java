@@ -81,7 +81,7 @@ public class ChainedRailBlock extends BaseRailBlock {
         updateConnectedPower(level, pos);
     }
 
-    private void schedulePowerUpdate(Level level, BlockPos pos) {
+    protected void schedulePowerUpdate(Level level, BlockPos pos) {
         if (!level.isClientSide) {
             level.scheduleTick(pos, this, 1);
         }
@@ -103,7 +103,7 @@ public class ChainedRailBlock extends BaseRailBlock {
         for (BlockPos pos : connected) {
             BlockState state = level.getBlockState(pos);
             int power = propagatedPower.getOrDefault(pos, 0);
-            if (state.is(this) && state.getValue(POWER) != power) {
+            if (state.getBlock() instanceof ChainedRailBlock && state.getValue(POWER) != power) {
                 level.setBlock(pos, state.setValue(POWER, power), UPDATE_CLIENTS);
             }
         }
@@ -128,7 +128,7 @@ public class ChainedRailBlock extends BaseRailBlock {
                 continue;
             }
             BlockState state = level.getBlockState(current);
-            if (!state.is(this)) {
+            if (!(state.getBlock() instanceof ChainedRailBlock)) {
                 continue;
             }
 
@@ -142,7 +142,8 @@ public class ChainedRailBlock extends BaseRailBlock {
                     }
 
                     BlockState candidateState = level.getBlockState(candidatePos);
-                    if (!candidateState.is(this) || candidateState.getValue(FACING) != state.getValue(FACING)) {
+                    if (!(candidateState.getBlock() instanceof ChainedRailBlock)
+                            || candidateState.getValue(FACING) != state.getValue(FACING)) {
                         continue;
                     }
 
@@ -186,6 +187,22 @@ public class ChainedRailBlock extends BaseRailBlock {
             double sign = facing.getStepX();
             minecart.setDeltaMovement(targetSpeed * (sign == 0.0D ? 1.0D : sign), movement.y, 0.0D);
         }
+    }
+
+    public static Direction facingForShape(RailShape shape, Direction preferred) {
+        boolean northSouth = shape == RailShape.NORTH_SOUTH
+                || shape == RailShape.ASCENDING_NORTH
+                || shape == RailShape.ASCENDING_SOUTH;
+        if ((northSouth && preferred.getAxis() == Direction.Axis.Z)
+                || (!northSouth && preferred.getAxis() == Direction.Axis.X)) {
+            return preferred;
+        }
+        return switch (shape) {
+            case ASCENDING_NORTH -> Direction.NORTH;
+            case ASCENDING_SOUTH -> Direction.SOUTH;
+            case ASCENDING_WEST -> Direction.WEST;
+            default -> northSouth ? Direction.SOUTH : Direction.EAST;
+        };
     }
 
     private static Direction[] railDirections(RailShape shape) {

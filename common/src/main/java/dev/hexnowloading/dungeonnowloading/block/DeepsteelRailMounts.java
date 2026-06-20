@@ -42,6 +42,10 @@ public final class DeepsteelRailMounts {
         if (mountedState.hasProperty(PoweredRailBlock.POWERED)) {
             mountedState = mountedState.setValue(PoweredRailBlock.POWERED, level.hasNeighborSignal(pos));
         }
+        if (mountedState.hasProperty(ChainedRailBlock.FACING)) {
+            RailShape shape = mountedState.getValue(((BaseRailBlock) mountedBlock).getShapeProperty());
+            mountedState = mountedState.setValue(ChainedRailBlock.FACING, ChainedRailBlock.facingForShape(shape, player.getDirection()));
+        }
 
         if (!level.isClientSide) {
             level.setBlock(pos, mountedState, Block.UPDATE_ALL);
@@ -71,6 +75,9 @@ public final class DeepsteelRailMounts {
         }
         if (railBlock == DNLBlocks.SIGNAL_RAIL.get()) {
             return DNLBlocks.DEEPSTEEL_MOUNTED_SIGNAL_RAIL.get();
+        }
+        if (railBlock == DNLBlocks.CHAINED_RAIL.get()) {
+            return DNLBlocks.DEEPSTEEL_MOUNTED_CHAINED_RAIL.get();
         }
         return null;
     }
