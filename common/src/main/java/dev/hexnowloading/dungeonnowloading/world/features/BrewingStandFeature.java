@@ -7,7 +7,8 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -42,7 +43,9 @@ public class BrewingStandFeature extends Feature<PotionConfig> {
 
         if (blockEntity instanceof BrewingStandBlockEntity brewingStandBlockEntity) {
             for (int i = 0; i < 3; i++) {
-                brewingStandBlockEntity.setItem(i, PotionUtils.setPotion(new ItemStack(item), context.config().potion));
+                ItemStack potionStack = new ItemStack(item);
+                potionStack.set(DataComponents.POTION_CONTENTS, new PotionContents(context.config().potion));
+                brewingStandBlockEntity.setItem(i, potionStack);
             }
         }
 

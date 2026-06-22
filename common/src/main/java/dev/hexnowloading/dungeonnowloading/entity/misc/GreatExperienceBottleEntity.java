@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -65,7 +65,7 @@ public class GreatExperienceBottleEntity extends ThrowableItemProjectile {
     protected void onHit(HitResult hitResult) {
         super.onHit(hitResult);
         if (this.level() instanceof ServerLevel) {
-            this.level().levelEvent(2002, this.blockPosition(), PotionUtils.getColor(Potions.LUCK));
+            this.level().levelEvent(2002, this.blockPosition(), PotionContents.getColor(Potions.LUCK));
             ExperienceOrb.award((ServerLevel)this.level(), this.position(), this.getExperienceAmount());
             this.discard();
         }

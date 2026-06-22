@@ -29,8 +29,12 @@ import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.GameRules;
@@ -289,20 +293,55 @@ public class RepulsorEntity extends Mob {
                         }
                     } else if (entity instanceof ThrownPotion thrownPotion) {
                         ItemStack itemStack = thrownPotion.getItem();
-                        Potion potion = PotionUtils.getPotion(itemStack);
-                        List<MobEffectInstance> list = PotionUtils.getMobEffects(itemStack);
-                        boolean flag = potion == Potions.WATER && list.isEmpty();
-                        if (flag) {
-                            thrownPotion.applyWater();
+                        PotionContents potionContents = itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+                        Holder<Potion> potion = potionContents.potion().orElse(null);
+                        List<MobEffectInstance> list = new java.util.ArrayList<>();
+                        potionContents.forEachEffect(list::add);
+                        boolean isWater = potionContents.is(Potions.WATER) && list.isEmpty();
+                        if (isWater) {
+                            // Splash water: extinguish fire / harm water-sensitive entities in range.
+                            AABB area = thrownPotion.getBoundingBox().inflate(4.0D, 2.0D, 4.0D);
+                            for (LivingEntity living : this.level().getEntitiesOfClass(LivingEntity.class, area, ThrownPotion.WATER_SENSITIVE_OR_ON_FIRE)) {
+                                if (living.isSensitiveToWater()) {
+                                    living.hurt(this.damageSources().indirectMagic(this, null), 1.0F);
+                                }
+                                if (living.isOnFire() && living.isAlive()) {
+                                    living.extinguishFire();
+                                }
+                            }
                         } else if (!list.isEmpty()) {
                             if (itemStack.is(Items.LINGERING_POTION)) {
-                                thrownPotion.makeAreaOfEffectCloud(itemStack, potion);
+                                AreaEffectCloud cloud = new AreaEffectCloud(this.level(), thrownPotion.getX(), thrownPotion.getY(), thrownPotion.getZ());
+                                cloud.setRadius(3.0F);
+                                cloud.setRadiusOnUse(-0.5F);
+                                cloud.setWaitTime(10);
+                                cloud.setRadiusPerTick(-cloud.getRadius() / cloud.getDuration());
+                                cloud.setPotionContents(potionContents);
+                                this.level().addFreshEntity(cloud);
                             } else {
-                                thrownPotion.applySplash(list, null);
+                                AABB area = thrownPotion.getBoundingBox().inflate(4.0D, 2.0D, 4.0D);
+                                for (LivingEntity living : this.level().getEntitiesOfClass(LivingEntity.class, area)) {
+                                    double distSqr = thrownPotion.distanceToSqr(living);
+                                    if (distSqr < 16.0D) {
+                                        double factor = living == entity ? 1.0D : 1.0D - Math.sqrt(distSqr) / 4.0D;
+                                        for (MobEffectInstance effect : list) {
+                                            Holder<net.minecraft.world.effect.MobEffect> mobEffect = effect.getEffect();
+                                            if (mobEffect.value().isInstantenous()) {
+                                                mobEffect.value().applyInstantenousEffect(this, this, living, effect.getAmplifier(), factor);
+                                            } else {
+                                                int duration = effect.mapDuration(d -> (int) (factor * d + 0.5D));
+                                                MobEffectInstance scaled = new MobEffectInstance(mobEffect, duration, effect.getAmplifier(), effect.isAmbient(), effect.isVisible());
+                                                if (!scaled.endsWithin(20)) {
+                                                    living.addEffect(scaled, this);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                        int i = potion.hasInstantEffects() ? 2007 : 2002;
-                        this.level().levelEvent(i, thrownPotion.blockPosition(), PotionUtils.getColor(itemStack));
+                        int i = (potion != null && potion.value().hasInstantEffects()) ? 2007 : 2002;
+                        this.level().levelEvent(i, thrownPotion.blockPosition(), potionContents.getColor());
                         discardEntity = true;
                     } else if (entity instanceof AbstractArrow arrow && arrow.inGround) {
                         continue;
