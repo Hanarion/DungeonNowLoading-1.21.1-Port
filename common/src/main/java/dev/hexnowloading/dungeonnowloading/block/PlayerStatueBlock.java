@@ -133,7 +133,7 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
         if (!(be instanceof PlayerStatueBlockEntity statue)) return;
 
         GameProfile gp = null;
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = StackNbt.getTag(stack);
 
         if (tag != null) {
             if (tag.contains("Owner", 10)) gp = NbtUtils.readGameProfile(tag.getCompound("Owner"));
@@ -353,13 +353,13 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
             // Prefer simple string SkullOwner in the item (your renderer resolves profile later)
             GameProfile gp = statue.getOwner();
             if (gp != null && gp.getName() != null && !gp.getName().isEmpty()) {
-                stack.getOrCreateTag().putString("SkullOwner", gp.getName());
+                StackNbt.update(stack, t -> t.putString("SkullOwner", gp.getName()));
             } else if (gp != null) {
                 // fallback to compound if name unknown
-                stack.getOrCreateTag().put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gp));
+                StackNbt.update(stack, t -> t.put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gp)));
             }
-            stack.getOrCreateTag().putInt("DNL_Pose", statue.getPoseVariant());
-            stack.getOrCreateTag().putString("DNL_Notch", statue.getNotchTier().name());
+            StackNbt.update(stack, t -> t.putInt("DNL_Pose", statue.getPoseVariant()));
+            StackNbt.update(stack, t -> t.putString("DNL_Notch", statue.getNotchTier().name()));
         }
         return stack;
     }

@@ -134,7 +134,7 @@ public final class StatueCommand {
                                               PlayerStatueBlockEntity.NotchTier tier,
                                               int poseVariant) {
         ItemStack stack = new ItemStack(DNLBlocks.PLAYER_STATUE.get());
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
 
         if (owner != null) {
             CompoundTag ownerTag = new CompoundTag();
@@ -156,6 +156,7 @@ public final class StatueCommand {
         // Optional: you already store this on pick-block; setPlacedBy doesn’t read it yet.
         tag.putInt("DNL_Pose", poseVariant);
 
+        StackNbt.setTag(stack, tag);
         return stack;
     }
 

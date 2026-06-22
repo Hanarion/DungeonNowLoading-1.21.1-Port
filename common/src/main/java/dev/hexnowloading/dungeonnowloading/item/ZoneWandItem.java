@@ -30,13 +30,14 @@ public class ZoneWandItem extends Item {
         if (player == null) return InteractionResult.PASS;
         if (level.isClientSide) return InteractionResult.SUCCESS;
 
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
 
         // Sneak-right-click: clear wand corners
         if (player.isCrouching()) {
             tag.remove(CORNER_A);
             tag.remove(CORNER_B);
             tag.remove("NextCornerIsB");
+            StackNbt.setTag(stack, tag);
             player.displayClientMessage(Component.literal("Corners cleared from wand."), true);
             return InteractionResult.CONSUME;
         }
@@ -100,6 +101,7 @@ public class ZoneWandItem extends Item {
             }
         }
 
+        StackNbt.setTag(stack, tag);
         return InteractionResult.CONSUME;
     }
 

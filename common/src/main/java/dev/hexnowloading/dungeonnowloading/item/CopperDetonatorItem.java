@@ -73,13 +73,13 @@ public class CopperDetonatorItem extends Item {
         } else {
             next = MODE_DEFAULT;
         }
-        stack.getOrCreateTag().putString(TAG_COSMETIC_MODE, next);
+        StackNbt.update(stack, t -> t.putString(TAG_COSMETIC_MODE, next));
     }
 
     public static String getCosmeticMode(ItemStack stack) {
-        return stack.getOrCreateTag().getString(TAG_COSMETIC_MODE).isEmpty()
+        return StackNbt.getOrCreateTag(stack).getString(TAG_COSMETIC_MODE).isEmpty()
                 ? MODE_DEFAULT
-                : stack.getOrCreateTag().getString(TAG_COSMETIC_MODE);
+                : StackNbt.getOrCreateTag(stack).getString(TAG_COSMETIC_MODE);
     }
 
     @Override

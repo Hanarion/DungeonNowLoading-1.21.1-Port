@@ -38,7 +38,7 @@ public class GreatExperienceBottleItem extends Item {
         level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_BOTTLE_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
         if (!level.isClientSide) {
             /*int experience = experienceLevelAmount;
-            CompoundTag compoundTag = itemStack.getOrCreateTag().getCompound("StoredExperience");
+            CompoundTag compoundTag = StackNbt.getOrCreateTag(itemStack).getCompound("StoredExperience");
             compoundTag.putInt("StoredExperience", 2000);
             if (compoundTag.contains("StoredExperience", CompoundTag.TAG_INT)) {
                 experience = compoundTag.getInt("StoredExperience");

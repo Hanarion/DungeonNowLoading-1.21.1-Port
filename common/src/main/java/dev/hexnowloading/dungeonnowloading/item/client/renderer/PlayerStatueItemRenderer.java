@@ -34,7 +34,7 @@ public class PlayerStatueItemRenderer extends BlockEntityWithoutLevelRenderer {
     public void renderByItem(ItemStack stack, ItemDisplayContext ctx, PoseStack pose, MultiBufferSource buf, int light, int overlay) {
         // Build block state for the dummy BE
         BlockState state = DNLBlocks.PLAYER_STATUE.get().defaultBlockState();
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = StackNbt.getTag(stack);
 
         // Keep a deterministic statue yaw for items (or read NBT if you like).
         // Using 8 (180°) or 14 (225°) are common; pick one and stick to it.

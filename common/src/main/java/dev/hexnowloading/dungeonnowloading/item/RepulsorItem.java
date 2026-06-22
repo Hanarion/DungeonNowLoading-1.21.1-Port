@@ -77,7 +77,7 @@ public class RepulsorItem extends Item {
 
         if (level instanceof ServerLevel server) {
             Consumer<RepulsorEntity> consumer = EntityType.createDefaultStackConfig(server, stack, ctx.getPlayer());
-            RepulsorEntity rep = (RepulsorEntity)DNLEntityTypes.REPULSOR.get().create(server, stack.getTag(), consumer, placePos, MobSpawnType.SPAWN_EGG, true, true);
+            RepulsorEntity rep = (RepulsorEntity)DNLEntityTypes.REPULSOR.get().create(server, StackNbt.getTag(stack), consumer, placePos, MobSpawnType.SPAWN_EGG, true, true);
             if (rep == null) return InteractionResult.FAIL;
 
             // Force exact placement + orientation
@@ -114,11 +114,11 @@ public class RepulsorItem extends Item {
     private static void cycleCosmeticMode(ItemStack stack) {
         String current = getCosmeticMode(stack);
         String next = current.equals(MODE_DEFAULT) ? MODE_GOLDEN : MODE_DEFAULT;
-        stack.getOrCreateTag().putString(TAG_COSMETIC_MODE, next);
+        StackNbt.update(stack, t -> t.putString(TAG_COSMETIC_MODE, next));
     }
 
     public static String getCosmeticMode(ItemStack stack) {
-        String v = stack.getOrCreateTag().getString(TAG_COSMETIC_MODE);
+        String v = StackNbt.getOrCreateTag(stack).getString(TAG_COSMETIC_MODE);
         return v.isEmpty() ? MODE_DEFAULT : v;
     }
 
@@ -142,7 +142,7 @@ public class RepulsorItem extends Item {
     }
 
     public static void setCosmeticMode(ItemStack stack, String mode) {
-        stack.getOrCreateTag().putString(TAG_COSMETIC_MODE, mode);
+        StackNbt.update(stack, t -> t.putString(TAG_COSMETIC_MODE, mode));
     }
     public static void setGolden(ItemStack stack)  { setCosmeticMode(stack, MODE_GOLDEN); }
     public static void setDefault(ItemStack stack) { setCosmeticMode(stack, MODE_DEFAULT); }

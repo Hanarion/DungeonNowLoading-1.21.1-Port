@@ -304,7 +304,7 @@ public class SpawnerCarrierEntity extends Monster {
         }
 
         // Determine entity type from the spawn egg (handles NBT overrides)
-        EntityType<?> type = egg.getType(stack.getTag());
+        EntityType<?> type = egg.getType(stack);
         ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
 
         if (key == null) {
@@ -316,8 +316,8 @@ public class SpawnerCarrierEntity extends Monster {
 
         // Store the egg's EntityTag (variants, custom name, etc.)
         CompoundTag newStored = new CompoundTag();
-        if (stack.hasTag() && stack.getTag() != null && stack.getTag().contains("EntityTag", CompoundTag.TAG_COMPOUND)) {
-            newStored = stack.getTag().getCompound("EntityTag").copy();
+        if (StackNbt.hasTag(stack) && StackNbt.getTag(stack) != null && StackNbt.getTag(stack).contains("EntityTag", CompoundTag.TAG_COMPOUND)) {
+            newStored = StackNbt.getTag(stack).getCompound("EntityTag").copy();
         }
         this.storedEntityNbt = newStored;
 

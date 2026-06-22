@@ -422,21 +422,21 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     }
 
     public static void setHeatLevel(ItemStack stack, float heatLevel, long timeStamp) {
-        stack.getOrCreateTag().putFloat(HEAT_TAG, heatLevel);
-        stack.getOrCreateTag().putLong(HEAT_TIME_STAMP, timeStamp);
+        StackNbt.update(stack, t -> t.putFloat(HEAT_TAG, heatLevel));
+        StackNbt.update(stack, t -> t.putLong(HEAT_TIME_STAMP, timeStamp));
     }
 
     private static void ensureUUID(ItemStack stack) {
-        if (!stack.hasTag()) {
+        if (!StackNbt.hasTag(stack)) {
             stack.setTag(new CompoundTag()); // ✅ Create tag if missing
         }
-        if (!stack.getTag().contains("ScorcherUUID")) {
-            stack.getTag().putUUID("ScorcherUUID", UUID.randomUUID()); // ✅ Assign unique UUID
+        if (!StackNbt.getTag(stack).contains("ScorcherUUID")) {
+            StackNbt.update(stack, t -> t.putUUID("ScorcherUUID", UUID.randomUUID())); // ✅ Assign unique UUID
         }
     }
 
     private void setFuelNBT(ItemStack weaponItemStack, Item fuelItem) {
-        CompoundTag tag = weaponItemStack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(weaponItemStack);
         ResourceLocation fuelId = BuiltInRegistries.ITEM.getKey(fuelItem);
 
         if (fuelId != null) {
@@ -445,7 +445,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     }
 
     public static Item getFuelType(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = StackNbt.getTag(stack);
         if (tag != null && tag.contains("FuelType")) {
             ResourceLocation fuelId = ResourceLocation.parse(tag.getString("FuelType"));
             return BuiltInRegistries.ITEM.get(fuelId);
@@ -454,11 +454,11 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     }
 
     private void setBurnTime(ItemStack itemStack, int tick) {
-        itemStack.getOrCreateTag().putInt(BURN_TIME, tick);
+        StackNbt.update(itemStack, t -> t.putInt(BURN_TIME, tick));
     }
 
     private int getBurnTime(ItemStack itemStack) {
-        CompoundTag tag = itemStack.getTag();
+        CompoundTag tag = StackNbt.getTag(itemStack);
         if (tag != null && tag.contains(BURN_TIME)) {
             return tag.getInt(BURN_TIME);
         }
@@ -466,11 +466,11 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     }
 
     public static float getHeatLevel(ItemStack stack) {
-        return stack.hasTag() ? stack.getTag().getFloat(HEAT_TAG) : 0.0F;
+        return StackNbt.hasTag(stack) ? StackNbt.getTag(stack).getFloat(HEAT_TAG) : 0.0F;
     }
 
     public static long getTimeStamp(ItemStack stack) {
-        return stack.hasTag() ? stack.getTag().getLong(HEAT_TIME_STAMP) : 0L;
+        return StackNbt.hasTag(stack) ? StackNbt.getTag(stack).getLong(HEAT_TIME_STAMP) : 0L;
     }
 
     @Override

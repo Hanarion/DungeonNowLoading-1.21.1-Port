@@ -225,12 +225,12 @@ public final class MimiclingFoodEffects {
     }
 
     private static void tickDurabilityDrainEffects(ItemStack stack, Level level) {
-        if (!stack.isDamageableItem() || !stack.hasTag()) {
+        if (!stack.isDamageableItem() || !StackNbt.hasTag(stack)) {
             return;
         }
 
         long gameTime = level.getGameTime();
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         CompoundTag timers = tag.getCompound(DURABILITY_DRAIN_TAG);
         boolean timersChanged = false;
         for (MimiclingFoods.EffectDefinition effect : MimiclingFoods.getActiveEffects(stack)) {
@@ -257,7 +257,10 @@ public final class MimiclingFoodEffects {
             MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1);
         }
         if (timersChanged) {
-            tag.put(DURABILITY_DRAIN_TAG, timers);
+            // Persist only the timers key onto the CURRENT stack tag (consumeUsage above may
+            // have mutated other keys), so we don't clobber it with our stale copy.
+            CompoundTag finalTimers = timers;
+            StackNbt.update(stack, t -> t.put(DURABILITY_DRAIN_TAG, finalTimers));
         }
     }
 
@@ -1124,7 +1127,7 @@ public final class MimiclingFoodEffects {
     }
 
     public static void retainMemoriesForActiveFoods(ItemStack stack, List<MimiclingFoods.FoodDefinition> activeFoods) {
-        if (!stack.hasTag() || !stack.getTag().contains(MEMORY_TAG)) {
+        if (!StackNbt.hasTag(stack) || !StackNbt.getTag(stack).contains(MEMORY_TAG)) {
             return;
         }
 
@@ -1137,7 +1140,7 @@ public final class MimiclingFoodEffects {
             }
         }
 
-        CompoundTag memory = stack.getTag().getCompound(MEMORY_TAG);
+        CompoundTag memory = StackNbt.getTag(stack).getCompound(MEMORY_TAG);
         for (String id : new HashSet<>(memory.getAllKeys())) {
             if (!activeMemoryIds.contains(id)) {
                 memory.remove(id);
@@ -1145,9 +1148,9 @@ public final class MimiclingFoodEffects {
         }
 
         if (memory.isEmpty()) {
-            stack.getTag().remove(MEMORY_TAG);
+            StackNbt.update(stack, t -> t.remove(MEMORY_TAG));
         } else {
-            stack.getTag().put(MEMORY_TAG, memory);
+            StackNbt.update(stack, t -> t.put(MEMORY_TAG, memory));
         }
     }
 
@@ -1157,9 +1160,9 @@ public final class MimiclingFoodEffects {
 
     private static void memorizePosition(ItemStack stack, Level level, JsonObject data, BlockPos pos) {
         String id = getMemoryId(data);
-        CompoundTag memory = stack.getOrCreateTag().getCompound(MEMORY_TAG);
+        CompoundTag memory = StackNbt.getOrCreateTag(stack).getCompound(MEMORY_TAG);
         memory.putLong(id, pos.asLong());
-        stack.getOrCreateTag().put(MEMORY_TAG, memory);
+        StackNbt.update(stack, t -> t.put(MEMORY_TAG, memory));
 
         spawnMemorySetParticles(level, data, pos);
     }
@@ -1190,7 +1193,7 @@ public final class MimiclingFoodEffects {
 
         int radius = data.has("radius") ? data.get("radius").getAsInt() : 16;
         String memoryId = data.has("memory") ? data.get("memory").getAsString() : TELEPORT_DESTINATION_TAG;
-        CompoundTag memory = stack.getOrCreateTag().getCompound(MEMORY_TAG);
+        CompoundTag memory = StackNbt.getOrCreateTag(stack).getCompound(MEMORY_TAG);
         if (memory.contains(memoryId)) {
             BlockPos destination = BlockPos.of(memory.getLong(memoryId));
             if (destination.closerToCenterThan(target.position(), radius)) {

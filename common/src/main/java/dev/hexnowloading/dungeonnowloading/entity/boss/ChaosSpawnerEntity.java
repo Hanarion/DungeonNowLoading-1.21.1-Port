@@ -823,7 +823,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         int level = 1;
 
         ItemStack book = EnchantedBookItem.createForEnchantment(new EnchantmentInstance(ench, level));
-        // (Optional) sanity check: book.getTag() should contain "StoredEnchantments"
+        // (Optional) sanity check: StackNbt.getTag(book) should contain "StoredEnchantments"
 
         this.spawnSpecialItemEntity(book, 0.0F, playerUuid);
     }

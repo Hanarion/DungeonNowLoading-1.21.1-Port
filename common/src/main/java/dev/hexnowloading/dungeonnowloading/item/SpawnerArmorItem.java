@@ -333,11 +333,11 @@ public class SpawnerArmorItem extends ArmorItem {
             next = MODE_DEFAULT;
         }
 
-        stack.getOrCreateTag().putString(TAG_WHIMPER_COSMETIC_MODE, next);
+        StackNbt.update(stack, t -> t.putString(TAG_WHIMPER_COSMETIC_MODE, next));
     }
 
     public static String getWhimperCosmeticMode(ItemStack stack) {
-        String value = stack.getOrCreateTag().getString(TAG_WHIMPER_COSMETIC_MODE);
+        String value = StackNbt.getOrCreateTag(stack).getString(TAG_WHIMPER_COSMETIC_MODE);
         return value.isEmpty() ? MODE_DEFAULT : value;
     }
 
@@ -358,7 +358,7 @@ public class SpawnerArmorItem extends ArmorItem {
     }
 
     private static int getSummonTick(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         if (!tag.contains(TAG_SUMMON_TICK)) {
             tag.putInt(TAG_SUMMON_TICK, DEFAULT_SUMMON_TICK);
         }
@@ -366,7 +366,7 @@ public class SpawnerArmorItem extends ArmorItem {
     }
 
     private static void setSummonTick(ItemStack stack, int value) {
-        stack.getOrCreateTag().putInt(TAG_SUMMON_TICK, value);
+        StackNbt.update(stack, t -> t.putInt(TAG_SUMMON_TICK, value));
     }
 
     private static String capitalize(String value) {

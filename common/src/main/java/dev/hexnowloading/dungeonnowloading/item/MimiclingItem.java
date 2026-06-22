@@ -353,8 +353,9 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         }
 
         ItemStack opened = copyWithForm(stack, FORM_BASE);
-        CompoundTag tag = opened.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(opened);
         tag.putString(TEMPORARY_INVENTORY_FORM_TAG, currentForm);
+        StackNbt.setTag(opened, tag);
         startTransition(opened, currentForm, FORM_BASE, player.level().getGameTime());
         slot.set(opened);
         slot.setChanged();
@@ -367,25 +368,26 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static ItemStack restoreTemporaryInventoryForm(ItemStack stack, long gameTime, boolean animate) {
-        if (!isBaseStorageForm(stack) || !stack.hasTag() || !stack.getTag().contains(TEMPORARY_INVENTORY_FORM_TAG)) {
+        if (!isBaseStorageForm(stack) || !StackNbt.hasTag(stack) || !StackNbt.getTag(stack).contains(TEMPORARY_INVENTORY_FORM_TAG)) {
             return stack;
         }
 
-        String originalForm = stack.getTag().getString(TEMPORARY_INVENTORY_FORM_TAG);
+        String originalForm = StackNbt.getTag(stack).getString(TEMPORARY_INVENTORY_FORM_TAG);
         if (!canTransformToForm(stack, originalForm)) {
-            stack.getTag().remove(TEMPORARY_INVENTORY_FORM_TAG);
-            stack.getTag().putString(FORM_TAG, FORM_BASE);
+            StackNbt.update(stack, t -> t.remove(TEMPORARY_INVENTORY_FORM_TAG));
+            StackNbt.update(stack, t -> t.putString(FORM_TAG, FORM_BASE));
             syncActiveEnchantmentTags(stack, FORM_BASE);
             return stack;
         }
 
         ItemStack restored = copyWithForm(stack, originalForm);
-        CompoundTag tag = restored.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(restored);
         tag.remove(TEMPORARY_INVENTORY_FORM_TAG);
+        StackNbt.setTag(restored, tag);
         if (animate) {
             startTransition(restored, FORM_BASE, originalForm, gameTime);
         } else {
-            tag.putString(FORM_TAG, originalForm);
+            StackNbt.update(restored, t -> t.putString(FORM_TAG, originalForm));
             clearTransitionData(restored);
             removeStaleAttributeModifierTags(restored);
             syncActiveEnchantmentTags(restored, originalForm);
@@ -677,7 +679,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
                     return false;
                 }
 
-                stack.getOrCreateTag().putInt(SELECTED_SLOT_TAG, selected);
+                StackNbt.update(stack, t -> t.putInt(SELECTED_SLOT_TAG, selected));
                 return true;
             }
         }
@@ -697,7 +699,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return false;
         }
 
-        stack.getOrCreateTag().putInt(SELECTED_FOOD_SLOT_TAG, selected);
+        StackNbt.update(stack, t -> t.putInt(SELECTED_FOOD_SLOT_TAG, selected));
         return true;
     }
 
@@ -717,7 +719,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return false;
         }
 
-        stack.getOrCreateTag().putInt(SELECTED_FOOD_SLOT_TAG, selected);
+        StackNbt.update(stack, t -> t.putInt(SELECTED_FOOD_SLOT_TAG, selected));
         return true;
     }
 
@@ -761,7 +763,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return false;
         }
 
-        stack.getOrCreateTag().putInt(SELECTED_SLOT_TAG, slot);
+        StackNbt.update(stack, t -> t.putInt(SELECTED_SLOT_TAG, slot));
         return true;
     }
 
@@ -780,31 +782,33 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return false;
         }
 
-        stack.getOrCreateTag().putInt(SELECTED_SLOT_TAG, nextSelected);
+        StackNbt.update(stack, t -> t.putInt(SELECTED_SLOT_TAG, nextSelected));
         return true;
     }
 
     private static void startTransition(ItemStack stack, String fromForm, String toForm, long gameTime) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         tag.putString(FORM_TAG, toForm);
         tag.putString(TRANSITION_FROM_TAG, fromForm);
         tag.putString(TRANSITION_TO_TAG, toForm);
         tag.putLong(TRANSITION_START_TAG, gameTime);
+        StackNbt.setTag(stack, tag);
         removeStaleAttributeModifierTags(stack);
         syncActiveEnchantmentTags(stack, toForm);
     }
 
     private static void clearTransitionData(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         tag.remove(TRANSITION_START_TAG);
         tag.remove(TRANSITION_FROM_TAG);
         tag.remove(TRANSITION_TO_TAG);
+        StackNbt.setTag(stack, tag);
     }
 
     private static ItemStack copyWithForm(ItemStack stack, String targetForm) {
         ItemStack transformed = new ItemStack(getItemForForm(stack, targetForm), stack.getCount());
-        if (stack.hasTag()) {
-            transformed.setTag(stack.getTag().copy());
+        if (StackNbt.hasTag(stack)) {
+            StackNbt.setTag(transformed, StackNbt.getTag(stack).copy());
         }
         transformed.setDamageValue(Math.min(stack.getDamageValue(), transformed.getMaxDamage()));
         return transformed;
@@ -958,7 +962,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return false;
         }
 
-        long elapsed = gameTime - stack.getTag().getLong(TRANSITION_START_TAG);
+        long elapsed = gameTime - StackNbt.getTag(stack).getLong(TRANSITION_START_TAG);
         String currentVisualForm;
         int currentFrame;
 
@@ -976,15 +980,15 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     public static boolean isMucus(ItemStack stack, long gameTime) {
-        return isTransitioning(stack, gameTime) && gameTime - stack.getTag().getLong(TRANSITION_START_TAG) == FIRST_PHASE_TICKS;
+        return isTransitioning(stack, gameTime) && gameTime - StackNbt.getTag(stack).getLong(TRANSITION_START_TAG) == FIRST_PHASE_TICKS;
     }
 
     public static boolean isChewingFrame(ItemStack stack, long gameTime, int frame) {
-        if (!isBaseStorageForm(stack) || !stack.hasTag() || !stack.getTag().contains(CHEWING_START_TAG)) {
+        if (!isBaseStorageForm(stack) || !StackNbt.hasTag(stack) || !StackNbt.getTag(stack).contains(CHEWING_START_TAG)) {
             return false;
         }
 
-        long elapsed = gameTime - stack.getTag().getLong(CHEWING_START_TAG);
+        long elapsed = gameTime - StackNbt.getTag(stack).getLong(CHEWING_START_TAG);
         return elapsed >= 0 && elapsed < CHEWING_FRAME_COUNT * CHEWING_TICKS_PER_FRAME && elapsed / CHEWING_TICKS_PER_FRAME == frame;
     }
 
@@ -1005,7 +1009,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return false;
         }
 
-        long elapsed = gameTime - stack.getTag().getLong(TRANSITION_START_TAG);
+        long elapsed = gameTime - StackNbt.getTag(stack).getLong(TRANSITION_START_TAG);
         if (elapsed >= 0 && elapsed < TRANSITION_DURATION) {
             return true;
         }
@@ -1015,7 +1019,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
     private static String getCurrentForm(ItemStack stack, long gameTime) {
         if (hasTransitionData(stack)) {
-            long elapsed = gameTime - stack.getTag().getLong(TRANSITION_START_TAG);
+            long elapsed = gameTime - StackNbt.getTag(stack).getLong(TRANSITION_START_TAG);
             return elapsed >= TRANSITION_DURATION ? getTransitionTo(stack) : getTransitionFrom(stack);
         }
 
@@ -1023,16 +1027,16 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static boolean hasTransitionData(ItemStack stack) {
-        return stack.hasTag() && stack.getTag().contains(TRANSITION_START_TAG) && stack.getTag().contains(TRANSITION_TO_TAG);
+        return StackNbt.hasTag(stack) && StackNbt.getTag(stack).contains(TRANSITION_START_TAG) && StackNbt.getTag(stack).contains(TRANSITION_TO_TAG);
     }
 
     private static String getTransitionFrom(ItemStack stack) {
-        String form = stack.getOrCreateTag().getString(TRANSITION_FROM_TAG);
+        String form = StackNbt.getOrCreateTag(stack).getString(TRANSITION_FROM_TAG);
         return form.isEmpty() ? FORM_BASE : form;
     }
 
     private static String getTransitionTo(ItemStack stack) {
-        String form = stack.getOrCreateTag().getString(TRANSITION_TO_TAG);
+        String form = StackNbt.getOrCreateTag(stack).getString(TRANSITION_TO_TAG);
         return form.isEmpty() ? FORM_BASE : form;
     }
 
@@ -1041,8 +1045,8 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return mimiclingFormItem.getMimiclingForm();
         }
 
-        if (stack.hasTag()) {
-            String legacyForm = stack.getTag().getString(FORM_TAG);
+        if (StackNbt.hasTag(stack)) {
+            String legacyForm = StackNbt.getTag(stack).getString(FORM_TAG);
             if (!legacyForm.isEmpty()) {
                 return legacyForm;
             }
@@ -1056,7 +1060,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static void startChewing(ItemStack stack, long gameTime) {
-        stack.getOrCreateTag().putLong(CHEWING_START_TAG, gameTime);
+        StackNbt.update(stack, t -> t.putLong(CHEWING_START_TAG, gameTime));
     }
 
     public static boolean isBaseStorageForm(ItemStack stack) {
@@ -1149,7 +1153,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static ListTag getStoredItemsList(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = StackNbt.getTag(stack);
         return tag == null ? new ListTag() : tag.getList(STORED_ITEMS_TAG, 10);
     }
 
@@ -1284,15 +1288,17 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return;
         }
 
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         int mucusFed = tag.getInt(MUCUS_FED_TAG) + 1;
         if (mucusFed >= MUCUS_PER_CAPACITY_UPGRADE) {
             tag.putInt(CAPACITY_TAG, Math.min(MAX_STORED_ITEMS, capacity + 1));
             tag.putInt(MUCUS_FED_TAG, 0);
+            StackNbt.setTag(stack, tag);
             return;
         }
 
         tag.putInt(MUCUS_FED_TAG, mucusFed);
+        StackNbt.setTag(stack, tag);
     }
 
     private static int repairDurability(ItemStack stack, int amount) {
@@ -1312,8 +1318,8 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return ItemStack.EMPTY;
         }
 
-        CompoundTag tag = stack.getOrCreateTag();
-        ListTag items = getOrCreateFixedStoredItems(stack);
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
+        ListTag items = getOrCreateFixedStoredItems(tag);
         ItemStack removed = ItemStack.of(items.getCompound(slot));
         if (removed.isEmpty() && getStoredItemCount(stack) >= getStorageCapacity(stack)) {
             return ItemStack.EMPTY;
@@ -1325,11 +1331,12 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         items.set(slot, storedTag);
         tag.put(STORED_ITEMS_TAG, items);
         tag.putInt(SELECTED_SLOT_TAG, slot);
+        StackNbt.setTag(stack, tag);
         return removed;
     }
 
     private static Optional<ItemStack> removeSelected(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         if (!tag.contains(STORED_ITEMS_TAG)) {
             return Optional.empty();
         }
@@ -1355,24 +1362,24 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static int getStorageCapacity(ItemStack stack) {
-        if (!stack.hasTag() || !stack.getTag().contains(CAPACITY_TAG)) {
+        if (!StackNbt.hasTag(stack) || !StackNbt.getTag(stack).contains(CAPACITY_TAG)) {
             return INITIAL_CAPACITY;
         }
 
-        return Math.max(INITIAL_CAPACITY, Math.min(stack.getTag().getInt(CAPACITY_TAG), MAX_STORED_ITEMS));
+        return Math.max(INITIAL_CAPACITY, Math.min(StackNbt.getTag(stack).getInt(CAPACITY_TAG), MAX_STORED_ITEMS));
     }
 
     private static int getSelectedSlot(ItemStack stack) {
-        if (!stack.hasTag()) {
+        if (!StackNbt.hasTag(stack)) {
             return 0;
         }
 
-        int selected = stack.getTag().getInt(SELECTED_SLOT_TAG);
+        int selected = StackNbt.getTag(stack).getInt(SELECTED_SLOT_TAG);
         return Math.max(0, Math.min(selected, MAX_STORED_ITEMS - 1));
     }
 
     private static int getSelectedFoodSlot(ItemStack stack) {
-        if (!stack.hasTag()) {
+        if (!StackNbt.hasTag(stack)) {
             return 0;
         }
 
@@ -1381,7 +1388,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return 0;
         }
 
-        int selected = stack.getTag().getInt(SELECTED_FOOD_SLOT_TAG);
+        int selected = StackNbt.getTag(stack).getInt(SELECTED_FOOD_SLOT_TAG);
         return Math.max(0, Math.min(selected, activeFoodCount - 1));
     }
 
@@ -1390,7 +1397,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static void cleanupStoredItemsTag(ItemStack stack, ListTag items) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         boolean hasStoredItem = false;
         for (int i = 0; i < items.size(); i++) {
             if (!ItemStack.of(items.getCompound(i)).isEmpty()) {
@@ -1402,11 +1409,13 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         if (!hasStoredItem) {
             tag.remove(STORED_ITEMS_TAG);
             tag.remove(SELECTED_SLOT_TAG);
+            StackNbt.setTag(stack, tag);
             return;
         }
 
         tag.put(STORED_ITEMS_TAG, items);
         tag.putInt(SELECTED_SLOT_TAG, getSelectedOccupiedSlotOrNext(items, getSelectedSlot(stack)));
+        StackNbt.setTag(stack, tag);
     }
 
     private static ItemStack getStoredItem(ItemStack stack, int slot) {
@@ -1432,8 +1441,8 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         return selectedSlot;
     }
 
-    private static ListTag getOrCreateFixedStoredItems(ItemStack stack) {
-        ListTag items = stack.getOrCreateTag().getList(STORED_ITEMS_TAG, 10);
+    private static ListTag getOrCreateFixedStoredItems(CompoundTag tag) {
+        ListTag items = tag.getList(STORED_ITEMS_TAG, 10);
         while (items.size() < MAX_STORED_ITEMS) {
             items.add(new CompoundTag());
         }
@@ -1500,10 +1509,11 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static void syncActiveEnchantmentTags(ItemStack stack, String form) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         ItemStack storedTool = getStoredToolForForm(stack, form);
         if (storedTool.isEmpty()) {
             tag.remove("Enchantments");
+            StackNbt.setTag(stack, tag);
             return;
         }
 
@@ -1511,15 +1521,17 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         MimiclingFoodEffects.applyTemporaryEnchantmentModifiers(stack, enchantments);
         if (enchantments.isEmpty()) {
             tag.remove("Enchantments");
+            StackNbt.setTag(stack, tag);
             return;
         }
 
         tag.put("Enchantments", enchantments);
+        StackNbt.setTag(stack, tag);
     }
 
     private static void removeStaleAttributeModifierTags(ItemStack stack) {
-        if (stack.hasTag()) {
-            stack.getTag().remove("AttributeModifiers");
+        if (StackNbt.hasTag(stack)) {
+            StackNbt.update(stack, t -> t.remove("AttributeModifiers"));
         }
     }
 

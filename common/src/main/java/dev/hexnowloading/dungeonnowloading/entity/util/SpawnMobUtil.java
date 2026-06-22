@@ -65,7 +65,7 @@ public class SpawnMobUtil {
         CompoundTag compoundTag = new CompoundTag();
         compoundTag.putString("material", "minecraft:" + trimMaterial.material);
         compoundTag.putString("pattern", "minecraft:" + trimPattern.pattern);
-        itemStack.getOrCreateTag().put("Trim", compoundTag);
+        StackNbt.update(itemStack, t -> t.put("Trim", compoundTag));
         return itemStack;
     }
 

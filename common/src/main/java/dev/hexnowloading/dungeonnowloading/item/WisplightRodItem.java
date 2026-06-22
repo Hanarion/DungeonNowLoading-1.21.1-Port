@@ -320,18 +320,18 @@ public class WisplightRodItem extends Item {
     }
 
     private boolean hasConsumedFuel(ItemStack stack) {
-        return stack.getOrCreateTag().getBoolean(FUEL_CONSUMED_TAG);
+        return StackNbt.getOrCreateTag(stack).getBoolean(FUEL_CONSUMED_TAG);
     }
 
     private void setFuelConsumed(ItemStack stack, boolean consumed) {
-        stack.getOrCreateTag().putBoolean(FUEL_CONSUMED_TAG, consumed);
+        StackNbt.update(stack, t -> t.putBoolean(FUEL_CONSUMED_TAG, consumed));
     }
 
     private boolean hasLargeFuelConsumed(ItemStack stack) {
-        return stack.getOrCreateTag().getBoolean(LARGE_FUEL_CONSUMED_TAG);
+        return StackNbt.getOrCreateTag(stack).getBoolean(LARGE_FUEL_CONSUMED_TAG);
     }
 
     private void setLargeFuelConsumed(ItemStack stack, boolean consumed) {
-        stack.getOrCreateTag().putBoolean(LARGE_FUEL_CONSUMED_TAG, consumed);
+        StackNbt.update(stack, t -> t.putBoolean(LARGE_FUEL_CONSUMED_TAG, consumed));
     }
 }

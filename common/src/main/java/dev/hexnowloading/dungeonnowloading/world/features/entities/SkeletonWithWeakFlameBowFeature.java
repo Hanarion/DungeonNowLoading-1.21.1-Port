@@ -60,7 +60,7 @@ public class SkeletonWithWeakFlameBowFeature extends Feature<NoneFeatureConfigur
         CompoundTag compoundTag = new CompoundTag();
         compoundTag.putString("material", "minecraft:gold");
         compoundTag.putString("pattern", "minecraft:wild");
-        itemStack.getOrCreateTag().put("Trim", compoundTag);
+        StackNbt.update(itemStack, t -> t.put("Trim", compoundTag));
         return itemStack;
     }
 }

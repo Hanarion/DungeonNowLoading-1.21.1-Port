@@ -19,21 +19,21 @@ public interface DNLAnimatedItem<T extends Enum<T> & DNLAnimationState> {
     void playDroppedAnimation(Player player, ItemStack itemStack);
 
     default void ensureItemUUID(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         if (!tag.hasUUID(ITEM_UUID)) {
             tag.putUUID(ITEM_UUID, UUID.randomUUID());
         }
     }
 
     default UUID getItemUUID(ItemStack stack) {
-        if (!stack.hasTag() || !stack.getTag().hasUUID(ITEM_UUID)) {
+        if (!StackNbt.hasTag(stack) || !StackNbt.getTag(stack).hasUUID(ITEM_UUID)) {
             return null;
         }
-        return stack.getTag().getUUID(ITEM_UUID);
+        return StackNbt.getTag(stack).getUUID(ITEM_UUID);
     }
 
     default void resetItemUUID(ItemStack stack) {
-        if (!stack.hasTag()) return;
-        stack.getTag().remove(ITEM_UUID);
+        if (!StackNbt.hasTag(stack)) return;
+        StackNbt.update(stack, t -> t.remove(ITEM_UUID));
     }
 }

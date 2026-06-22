@@ -51,9 +51,9 @@ public class ScepterOfSealedChaosItem extends Item {
 // cycle mode if amethyst cluster is clicked
         if (clickedState.is(net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER)) {
             if (!level.isClientSide && player != null) {
-                boolean basic = itemStack.getOrCreateTag().getBoolean(MODE_BASIC);
+                boolean basic = StackNbt.getOrCreateTag(itemStack).getBoolean(MODE_BASIC);
                 basic = !basic;
-                itemStack.getOrCreateTag().putBoolean(MODE_BASIC, basic);
+                StackNbt.update(itemStack, t -> t.putBoolean(MODE_BASIC, basic));
 
                 player.displayClientMessage(
                         Component.translatable(
@@ -129,7 +129,7 @@ public class ScepterOfSealedChaosItem extends Item {
                 }
 
 
-                    boolean basic = itemStack.getOrCreateTag().getBoolean(MODE_BASIC);
+                    boolean basic = StackNbt.getOrCreateTag(itemStack).getBoolean(MODE_BASIC);
                     sealedChaosEntity.setBasicVariant(basic);
 
                     level.addFreshEntity(sealedChaosEntity);

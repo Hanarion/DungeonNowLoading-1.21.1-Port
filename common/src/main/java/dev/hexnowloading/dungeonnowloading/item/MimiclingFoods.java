@@ -150,7 +150,7 @@ public final class MimiclingFoods {
             return returnedItems;
         }
 
-        CompoundTag tag = mimicling.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(mimicling);
         ListTag activeFoods = tag.getList(ACTIVE_FOODS_TAG, 10);
         ListTag updatedFoods = new ListTag();
 
@@ -168,6 +168,7 @@ public final class MimiclingFoods {
 
         if (mergedExistingFood) {
             tag.put(ACTIVE_FOODS_TAG, updatedFoods);
+            StackNbt.setTag(mimicling, tag);
             MimiclingFoodEffects.retainMemoriesForActiveFoods(mimicling, getActiveFoods(mimicling));
             return returnedItems;
         }
@@ -190,6 +191,7 @@ public final class MimiclingFoods {
             }
         }
         tag.put(ACTIVE_FOODS_TAG, updatedFoods);
+        StackNbt.setTag(mimicling, tag);
         MimiclingFoodEffects.retainMemoriesForActiveFoods(mimicling, getActiveFoods(mimicling));
         return returnedItems;
     }
@@ -213,11 +215,11 @@ public final class MimiclingFoods {
     }
 
     private static boolean isAtUsageCap(ItemStack mimicling, FoodDefinition food) {
-        if (!mimicling.hasTag()) {
+        if (!StackNbt.hasTag(mimicling)) {
             return false;
         }
 
-        ListTag activeFoods = mimicling.getTag().getList(ACTIVE_FOODS_TAG, 10);
+        ListTag activeFoods = StackNbt.getTag(mimicling).getList(ACTIVE_FOODS_TAG, 10);
         for (int i = 0; i < activeFoods.size(); i++) {
             CompoundTag activeFood = activeFoods.getCompound(i);
             if (!food.id().equals(activeFood.getString(ACTIVE_FOOD_ID_TAG))) {
@@ -296,11 +298,11 @@ public final class MimiclingFoods {
 
     public static List<ActiveFood> getActiveFoodEntries(ItemStack mimicling) {
         List<ActiveFood> foods = new ArrayList<>();
-        if (!mimicling.hasTag()) {
+        if (!StackNbt.hasTag(mimicling)) {
             return foods;
         }
 
-        ListTag activeFoods = mimicling.getTag().getList(ACTIVE_FOODS_TAG, 10);
+        ListTag activeFoods = StackNbt.getTag(mimicling).getList(ACTIVE_FOODS_TAG, 10);
         for (int i = 0; i < activeFoods.size(); i++) {
             CompoundTag activeFood = activeFoods.getCompound(i);
             FoodDefinition food = FOODS_BY_ID.get(activeFood.getString(ACTIVE_FOOD_ID_TAG));
@@ -312,11 +314,11 @@ public final class MimiclingFoods {
     }
 
     public static boolean hasActiveFood(ItemStack mimicling, String foodId) {
-        if (!mimicling.hasTag()) {
+        if (!StackNbt.hasTag(mimicling)) {
             return false;
         }
 
-        ListTag activeFoods = mimicling.getTag().getList(ACTIVE_FOODS_TAG, 10);
+        ListTag activeFoods = StackNbt.getTag(mimicling).getList(ACTIVE_FOODS_TAG, 10);
         for (int i = 0; i < activeFoods.size(); i++) {
             if (foodId.equals(activeFoods.getCompound(i).getString(ACTIVE_FOOD_ID_TAG))) {
                 return true;
@@ -344,7 +346,7 @@ public final class MimiclingFoods {
     }
 
     public static boolean hasActiveEffect(ItemStack mimicling, String type, @Nullable String action) {
-        if (!mimicling.hasTag()) {
+        if (!StackNbt.hasTag(mimicling)) {
             return false;
         }
 
@@ -357,11 +359,11 @@ public final class MimiclingFoods {
     }
 
     public static void consumeUsage(ItemStack mimicling) {
-        if (!mimicling.hasTag()) {
+        if (!StackNbt.hasTag(mimicling)) {
             return;
         }
 
-        CompoundTag tag = mimicling.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(mimicling);
         Set<String> handledFoods = getHandledUsageFoods(tag);
         Set<String> actionManagedFoods = getActionManagedUsageFoods(mimicling);
         ListTag activeFoods = tag.getList(ACTIVE_FOODS_TAG, 10);
@@ -391,6 +393,7 @@ public final class MimiclingFoods {
             tag.put(ACTIVE_FOODS_TAG, remainingFoods);
         }
         tag.remove(USAGE_HANDLED_FOODS_TAG);
+        StackNbt.setTag(mimicling, tag);
         MimiclingFoodEffects.retainMemoriesForActiveFoods(mimicling, getActiveFoods(mimicling));
     }
 
@@ -415,11 +418,11 @@ public final class MimiclingFoods {
     }
 
     public static boolean consumeUsage(ItemStack mimicling, String foodId, int amount) {
-        if (amount <= 0 || !mimicling.hasTag()) {
+        if (amount <= 0 || !StackNbt.hasTag(mimicling)) {
             return false;
         }
 
-        CompoundTag tag = mimicling.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(mimicling);
         ListTag activeFoods = tag.getList(ACTIVE_FOODS_TAG, 10);
         ListTag remainingFoods = new ListTag();
         boolean consumed = false;
@@ -447,12 +450,13 @@ public final class MimiclingFoods {
         } else {
             tag.put(ACTIVE_FOODS_TAG, remainingFoods);
         }
+        StackNbt.setTag(mimicling, tag);
         MimiclingFoodEffects.retainMemoriesForActiveFoods(mimicling, getActiveFoods(mimicling));
         return consumed;
     }
 
     public static void markUsageHandled(ItemStack mimicling, String foodId) {
-        CompoundTag tag = mimicling.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(mimicling);
         Set<String> handledFoods = getHandledUsageFoods(tag);
         if (handledFoods.contains(foodId)) {
             return;
@@ -461,10 +465,11 @@ public final class MimiclingFoods {
         ListTag handled = tag.getList(USAGE_HANDLED_FOODS_TAG, 8);
         handled.add(StringTag.valueOf(foodId));
         tag.put(USAGE_HANDLED_FOODS_TAG, handled);
+        StackNbt.setTag(mimicling, tag);
     }
 
     public static boolean isUsageHandled(ItemStack mimicling, String foodId) {
-        return mimicling.hasTag() && getHandledUsageFoods(mimicling.getTag()).contains(foodId);
+        return StackNbt.hasTag(mimicling) && StackNbt.getTag(getHandledUsageFoods(mimicling)).contains(foodId);
     }
 
     private static Set<String> getHandledUsageFoods(CompoundTag tag) {

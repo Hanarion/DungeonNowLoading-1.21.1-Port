@@ -77,7 +77,7 @@ public class SpecialItemEntity extends ItemEntity implements TraceableEntity {
         this.picker = uuid;
 
         // merge into existing tag (don't overwrite enchantments, custom names, etc.)
-        this.getItem().getOrCreateTag().putUUID("PickerUUID", uuid);
+        StackNbt.update(this.getItem(), t -> t.putUUID("PickerUUID", uuid));
     }
 
     public UUID getPickerUUID() {

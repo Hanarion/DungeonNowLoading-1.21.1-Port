@@ -44,7 +44,7 @@ public class PlayerStatueBlockItem extends BlockItem {
     }
 
     private static String readOwnerName(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = StackNbt.getTag(stack);
         if (tag == null) return null;
 
         // Accept either "SkullOwner" (string or compound) or "Owner" (compound)

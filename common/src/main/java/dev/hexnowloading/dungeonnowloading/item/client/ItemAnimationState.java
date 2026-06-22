@@ -13,7 +13,7 @@ public class ItemAnimationState {
 
         if (resetAnimations) stopAll(stack);
 
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(stack);
         CompoundTag animationsTag = tag.getCompound(ANIMATIONS_TAG);
 
         CompoundTag animTag = new CompoundTag();
@@ -23,6 +23,7 @@ public class ItemAnimationState {
 
         animationsTag.put(animationName, animTag);
         tag.put(ANIMATIONS_TAG, animationsTag);
+        StackNbt.setTag(stack, tag);
     }
 
     public static void startIfStopped(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
@@ -32,9 +33,9 @@ public class ItemAnimationState {
     }
 
     public static float getProgress(ItemStack stack, String animationName, long gameTime, float partialTicks) {
-        if (!stack.hasTag()) return 0.0f;
+        if (!StackNbt.hasTag(stack)) return 0.0f;
 
-        CompoundTag animationsTag = stack.getTag().getCompound("Animations");
+        CompoundTag animationsTag = StackNbt.getTag(stack).getCompound("Animations");
         if (!animationsTag.contains(animationName)) return 0.0f;
 
         CompoundTag animTag = animationsTag.getCompound(animationName);
@@ -49,9 +50,9 @@ public class ItemAnimationState {
     }
 
     public static String getCurrentAnimation(ItemStack stack, long gameTime) {
-        if (!stack.hasTag()) return null;
+        if (!StackNbt.hasTag(stack)) return null;
 
-        CompoundTag animationsTag = stack.getTag().getCompound(ANIMATIONS_TAG);
+        CompoundTag animationsTag = StackNbt.getTag(stack).getCompound(ANIMATIONS_TAG);
 
         for (String key : animationsTag.getAllKeys()) {
             CompoundTag animTag = animationsTag.getCompound(key);
@@ -67,9 +68,9 @@ public class ItemAnimationState {
     }
 
     public static boolean isAnimating(ItemStack stack, String animationName, long gameTime) {
-        if (!stack.hasTag()) return false;
+        if (!StackNbt.hasTag(stack)) return false;
 
-        CompoundTag animationsTag = stack.getTag().getCompound(ANIMATIONS_TAG);
+        CompoundTag animationsTag = StackNbt.getTag(stack).getCompound(ANIMATIONS_TAG);
         if (!animationsTag.contains(animationName)) return false;
 
         CompoundTag animTag = animationsTag.getCompound(animationName);
@@ -81,9 +82,9 @@ public class ItemAnimationState {
     }
 
     public static boolean isAnimatingOrHanging(ItemStack stack, String animationName, long gameTime) {
-        if (!stack.hasTag()) return false;
+        if (!StackNbt.hasTag(stack)) return false;
 
-        CompoundTag animationsTag = stack.getTag().getCompound(ANIMATIONS_TAG);
+        CompoundTag animationsTag = StackNbt.getTag(stack).getCompound(ANIMATIONS_TAG);
         if (!animationsTag.contains(animationName)) return false;
 
         CompoundTag animTag = animationsTag.getCompound(animationName);
@@ -95,9 +96,9 @@ public class ItemAnimationState {
     }
 
     public static boolean isAnimationHanging(ItemStack stack, String animationName, long gameTime) {
-        if (!stack.hasTag()) return false;
+        if (!StackNbt.hasTag(stack)) return false;
 
-        CompoundTag animationsTag = stack.getTag().getCompound(ANIMATIONS_TAG);
+        CompoundTag animationsTag = StackNbt.getTag(stack).getCompound(ANIMATIONS_TAG);
         if (!animationsTag.contains(animationName)) return false;
 
         CompoundTag animTag = animationsTag.getCompound(animationName);
@@ -110,9 +111,9 @@ public class ItemAnimationState {
     }
 
     public static void stopAll(ItemStack itemStack) {
-        if (!itemStack.hasTag()) return;
+        if (!StackNbt.hasTag(itemStack)) return;
 
-        CompoundTag tag = itemStack.getTag();
+        CompoundTag tag = StackNbt.getTag(itemStack);
         if (tag.contains(ANIMATIONS_TAG)) {
             tag.remove(ANIMATIONS_TAG);
         }

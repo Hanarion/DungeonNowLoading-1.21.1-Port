@@ -22,20 +22,21 @@ public class ScrapItem extends Item {
 
     public static ItemStack ofOriginal(ItemStack original) {
         ItemStack scrap = new ItemStack(DNLItems.ITEM_SCRAPS.get());
-        CompoundTag tag = scrap.getOrCreateTag();
+        CompoundTag tag = StackNbt.getOrCreateTag(scrap);
         CompoundTag originalTag = new CompoundTag();
         original.save(originalTag);
         tag.put(ORIGINAL_TAG, originalTag);
+        StackNbt.setTag(scrap, tag);
         return scrap;
     }
 
     public static boolean hasOriginal(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = StackNbt.getTag(stack);
         return tag != null && tag.contains(ORIGINAL_TAG, 10); // 10 = Compound
     }
 
     public static ItemStack getOriginal(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = StackNbt.getTag(stack);
         if (tag != null && tag.contains(ORIGINAL_TAG, 10)) {
             return ItemStack.of(tag.getCompound(ORIGINAL_TAG));
         }
