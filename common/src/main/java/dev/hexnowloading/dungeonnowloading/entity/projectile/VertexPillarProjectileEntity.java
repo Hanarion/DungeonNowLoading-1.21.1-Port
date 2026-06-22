@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.projectile;
 
+import net.minecraft.network.syncher.SynchedEntityData;
 import dev.hexnowloading.dungeonnowloading.block.VertexPillarBlock;
 import dev.hexnowloading.dungeonnowloading.entity.boss.FairkeeperSerpentEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.ModelledProjectileEntity;
@@ -61,7 +62,7 @@ public class VertexPillarProjectileEntity extends ModelledProjectileEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
     }
 

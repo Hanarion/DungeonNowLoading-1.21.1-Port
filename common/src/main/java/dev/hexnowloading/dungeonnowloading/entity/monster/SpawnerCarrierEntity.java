@@ -144,12 +144,12 @@ public class SpawnerCarrierEntity extends Monster {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(STORED_ENTITY_ID, "");
-        this.entityData.define(PICKAXE_ACCUM_DAMAGE, 0.0F);
-        this.entityData.define(ANIMATION_STATE, SpawnerCarrierAnimationState.IDLE);
-        this.entityData.define(ANIMATION_SEQ, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(STORED_ENTITY_ID, "");
+        builder.define(PICKAXE_ACCUM_DAMAGE, 0.0F);
+        builder.define(ANIMATION_STATE, SpawnerCarrierAnimationState.IDLE);
+        builder.define(ANIMATION_SEQ, 0);
     }
 
     @Override

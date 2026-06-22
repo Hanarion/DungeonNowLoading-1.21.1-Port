@@ -242,7 +242,7 @@ public class WebCarpetBlock extends MultifaceBlock {
         for (Entity e : entities) {
             if (e instanceof LivingEntity living) {
                 // Set on fire as soon as it ignites
-                living.setSecondsOnFire(3);
+                living.igniteForSeconds(3);
             }
         }
 

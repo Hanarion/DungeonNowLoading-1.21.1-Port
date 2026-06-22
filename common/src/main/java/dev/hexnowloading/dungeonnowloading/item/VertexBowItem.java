@@ -80,7 +80,7 @@ public class VertexBowItem extends BowItem {
                         }
 
                         if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, itemStack) > 0) {
-                            arrow.setSecondsOnFire(100);
+                            arrow.igniteForSeconds(100);
                         }
 
                         itemStack.hurtAndBreak(1, player, $$1x -> $$1x.broadcastBreakEvent(player.getUsedItemHand()));

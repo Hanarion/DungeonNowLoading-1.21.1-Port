@@ -82,15 +82,15 @@ public class GasCloudEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_GAS_SIZE, 1);
-        this.entityData.define(DATA_GROWTH_TIME, 0);
-        this.entityData.define(DATA_GAS_SPREAD, 3.0F);
-        this.entityData.define(DATA_GAS_SPEED, 0.02F);
-        this.entityData.define(DATA_LIFE, 200);
-        this.entityData.define(DATA_EXPLOSION_MULTIPLIER, 0.4F);
-        this.entityData.define(DATA_AIR_RESISTANCE, 0.05F);
-        this.entityData.define(DATA_STATE, GasState.DEFAULT.ordinal());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_GAS_SIZE, 1);
+        builder.define(DATA_GROWTH_TIME, 0);
+        builder.define(DATA_GAS_SPREAD, 3.0F);
+        builder.define(DATA_GAS_SPEED, 0.02F);
+        builder.define(DATA_LIFE, 200);
+        builder.define(DATA_EXPLOSION_MULTIPLIER, 0.4F);
+        builder.define(DATA_AIR_RESISTANCE, 0.05F);
+        builder.define(DATA_STATE, GasState.DEFAULT.ordinal());
     }
 
     @Override
@@ -404,7 +404,7 @@ public class GasCloudEntity extends Entity {
             // 🔥 burn mode (unchanged)
             for (LivingEntity entity : list) {
                 if (entity.fireImmune()) continue;
-                entity.setSecondsOnFire(1);
+                entity.igniteForSeconds(1);
                 float burnDamagePerTick = 0.5F;
                 entity.hurt(this.level().damageSources().inFire(), burnDamagePerTick);
             }

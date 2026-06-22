@@ -104,14 +104,14 @@ public class RepulsorEntity extends Mob {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_CAN_RENDER, false);
-        this.entityData.define(DATA_AGE, 0);
-        this.entityData.define(DATA_SHIELD_HEALTH, SHIELD_MAX_HEALTH);
-        this.entityData.define(DATA_STATE, State.SETUP);
-        this.entityData.define(DATA_SKIN, Skin.DEFAULT);
-        this.entityData.define(DATA_SKIN_VALIDATION, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_CAN_RENDER, false);
+        builder.define(DATA_AGE, 0);
+        builder.define(DATA_SHIELD_HEALTH, SHIELD_MAX_HEALTH);
+        builder.define(DATA_STATE, State.SETUP);
+        builder.define(DATA_SKIN, Skin.DEFAULT);
+        builder.define(DATA_SKIN_VALIDATION, false);
     }
 
     @Override

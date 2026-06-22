@@ -91,10 +91,10 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(STATE, BallistaGolemState.SLUMBERING);
-        this.entityData.define(ARROW_COUNT, 6);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(STATE, BallistaGolemState.SLUMBERING);
+        builder.define(ARROW_COUNT, 6);
     }
 
     @Override

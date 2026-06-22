@@ -106,14 +106,14 @@ public class SeepingSoulEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_SPAWN_DELAY, SPAWN_DELAY_TICKS);
-        this.entityData.define(DATA_HP, MAX_HP);
-        this.entityData.define(DATA_DEFEATED_COUNT, 0);
-        this.entityData.define(DATA_CHANNEL_TICKS, 0);
-        this.entityData.define(DATA_HURT_TICKS, 0);
-        this.entityData.define(ANIMATION_STATE, SeepingSoulAnimationState.NONE);
-        this.entityData.define(DATA_BOSS_ID, DEFAULT_BOSS_ID.toString());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_SPAWN_DELAY, SPAWN_DELAY_TICKS);
+        builder.define(DATA_HP, MAX_HP);
+        builder.define(DATA_DEFEATED_COUNT, 0);
+        builder.define(DATA_CHANNEL_TICKS, 0);
+        builder.define(DATA_HURT_TICKS, 0);
+        builder.define(ANIMATION_STATE, SeepingSoulAnimationState.NONE);
+        builder.define(DATA_BOSS_ID, DEFAULT_BOSS_ID.toString());
 
     }
 

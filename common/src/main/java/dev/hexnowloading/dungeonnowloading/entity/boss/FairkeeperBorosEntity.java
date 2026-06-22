@@ -149,13 +149,13 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(CHILD_UUID, Optional.empty());
-        //this.entityData.define(CALLER_UUID, Optional.empty());
-        this.entityData.define(STATE, FairkeeperBorosState.IDLE);
-        this.entityData.define(ANIMATION_STATE, FairkeeperBorosAnimationState.IDLE);
-        this.entityData.define(HAS_ARMOR, true);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(CHILD_UUID, Optional.empty());
+        //builder.define(CALLER_UUID, Optional.empty());
+        builder.define(STATE, FairkeeperBorosState.IDLE);
+        builder.define(ANIMATION_STATE, FairkeeperBorosAnimationState.IDLE);
+        builder.define(HAS_ARMOR, true);
     }
 
     @Override

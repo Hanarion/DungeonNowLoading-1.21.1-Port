@@ -121,15 +121,15 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(HURT_TIME, 0);
-        this.entityData.define(HURT_TIME_DIRECT, 1);
-        this.entityData.define(DAMAGE, 0.0f);
-        this.entityData.define(VELOCITY, Vec3.ZERO.toVector3f());
-        this.entityData.define(ANIMATION_STATE, VertexDomainAnimationState.IDLE);
-        this.entityData.define(DYING_TICK, 0);
-        this.entityData.define(GROUND_COLLISION, false);
-        this.entityData.define(RADIUS, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(HURT_TIME, 0);
+        builder.define(HURT_TIME_DIRECT, 1);
+        builder.define(DAMAGE, 0.0f);
+        builder.define(VELOCITY, Vec3.ZERO.toVector3f());
+        builder.define(ANIMATION_STATE, VertexDomainAnimationState.IDLE);
+        builder.define(DYING_TICK, 0);
+        builder.define(GROUND_COLLISION, false);
+        builder.define(RADIUS, 0);
     }
 
     @Override

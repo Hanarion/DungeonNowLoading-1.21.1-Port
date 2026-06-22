@@ -81,10 +81,10 @@ public class WispLanternEntity extends FlyingMob implements Enemy {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(SUMMONING_WISP, false);
-        this.entityData.define(LOOK_AROUND_TRIGGER, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(SUMMONING_WISP, false);
+        builder.define(LOOK_AROUND_TRIGGER, 0);
     }
 
     public boolean isSummoningWisp() {

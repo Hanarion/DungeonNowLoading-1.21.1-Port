@@ -34,9 +34,9 @@ public class GreatExperienceBottleEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(EXPERIENCE_AMOUNT, 100);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(EXPERIENCE_AMOUNT, 100);
     }
 
     @Override

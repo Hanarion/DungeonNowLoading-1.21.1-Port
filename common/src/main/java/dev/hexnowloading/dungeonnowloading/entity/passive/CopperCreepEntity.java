@@ -97,7 +97,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
     private static final float EXPLOSION_RADIUS = 3.0f;
     private static final float POWERED_EXPLOSION_RADIUS = 5.0f;
 
-    private final AttributeModifier SPEED_MODIFIER = new AttributeModifier(UUID.randomUUID(), "Slowdown Speed", -1.0, AttributeModifier.Operation.MULTIPLY_BASE);
+    private final AttributeModifier SPEED_MODIFIER = new AttributeModifier(UUID.randomUUID(), "Slowdown Speed", -1.0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     private static final EntityDataAccessor<Optional<UUID>> SUMMONER_UUID = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> DATA_IS_POWERED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
@@ -200,19 +200,19 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
 
     // Define Synched Data (This is the part where we define what data to sync)
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(ANIMATION_STATE, CopperCreepAnimationState.IDLE);
-        this.entityData.define(SUMMONER_UUID, Optional.empty()); // Initially, no UUID is set
-        this.entityData.define(DATA_IS_POWERED, false);
-        this.entityData.define(DATA_IS_IGNITED, false);
-        this.entityData.define(DATA_IS_ALREADY_SUMMONED, false);
-        this.entityData.define(STATE, State.SUMMONING);
-        this.entityData.define(SKIN, Skin.DEFAULT);
-        this.entityData.define(SKIN_VALIDATION, false);
-        this.entityData.define(GIGANTIC, false);
-        this.entityData.define(OVERWORKED, false);
-        this.entityData.define(OVERWORKED_LEVEL, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(ANIMATION_STATE, CopperCreepAnimationState.IDLE);
+        builder.define(SUMMONER_UUID, Optional.empty()); // Initially, no UUID is set
+        builder.define(DATA_IS_POWERED, false);
+        builder.define(DATA_IS_IGNITED, false);
+        builder.define(DATA_IS_ALREADY_SUMMONED, false);
+        builder.define(STATE, State.SUMMONING);
+        builder.define(SKIN, Skin.DEFAULT);
+        builder.define(SKIN_VALIDATION, false);
+        builder.define(GIGANTIC, false);
+        builder.define(OVERWORKED, false);
+        builder.define(OVERWORKED_LEVEL, 0);
     }
 
     @Override
@@ -393,7 +393,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
                     GIGANTISM_MAX_HEALTH_MODIFIER_ID,
                     "dnl_gigantism_max_health",
                     0.5D,
-                    AttributeModifier.Operation.MULTIPLY_TOTAL
+                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
             ));
         }
 
@@ -466,7 +466,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
                         overworkedSpeedId,
                         "dnl_overworked_speed",
                         bonus,
-                        AttributeModifier.Operation.MULTIPLY_TOTAL
+                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
                 ));
             }
         }
@@ -592,7 +592,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
     public void thunderHit(ServerLevel serverLevel, LightningBolt lightningBolt) {
         this.setRemainingFireTicks(this.getRemainingFireTicks() + 1);
         if (this.getRemainingFireTicks() == 0) {
-            this.setSecondsOnFire(8);
+            this.igniteForSeconds(8);
         }
 
 //        this.hurt(this.damageSources().lightningBolt(), 5.0F);

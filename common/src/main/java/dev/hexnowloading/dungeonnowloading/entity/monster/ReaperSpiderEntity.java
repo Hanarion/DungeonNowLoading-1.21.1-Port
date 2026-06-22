@@ -106,13 +106,13 @@ public class ReaperSpiderEntity extends Spider implements LocomotionLockable {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(ANIMATION_STATE,  ReaperSpiderAnimationState.IDLE);
-        this.entityData.define(REVEALED_STATE, false);
-        this.entityData.define(BACKING_UP, false);
-        this.entityData.define(RETREATING_STATE, false);
-        this.entityData.define(BEHAVIOR_STATE, BehaviorState.WANDER.ordinal());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(ANIMATION_STATE,  ReaperSpiderAnimationState.IDLE);
+        builder.define(REVEALED_STATE, false);
+        builder.define(BACKING_UP, false);
+        builder.define(RETREATING_STATE, false);
+        builder.define(BEHAVIOR_STATE, BehaviorState.WANDER.ordinal());
     }
 
     @Override

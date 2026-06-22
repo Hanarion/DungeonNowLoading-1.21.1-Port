@@ -77,11 +77,11 @@ public class SilkSpiderEntity extends Spider implements RangedAttackMob {
     // --- Anchored state sync ---
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(ANCHORED, Boolean.FALSE);
-        this.entityData.define(BACKING_UP, Boolean.FALSE);
-        this.entityData.define(ANIMATION_STATE, SilkSpiderAnimationState.IDLE);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(ANCHORED, Boolean.FALSE);
+        builder.define(BACKING_UP, Boolean.FALSE);
+        builder.define(ANIMATION_STATE, SilkSpiderAnimationState.IDLE);
     }
 
     public boolean isAnchored() {

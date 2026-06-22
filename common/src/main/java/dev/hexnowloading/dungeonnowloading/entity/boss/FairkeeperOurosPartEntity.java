@@ -110,21 +110,21 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(PARENT_UUID, Optional.empty());
-        this.entityData.define(CHILD_UUID, Optional.empty());
-        this.entityData.define(HEAD_UUID, Optional.empty());
-        this.entityData.define(BODY_INDEX, 0);
-        this.entityData.define(TAIL, false);
-        this.entityData.define(DROPPER, false);
-        this.entityData.define(HEAD_MOVING, false);
-        this.entityData.define(MODEL_VISIBLE, true);
-        this.entityData.define(ROTATABLE, true);
-        this.entityData.define(CANNON_PITCH, 0F);
-        this.entityData.define(CANNON_YAW, 0F);
-        this.entityData.define(STATE, FairkeeperOurosPartState.IDLE);
-        this.entityData.define(ANIMATION_STATE, FairkeeperOurosPartAnimationState.NONE);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(PARENT_UUID, Optional.empty());
+        builder.define(CHILD_UUID, Optional.empty());
+        builder.define(HEAD_UUID, Optional.empty());
+        builder.define(BODY_INDEX, 0);
+        builder.define(TAIL, false);
+        builder.define(DROPPER, false);
+        builder.define(HEAD_MOVING, false);
+        builder.define(MODEL_VISIBLE, true);
+        builder.define(ROTATABLE, true);
+        builder.define(CANNON_PITCH, 0F);
+        builder.define(CANNON_YAW, 0F);
+        builder.define(STATE, FairkeeperOurosPartState.IDLE);
+        builder.define(ANIMATION_STATE, FairkeeperOurosPartAnimationState.NONE);
     }
 
     @Override

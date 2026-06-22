@@ -101,7 +101,7 @@ public final class OverworkedPenaltyUtil {
                     OVERWORKED_HP_MODIFIER_ID,
                     "dnl_overworked_player_max_health",
                     -penalty,
-                    AttributeModifier.Operation.ADDITION
+                    AttributeModifier.Operation.ADD_VALUE
             ));
         }
 

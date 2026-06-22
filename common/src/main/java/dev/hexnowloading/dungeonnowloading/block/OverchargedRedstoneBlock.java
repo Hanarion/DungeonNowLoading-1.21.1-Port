@@ -55,7 +55,7 @@ public class OverchargedRedstoneBlock extends Block {
         if (entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) entity) && !(entity instanceof ScuttleEntity)) {
             entity.hurt(level.damageSources().hotFloor(), 6.0F);
             if (!entity.fireImmune()) {
-                entity.setSecondsOnFire(5);
+                entity.igniteForSeconds(5);
             }
         }
         super.stepOn(level, blockPos, blockState, entity);

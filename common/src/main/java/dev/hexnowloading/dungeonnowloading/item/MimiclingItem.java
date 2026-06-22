@@ -1488,7 +1488,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     private static double getToolAttackDamage(ItemStack stack) {
         double attackDamage = 0.0D;
         for (AttributeModifier modifier : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE)) {
-            if (modifier.getOperation() == AttributeModifier.Operation.ADDITION) {
+            if (modifier.getOperation() == AttributeModifier.Operation.ADD_VALUE) {
                 attackDamage += modifier.getAmount();
             }
         }

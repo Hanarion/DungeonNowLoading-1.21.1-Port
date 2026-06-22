@@ -67,7 +67,7 @@ public class RedstoneLaneBlock extends DirectionalBlock {
             if (entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) entity) && !(entity instanceof ScuttleEntity)) {
                 entity.hurt(level.damageSources().hotFloor(), 6.0F);
                 if (!entity.fireImmune()) {
-                    entity.setSecondsOnFire(5);
+                    entity.igniteForSeconds(5);
                 }
             }
         }

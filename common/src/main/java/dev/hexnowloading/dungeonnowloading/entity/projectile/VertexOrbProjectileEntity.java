@@ -119,14 +119,14 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(HURT_TIME, 0);
-        this.entityData.define(HURT_TIME_DIRECT, 1);
-        this.entityData.define(DAMAGE, 0.0f);
-        this.entityData.define(VELOCITY, Vec3.ZERO.toVector3f());
-        this.entityData.define(RADIUS, 0);
-        this.entityData.define(DYING_TICK, 0);
-        this.entityData.define(GROUND_COLLISION, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(HURT_TIME, 0);
+        builder.define(HURT_TIME_DIRECT, 1);
+        builder.define(DAMAGE, 0.0f);
+        builder.define(VELOCITY, Vec3.ZERO.toVector3f());
+        builder.define(RADIUS, 0);
+        builder.define(DYING_TICK, 0);
+        builder.define(GROUND_COLLISION, false);
     }
 
     @Override

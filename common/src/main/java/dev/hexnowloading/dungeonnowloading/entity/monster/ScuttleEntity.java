@@ -84,9 +84,9 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(STATE, ScuttleState.SLUMBERING);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(STATE, ScuttleState.SLUMBERING);
     }
 
     @Override

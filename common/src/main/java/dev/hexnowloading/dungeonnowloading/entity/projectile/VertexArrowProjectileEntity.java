@@ -50,9 +50,9 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(POWER_LEVEL, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(POWER_LEVEL, 0);
     }
 
     @Override

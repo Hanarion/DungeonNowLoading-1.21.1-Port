@@ -55,10 +55,10 @@ public class WispwardLanternCartEntity extends AbstractMinecart {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(LIT, false);
-        this.entityData.define(TIMED, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(LIT, false);
+        builder.define(TIMED, false);
     }
 
     public boolean isLit() {

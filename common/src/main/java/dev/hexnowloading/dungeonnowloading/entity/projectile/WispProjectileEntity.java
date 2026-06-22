@@ -91,9 +91,9 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(HOMING_TARGET_ID, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(HOMING_TARGET_ID, 0);
     }
 
     @Override
@@ -481,7 +481,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
         Entity owner = this.getOwner();
         target.push(this);
         if (target instanceof LivingEntity living) {
-            living.setSecondsOnFire(4);
+            living.igniteForSeconds(4);
         }
         if (owner instanceof LivingEntity livingOwner) {
             target.hurt(this.damageSources().mobProjectile(this, livingOwner), this.damage);

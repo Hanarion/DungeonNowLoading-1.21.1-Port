@@ -62,9 +62,9 @@ public class BrokenGarholdEntity extends Monster {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(STATE, BrokenGarholdState.HANGING);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(STATE, BrokenGarholdState.HANGING);
     }
 
     @Override

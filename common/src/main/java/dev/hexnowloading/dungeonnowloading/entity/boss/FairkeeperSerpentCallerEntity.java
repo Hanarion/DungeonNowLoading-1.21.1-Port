@@ -150,14 +150,14 @@ public class FairkeeperSerpentCallerEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(ANIMATION_STATE, FairkeeperSerpentCallerAnimationState.NONE);
-        this.entityData.define(ACTIVATED, false);
-        this.entityData.define(BOROS_UUID, Optional.empty());
-        this.entityData.define(OUROS_UUID, Optional.empty());
-        this.entityData.define(HORIZONTAL_OFFSET, 0);
-        this.entityData.define(VERTICAL_OFFSET, 0);
-        this.entityData.define(PHASE, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(ANIMATION_STATE, FairkeeperSerpentCallerAnimationState.NONE);
+        builder.define(ACTIVATED, false);
+        builder.define(BOROS_UUID, Optional.empty());
+        builder.define(OUROS_UUID, Optional.empty());
+        builder.define(HORIZONTAL_OFFSET, 0);
+        builder.define(VERTICAL_OFFSET, 0);
+        builder.define(PHASE, 0);
     }
 
     @Override

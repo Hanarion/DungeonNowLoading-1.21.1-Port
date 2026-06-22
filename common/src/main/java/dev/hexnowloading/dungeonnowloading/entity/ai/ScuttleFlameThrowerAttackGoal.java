@@ -17,8 +17,8 @@ import java.util.UUID;
 public class ScuttleFlameThrowerAttackGoal extends Goal {
 
     private static final UUID FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID = UUID.fromString("2a6f22a4-5468-4eed-b100-fe77cdc8bd98");
-    private final AttributeModifier FULL_KNOCKBACK_RESISTANCE = new AttributeModifier(FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID, "Full knockback resistance", 0.5F, AttributeModifier.Operation.ADDITION);
-    private final AttributeModifier CLOSED_ARMOR = new AttributeModifier(UUID.randomUUID(), "Closed armor bonus", -1.0, AttributeModifier.Operation.MULTIPLY_BASE);
+    private final AttributeModifier FULL_KNOCKBACK_RESISTANCE = new AttributeModifier(FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID, "Full knockback resistance", 0.5F, AttributeModifier.Operation.ADD_VALUE);
+    private final AttributeModifier CLOSED_ARMOR = new AttributeModifier(UUID.randomUUID(), "Closed armor bonus", -1.0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
     private final ScuttleEntity scuttleEntity;
     private int nextScanTick;
@@ -73,7 +73,7 @@ public class ScuttleFlameThrowerAttackGoal extends Goal {
             AABB aabb = (new AABB(scuttleEntity.blockPosition())).inflate(1.2F);
             List<Player> targets = scuttleEntity.level().getEntitiesOfClass(Player.class, aabb);
             for (Player player : targets) {
-                player.setSecondsOnFire(5);
+                player.igniteForSeconds(5);
                 scuttleEntity.doHurtTarget(player);
             }
         }

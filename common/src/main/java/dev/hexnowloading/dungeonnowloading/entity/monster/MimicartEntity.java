@@ -859,9 +859,9 @@ public class MimicartEntity extends AbstractMinecart {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(ANIMATION_STATE, MimicartAnimationState.IDLE);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(ANIMATION_STATE, MimicartAnimationState.IDLE);
     }
 
     @Override
@@ -951,7 +951,7 @@ public class MimicartEntity extends AbstractMinecart {
     }
 
     @Override
-    public void setSecondsOnFire(int seconds) {
+    public void igniteForSeconds(float seconds) {
         // block being lit on fire
     }
 

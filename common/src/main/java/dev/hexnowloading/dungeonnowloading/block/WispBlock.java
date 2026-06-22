@@ -184,7 +184,7 @@ public class WispBlock extends Block implements EntityBlock {
             return;
         }
 
-        mob.setSecondsOnFire(4);
+        mob.igniteForSeconds(4);
         if (level.getBlockEntity(pos) instanceof WispBlockEntity blockEntity && blockEntity.getOwner() != null) {
             Player owner = level.getServer().getPlayerList().getPlayer(blockEntity.getOwner());
             if (owner != null) {

@@ -148,13 +148,13 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(CHILD_UUID, Optional.empty());
-        //this.entityData.define(CALLER_UUID, Optional.empty());
-        this.entityData.define(IS_ON_CEILING, false);
-        this.entityData.define(STATE, FairkeeperOurosState.IDLE);
-        this.entityData.define(OUROS_ANIMATION_STATE, FairkeeperOurosAnimationState.IDLE);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(CHILD_UUID, Optional.empty());
+        //builder.define(CALLER_UUID, Optional.empty());
+        builder.define(IS_ON_CEILING, false);
+        builder.define(STATE, FairkeeperOurosState.IDLE);
+        builder.define(OUROS_ANIMATION_STATE, FairkeeperOurosAnimationState.IDLE);
     }
 
     @Override

@@ -69,10 +69,10 @@ public class GarholdEntity extends Monster {
 
 
     private static final UUID CAPTURE_KB_UUID = UUID.fromString("c84d8d2a-1a5f-4b0c-9a4c-6c2c4d9b6a21");
-    private static final AttributeModifier CAPTURE_KB_MOD = new AttributeModifier(CAPTURE_KB_UUID, "Garhold capture knockback", 1.0, AttributeModifier.Operation.ADDITION);
+    private static final AttributeModifier CAPTURE_KB_MOD = new AttributeModifier(CAPTURE_KB_UUID, "Garhold capture knockback", 1.0, AttributeModifier.Operation.ADD_VALUE);
 
     private static final UUID CHAIN_KB_UUID = UUID.fromString("8c3a1b6e-2d78-4b1d-9c3b-7f7a6a3c2d11");
-    private static final AttributeModifier CHAIN_KB_MOD = new AttributeModifier(CHAIN_KB_UUID, "Garhold chain lock knockback", 1.0, AttributeModifier.Operation.ADDITION);
+    private static final AttributeModifier CHAIN_KB_MOD = new AttributeModifier(CHAIN_KB_UUID, "Garhold chain lock knockback", 1.0, AttributeModifier.Operation.ADD_VALUE);
 
     private AnimationChainer<GarholdAnimationState> animationChainer = new AnimationChainer<>();
     private AnimationChainer<GarholdSideGateAnimationState> sideGateAnimationChainer = new AnimationChainer<>();
@@ -182,14 +182,14 @@ public class GarholdEntity extends Monster {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(STATE, GarholdState.FLYING);
-        this.entityData.define(ANIMATION_STATE, GarholdAnimationState.NONE);
-        //this.entityData.define(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_CLOSED);
-        this.entityData.define(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.NONE);
-        this.entityData.define(BOTTOM_OPENESS, false);
-        this.entityData.define(SIDE_OPENESS, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(STATE, GarholdState.FLYING);
+        builder.define(ANIMATION_STATE, GarholdAnimationState.NONE);
+        //builder.define(BOTTOM_GATE_ANIMATION_STATE, GarholdBottomGateAnimationState.BOTTOM_CLOSED);
+        builder.define(SIDE_GATE_ANIMATION_STATE, GarholdSideGateAnimationState.NONE);
+        builder.define(BOTTOM_OPENESS, false);
+        builder.define(SIDE_OPENESS, false);
     }
 
     @Override

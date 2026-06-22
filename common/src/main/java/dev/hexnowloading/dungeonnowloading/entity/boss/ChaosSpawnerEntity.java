@@ -167,21 +167,21 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(SPAWN_POINT, BlockPos.ZERO);
-        this.entityData.define(DATA_STATE, State.IDLE);
-        this.entityData.define(PHASE, 0);
-        this.entityData.define(DATA_FLAGS_ID, false);
-        this.entityData.define(AWAKENING_TICKS, 0);
-        this.entityData.define(ATTACK_TICK, 0);
-        this.entityData.define(PLAYER_COUNT, 0);
-        this.entityData.define(BARRIER_NORTH_TICK, -1);
-        this.entityData.define(BARRIER_EAST_TICK, -1);
-        this.entityData.define(BARRIER_SOUTH_TICK, -1);
-        this.entityData.define(BARRIER_WEST_TICK, -1);
-        this.entityData.define(BARRIER_UP_TICK, -1);
-        this.entityData.define(BARRIER_DOWN_TICK, -1);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(SPAWN_POINT, BlockPos.ZERO);
+        builder.define(DATA_STATE, State.IDLE);
+        builder.define(PHASE, 0);
+        builder.define(DATA_FLAGS_ID, false);
+        builder.define(AWAKENING_TICKS, 0);
+        builder.define(ATTACK_TICK, 0);
+        builder.define(PLAYER_COUNT, 0);
+        builder.define(BARRIER_NORTH_TICK, -1);
+        builder.define(BARRIER_EAST_TICK, -1);
+        builder.define(BARRIER_SOUTH_TICK, -1);
+        builder.define(BARRIER_WEST_TICK, -1);
+        builder.define(BARRIER_UP_TICK, -1);
+        builder.define(BARRIER_DOWN_TICK, -1);
     }
 
     @Override

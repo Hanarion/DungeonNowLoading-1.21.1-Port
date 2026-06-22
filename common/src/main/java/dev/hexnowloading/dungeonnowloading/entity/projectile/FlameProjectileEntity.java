@@ -41,10 +41,10 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DAMAGE, 0.0f);
-        this.entityData.define(SOUL, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DAMAGE, 0.0f);
+        builder.define(SOUL, false);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
         }
         if (owner instanceof LivingEntity livingEntity) {
             double damageAmount = livingEntity.getAttributeValue(Attributes.ATTACK_DAMAGE);
-            target.setSecondsOnFire(5);
+            target.igniteForSeconds(5);
             if (!(target instanceof LivingEntity targetLivingEntity)) {
                 return;
             }

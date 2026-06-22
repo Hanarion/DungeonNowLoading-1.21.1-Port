@@ -136,9 +136,9 @@ public class WispEntity extends FlyingMob implements Enemy, TraceableEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(ANIMATION_STATE, WispAnimationState.IDLE);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(ANIMATION_STATE, WispAnimationState.IDLE);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class BallistaArrowEntity extends AbstractArrow {
         boolean isEnderman = target.getType() == EntityType.ENDERMAN;
         int fireTick = target.getRemainingFireTicks();
         if (this.isOnFire() && !isEnderman) {
-            target.setSecondsOnFire(15);
+            target.igniteForSeconds(15);
         }
 
         if (target.hurt(damageSource, (float) damage)) {

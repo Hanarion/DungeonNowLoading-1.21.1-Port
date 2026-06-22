@@ -85,15 +85,15 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DESPAWN_TICK, 600);
-        this.entityData.define(OWNER_UUID, Optional.empty());
-        this.entityData.define(ARC_SHOT_LEVEL, 0);
-        this.entityData.define(PULSE_SHOT_LEVEL, 0);
-        this.entityData.define(GIGANTIC, false);
-        this.entityData.define(OVERWORKED_LEVEL, 0);
-        this.entityData.define(BASIC, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DESPAWN_TICK, 600);
+        builder.define(OWNER_UUID, Optional.empty());
+        builder.define(ARC_SHOT_LEVEL, 0);
+        builder.define(PULSE_SHOT_LEVEL, 0);
+        builder.define(GIGANTIC, false);
+        builder.define(OVERWORKED_LEVEL, 0);
+        builder.define(BASIC, false);
     }
 
     @Override
@@ -316,7 +316,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
                         modifierId,
                         "dnl_overworked_attack_speed",
                         bonus,
-                        AttributeModifier.Operation.MULTIPLY_TOTAL
+                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
                 ));
             }
         }
@@ -342,7 +342,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
                     GIGANTISM_MAX_HEALTH_MODIFIER_ID,
                     "dnl_gigantism_max_health",
                     0.5D,
-                    AttributeModifier.Operation.MULTIPLY_TOTAL
+                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
             ));
         }
 
