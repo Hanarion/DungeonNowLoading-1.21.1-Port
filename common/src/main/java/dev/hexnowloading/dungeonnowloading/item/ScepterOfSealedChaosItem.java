@@ -101,12 +101,12 @@ public class ScepterOfSealedChaosItem extends Item {
                 sealedChaosEntity.moveTo(blockPos1, 0.0F, 0.0F);
                 sealedChaosEntity.setOwnerUUID(player.getUUID());
 
-                int arcLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.ARC_SHOT.get(), itemStack);
-                int pulseLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.PULSE_SHOT.get(), itemStack);
+                int arcLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(player.level(), DNLEnchantments.ARC_SHOT), itemStack);
+                int pulseLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(player.level(), DNLEnchantments.PULSE_SHOT), itemStack);
                 sealedChaosEntity.setArcShotLevel(Math.max(0, Math.min(2, arcLevel)));
                 sealedChaosEntity.setPulseShotLevel(Math.max(0, Math.min(2, pulseLevel)));
 
-                int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), itemStack);
+                int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(player.level(), DNLEnchantments.GIGANTISM), itemStack);
                 if (gigantismLevel > 0) {
                     sealedChaosEntity.setGigantic(true);
                 }
@@ -122,7 +122,7 @@ public class ScepterOfSealedChaosItem extends Item {
                 ((ServerLevel) level).sendParticles(ParticleTypes.POOF, blockPos1.getX() + 0.5F, blockPos1.getY() + 0.5F, blockPos1.getZ() + 0.5F, 20, 0.3D, 0.3D, 0.3D, 0.0D);
                 ((ServerLevel) level).sendParticles(ParticleTypes.FLAME, blockPos1.getX() + 0.5F, blockPos1.getY() + 0.5F, blockPos1.getZ() + 0.5F, 10, 0.3D, 0.3D, 0.3D, 0.0D);
 
-                int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), itemStack);
+                int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(player.level(), DNLEnchantments.OVERWORKED), itemStack);
                 if (overworkedLevel > 0) {
                     sealedChaosEntity.setOverworkedLevel(overworkedLevel);
                     sealedChaosEntity.applyOverworkedAttackSpeedBonus();

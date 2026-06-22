@@ -28,7 +28,7 @@ public class SpawnerSword extends SwordItem {
     public boolean hurtEnemy(ItemStack itemStack, LivingEntity target, LivingEntity attacker) {
         boolean result = super.hurtEnemy(itemStack, target, attacker);
         if (result && !target.level().isClientSide) {
-            int recklessLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.RECKLESS.get(), attacker.getMainHandItem());
+            int recklessLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(attacker.level(), DNLEnchantments.RECKLESS), attacker.getMainHandItem());
             float selfDamage = 1.0F + recklessLevel;
 
             // Don't self-damage in creative/spectator.
@@ -53,7 +53,7 @@ public class SpawnerSword extends SwordItem {
     }
 
     public static float onLivingDamage(LivingEntity attacker, LivingEntity target, float damage) {
-        int recklessLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.RECKLESS.get(), attacker.getMainHandItem());
+        int recklessLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(attacker.level(), DNLEnchantments.RECKLESS), attacker.getMainHandItem());
         if (recklessLevel > 0 && damage > 0.0F) {
             float selfDamage = 1.0F + recklessLevel;
             // If applying reckless self-damage would kill the attacker, don't grant the bonus damage.

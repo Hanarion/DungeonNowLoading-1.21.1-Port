@@ -181,7 +181,7 @@ public class SpawnerArmorItem extends ArmorItem {
 
     private void applyPackBlessingEffect(Level level, Player player, ItemStack helmetStack) {
         int packBlessingLevel = EnchantmentHelper.getItemEnchantmentLevel(
-                DNLEnchantments.PACK_BLESSING.get(),
+                DNLEnchantments.holder(level, DNLEnchantments.PACK_BLESSING),
                 helmetStack
         );
 
@@ -235,7 +235,7 @@ public class SpawnerArmorItem extends ArmorItem {
         whimper.setOwnerUUID(owner.getUUID());
         whimper.setSkin(resolveWhimperSkin(level, helmetStack));
 
-        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), helmetStack);
+        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, DNLEnchantments.GIGANTISM), helmetStack);
         if (gigantismLevel > 0) {
             whimper.setGigantic(true);
         }
@@ -244,7 +244,7 @@ public class SpawnerArmorItem extends ArmorItem {
             return false;
         }
 
-        int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), helmetStack);
+        int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, DNLEnchantments.OVERWORKED), helmetStack);
         whimper.setOverworkedLevel(overworkedLevel);
         if (overworkedLevel > 0) {
             whimper.applyOverworkedAttackSpeedBonus();

@@ -69,16 +69,16 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SPAWNER_LEGGINGS.get());
                 output.accept(DNLItems.SPAWNER_BOOTS.get());
                 // Enchantments - Books
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.BREAK_PROTECTION.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.AMPLIFICATION.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.NULLIFICATION.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.GIGANTISM.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.OVERWORKED.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.PACK_BLESSING.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.ARC_SHOT.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.PULSE_SHOT.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.SACRIFICE.get(), 1)));
-                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.RECKLESS.get(), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.BREAK_PROTECTION), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.AMPLIFICATION), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.NULLIFICATION), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.GIGANTISM), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.OVERWORKED), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.PACK_BLESSING), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.ARC_SHOT), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.PULSE_SHOT), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.SACRIFICE), 1)));
+                output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(DNLEnchantments.holder(itemDisplayParameters.holders(), DNLEnchantments.RECKLESS), 1)));
 
                 // Items - Boss Related
                 output.accept(DNLItems.GREAT_EXPERIENCE_BOTTLE.get());

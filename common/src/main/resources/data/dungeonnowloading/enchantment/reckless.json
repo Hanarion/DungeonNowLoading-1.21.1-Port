@@ -1,0 +1,21 @@
+{
+  "description": {
+    "translate": "enchantment.dungeonnowloading.reckless"
+  },
+  "supported_items": "dungeonnowloading:spawner_sword",
+  "weight": 1,
+  "max_level": 3,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 0
+  },
+  "max_cost": {
+    "base": 50,
+    "per_level_above_first": 0
+  },
+  "anvil_cost": 1,
+  "slots": [
+    "mainhand"
+  ],
+  "effects": {}
+}

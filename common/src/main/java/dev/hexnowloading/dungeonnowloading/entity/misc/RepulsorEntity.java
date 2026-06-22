@@ -500,7 +500,7 @@ public class RepulsorEntity extends Mob {
         if (this.level().isClientSide) return;
         if (this.sourceStack.isEmpty()) return;
         // Only convert to scrap if the original item had Break Protection
-        if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.BREAK_PROTECTION.get(), this.sourceStack) <= 0) return;
+        if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(this.level(), DNLEnchantments.BREAK_PROTECTION), this.sourceStack) <= 0) return;
 
         ItemStack original = this.sourceStack.copy();
         // Mark as fully broken so reconstruction math is straightforward; NBT (incl. enchants) is preserved

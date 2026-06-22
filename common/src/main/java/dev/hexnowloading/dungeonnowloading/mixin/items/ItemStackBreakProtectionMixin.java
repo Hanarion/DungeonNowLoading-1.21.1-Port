@@ -3,10 +3,11 @@ package dev.hexnowloading.dungeonnowloading.mixin.items;
 import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.item.ScrapItem;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,28 +20,29 @@ import java.util.function.Consumer;
 @Mixin(ItemStack.class)
 public abstract class ItemStackBreakProtectionMixin {
 
-    @Inject(method = "hurtAndBreak", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"), cancellable = true)
-    private void dnl$convertToScrapOnBreak(int amount, LivingEntity entity, Consumer<LivingEntity> onBroken, CallbackInfo ci) {
+    @Inject(method = "hurtAndBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Ljava/util/function/Consumer;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"), cancellable = true)
+    private void dnl$convertToScrapOnBreak(int amount, ServerLevel serverLevel, ServerPlayer player, Consumer<Item> onBroken, CallbackInfo ci) {
         ItemStack self = (ItemStack)(Object)this;
         if (!self.isDamageableItem()) return;
-        if (MimiclingItem.tryTransformBrokenToolFormToBase(self, entity)) {
+        if (MimiclingItem.tryTransformBrokenToolFormToBase(self, player)) {
             ci.cancel();
             return;
         }
 
         // Only intercept if the item has our Break Protection enchantment
-        if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.BREAK_PROTECTION.get(), self) <= 0) return;
+        if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(serverLevel, DNLEnchantments.BREAK_PROTECTION), self) <= 0) return;
 
-        // Fire vanilla break callback (plays animation/sound via broadcastBreakEvent)
-        if (entity != null && onBroken != null) {
-            onBroken.accept(entity);
+        // Fire vanilla break callback (plays animation/sound)
+        if (onBroken != null) {
+            onBroken.accept(self.getItem());
         }
 
         // Build the scrap with a snapshot of the original item
         ItemStack scrap = ScrapItem.ofOriginal(self.copy());
 
         boolean replaced = false;
-        if (entity instanceof Player player) {
+        if (player != null) {
             // Try replace in main/off hand first
             if (player.getMainHandItem() == self) {
                 player.setItemInHand(InteractionHand.MAIN_HAND, scrap);
@@ -63,8 +65,6 @@ public abstract class ItemStackBreakProtectionMixin {
                     player.drop(scrap, false);
                 }
             }
-        } else if (entity != null) {
-            entity.spawnAtLocation(scrap);
         }
 
         // Clear the original stack and cancel vanilla shrink()

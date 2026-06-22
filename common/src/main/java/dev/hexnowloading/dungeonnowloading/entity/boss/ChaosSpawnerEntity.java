@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import net.minecraft.core.Holder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
@@ -815,9 +816,9 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private void dropRecallEnchantedBookForPlayer(UUID playerUuid) {
         if (this.level().isClientSide) return;
 
-        Enchantment ench = this.random.nextBoolean()
-                ? DNLEnchantments.ARC_SHOT.get()
-                : DNLEnchantments.PULSE_SHOT.get();
+        Holder<Enchantment> ench = this.random.nextBoolean()
+                ? DNLEnchantments.holder(this.level(), DNLEnchantments.ARC_SHOT)
+                : DNLEnchantments.holder(this.level(), DNLEnchantments.PULSE_SHOT);
 
         int level = 1;
 

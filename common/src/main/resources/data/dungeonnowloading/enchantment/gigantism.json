@@ -1,0 +1,22 @@
+{
+  "description": {
+    "translate": "enchantment.dungeonnowloading.gigantism"
+  },
+  "supported_items": "#dungeonnowloading:gigantism_overwork_targets",
+  "weight": 1,
+  "max_level": 1,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 0
+  },
+  "max_cost": {
+    "base": 50,
+    "per_level_above_first": 0
+  },
+  "anvil_cost": 1,
+  "slots": [
+    "mainhand",
+    "head"
+  ],
+  "effects": {}
+}

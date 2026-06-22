@@ -49,7 +49,7 @@ public class LifeStealerItem extends SwordItem {
 
     public static float onLivingDamage(LivingEntity attacker, LivingEntity target, float damage) {
         // Sacrifice enchantment: heal when hitting allies/summons
-        int sacrificeLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.SACRIFICE.get(), attacker.getMainHandItem());
+        int sacrificeLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(attacker.level(), DNLEnchantments.SACRIFICE), attacker.getMainHandItem());
         boolean sacrificeTriggered = sacrificeLevel > 0 && damage > 0.0F && isAllyOrSummon(attacker, target);
         if (sacrificeTriggered) {
             float healFactor = 0.2F + 0.1F * sacrificeLevel; // 20% + 10% per level

@@ -161,7 +161,7 @@ public class CopperDetonatorItem extends Item {
         creep.moveTo(launchX, launchY, launchZ, player.getYRot(), player.getXRot());
 
         // Gigantism: if the detonator has the enchant, double the Copper Creep's size
-        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), detonatorStack);
+        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(player.level(), DNLEnchantments.GIGANTISM), detonatorStack);
         if (gigantismLevel > 0) {
             creep.setGigantic(true);
         }
@@ -190,7 +190,7 @@ public class CopperDetonatorItem extends Item {
         }
         creep.setSkinValidation(true);
 
-        int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.OVERWORKED.get(), detonatorStack);
+        int overworkedLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(player.level(), DNLEnchantments.OVERWORKED), detonatorStack);
         if (overworkedLevel > 0) {
             creep.setOverworkedLevel(overworkedLevel);
         }
@@ -253,7 +253,7 @@ public class CopperDetonatorItem extends Item {
         double launchZ = player.getZ() + Math.cos(Math.toRadians(player.getYRot())) * offset;
         creep.moveTo(launchX, launchY, launchZ, player.getYRot(), player.getXRot());
 
-        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.GIGANTISM.get(), detonatorStack);
+        int gigantismLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(player.level(), DNLEnchantments.GIGANTISM), detonatorStack);
         if (gigantismLevel > 0) {
             creep.setGigantic(true);
         }
