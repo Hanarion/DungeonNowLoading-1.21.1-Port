@@ -16,8 +16,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public class VertexDomainProjectileRenderer<T extends VertexDomainProjectileEntity> extends EntityRenderer<VertexDomainProjectileEntity> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_domain_projectile.png");
-    private static final ResourceLocation EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_domain_projectile_emissive.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_domain_projectile.png");
+    private static final ResourceLocation EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_domain_projectile_emissive.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TEXTURE);
     private static final RenderType EMISSIVE_RENDER_TYPE = RenderType.entityTranslucent(EMISSIVE);
     private VertexDomainProjectileModel model;

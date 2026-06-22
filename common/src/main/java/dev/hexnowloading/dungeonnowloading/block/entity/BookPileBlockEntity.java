@@ -46,7 +46,7 @@ public class BookPileBlockEntity extends BlockEntity {
         super.load(tag);
 
         if (tag.contains("LootTable", Tag.TAG_STRING)) {
-            this.lootTable = new ResourceLocation(tag.getString("LootTable"));
+            this.lootTable = ResourceLocation.parse(tag.getString("LootTable"));
             this.lootTableSeed = tag.getLong("LootTableSeed");
         } else {
             this.lootTable = null;

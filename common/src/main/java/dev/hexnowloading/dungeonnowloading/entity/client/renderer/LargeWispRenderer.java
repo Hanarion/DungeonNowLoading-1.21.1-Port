@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 public class LargeWispRenderer<T extends LargeWispEntity> extends MobRenderer<T, LargeWispModel<T>> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/large_wisp/large_wisp.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/large_wisp/large_wisp.png");
     private static final float MODEL_SCALE = 1.5F;
 
     public LargeWispRenderer(EntityRendererProvider.Context renderManager) {

@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 
 public class VertexOrbProjectileRenderer<T extends VertexOrbProjectileEntity> extends EntityRenderer<VertexOrbProjectileEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_orb_projectile.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_orb_projectile.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TEXTURE);
     private VertexOrbProjectileModel model;
 

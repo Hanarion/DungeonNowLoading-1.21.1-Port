@@ -18,7 +18,7 @@ import net.minecraft.world.entity.AnimationState;
 import org.joml.Vector3f;
 
 public class ReaperSpiderModel <T extends ReaperSpiderEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "reaper_spider"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "reaper_spider"), "main");
 
     private final ModelPart root;
     private final ModelPart spider;

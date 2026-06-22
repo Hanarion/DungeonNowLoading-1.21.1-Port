@@ -29,7 +29,7 @@ public abstract class ServerPlayerMixin {
         if (currentPos.equals(lastCheckedPos)) return; // Skip check if still in the same block
 
         lastCheckedPos = currentPos;
-        // ✅ Get the structure at the player's positionetResourceKey(new ResourceLocation("dungeonnowloading", "temple_of_duality"));
+        // ✅ Get the structure at the player's positionetResourceKey(ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "temple_of_duality"));
 
         boolean isInTemple = serverLevel().structureManager().getStructureWithPieceAt(currentPos, DNLTags.TEMPLE_OF_DUALITY).isValid();
 

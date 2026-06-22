@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class DisabledFairkeeperChestModel extends Model {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "disabled_fairkeeper_chest"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "disabled_fairkeeper_chest"), "main");
     public final ModelPart lid;
     public final ModelPart base;
 

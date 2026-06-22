@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class SeepingSoulSerpentCallerModel<T extends SeepingSoulEntity> extends HierarchicalModel<T> implements SeepingSoulRenderModel{
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "seeping_soul_fairkeeper_serpent_caller"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "seeping_soul_fairkeeper_serpent_caller"), "main");
     private final ModelPart root;
     private final ModelPart BourosSoul;
     private final ModelPart CompleteSoul;

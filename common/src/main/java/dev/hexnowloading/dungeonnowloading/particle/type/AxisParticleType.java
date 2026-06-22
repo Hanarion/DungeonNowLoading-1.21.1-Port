@@ -20,7 +20,7 @@ public class AxisParticleType extends ParticleType<AxisParticleType.AxisParticle
             Codec.STRING.fieldOf("particle_type").forGetter(data -> BuiltInRegistries.PARTICLE_TYPE.getKey(data.particleType).toString()),
             Codec.INT.fieldOf("axis").forGetter(data -> data.axis),
             Codec.FLOAT.fieldOf("degree").forGetter(data -> data.degree)
-    ).apply(instance, (type, axis, degree) -> new AxisParticleData((ParticleType<AxisParticleData>)BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(type)), axis, degree)));
+    ).apply(instance, (type, axis, degree) -> new AxisParticleData((ParticleType<AxisParticleData>)BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)), axis, degree)));
 
     public AxisParticleType(boolean alwaysShow) {
         super(alwaysShow, AxisParticleData.DESERIALIZER);

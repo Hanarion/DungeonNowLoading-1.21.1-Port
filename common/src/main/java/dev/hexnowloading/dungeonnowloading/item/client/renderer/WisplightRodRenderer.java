@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class WisplightRodRenderer extends BlockEntityWithoutLevelRenderer {
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/wisplight_rod/wisplight_rod_handheld_emissive.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/item/wisplight_rod/wisplight_rod_handheld_emissive.png");
     private static final RenderType RENDER_TYPE_TRANSLUCENT = RenderType.entityTranslucent(WisplightRodModel.TEXTURE);
     private static final RenderType RENDER_TYPE_EMISSIVE = RenderType.entityTranslucent(TEXTURE_EMISSIVE);
 

@@ -46,7 +46,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity implements MenuProvider, ZoneReceiverBlockEntity {
-    public static final ResourceLocation DEFAULT_LOOT_TABLE = new ResourceLocation("dungeonnowloading", "chests/wispward_chest");
+    public static final ResourceLocation DEFAULT_LOOT_TABLE = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "chests/wispward_chest");
     private static final int LANTERN_NOTIFY_CHUNK_RADIUS = 2;
     private static final int FLAME_TRAVEL_TICKS = 40;
     private static final int FLAME_EMIT_INTERVAL_TICKS = 4;
@@ -718,7 +718,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
         this.cachedLitLanterns = tag.getInt("cachedLitLanterns");
         this.requiredLitLanterns = tag.contains("requiredLitLanterns", Tag.TAG_INT) ? tag.getInt("requiredLitLanterns") : -1;
         this.configuredLootTable = tag.contains("configuredLootTable", Tag.TAG_STRING)
-                ? new ResourceLocation(tag.getString("configuredLootTable"))
+                ? ResourceLocation.parse(tag.getString("configuredLootTable"))
                 : DEFAULT_LOOT_TABLE;
         this.lootSpewDelayTicks = tag.contains("lootSpewDelayTicks", Tag.TAG_INT) ? tag.getInt("lootSpewDelayTicks") : -1;
         this.lootSpewCooldown = tag.getInt("lootSpewCooldown");

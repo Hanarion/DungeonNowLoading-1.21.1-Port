@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
 public class RepulsorLayer<T extends RepulsorEntity, M extends RepulsorModel<T>> extends RenderLayer<T, M> {
-    private static final ResourceLocation EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/repulsor/repulsor_emissive.png");
+    private static final ResourceLocation EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/repulsor/repulsor_emissive.png");
 
     public RepulsorLayer(RepulsorRenderer renderer) { super(renderer); }
 

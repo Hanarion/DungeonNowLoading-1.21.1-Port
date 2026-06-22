@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MendingAuraBlockEntityOverlayBuffer implements MultiBufferSource {
     public static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS);
-    private static final ResourceLocation MENDING_AURA_SPRITE = new ResourceLocation("dungeonnowloading", "block/mending_aura_0");
+    private static final ResourceLocation MENDING_AURA_SPRITE = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "block/mending_aura_0");
     private static final float OVERLAY_OFFSET = 0.002F;
     private static final Map<ResourceLocation, TextureMask> TEXTURE_MASK_CACHE = new ConcurrentHashMap<>();
     private static Field compositeStateField;

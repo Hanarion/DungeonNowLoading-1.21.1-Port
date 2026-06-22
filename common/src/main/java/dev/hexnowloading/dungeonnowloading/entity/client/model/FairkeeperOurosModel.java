@@ -15,7 +15,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class FairkeeperOurosModel<T extends FairkeeperOurosEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_ouros_head"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "fairkeeper_ouros_head"), "main");
     private final ModelPart ouros;
     private final ModelPart upper_jaw;
     private final ModelPart horns;

@@ -99,7 +99,7 @@ public class BookPileBlock extends PileBlock implements EntityBlock {
         // Read from item BlockEntityTag (same pattern as chests/shulkers)
         CompoundTag bet = stack.getTagElement("BlockEntityTag");
         if (bet != null && bet.contains("LootTable", Tag.TAG_STRING)) {
-            ResourceLocation id = new ResourceLocation(bet.getString("LootTable"));
+            ResourceLocation id = ResourceLocation.parse(bet.getString("LootTable"));
             long seed = bet.contains("LootTableSeed", Tag.TAG_LONG) ? bet.getLong("LootTableSeed") : level.getRandom().nextLong();
             pileBe.setLootTable(id, seed);
         }

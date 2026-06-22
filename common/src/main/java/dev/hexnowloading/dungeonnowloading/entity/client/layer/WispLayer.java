@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WispLayer<T extends WispEntity, M extends WispModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wisp/wisp_emissive.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/wisp/wisp_emissive.png");
 
     public WispLayer(WispRenderer renderer) {
         super(renderer);

@@ -8,11 +8,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class MendingTableScreen extends AbstractContainerScreen<MendingTableMenu> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("dungeonnowloading", "textures/gui/mending_table_gui.png");
-    private static final ResourceLocation PICKAXE_OUTLINE = new ResourceLocation("dungeonnowloading", "textures/gui/pickaxe_outline_gui.png");
-    private static final ResourceLocation DURITE_OUTLINE = new ResourceLocation("dungeonnowloading", "textures/gui/durite_outline_gui.png");
-    private static final ResourceLocation DURITE_NOTCH = new ResourceLocation("dungeonnowloading", "textures/gui/mending_table_gui_durite_notch.png");
-    private static final ResourceLocation GOLD_NOTCH = new ResourceLocation("dungeonnowloading", "textures/gui/mending_table_gui_golden_notch.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "textures/gui/mending_table_gui.png");
+    private static final ResourceLocation PICKAXE_OUTLINE = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "textures/gui/pickaxe_outline_gui.png");
+    private static final ResourceLocation DURITE_OUTLINE = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "textures/gui/durite_outline_gui.png");
+    private static final ResourceLocation DURITE_NOTCH = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "textures/gui/mending_table_gui_durite_notch.png");
+    private static final ResourceLocation GOLD_NOTCH = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "textures/gui/mending_table_gui_golden_notch.png");
     private static final int NOTCH_START_X = 113;
     private static final int NOTCH_ROW1_Y = 69;
     private static final int NOTCH_ROW2_Y = 75; // keep given y even though height is 3 (gap visually larger)

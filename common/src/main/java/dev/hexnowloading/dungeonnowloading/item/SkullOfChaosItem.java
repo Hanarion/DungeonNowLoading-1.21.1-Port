@@ -16,7 +16,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Vanishable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SkullOfChaosItem extends Item implements BossSummoningItem, Vanishable {
+public class SkullOfChaosItem extends Item implements BossSummoningItem {
 
     public SkullOfChaosItem(Properties properties) {
         super(properties);
@@ -41,7 +40,7 @@ public class SkullOfChaosItem extends Item implements BossSummoningItem, Vanisha
         AABB aabb = new AABB(player.blockPosition()).inflate(16);
 
         // 1) Try recall first: find nearby souls that belong to Chaos Spawner
-        ResourceLocation chaosSpawnerId = new ResourceLocation(DungeonNowLoading.MOD_ID, "chaos_spawner");
+        ResourceLocation chaosSpawnerId = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "chaos_spawner");
 
         List<SeepingSoulEntity> souls = level.getEntitiesOfClass(SeepingSoulEntity.class, aabb);
         for (SeepingSoulEntity soul : souls) {

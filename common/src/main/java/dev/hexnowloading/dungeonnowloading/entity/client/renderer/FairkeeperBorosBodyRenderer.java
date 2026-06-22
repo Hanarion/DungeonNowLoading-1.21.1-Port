@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FairkeeperBorosBodyRenderer<T extends FairkeeperBorosPartEntity> extends MobRenderer<T, FairkeeperBorosBodyModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_boros/fairkeeper_boros_body.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_boros/fairkeeper_boros_body.png");
 
     public FairkeeperBorosBodyRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new FairkeeperBorosBodyModel<>(renderManager.bakeLayer(FairkeeperBorosBodyModel.LAYER_LOCATION)), 1.0F);

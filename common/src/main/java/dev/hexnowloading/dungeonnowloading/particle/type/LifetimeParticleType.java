@@ -16,7 +16,7 @@ public class LifetimeParticleType extends ParticleType<LifetimeParticleType.Data
     public static final Codec<Data> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("particle_type").forGetter(data -> BuiltInRegistries.PARTICLE_TYPE.getKey(data.particleType).toString()),
             Codec.INT.fieldOf("lifetime").forGetter(data -> data.lifetime)
-    ).apply(instance, (type, lifetime) -> new Data((ParticleType<Data>)BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(type)), lifetime)));
+    ).apply(instance, (type, lifetime) -> new Data((ParticleType<Data>)BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)), lifetime)));
 
     public LifetimeParticleType(boolean alwaysShow) {
         super(alwaysShow, Data.DESERIALIZER);

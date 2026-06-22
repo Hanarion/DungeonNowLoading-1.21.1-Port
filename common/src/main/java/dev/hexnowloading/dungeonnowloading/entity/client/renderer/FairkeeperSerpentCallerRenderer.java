@@ -15,8 +15,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FairkeeperSerpentCallerRenderer<T extends FairkeeperSerpentCallerEntity> extends EntityRenderer<FairkeeperSerpentCallerEntity> {
 
-    private static final ResourceLocation TEXTURE_INACTIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_serpent_caller/fairkeeper_serpent_caller_inactive.png");
-    private static final ResourceLocation TEXTURE_ACTIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_serpent_caller/fairkeeper_serpent_caller_active.png");
+    private static final ResourceLocation TEXTURE_INACTIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_serpent_caller/fairkeeper_serpent_caller_inactive.png");
+    private static final ResourceLocation TEXTURE_ACTIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_serpent_caller/fairkeeper_serpent_caller_active.png");
     private FairkeeperSerpentCallerModel model;
     private static final RenderType RENDER_TYPE_INACTIVE = RenderType.entityTranslucent(TEXTURE_INACTIVE);
     private static final RenderType RENDER_TYPE_ACTIVE = RenderType.entityTranslucent(TEXTURE_ACTIVE);

@@ -14,7 +14,7 @@ import net.minecraft.util.Mth;
 
 public class WispRenderer<T extends WispEntity> extends MobRenderer<T, WispModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wisp/wisp.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/wisp/wisp.png");
     private static final float MODEL_SCALE = 1.5F;
 
     public WispRenderer(EntityRendererProvider.Context renderManager) {

@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class MimicartRenderer<T extends MimicartEntity> extends EntityRenderer<T> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/mimicart/mimicart.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/mimicart/mimicart.png");
     protected final EntityModel<T> model;
     private final BlockRenderDispatcher blockRenderer;
 

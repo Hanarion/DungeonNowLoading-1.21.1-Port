@@ -15,7 +15,7 @@ import net.minecraft.util.Mth;
 
 public class VertexDomainProjectileModel<T extends VertexDomainProjectileEntity> extends HierarchicalModel<T> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "vertex_domain_projectile"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "vertex_domain_projectile"), "main");
     private final ModelPart fairkeeper_domain_projectile;
     private final ModelPart orb;
     private final ModelPart wave;

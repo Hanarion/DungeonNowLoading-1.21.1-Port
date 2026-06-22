@@ -21,21 +21,21 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BurnacleBlockRenderer implements BlockEntityRenderer<BurnacleBlockEntity> {
-    private static final ResourceLocation BUD_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/burnacle_bud.png");
-    private static final ResourceLocation JUVENILE_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/burnacle_juvenile.png");
-    private static final ResourceLocation MATURE_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/burnacle_mature.png");
-    private static final ResourceLocation ELDER_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/burnacle_elder.png");
+    private static final ResourceLocation BUD_TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/burnacle_bud.png");
+    private static final ResourceLocation JUVENILE_TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/burnacle_juvenile.png");
+    private static final ResourceLocation MATURE_TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/burnacle_mature.png");
+    private static final ResourceLocation ELDER_TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/burnacle_elder.png");
     private static final ResourceLocation[] DESTROY_STAGES = new ResourceLocation[] {
-            new ResourceLocation("textures/block/destroy_stage_0.png"),
-            new ResourceLocation("textures/block/destroy_stage_1.png"),
-            new ResourceLocation("textures/block/destroy_stage_2.png"),
-            new ResourceLocation("textures/block/destroy_stage_3.png"),
-            new ResourceLocation("textures/block/destroy_stage_4.png"),
-            new ResourceLocation("textures/block/destroy_stage_5.png"),
-            new ResourceLocation("textures/block/destroy_stage_6.png"),
-            new ResourceLocation("textures/block/destroy_stage_7.png"),
-            new ResourceLocation("textures/block/destroy_stage_8.png"),
-            new ResourceLocation("textures/block/destroy_stage_9.png")
+            ResourceLocation.parse("textures/block/destroy_stage_0.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_1.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_2.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_3.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_4.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_5.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_6.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_7.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_8.png"),
+            ResourceLocation.parse("textures/block/destroy_stage_9.png")
     };
 
     private final BurnacleBudModel budModel;

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class PedestalEditScreen extends Screen {
     private static final ResourceLocation PREVIEW_TEX =
-            new ResourceLocation("dungeonnowloading", "textures/block/player_statue_pedestal_side.png");
+            ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "textures/block/player_statue_pedestal_side.png");
 
     private static final int MAX_CHARS = 16; // ⬅︎ hard username-length cap
 

@@ -15,10 +15,10 @@ import net.minecraft.world.entity.AnimationState;
 
 public class ChaosSpawnerLayer<T extends ChaosSpawnerEntity, M extends ChaosSpawnerModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EYES = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_eyes.png");
-    private static final ResourceLocation TEXTURE_CHAINED = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_chained.png");
-    private static final ResourceLocation TEXTURE_SHOCKWAVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_shockwave.png");
-    private static final ResourceLocation TEXTURE_CHAOS_HEXAHEDRON = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_chaos_hexahedron.png");
+    private static final ResourceLocation TEXTURE_EYES = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_eyes.png");
+    private static final ResourceLocation TEXTURE_CHAINED = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_chained.png");
+    private static final ResourceLocation TEXTURE_SHOCKWAVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_shockwave.png");
+    private static final ResourceLocation TEXTURE_CHAOS_HEXAHEDRON = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_chaos_hexahedron.png");
 
     public ChaosSpawnerLayer(ChaosSpawnerRenderer renderer) {
         super(renderer);

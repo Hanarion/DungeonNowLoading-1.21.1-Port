@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
 import java.util.Arrays;
 
 public class WhimperModel<T extends WhimperEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "whimper"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "whimper"), "main");
     private final ModelPart Whimper;
     private final ModelPart right_hand;
     private final ModelPart Lantern;

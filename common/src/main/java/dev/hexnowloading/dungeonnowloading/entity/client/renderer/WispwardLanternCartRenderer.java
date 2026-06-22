@@ -17,8 +17,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class WispwardLanternCartRenderer<T extends WispwardLanternCartEntity> extends EntityRenderer<T> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wispward_lantern_cart/wispward_lantern_cart.png");
-    private static final ResourceLocation TIMED_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wispward_lantern_cart/timed_wispward_lantern_cart.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/wispward_lantern_cart/wispward_lantern_cart.png");
+    private static final ResourceLocation TIMED_TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/wispward_lantern_cart/timed_wispward_lantern_cart.png");
     protected final WispwardLanternModel<T> model;
 
     public WispwardLanternCartRenderer(EntityRendererProvider.Context renderManager) {

@@ -686,7 +686,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         soul.moveTo(start.getX() + 0.5, start.getY() + RECALL_POSITION_OFFSET_Y, start.getZ() + 0.5, 0, 0);
 
         // bossId should match the recall registry id you use for Chaos Spawner
-        soul.setBossId(new ResourceLocation(DungeonNowLoading.MOD_ID, "chaos_spawner"));
+        soul.setBossId(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "chaos_spawner"));
 
         int count = SeepingSoulEntity.getRecallCountForSeepingSoul(this.defeatedCount, this.modifiedDefeatedCount);
 

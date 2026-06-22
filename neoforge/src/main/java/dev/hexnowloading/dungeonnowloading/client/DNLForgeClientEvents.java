@@ -174,35 +174,35 @@ public class DNLForgeClientEvents {
         event.registerBlockEntityRenderer(DNLBlockEntityTypes.BURNACLE.get(), BurnacleBlockRenderer::new);
 
         // Item Properties
-        ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pull"), (stack, level, entity, idk) -> {
+        ItemProperties.register(DNLItems.VERTEX_BOW.get(), ResourceLocation.parse("pull"), (stack, level, entity, idk) -> {
             if (entity == null) return 0.0F;
             else
                 return entity.getUseItem() != stack ? 0.0F : (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 30.0F;
         });
 
-        ItemProperties.register(DNLItems.VERTEX_BOW.get(), new ResourceLocation("pulling"), (stack, level, entity, idk) ->
+        ItemProperties.register(DNLItems.VERTEX_BOW.get(), ResourceLocation.parse("pulling"), (stack, level, entity, idk) ->
                 entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
 
-        ItemProperties.register(DNLItems.COPPER_DETONATOR.get(), new ResourceLocation("mode_switch"), (stack, BlockableEventLoop, entity, idk) -> {
+        ItemProperties.register(DNLItems.COPPER_DETONATOR.get(), ResourceLocation.parse("mode_switch"), (stack, BlockableEventLoop, entity, idk) -> {
             if (entity == null || entity.getUseItem() != stack) return 0.0F;
 
             int useTime = stack.getUseDuration() - entity.getUseItemRemainingTicks();
             return useTime > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
         });
 
-        ItemProperties.register(DNLItems.REPULSOR.get(), new ResourceLocation("golden_mode"),
+        ItemProperties.register(DNLItems.REPULSOR.get(), ResourceLocation.parse("golden_mode"),
                 (stack, level, entity, seed) -> RepulsorItem.isGoldenMode(stack) ? 1.0F : 0.0F);
 
         for (Item mimiclingItem : getMimiclingItems()) {
             for (int frame = 0; frame < 15; frame++) {
                 int currentFrame = frame;
-                ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_chewing_frame_" + currentFrame),
+                ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_chewing_frame_" + currentFrame),
                         (stack, level, entity, seed) -> MimiclingItem.isChewingFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
             }
 
             for (int frame = 0; frame < 3; frame++) {
                 int currentFrame = frame;
-                ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_open_frame_" + currentFrame),
+                ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_open_frame_" + currentFrame),
                         (stack, level, entity, seed) -> MimiclingFeedHintHandler.isOpenFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
             }
 
@@ -211,17 +211,17 @@ public class DNLForgeClientEvents {
             for (int formIndex = 0; formIndex < mimiclingForms.length; formIndex++) {
                 String form = mimiclingForms[formIndex];
                 int frameCount = mimiclingFrameCounts[formIndex];
-                ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_form_" + form),
+                ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_form_" + form),
                         (stack, level, entity, seed) -> MimiclingItem.isForm(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, form) ? 1.0F : 0.0F);
 
                 for (int frame = 0; frame < frameCount; frame++) {
                     int currentFrame = frame;
-                    ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_" + form + "_frame_" + currentFrame),
+                    ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_" + form + "_frame_" + currentFrame),
                             (stack, level, entity, seed) -> MimiclingItem.isTransitionFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, form, currentFrame, frameCount) ? 1.0F : 0.0F);
                 }
             }
 
-            ItemProperties.register(mimiclingItem, new ResourceLocation(DungeonNowLoading.MOD_ID, "mucus"),
+            ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mucus"),
                     (stack, level, entity, seed) -> MimiclingItem.isMucus(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L) ? 1.0F : 0.0F);
         }
     }

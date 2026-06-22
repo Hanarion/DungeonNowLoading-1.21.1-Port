@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class VertexPillarProjectileRenderer<T extends VertexPillarProjectileEntity> extends EntityRenderer<VertexPillarProjectileEntity> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_pillar.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_pillar.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TEXTURE);
     private VertexPillarProjectileModel model;
 

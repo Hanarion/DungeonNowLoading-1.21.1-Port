@@ -704,7 +704,7 @@ public final class MimiclingFoodEffects {
     }
 
     private static void spawnTrailParticles(ServerLevel level, Vec3 start, Vec3 end, JsonObject data) {
-        ResourceLocation particleId = data.has("particle") ? new ResourceLocation(data.get("particle").getAsString()) : null;
+        ResourceLocation particleId = data.has("particle") ? ResourceLocation.parse(data.get("particle").getAsString()) : null;
         if (particleId != null && DNLParticleTypes.SNIFFER_TRAIL_PARTICLE.get() == BuiltInRegistries.PARTICLE_TYPE.get(particleId)) {
             spawnSnifferTrailParticles(level, start, end, data);
             return;
@@ -763,7 +763,7 @@ public final class MimiclingFoodEffects {
             return fallback;
         }
 
-        return (ParticleOptions)BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(data.get("particle").getAsString()));
+        return (ParticleOptions)BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(data.get("particle").getAsString()));
     }
 
     public static void applyTemporaryEnchantmentModifiers(ItemStack stack, ListTag enchantments) {
@@ -977,7 +977,7 @@ public final class MimiclingFoodEffects {
                 continue;
             }
 
-            if (killedEntityId.equals(new ResourceLocation(override.get("when_killed").getAsString()))) {
+            if (killedEntityId.equals(ResourceLocation.parse(override.get("when_killed").getAsString()))) {
                 if (override.has("nbt")) {
                     applyEntityNbt(entity, override.get("nbt").getAsString());
                 }
@@ -1169,7 +1169,7 @@ public final class MimiclingFoodEffects {
             return;
         }
 
-        ParticleOptions particle = (ParticleOptions) BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(data.get("particle").getAsString()));
+        ParticleOptions particle = (ParticleOptions) BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(data.get("particle").getAsString()));
         int count = data.has("particle_count") ? data.get("particle_count").getAsInt() : 16;
         double spread = data.has("particle_spread") ? data.get("particle_spread").getAsDouble() : 0.35D;
         double xSpread = data.has("particle_spread_x") ? data.get("particle_spread_x").getAsDouble() : spread;
@@ -1249,7 +1249,7 @@ public final class MimiclingFoodEffects {
 
         ResourceLocation targetId = BuiltInRegistries.ENTITY_TYPE.getKey(target.getType());
         for (JsonElement element : data.getAsJsonArray("immune_entities")) {
-            if (targetId.equals(new ResourceLocation(element.getAsString()))) {
+            if (targetId.equals(ResourceLocation.parse(element.getAsString()))) {
                 return true;
             }
         }
@@ -1274,7 +1274,7 @@ public final class MimiclingFoodEffects {
             }
 
             JsonObject effectData = element.getAsJsonObject();
-            MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(effectData.get("effect").getAsString()));
+            MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(effectData.get("effect").getAsString()));
             int duration = effectData.has("duration") ? effectData.get("duration").getAsInt() : 200;
             int amplifier = effectData.has("amplifier") ? effectData.get("amplifier").getAsInt() : 0;
             target.addEffect(new MobEffectInstance(effect, duration, amplifier));
@@ -1288,7 +1288,7 @@ public final class MimiclingFoodEffects {
                 continue;
             }
 
-            MobEffect convertedEffect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(conversion.get("to").getAsString()));
+            MobEffect convertedEffect = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(conversion.get("to").getAsString()));
             int duration = activeEffect.getDuration();
             if (conversion.has("copy_duration") && !conversion.get("copy_duration").getAsBoolean()) {
                 duration = conversion.has("duration") ? conversion.get("duration").getAsInt() : 1;
@@ -1428,7 +1428,7 @@ public final class MimiclingFoodEffects {
     }
 
     private static List<ItemStack> rollConfiguredLootTable(ServerLevel level, ItemStack tool, BlockState state, JsonObject data) {
-        ResourceLocation lootTableId = new ResourceLocation(data.get("loot_table").getAsString());
+        ResourceLocation lootTableId = ResourceLocation.parse(data.get("loot_table").getAsString());
         LootTable table = level.getServer().getLootData().getLootTable(lootTableId);
         LootParams params = new LootParams.Builder(level)
                 .withParameter(LootContextParams.ORIGIN, Vec3.ZERO)
@@ -1461,7 +1461,7 @@ public final class MimiclingFoodEffects {
     }
 
     private static boolean targetBlockMatches(BlockState state, String blockId) {
-        return BuiltInRegistries.BLOCK.getKey(state.getBlock()).equals(new ResourceLocation(blockId));
+        return BuiltInRegistries.BLOCK.getKey(state.getBlock()).equals(ResourceLocation.parse(blockId));
     }
 
     private static List<ItemStack> copyDrops(List<ItemStack> originalDrops) {

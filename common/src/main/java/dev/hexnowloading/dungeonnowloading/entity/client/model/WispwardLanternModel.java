@@ -17,7 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
 public class WispwardLanternModel<T extends Entity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "wispward_lantern_cart"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "wispward_lantern_cart"), "main");
     private static final float INCLINE_CART_Z_ROTATION = (float) Math.toRadians(-45.0D);
     private static final float INCLINE_LANTERN_X_OFFSET = -4.0F;
     private final ModelPart root;

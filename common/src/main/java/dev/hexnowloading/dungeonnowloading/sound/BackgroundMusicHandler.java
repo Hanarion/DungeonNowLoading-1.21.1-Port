@@ -13,8 +13,8 @@ public class BackgroundMusicHandler {
     private static final List<FadingChannel> fadingChannels = new ArrayList<>();
 
     private static final List<ResourceLocation> BLOCKING_TICKING_SOUNDS = List.of(
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "music_clash_of_duality_base"),
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "music_hellspawn_base")
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "music_clash_of_duality_base"),
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "music_hellspawn_base")
     );
 
     public static boolean isBackgroundMusicBlocked() {

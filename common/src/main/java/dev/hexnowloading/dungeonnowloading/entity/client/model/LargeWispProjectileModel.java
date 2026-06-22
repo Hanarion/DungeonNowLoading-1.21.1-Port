@@ -22,7 +22,7 @@ import net.minecraft.world.entity.AnimationState;
 import org.joml.Vector3f;
 
 public class LargeWispProjectileModel extends HierarchicalModel<LargeWispProjectileEntity> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "large_wisp_projectile"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "large_wisp_projectile"), "main");
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
     private static final float TACKLE_FADE_IN_MS = 500.0F;
 

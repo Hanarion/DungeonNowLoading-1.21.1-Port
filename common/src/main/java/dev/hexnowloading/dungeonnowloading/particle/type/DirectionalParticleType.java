@@ -26,7 +26,7 @@ public class DirectionalParticleType extends ParticleType<DirectionalParticleTyp
             Codec.FLOAT.fieldOf("vz").forGetter(d -> d.vz)
     ).apply(instance, (type, vx, vy, vz) ->
             new Data(
-                    (ParticleType<Data>) BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(type)),
+                    (ParticleType<Data>) BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)),
                     vx, vy, vz
             )
     ));

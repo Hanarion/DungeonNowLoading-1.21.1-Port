@@ -23,7 +23,7 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
 
     public static final TagKey<Item> SPAWNER_BANNERS_TAG = TagKey.create(
             Registries.ITEM,
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "dungeon_banner_spawner")
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "dungeon_banner_spawner")
     );
 
     private static TagKey<Item> recolorFromTag(DyeColor to) {

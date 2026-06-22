@@ -18,8 +18,8 @@ public class CopperCreepRenderer extends MobRenderer<CopperCreepEntity, Hierarch
     //private final CopperCreepModel<CopperCreepEntity> defaultModel;
     private final CopperCreepButlerModel<CopperCreepEntity> butlerModel;
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep.png");
-    private static final ResourceLocation TEXTURE_BUTLER = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep_butler.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep.png");
+    private static final ResourceLocation TEXTURE_BUTLER = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep_butler.png");
 
     public CopperCreepRenderer(EntityRendererProvider.Context context) {
         super(context, new CopperCreepModel<>(context.bakeLayer(CopperCreepModel.LAYER_LOCATION)), 0.5F);

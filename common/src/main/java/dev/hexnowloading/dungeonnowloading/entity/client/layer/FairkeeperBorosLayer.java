@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FairkeeperBorosLayer<T extends FairkeeperBorosEntity, M extends FairkeeperBorosModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_boros/fairkeeper_boros_head_emissive.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_boros/fairkeeper_boros_head_emissive.png");
 
     public FairkeeperBorosLayer(FairkeeperBorosRenderer renderer) {
         super(renderer);

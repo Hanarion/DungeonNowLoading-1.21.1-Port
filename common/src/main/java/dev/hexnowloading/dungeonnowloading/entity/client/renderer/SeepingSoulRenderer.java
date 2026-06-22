@@ -47,7 +47,7 @@ public class SeepingSoulRenderer extends EntityRenderer<SeepingSoulEntity> {
     }
 
     private static ResourceLocation tex(String path) {
-        return new ResourceLocation(DungeonNowLoading.MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, path);
     }
 
     private static SeepingSoulRenderBundle makeBundle(SeepingSoulRenderModel model, ResourceLocation base, ResourceLocation eyes) {
@@ -55,7 +55,7 @@ public class SeepingSoulRenderer extends EntityRenderer<SeepingSoulEntity> {
     }
 
     private void put(String bossIdPath, SeepingSoulRenderBundle bundle) {
-        this.bundles.put(new ResourceLocation(DungeonNowLoading.MOD_ID, bossIdPath), bundle);
+        this.bundles.put(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, bossIdPath), bundle);
     }
 
     @Override

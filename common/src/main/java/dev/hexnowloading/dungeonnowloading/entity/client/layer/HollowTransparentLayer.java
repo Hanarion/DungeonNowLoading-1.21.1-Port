@@ -16,8 +16,8 @@ import net.minecraft.world.level.LightLayer;
 
 public class HollowTransparentLayer<T extends HollowEntity, M extends HollowModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/hollow_body.png");
-    private static final ResourceLocation EYE_TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/hollow.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/hollow_body.png");
+    private static final ResourceLocation EYE_TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/hollow.png");
 
     public HollowTransparentLayer(HollowRenderer renderer) {
         super(renderer);

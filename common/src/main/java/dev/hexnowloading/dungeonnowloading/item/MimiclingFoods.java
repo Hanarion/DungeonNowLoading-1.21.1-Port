@@ -327,14 +327,14 @@ public final class MimiclingFoods {
 
     private static ItemStack getDisplayStack(CompoundTag activeFood, FoodDefinition food) {
         if (activeFood.contains(ACTIVE_FOOD_ITEM_TAG)) {
-            Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(activeFood.getString(ACTIVE_FOOD_ITEM_TAG)));
+            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(activeFood.getString(ACTIVE_FOOD_ITEM_TAG)));
             if (item != Items.AIR) {
                 return new ItemStack(item);
             }
         }
 
         if (!food.id().startsWith("#")) {
-            Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(food.id()));
+            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(food.id()));
             if (item != Items.AIR) {
                 return new ItemStack(item);
             }
@@ -590,7 +590,7 @@ public final class MimiclingFoods {
             }
 
             if (object.has("item")) {
-                ResourceLocation itemId = new ResourceLocation(object.get("item").getAsString());
+                ResourceLocation itemId = ResourceLocation.parse(object.get("item").getAsString());
                 Item item = BuiltInRegistries.ITEM.getOptional(itemId).orElse(null);
                 if (item == null) {
                     logger.warn("Mimicling food {} references unknown item {}.", fileId, itemId);
@@ -603,7 +603,7 @@ public final class MimiclingFoods {
             }
 
             if (object.has("tag")) {
-                ResourceLocation tagId = new ResourceLocation(object.get("tag").getAsString());
+                ResourceLocation tagId = ResourceLocation.parse(object.get("tag").getAsString());
                 FoodDefinition food = parseFoodDefinition(getFoodId(object, "#" + tagId), fileId, object, repairAmount);
                 foodsById.put(food.id(), food);
                 tagFoods.add(new TagFoodEntry(TagKey.create(BuiltInRegistries.ITEM.key(), tagId), food));
@@ -663,7 +663,7 @@ public final class MimiclingFoods {
         }
 
         private Item parseReturnItemId(ResourceLocation fileId, String rawItemId) {
-            ResourceLocation itemId = new ResourceLocation(rawItemId);
+            ResourceLocation itemId = ResourceLocation.parse(rawItemId);
             Item item = BuiltInRegistries.ITEM.getOptional(itemId).orElse(null);
             if (item == null || item == Items.AIR) {
                 logger.warn("Mimicling food {} references unknown return item {}.", fileId, itemId);

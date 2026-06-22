@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 public class ChaosSpawnerProjectileRenderer<T extends ChaosSpawnerProjectileEntity> extends EntityRenderer<ChaosSpawnerProjectileEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_projectile.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/chaos_spawner/chaos_spawner_projectile.png");
     private ChaosSpawnerProjectileModel model;
     private static final RenderType RENDER_TYPE;
 

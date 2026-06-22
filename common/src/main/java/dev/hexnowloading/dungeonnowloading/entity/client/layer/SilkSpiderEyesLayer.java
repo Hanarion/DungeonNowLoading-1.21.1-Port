@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class SilkSpiderEyesLayer<T extends SilkSpiderEntity, M extends SilkSpiderModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/silk_spider/silk_spider_eyes.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/silk_spider/silk_spider_eyes.png");
 
     public SilkSpiderEyesLayer(SilkSpiderRenderer renderer) {
         super(renderer);

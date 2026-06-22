@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FairkeeperOurosBodyRenderer<T extends FairkeeperOurosPartEntity> extends MobRenderer<T, FairkeeperOurosBodyModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_ouros/fairkeeper_ouros_body.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_ouros/fairkeeper_ouros_body.png");
 
     public FairkeeperOurosBodyRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new FairkeeperOurosBodyModel<>(renderManager.bakeLayer(FairkeeperOurosBodyModel.LAYER_LOCATION)), 1.0F);

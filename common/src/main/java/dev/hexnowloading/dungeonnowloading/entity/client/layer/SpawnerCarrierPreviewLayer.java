@@ -123,7 +123,7 @@ public class SpawnerCarrierPreviewLayer<T extends SpawnerCarrierEntity, M extend
     @Nullable
     private Entity createDisplayEntity(T carrier, String id) {
         try {
-            ResourceLocation rl = new ResourceLocation(id);
+            ResourceLocation rl = ResourceLocation.parse(id);
             EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(rl);
             if (type == null) return null;
 

@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
-    private static final TagKey<Block> MINEABLE_WITH_SHEARS = BlockTags.create(new ResourceLocation("minecraft", "mineable/shears"));
-    private static final TagKey<Block> MINEABLE_WITH_SWORD = BlockTags.create(new ResourceLocation("minecraft", "mineable/sword"));
+    private static final TagKey<Block> MINEABLE_WITH_SHEARS = BlockTags.create(ResourceLocation.fromNamespaceAndPath("minecraft", "mineable/shears"));
+    private static final TagKey<Block> MINEABLE_WITH_SWORD = BlockTags.create(ResourceLocation.fromNamespaceAndPath("minecraft", "mineable/sword"));
 
     public DNLForgeBlockTagGenerator(DataGenerator generator, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
         super(generator.getPackOutput(), lookupProvider, DungeonNowLoading.MOD_ID, existingFileHelper);

@@ -18,7 +18,7 @@ public class ScalableAxisParticleType extends ParticleType<ScalableAxisParticleT
             Codec.INT.fieldOf("axis").forGetter(data -> data.axis),
             Codec.FLOAT.fieldOf("degree").forGetter(data -> data.degree),
             Codec.FLOAT.fieldOf("scale").forGetter(data -> data.scale)
-    ).apply(instance, (type, axis, degree, scale) -> new ScalableAxisParticleData((ParticleType<ScalableAxisParticleData>)BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(type)), axis, degree, scale)));
+    ).apply(instance, (type, axis, degree, scale) -> new ScalableAxisParticleData((ParticleType<ScalableAxisParticleData>)BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)), axis, degree, scale)));
 
     public ScalableAxisParticleType(boolean alwaysShow) { super(alwaysShow, ScalableAxisParticleData.DESERIALIZER); }
 

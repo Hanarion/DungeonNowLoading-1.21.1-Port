@@ -828,7 +828,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     }
 
     private void redstoneLaneWithItem(RedstoneLaneBlock block) {
-        ResourceLocation base_lane = new ResourceLocation(DungeonNowLoading.MOD_ID + ":block/redstone_lane");
+        ResourceLocation base_lane = ResourceLocation.parse(DungeonNowLoading.MOD_ID + ":block/redstone_lane");
         ResourceLocation side = extend(base_lane, "_side");
         ResourceLocation front = extend(base_lane, "_front");
         ResourceLocation front_powered = extend(base_lane, "_front_powered");
@@ -891,7 +891,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     private void wallBlockWithItem(WallBlock block , Block parent) {
         wallBlock(block, blockTexture(parent));
         itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/wall_inventory"))
-                .texture("wall",  new ResourceLocation(DungeonNowLoading.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(parent).getPath()));
+                .texture("wall",  ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(parent).getPath()));
     }
 
     private void wallBlockWithItem(WallBlock block) {
@@ -899,7 +899,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         //itemModels().getBuilder(name(block)).texture(name(block), blockTexture(block));
         //simpleBlockItem(block, models().getExistingFile(blockTexture(block)));
         itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/wall_inventory"))
-                .texture("wall",  new ResourceLocation(DungeonNowLoading.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(block).getPath()));
+                .texture("wall",  ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(block).getPath()));
     }
 
     // --- Helpers: rotations for 6-way FACING
@@ -1600,7 +1600,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         // models/block/<name>_particle.json → parent builtin/entity + particle tex
         ModelFile model = models().getBuilder(name + "_particle")
                 .parent(new ModelFile.UncheckedModelFile("minecraft:builtin/entity"))
-                .texture("particle", new ResourceLocation(ns, "block/" + name + "_particle"));
+                .texture("particle", ResourceLocation.fromNamespaceAndPath(ns, "block/" + name + "_particle"));
 
         // blockstates/<name>.json → map every state (rotation_16, waterlogged, …) to that model
         getVariantBuilder(block).forAllStates(s -> new ConfiguredModel[]{new ConfiguredModel(model)});
@@ -1615,6 +1615,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     }
 
     private ResourceLocation extend(ResourceLocation rl, String suffix) {
-        return new ResourceLocation(rl.getNamespace(), rl.getPath() + suffix);
+        return ResourceLocation.fromNamespaceAndPath(rl.getNamespace(), rl.getPath() + suffix);
     }
 }

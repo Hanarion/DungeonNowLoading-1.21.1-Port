@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 
 public class BallistaGolemPathNavigation extends GroundPathNavigation {
@@ -13,7 +13,7 @@ public class BallistaGolemPathNavigation extends GroundPathNavigation {
     }
 
     @Override
-    public boolean canCutCorner(BlockPathTypes blockPathTypes) {
+    public boolean canCutCorner(PathType blockPathTypes) {
         return false;
     }
 

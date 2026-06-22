@@ -55,7 +55,7 @@ public class SpawnPoolReloadListener extends SimpleJsonResourceReloadListener {
                         // explicit "empty" support
                         if (!raw.equalsIgnoreCase("empty") && !raw.isBlank()) {
                             try {
-                                nodeId = new ResourceLocation(raw);
+                                nodeId = ResourceLocation.parse(raw);
                             } catch (Exception ex) {
                                 // invalid RL -> treat as empty roll (or continue; up to you)
                                 nodeId = null;

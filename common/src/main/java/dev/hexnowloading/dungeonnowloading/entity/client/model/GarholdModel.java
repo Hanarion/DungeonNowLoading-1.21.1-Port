@@ -17,7 +17,7 @@ import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
 public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "garhold"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "garhold"), "main");
     private final ModelPart root;
     private final ModelPart Garhold;
     private final ModelPart bone;

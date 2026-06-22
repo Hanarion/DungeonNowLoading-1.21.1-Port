@@ -16,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends HierarchicalModel<T> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_boros_head"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "fairkeeper_boros_head"), "main");
     private final ModelPart boros;
     private final ModelPart head;
     private final ModelPart upper_jaw;

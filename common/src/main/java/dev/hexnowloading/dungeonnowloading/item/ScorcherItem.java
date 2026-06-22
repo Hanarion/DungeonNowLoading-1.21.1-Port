@@ -446,7 +446,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     public static Item getFuelType(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("FuelType")) {
-            ResourceLocation fuelId = new ResourceLocation(tag.getString("FuelType"));
+            ResourceLocation fuelId = ResourceLocation.parse(tag.getString("FuelType"));
             return BuiltInRegistries.ITEM.get(fuelId);
         }
         return Items.AIR;

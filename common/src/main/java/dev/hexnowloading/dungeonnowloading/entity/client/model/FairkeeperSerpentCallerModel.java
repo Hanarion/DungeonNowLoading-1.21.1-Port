@@ -12,7 +12,7 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 
 public class FairkeeperSerpentCallerModel<T extends FairkeeperSerpentCallerEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("modid", "fairkeeper_serpent_caller"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("modid", "fairkeeper_serpent_caller"), "main");
     private final ModelPart fairkeeper_serpent_caller;
     private final ModelPart orb;
     private final ModelPart left;

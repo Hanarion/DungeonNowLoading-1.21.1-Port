@@ -17,7 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 public class ReaperSpiderRenderer<T extends ReaperSpiderEntity> extends MobRenderer<T, ReaperSpiderModel<T>> {
-    private static final ResourceLocation SPIDER_LOCATION = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/reaper_spider/reaper_spider.png");
+    private static final ResourceLocation SPIDER_LOCATION = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/reaper_spider/reaper_spider.png");
 
     public ReaperSpiderRenderer(EntityRendererProvider.Context context) {
         super(context, new ReaperSpiderModel<>(context.bakeLayer(ReaperSpiderModel.LAYER_LOCATION)), 1.8F);

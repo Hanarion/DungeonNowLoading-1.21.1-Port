@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class BallistaGolemRenderer<T extends BallistaGolemEntity> extends MobRenderer<T, BallistaGolemModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/ballista_golem/ballista_golem.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/ballista_golem/ballista_golem.png");
 
     public BallistaGolemRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new BallistaGolemModel<>(renderManager.bakeLayer(BallistaGolemModel.LAYER_LOCATION)), 1.5F);

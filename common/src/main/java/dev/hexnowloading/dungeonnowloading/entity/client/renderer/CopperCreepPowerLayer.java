@@ -22,7 +22,7 @@ import net.minecraft.world.entity.PowerableMob;
 
 //public class ChaosSpawnerLayer<T extends ChaosSpawnerEntity, M extends ChaosSpawnerModel<T>> extends RenderLayer<T, M> {
 public class CopperCreepPowerLayer<T extends CopperCreepEntity, M extends HierarchicalModel<T>> extends RenderLayer<T, M> {
-    private static final ResourceLocation POWER_LOCATION = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep_armor.png");
+    private static final ResourceLocation POWER_LOCATION = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/copper_creep/copper_creep_armor.png");
     private final CopperCreepModel<CopperCreepEntity> model;
     private final float OFFSET_Y_BY_PIXEL = 0.75F;
 

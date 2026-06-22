@@ -18,7 +18,7 @@ import net.minecraft.world.entity.AnimationState;
 import org.joml.Vector3f;
 
 public class WispModel<T extends WispEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "wisp"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "wisp"), "main");
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
     private static final float IDLE_FADE_OUT_MS = 500.0F;
     private static final float TACKLE_START_FADE_IN_MS = 140.0F;

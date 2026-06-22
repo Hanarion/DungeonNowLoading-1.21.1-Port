@@ -26,18 +26,18 @@ public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlo
     private final Font font; // 🔹 add
 
     private static final ResourceLocation PEDESTAL_TEX =
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal.png");
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal.png");
     private static final ResourceLocation PEDESTAL_TEX_COPPER_NOTCH =
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_copper_notch.png");
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_copper_notch.png");
     private static final ResourceLocation PEDESTAL_TEX_IRON_NOTCH =
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_iron_notch.png");
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_iron_notch.png");
     private static final ResourceLocation PEDESTAL_TEX_GOLD_NOTCH =
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_gold_notch.png");
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_gold_notch.png");
     private static final ResourceLocation PEDESTAL_TEX_DIAMOND_NOTCH =
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_diamond_notch.png");
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/player_statue_pedestal_diamond_notch.png");
 
     private static final ResourceLocation STONE_OVERLAY_TEX =
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/player_statue_stone.png");
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/player_statue_stone.png");
 
 
     public PlayerStatueRenderer(BlockEntityRendererProvider.Context ctx) {

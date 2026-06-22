@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 public class SpawnerCarrierRenderer<T extends SpawnerCarrierEntity> extends MobRenderer<T, SpawnerCarrierModel<T>> {
 
     private static final ResourceLocation TEXTURE =
-            new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/spawner_carrier.png");
+            ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/spawner_carrier.png");
 
     public SpawnerCarrierRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new SpawnerCarrierModel<>(ctx.bakeLayer(SpawnerCarrierModel.LAYER_LOCATION)), 1.5F);

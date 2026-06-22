@@ -17,7 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class CopperCreepModel<T extends CopperCreepEntity> extends HierarchicalModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "copper_creep"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "copper_creep"), "main");
 	private final ModelPart coppercreep;
 	private final ModelPart body;
 	private final ModelPart rod;

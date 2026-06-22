@@ -10,8 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public class CapabilityList implements EntityComponentInitializer {
 
-    public static final ComponentKey<IFairkeeperChestPositionsCapability> FAIRKEEPER_CHEST_POSITIONS_CAP = ComponentRegistry.getOrCreate(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_chest_positions"), IFairkeeperChestPositionsCapability.class);
-    public static final ComponentKey<DNLArmPoseComponent> DNL_ARM_POSE = ComponentRegistry.getOrCreate(new ResourceLocation(DungeonNowLoading.MOD_ID, "dnl_arm_pose"), DNLArmPoseComponent.class);
+    public static final ComponentKey<IFairkeeperChestPositionsCapability> FAIRKEEPER_CHEST_POSITIONS_CAP = ComponentRegistry.getOrCreate(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "fairkeeper_chest_positions"), IFairkeeperChestPositionsCapability.class);
+    public static final ComponentKey<DNLArmPoseComponent> DNL_ARM_POSE = ComponentRegistry.getOrCreate(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "dnl_arm_pose"), DNLArmPoseComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {

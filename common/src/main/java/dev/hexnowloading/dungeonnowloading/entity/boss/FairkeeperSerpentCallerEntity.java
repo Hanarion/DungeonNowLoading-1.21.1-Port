@@ -753,7 +753,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         soul.moveTo(start.getX() + 0.5, start.getY(), start.getZ() + 0.5, this.getYRot(), 0);
 
         // bossId should match the recall registry id you use for Chaos Spawner
-        soul.setBossId(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller"));
+        soul.setBossId(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller"));
 
         int count = SeepingSoulEntity.getRecallCountForSeepingSoul(this.defeatedCount, this.modifiedDefeatedCount);
 

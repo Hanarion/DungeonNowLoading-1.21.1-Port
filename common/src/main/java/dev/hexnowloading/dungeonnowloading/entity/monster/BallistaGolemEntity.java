@@ -34,7 +34,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
         this.setState(BallistaGolemState.SLUMBERING);
         this.setBallistaArrowCount(6);
         this.setMaxUpStep(1.0F);
-        this.setPathfindingMalus(BlockPathTypes.LEAVES, 0.0F);
+        this.setPathfindingMalus(PathType.LEAVES, 0.0F);
         this.moveControl = new BallistaGolemMoveControl(this);
         this.navigation = new BallistaGolemPathNavigation(this, this.level());
         this.xpReward = 50;

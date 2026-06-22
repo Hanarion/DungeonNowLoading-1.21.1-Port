@@ -25,7 +25,7 @@ public class MendingFadeParticleType extends ParticleType<MendingFadeParticleTyp
             Codec.INT.fieldOf("lifetime").forGetter(d -> d.lifetimeTicks)
     ).apply(instance, (type, vx, vy, vz, fadeIn, fadeOut, lifetime) ->
             new Data(
-                    (ParticleType<Data>) BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(type)),
+                    (ParticleType<Data>) BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)),
                     vx, vy, vz,
                     fadeIn, fadeOut, lifetime
             )

@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class HollowRenderer<T extends HollowEntity> extends MobRenderer<T, HollowModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/hollow.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/hollow.png");
 
     public HollowRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new HollowModel<>(renderManager.bakeLayer(HollowModel.LAYER_LOCATION)), 0.5F);

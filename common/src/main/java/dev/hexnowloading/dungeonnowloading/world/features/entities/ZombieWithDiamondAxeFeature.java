@@ -43,7 +43,7 @@ public class ZombieWithDiamondAxeFeature extends Feature<NoneFeatureConfiguratio
         zombie.setDropChance(EquipmentSlot.CHEST, 0.0F);
         zombie.setDropChance(EquipmentSlot.LEGS, 0.0F);
         zombie.setDropChance(EquipmentSlot.FEET, 0.0F);
-        zombie.lootTable = new ResourceLocation(DungeonNowLoading.MOD_ID, "entities/modified/diamond_zombie");
+        zombie.lootTable = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "entities/modified/diamond_zombie");
 
         zombie.setLeftHanded(context.level().getRandom().nextFloat() < 0.05F);
         context.level().addFreshEntityWithPassengers(zombie);

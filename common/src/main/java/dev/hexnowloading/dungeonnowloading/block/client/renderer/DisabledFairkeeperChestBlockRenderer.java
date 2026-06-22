@@ -20,8 +20,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class DisabledFairkeeperChestBlockRenderer implements BlockEntityRenderer<DisabledFairkeeperChestBlockEntity> {
 
     private final DisabledFairkeeperChestModel fairkeeperChestModel;
-    private static final ResourceLocation TEXTURE_OFF = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/entity/fairkeeper_chest_off.png");
-    private static final ResourceLocation TEXTURE_ON = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/block/entity/fairkeeper_chest_on.png");
+    private static final ResourceLocation TEXTURE_OFF = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/entity/fairkeeper_chest_off.png");
+    private static final ResourceLocation TEXTURE_ON = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/block/entity/fairkeeper_chest_on.png");
 
     public DisabledFairkeeperChestBlockRenderer(BlockEntityRendererProvider.Context renderer) {
         this.fairkeeperChestModel = new DisabledFairkeeperChestModel(renderer.bakeLayer(DisabledFairkeeperChestModel.LAYER_LOCATION));

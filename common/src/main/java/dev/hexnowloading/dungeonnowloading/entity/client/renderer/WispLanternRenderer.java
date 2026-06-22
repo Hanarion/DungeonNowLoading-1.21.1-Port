@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WispLanternRenderer<T extends WispLanternEntity> extends MobRenderer<T, WispLanternModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/wisp_lantern/wisp_lantern.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/wisp_lantern/wisp_lantern.png");
     private static final float MODEL_SCALE = 1.25F;
 
     public WispLanternRenderer(EntityRendererProvider.Context renderManager) {

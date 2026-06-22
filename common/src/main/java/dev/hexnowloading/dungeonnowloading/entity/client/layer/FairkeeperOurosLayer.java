@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FairkeeperOurosLayer<T extends FairkeeperOurosEntity, M extends FairkeeperOurosModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_ouros/fairkeeper_ouros_head_emissive.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/fairkeeper_ouros/fairkeeper_ouros_head_emissive.png");
 
     public FairkeeperOurosLayer(FairkeeperOurosRenderer renderer) {
         super(renderer);

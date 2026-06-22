@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public class BrokenGarholdRenderer<T extends BrokenGarholdEntity> extends MobRenderer<T, BrokenGarholdModel<T>> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/garhold/broken_garhold.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/garhold/broken_garhold.png");
 
     public BrokenGarholdRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new BrokenGarholdModel<>(renderManager.bakeLayer(BrokenGarholdModel.LAYER_LOCATION)), 1.0F);

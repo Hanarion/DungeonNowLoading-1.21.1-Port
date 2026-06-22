@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WhimperLayer<T extends WhimperEntity, M extends WhimperModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/whimper/whimper_emissive.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/whimper/whimper_emissive.png");
 
     public WhimperLayer(RenderLayerParent<T, M> $$0) {
         super($$0);

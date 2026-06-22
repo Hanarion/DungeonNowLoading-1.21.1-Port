@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WhimperRenderer<T extends WhimperEntity> extends MobRenderer<T, WhimperModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/whimper/whimper.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/whimper/whimper.png");
 
     public WhimperRenderer(EntityRendererProvider.Context context) {
         super(context, new WhimperModel<>(context.bakeLayer(WhimperModel.LAYER_LOCATION)), 0.5F);

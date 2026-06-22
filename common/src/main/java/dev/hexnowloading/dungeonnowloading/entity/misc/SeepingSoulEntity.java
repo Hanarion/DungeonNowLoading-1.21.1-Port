@@ -74,7 +74,7 @@ public class SeepingSoulEntity extends Entity {
     private static final EntityDataAccessor<SeepingSoulAnimationState> ANIMATION_STATE = SynchedEntityData.defineId(SeepingSoulEntity.class, EntityStates.SEEPING_SOUL_ANIMATION_STATE);
     private static final EntityDataAccessor<String> DATA_BOSS_ID = SynchedEntityData.defineId(SeepingSoulEntity.class, EntityDataSerializers.STRING);
 
-    private static final ResourceLocation DEFAULT_BOSS_ID = new ResourceLocation("minecraft", "pig"); // fallback
+    private static final ResourceLocation DEFAULT_BOSS_ID = ResourceLocation.fromNamespaceAndPath("minecraft", "pig"); // fallback
     // Stored as string in NBT
     private int lastHitTick = -999999;
     private final Set<UUID> playerDefeatedUUIDs = new HashSet<>();
@@ -375,7 +375,7 @@ public class SeepingSoulEntity extends Entity {
     protected void readAdditionalSaveData(CompoundTag tag) {
         if (tag.contains("Boss", CompoundTag.TAG_STRING)) {
             try {
-                this.setBossId(new ResourceLocation(tag.getString("Boss")));
+                this.setBossId(ResourceLocation.parse(tag.getString("Boss")));
             } catch (Exception ignored) {
                 this.setBossId(DEFAULT_BOSS_ID);
             }
@@ -508,7 +508,7 @@ public class SeepingSoulEntity extends Entity {
         if (s == null || s.isBlank()) return DEFAULT_BOSS_ID;
 
         try {
-            return new ResourceLocation(s);
+            return ResourceLocation.parse(s);
         } catch (Exception e) {
             return DEFAULT_BOSS_ID;
         }
@@ -572,7 +572,7 @@ public class SeepingSoulEntity extends Entity {
         ResourceLocation boss = this.getBossId();
 
         // Use exact ids that you used in the renderer bundles map:
-        if (boss.equals(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller"))) {
+        if (boss.equals(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller"))) {
             return SeepingSoulAnimationDuration.SERPENT_CALLER;
         }
 

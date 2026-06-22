@@ -13,8 +13,8 @@ public final class DNLReloadListeners {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static void init() {
-        Services.RELOAD_LISTENERS.registerDataReloadListener(new ResourceLocation(DungeonNowLoading.MOD_ID, "spawn_pools"), new SpawnPoolReloadListener(GSON, DungeonNowLoading.LOGGER));
-        Services.RELOAD_LISTENERS.registerDataReloadListener(new ResourceLocation(DungeonNowLoading.MOD_ID, "spawn_nodes"), new SpawnNodeReloadListener(GSON, DungeonNowLoading.LOGGER));
-        Services.RELOAD_LISTENERS.registerDataReloadListener(new ResourceLocation(DungeonNowLoading.MOD_ID, "mimicling_foods"), new MimiclingFoods.ReloadListener(GSON, DungeonNowLoading.LOGGER));
+        Services.RELOAD_LISTENERS.registerDataReloadListener(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "spawn_pools"), new SpawnPoolReloadListener(GSON, DungeonNowLoading.LOGGER));
+        Services.RELOAD_LISTENERS.registerDataReloadListener(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "spawn_nodes"), new SpawnNodeReloadListener(GSON, DungeonNowLoading.LOGGER));
+        Services.RELOAD_LISTENERS.registerDataReloadListener(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_foods"), new MimiclingFoods.ReloadListener(GSON, DungeonNowLoading.LOGGER));
     }
 }

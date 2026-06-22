@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ScuttleLayer<T extends ScuttleEntity, M extends ScuttleModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/scuttle/scuttle_emissive.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/scuttle/scuttle_emissive.png");
     public ScuttleLayer(ScuttleRenderer renderer) { super(renderer); }
 
     @Override

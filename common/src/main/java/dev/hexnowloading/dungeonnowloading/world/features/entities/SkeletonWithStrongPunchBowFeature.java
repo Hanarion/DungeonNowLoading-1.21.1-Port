@@ -40,7 +40,7 @@ public class SkeletonWithStrongPunchBowFeature extends Feature<NoneFeatureConfig
         skeleton.setDropChance(EquipmentSlot.LEGS, 0.0F);
         skeleton.setDropChance(EquipmentSlot.FEET, 0.0F);
         skeleton.setLeftHanded(context.level().getRandom().nextFloat() < 0.05F);
-        skeleton.lootTable = new ResourceLocation(DungeonNowLoading.MOD_ID, "entities/modified/diamond_skeleton");
+        skeleton.lootTable = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "entities/modified/diamond_skeleton");
 
         context.level().addFreshEntity(skeleton);
         return true;

@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ReaperSpiderEyesLayer<T extends ReaperSpiderEntity, M extends ReaperSpiderModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/reaper_spider/reaper_spider_eyes.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/reaper_spider/reaper_spider_eyes.png");
 
     public ReaperSpiderEyesLayer(ReaperSpiderRenderer renderer) {
         super(renderer);

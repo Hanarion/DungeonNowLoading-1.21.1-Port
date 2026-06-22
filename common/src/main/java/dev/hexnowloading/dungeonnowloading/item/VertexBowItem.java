@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class VertexBowItem extends BowItem implements Vanishable {
+public class VertexBowItem extends BowItem {
     private static final float VERTEX_USE_THRESHOLD = 30.0f;
     private static final float CHARGE_TIME = 30.0f;
 

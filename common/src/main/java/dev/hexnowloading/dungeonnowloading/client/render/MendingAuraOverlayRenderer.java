@@ -36,7 +36,7 @@ public class MendingAuraOverlayRenderer {
     private static final int OVERLAY_TICKS = 40;
     private static final float MODEL_OVERLAY_OFFSET = 0.002F;
     private static final float SHAPE_OVERLAY_EPSILON = 0.001F;
-    private static final ResourceLocation MENDING_AURA_SPRITE = new ResourceLocation("dungeonnowloading", "block/mending_aura_0");
+    private static final ResourceLocation MENDING_AURA_SPRITE = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "block/mending_aura_0");
     private static final Map<TextureAtlasSprite, Map<BakedQuad, List<BakedQuad>>> OVERLAY_REMAPPED_QUAD_CACHE = new IdentityHashMap<>();
 
     private MendingAuraOverlayRenderer() {

@@ -54,7 +54,7 @@ public class WispBlockTracker extends SavedData {
             ListTag wispTags = playerTag.getList(WISPS_TAG, Tag.TAG_COMPOUND);
             for (int j = 0; j < wispTags.size(); j++) {
                 CompoundTag wispTag = wispTags.getCompound(j);
-                ResourceLocation dimensionId = new ResourceLocation(wispTag.getString(DIMENSION_TAG));
+                ResourceLocation dimensionId = ResourceLocation.parse(wispTag.getString(DIMENSION_TAG));
                 ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, dimensionId);
                 BlockPos pos = new BlockPos(wispTag.getInt(X_TAG), wispTag.getInt(Y_TAG), wispTag.getInt(Z_TAG));
                 wisps.add(new TrackedWisp(dimension, pos, wispTag.getLong(PLACED_GAME_TIME_TAG)));

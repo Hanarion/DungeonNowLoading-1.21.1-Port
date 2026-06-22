@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public class SilkSpiderRenderer<T extends SilkSpiderEntity> extends MobRenderer<T, SilkSpiderModel<T>> {
-    private static final ResourceLocation SPIDER_LOCATION = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/silk_spider/silk_spider.png");
+    private static final ResourceLocation SPIDER_LOCATION = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/silk_spider/silk_spider.png");
 
     public SilkSpiderRenderer(EntityRendererProvider.Context context) {
         super(context, new SilkSpiderModel<>(context.bakeLayer(SilkSpiderModel.LAYER_LOCATION)), 0.8F);

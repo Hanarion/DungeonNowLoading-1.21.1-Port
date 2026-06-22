@@ -147,7 +147,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
 
             ResourceLocation poolId;
             try {
-                poolId = new ResourceLocation(entry.poolId);
+                poolId = ResourceLocation.parse(entry.poolId);
             } catch (Exception e) {
                 continue;
             }

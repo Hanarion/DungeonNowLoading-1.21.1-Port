@@ -16,11 +16,11 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 public class VertexArrowProjectileRenderer<T extends VertexArrowProjectileEntity> extends EntityRenderer<VertexArrowProjectileEntity> {
-    private static final ResourceLocation TEXTURE_0 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_0.png");
-    private static final ResourceLocation TEXTURE_1 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_1.png");
-    private static final ResourceLocation TEXTURE_2 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_2.png");
-    private static final ResourceLocation TEXTURE_3 = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_3.png");
-    private static final ResourceLocation EMISSIVE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_emissive.png");
+    private static final ResourceLocation TEXTURE_0 = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_0.png");
+    private static final ResourceLocation TEXTURE_1 = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_1.png");
+    private static final ResourceLocation TEXTURE_2 = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_2.png");
+    private static final ResourceLocation TEXTURE_3 = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_3.png");
+    private static final ResourceLocation EMISSIVE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/vertex_arrow_projectile/vertex_arrow_projectile_emissive.png");
 
     public VertexArrowProjectileRenderer(EntityRendererProvider.Context context) {
         super(context);

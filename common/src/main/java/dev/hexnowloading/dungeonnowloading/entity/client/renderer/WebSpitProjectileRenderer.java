@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class WebSpitProjectileRenderer extends EntityRenderer<WebSpitProjectileEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/web_spit.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/web_spit.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(TEXTURE);
     private static final double MODEL_Y_OFFSET = 1.1D;
     private static final double MODEL_BACK_OFFSET = 0.3D;

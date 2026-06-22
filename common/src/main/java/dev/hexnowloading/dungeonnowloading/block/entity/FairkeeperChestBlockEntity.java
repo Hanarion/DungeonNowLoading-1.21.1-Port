@@ -134,7 +134,7 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
             ContainerHelper.loadAllItems(nbt,this.items);
         } else {
             if (nbt.contains("CombatLootTable", CompoundTag.OBJECT_HEADER)) {
-                this.combatLootTable = new ResourceLocation(nbt.getString("CombatLootTable"));
+                this.combatLootTable = ResourceLocation.parse(nbt.getString("CombatLootTable"));
                 this.combatLootTableSeed = nbt.getLong("CombatLootTableSeed");
             }
         }
@@ -220,7 +220,7 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
 
     protected boolean tryLoadLootTable(CompoundTag nbt) {
         if (nbt.contains("LootTable", 8)) {
-            this.lootTable = new ResourceLocation(nbt.getString("LootTable"));
+            this.lootTable = ResourceLocation.parse(nbt.getString("LootTable"));
             this.lootTableSeed = nbt.getLong("LootTableSeed");
             return true;
         } else {

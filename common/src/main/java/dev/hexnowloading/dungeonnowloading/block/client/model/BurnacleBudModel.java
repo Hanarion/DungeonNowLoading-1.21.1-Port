@@ -20,7 +20,7 @@ import net.minecraft.world.entity.Entity;
 import org.joml.Vector3f;
 
 public class BurnacleBudModel extends HierarchicalModel<Entity> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "burnacle_bud"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "burnacle_bud"), "main");
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
 
     private final ModelPart root;

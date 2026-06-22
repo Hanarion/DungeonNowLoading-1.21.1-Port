@@ -28,7 +28,7 @@ public final class StatueSkinCache {
 
     private static final boolean LOG = true;
     public record StatueSkin(ResourceLocation texture, boolean slim) {}
-    private static final ResourceLocation DEFAULT_STONE = new ResourceLocation("dungeonnowloading", "textures/block/player_statue_stone.png");
+    private static final ResourceLocation DEFAULT_STONE = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "textures/block/player_statue_stone.png");
     private static final float DEFAULT_OVERLAY_ALPHA = 0.35f;
     private static final Map<String, StatueSkin> READY = new ConcurrentHashMap<>();
     private static final Set<String> INFLIGHT = ConcurrentHashMap.newKeySet();
@@ -94,7 +94,7 @@ public final class StatueSkinCache {
                 NativeImage finalImg = s.img;
                 String seed = key + "|" + String.format(Locale.ROOT, "%.2f", overlayAlpha) + "|" + stoneTex;
                 String digest = Hashing.sha1().hashString(seed, StandardCharsets.UTF_8).toString();
-                ResourceLocation loc = new ResourceLocation("dungeonnowloading", "statue/" + digest);
+                ResourceLocation loc = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "statue/" + digest);
 
                 boolean isSlim = s.slim;
                 Minecraft.getInstance().execute(() -> {
@@ -348,7 +348,7 @@ public final class StatueSkinCache {
 
                 String seed = keySeed + "|ph|" + String.format(Locale.ROOT, "%.2f", overlayAlpha) + "|" + stoneTex;
                 String digest = Hashing.sha1().hashString(seed, StandardCharsets.UTF_8).toString();
-                ResourceLocation loc = new ResourceLocation("dungeonnowloading", "statue/" + digest);
+                ResourceLocation loc = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "statue/" + digest);
                 Minecraft.getInstance().getTextureManager().register(loc, dyn);
                 return new StatueSkin(loc, slim);
             }

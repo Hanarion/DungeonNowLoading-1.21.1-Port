@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientMimiclingTooltip implements ClientTooltipComponent {
-    private static final ResourceLocation BUNDLE_TEXTURE_LOCATION = new ResourceLocation("textures/gui/container/bundle.png");
-    private static final ResourceLocation MIMICLING_TEXTURE_LOCATION = new ResourceLocation("dungeonnowloading", "textures/gui/mimicling_gui.png");
+    private static final ResourceLocation BUNDLE_TEXTURE_LOCATION = ResourceLocation.parse("textures/gui/container/bundle.png");
+    private static final ResourceLocation MIMICLING_TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "textures/gui/mimicling_gui.png");
     private static final int SLOT_COUNT = 5;
     private static final int SLOT_WIDTH = 18;
     private static final int SLOT_HEIGHT = 20;

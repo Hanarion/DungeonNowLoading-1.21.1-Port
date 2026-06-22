@@ -16,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> extends HierarchicalModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_ouros_body"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "fairkeeper_ouros_body"), "main");
     private final ModelPart root;
     private final ModelPart ouros_segment;
     private final ModelPart body;

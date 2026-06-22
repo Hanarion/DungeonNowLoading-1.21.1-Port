@@ -17,7 +17,7 @@ import org.joml.Matrix4f;
 
 public class BorusArrowRenderer<T extends BorusArrowEntity> extends EntityRenderer<BorusArrowEntity> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/borus_arrow.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/borus_arrow.png");
 
     public BorusArrowRenderer(EntityRendererProvider.Context renderManager) { super(renderManager); }
 

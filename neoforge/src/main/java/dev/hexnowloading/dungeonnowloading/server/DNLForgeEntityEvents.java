@@ -64,10 +64,10 @@ public class DNLForgeEntityEvents {
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
         if(event.getObject() instanceof Player) {
             if(!event.getObject().getCapability(FairkeeperChestPositionsCapabilityProvider.FAIRKEEPER_CHEST_POSITIONS).isPresent()) {
-                event.addCapability(new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_chest_positions"), new FairkeeperChestPositionsCapabilityProvider());
+                event.addCapability(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "fairkeeper_chest_positions"), new FairkeeperChestPositionsCapabilityProvider());
             }
             if (!event.getObject().getCapability(DNLArmPoseCapabilityProvider.DNL_ARM_POSE).isPresent()) {
-                event.addCapability(new ResourceLocation(DungeonNowLoading.MOD_ID, "dnl_arm_pose"), new DNLArmPoseCapabilityProvider());
+                event.addCapability(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "dnl_arm_pose"), new DNLArmPoseCapabilityProvider());
             }
         }
     }

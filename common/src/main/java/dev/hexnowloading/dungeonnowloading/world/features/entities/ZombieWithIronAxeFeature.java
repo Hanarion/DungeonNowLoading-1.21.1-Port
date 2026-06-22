@@ -40,7 +40,7 @@ public class ZombieWithIronAxeFeature extends Feature<NoneFeatureConfiguration> 
         zombie.setDropChance(EquipmentSlot.LEGS, 0.0F);
         zombie.setDropChance(EquipmentSlot.FEET, 0.0F);
         zombie.setLeftHanded(context.level().getRandom().nextFloat() < 0.05F);
-        zombie.lootTable = new ResourceLocation(DungeonNowLoading.MOD_ID, "entities/modified/iron_zombie");
+        zombie.lootTable = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "entities/modified/iron_zombie");
 
         context.level().addFreshEntityWithPassengers(zombie);
         return true;

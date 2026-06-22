@@ -17,7 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class RepulsorModel<T extends RepulsorEntity> extends HierarchicalModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "repulsor"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "repulsor"), "main");
 	private final ModelPart root;
 	private final ModelPart base;
 	private final ModelPart gear1;

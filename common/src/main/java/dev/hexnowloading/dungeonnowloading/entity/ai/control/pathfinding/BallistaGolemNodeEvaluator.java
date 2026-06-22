@@ -12,7 +12,7 @@ public class BallistaGolemNodeEvaluator extends WalkNodeEvaluator {
 
     /*@Nullable
     @Override
-    protected Node findAcceptedNode(int x, int y, int z, int maxJumpHeight, double floorY, Direction direction, BlockPathTypes previousType) {
+    protected Node findAcceptedNode(int x, int y, int z, int maxJumpHeight, double floorY, Direction direction, PathType previousType) {
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
         double nodeFloorY = this.getFloorLevel(mutablePos.set(x, y, z));
 
@@ -20,7 +20,7 @@ public class BallistaGolemNodeEvaluator extends WalkNodeEvaluator {
             return null;
         }
 
-        BlockPathTypes pathType = this.getCachedBlockType(this.mob, x, y, z);
+        PathType pathType = this.getCachedBlockType(this.mob, x, y, z);
         float malus = this.mob.getPathfindingMalus(pathType);
 
         Node node = null;
@@ -42,8 +42,8 @@ public class BallistaGolemNodeEvaluator extends WalkNodeEvaluator {
         return Math.max(1.125, (double)this.mob.maxUpStep());
     }
 
-    private static boolean doesBlockHavePartialCollision(BlockPathTypes $$0) {
-        return $$0 == BlockPathTypes.FENCE || $$0 == BlockPathTypes.DOOR_WOOD_CLOSED || $$0 == BlockPathTypes.DOOR_IRON_CLOSED;
+    private static boolean doesBlockHavePartialCollision(PathType $$0) {
+        return $$0 == PathType.FENCE || $$0 == PathType.DOOR_WOOD_CLOSED || $$0 == PathType.DOOR_IRON_CLOSED;
     }
 
     private boolean canReachWithoutCollision(Node $$0) {

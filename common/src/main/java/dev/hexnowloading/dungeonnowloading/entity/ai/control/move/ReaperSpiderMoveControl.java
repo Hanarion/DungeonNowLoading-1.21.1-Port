@@ -7,7 +7,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.NodeEvaluator;
 
 public class ReaperSpiderMoveControl extends MoveControl {
@@ -122,11 +122,11 @@ public class ReaperSpiderMoveControl extends MoveControl {
         NodeEvaluator eval = nav != null ? nav.getNodeEvaluator() : null;
 
         if (eval != null) {
-            BlockPathTypes feetType = eval.getBlockPathType(this.mob.level(), x, y, z);
+            PathType feetType = eval.getBlockPathType(this.mob.level(), x, y, z);
             if (this.isDangerous(feetType)) {
                 return false;
             }
-            if (feetType == BlockPathTypes.WALKABLE) {
+            if (feetType == PathType.WALKABLE) {
                 return true;
             }
 
@@ -136,11 +136,11 @@ public class ReaperSpiderMoveControl extends MoveControl {
             }
 
             for (int depth = 1; depth <= 3; depth++) {
-                BlockPathTypes typeBelow = eval.getBlockPathType(this.mob.level(), x, y - depth, z);
+                PathType typeBelow = eval.getBlockPathType(this.mob.level(), x, y - depth, z);
                 if (this.isDangerous(typeBelow)) {
                     return false;
                 }
-                if (typeBelow == BlockPathTypes.WALKABLE) {
+                if (typeBelow == PathType.WALKABLE) {
                     return true;
                 }
             }
@@ -177,7 +177,7 @@ public class ReaperSpiderMoveControl extends MoveControl {
         return this.isSafeStrafe(dx, dz);
     }
 
-    private boolean isDangerous(BlockPathTypes type) {
+    private boolean isDangerous(PathType type) {
         if (type == null) {
             return false;
         }

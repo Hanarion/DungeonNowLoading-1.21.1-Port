@@ -19,7 +19,7 @@ public class ScalableParticleType extends ParticleType<ScalableParticleType.Scal
     public static final Codec<ScalableParticleData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("particle_type").forGetter(data -> BuiltInRegistries.PARTICLE_TYPE.getKey(data.particleType).toString()),
             Codec.FLOAT.fieldOf("scale").forGetter(data -> data.scale)
-    ).apply(instance, (type, scale) -> new ScalableParticleData((ParticleType<ScalableParticleData>)BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(type)), scale)));
+    ).apply(instance, (type, scale) -> new ScalableParticleData((ParticleType<ScalableParticleData>)BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)), scale)));
 
     public ScalableParticleType(boolean alwaysShow) {
         super(alwaysShow, ScalableParticleData.DESERIALIZER);

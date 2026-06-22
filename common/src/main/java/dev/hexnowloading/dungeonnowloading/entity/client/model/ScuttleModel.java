@@ -15,7 +15,7 @@ import net.minecraft.util.Mth;
 
 public class ScuttleModel<T extends ScuttleEntity> extends HierarchicalModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "scuttle"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "scuttle"), "main");
     private final ModelPart torchgolem;
     private final ModelPart body;
     private final ModelPart flame_thrower_n_upper;

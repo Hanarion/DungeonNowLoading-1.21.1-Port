@@ -23,9 +23,9 @@ import static dev.hexnowloading.dungeonnowloading.item.ScorcherItem.getTimeStamp
 
 public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
 
-    private static final ResourceLocation TEXTURE_EMISSIVE_FLAME = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher_emissive_flame.png");
-    private static final ResourceLocation TEXTURE_EMISSIVE_SOUL_FLAME = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher_emissive_soul_flame.png");
-    private static final ResourceLocation TEXTURE_EMISSIVE_HEAT = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher_emissive_heat.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE_FLAME = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher_emissive_flame.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE_SOUL_FLAME = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher_emissive_soul_flame.png");
+    private static final ResourceLocation TEXTURE_EMISSIVE_HEAT = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/item/scorcher/scorcher_emissive_heat.png");
     private static final RenderType RENDER_TYPE_EMISSIVE_FLAME = RenderType.entityTranslucent(TEXTURE_EMISSIVE_FLAME);
     private static final RenderType RENDER_TYPE_EMISSIVE_SOUL_FLAME = RenderType.entityTranslucent(TEXTURE_EMISSIVE_SOUL_FLAME);
     private static final RenderType RENDER_TYPE_EMISSIVE_HEAT = RenderType.entityTranslucent(TEXTURE_EMISSIVE_HEAT);

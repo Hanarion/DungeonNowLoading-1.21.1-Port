@@ -24,8 +24,8 @@ public class WisplightRodModel extends AnimatedItemModel {
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
 
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/item/wisplight_rod/wisplight_rod_handheld.png");
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(DungeonNowLoading.MOD_ID, "wisplight_rod"), "main");
+    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/item/wisplight_rod/wisplight_rod_handheld.png");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "wisplight_rod"), "main");
     private final ModelPart root;
     private final ModelPart All;
     private final ModelPart Wand;

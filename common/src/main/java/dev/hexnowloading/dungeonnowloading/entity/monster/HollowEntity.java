@@ -238,7 +238,7 @@ public class HollowEntity extends Monster {
         if (source.getDirectEntity() instanceof Arrow arrow && arrow.potion != Potions.EMPTY) {
 
             LootTable table = serverLevel.getServer().getLootData()
-                    .getLootTable(new ResourceLocation("dungeonnowloading", "entities/hollow_tipped_arrow_kill"));
+                    .getLootTable(ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "entities/hollow_tipped_arrow_kill"));
 
             LootParams params = new LootParams.Builder(serverLevel)
                     .withParameter(LootContextParams.THIS_ENTITY, this)

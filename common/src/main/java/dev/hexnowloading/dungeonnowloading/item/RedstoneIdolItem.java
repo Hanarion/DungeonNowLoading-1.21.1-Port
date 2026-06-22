@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class RedstoneIdolItem extends BlockItem implements BossSummoningItem, Vanishable {
+public class RedstoneIdolItem extends BlockItem implements BossSummoningItem {
 
     public RedstoneIdolItem(Block block, Item.Properties properties) {
         super(block, properties);
@@ -38,7 +38,7 @@ public class RedstoneIdolItem extends BlockItem implements BossSummoningItem, Va
         AABB aabb = (new AABB(player.blockPosition())).inflate(32);
 
         // 1) Try recall first: find nearby souls that belong to Chaos Spawner
-        ResourceLocation fairkeepersId = new ResourceLocation(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller");
+        ResourceLocation fairkeepersId = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "fairkeeper_serpent_caller");
 
         List<SeepingSoulEntity> souls = level.getEntitiesOfClass(SeepingSoulEntity.class, aabb);
         for (SeepingSoulEntity soul : souls) {

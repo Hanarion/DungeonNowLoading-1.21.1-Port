@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ScuttleRenderer<T extends ScuttleEntity> extends MobRenderer<T, ScuttleModel<T>> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/scuttle/scuttle.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/scuttle/scuttle.png");
 
     public ScuttleRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new ScuttleModel<>(renderManager.bakeLayer(ScuttleModel.LAYER_LOCATION)), 1.0F);

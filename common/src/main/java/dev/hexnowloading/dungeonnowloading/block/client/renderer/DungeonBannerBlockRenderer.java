@@ -30,7 +30,7 @@ public class DungeonBannerBlockRenderer implements BlockEntityRenderer<DungeonBa
         // textures/block/dungeon_banner/dungeon_banner_hollow.png
         // etc.
         for (DungeonBannerBlock.DungeonBannerVariant v : DungeonBannerBlock.DungeonBannerVariant.values()) {
-            TEX.put(v, new ResourceLocation(
+            TEX.put(v, ResourceLocation.fromNamespaceAndPath(
                     DungeonNowLoading.MOD_ID,
                     "textures/block/dungeon_banner/dungeon_banner_" + v.getSerializedName() + ".png"
             ));

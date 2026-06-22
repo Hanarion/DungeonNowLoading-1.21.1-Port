@@ -86,7 +86,7 @@ public class SpawnNodeReloadListener extends SimpleJsonResourceReloadListener {
         try {
             if (!obj.has("entity")) return null;
 
-            ResourceLocation entityId = new ResourceLocation(obj.get("entity").getAsString());
+            ResourceLocation entityId = ResourceLocation.parse(obj.get("entity").getAsString());
             if (!BuiltInRegistries.ENTITY_TYPE.containsKey(entityId)) return null;
 
             EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(entityId);

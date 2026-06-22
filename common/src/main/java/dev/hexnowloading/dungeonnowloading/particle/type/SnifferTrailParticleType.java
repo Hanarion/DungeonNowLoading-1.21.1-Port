@@ -20,7 +20,7 @@ public class SnifferTrailParticleType extends ParticleType<SnifferTrailParticleT
             Codec.FLOAT.fieldOf("target_z").forGetter(data -> data.targetZ),
             Codec.INT.fieldOf("travel_lifetime").forGetter(data -> data.travelLifetime),
             Codec.INT.fieldOf("delay").forGetter(data -> data.delay)
-    ).apply(instance, (type, targetX, targetY, targetZ, travelLifetime, delay) -> new Data((ParticleType<Data>)BuiltInRegistries.PARTICLE_TYPE.get(new ResourceLocation(type)), targetX, targetY, targetZ, travelLifetime, delay)));
+    ).apply(instance, (type, targetX, targetY, targetZ, travelLifetime, delay) -> new Data((ParticleType<Data>)BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)), targetX, targetY, targetZ, travelLifetime, delay)));
 
     public SnifferTrailParticleType(boolean alwaysShow) {
         super(alwaysShow, Data.DESERIALIZER);

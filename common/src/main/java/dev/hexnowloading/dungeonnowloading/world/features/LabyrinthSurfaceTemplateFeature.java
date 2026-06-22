@@ -17,7 +17,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 public class LabyrinthSurfaceTemplateFeature extends Feature<NoneFeatureConfiguration> {
 
     private static final ResourceLocation TEMPLATE_ID =
-            new ResourceLocation("dungeonnowloading", "labyrinth/surface");
+            ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "labyrinth/surface");
 
     public LabyrinthSurfaceTemplateFeature() {
         super(NoneFeatureConfiguration.CODEC);

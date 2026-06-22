@@ -28,7 +28,7 @@ public class DungeonBannerBlockItemRenderer extends BlockEntityWithoutLevelRende
     static {
         // expects: textures/block/dungeon_banner/dungeon_banner_<serialized>.png
         for (DungeonBannerBlock.DungeonBannerVariant v : DungeonBannerBlock.DungeonBannerVariant.values()) {
-            TEX.put(v, new ResourceLocation(
+            TEX.put(v, ResourceLocation.fromNamespaceAndPath(
                     DungeonNowLoading.MOD_ID,
                     "textures/block/dungeon_banner/dungeon_banner_" + v.getSerializedName() + ".png"
             ));

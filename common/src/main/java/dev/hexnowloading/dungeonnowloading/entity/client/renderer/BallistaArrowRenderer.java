@@ -20,7 +20,7 @@ import org.joml.Matrix4f;
 
 public class BallistaArrowRenderer<T extends BallistaArrowEntity> extends EntityRenderer<BallistaArrowEntity> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/ballista_arrow.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/ballista_arrow.png");
 
     public BallistaArrowRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager);

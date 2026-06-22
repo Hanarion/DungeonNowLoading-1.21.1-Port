@@ -88,7 +88,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
                 .parent(ITEM_GENERATED)
                 .texture("layer0", modLoc("item/" + baseTexture))
                 .override()
-                .predicate(new ResourceLocation(propertyName), 1.0F)
+                .predicate(ResourceLocation.parse(propertyName), 1.0F)
                 .model(getExistingFile(modLoc("item/" + overrideTexture)));
     }
 
@@ -198,8 +198,8 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
     }
     /*private ItemModelBuilder simpleItem(RegistryObject<Item> item) {
         return withExistingParent(item.getId().getPath(),
-                new ResourceLocation("item/generated")).texture("layer0",
-                new ResourceLocation(DungeonNowLoading.MOD_ID, "item/" + item.getId().getPath()));
+                ResourceLocation.parse("item/generated")).texture("layer0",
+                ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "item/" + item.getId().getPath()));
     }*/
 
     public void evenSimplerBlockItem(RegistryObject<Block> block) {
@@ -209,8 +209,8 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
 
     private ItemModelBuilder simpleBlockItem(RegistryObject<Block> item) {
         return withExistingParent(item.getId().getPath(),
-                new ResourceLocation("item/generated")).texture("layer0",
-                new ResourceLocation(DungeonNowLoading.MOD_ID,"item/" + item.getId().getPath()));
+                ResourceLocation.parse("item/generated")).texture("layer0",
+                ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID,"item/" + item.getId().getPath()));
     }
 
     private void builtinEntityItem(Item item) {

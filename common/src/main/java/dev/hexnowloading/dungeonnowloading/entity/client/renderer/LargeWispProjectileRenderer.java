@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class LargeWispProjectileRenderer extends EntityRenderer<LargeWispProjectileEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(DungeonNowLoading.MOD_ID, "textures/entity/large_wisp/large_wisp.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "textures/entity/large_wisp/large_wisp.png");
     private static final RenderType RENDER_TYPE = RenderType.entityTranslucentEmissive(TEXTURE, true);
     private static final float MODEL_SCALE = 1.5F;
     private static final float LIVING_MODEL_Y_OFFSET = -1.501F;
