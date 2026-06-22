@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import net.minecraft.core.Holder;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexOrbProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.entity.util.Boss;
@@ -205,7 +206,7 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
     }
 
     private void vertexTransmissionEffectImmunity() {
-        this.removeEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+        this.removeEffect(DNLMobEffects.vertexTransmission());
     }
 
     private void setPathOnFire() {
@@ -294,8 +295,8 @@ public class FairkeeperBorosPartEntity extends Monster implements Boss, Enemy, S
 
     @Override
     public boolean canBeAffected(MobEffectInstance mobEffectInstance) {
-        MobEffect effect = mobEffectInstance.getEffect();
-        if (effect == MobEffects.POISON || effect == DNLMobEffects.VERTEX_TRANSMISSION.get()) {
+        Holder<MobEffect> effect = mobEffectInstance.getEffect();
+        if (effect == MobEffects.POISON || effect == DNLMobEffects.vertexTransmission()) {
             return false;
         }
         return super.canBeAffected(mobEffectInstance);

@@ -95,12 +95,12 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
             entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, slownessDurationTicks, slownessAmplifier));
 
             // Vertex Transmission application
-            boolean entityHasEffect = entity.hasEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+            boolean entityHasEffect = entity.hasEffect(DNLMobEffects.vertexTransmission());
             if (!entityHasEffect) {
-                entity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), vertexTransDurationTicks, vertexTransAmplifier));
+                entity.addEffect(new MobEffectInstance(DNLMobEffects.vertexTransmission(), vertexTransDurationTicks, vertexTransAmplifier));
             } else {
-                entity.addEffect(new MobEffectInstance(DNLMobEffects.VERTEX_TRANSMISSION.get(), vertexTransDurationTicks, vertexTransAmplifier));
-                VertexTransmissionEffect vertexTransmissionEffect = (VertexTransmissionEffect) entity.getEffect(DNLMobEffects.VERTEX_TRANSMISSION.get()).getEffect();
+                entity.addEffect(new MobEffectInstance(DNLMobEffects.vertexTransmission(), vertexTransDurationTicks, vertexTransAmplifier));
+                VertexTransmissionEffect vertexTransmissionEffect = (VertexTransmissionEffect) entity.getEffect(DNLMobEffects.vertexTransmission()).getEffect().value();
                 vertexTransmissionEffect.markAsReconnectionCase(entity.getUUID());
             }
         }

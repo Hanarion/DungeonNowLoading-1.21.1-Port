@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import net.minecraft.core.Holder;
 import com.mojang.logging.LogUtils;
 import dev.hexnowloading.dungeonnowloading.entity.ai.*;
 import dev.hexnowloading.dungeonnowloading.entity.ai.control.move.FairkeeperOurosMoveControl;
@@ -686,8 +687,8 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
 
     @Override
     public boolean canBeAffected(MobEffectInstance mobEffectInstance) {
-        MobEffect effect = mobEffectInstance.getEffect();
-        if (effect == MobEffects.POISON || effect == DNLMobEffects.VERTEX_TRANSMISSION.get()) {
+        Holder<MobEffect> effect = mobEffectInstance.getEffect();
+        if (effect == MobEffects.POISON || effect == DNLMobEffects.vertexTransmission()) {
             return false;
         }
         return super.canBeAffected(mobEffectInstance);

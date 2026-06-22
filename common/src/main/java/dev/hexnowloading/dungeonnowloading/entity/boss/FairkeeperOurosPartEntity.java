@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import net.minecraft.core.Holder;
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropScuttleGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyDropVertexPillarGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.FairkeeperOurosBodyShootVertexOrbGoal;
@@ -263,7 +264,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
     }
 
     private void vertexTransmissionEffectImmunity() {
-        this.removeEffect(DNLMobEffects.VERTEX_TRANSMISSION.get());
+        this.removeEffect(DNLMobEffects.vertexTransmission());
     }
 
     private void performContactDamage() {
@@ -330,8 +331,8 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
 
     @Override
     public boolean canBeAffected(MobEffectInstance mobEffectInstance) {
-        MobEffect effect = mobEffectInstance.getEffect();
-        if (effect == MobEffects.POISON || effect == DNLMobEffects.VERTEX_TRANSMISSION.get()) {
+        Holder<MobEffect> effect = mobEffectInstance.getEffect();
+        if (effect == MobEffects.POISON || effect == DNLMobEffects.vertexTransmission()) {
             return false;
         }
         return super.canBeAffected(mobEffectInstance);
