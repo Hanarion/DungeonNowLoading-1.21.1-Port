@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
+import net.minecraft.tags.EntityTypeTags;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.GarholdAnimationDuration;
@@ -837,7 +838,7 @@ public class GarholdEntity extends Monster {
 
     private boolean isValidGarholdTarget(LivingEntity target) {
 
-        if (target.getMobType() == MobType.UNDEAD) return false;
+        if (target.getType().is(EntityTypeTags.UNDEAD)) return false;
 
         return isValidCaptureTarget(target);
     }

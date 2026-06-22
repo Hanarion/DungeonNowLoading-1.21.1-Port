@@ -288,10 +288,8 @@ public class HollowEntity extends Monster {
         );
     }
 
-    @Override
-    public MobType getMobType() {
-        return MobType.UNDEAD;
-    }
+    // 1.21 removed MobType; "undead" classification is now via the
+    // #minecraft:undead entity_type tag (see data/.../tags/entity_type/).
 
     @Override
     protected SoundEvent getAmbientSound() {
