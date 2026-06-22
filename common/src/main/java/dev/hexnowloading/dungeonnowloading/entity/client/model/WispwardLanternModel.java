@@ -67,13 +67,13 @@ public class WispwardLanternModel<T extends Entity> extends HierarchicalModel<T>
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        this.wispward_lantern_cart.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        this.wispward_lantern_cart.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     public void renderBase(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay) {
         this.light.visible = false;
-        this.wispward_lantern_cart.render(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.wispward_lantern_cart.render(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
         this.light.visible = true;
     }
 
@@ -81,7 +81,7 @@ public class WispwardLanternModel<T extends Entity> extends HierarchicalModel<T>
         poseStack.pushPose();
         this.wispward_lantern_cart.translateAndRotate(poseStack);
         this.lantern.translateAndRotate(poseStack);
-        this.light.render(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.light.render(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
         poseStack.popPose();
     }
 

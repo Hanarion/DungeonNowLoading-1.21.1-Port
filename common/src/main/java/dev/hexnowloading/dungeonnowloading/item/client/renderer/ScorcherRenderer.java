@@ -66,19 +66,19 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
             heatAlpha = getHeat(player, itemStack);
         }
 
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0f, 1.0f, 1.0f, 1.0f);
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
 
         if (flameAlpha > 0.0F) {
             VertexConsumer emissiveFlame = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_FLAME);
             if (itemStack.is(DNLItems.SOUL_SCORCHER.get())) {
                 emissiveFlame = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_SOUL_FLAME);
             }
-            this.model.renderToBuffer(poseStack, emissiveFlame, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, flameAlpha);
+            this.model.renderToBuffer(poseStack, emissiveFlame, LightTexture.FULL_BRIGHT, packedOverlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(flameAlpha, 1.0F, 1.0F, 1.0F));
         }
 
         if (heatAlpha > 0.0F) {
             VertexConsumer emissiveHeat = bufferSource.getBuffer(RENDER_TYPE_EMISSIVE_HEAT);
-            this.model.renderToBuffer(poseStack, emissiveHeat, LightTexture.FULL_BRIGHT, packedOverlay, 1.0F, 1.0F, 1.0F, heatAlpha);
+            this.model.renderToBuffer(poseStack, emissiveHeat, LightTexture.FULL_BRIGHT, packedOverlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(heatAlpha, 1.0F, 1.0F, 1.0F));
         }
         poseStack.popPose();
     }

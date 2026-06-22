@@ -69,7 +69,7 @@ public class BurnacleBlockRenderer implements BlockEntityRenderer<BurnacleBlockE
         VertexConsumer vertexConsumer = bufferSource.getBuffer(renderStage.model().renderType(renderStage.texture()));
         float ageInTicks = blockEntity.getLevel() == null ? 0.0F : blockEntity.getLevel().getGameTime() + partialTick;
         renderStage.setupAnim(blockEntity, partialTick, ageInTicks);
-        renderStage.model().renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        renderStage.model().renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
         this.renderDestroyProgress(blockEntity, renderStage, poseStack, bufferSource, packedLight);
         poseStack.popPose();
     }
@@ -82,7 +82,7 @@ public class BurnacleBlockRenderer implements BlockEntityRenderer<BurnacleBlockE
 
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.crumbling(DESTROY_STAGES[progress]));
         VertexConsumer repeatingVertexConsumer = new CenteredRepeatingUvVertexConsumer(vertexConsumer, renderStage.textureWidth(), renderStage.textureHeight());
-        renderStage.model().renderToBuffer(poseStack, repeatingVertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        renderStage.model().renderToBuffer(poseStack, repeatingVertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
     }
 
     private static void rotateOutward(PoseStack poseStack, Direction facing) {

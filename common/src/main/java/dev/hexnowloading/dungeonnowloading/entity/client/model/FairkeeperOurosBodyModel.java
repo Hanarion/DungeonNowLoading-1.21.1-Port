@@ -146,9 +146,9 @@ public class FairkeeperOurosBodyModel<T extends FairkeeperOurosPartEntity> exten
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        ouros_segment.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        cannon.render(poseStack, vertexConsumer, 0xF000F0, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        ouros_segment.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        cannon.render(poseStack, vertexConsumer, 0xF000F0, packedOverlay, color);
     }
 
     public float getTiltAngle(FairkeeperOurosPartEntity entity) {

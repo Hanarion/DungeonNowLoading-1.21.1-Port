@@ -139,8 +139,8 @@ public class FairkeeperBorosModel<T extends FairkeeperBorosEntity> extends Hiera
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        boros.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        boros.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     @Override

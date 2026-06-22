@@ -29,7 +29,7 @@ public class ScuttleLayer<T extends ScuttleEntity, M extends ScuttleModel<T>> ex
             float DURATION = 3.0F;
             float timeInSeconds = (float) (scuttleEntity.tickCount - scuttleEntity.getRenderOldTick()) / 20.0F;
             if (scuttleEntity.isState(ScuttleEntity.ScuttleState.OPENING) || scuttleEntity.isState(ScuttleEntity.ScuttleState.OPENED)) {
-                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(scuttleEntity, 0), 1.0F, 1.0F, 1.0F, timeInSeconds < DURATION ? timeInSeconds/DURATION : 1.0F);
+                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(scuttleEntity, 0), net.minecraft.util.FastColor.ARGB32.colorFromFloat(timeInSeconds < DURATION ? timeInSeconds/DURATION : 1.0F, 1.0F, 1.0F, 1.0F));
             }
         }
         if (scuttleEntity.isState(ScuttleEntity.ScuttleState.CLOSING) && scuttleEntity.isRenderHeating()) {
@@ -40,7 +40,7 @@ public class ScuttleLayer<T extends ScuttleEntity, M extends ScuttleModel<T>> ex
         if (scuttleEntity.isRenderCooling()) {
             float DURATION = 5.0F;
             float timeInSeconds = (float) (scuttleEntity.tickCount - scuttleEntity.getRenderOldTick()) / 20.0F;
-            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(scuttleEntity, 0), 1.0F, 1.0F, 1.0F, timeInSeconds < DURATION ? (DURATION - timeInSeconds)/DURATION : 0.0F);
+            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(scuttleEntity, 0), net.minecraft.util.FastColor.ARGB32.colorFromFloat(timeInSeconds < DURATION ? (DURATION - timeInSeconds) / DURATION : 0.0F, 1.0F, 1.0F, 1.0F));
         }
     }
 }

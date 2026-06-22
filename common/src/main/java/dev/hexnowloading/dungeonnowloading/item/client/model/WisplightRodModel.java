@@ -117,22 +117,22 @@ public class WisplightRodModel extends AnimatedItemModel {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        All.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        All.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     public void renderSolidToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         poseStack.pushPose();
         this.All.translateAndRotate(poseStack);
-        this.Wand.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        this.UppperPart.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        this.Wand.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        this.UppperPart.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
         poseStack.popPose();
     }
 
     public void renderTranslucentToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         poseStack.pushPose();
         this.All.translateAndRotate(poseStack);
-        this.FireBall.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        this.FireBall.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
         poseStack.popPose();
     }
 

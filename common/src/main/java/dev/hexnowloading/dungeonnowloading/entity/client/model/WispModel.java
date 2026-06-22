@@ -96,9 +96,9 @@ public class WispModel<T extends WispEntity> extends HierarchicalModel<T> {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        wisp.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        outerlayer.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        wisp.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        outerlayer.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     @Override

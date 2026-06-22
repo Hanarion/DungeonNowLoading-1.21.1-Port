@@ -58,10 +58,7 @@ public class HollowTransparentLayer<T extends HollowEntity, M extends HollowMode
                 poseStack,
                 bodyVc,
                 packedLight,
-                LivingEntityRenderer.getOverlayCoords(entity, 0.0F),
-                1.0F, 1.0F, 1.0F,
-                alpha
-        );
+                LivingEntityRenderer.getOverlayCoords(entity, 0.0F), net.minecraft.util.FastColor.ARGB32.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
 
 
         // 2) EYES (always emissive, ignore lighting)
@@ -70,9 +67,6 @@ public class HollowTransparentLayer<T extends HollowEntity, M extends HollowMode
                 poseStack,
                 eyeVc,
                 packedLight,
-                LivingEntityRenderer.getOverlayCoords(entity, 0.0F),
-                1.0F, 1.0F, 1.0F,
-                1.0F
-        );
+                LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 0xFFFFFFFF);
     }
 }

@@ -75,16 +75,16 @@ public class VertexOrbProjectileModel<T extends VertexOrbProjectileEntity> exten
     }
 
     /*@Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
          // Value between 0 and 1
 
-        orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        wave.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, waveAlpha);
-        //vertex_orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        wave.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        //vertex_orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }*/
 
     public void renderToBufferWithEntity(VertexOrbProjectileEntity entity, PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
         wave.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, entity.getDyingTick() > 0 || (entity.getLife() > 0 && entity.getLife() < 20) ? alpha : waveAlpha);
     }
 

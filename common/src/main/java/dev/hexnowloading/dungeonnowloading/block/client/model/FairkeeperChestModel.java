@@ -41,9 +41,9 @@ public class FairkeeperChestModel extends Model {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        lid.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        base.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        lid.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        base.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     public void setupAnim(float openProgress) {

@@ -105,7 +105,7 @@ public class MimicartRenderer<T extends MimicartEntity> extends EntityRenderer<T
         float a = 1.0F;
 
         VertexConsumer vc = buffer.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(poseStack, vc, packedLight, overlay, r, g, b, a);
+        this.model.renderToBuffer(poseStack, vc, packedLight, overlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(a, r, g, b));
 
         poseStack.popPose();
     }

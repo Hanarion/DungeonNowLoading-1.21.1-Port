@@ -184,8 +184,8 @@ public class ReaperSpiderModel <T extends ReaperSpiderEntity> extends Hierarchic
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        spider.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        spider.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     private final AnimationState idleLoop = new AnimationState();

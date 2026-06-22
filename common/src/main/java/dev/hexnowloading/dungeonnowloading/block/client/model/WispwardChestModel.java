@@ -34,13 +34,13 @@ public class WispwardChestModel extends Model{
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        wispward_chest.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        wispward_chest.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     public void renderBase(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay) {
         this.fire.visible = false;
-        this.wispward_chest.render(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.wispward_chest.render(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
         this.fire.visible = true;
     }
 

@@ -144,8 +144,8 @@ public class GarholdModel<T extends GarholdEntity> extends HierarchicalModel<T> 
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        Garhold.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        Garhold.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     @Override

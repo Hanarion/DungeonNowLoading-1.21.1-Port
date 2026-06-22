@@ -34,9 +34,9 @@ public class ChaosSpawnerProjectileRenderer<T extends ChaosSpawnerProjectileEnti
         this.model.headAnim(yRot, xRot);
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RENDER_TYPE);
         if (chaosSpawnerProjectileEntity.tickCount > 4) {
-            this.model.renderToBuffer(poseStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            this.model.renderToBuffer(poseStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
         } else {
-            this.model.renderToBuffer(poseStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.0F);
+            this.model.renderToBuffer(poseStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, net.minecraft.util.FastColor.ARGB32.colorFromFloat(0.0F, 1.0F, 1.0F, 1.0F));
         }
         poseStack.popPose();
         super.render(chaosSpawnerProjectileEntity, v, v1, poseStack, multiBufferSource, i);

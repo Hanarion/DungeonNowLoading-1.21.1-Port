@@ -27,7 +27,7 @@ public class HollowRenderer<T extends HollowEntity> extends MobRenderer<T, Hollo
     public void render(T entity, float v, float v1, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
         super.render(entity, v, v1, poseStack, multiBufferSource, i);
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE));
-        this.model.renderToBuffer(poseStack, vertexConsumer, i, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 0.5F);
+        this.model.renderToBuffer(poseStack, vertexConsumer, i, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), net.minecraft.util.FastColor.ARGB32.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F));
     }*/
 
     @Override

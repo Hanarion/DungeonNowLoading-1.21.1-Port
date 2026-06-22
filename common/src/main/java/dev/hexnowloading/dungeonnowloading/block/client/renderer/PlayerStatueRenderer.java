@@ -99,7 +99,7 @@ public class PlayerStatueRenderer implements BlockEntityRenderer<PlayerStatueBlo
         statue.useSlimArms(skin.slim());
         //var statVx = buf.getBuffer(RenderType.entityTranslucent(skin.texture()));
         var statVx = buf.getBuffer(RenderType.armorCutoutNoCull(skin.texture()));
-        statue.renderToBuffer(pose, statVx, light, overlay, 1f, 1f, 1f, 1f);
+        statue.renderToBuffer(pose, statVx, light, overlay, 0xFFFFFFFF);
         pose.popPose();
 
         // --- text (aligns with pedestal orientation) ---

@@ -23,6 +23,6 @@ public class FairkeeperBorosLayer<T extends FairkeeperBorosEntity, M extends Fai
     @Override
     public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLightIn, FairkeeperBorosEntity fairkeeperBoros, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE_EMISSIVE, true));
-        this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(fairkeeperBoros, 0), 1.0F, 1.0F, 1.0F, 1.0F);
+        this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(fairkeeperBoros, 0), 0xFFFFFFFF);
     }
 }

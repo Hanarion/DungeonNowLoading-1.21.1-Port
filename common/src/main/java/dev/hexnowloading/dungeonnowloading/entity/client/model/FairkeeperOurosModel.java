@@ -176,8 +176,8 @@ public class FairkeeperOurosModel<T extends FairkeeperOurosEntity> extends Hiera
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        ouros.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        ouros.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     @Override

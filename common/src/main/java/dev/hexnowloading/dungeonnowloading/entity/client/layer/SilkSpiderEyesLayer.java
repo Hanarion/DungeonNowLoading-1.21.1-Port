@@ -23,6 +23,6 @@ public class SilkSpiderEyesLayer<T extends SilkSpiderEntity, M extends SilkSpide
     @Override
     public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLightIn, SilkSpiderEntity body, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE_EMISSIVE, true));
-        this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 0xF00000, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 0xF00000, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
     }
 }

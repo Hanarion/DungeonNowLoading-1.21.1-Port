@@ -51,7 +51,7 @@ public class LargeWispProjectileRenderer extends EntityRenderer<LargeWispProject
         this.model.setupAnim(entity, 0.0F, 0.0F, entity.tickCount + partialTicks, entityYaw, 0.0F);
 
         VertexConsumer base = buffer.getBuffer(RENDER_TYPE);
-        this.model.renderToBuffer(poseStack, base, 0xF000F0, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(poseStack, base, 0xF000F0, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
 
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);

@@ -52,7 +52,7 @@ public class CopperCreepPowerLayer<T extends CopperCreepEntity, M extends Hierar
             this.getParentModel().copyPropertiesTo((EntityModel<T>) entityModel);
             VertexConsumer $$12 = bufferSource.getBuffer(RenderType.energySwirl(POWER_LOCATION, this.xOffset(tickCount) % 1.0F, tickCount * 0.01F % 1.0F));
             entityModel.setupAnim(copperCreepEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-            entityModel.renderToBuffer(poseStack, $$12, packedLight, OverlayTexture.NO_OVERLAY, 0.5F, 0.5F, 0.5F, 1.0F);
+            entityModel.renderToBuffer(poseStack, $$12, packedLight, OverlayTexture.NO_OVERLAY, net.minecraft.util.FastColor.ARGB32.colorFromFloat(1.0F, 0.5F, 0.5F, 0.5F));
             poseStack.popPose();
         }
     }
@@ -70,7 +70,7 @@ public class CopperCreepPowerLayer<T extends CopperCreepEntity, M extends Hierar
 //        if (entitylivingbaseIn.isPowered()) {
 ////            super.render(poseStack, bufferSource, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
 //            VertexConsumer shockwaveVertexConsumer = bufferIn.getBuffer(RenderType.entityTranslucentEmissive(POWER_LOCATION, true));
-//            this.getParentModel().renderToBuffer(matrixStackIn, shockwaveVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), 1.0F, 1.0F, 1.0F, 1.0F);
+//            this.getParentModel().renderToBuffer(matrixStackIn, shockwaveVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), 0xFFFFFFFF);
 //        }
 //    }
 }

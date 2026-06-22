@@ -38,7 +38,7 @@ public class FairkeeperSerpentCallerRenderer<T extends FairkeeperSerpentCallerEn
         if (entity.isActivated()) {
             vertexConsumer = multiBufferSource.getBuffer(RENDER_TYPE_ACTIVE);
         }
-        this.model.renderToBuffer(poseStack, vertexConsumer, 0xF000F0, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(poseStack, vertexConsumer, 0xF000F0, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
         this.model.setupAnim(entity, 0, 0, entity.tickCount + partialTicks, entityYaw, 0);
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, multiBufferSource, i);

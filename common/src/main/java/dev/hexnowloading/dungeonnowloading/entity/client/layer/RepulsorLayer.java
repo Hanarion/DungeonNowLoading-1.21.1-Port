@@ -25,9 +25,9 @@ public class RepulsorLayer<T extends RepulsorEntity, M extends RepulsorModel<T>>
                 float healthRation = repulsorEntity.getShieldHealth() / RepulsorEntity.SHIELD_ALERT_THRESHOLD;
                 float blinkCycle = 40 - 35F * (1 - healthRation);
                 float alpha = (repulsorEntity.getAge() % blinkCycle < blinkCycle / 2) ? 1.0F : 0.0F;
-                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
+                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, net.minecraft.util.FastColor.ARGB32.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
             } else {
-                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1);
+                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
             }
         }
     }

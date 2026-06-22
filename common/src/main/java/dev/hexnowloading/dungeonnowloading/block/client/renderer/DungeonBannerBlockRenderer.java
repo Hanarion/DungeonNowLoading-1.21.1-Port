@@ -79,7 +79,7 @@ public class DungeonBannerBlockRenderer implements BlockEntityRenderer<DungeonBa
 
         waverBanner(be, partialTick);
 
-        model.renderToBuffer(poseStack, vc, packedLight, packedOverlay, 1f, 1f, 1f, 1f);
+        model.renderToBuffer(poseStack, vc, packedLight, packedOverlay, 0xFFFFFFFF);
 
         poseStack.popPose();
     }

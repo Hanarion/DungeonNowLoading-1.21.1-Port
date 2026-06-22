@@ -54,10 +54,10 @@ public class WispProjectileRenderer<T extends WispProjectileEntity> extends Enti
         this.model.setupAnim(entity, 0.0F, 0.0F, entity.tickCount + partialTicks, entityYaw, 0.0F);
 
         VertexConsumer base = buffer.getBuffer(RENDER_TYPE);
-        this.model.renderToBuffer(poseStack, base, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(poseStack, base, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
 
         VertexConsumer emissive = buffer.getBuffer(EMISSIVE_RENDER_TYPE);
-        this.model.renderToBuffer(poseStack, emissive, emissiveLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.5F);
+        this.model.renderToBuffer(poseStack, emissive, emissiveLight, OverlayTexture.NO_OVERLAY, net.minecraft.util.FastColor.ARGB32.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F));
 
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);

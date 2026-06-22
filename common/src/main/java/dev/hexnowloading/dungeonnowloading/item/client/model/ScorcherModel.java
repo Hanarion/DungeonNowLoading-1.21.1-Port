@@ -93,8 +93,8 @@ public class ScorcherModel extends AnimatedItemModel {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        scorcher.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        scorcher.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     public void setUpAnim(ScorcherItem item, Player player, ItemStack stack, float partialTicks) {

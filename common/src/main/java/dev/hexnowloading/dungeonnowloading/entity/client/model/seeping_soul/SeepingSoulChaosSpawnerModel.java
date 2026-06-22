@@ -69,8 +69,8 @@ public class SeepingSoulChaosSpawnerModel<T extends SeepingSoulEntity> extends H
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        Skullsoul.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        Skullsoul.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     public ModelPart root() {

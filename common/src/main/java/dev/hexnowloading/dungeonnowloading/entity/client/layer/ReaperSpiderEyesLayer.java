@@ -28,6 +28,6 @@ public class ReaperSpiderEyesLayer<T extends ReaperSpiderEntity, M extends Reape
                 : RenderType.entityTranslucent(TEXTURE_EMISSIVE));
         float strength = body.getEyesAlpha(partialTicks);
         int light = emissive ? 0xF00000 : packedLightIn;
-        this.getParentModel().renderToBuffer(poseStack, vertexConsumer, light, LivingEntityRenderer.getOverlayCoords(body, 0.0F), strength, strength, strength, strength);
+        this.getParentModel().renderToBuffer(poseStack, vertexConsumer, light, LivingEntityRenderer.getOverlayCoords(body, 0.0F), net.minecraft.util.FastColor.ARGB32.colorFromFloat(strength, strength, strength, strength));
     }
 }

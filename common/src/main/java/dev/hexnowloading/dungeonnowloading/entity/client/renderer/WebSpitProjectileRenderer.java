@@ -48,7 +48,7 @@ public class WebSpitProjectileRenderer extends EntityRenderer<WebSpitProjectileE
         this.model.headAnim(yRot + MODEL_YAW_OFFSET, -xRot);
 
         VertexConsumer vertexConsumer = buffer.getBuffer(RENDER_TYPE);
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }

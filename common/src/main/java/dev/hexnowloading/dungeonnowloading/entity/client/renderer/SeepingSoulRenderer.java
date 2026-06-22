@@ -85,10 +85,7 @@ public class SeepingSoulRenderer extends EntityRenderer<SeepingSoulEntity> {
                 poseStack,
                 baseVc,
                 emissiveLight,
-                OverlayTexture.pack(0.0f, bl),
-                1.0F, 1.0F, 1.0F,
-                alpha
-        );
+                OverlayTexture.pack(0.0f, bl), net.minecraft.util.FastColor.ARGB32.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
 
         // Eyes
         VertexConsumer eyesVc = buffer.getBuffer(bundle.eyesRenderType());
@@ -96,10 +93,7 @@ public class SeepingSoulRenderer extends EntityRenderer<SeepingSoulEntity> {
                 poseStack,
                 eyesVc,
                 emissiveLight,
-                OverlayTexture.NO_OVERLAY,
-                1.0F, 1.0F, 1.0F,
-                1.0F
-        );
+                OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
 
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);

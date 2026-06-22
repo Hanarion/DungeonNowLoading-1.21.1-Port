@@ -117,8 +117,8 @@ public class CopperCreepButlerModel<T extends CopperCreepEntity> extends Hierarc
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        coppercreep.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        coppercreep.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     @Override

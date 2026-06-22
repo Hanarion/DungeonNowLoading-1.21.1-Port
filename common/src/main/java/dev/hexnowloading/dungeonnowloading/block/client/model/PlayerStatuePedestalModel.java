@@ -35,7 +35,7 @@ public class PlayerStatuePedestalModel extends Model {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int light, int overlay, float v, float v1, float v2, float v3) {
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int light, int overlay, int color) {
         Pedestal.render(poseStack, vertexConsumer, light, overlay);
     }
 }

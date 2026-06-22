@@ -27,16 +27,16 @@ public class ChaosSpawnerLayer<T extends ChaosSpawnerEntity, M extends ChaosSpaw
     public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, ChaosSpawnerEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (entitylivingbaseIn.smashAttackAnimationState.isStarted()) {
             VertexConsumer shockwaveVertexConsumer = bufferIn.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE_SHOCKWAVE, true));
-            this.getParentModel().renderToBuffer(matrixStackIn, shockwaveVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), 1.0F, 1.0F, 1.0F, 1.0F);
+            this.getParentModel().renderToBuffer(matrixStackIn, shockwaveVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), 0xFFFFFFFF);
         } else if (entitylivingbaseIn.rangeAttackAnimationState.isStarted() || entitylivingbaseIn.rangeBurstAttackAnimationState.isStarted()) {
             VertexConsumer chaosHexahedronVertexConsumer = bufferIn.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE_CHAOS_HEXAHEDRON, true));
-            this.getParentModel().renderToBuffer(matrixStackIn, chaosHexahedronVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), 1.0F, 1.0F, 1.0F, 0.8F);
+            this.getParentModel().renderToBuffer(matrixStackIn, chaosHexahedronVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), net.minecraft.util.FastColor.ARGB32.colorFromFloat(0.8F, 1.0F, 1.0F, 1.0F));
         } else if (entitylivingbaseIn.getState() == ChaosSpawnerEntity.State.SLEEPING || entitylivingbaseIn.getAwakeningTick() > 100) {
             VertexConsumer chainVertexConsumer = bufferIn.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE_CHAINED, true));
-            this.getParentModel().renderToBuffer(matrixStackIn, chainVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), 1.0F, 1.0F, 1.0F, 0.8F);
+            this.getParentModel().renderToBuffer(matrixStackIn, chainVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), net.minecraft.util.FastColor.ARGB32.colorFromFloat(0.8F, 1.0F, 1.0F, 1.0F));
         } else {
             VertexConsumer eyesVertexConsumer = bufferIn.getBuffer(RenderType.entityTranslucentEmissive(TEXTURE_EYES, true));
-            this.getParentModel().renderToBuffer(matrixStackIn, eyesVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), 1.0F, 1.0F, 1.0F, 1.0F);
+            this.getParentModel().renderToBuffer(matrixStackIn, eyesVertexConsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords(entitylivingbaseIn, 0), 0xFFFFFFFF);
         }
     }
 }

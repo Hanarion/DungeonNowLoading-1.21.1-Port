@@ -48,7 +48,7 @@ public class DisabledFairkeeperChestBlockRenderer implements BlockEntityRenderer
         float openProgress = blockEntity.getOpenProgress(partialTicks);
         fairkeeperChestModel.lid.xRot = -(float)(((3.0F * openProgress - 3.0F * openProgress * openProgress + openProgress * openProgress * openProgress)) * Math.PI * 0.5F);
         //fairkeeperChestModel.lid.xRot = -(float)(((1.0F - openProgress * openProgress * openProgress)) * Math.PI * 0.5F);
-        fairkeeperChestModel.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        fairkeeperChestModel.renderToBuffer(poseStack, vertexConsumer, light, overlay, 0xFFFFFFFF);
 
         poseStack.popPose();
     }

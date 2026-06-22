@@ -29,7 +29,7 @@ public class VertexPillarProjectileRenderer<T extends VertexPillarProjectileEnti
         poseStack.scale(-0.99f, -0.99F, 0.99F);
         poseStack.translate(0.0f, -entity.getBbHeight() + 0.5F, 0.0f);
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RENDER_TYPE);
-        this.model.renderToBuffer(poseStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(poseStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
         poseStack.popPose();
         super.render(entity, v, v1, poseStack, multiBufferSource, i);
     }

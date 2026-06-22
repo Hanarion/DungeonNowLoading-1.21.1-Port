@@ -79,7 +79,7 @@ public class DungeonBannerBlockItemRenderer extends BlockEntityWithoutLevelRende
         RenderType type = RenderType.entityCutoutNoCull(tex);
         VertexConsumer vc = buffer.getBuffer(type);
 
-        model.renderToBuffer(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+        model.renderToBuffer(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
 
         poseStack.popPose();
     }

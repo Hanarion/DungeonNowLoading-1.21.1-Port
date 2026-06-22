@@ -73,8 +73,7 @@ public class PlayerStatueModel extends Model {
     }
 
     @Override
-    public void renderToBuffer(PoseStack ps, VertexConsumer vc, int light, int overlay,
-                               float r, float g, float b, float a) {
-        Body.render(ps, vc, light, overlay, r, g, b, a);
+    public void renderToBuffer(PoseStack ps, VertexConsumer vc, int light, int overlay, int color) {
+        Body.render(ps, vc, light, overlay, color);
     }
 }
