@@ -29,7 +29,7 @@ public abstract class ShearsItemMixin {
         }
 
         if (!level.isClientSide && !state.is(BlockTags.FIRE)) {
-            stack.hurtAndBreak(1, entity, e -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+            stack.hurtAndBreak(1, entity, EquipmentSlot.MAINHAND);
         }
 
         cir.setReturnValue(true);

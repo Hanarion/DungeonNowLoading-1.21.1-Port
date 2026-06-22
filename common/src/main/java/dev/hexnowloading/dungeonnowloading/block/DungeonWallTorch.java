@@ -137,7 +137,7 @@ public class DungeonWallTorch extends HorizontalDirectionalBlock {
             if (flintAndSteel.is(Items.FLINT_AND_STEEL) && !blockState.getValue(LIT)) {
                 if (flintAndSteel.getDamageValue() < flintAndSteel.getMaxDamage()) {
                     setLit(level, blockState, blockPos, true);
-                    if (player instanceof ServerPlayer) { flintAndSteel.hurtAndBreak(1, player, playerx -> playerx.broadcastBreakEvent(interactionHand)); }
+                    if (player instanceof ServerPlayer) { flintAndSteel.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(interactionHand)); }
                     level.playSound(player, blockPos, SoundEvents.FLINTANDSTEEL_USE,SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.4F + 0.8F);
                     level.gameEvent(player, GameEvent.BLOCK_CHANGE, blockPos);
                     return InteractionResult.sidedSuccess(level.isClientSide);

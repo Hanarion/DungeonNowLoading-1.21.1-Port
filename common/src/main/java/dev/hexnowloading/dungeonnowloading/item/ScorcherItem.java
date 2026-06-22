@@ -180,7 +180,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
             }
 
             if (getBurnTime(itemStack) % 20 == 0) {
-                itemStack.hurtAndBreak(1, entity, e -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+                itemStack.hurtAndBreak(1, entity, EquipmentSlot.MAINHAND);
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
 

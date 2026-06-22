@@ -140,7 +140,7 @@ public class HollowEntity extends Monster {
                 if (head.isDamageableItem()) {
                     head.setDamageValue(head.getDamageValue() + this.random.nextInt(2));
                     if (head.getDamageValue() >= head.getMaxDamage()) {
-                        this.broadcastBreakEvent(EquipmentSlot.HEAD);
+                        this.onEquippedItemBroken(head.getItem(), EquipmentSlot.HEAD);
                         this.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
                     }
                 }

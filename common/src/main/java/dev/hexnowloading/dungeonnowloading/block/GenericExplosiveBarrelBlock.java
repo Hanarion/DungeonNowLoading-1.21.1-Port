@@ -230,7 +230,7 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
             this.onImmediateTrigger(level, pos, player, TriggerCause.GENTLY_LIT_ON_FIRE);
             if (!player.isCreative()) {
                 if (held.is(Items.FLINT_AND_STEEL)) {
-                    held.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
+                    held.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
                 } else {
                     held.shrink(1);
                 }

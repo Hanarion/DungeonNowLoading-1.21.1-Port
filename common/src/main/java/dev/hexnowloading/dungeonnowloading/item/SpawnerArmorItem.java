@@ -270,10 +270,10 @@ public class SpawnerArmorItem extends ArmorItem {
     }
 
     private void damageAllArmor(Player player, int amount) {
-        player.getInventory().getArmor(0).hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(net.minecraft.world.entity.EquipmentSlot.FEET));
-        player.getInventory().getArmor(1).hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(net.minecraft.world.entity.EquipmentSlot.LEGS));
-        player.getInventory().getArmor(2).hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(net.minecraft.world.entity.EquipmentSlot.CHEST));
-        player.getInventory().getArmor(3).hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(net.minecraft.world.entity.EquipmentSlot.HEAD));
+        player.getInventory().getArmor(0).hurtAndBreak(amount, player, net.minecraft.world.entity.EquipmentSlot.FEET);
+        player.getInventory().getArmor(1).hurtAndBreak(amount, player, net.minecraft.world.entity.EquipmentSlot.LEGS);
+        player.getInventory().getArmor(2).hurtAndBreak(amount, player, net.minecraft.world.entity.EquipmentSlot.CHEST);
+        player.getInventory().getArmor(3).hurtAndBreak(amount, player, net.minecraft.world.entity.EquipmentSlot.HEAD);
     }
 
     private boolean isEquippedSpawnerHelmet(Player player, ItemStack stack) {

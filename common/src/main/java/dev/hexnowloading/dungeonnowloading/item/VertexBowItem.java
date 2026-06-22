@@ -83,7 +83,7 @@ public class VertexBowItem extends BowItem {
                             arrow.igniteForSeconds(100);
                         }
 
-                        itemStack.hurtAndBreak(1, player, $$1x -> $$1x.broadcastBreakEvent(player.getUsedItemHand()));
+                        itemStack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(player.getUsedItemHand()));
                         if (b1 || player.getAbilities().instabuild && (projectile.is(Items.SPECTRAL_ARROW) || projectile.is(Items.TIPPED_ARROW))) {
                             arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                         }

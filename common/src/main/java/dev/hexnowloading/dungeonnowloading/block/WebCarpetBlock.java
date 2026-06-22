@@ -118,7 +118,7 @@ public class WebCarpetBlock extends MultifaceBlock {
 
             if (!player.getAbilities().instabuild) {
                 if (stack.is(Items.FLINT_AND_STEEL)) {
-                    stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                    stack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
                 } else if (stack.is(Items.FIRE_CHARGE)) {
                     stack.shrink(1);
                 }

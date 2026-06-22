@@ -298,9 +298,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
                 if (!itemStack.isDamageableItem()) {
                     itemStack.shrink(1);
                 } else {
-                    itemStack.hurtAndBreak(1, player, (playerx) -> {
-                        playerx.broadcastBreakEvent(interactionHand);
-                    });
+                    itemStack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(interactionHand));
                 }
             }
 

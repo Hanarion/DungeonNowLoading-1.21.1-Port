@@ -79,7 +79,7 @@ public class WisplightRodItem extends Item {
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         target.igniteForSeconds(BURN_SECONDS);
-        stack.hurtAndBreak(1, attacker, entity -> entity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+        stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
         return true;
     }
 
@@ -106,7 +106,7 @@ public class WisplightRodItem extends Item {
             if (level instanceof ServerLevel serverLevel && WispwardLanternBlock.lightFromWisp(serverLevel, clickedPos, clickedState)) {
                 level.gameEvent(player, GameEvent.BLOCK_CHANGE, clickedPos);
                 player.awardStat(Stats.ITEM_USED.get(this));
-                stack.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(context.getHand()));
+                stack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(context.getHand()));
             }
             return InteractionResult.CONSUME;
         }
@@ -143,7 +143,7 @@ public class WisplightRodItem extends Item {
             }
             level.gameEvent(player, GameEvent.BLOCK_PLACE, placePos);
             player.awardStat(Stats.ITEM_USED.get(this));
-            stack.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(context.getHand()));
+            stack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(context.getHand()));
             player.getCooldowns().addCooldown(this, WISP_BLOCK_PLACE_COOLDOWN_TICKS);
         }
 
@@ -235,7 +235,7 @@ public class WisplightRodItem extends Item {
         projectile.setAttackDamage(NORMAL_PROJECTILE_DAMAGE);
         this.configureShotProjectile(level, player, projectile, PROJECTILE_SPEED);
         level.addFreshEntity(projectile);
-        stack.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(hand));
+        stack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
     }
 
     private void shootLargeWisp(Level level, Player player, ItemStack stack, InteractionHand hand) {
@@ -243,7 +243,7 @@ public class WisplightRodItem extends Item {
         projectile.setAttackDamage(LARGE_PROJECTILE_DAMAGE);
         this.configureShotProjectile(level, player, projectile, LARGE_PROJECTILE_SPEED);
         level.addFreshEntity(projectile);
-        stack.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(hand));
+        stack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
     }
 
     private void configureShotProjectile(Level level, Player player, WispProjectileEntity projectile, float projectileSpeed) {

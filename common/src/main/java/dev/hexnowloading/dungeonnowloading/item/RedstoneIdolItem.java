@@ -66,7 +66,7 @@ public class RedstoneIdolItem extends BlockItem implements BossSummoningItem {
                 }
             }
             /*if (player instanceof ServerPlayer) {
-                itemStack.hurtAndBreak(1, player, (player1 -> player1.broadcastBreakEvent(hand)));
+                itemStack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
             }*/
             return InteractionResultHolder.consume(stack);
         }

@@ -130,7 +130,7 @@ public class CopperDetonatorItem extends Item {
                 if (consumeCopperBlockIfAvailable(player)) {
                     launchCreep(level, player, itemStack);
                     player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
-                    itemStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(player1.getUsedItemHand()));
+                    itemStack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(player1.getUsedItemHand()));
                     player.swing(hand);
                 }
             }
