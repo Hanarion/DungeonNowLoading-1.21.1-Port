@@ -18,13 +18,13 @@ public class SkeletonCaveSpiderJokeyFeature extends Feature<NoneFeatureConfigura
         CaveSpider caveSpider = EntityType.CAVE_SPIDER.create(context.level().getLevel());
         caveSpider.setPersistenceRequired();
         caveSpider.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
-        caveSpider.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
+        caveSpider.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         EntityScale.scaleMobAttributes(caveSpider);
 
         Skeleton skeleton = EntityType.SKELETON.create(context.level().getLevel());
         skeleton.setPersistenceRequired();
         skeleton.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY() + 1, (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
-        skeleton.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
+        skeleton.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         EntityScale.scaleMobAttributes(skeleton);
 
         skeleton.startRiding(caveSpider);

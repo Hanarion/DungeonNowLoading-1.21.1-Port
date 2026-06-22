@@ -27,7 +27,7 @@ public class SkeletonWithWeakPunchBowFeature extends Feature<NoneFeatureConfigur
         Skeleton skeleton = EntityType.SKELETON.create(context.level().getLevel());
         skeleton.setPersistenceRequired();
         skeleton.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
-        skeleton.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
+        skeleton.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         EntityScale.scaleMobAttributes(skeleton);
         skeleton.setItemSlot(EquipmentSlot.MAINHAND, weakPunchBow(context.level().registryAccess()));
         skeleton.setItemSlot(EquipmentSlot.HEAD, trimArmor(Items.IRON_HELMET));

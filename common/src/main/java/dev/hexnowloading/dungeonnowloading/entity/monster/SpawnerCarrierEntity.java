@@ -249,7 +249,7 @@ public class SpawnerCarrierEntity extends Monster {
 
         if (spawned instanceof Mob mob) {
             BlockPos pos = BlockPos.containing(x, y, z);
-            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.MOB_SUMMONED, null, null);
+            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.MOB_SUMMONED, null);
             mob.setTarget(this.getTarget());
 
         }
@@ -456,8 +456,8 @@ public class SpawnerCarrierEntity extends Monster {
     @Override
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                        @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
-        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+                                        @Nullable SpawnGroupData spawnGroupData) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
 
         // Only choose randomly when it "naturally" appears in the world
         if (spawnType == MobSpawnType.NATURAL || spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.SPAWN_EGG) {

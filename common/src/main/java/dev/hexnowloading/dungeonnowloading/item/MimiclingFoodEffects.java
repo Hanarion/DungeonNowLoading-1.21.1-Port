@@ -947,7 +947,7 @@ public final class MimiclingFoodEffects {
         }
 
         if (livingEntity instanceof Mob mob) {
-            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(target.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(target.blockPosition()), MobSpawnType.MOB_SUMMONED, null);
         }
         if (!applyEntityNbt(livingEntity, data, target)) {
             return null;

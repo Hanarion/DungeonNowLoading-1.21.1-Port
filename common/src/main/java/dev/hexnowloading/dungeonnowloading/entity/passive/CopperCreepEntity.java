@@ -281,7 +281,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
 //    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor $$0, DifficultyInstance $$1, MobSpawnType $$2, @Nullable SpawnGroupData $$3, @Nullable CompoundTag $$4) {
 ////        triggerIdleAnimation();
 ////        triggerSummonAnimation();
-//        return super.finalizeSpawn($$0, $$1, $$2, $$3, $$4);
+//        return super.finalizeSpawn($$0, $$1, $$2, $$3);
 //    }
 
     protected InteractionResult mobInteract(Player player, InteractionHand interactionHand) {

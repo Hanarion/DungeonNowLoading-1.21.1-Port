@@ -21,7 +21,7 @@ public class ZombieHorseFeature extends Feature<NoneFeatureConfiguration> {
         ZombieHorse zombieHorse = EntityType.ZOMBIE_HORSE.create(context.level().getLevel());
         zombieHorse.setPersistenceRequired();
         zombieHorse.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
-        zombieHorse.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
+        zombieHorse.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         zombieHorse.setTamed(true);
         zombieHorse.equipSaddle(SoundSource.NEUTRAL);
 

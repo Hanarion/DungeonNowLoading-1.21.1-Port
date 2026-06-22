@@ -208,7 +208,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
         }
 
         // 1) Vanilla setup FIRST (may overwrite gear)
-        mob.finalizeSpawn(server, server.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null, null);
+        mob.finalizeSpawn(server, server.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null);
 
         // 2) Then FORCE our custom NBT LAST (restores enchanted bow, armor, etc.)
         if (patch != null && !patch.isEmpty()) {

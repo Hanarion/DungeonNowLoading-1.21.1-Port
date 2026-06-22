@@ -18,7 +18,7 @@ public class GenericMobFeature extends Feature<EntityTypeConfig> {
         Mob mob = (Mob) context.config().entityType.create(context.level().getLevel());
         mob.setPersistenceRequired();
         mob.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
-        mob.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
+        mob.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         EntityScale.scaleMobAttributes(mob);
 
         context.level().addFreshEntity(mob);

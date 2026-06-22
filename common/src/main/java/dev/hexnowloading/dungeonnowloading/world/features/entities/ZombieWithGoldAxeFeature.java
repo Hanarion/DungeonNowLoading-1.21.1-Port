@@ -28,7 +28,7 @@ public class ZombieWithGoldAxeFeature extends Feature<NoneFeatureConfiguration> 
         Zombie zombie = EntityType.ZOMBIE.create(context.level().getLevel());
         zombie.setPersistenceRequired();
         zombie.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
-        zombie.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
+        zombie.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         EntityScale.scaleMobAttributes(zombie);
         zombie.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.3F);
         zombie.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0F);

@@ -252,7 +252,7 @@ public class FairkeeperSpawnerBlockEntity extends BlockEntity {
                 EntityScale.scaleMobAttributes(mob1);
                 mob1.setPersistenceRequired();
                 if (spawnData.getEntityToSpawn().size() == 1 && spawnData.getEntityToSpawn().contains("id", CompoundTag.OBJECT_HEADER)) { // adding this part ignores equipment attachment from the finalized spawn, which is good, but don't know why it happens...
-                    ((Mob)mob).finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.SPAWNER, (SpawnGroupData)null, (CompoundTag)null);
+                    ((Mob)mob).finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.SPAWNER, (SpawnGroupData)null);
                 }
                 /*Collection<MobEffectInstance> reapplyMobEffects = mob1.getActiveEffects();
                 mob1.removeAllEffects();

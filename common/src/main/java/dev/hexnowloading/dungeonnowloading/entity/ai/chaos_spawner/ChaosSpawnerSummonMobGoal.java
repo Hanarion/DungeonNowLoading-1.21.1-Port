@@ -160,7 +160,7 @@ public class ChaosSpawnerSummonMobGoal extends Goal {
         if (mob == null) return;
 
         mob.moveTo(summonPos, 0.0F, 0.0F);
-        mob.finalizeSpawn(serverLevel, level.getCurrentDifficultyAt(summonPos), MobSpawnType.MOB_SUMMONED, null, null);
+        mob.finalizeSpawn(serverLevel, level.getCurrentDifficultyAt(summonPos), MobSpawnType.MOB_SUMMONED, null);
 
         entry.post().accept(mob);
         level.addFreshEntity(mob);
@@ -177,8 +177,8 @@ public class ChaosSpawnerSummonMobGoal extends Goal {
         spider.moveTo(summonPos, 0.0F, 0.0F);
         skeleton.moveTo(summonPos, 0.0F, 0.0F);
 
-        spider.finalizeSpawn(serverLevel, level.getCurrentDifficultyAt(summonPos), MobSpawnType.MOB_SUMMONED, null, null);
-        skeleton.finalizeSpawn(serverLevel, level.getCurrentDifficultyAt(summonPos), MobSpawnType.MOB_SUMMONED, null, null);
+        spider.finalizeSpawn(serverLevel, level.getCurrentDifficultyAt(summonPos), MobSpawnType.MOB_SUMMONED, null);
+        skeleton.finalizeSpawn(serverLevel, level.getCurrentDifficultyAt(summonPos), MobSpawnType.MOB_SUMMONED, null);
 
         // no drop chance on rider (and optionally spider)
         noDropChance(skeleton);

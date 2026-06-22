@@ -21,7 +21,7 @@ public class SpawnerCarrierFeature extends Feature<EntityTypeConfig> {
 
         spawnerCarrier.setPersistenceRequired();
         spawnerCarrier.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
-        spawnerCarrier.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
+        spawnerCarrier.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         EntityScale.scaleMobAttributes(spawnerCarrier);
         EntityType<?> entityType = context.config().entityType;
         if (EntityType.ZOMBIE.equals(entityType)) {
