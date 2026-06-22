@@ -44,7 +44,7 @@ public class ZombieWithGoldAxeFeature extends Feature<NoneFeatureConfiguration> 
         zombie.setDropChance(EquipmentSlot.LEGS, 0.0F);
         zombie.setDropChance(EquipmentSlot.FEET, 0.0F);
         zombie.setLeftHanded(context.level().getRandom().nextFloat() < 0.05F);
-        zombie.lootTable = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "entities/modified/diamond_zombie");
+        zombie.lootTable = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "entities/modified/diamond_zombie"));
 
         context.level().addFreshEntityWithPassengers(zombie);
         return true;

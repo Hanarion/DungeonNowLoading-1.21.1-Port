@@ -41,7 +41,7 @@ public class SkeletonWithStrongFlameBowFeature extends Feature<NoneFeatureConfig
         skeleton.setDropChance(EquipmentSlot.LEGS, 0.0F);
         skeleton.setDropChance(EquipmentSlot.FEET, 0.0F);
         skeleton.setLeftHanded(context.level().getRandom().nextFloat() < 0.05F);
-        skeleton.lootTable = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "entities/modified/diamond_skeleton");
+        skeleton.lootTable = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "entities/modified/diamond_skeleton"));
 
         context.level().addFreshEntity(skeleton);
         return true;

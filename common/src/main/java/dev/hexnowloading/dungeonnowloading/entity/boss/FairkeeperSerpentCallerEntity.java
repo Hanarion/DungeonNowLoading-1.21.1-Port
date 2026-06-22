@@ -809,13 +809,13 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         }
         ResourceLocation baseResourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(DNLEntityTypes.FAIRKEEPER_SERPENT_CALLER.get()).withPrefix("entities/");
         ResourceLocation lootTableResourceLocation = this.isBorosDefeated > this.isOurosDefeated ? baseResourceLocation.withSuffix("/boros") : baseResourceLocation.withSuffix("/ouros");
-        LootTable lootTable = this.level().getServer().getLootData().getLootTable(lootTableResourceLocation);
+        LootTable lootTable = this.level().getServer().reloadableRegistries().getLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, lootTableResourceLocation));
         LootParams.Builder builder = (new LootParams.Builder((ServerLevel) this.level()))
                 .withParameter(LootContextParams.THIS_ENTITY, this)
                 .withParameter(LootContextParams.ORIGIN, this.position())
                 .withParameter(LootContextParams.DAMAGE_SOURCE, damageSource)
-                .withOptionalParameter(LootContextParams.KILLER_ENTITY, damageSource.getEntity())
-                .withOptionalParameter(LootContextParams.DIRECT_KILLER_ENTITY, damageSource.getDirectEntity());
+                .withOptionalParameter(LootContextParams.ATTACKING_ENTITY, damageSource.getEntity())
+                .withOptionalParameter(LootContextParams.DIRECT_ATTACKING_ENTITY, damageSource.getDirectEntity());
         if (b && damageSource.getEntity() instanceof Player player) {
             builder = builder.withParameter(LootContextParams.LAST_DAMAGE_PLAYER, player).withLuck(player.getLuck());
         }

@@ -111,7 +111,7 @@ public class BookPileBlock extends PileBlock implements EntityBlock {
             ResourceLocation tableId = pileBe.getLootTable();
 
             if (tableId != null) {
-                LootTable table = serverLevel.getServer().getLootData().getLootTable(tableId);
+                LootTable table = serverLevel.getServer().reloadableRegistries().getLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, tableId));
 
                 LootParams.Builder builder = new LootParams.Builder(serverLevel)
                         .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
@@ -141,7 +141,7 @@ public class BookPileBlock extends PileBlock implements EntityBlock {
             ResourceLocation tableId = be.getLootTable();
             Level level = builder.getLevel();
             if (tableId != null) {
-                var lootTable = level.getServer().getLootData().getLootTable(tableId);
+                var lootTable = level.getServer().reloadableRegistries().getLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, tableId));
 
                 // Run the stored loot table
                 return lootTable.getRandomItems(builder.create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK));

@@ -562,8 +562,9 @@ public class SpawnerCarrierEntity extends Monster {
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
-        super.dropCustomDeathLoot(source, looting, recentlyHit);
+    protected void dropCustomDeathLoot(net.minecraft.server.level.ServerLevel serverLevel, DamageSource source, boolean recentlyHit) {
+        super.dropCustomDeathLoot(serverLevel, source, recentlyHit);
+        int looting = 0; // 1.21: looting level no longer passed; loot context applies it
 
         int base = this.getDeathFragmentValue(); // your 0..4 value based on spawner damage
         if (base <= 0) return;

@@ -230,23 +230,22 @@ public class HollowEntity extends Monster {
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
-        super.dropCustomDeathLoot(source, looting, recentlyHit);
+    protected void dropCustomDeathLoot(net.minecraft.server.level.ServerLevel serverLevel, DamageSource source, boolean recentlyHit) {
+        super.dropCustomDeathLoot(serverLevel, source, recentlyHit);
 
         if (this.level().isClientSide) return;
-        if (!(this.level() instanceof ServerLevel serverLevel)) return;
 
         if (source.getDirectEntity() instanceof Arrow arrow && arrow.potion != Potions.EMPTY) {
 
-            LootTable table = serverLevel.getServer().getLootData()
-                    .getLootTable(ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "entities/hollow_tipped_arrow_kill"));
+            LootTable table = serverLevel.getServer().reloadableRegistries()
+                    .getLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "entities/hollow_tipped_arrow_kill")));
 
             LootParams params = new LootParams.Builder(serverLevel)
                     .withParameter(LootContextParams.THIS_ENTITY, this)
                     .withParameter(LootContextParams.ORIGIN, this.position())
                     .withParameter(LootContextParams.DAMAGE_SOURCE, source)
-                    .withOptionalParameter(LootContextParams.KILLER_ENTITY, source.getEntity())
-                    .withOptionalParameter(LootContextParams.DIRECT_KILLER_ENTITY, source.getDirectEntity())
+                    .withOptionalParameter(LootContextParams.ATTACKING_ENTITY, source.getEntity())
+                    .withOptionalParameter(LootContextParams.DIRECT_ATTACKING_ENTITY, source.getDirectEntity())
                     .create(LootContextParamSets.ENTITY);
 
             for (ItemStack stack : table.getRandomItems(params)) {

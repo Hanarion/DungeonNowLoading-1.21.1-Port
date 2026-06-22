@@ -68,7 +68,7 @@ public class FairkeeperOurosBodyDropScuttleGoal extends StoppableGoal{
         scuttle = (ScuttleEntity) SpawnMobUtil.spawnEntityWithRot(scuttle, this.part.getX(), this.part.getY() - 2.0F, this.part.getZ(), this.part.getYRot(), 0.0F, level);
         scuttle.setYBodyRot(this.part.getYRot());
         scuttle.setYHeadRot(this.part.getYRot());
-        scuttle.lootTable = ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "empty");
+        scuttle.lootTable = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "empty"));
         scuttle.skipDropExperience();
         level.addFreshEntity(scuttle);
 

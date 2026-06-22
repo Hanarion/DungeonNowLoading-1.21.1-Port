@@ -1,12 +1,8 @@
 accessWidener   v1  named
 accessible  class   net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
-accessible field net/minecraft/world/entity/projectile/Arrow potion Lnet/minecraft/world/item/alchemy/Potion;
-accessible field net/minecraft/world/entity/Mob lootTable Lnet/minecraft/resources/ResourceLocation;
+accessible field net/minecraft/world/entity/Mob lootTable Lnet/minecraft/resources/ResourceKey;
 accessible method net/minecraft/world/level/block/StairBlock <init> (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
 accessible method net/minecraft/client/renderer/entity/ItemRenderer renderModelLists (Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/item/ItemStack;IILcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V
-accessible method net/minecraft/world/entity/projectile/ThrownPotion applySplash (Ljava/util/List;Lnet/minecraft/world/entity/Entity;)V
-accessible method net/minecraft/world/entity/projectile/ThrownPotion applyWater ()V
-accessible method net/minecraft/world/entity/projectile/ThrownPotion makeAreaOfEffectCloud (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)V
 accessible field net/minecraft/world/level/pathfinder/WalkNodeEvaluator collisionCache Lit/unimi/dsi/fastutil/objects/Object2BooleanMap;
 accessible field net/minecraft/world/entity/projectile/AbstractArrow inGround Z
 accessible field net/minecraft/client/sounds/MusicManager currentMusic Lnet/minecraft/client/resources/sounds/SoundInstance;

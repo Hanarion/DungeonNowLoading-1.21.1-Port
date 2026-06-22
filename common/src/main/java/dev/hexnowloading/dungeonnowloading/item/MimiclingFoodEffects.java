@@ -1429,7 +1429,7 @@ public final class MimiclingFoodEffects {
 
     private static List<ItemStack> rollConfiguredLootTable(ServerLevel level, ItemStack tool, BlockState state, JsonObject data) {
         ResourceLocation lootTableId = ResourceLocation.parse(data.get("loot_table").getAsString());
-        LootTable table = level.getServer().getLootData().getLootTable(lootTableId);
+        LootTable table = level.getServer().reloadableRegistries().getLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, lootTableId));
         LootParams params = new LootParams.Builder(level)
                 .withParameter(LootContextParams.ORIGIN, Vec3.ZERO)
                 .withParameter(LootContextParams.TOOL, tool)

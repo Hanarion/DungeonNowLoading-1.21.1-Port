@@ -728,9 +728,9 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource damageSource, int a, boolean b) {
+    protected void dropCustomDeathLoot(net.minecraft.server.level.ServerLevel serverLevel, DamageSource damageSource, boolean b) {
         if (!BossConfig.TOGGLE_MULTIPLAYER_LOOT.get()) {
-            super.dropCustomDeathLoot(damageSource, a, b);
+            super.dropCustomDeathLoot(serverLevel, damageSource, b);
             return;
         }
 
@@ -836,9 +836,9 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     }
 
     public void spawnLootTableItems(DamageSource damageSource, boolean b) {
-        ResourceLocation resourceLocation = this.getLootTable();
-        LootTable lootTable = this.level().getServer().getLootData().getLootTable(resourceLocation);
-        LootParams.Builder lootparams$builder = (new LootParams.Builder((ServerLevel) this.level())).withParameter(LootContextParams.THIS_ENTITY, this).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.DAMAGE_SOURCE, damageSource).withOptionalParameter(LootContextParams.KILLER_ENTITY, damageSource.getEntity()).withOptionalParameter(LootContextParams.DIRECT_KILLER_ENTITY, damageSource.getDirectEntity());
+        net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable> resourceLocation = this.getLootTable();
+        LootTable lootTable = this.level().getServer().reloadableRegistries().getLootTable(resourceLocation);
+        LootParams.Builder lootparams$builder = (new LootParams.Builder((ServerLevel) this.level())).withParameter(LootContextParams.THIS_ENTITY, this).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.DAMAGE_SOURCE, damageSource).withOptionalParameter(LootContextParams.ATTACKING_ENTITY, damageSource.getEntity()).withOptionalParameter(LootContextParams.DIRECT_ATTACKING_ENTITY, damageSource.getDirectEntity());
         if (b && this.lastHurtByPlayer != null) {
             lootparams$builder = lootparams$builder.withParameter(LootContextParams.LAST_DAMAGE_PLAYER, this.lastHurtByPlayer).withLuck(this.lastHurtByPlayer.getLuck());
         }
