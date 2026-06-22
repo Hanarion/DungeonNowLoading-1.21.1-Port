@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.ai.garhold.*;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.GarholdAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
@@ -68,11 +69,11 @@ public class GarholdEntity extends Monster {
     private static final EntityDataAccessor<Boolean> SIDE_OPENESS = SynchedEntityData.defineId(GarholdEntity.class, EntityDataSerializers.BOOLEAN);
 
 
-    private static final UUID CAPTURE_KB_UUID = UUID.fromString("c84d8d2a-1a5f-4b0c-9a4c-6c2c4d9b6a21");
-    private static final AttributeModifier CAPTURE_KB_MOD = new AttributeModifier(CAPTURE_KB_UUID, "Garhold capture knockback", 1.0, AttributeModifier.Operation.ADD_VALUE);
+    private static final ResourceLocation CAPTURE_KB_UUID = DungeonNowLoading.id("garhold_capture_knockback");
+    private static final AttributeModifier CAPTURE_KB_MOD = new AttributeModifier(CAPTURE_KB_UUID, 1.0, AttributeModifier.Operation.ADD_VALUE);
 
-    private static final UUID CHAIN_KB_UUID = UUID.fromString("8c3a1b6e-2d78-4b1d-9c3b-7f7a6a3c2d11");
-    private static final AttributeModifier CHAIN_KB_MOD = new AttributeModifier(CHAIN_KB_UUID, "Garhold chain lock knockback", 1.0, AttributeModifier.Operation.ADD_VALUE);
+    private static final ResourceLocation CHAIN_KB_UUID = DungeonNowLoading.id("garhold_chain_lock_knockback");
+    private static final AttributeModifier CHAIN_KB_MOD = new AttributeModifier(CHAIN_KB_UUID, 1.0, AttributeModifier.Operation.ADD_VALUE);
 
     private AnimationChainer<GarholdAnimationState> animationChainer = new AnimationChainer<>();
     private AnimationChainer<GarholdSideGateAnimationState> sideGateAnimationChainer = new AnimationChainer<>();
@@ -613,7 +614,7 @@ public class GarholdEntity extends Monster {
 
     private void applyCaptureAttributes() {
         AttributeInstance kb = this.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
-        if (kb != null && !kb.hasModifier(CAPTURE_KB_MOD)) {
+        if (kb != null && !kb.hasModifier(CAPTURE_KB_MOD.id())) {
             kb.addTransientModifier(CAPTURE_KB_MOD);
         }
     }
@@ -684,7 +685,7 @@ public class GarholdEntity extends Monster {
 
     private void clearCaptureAttributes() {
         AttributeInstance kb = this.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
-        if (kb != null && kb.hasModifier(CAPTURE_KB_MOD)) {
+        if (kb != null && kb.hasModifier(CAPTURE_KB_MOD.id())) {
             kb.removeModifier(CAPTURE_KB_UUID);
         }
     }

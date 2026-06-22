@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.passive;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import net.minecraft.resources.ResourceLocation;
 import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.CopperCreepAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.AnimationChainer;
@@ -97,7 +99,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
     private static final float EXPLOSION_RADIUS = 3.0f;
     private static final float POWERED_EXPLOSION_RADIUS = 5.0f;
 
-    private final AttributeModifier SPEED_MODIFIER = new AttributeModifier(UUID.randomUUID(), "Slowdown Speed", -1.0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+    private final AttributeModifier SPEED_MODIFIER = new AttributeModifier(DungeonNowLoading.id("copper_creep_slowdown_speed"), -1.0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     private static final EntityDataAccessor<Optional<UUID>> SUMMONER_UUID = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Boolean> DATA_IS_POWERED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(CopperCreepEntity.class, EntityDataSerializers.BOOLEAN);
@@ -138,7 +140,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
     private AnimationChainer<CopperCreepAnimationState> animationChainer = new AnimationChainer<>();
     public State currentState;
 
-    private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
+    private static final ResourceLocation GIGANTISM_MAX_HEALTH_MODIFIER_ID = DungeonNowLoading.id("gigantism_max_health");
 
     public CopperCreepEntity(EntityType<? extends CopperCreepEntity> entityType, Level level) {
         super(entityType, level);
@@ -335,7 +337,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         this.playSound(DNLSounds.COPPER_CREEP_SIT_DOWN.get());
         this.getNavigation().stop();
         AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER)) {
+        if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER.id())) {
             moveSpeedAttr.addTransientModifier(SPEED_MODIFIER);
         }
         this.sitAnimationTick = Mth.ceil(CopperCreepAnimationDuration.SIT * 20);
@@ -391,7 +393,6 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         if (this.isGigantic()) {
             maxHealth.addTransientModifier(new AttributeModifier(
                     GIGANTISM_MAX_HEALTH_MODIFIER_ID,
-                    "dnl_gigantism_max_health",
                     0.5D,
                     AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
             ));
@@ -448,7 +449,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         // Overworked: scale movement speed. Lvl 5 => 2x speed (= +100%).
         AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
         if (moveSpeedAttr != null) {
-            UUID overworkedSpeedId = UUID.nameUUIDFromBytes("dnl_overworked_speed".getBytes());
+            ResourceLocation overworkedSpeedId = DungeonNowLoading.id("overworked_speed");
             AttributeModifier existing = moveSpeedAttr.getModifier(overworkedSpeedId);
             if (existing != null) {
                 moveSpeedAttr.removeModifier(existing);
@@ -460,7 +461,6 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
                 double bonus = 0.2D * Math.max(1, Math.min(5, level));
                 moveSpeedAttr.addTransientModifier(new AttributeModifier(
                         overworkedSpeedId,
-                        "dnl_overworked_speed",
                         bonus,
                         AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
                 ));
@@ -515,7 +515,7 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
                     this.setState(State.SITTING_DETONATION);
                 } else {
                     AttributeInstance moveSpeedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
-                    if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER)) {
+                    if (moveSpeedAttr != null && !moveSpeedAttr.hasModifier(SPEED_MODIFIER.id())) {
                         moveSpeedAttr.addTransientModifier(SPEED_MODIFIER);
                     }
                     triggerDetonationAnimation();

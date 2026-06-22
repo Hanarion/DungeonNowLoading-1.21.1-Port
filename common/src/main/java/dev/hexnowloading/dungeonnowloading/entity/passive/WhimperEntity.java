@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.passive;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import net.minecraft.resources.ResourceLocation;
 import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperChargeAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.WhimperMoveControl;
@@ -48,7 +50,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Skin> SKIN = SynchedEntityData.defineId(WhimperEntity.class, EntityStates.WHIMPER_SKIN);
     private static final EntityDataAccessor<Boolean> SKIN_VALIDATION = SynchedEntityData.defineId(WhimperEntity.class, EntityDataSerializers.BOOLEAN);
 
-    private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
+    private static final ResourceLocation GIGANTISM_MAX_HEALTH_MODIFIER_ID = DungeonNowLoading.id("gigantism_max_health");
 
     public AnimationState attackAnimationState = new AnimationState();
     public AnimationState blessingAnimationState = new AnimationState();
@@ -318,7 +320,6 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
             // +50% max health. Use a transient modifier so it takes effect immediately after spawn and doesn't depend on NBT.
             maxHealth.addTransientModifier(new AttributeModifier(
                     GIGANTISM_MAX_HEALTH_MODIFIER_ID,
-                    "dnl_gigantism_max_health",
                     0.5D,
                     AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
             ));
@@ -343,7 +344,7 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
         int level = this.getOverworkedLevel();
         AttributeInstance attackSpeed = this.getAttribute(Attributes.ATTACK_SPEED);
         if (attackSpeed != null) {
-            UUID modifierId = UUID.nameUUIDFromBytes("dnl_overworked_attack_speed".getBytes());
+            ResourceLocation modifierId = DungeonNowLoading.id("overworked_attack_speed");
             if (attackSpeed.getModifier(modifierId) != null) {
                 attackSpeed.removeModifier(modifierId);
             }
@@ -351,7 +352,6 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
                 double bonus = 0.2D * level;
                 attackSpeed.addPermanentModifier(new AttributeModifier(
                         modifierId,
-                        "dnl_overworked_attack_speed",
                         bonus,
                         AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
                 ));

@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.util;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import net.minecraft.resources.ResourceLocation;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
@@ -20,9 +22,9 @@ public final class OverworkedPenaltyUtil {
     private OverworkedPenaltyUtil() {
     }
 
-    /** Stable UUID so the modifier can be updated/removed safely. */
-    public static final UUID OVERWORKED_HP_MODIFIER_ID =
-            UUID.nameUUIDFromBytes("dnl_overworked_player_max_health".getBytes());
+    /** Stable id so the modifier can be updated/removed safely. */
+    public static final ResourceLocation OVERWORKED_HP_MODIFIER_ID =
+            DungeonNowLoading.id("overworked_player_max_health");
 
     /**
      * Refresh the owner's max-health penalty based on currently alive overworked summons.
@@ -99,7 +101,6 @@ public final class OverworkedPenaltyUtil {
         if (penalty > 0.0D) {
             maxHealthAttr.addPermanentModifier(new AttributeModifier(
                     OVERWORKED_HP_MODIFIER_ID,
-                    "dnl_overworked_player_max_health",
                     -penalty,
                     AttributeModifier.Operation.ADD_VALUE
             ));

@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import net.minecraft.resources.ResourceLocation;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import dev.hexnowloading.dungeonnowloading.block.WispBlock;

@@ -1,18 +1,19 @@
 package dev.hexnowloading.dungeonnowloading.entity.util;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.config.BossConfig;
 import dev.hexnowloading.dungeonnowloading.config.MobConfig;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class EntityScale {
 
-    private static final UUID SCALED_HEALTH_MODIFIER_UUID = UUID.fromString("f47ac10b-58cc-4372-a567-0e02b2c3d479");
-    private static final UUID SCALED_ATTACK_MODIFIER_UUID = UUID.fromString("3a284fc3-6c5a-43d7-93ec-d96423e0f34f");
+    private static final ResourceLocation SCALED_HEALTH_MODIFIER_UUID = DungeonNowLoading.id("scaled_health");
+    private static final ResourceLocation SCALED_ATTACK_MODIFIER_UUID = DungeonNowLoading.id("scaled_attack");
     private static final double bossHealthScale = BossConfig.BOSS_HEALTH_MODIFIER.get();
     private static final double bossAttackDamageScale = BossConfig.BOSS_DAMAGE_MODIFIER.get();
     private static final double bossExhaustionScale = BossConfig.BOSS_EXHAUSTION_MODIFIER.get();
@@ -30,7 +31,7 @@ public class EntityScale {
 
         double healthMultiplier = baseBonus + mpBonus + recallBonus;
 
-        AttributeModifier SCALED_HEALTH_MODIFIER = new AttributeModifier(SCALED_HEALTH_MODIFIER_UUID, "Scaled health", healthMultiplier, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        AttributeModifier SCALED_HEALTH_MODIFIER = new AttributeModifier(SCALED_HEALTH_MODIFIER_UUID, healthMultiplier, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
         Objects.requireNonNull(entityType.getAttribute(Attributes.MAX_HEALTH)).removeModifier(SCALED_HEALTH_MODIFIER);
         Objects.requireNonNull(entityType.getAttribute(Attributes.MAX_HEALTH)).addPermanentModifier(SCALED_HEALTH_MODIFIER);
         entityType.setHealth(entityType.getMaxHealth());
@@ -43,7 +44,7 @@ public class EntityScale {
 
         double attackMultiplier = baseBase + mpBonus + recallBonus;
 
-        AttributeModifier SCALED_ATTACK_MODIFIER = new AttributeModifier(SCALED_ATTACK_MODIFIER_UUID, "Scaled attack", attackMultiplier, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        AttributeModifier SCALED_ATTACK_MODIFIER = new AttributeModifier(SCALED_ATTACK_MODIFIER_UUID, attackMultiplier, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
         Objects.requireNonNull(entityType.getAttribute(Attributes.ATTACK_DAMAGE)).removeModifier(SCALED_ATTACK_MODIFIER);
         Objects.requireNonNull(entityType.getAttribute(Attributes.ATTACK_DAMAGE)).addPermanentModifier(SCALED_ATTACK_MODIFIER);
     }

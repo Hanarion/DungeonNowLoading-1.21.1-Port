@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import net.minecraft.resources.ResourceLocation;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.FlameProjectileEntity;
 import net.minecraft.util.Mth;
@@ -16,9 +18,9 @@ import java.util.UUID;
 
 public class ScuttleFlameThrowerAttackGoal extends Goal {
 
-    private static final UUID FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID = UUID.fromString("2a6f22a4-5468-4eed-b100-fe77cdc8bd98");
-    private final AttributeModifier FULL_KNOCKBACK_RESISTANCE = new AttributeModifier(FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID, "Full knockback resistance", 0.5F, AttributeModifier.Operation.ADD_VALUE);
-    private final AttributeModifier CLOSED_ARMOR = new AttributeModifier(UUID.randomUUID(), "Closed armor bonus", -1.0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+    private static final ResourceLocation FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID = DungeonNowLoading.id("scuttle_full_knockback_resistance");
+    private final AttributeModifier FULL_KNOCKBACK_RESISTANCE = new AttributeModifier(FULL_KNOCKBACK_RESISTANCE_MODIFIER_UUID, 0.5F, AttributeModifier.Operation.ADD_VALUE);
+    private final AttributeModifier CLOSED_ARMOR = new AttributeModifier(DungeonNowLoading.id("scuttle_closed_armor"), -1.0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
     private final ScuttleEntity scuttleEntity;
     private int nextScanTick;

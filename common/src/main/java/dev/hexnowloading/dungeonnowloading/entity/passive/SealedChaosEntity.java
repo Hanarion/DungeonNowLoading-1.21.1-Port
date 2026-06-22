@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.entity.passive;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
+import net.minecraft.resources.ResourceLocation;
 import dev.hexnowloading.dungeonnowloading.config.PvpConfig;
 import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.ai.SealedChaosAttackGoal;
@@ -47,7 +49,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Boolean> GIGANTIC = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> OVERWORKED_LEVEL = SynchedEntityData.defineId(SealedChaosEntity.class, EntityDataSerializers.INT);
 
-    private static final java.util.UUID GIGANTISM_MAX_HEALTH_MODIFIER_ID = java.util.UUID.nameUUIDFromBytes("dnl_gigantism_max_health".getBytes());
+    private static final ResourceLocation GIGANTISM_MAX_HEALTH_MODIFIER_ID = DungeonNowLoading.id("gigantism_max_health");
 
     public SealedChaosEntity(EntityType<? extends SealedChaosEntity> entityType, Level level) {
         super(entityType, level);
@@ -302,7 +304,7 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         int level = this.getOverworkedLevel();
         AttributeInstance attackSpeed = this.getAttribute(Attributes.ATTACK_SPEED);
         if (attackSpeed != null) {
-            java.util.UUID modifierId = java.util.UUID.nameUUIDFromBytes("dnl_overworked_attack_speed".getBytes());
+            ResourceLocation modifierId = DungeonNowLoading.id("overworked_attack_speed");
             if (attackSpeed.getModifier(modifierId) != null) {
                 attackSpeed.removeModifier(modifierId);
             }
@@ -310,7 +312,6 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
                 double bonus = 0.2D * level; // 20% per level
                 attackSpeed.addPermanentModifier(new AttributeModifier(
                         modifierId,
-                        "dnl_overworked_attack_speed",
                         bonus,
                         AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
                 ));
@@ -336,7 +337,6 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
         if (this.isGigantic()) {
             maxHealth.addTransientModifier(new AttributeModifier(
                     GIGANTISM_MAX_HEALTH_MODIFIER_ID,
-                    "dnl_gigantism_max_health",
                     0.5D,
                     AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
             ));
