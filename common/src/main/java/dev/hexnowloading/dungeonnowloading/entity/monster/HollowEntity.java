@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
+import dev.hexnowloading.dungeonnowloading.util.ArrowUtil;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.entity.ai.hollow.HollowBreakLightGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.hollow.HollowChargeAttackGoal;
@@ -190,7 +191,7 @@ public class HollowEntity extends Monster {
 
         if (source.getDirectEntity() instanceof Arrow arrow) {
             // tipped arrows should damage
-            if (arrow.potion != Potions.EMPTY) {
+            if (ArrowUtil.hasPotionEffects(arrow)) {
                 return super.hurt(source, amount);
             }
             // non-tipped arrows should not damage
@@ -221,7 +222,7 @@ public class HollowEntity extends Monster {
 
     private boolean isValidHollowKill(DamageSource source) {
         // tipped arrow impact kill
-        if (source.getDirectEntity() instanceof Arrow arrow && arrow.potion != Potions.EMPTY) {
+        if (source.getDirectEntity() instanceof Arrow arrow && ArrowUtil.hasPotionEffects(arrow)) {
             return true;
         }
 
@@ -235,7 +236,7 @@ public class HollowEntity extends Monster {
 
         if (this.level().isClientSide) return;
 
-        if (source.getDirectEntity() instanceof Arrow arrow && arrow.potion != Potions.EMPTY) {
+        if (source.getDirectEntity() instanceof Arrow arrow && ArrowUtil.hasPotionEffects(arrow)) {
 
             LootTable table = serverLevel.getServer().reloadableRegistries()
                     .getLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "entities/hollow_tipped_arrow_kill")));

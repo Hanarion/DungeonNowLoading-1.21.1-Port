@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.entities;
 
+import dev.hexnowloading.dungeonnowloading.util.ArrowUtil;
 import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.server.level.ServerLevel;
@@ -37,7 +38,7 @@ public abstract class AbstractArrowMixin {
             return;
         }
 
-        if (arrow.potion != Potions.EMPTY) {
+        if (ArrowUtil.hasPotionEffects(arrow)) {
             return;
         }
 
