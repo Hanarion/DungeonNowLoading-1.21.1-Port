@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.world.features.entities;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +29,7 @@ public class SkeletonWithStrongFlameBowFeature extends Feature<NoneFeatureConfig
         skeleton.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
         skeleton.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
         EntityScale.scaleMobAttributes(skeleton);
-        skeleton.setItemSlot(EquipmentSlot.MAINHAND, strongFlameBow());
+        skeleton.setItemSlot(EquipmentSlot.MAINHAND, strongFlameBow(context.level().registryAccess()));
         skeleton.setItemSlot(EquipmentSlot.HEAD, trimArmor(Items.DIAMOND_HELMET));
         skeleton.setItemSlot(EquipmentSlot.CHEST, trimArmor(Items.DIAMOND_CHESTPLATE));
         skeleton.setItemSlot(EquipmentSlot.LEGS, trimArmor(Items.DIAMOND_LEGGINGS));
@@ -46,10 +47,10 @@ public class SkeletonWithStrongFlameBowFeature extends Feature<NoneFeatureConfig
         return true;
     }
 
-    private static ItemStack strongFlameBow() {
+    private static ItemStack strongFlameBow(net.minecraft.core.HolderLookup.Provider registries) {
         ItemStack itemStack = new ItemStack(Items.BOW);
-        itemStack.enchant(Enchantments.POWER_ARROWS, 5);
-        itemStack.enchant(Enchantments.FLAMING_ARROWS, 2);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.POWER_ARROWS), 5);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.FLAMING_ARROWS), 2);
         return itemStack;
     }
 

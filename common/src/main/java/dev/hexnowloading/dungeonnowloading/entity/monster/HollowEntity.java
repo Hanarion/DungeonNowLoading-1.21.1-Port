@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.entity.ai.hollow.HollowBreakLightGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.hollow.HollowChargeAttackGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.hollow.HollowMoveControl;
@@ -175,7 +176,7 @@ public class HollowEntity extends Monster {
             // Only treat as a "physical hit" if the direct entity is the attacker (not arrows, potions, etc.)
             if (source.getDirectEntity() == attacker) {
                 ItemStack weapon = attacker.getMainHandItem();
-                if (!weapon.isEmpty() && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SMITE, weapon) > 0) {
+                if (!weapon.isEmpty() && EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(this.level(), Enchantments.SMITE), weapon) > 0) {
                     return super.hurt(source, amount);
                 }
             }

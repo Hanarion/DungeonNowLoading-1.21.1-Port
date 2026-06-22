@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.block.entity.ScuttleStatueBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -108,7 +109,7 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
             this.playerDestroyed = !player.getAbilities().instabuild;
             if (playerDestroyed) {
                 ItemStack heldItem = player.getMainHandItem();
-                this.playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, heldItem) < 1;
+                this.playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.SILK_TOUCH), heldItem) < 1;
             }
         }
         super.playerWillDestroy(level, blockPos, blockState, player);

@@ -20,7 +20,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.EntityBasedExplosionDamageCalculator;
 import net.minecraft.world.level.Explosion;
@@ -200,10 +199,10 @@ public final class DNLCustomExplosion {
                 entity.hurt(damageSource, damage);
             }
 
+            // 1.21 removed ProtectionEnchantment#getExplosionKnockbackAfterDampener;
+            // Blast Protection knockback reduction is now applied via enchantment
+            // effect components by the engine, so use the raw impact here.
             double knockback = impact;
-            if (entity instanceof LivingEntity livingEntity) {
-                knockback = ProtectionEnchantment.getExplosionKnockbackAfterDampener(livingEntity, impact);
-            }
             entity.setDeltaMovement(entity.getDeltaMovement().add(x * knockback, y * knockback, z * knockback));
         }
     }

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.block.entity.BallistaGolemStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.BallistaGolemStatueStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
@@ -196,7 +197,7 @@ public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityB
             this.playerDestroyed = !player.getAbilities().instabuild;
             if (this.playerDestroyed) {
                 ItemStack heldItem = player.getMainHandItem();
-                this.playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, heldItem) < 1;
+                this.playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(world, Enchantments.SILK_TOUCH), heldItem) < 1;
             }
         }
         super.playerWillDestroy(world, pos, state, player);

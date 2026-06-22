@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.block.entity.BallistaGolemStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.BallistaGolemStatueStates;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
@@ -78,7 +79,7 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
             this.playerDestroyedPart = !player.getAbilities().instabuild;
             if (this.playerDestroyedPart) {
                 ItemStack heldItem = player.getMainHandItem();
-                this.playerDestroyedPart = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, heldItem) < 1;
+                this.playerDestroyedPart = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(world, Enchantments.SILK_TOUCH), heldItem) < 1;
             }
         }
         super.playerWillDestroy(world, pos, state, player);

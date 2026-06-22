@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.world.features.entities;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +29,7 @@ public class SkeletonWithWeakPunchBowFeature extends Feature<NoneFeatureConfigur
         skeleton.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
         skeleton.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
         EntityScale.scaleMobAttributes(skeleton);
-        skeleton.setItemSlot(EquipmentSlot.MAINHAND, weakPunchBow());
+        skeleton.setItemSlot(EquipmentSlot.MAINHAND, weakPunchBow(context.level().registryAccess()));
         skeleton.setItemSlot(EquipmentSlot.HEAD, trimArmor(Items.IRON_HELMET));
         skeleton.setItemSlot(EquipmentSlot.CHEST, trimArmor(Items.IRON_CHESTPLATE));
         skeleton.setItemSlot(EquipmentSlot.LEGS, trimArmor(Items.IRON_LEGGINGS));
@@ -47,10 +48,10 @@ public class SkeletonWithWeakPunchBowFeature extends Feature<NoneFeatureConfigur
         return true;
     }
 
-    private static ItemStack weakPunchBow() {
+    private static ItemStack weakPunchBow(net.minecraft.core.HolderLookup.Provider registries) {
         ItemStack itemStack = new ItemStack(Items.BOW);
-        itemStack.enchant(Enchantments.POWER_ARROWS, 3);
-        itemStack.enchant(Enchantments.PUNCH_ARROWS, 1);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.POWER_ARROWS), 3);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.PUNCH_ARROWS), 1);
         return itemStack;
     }
 

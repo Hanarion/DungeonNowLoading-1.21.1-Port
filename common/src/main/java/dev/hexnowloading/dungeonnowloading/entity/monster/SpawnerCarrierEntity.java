@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.entity.ai.spawner_carrier.SpawnerCarrierApproachAndSmashGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.spawner_carrier.SpawnerCarrierHurtByTargetGoal;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.SpawnerCarrierAnimationDuration;
@@ -505,7 +506,7 @@ public class SpawnerCarrierEntity extends Monster {
         int toDrop = Math.max(0, afterSteps - beforeSteps);
         if (toDrop > 0) {
 
-            int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, held);
+            int fortune = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(this.level(), Enchantments.BLOCK_FORTUNE), held);
             float height = this.getBbHeight();
 
             for (int i = 0; i < toDrop; i++) {

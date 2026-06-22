@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.world.features.entities;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +29,7 @@ public class ZombieWithGoldSwordFeature extends Feature<NoneFeatureConfiguration
         zombie.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
         zombie.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null, null);
         EntityScale.scaleMobAttributes(zombie);
-        zombie.setItemSlot(EquipmentSlot.MAINHAND, goldSword());
+        zombie.setItemSlot(EquipmentSlot.MAINHAND, goldSword(context.level().registryAccess()));
         zombie.setItemSlot(EquipmentSlot.HEAD, trimArmor(Items.IRON_HELMET));
         zombie.setItemSlot(EquipmentSlot.CHEST, trimArmor(Items.IRON_CHESTPLATE));
         zombie.setItemSlot(EquipmentSlot.LEGS, trimArmor(Items.IRON_LEGGINGS));
@@ -46,10 +47,10 @@ public class ZombieWithGoldSwordFeature extends Feature<NoneFeatureConfiguration
         return true;
     }
 
-    private static ItemStack goldSword() {
+    private static ItemStack goldSword(net.minecraft.core.HolderLookup.Provider registries) {
         ItemStack itemStack = new ItemStack(Items.GOLDEN_SWORD);
-        itemStack.enchant(Enchantments.SHARPNESS, 3);
-        itemStack.enchant(Enchantments.FIRE_ASPECT, 1);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.SHARPNESS), 3);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.FIRE_ASPECT), 1);
         return itemStack;
     }
 

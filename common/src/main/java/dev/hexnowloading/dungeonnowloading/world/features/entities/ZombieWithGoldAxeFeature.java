@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.world.features.entities;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityScale;
 import net.minecraft.nbt.CompoundTag;
@@ -31,7 +32,7 @@ public class ZombieWithGoldAxeFeature extends Feature<NoneFeatureConfiguration> 
         EntityScale.scaleMobAttributes(zombie);
         zombie.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.3F);
         zombie.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0F);
-        zombie.setItemSlot(EquipmentSlot.MAINHAND, goldenAxe());
+        zombie.setItemSlot(EquipmentSlot.MAINHAND, goldenAxe(context.level().registryAccess()));
         zombie.setItemSlot(EquipmentSlot.HEAD, trimArmor(Items.DIAMOND_HELMET));
         zombie.setItemSlot(EquipmentSlot.CHEST, trimArmor(Items.DIAMOND_CHESTPLATE));
         zombie.setItemSlot(EquipmentSlot.LEGS, trimArmor(Items.DIAMOND_LEGGINGS));
@@ -49,11 +50,11 @@ public class ZombieWithGoldAxeFeature extends Feature<NoneFeatureConfiguration> 
         return true;
     }
 
-    private static ItemStack goldenAxe() {
+    private static ItemStack goldenAxe(net.minecraft.core.HolderLookup.Provider registries) {
         ItemStack itemStack = new ItemStack(Items.GOLDEN_AXE);
-        itemStack.enchant(Enchantments.SHARPNESS, 5);
-        itemStack.enchant(Enchantments.FIRE_ASPECT, 2);
-        itemStack.enchant(Enchantments.KNOCKBACK, 5);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.SHARPNESS), 5);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.FIRE_ASPECT), 2);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.KNOCKBACK), 5);
         return itemStack;
     }
 

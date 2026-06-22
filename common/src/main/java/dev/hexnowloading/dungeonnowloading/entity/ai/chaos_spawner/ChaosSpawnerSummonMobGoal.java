@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.ai.chaos_spawner;
 
+import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import com.google.common.collect.ImmutableList;
 import dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.SpawnerCarrierEntity;
@@ -221,7 +222,7 @@ public class ChaosSpawnerSummonMobGoal extends Goal {
             if (m instanceof Zombie z) {
                 z.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.DIAMOND_HELMET));
                 z.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_SWORD));
-                z.getItemBySlot(EquipmentSlot.MAINHAND).enchant(Enchantments.SHARPNESS, 2);
+                z.getItemBySlot(EquipmentSlot.MAINHAND).enchant(DNLEnchantments.holder(z.level(), Enchantments.SHARPNESS), 2);
                 noDropChance(z);
             }
         }), 6);
@@ -231,7 +232,7 @@ public class ChaosSpawnerSummonMobGoal extends Goal {
             if (m instanceof Skeleton s) {
                 s.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.DIAMOND_HELMET));
                 s.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-                s.getItemBySlot(EquipmentSlot.MAINHAND).enchant(Enchantments.POWER_ARROWS, 2);
+                s.getItemBySlot(EquipmentSlot.MAINHAND).enchant(DNLEnchantments.holder(s.level(), Enchantments.POWER_ARROWS), 2);
                 noDropChance(s);
             }
         }), 6);
@@ -260,7 +261,7 @@ public class ChaosSpawnerSummonMobGoal extends Goal {
                 z.setItemSlot(EquipmentSlot.LEGS, new ItemStack(Items.DIAMOND_LEGGINGS));
                 z.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.DIAMOND_BOOTS));
                 z.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_AXE));
-                z.getItemBySlot(EquipmentSlot.MAINHAND).enchant(Enchantments.SHARPNESS, 4);
+                z.getItemBySlot(EquipmentSlot.MAINHAND).enchant(DNLEnchantments.holder(z.level(), Enchantments.SHARPNESS), 4);
                 noDropChance(z);
             }
         }), 1);
