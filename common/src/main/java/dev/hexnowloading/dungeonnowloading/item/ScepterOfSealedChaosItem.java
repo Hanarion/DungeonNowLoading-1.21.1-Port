@@ -161,7 +161,7 @@ public class ScepterOfSealedChaosItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
         if (GeneralConfig.TOGGLE_HELPFUL_ITEM_TOOLTIP.get()) {
             components.add(Component.translatable("item.dungeonnowloading.scepter_of_sealed_chaos.ability_name").withStyle(ChatFormatting.GRAY));

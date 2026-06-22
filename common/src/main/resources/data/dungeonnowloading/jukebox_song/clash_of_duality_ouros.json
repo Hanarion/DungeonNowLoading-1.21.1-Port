@@ -1,0 +1,8 @@
+{
+  "comparator_output": 15,
+  "description": {
+    "translate": "jukebox_song.dungeonnowloading.clash_of_duality_ouros"
+  },
+  "length_in_seconds": 170,
+  "sound_event": "dungeonnowloading:disc_clash_of_duality_ouros"
+}

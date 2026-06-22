@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import net.minecraft.world.item.Item;
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexArrowProjectileEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -184,7 +185,7 @@ public class VertexBowItem extends BowItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
         if (GeneralConfig.TOGGLE_HELPFUL_ITEM_TOOLTIP.get()) {
             components.add(Component.translatable("item.dungeonnowloading.vertex_bow.tooltip.ability_name").withStyle(ChatFormatting.GRAY));

@@ -20,7 +20,7 @@ public class ToolTipItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext world, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable(this.toolTipKey).withStyle(ChatFormatting.GRAY));
         super.appendHoverText(stack, world, tooltip, flag);
     }

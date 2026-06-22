@@ -59,7 +59,7 @@ public class GreatExperienceBottleItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> components, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext level, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, components, tooltipFlag);
         components.add(Component.translatable("item.dungeonnowloading.great_experience_bottle.tooltip", this.experienceLevelAmount).withStyle(ChatFormatting.GRAY));
     }

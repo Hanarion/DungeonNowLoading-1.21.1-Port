@@ -1,0 +1,8 @@
+{
+  "comparator_output": 15,
+  "description": {
+    "translate": "jukebox_song.dungeonnowloading.aotsugi"
+  },
+  "length_in_seconds": 218,
+  "sound_event": "dungeonnowloading:disc_aotsugi"
+}
