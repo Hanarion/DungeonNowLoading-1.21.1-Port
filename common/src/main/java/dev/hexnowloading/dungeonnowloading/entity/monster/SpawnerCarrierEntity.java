@@ -119,7 +119,7 @@ public class SpawnerCarrierEntity extends Monster {
 
     public SpawnerCarrierEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
-        this.setMaxUpStep(1.0F);
+        { net.minecraft.world.entity.ai.attributes.AttributeInstance __step = this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT); if (__step != null) __step.setBaseValue(1.0F); }
         this.xpReward = 20;
         this.spawnedMinions = new ArrayList<>();
     }
@@ -437,7 +437,7 @@ public class SpawnerCarrierEntity extends Monster {
 
     private boolean canSpawnAt(ServerLevel level, double x, double y, double z) {
         var type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getOptional(
-                new net.minecraft.resources.ResourceLocation(this.getStoredEntityId())
+                net.minecraft.resources.ResourceLocation.parse(this.getStoredEntityId())
         ).orElse(null);
 
         if (type == null) return false;

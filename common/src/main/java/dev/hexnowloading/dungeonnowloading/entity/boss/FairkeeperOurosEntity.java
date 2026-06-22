@@ -102,7 +102,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
         //this.moveControl = new FairkeeperSerpentMoveControl(this, 5.0F);
         this.moveControl = new FairkeeperOurosMoveControl(this);
         this.jumpControl = new JumpControl(this);
-        this.setMaxUpStep(0.0f);
+        { net.minecraft.world.entity.ai.attributes.AttributeInstance __step = this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT); if (__step != null) __step.setBaseValue(0.0f); }
         this.setPersistenceRequired();
         this.xpReward = 0;
         this.bossEvent = (ServerBossEvent)(new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS)).setDarkenScreen(true);

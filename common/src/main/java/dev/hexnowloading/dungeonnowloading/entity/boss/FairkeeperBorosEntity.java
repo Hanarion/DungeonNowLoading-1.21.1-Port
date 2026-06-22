@@ -101,7 +101,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
 
     public FairkeeperBorosEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
-        this.setMaxUpStep(1.0f);
+        { net.minecraft.world.entity.ai.attributes.AttributeInstance __step = this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT); if (__step != null) __step.setBaseValue(1.0f); }
         this.setPersistenceRequired();
         this.setArmor(true);
         this.setArmorHealth(75.0F);

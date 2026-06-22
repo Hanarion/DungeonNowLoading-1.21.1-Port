@@ -61,7 +61,7 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
         super(entityType, level);
         this.setState(BallistaGolemState.SLUMBERING);
         this.setBallistaArrowCount(6);
-        this.setMaxUpStep(1.0F);
+        { net.minecraft.world.entity.ai.attributes.AttributeInstance __step = this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT); if (__step != null) __step.setBaseValue(1.0F); }
         this.setPathfindingMalus(PathType.LEAVES, 0.0F);
         this.moveControl = new BallistaGolemMoveControl(this);
         this.navigation = new BallistaGolemPathNavigation(this, this.level());
