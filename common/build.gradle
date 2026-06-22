@@ -22,7 +22,7 @@ dependencies {
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: "${mixin_extras}"
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: "${mixin_extras}"
 
-    compileOnly "fuzs.forgeconfigapiport:forgeconfigapiport-common:${forgeconfigapiport_version}"
+    compileOnly "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:${forgeconfigapiport_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 

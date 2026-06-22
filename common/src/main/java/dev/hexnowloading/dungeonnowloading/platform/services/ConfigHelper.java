@@ -1,8 +1,15 @@
 package dev.hexnowloading.dungeonnowloading.platform.services;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public interface ConfigHelper {
-    void registerConfig(ModConfig.Type type, ForgeConfigSpec spec);
+
+    /** Loader-agnostic config sidedness, mapped to each loader's native ModConfig.Type. */
+    enum ConfigType {
+        CLIENT,
+        COMMON,
+        SERVER
+    }
+
+    void registerConfig(ConfigType type, ModConfigSpec spec);
 }

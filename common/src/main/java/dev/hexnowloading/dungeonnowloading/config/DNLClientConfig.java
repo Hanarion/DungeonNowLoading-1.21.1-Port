@@ -1,13 +1,13 @@
 package dev.hexnowloading.dungeonnowloading.config;
 
 import dev.hexnowloading.dungeonnowloading.platform.Services;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import dev.hexnowloading.dungeonnowloading.platform.services.ConfigHelper;
 
 public class DNLClientConfig {
     public static void register() {
-        ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder CLIENT_BUILDER = new ModConfigSpec.Builder();
 
-        Services.CONFIG.registerConfig(ModConfig.Type.CLIENT, CLIENT_BUILDER.build());
+        Services.CONFIG.registerConfig(ConfigHelper.ConfigType.CLIENT, CLIENT_BUILDER.build());
     }
 }

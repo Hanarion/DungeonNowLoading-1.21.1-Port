@@ -1,23 +1,23 @@
 package dev.hexnowloading.dungeonnowloading.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class BossConfig {
-    public static ForgeConfigSpec.BooleanValue TOGGLE_MULTIPLAYER_SCALING;
-    public static ForgeConfigSpec.BooleanValue TOGGLE_BOSS_RESET;
-    public static ForgeConfigSpec.BooleanValue TOGGLE_MULTIPLAYER_LOOT;
+    public static ModConfigSpec.BooleanValue TOGGLE_MULTIPLAYER_SCALING;
+    public static ModConfigSpec.BooleanValue TOGGLE_BOSS_RESET;
+    public static ModConfigSpec.BooleanValue TOGGLE_MULTIPLAYER_LOOT;
 
-    public static ForgeConfigSpec.DoubleValue BOSS_HEALTH_MODIFIER;
-    public static ForgeConfigSpec.DoubleValue BOSS_DAMAGE_MODIFIER;
-    public static ForgeConfigSpec.DoubleValue BOSS_EXHAUSTION_MODIFIER;
-    public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_HEALTH_SCALE;
-    public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_ATTACK_SCALE;
-    public static ForgeConfigSpec.DoubleValue MULTIPLAYER_BOSS_EXHAUSTION_SCALE;
-    public static ForgeConfigSpec.DoubleValue RECALL_BOSS_HEALTH_SCALE;
-    public static ForgeConfigSpec.DoubleValue RECALL_BOSS_ATTACK_SCALE;
-    public static ForgeConfigSpec.DoubleValue RECALL_BOSS_EXHAUSTION_SCALE;
+    public static ModConfigSpec.DoubleValue BOSS_HEALTH_MODIFIER;
+    public static ModConfigSpec.DoubleValue BOSS_DAMAGE_MODIFIER;
+    public static ModConfigSpec.DoubleValue BOSS_EXHAUSTION_MODIFIER;
+    public static ModConfigSpec.DoubleValue MULTIPLAYER_BOSS_HEALTH_SCALE;
+    public static ModConfigSpec.DoubleValue MULTIPLAYER_BOSS_ATTACK_SCALE;
+    public static ModConfigSpec.DoubleValue MULTIPLAYER_BOSS_EXHAUSTION_SCALE;
+    public static ModConfigSpec.DoubleValue RECALL_BOSS_HEALTH_SCALE;
+    public static ModConfigSpec.DoubleValue RECALL_BOSS_ATTACK_SCALE;
+    public static ModConfigSpec.DoubleValue RECALL_BOSS_EXHAUSTION_SCALE;
 
-    public static void registerServerConfig(ForgeConfigSpec.Builder builder) {
+    public static void registerServerConfig(ModConfigSpec.Builder builder) {
         builder.push("multiplayer-boss-scaling");
         TOGGLE_MULTIPLAYER_SCALING = builder.comment("Whether the boss scales with number of players.").translation("toggle_multiplayer_scaling").define("toggle_multiplayer_scaling", true);
         MULTIPLAYER_BOSS_HEALTH_SCALE = builder.comment("Multiplies the boss health by this value per additional player.").translation("multiplayer_boss_health_scale").defineInRange("multiplayer_boss_health_scale", 0.5D, 0.0D, Double.MAX_VALUE);
