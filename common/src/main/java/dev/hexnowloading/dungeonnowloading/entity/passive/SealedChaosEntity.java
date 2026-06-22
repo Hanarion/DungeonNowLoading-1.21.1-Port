@@ -222,15 +222,11 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
-        // Base eye height as a fraction of current height so it scales naturally with size
-        return size.height * 0.8F;
-    }
-
-    @Override
-    public EntityDimensions getDimensions(Pose pose) {
-        EntityDimensions base = super.getDimensions(pose);
-        return this.isGigantic() ? base.scale(2.0F) : base;
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
+        EntityDimensions base = super.getDefaultDimensions(pose);
+        EntityDimensions scaled = this.isGigantic() ? base.scale(2.0F) : base;
+        // Eye height as a fraction of current height so it scales naturally with size
+        return scaled.withEyeHeight(scaled.height() * 0.8F);
     }
 
     @Override

@@ -166,8 +166,8 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return 2.0F;
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
+        return super.getDefaultDimensions(pose).withEyeHeight(2.0F);
     }
 
     @Override

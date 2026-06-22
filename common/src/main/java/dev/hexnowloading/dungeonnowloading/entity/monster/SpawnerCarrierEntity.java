@@ -472,8 +472,8 @@ public class SpawnerCarrierEntity extends Monster {
 
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return 0.95F;
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
+        return super.getDefaultDimensions(pose).withEyeHeight(0.95F);
     }
 
     @Override

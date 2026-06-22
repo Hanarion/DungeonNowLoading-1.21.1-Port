@@ -217,15 +217,11 @@ public class WhimperEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
-    public EntityDimensions getDimensions(Pose pose) {
-        EntityDimensions base = super.getDimensions(pose);
-        return this.isGigantic() ? base.scale(2.0F) : base;
-    }
-
-    @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
-        // Scale eye height with current bounding box height for consistent visuals
-        return size.height * 0.8F;
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
+        EntityDimensions base = super.getDefaultDimensions(pose);
+        EntityDimensions scaled = this.isGigantic() ? base.scale(2.0F) : base;
+        // Eye height scales with current bounding box height for consistent visuals
+        return scaled.withEyeHeight(scaled.height() * 0.8F);
     }
 
     @Nullable

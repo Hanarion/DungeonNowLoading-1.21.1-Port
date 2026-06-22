@@ -182,8 +182,8 @@ public class ScuttleEntity extends Monster implements Enemy, SlumberingEntity {
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return 1.45F;
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
+        return super.getDefaultDimensions(pose).withEyeHeight(1.45F);
     }
 
     @Override

@@ -428,15 +428,11 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
     }
 
     @Override
-    public EntityDimensions getDimensions(Pose pose) {
-        EntityDimensions base = super.getDimensions(pose);
-        return this.isGigantic() ? base.scale(2.0F) : base;
-    }
-
-    @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
-        // Scale eye height as a fraction of current height so it matches both normal and gigantic
-        return size.height * 0.8F;
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
+        EntityDimensions base = super.getDefaultDimensions(pose);
+        EntityDimensions scaled = this.isGigantic() ? base.scale(2.0F) : base;
+        // Eye height as a fraction of current height so it matches both normal and gigantic
+        return scaled.withEyeHeight(scaled.height() * 0.8F);
     }
 
     @Override
