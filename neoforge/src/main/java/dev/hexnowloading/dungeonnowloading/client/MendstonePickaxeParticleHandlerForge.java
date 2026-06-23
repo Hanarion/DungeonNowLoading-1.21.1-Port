@@ -6,8 +6,9 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class MendstonePickaxeParticleHandlerForge {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {

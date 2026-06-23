@@ -5,11 +5,12 @@ import dev.hexnowloading.dungeonnowloading.platform.services.ReloadListenerPlatf
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = DungeonNowLoading.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = DungeonNowLoading.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class ForgeReloadListenerPlatform implements ReloadListenerPlatform {
 
     public record Entry(ResourceLocation id, PreparableReloadListener listener) {}
