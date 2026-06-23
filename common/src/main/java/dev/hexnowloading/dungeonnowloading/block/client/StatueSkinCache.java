@@ -5,13 +5,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.client.resources.SkinManager;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.InputStream;
@@ -79,9 +78,11 @@ public final class StatueSkinCache {
             try {
                 SkinImg s = (profile != null) ? resolveSkinImageAndModel(profile) : null;
                 if (s == null || s.img == null) {
-                    UUID derived = (profile != null) ? UUIDUtil.getOrCreatePlayerUUID(profile) : new UUID(0L, 0L);
-                    ResourceLocation def = DefaultPlayerSkin.getDefaultSkin(derived);
-                    boolean slim = "slim".equals(DefaultPlayerSkin.getSkinModelName(derived));
+                    PlayerSkin defaultSkin = (profile != null)
+                            ? DefaultPlayerSkin.get(profile)
+                            : DefaultPlayerSkin.get(new UUID(0L, 0L));
+                    ResourceLocation def = defaultSkin.texture();
+                    boolean slim = defaultSkin.model() == PlayerSkin.Model.SLIM;
                     NativeImage img = readResource(def);
                     if (img == null) return;
                     s = new SkinImg(img, slim);
@@ -119,15 +120,13 @@ public final class StatueSkinCache {
     }
 
     private static SkinImg resolveSkinImageAndModel(GameProfile profile) {
-        // A) SkinManager (has MinecraftProfileTexture with metadata)
+        // A) SkinManager (1.21 returns a PlayerSkin with textureUrl + model)
         try {
             SkinManager sm = Minecraft.getInstance().getSkinManager();
-            Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = sm.getInsecureSkinInformation(profile);
-            MinecraftProfileTexture skin = map.get(MinecraftProfileTexture.Type.SKIN);
-            if (skin != null) {
-                String model = skin.getMetadata("model"); // returns "slim" for Alex-type skins
-                boolean slim = "slim".equals(model);
-                NativeImage img = downloadPng(skin.getUrl());
+            PlayerSkin skin = sm.getInsecureSkin(profile);
+            if (skin != null && skin.textureUrl() != null) {
+                boolean slim = skin.model() == PlayerSkin.Model.SLIM;
+                NativeImage img = downloadPng(skin.textureUrl());
                 if (img != null) return new SkinImg(img, slim);
             }
         } catch (Exception ignored) {}
@@ -165,11 +164,11 @@ public final class StatueSkinCache {
         } catch (Exception ignored) {}
 
         // C) Crafatar fallback: no metadata → derive from UUID parity
-        boolean slim = "slim".equals(DefaultPlayerSkin.getSkinModelName(UUID.fromString(
+        boolean slim = DefaultPlayerSkin.get(UUID.fromString(
                 uuidNoDash.replaceFirst(
                         "(........)(....)(....)(....)(............)",
                         "$1-$2-$3-$4-$5"
-                ))));
+                ))).model() == PlayerSkin.Model.SLIM;
         NativeImage img = downloadPng("https://crafatar.com/skins/" + uuidNoDash);
         return (img != null) ? new SkinImg(img, slim) : null;
     }
@@ -213,9 +212,8 @@ public final class StatueSkinCache {
     private static String trySkinManager(GameProfile profile) {
         try {
             SkinManager sm = Minecraft.getInstance().getSkinManager();
-            Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = sm.getInsecureSkinInformation(profile);
-            MinecraftProfileTexture skin = map.get(MinecraftProfileTexture.Type.SKIN);
-            return skin != null ? skin.getUrl() : null;
+            PlayerSkin skin = sm.getInsecureSkin(profile);
+            return skin != null ? skin.textureUrl() : null;
         } catch (Exception ignored) {
             return null;
         }
@@ -335,9 +333,9 @@ public final class StatueSkinCache {
     private static StatueSkin buildPlaceholder(float overlayAlpha, ResourceLocation stoneTex, String keySeed) {
         try {
             // fixed UUID -> stable Steve/Alex selection
-            UUID derived = new UUID(0L, 0L);
-            ResourceLocation def = DefaultPlayerSkin.getDefaultSkin(derived);
-            boolean slim = "slim".equals(DefaultPlayerSkin.getSkinModelName(derived));
+            PlayerSkin defaultSkin = DefaultPlayerSkin.get(new UUID(0L, 0L));
+            ResourceLocation def = defaultSkin.texture();
+            boolean slim = defaultSkin.model() == PlayerSkin.Model.SLIM;
 
             NativeImage img = readResource(def);
             if (img != null) {
