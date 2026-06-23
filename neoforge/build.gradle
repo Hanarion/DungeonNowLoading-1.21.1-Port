@@ -3,6 +3,13 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
+// Datagen providers are dev-only (./gradlew :neoforge:runData) and not yet ported to
+// the 1.21 NeoForge datagen API; exclude them so the runtime client/server compiles.
+// The generated assets/data already exist under src/main/resources.
+sourceSets.main.java {
+    exclude 'dev/hexnowloading/dungeonnowloading/datagen/**'
+}
+
 neoForge {
     version = neoforge_version
     // Automatically enable neoforge AccessTransformers if the file exists
