@@ -171,7 +171,7 @@ public class WisplightRodItem extends Item {
             return;
         }
 
-        int chargeTime = this.getUseDuration(stack) - remainingUseDuration;
+        int chargeTime = this.getUseDuration(stack, player) - remainingUseDuration;
         if (!this.hasConsumedFuel(stack) && chargeTime >= CHARGE_TIME_TICKS) {
             if (!this.hasFuel(player)) {
                 player.releaseUsingItem();
@@ -201,7 +201,7 @@ public class WisplightRodItem extends Item {
             return;
         }
 
-        int chargeTime = this.getUseDuration(stack) - timeCharged;
+        int chargeTime = this.getUseDuration(stack, player) - timeCharged;
         boolean fullyCharged = chargeTime >= CHARGE_TIME_TICKS;
         boolean fuelConsumed = this.hasConsumedFuel(stack);
         boolean largeFuelConsumed = this.hasLargeFuelConsumed(stack);
@@ -222,7 +222,7 @@ public class WisplightRodItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack, net.minecraft.world.entity.LivingEntity entity) {
         return 72000;
     }
 

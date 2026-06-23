@@ -47,7 +47,7 @@ public class VertexBowItem extends BowItem {
                     projectile = new ItemStack(Items.ARROW);
                 }
 
-                int currentUseDuration = this.getUseDuration(itemStack) - remainingUseDuration;
+                int currentUseDuration = this.getUseDuration(itemStack, livingEntity) - remainingUseDuration;
                 float powerForTime = getPowerForTime(currentUseDuration);
                 if (!((double)powerForTime < 0.1)) {
                     boolean b1 = b && projectile.is(Items.ARROW);
@@ -140,7 +140,7 @@ public class VertexBowItem extends BowItem {
     @Override
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack itemStack, int remainingUseDuration) {
         if (livingEntity instanceof Player player) {
-            int chargeDuration = this.getUseDuration(itemStack) - remainingUseDuration;
+            int chargeDuration = this.getUseDuration(itemStack, livingEntity) - remainingUseDuration;
 
             if (!level.isClientSide && chargeDuration == 0) {
                 level.playSound(

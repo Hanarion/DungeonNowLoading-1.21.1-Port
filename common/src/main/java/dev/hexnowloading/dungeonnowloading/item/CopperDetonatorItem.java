@@ -92,7 +92,7 @@ public class CopperDetonatorItem extends Item {
 
     @Override
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack itemStack, int remainingUseTick) {
-        int usedTime = itemStack.getUseDuration() - remainingUseTick;
+        int usedTime = itemStack.getUseDuration(livingEntity) - remainingUseTick;
         if (usedTime == MODE_SWITCH_TIMING) {
             livingEntity.playSound(DNLSounds.COPPER_DETONATOR_READY.get());
         } else if (usedTime > MODE_SWITCH_TIMING && (usedTime - MODE_SWITCH_TIMING) % 20 == 0) {
@@ -108,7 +108,7 @@ public class CopperDetonatorItem extends Item {
 
     @Override
     public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int remainingTicks) {
-        int usedTime = itemStack.getUseDuration() - remainingTicks;
+        int usedTime = itemStack.getUseDuration(livingEntity) - remainingTicks;
 
         if (!(livingEntity instanceof Player player)) return;
 
@@ -131,7 +131,7 @@ public class CopperDetonatorItem extends Item {
                 if (consumeCopperBlockIfAvailable(player)) {
                     launchCreep(level, player, itemStack);
                     player.getCooldowns().addCooldown(this, SUMMON_COOLDOWN);
-                    itemStack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(player1.getUsedItemHand()));
+                    itemStack.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
                     player.swing(hand);
                 }
             }
@@ -147,7 +147,7 @@ public class CopperDetonatorItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack itemStack) {
+    public int getUseDuration(ItemStack itemStack, net.minecraft.world.entity.LivingEntity entity) {
         return 72000;
     }
 

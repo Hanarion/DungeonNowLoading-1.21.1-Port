@@ -99,7 +99,7 @@ public class WisplightRodModel extends AnimatedItemModel {
             return;
         }
 
-        float useTicks = stack.getUseDuration() - player.getUseItemRemainingTicks() + partialTicks;
+        float useTicks = stack.getUseDuration(player) - player.getUseItemRemainingTicks() + partialTicks;
         if (useTicks >= CHARGED_START_TICKS) {
             animateLoop(WisplightRodAnimation.CHARGEED, (useTicks - CHARGED_START_TICKS) / 20.0F);
         } else if (useTicks >= CHARGE_UP_START_TICKS) {

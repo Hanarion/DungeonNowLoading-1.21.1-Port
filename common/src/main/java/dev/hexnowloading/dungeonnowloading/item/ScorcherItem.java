@@ -119,7 +119,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
         if (!(entity instanceof Player player)) return;
 
-        int chargeTime = getUseDuration(itemStack) - remainingUseDuration;
+        int chargeTime = getUseDuration(itemStack, entity) - remainingUseDuration;
         long gameTime = player.level().getGameTime();
         float overHeatedDuration = ScorcherAnimationDuration.SCORCHER_OVERHEAT / ScorcherAnimationDuration.SCORCHER_SHOOT;
 
@@ -397,7 +397,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     }
 
     @Override
-    public int getUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack, net.minecraft.world.entity.LivingEntity entity) {
         return 72000;
     }
 
