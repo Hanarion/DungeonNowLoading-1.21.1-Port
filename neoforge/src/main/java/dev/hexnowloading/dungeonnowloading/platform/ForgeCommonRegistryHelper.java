@@ -14,10 +14,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraftforge.common.util.ForgeSoundType;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +30,11 @@ public class ForgeCommonRegistryHelper implements RegistryHelper {
 
     public static final List<SimpleJsonResourceReloadListener> dataLoaders = new ArrayList<>();
 
+    // 1.21 NeoForge: the mod event bus is provided to the @Mod ctor; capture it so the
+    // lazily-created DeferredRegisters can register against it.
+    private static IEventBus modBus;
+    public static void setModBus(IEventBus bus) { modBus = bus; }
+
     @Override
     public <T> Supplier<T> register(Registry<? super T> registry, String name, Supplier<T> entry) {
         return registryMap.register(registry, name, entry);
@@ -43,7 +47,7 @@ public class ForgeCommonRegistryHelper implements RegistryHelper {
 
     @Override
     public SoundType getSoundType(float volume, float pitch, Supplier<SoundEvent> breakSound, Supplier<SoundEvent> stepSound, Supplier<SoundEvent> placeSound, Supplier<SoundEvent> hitSound, Supplier<SoundEvent> fallSound) {
-        return new ForgeSoundType(volume, pitch, breakSound, stepSound, placeSound, hitSound, fallSound);
+        return new SoundType(volume, pitch, breakSound.get(), stepSound.get(), placeSound.get(), hitSound.get(), fallSound.get());
     }
 
     @Override
@@ -63,7 +67,7 @@ public class ForgeCommonRegistryHelper implements RegistryHelper {
 
         private final Map<ResourceLocation, DeferredRegister<?>> registries = new HashMap<>();
 
-        private <T> RegistryObject<T> register(Registry<? super T> registry, String name, Supplier<T> entry) {
+        private <T> Supplier<T> register(Registry<? super T> registry, String name, Supplier<T> entry) {
             DeferredRegister<T> reg = getDeferred(registry);
             return reg != null ? reg.register(name, entry) : null;
         }
@@ -72,7 +76,9 @@ public class ForgeCommonRegistryHelper implements RegistryHelper {
         public <T> DeferredRegister<T> getDeferred(Registry<? super T> registry) {
             return (DeferredRegister<T>)registries.computeIfAbsent(registry.key().location(), (key) -> {
                 DeferredRegister<T> defReg = DeferredRegister.create(registry.key().location(), DungeonNowLoading.MOD_ID);
-                defReg.register(FMLJavaModLoadingContext.get().getModEventBus());
+                if (modBus != null) {
+                    defReg.register(modBus);
+                }
                 return defReg;
             });
         }

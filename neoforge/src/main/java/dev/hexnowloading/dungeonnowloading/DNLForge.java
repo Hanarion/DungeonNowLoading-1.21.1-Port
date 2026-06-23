@@ -21,6 +21,8 @@ public class DNLForge {
 
     // 1.21 NeoForge: the @Mod constructor receives the mod event bus directly.
     public DNLForge(IEventBus bus) {
+        // Capture the mod bus before init() so lazily-created DeferredRegisters bind to it.
+        ForgeCommonRegistryHelper.setModBus(bus);
         DungeonNowLoading.init();
 
         DNLAttachments.ATTACHMENT_TYPES.register(bus);
