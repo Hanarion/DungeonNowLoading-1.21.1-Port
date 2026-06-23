@@ -3,8 +3,6 @@ package dev.hexnowloading.dungeonnowloading.mixin.block;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DetectorRailBlock;
 import net.minecraft.world.level.block.PoweredRailBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,21 +28,9 @@ public abstract class PoweredRailBlockMixin {
         }
     }
 
-    // DNL 1.21: @Redirect of BlockState.is(Block) in isSameRailWithPower doesn't bind at runtime;
-    // custom Deepsteel powered-rail chaining disabled pending a proper retarget. Kept as unused.
-    @SuppressWarnings("unused")
-    private boolean dungeonnowloading$connectDeepsteelMountedPoweredRails(BlockState state, Block block) {
-        Block self = (Block) (Object) this;
-        if (isPoweredRailPowerChainBlock(self) && isPoweredRailPowerChainBlock(state.getBlock())) {
-            return true;
-        }
-
-        return state.is(block);
-    }
-
-    private boolean isPoweredRailPowerChainBlock(Block block) {
-        return block == Blocks.POWERED_RAIL || block == DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get();
-    }
+    // 1.21: isSameRailWithPower detects neighbours via `instanceof PoweredRailBlock` (no
+    // BlockState.is(Block) call), and DeepsteelMountedPoweredRailBlock extends PoweredRailBlock,
+    // so deepsteel powered rails already chain power natively. The old @Redirect was removed.
 
     private boolean canRailPowerContinue(RailShape sourceShape, RailShape targetShape) {
         if (sourceShape == RailShape.EAST_WEST) {
