@@ -95,6 +95,7 @@ public final class DNLCustomExplosion {
                     ? getDestroyType(level, GameRules.RULE_MOB_EXPLOSION_DROP_DECAY)
                     : Explosion.BlockInteraction.KEEP;
             case TNT -> getDestroyType(level, GameRules.RULE_TNT_EXPLOSION_DROP_DECAY);
+            case TRIGGER -> Explosion.BlockInteraction.TRIGGER_BLOCK;
         };
     }
 

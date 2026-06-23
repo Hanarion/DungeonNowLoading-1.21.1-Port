@@ -681,7 +681,8 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
                     return false;
                 }
 
-                StackNbt.update(stack, t -> t.putInt(SELECTED_SLOT_TAG, selected));
+                final int selectedSlot = selected;
+                StackNbt.update(stack, t -> t.putInt(SELECTED_SLOT_TAG, selectedSlot));
                 return true;
             }
         }
