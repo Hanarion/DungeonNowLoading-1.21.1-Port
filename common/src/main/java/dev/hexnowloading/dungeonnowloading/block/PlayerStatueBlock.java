@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import dev.hexnowloading.dungeonnowloading.util.ItemNbt;
 import dev.hexnowloading.dungeonnowloading.util.ProfileNbt;
 import com.mojang.authlib.GameProfile;
 import dev.hexnowloading.dungeonnowloading.block.entity.PlayerStatueBlockEntity;
@@ -161,7 +162,7 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
                 var tier = PlayerStatueBlockEntity.NotchTier.fromString(tag.getString("DNL_Notch"));
                 if (tier != PlayerStatueBlockEntity.NotchTier.NONE) statue.setNotchTier(tier);
             } else if (tag.contains("Offering", 10)) { // legacy item NBT
-                ItemStack off = ItemStack.of(tag.getCompound("Offering"));
+                ItemStack off = ItemNbt.load(tag.getCompound("Offering"));
                 var tier = PlayerStatueBlockEntity.tierFromItem(off);
                 if (tier != PlayerStatueBlockEntity.NotchTier.NONE) statue.setNotchTier(tier);
             }

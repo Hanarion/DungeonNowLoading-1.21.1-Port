@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.misc;
 
+import dev.hexnowloading.dungeonnowloading.util.ItemNbt;
 import dev.hexnowloading.dungeonnowloading.entity.ai.EntityBodyRotationControl;
 import dev.hexnowloading.dungeonnowloading.entity.client.animation_duration.RepulsorAnimationDuration;
 import dev.hexnowloading.dungeonnowloading.entity.util.EntityStates;
@@ -124,7 +125,7 @@ public class RepulsorEntity extends Mob {
             this.entityData.set(DATA_SKIN, Skin.fromId(compoundTag.getString("skin")));
         }
         if (compoundTag.contains("SourceStack", 10)) { // 10 = compound
-            this.sourceStack = ItemStack.of(compoundTag.getCompound("SourceStack"));
+            this.sourceStack = ItemNbt.load(compoundTag.getCompound("SourceStack"));
         } else {
             this.sourceStack = ItemStack.EMPTY;
         }
@@ -139,8 +140,7 @@ public class RepulsorEntity extends Mob {
         compoundTag.putInt("shieldHealth", this.entityData.get(DATA_SHIELD_HEALTH));
         compoundTag.putString("skin", getSkin().getId());
         if (!this.sourceStack.isEmpty()) {
-            CompoundTag s = new CompoundTag();
-            this.sourceStack.save(s);
+            CompoundTag s = ItemNbt.save(this.sourceStack);
             compoundTag.put("SourceStack", s);
         }
     }

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.ItemNbt;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -23,8 +24,7 @@ public class ScrapItem extends Item {
     public static ItemStack ofOriginal(ItemStack original) {
         ItemStack scrap = new ItemStack(DNLItems.ITEM_SCRAPS.get());
         CompoundTag tag = StackNbt.getOrCreateTag(scrap);
-        CompoundTag originalTag = new CompoundTag();
-        original.save(originalTag);
+        CompoundTag originalTag = ItemNbt.save(original);
         tag.put(ORIGINAL_TAG, originalTag);
         StackNbt.setTag(scrap, tag);
         return scrap;
@@ -38,7 +38,7 @@ public class ScrapItem extends Item {
     public static ItemStack getOriginal(ItemStack stack) {
         CompoundTag tag = StackNbt.getTag(stack);
         if (tag != null && tag.contains(ORIGINAL_TAG, 10)) {
-            return ItemStack.of(tag.getCompound(ORIGINAL_TAG));
+            return ItemNbt.load(tag.getCompound(ORIGINAL_TAG));
         }
         return ItemStack.EMPTY;
     }

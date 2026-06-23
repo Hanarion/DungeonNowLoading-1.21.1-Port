@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.ItemNbt;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import dev.hexnowloading.dungeonnowloading.registry.DNLTags;
 import net.minecraft.ChatFormatting;
@@ -1145,7 +1146,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         int count = 0;
         ListTag items = getStoredItemsList(stack);
         for (int i = 0; i < MAX_STORED_ITEMS; i++) {
-            if (i < items.size() && !ItemStack.of(items.getCompound(i)).isEmpty()) {
+            if (i < items.size() && !ItemNbt.load(items.getCompound(i)).isEmpty()) {
                 count++;
             }
         }
@@ -1320,14 +1321,13 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
         CompoundTag tag = StackNbt.getOrCreateTag(stack);
         ListTag items = getOrCreateFixedStoredItems(tag);
-        ItemStack removed = ItemStack.of(items.getCompound(slot));
+        ItemStack removed = ItemNbt.load(items.getCompound(slot));
         if (removed.isEmpty() && getStoredItemCount(stack) >= getStorageCapacity(stack)) {
             return ItemStack.EMPTY;
         }
 
         ItemStack stored = itemToStore.copyWithCount(1);
-        CompoundTag storedTag = new CompoundTag();
-        stored.save(storedTag);
+        CompoundTag storedTag = ItemNbt.save(stored);
         items.set(slot, storedTag);
         tag.put(STORED_ITEMS_TAG, items);
         tag.putInt(SELECTED_SLOT_TAG, slot);
@@ -1351,7 +1351,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return Optional.empty();
         }
 
-        ItemStack removed = ItemStack.of(items.getCompound(selected));
+        ItemStack removed = ItemNbt.load(items.getCompound(selected));
         if (removed.isEmpty()) {
             return Optional.empty();
         }
@@ -1400,7 +1400,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         CompoundTag tag = StackNbt.getOrCreateTag(stack);
         boolean hasStoredItem = false;
         for (int i = 0; i < items.size(); i++) {
-            if (!ItemStack.of(items.getCompound(i)).isEmpty()) {
+            if (!ItemNbt.load(items.getCompound(i)).isEmpty()) {
                 hasStoredItem = true;
                 break;
             }
@@ -1423,17 +1423,17 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         if (slot < 0 || slot >= items.size()) {
             return ItemStack.EMPTY;
         }
-        return ItemStack.of(items.getCompound(slot));
+        return ItemNbt.load(items.getCompound(slot));
     }
 
     private static int getSelectedOccupiedSlotOrNext(ListTag items, int selectedSlot) {
-        if (selectedSlot < items.size() && !ItemStack.of(items.getCompound(selectedSlot)).isEmpty()) {
+        if (selectedSlot < items.size() && !ItemNbt.load(items.getCompound(selectedSlot)).isEmpty()) {
             return selectedSlot;
         }
 
         for (int i = 1; i <= MAX_STORED_ITEMS; i++) {
             int slot = Math.floorMod(selectedSlot + i, MAX_STORED_ITEMS);
-            if (slot < items.size() && !ItemStack.of(items.getCompound(slot)).isEmpty()) {
+            if (slot < items.size() && !ItemNbt.load(items.getCompound(slot)).isEmpty()) {
                 return slot;
             }
         }

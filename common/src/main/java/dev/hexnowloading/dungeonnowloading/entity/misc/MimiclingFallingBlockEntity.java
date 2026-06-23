@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.misc;
 
+import dev.hexnowloading.dungeonnowloading.util.ItemNbt;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import net.minecraft.core.BlockPos;
@@ -215,8 +216,7 @@ public class MimiclingFallingBlockEntity extends FallingBlockEntity {
         tag.putFloat("MimiclingImpactDamage", this.impactDamage);
         ListTag drops = new ListTag();
         for (ItemStack stack : this.impactDrops) {
-            CompoundTag stackTag = new CompoundTag();
-            stack.save(stackTag);
+            CompoundTag stackTag = ItemNbt.save(stack);
             drops.add(stackTag);
         }
         tag.put("MimiclingImpactDrops", drops);
@@ -232,7 +232,7 @@ public class MimiclingFallingBlockEntity extends FallingBlockEntity {
         this.impactDrops = NonNullList.create();
         ListTag drops = tag.getList("MimiclingImpactDrops", 10);
         for (int i = 0; i < drops.size(); i++) {
-            ItemStack stack = ItemStack.of(drops.getCompound(i));
+            ItemStack stack = ItemNbt.load(drops.getCompound(i));
             if (!stack.isEmpty()) {
                 this.impactDrops.add(stack);
             }
