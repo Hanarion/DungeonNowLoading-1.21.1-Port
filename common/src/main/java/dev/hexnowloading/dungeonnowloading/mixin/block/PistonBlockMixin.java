@@ -27,7 +27,7 @@ public abstract class PistonBlockMixin {
 
         // Fire a game event for debugging or tracking purposes
         if (level instanceof ServerLevel serverLevel) {
-            serverLevel.gameEvent(null, isPushable ? DNLGameEvents.BLOCK_PUSHED_EARLY.get() : DNLGameEvents.BLOCK_PUSHED_EARLY_FAILED.get(), Vec3.atCenterOf(blockPos));
+            serverLevel.gameEvent(null, isPushable ? DNLGameEvents.holder(DNLGameEvents.BLOCK_PUSHED_EARLY) : DNLGameEvents.holder(DNLGameEvents.BLOCK_PUSHED_EARLY_FAILED), Vec3.atCenterOf(blockPos));
         }
 
         if (PistonPushManager.shouldCancel()) {

@@ -21,7 +21,7 @@ public abstract class LecternBlockMixin {
             cancellable = true)
     private void cancelPopBook(BlockState state, Level level, BlockPos pos, CallbackInfo ci) {
         if (level instanceof ServerLevel serverLevel) {
-            serverLevel.gameEvent(null, DNLGameEvents.BLOCK_CONTENT_DROPPING.get(), Vec3.atCenterOf(pos));
+            serverLevel.gameEvent(null, DNLGameEvents.holder(DNLGameEvents.BLOCK_CONTENT_DROPPING), Vec3.atCenterOf(pos));
         }
 
         if (ContainerDropManager.shouldCancel(pos)) {

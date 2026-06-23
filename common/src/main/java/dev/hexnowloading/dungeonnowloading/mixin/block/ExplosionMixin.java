@@ -52,7 +52,7 @@ public abstract class ExplosionMixin {
         if (level instanceof ServerLevel serverLevel) {
             //Note: The ExplosionDestructionManager.reset() need to run only on the serverside and not on the clientside since the shouldCancelDestruction boolean is shared between client and server due to being a static variable.
             ExplosionDestructionManager.reset();
-            serverLevel.gameEvent(null, DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION.get(), Vec3.atCenterOf(targetBlockPos));
+            serverLevel.gameEvent(null, DNLGameEvents.holder(DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION), Vec3.atCenterOf(targetBlockPos));
         }
 
         return blockstate.isAir() || (level instanceof ServerLevel && ExplosionDestructionManager.shouldCancel(targetBlockPos));

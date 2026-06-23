@@ -33,7 +33,7 @@ public class DNLLevelUtil {
 
     public static boolean destroyBlockMulti(Level level, BlockPos pos, boolean dropBlock, @Nullable Entity entity, int flags) {
         BlockDestructionManager.reset();
-        level.gameEvent(DNLGameEvents.BLOCK_DESTROY_EARLY.get(), pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
+        level.gameEvent(DNLGameEvents.holder(DNLGameEvents.BLOCK_DESTROY_EARLY), pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
         if (BlockDestructionManager.shouldCancel()) {
             return false;
         }

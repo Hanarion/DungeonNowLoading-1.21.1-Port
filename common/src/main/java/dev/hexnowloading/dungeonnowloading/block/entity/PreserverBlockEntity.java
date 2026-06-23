@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PreserverBlockEntity extends BlockEntity implements GameEventListener.Holder<PreserverBlockDestructionSystem.Listener>, PreserverBlockDestructionSystem, ZoneReceiverBlockEntity {
+public class PreserverBlockEntity extends BlockEntity implements GameEventListener.Provider<PreserverBlockDestructionSystem.Listener>, PreserverBlockDestructionSystem, ZoneReceiverBlockEntity {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private PreserverBlockDestructionSystem.User user;

@@ -22,7 +22,7 @@ public class BlockDestroyCancelMixin {
     private void onDestroyBlock(BlockPos pos, boolean drop, @Nullable Entity entity, int flags, CallbackInfoReturnable<Boolean> cir) {
         BlockDestructionManager.reset();
         Level level = ((Level) (Object) this);
-        level.gameEvent(DNLGameEvents.BLOCK_DESTROY_EARLY.get(), pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
+        level.gameEvent(DNLGameEvents.holder(DNLGameEvents.BLOCK_DESTROY_EARLY), pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
 
         if (!level.isClientSide && level instanceof ServerLevel server) {
             BlockEntity be = server.getBlockEntity(pos);

@@ -24,7 +24,7 @@ public abstract class DNLFireBlockMixin {
         BlockBurnManager.reset();
 
         if (level instanceof ServerLevel serverLevel) {
-            serverLevel.gameEvent(null, DNLGameEvents.BLOCK_BURNED.get(), Vec3.atCenterOf(blockPos));
+            serverLevel.gameEvent(null, DNLGameEvents.holder(DNLGameEvents.BLOCK_BURNED), Vec3.atCenterOf(blockPos));
         }
 
         if (BlockBurnManager.shouldCancel()) {

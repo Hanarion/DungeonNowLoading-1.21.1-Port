@@ -187,7 +187,8 @@ public interface PreserverBlockDestructionSystem {
         }
 
         @Override
-        public boolean handleGameEvent(ServerLevel serverLevel, GameEvent gameEvent, GameEvent.Context context, Vec3 pos) {
+        public boolean handleGameEvent(ServerLevel serverLevel, net.minecraft.core.Holder<GameEvent> gameEventHolder, GameEvent.Context context, Vec3 pos) {
+            GameEvent gameEvent = gameEventHolder.value();
 
             BlockPos eventBlockPos = new BlockPos((int) Math.floor(pos.x), (int) Math.floor(pos.y), (int) Math.floor(pos.z));
             //int radius = reverseSquareRegionCalculation(this.getListenerRadius());
@@ -452,7 +453,7 @@ public interface PreserverBlockDestructionSystem {
 
                 return true;
             }
-            if (gameEvent == GameEvent.BLOCK_PLACE) {
+            if (gameEvent == GameEvent.BLOCK_PLACE.value()) {
                 if (context.sourceEntity() instanceof Player player && player.getAbilities().instabuild) {
                     return false;
                 }

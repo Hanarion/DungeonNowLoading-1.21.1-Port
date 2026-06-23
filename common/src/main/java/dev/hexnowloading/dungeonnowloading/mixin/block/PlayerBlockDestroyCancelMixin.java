@@ -58,7 +58,7 @@ public abstract class PlayerBlockDestroyCancelMixin {
         }
 
         BlockDestructionManager.reset();
-        level.gameEvent(DNLGameEvents.PLAYER_BLOCK_DESTROY_EARLY.get(), blockPos, GameEvent.Context.of(player, level.getBlockState(blockPos)));
+        level.gameEvent(DNLGameEvents.holder(DNLGameEvents.PLAYER_BLOCK_DESTROY_EARLY), blockPos, GameEvent.Context.of(player, level.getBlockState(blockPos)));
 
         var be = level.getBlockEntity(blockPos);
         if (be instanceof dev.hexnowloading.dungeonnowloading.block.entity.DuriteQuellerBlockEntity quellerBe) {

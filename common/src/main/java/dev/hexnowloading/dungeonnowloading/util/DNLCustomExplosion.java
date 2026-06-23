@@ -238,7 +238,7 @@ public final class DNLCustomExplosion {
         for (BlockPos blockPos : toBlow) {
             BlockState blockState = level.getBlockState(blockPos);
             ExplosionDestructionManager.reset();
-            level.gameEvent(null, DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION.get(), Vec3.atCenterOf(blockPos));
+            level.gameEvent(null, DNLGameEvents.holder(DNLGameEvents.BLOCK_DESTROYED_BY_EXPLOSION), Vec3.atCenterOf(blockPos));
             if (blockState.isAir() || ExplosionDestructionManager.shouldCancel(blockPos)) {
                 continue;
             }

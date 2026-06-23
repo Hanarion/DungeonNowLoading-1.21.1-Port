@@ -20,7 +20,7 @@ public abstract class ContainerMixin {
             at = @At("HEAD"), cancellable = true)
     private static void onDropContents(Level level, BlockPos pos, Container container, CallbackInfo ci) {
         if (level instanceof ServerLevel serverLevel) {
-            serverLevel.gameEvent(null, DNLGameEvents.BLOCK_CONTENT_DROPPING.get(), Vec3.atCenterOf(pos));
+            serverLevel.gameEvent(null, DNLGameEvents.holder(DNLGameEvents.BLOCK_CONTENT_DROPPING), Vec3.atCenterOf(pos));
         }
         if (ContainerDropManager.shouldCancel(pos)) {
             ContainerDropManager.reset();
