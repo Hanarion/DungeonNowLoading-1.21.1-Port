@@ -231,7 +231,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     @Override
     public boolean isFoil(ItemStack stack) {
         ItemStack storedTool = getStoredToolForCurrentForm(stack);
-        return !stack.getEnchantmentTags().isEmpty() || !storedTool.isEmpty() && storedTool.hasFoil();
+        return stack.isEnchanted() || !storedTool.isEmpty() && storedTool.hasFoil();
     }
 
     @Override
@@ -289,7 +289,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
     @Override
     public void onDestroyed(ItemEntity itemEntity) {
-        ItemUtils.onContainerDestroyed(itemEntity, getStoredItems(itemEntity.getItem()));
+        ItemUtils.onContainerDestroyed(itemEntity, (Iterable<ItemStack>) getStoredItems(itemEntity.getItem())::iterator);
     }
 
     public static boolean tryTransformToForm(ItemStack stack, Player player, InteractionHand hand, String targetForm) {
@@ -656,11 +656,11 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
     public static boolean isMimiclingFoil(ItemStack stack) {
         ItemStack storedTool = getStoredToolForCurrentForm(stack);
-        return !stack.getEnchantmentTags().isEmpty() || !storedTool.isEmpty() && storedTool.hasFoil();
+        return stack.isEnchanted() || !storedTool.isEmpty() && storedTool.hasFoil();
     }
 
     public static void onMimiclingDestroyed(ItemEntity itemEntity) {
-        ItemUtils.onContainerDestroyed(itemEntity, getStoredItems(itemEntity.getItem()));
+        ItemUtils.onContainerDestroyed(itemEntity, (Iterable<ItemStack>) getStoredItems(itemEntity.getItem())::iterator);
     }
 
     public static boolean tryScrollSelectedSlot(ItemStack stack, int delta) {
@@ -940,11 +940,11 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
         Tiers closest = Tiers.DIAMOND;
         double closestScore = Double.MAX_VALUE;
         for (Tiers candidate : Tiers.values()) {
-            double score = Math.abs(candidate.getLevel() - tier.getLevel()) * 100.0D
-                    + Math.abs(candidate.getSpeed() - tier.getSpeed())
+            // 1.21 removed Tier.getLevel()/getEnchantmentValue() from the interface; score the
+            // closest vanilla tier by the remaining measurable properties.
+            double score = Math.abs(candidate.getSpeed() - tier.getSpeed())
                     + Math.abs(candidate.getAttackDamageBonus() - tier.getAttackDamageBonus())
-                    + Math.abs(candidate.getUses() - tier.getUses()) / 1000.0D
-                    + Math.abs(candidate.getEnchantmentValue() - tier.getEnchantmentValue()) / 10.0D;
+                    + Math.abs(candidate.getUses() - tier.getUses()) / 1000.0D;
             if (score < closestScore) {
                 closest = candidate;
                 closestScore = score;
@@ -1483,7 +1483,17 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
     }
 
     private static int getToolTierLevel(ItemStack stack) {
-        return stack.getItem() instanceof TieredItem tieredItem ? tieredItem.getTier().getLevel() : -1;
+        // 1.21 removed Tier.getLevel(); approximate the old numeric mining level from the
+        // tier's progression. Vanilla Tiers map directly to their ordinal (WOOD..NETHERITE);
+        // other tiers fall back to their attack-damage bonus as a proxy.
+        if (!(stack.getItem() instanceof TieredItem tieredItem)) {
+            return -1;
+        }
+        net.minecraft.world.item.Tier tier = tieredItem.getTier();
+        if (tier instanceof Tiers tiers) {
+            return tiers.ordinal();
+        }
+        return Math.round(tier.getAttackDamageBonus());
     }
 
     private static int getBlockTieBreaker(String form) {
@@ -1497,9 +1507,12 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
     private static double getToolAttackDamage(ItemStack stack) {
         double attackDamage = 0.0D;
-        for (AttributeModifier modifier : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE)) {
-            if (modifier.getOperation() == AttributeModifier.Operation.ADD_VALUE) {
-                attackDamage += modifier.getAmount();
+        // 1.21: attribute modifiers live in the ITEM_ATTRIBUTE_MODIFIERS component;
+        // iterate its entries and AttributeModifier is now a record (operation()/amount()).
+        for (net.minecraft.world.item.component.ItemAttributeModifiers.Entry entry : stack.getOrDefault(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS, net.minecraft.world.item.component.ItemAttributeModifiers.EMPTY).modifiers()) {
+            if (entry.attribute().equals(Attributes.ATTACK_DAMAGE)
+                    && entry.modifier().operation() == AttributeModifier.Operation.ADD_VALUE) {
+                attackDamage += entry.modifier().amount();
             }
         }
         return attackDamage;
@@ -1518,7 +1531,7 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
             return;
         }
 
-        ListTag enchantments = storedTool.getEnchantmentTags().copy();
+        ListTag enchantments = enchantmentsToListTag(storedTool);
         MimiclingFoodEffects.applyTemporaryEnchantmentModifiers(stack, enchantments);
         if (enchantments.isEmpty()) {
             tag.remove("Enchantments");
@@ -1528,6 +1541,28 @@ public class MimiclingItem extends Item implements MimiclingFormItem {
 
         tag.put("Enchantments", enchantments);
         StackNbt.setTag(stack, tag);
+    }
+
+    /**
+     * 1.21 removed ItemStack.getEnchantmentTags(); enchantments live in the ENCHANTMENTS
+     * component. Rebuild the legacy {id, lvl} ListTag the temporary-modifier code expects.
+     */
+    private static ListTag enchantmentsToListTag(ItemStack stack) {
+        ListTag list = new ListTag();
+        net.minecraft.world.item.enchantment.ItemEnchantments enchantments = stack.getEnchantments();
+        for (net.minecraft.core.Holder<net.minecraft.world.item.enchantment.Enchantment> holder : enchantments.keySet()) {
+            net.minecraft.resources.ResourceLocation id = holder.unwrapKey()
+                    .map(net.minecraft.resources.ResourceKey::location)
+                    .orElse(null);
+            if (id == null) {
+                continue;
+            }
+            CompoundTag entry = new CompoundTag();
+            entry.putString("id", id.toString());
+            entry.putInt("lvl", enchantments.getLevel(holder));
+            list.add(entry);
+        }
+        return list;
     }
 
     private static void removeStaleAttributeModifierTags(ItemStack stack) {
