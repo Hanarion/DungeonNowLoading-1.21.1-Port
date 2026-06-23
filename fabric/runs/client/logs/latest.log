@@ -1,0 +1,115 @@
+[01:26:26] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.21.1 with Fabric Loader 0.16.5
+[01:26:26] [main/WARN] (FabricLoader/Resolution) Warnings were found!
+ - Mod 'Forge Config API Port' (forgeconfigapiport) 21.1.1 recommends any version of modmenu, which is missing!
+	 - You should install any version of modmenu for the optimal experience.
+[01:26:26] [main/INFO] (FabricLoader) Loading 59 mods:
+	- cardinal-components-base 6.1.3
+	- cardinal-components-entity 6.1.3
+	- cardinal-components-world 6.1.3
+	- dungeonnowloading 3.0
+	- fabric-api 0.102.0+1.21.1
+	- fabric-api-base 0.4.42+6573ed8cd1
+	- fabric-api-lookup-api-v1 1.6.68+b55973446a
+	- fabric-biome-api-v1 13.0.29+5bd9f1bc6a
+	- fabric-block-api-v1 1.0.22+0af3f5a76a
+	- fabric-block-view-api-v2 1.0.10+6573ed8c6a
+	- fabric-blockrenderlayer-v1 1.1.52+0af3f5a76a
+	- fabric-client-tags-api-v1 1.1.15+6573ed8c6a
+	- fabric-command-api-v1 1.2.49+f71b366f6a
+	- fabric-command-api-v2 2.2.28+6ced4dd96a
+	- fabric-commands-v0 0.2.66+df3654b36a
+	- fabric-content-registries-v0 8.0.16+b55973446a
+	- fabric-convention-tags-v1 2.0.19+7f945d5b6a
+	- fabric-convention-tags-v2 2.5.0+c5e2b5c66a
+	- fabric-crash-report-info-v1 0.2.29+0af3f5a76a
+	- fabric-data-attachment-api-v1 1.1.27+1daea2156a
+	- fabric-data-generation-api-v1 20.2.16+16c4ae256a
+	- fabric-dimensions-v1 4.0.0+6fc22b996a
+	- fabric-entity-events-v1 1.6.12+6fc22b996a
+	- fabric-events-interaction-v0 0.7.12+ba9dae066a
+	- fabric-game-rule-api-v1 1.0.53+6ced4dd96a
+	- fabric-gametest-api-v1 2.0.4+6fc22b996a
+	- fabric-item-api-v1 11.0.0+afdfc9216a
+	- fabric-item-group-api-v1 4.1.4+780172706a
+	- fabric-key-binding-api-v1 1.0.47+0af3f5a76a
+	- fabric-keybindings-v0 0.2.45+df3654b36a
+	- fabric-lifecycle-events-v1 2.3.12+6c1df3606a
+	- fabric-loot-api-v2 3.0.14+3f89f5a56a
+	- fabric-loot-api-v3 1.0.2+3f89f5a56a
+	- fabric-message-api-v1 6.0.13+6573ed8c6a
+	- fabric-model-loading-api-v1 2.0.0+fe474d6b6a
+	- fabric-networking-api-v1 4.2.2+60c3209b6a
+	- fabric-object-builder-api-v1 15.2.0+40875a936a
+	- fabric-particles-v1 4.0.2+6573ed8c6a
+	- fabric-recipe-api-v1 5.0.12+650897126a
+	- fabric-registry-sync-v0 5.1.2+60c3209b6a
+	- fabric-renderer-api-v1 3.4.0+c705a49c6a
+	- fabric-renderer-indigo 1.7.0+c705a49c6a
+	- fabric-renderer-registries-v1 3.2.68+df3654b36a
+	- fabric-rendering-data-attachment-v1 0.3.48+73761d2e6a
+	- fabric-rendering-fluids-v1 3.1.6+1daea2156a
+	- fabric-rendering-v0 1.1.71+df3654b36a
+	- fabric-rendering-v1 5.0.5+df16efd06a
+	- fabric-resource-conditions-api-v1 4.3.0+8dc279b16a
+	- fabric-resource-loader-v0 1.3.0+565991296a
+	- fabric-screen-api-v1 2.0.24+b55973446a
+	- fabric-screen-handler-api-v1 1.3.86+b55973446a
+	- fabric-sound-api-v1 1.0.23+6573ed8c6a
+	- fabric-transfer-api-v1 5.1.16+3dccd3436a
+	- fabric-transitive-access-wideners-v1 6.1.0+1daea2156a
+	- fabricloader 0.16.5
+	- forgeconfigapiport 21.1.1
+	- java 21
+	- minecraft 1.21.1
+	- mixinextras 0.4.1
+[01:26:26] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/home/landry/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.3+mixin.0.8.7/51ee0a44ab05f6fddd66b09e66b3a16904f9c55d/sponge-mixin-0.15.3+mixin.0.8.7.jar Service=Knot/Fabric Env=CLIENT
+[01:26:26] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
+[01:26:26] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_17
+[01:26:26] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_21
+[01:26:26] [main/WARN] (FabricLoader/Mixin) Reference map 'forgeconfigapiport.common.refmap.json' for forgeconfigapiport.common.mixins.json could not be read. If this is a development environment you can ignore this message
+[01:26:27] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
+[01:26:28] [Datafixer Bootstrap/INFO] (Minecraft) 226 Datafixer optimizations took 219 milliseconds
+[01:26:31] [main/ERROR] (FabricLoader/Mixin) Mixin apply for mod dungeonnowloading failed dungeonnowloading.fabric.mixins.json:items.ItemStackBreakProtectionMixin from mod dungeonnowloading -> net.minecraft.world.item.ItemStack: org.spongepowered.asm.mixin.injection.throwables.InvalidInjectionException Invalid descriptor on dungeonnowloading.fabric.mixins.json:items.ItemStackBreakProtectionMixin from mod dungeonnowloading->@Inject::dnl$convertToScrapOnBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V! Expected (ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Ljava/util/function/Consumer;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V but found (ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V [INJECT_APPLY Applicator Phase -> dungeonnowloading.fabric.mixins.json:items.ItemStackBreakProtectionMixin from mod dungeonnowloading -> Apply Injections ->  -> Inject -> dungeonnowloading.fabric.mixins.json:items.ItemStackBreakProtectionMixin from mod dungeonnowloading->@Inject::dnl$convertToScrapOnBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V]
+org.spongepowered.asm.mixin.injection.throwables.InvalidInjectionException: Invalid descriptor on dungeonnowloading.fabric.mixins.json:items.ItemStackBreakProtectionMixin from mod dungeonnowloading->@Inject::dnl$convertToScrapOnBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V! Expected (ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Ljava/util/function/Consumer;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V but found (ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V [INJECT_APPLY Applicator Phase -> dungeonnowloading.fabric.mixins.json:items.ItemStackBreakProtectionMixin from mod dungeonnowloading -> Apply Injections ->  -> Inject -> dungeonnowloading.fabric.mixins.json:items.ItemStackBreakProtectionMixin from mod dungeonnowloading->@Inject::dnl$convertToScrapOnBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V]
+	at org.spongepowered.asm.mixin.injection.callback.CallbackInjector.inject(CallbackInjector.java:560) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.injection.callback.CallbackInjector.inject(CallbackInjector.java:490) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.injection.code.Injector.inject(Injector.java:284) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.injection.struct.InjectionInfo.inject(InjectionInfo.java:508) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.MixinTargetContext.applyInjections(MixinTargetContext.java:1483) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.MixinApplicatorStandard.applyInjections(MixinApplicatorStandard.java:752) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.MixinApplicatorStandard.applyMixin(MixinApplicatorStandard.java:330) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.MixinApplicatorStandard.apply(MixinApplicatorStandard.java:246) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.TargetClassContext.apply(TargetClassContext.java:437) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.TargetClassContext.applyMixins(TargetClassContext.java:418) ~[sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.MixinProcessor.applyMixins(MixinProcessor.java:363) [sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.MixinTransformer.transformClass(MixinTransformer.java:234) [sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at org.spongepowered.asm.mixin.transformer.MixinTransformer.transformClassBytes(MixinTransformer.java:202) [sponge-mixin-0.15.3+mixin.0.8.7.jar:0.15.3+mixin.0.8.7]
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.getPostMixinClassByteArray(KnotClassDelegate.java:422) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.tryLoadClass(KnotClassDelegate.java:323) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.loadClass(KnotClassDelegate.java:218) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.KnotClassLoader.loadClass(KnotClassLoader.java:119) [fabric-loader-0.16.5.jar:?]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526) [?:?]
+	at net.minecraft.core.cauldron.CauldronInteraction.newInteractionMap(CauldronInteraction.java:47) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.core.cauldron.CauldronInteraction.<clinit>(CauldronInteraction.java:40) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.world.level.block.CauldronBlock.<init>(CauldronBlock.java:25) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.world.level.block.Blocks.<clinit>(Blocks.java:480) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.world.level.block.FireBlock.bootStrap(FireBlock.java:336) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.server.Bootstrap.bootStrap(Bootstrap.java:52) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.client.main.Main.main(Main.java:130) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:480) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86) [dev-launch-injector-0.2.1+build.8.jar:?]
+[01:26:32] [main/WARN] (Minecraft) Failed to get system info for GL Caps
+java.lang.IllegalStateException: Rendersystem called from wrong thread
+	at com.mojang.blaze3d.systems.RenderSystem.constructThreadException(RenderSystem.java:140) ~[minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at com.mojang.blaze3d.systems.RenderSystem.assertOnRenderThread(RenderSystem.java:135) ~[minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at com.mojang.blaze3d.systems.RenderSystem.getCapsString(RenderSystem.java:527) ~[minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.SystemReport.setDetail(SystemReport.java:70) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.client.Minecraft.fillSystemReport(Minecraft.java:2547) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.client.Minecraft.fillReport(Minecraft.java:2517) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.minecraft.client.main.Main.main(Main.java:210) [minecraft-merged-37d47de048-1.21.1-loom.mappings.1_21_1.layered+hash.288375958-v2.jar:?]
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:480) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23) [fabric-loader-0.16.5.jar:?]
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86) [dev-launch-injector-0.2.1+build.8.jar:?]

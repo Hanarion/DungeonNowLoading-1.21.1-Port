@@ -20,13 +20,12 @@ import java.util.function.Consumer;
 @Mixin(ItemStack.class)
 public abstract class ItemStackBreakProtectionMixin {
 
-    // 1.21 NeoForge: the actual break logic (the shrink(1) call) lives in the
-    // hurtAndBreak(int, ServerLevel, LivingEntity, Consumer) overload; the ServerPlayer
-    // overload just delegates to it. Target the LivingEntity one so the @At INVOKE binds.
-    @Inject(method = "hurtAndBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V",
+    // 1.21: target the hurtAndBreak(int, ServerLevel, ServerPlayer, Consumer) overload. This overload
+    // exists on BOTH vanilla (Fabric) and NeoForge, and contains the shrink(1) break call (NeoForge
+    // also has a LivingEntity overload, but vanilla does not — targeting that breaks Fabric).
+    @Inject(method = "hurtAndBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Ljava/util/function/Consumer;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"), cancellable = true)
-    private void dnl$convertToScrapOnBreak(int amount, ServerLevel serverLevel, net.minecraft.world.entity.LivingEntity entity, Consumer<Item> onBroken, CallbackInfo ci) {
-        ServerPlayer player = entity instanceof ServerPlayer sp ? sp : null;
+    private void dnl$convertToScrapOnBreak(int amount, ServerLevel serverLevel, ServerPlayer player, Consumer<Item> onBroken, CallbackInfo ci) {
         ItemStack self = (ItemStack)(Object)this;
         if (!self.isDamageableItem()) return;
         if (MimiclingItem.tryTransformBrokenToolFormToBase(self, player)) {
