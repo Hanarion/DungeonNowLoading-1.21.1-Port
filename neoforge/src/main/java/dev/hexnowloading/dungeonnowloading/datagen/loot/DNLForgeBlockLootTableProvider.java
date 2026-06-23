@@ -58,6 +58,20 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
+        // Default first: every registered DNL block needs a loot table or 1.21 datagen validation
+        // fails ("Missing loottable ..."). Blocks with a BlockItem drop themselves; blocks without
+        // an item (e.g. mounted rails using a vanilla item) get an explicit no-drop table. Blocks
+        // marked .noLootTable() (EMPTY sentinel) are left alone. Explicit entries below override.
+        net.minecraft.resources.ResourceLocation empty = net.minecraft.world.level.storage.loot.BuiltInLootTables.EMPTY.location();
+        for (Block block : getKnownBlocks()) {
+            if (block.getLootTable().location().equals(empty)) continue;        // .noLootTable()
+            if (Item.byBlock(block) == Items.AIR) {
+                this.add(block, noDrop());                                     // no BlockItem -> drops nothing
+            } else {
+                this.dropSelf(block);
+            }
+        }
+
         this.dropSelf(DNLBlocks.COILING_STONE_PILLAR.get());
         this.dropSelf(DNLBlocks.COILING_STONE_PILLAR_STAIRS.get());
         this.add(DNLBlocks.COILING_STONE_PILLAR_SLAB.get(), block -> createSlabItemTable(DNLBlocks.COILING_STONE_PILLAR_SLAB.get()));

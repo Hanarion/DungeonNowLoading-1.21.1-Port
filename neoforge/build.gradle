@@ -26,7 +26,12 @@ neoForge {
         data {
             data()
             // DataGen: "./gradlew :neoforge:runData"
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            // Textures/models the providers reference live in :common's resources (the neoforge
+            // sourceset has none), so add common's resource dir as an --existing source.
+            programArguments.addAll '--mod', project.mod_id, '--all',
+                    '--output', file('src/generated/resources/').getAbsolutePath(),
+                    '--existing', file('src/main/resources/').getAbsolutePath(),
+                    '--existing', rootProject.file('common/src/main/resources/').getAbsolutePath()
         }
         server {
             server()
