@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.command;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -137,14 +138,18 @@ public final class StatueCommand {
         CompoundTag tag = StackNbt.getOrCreateTag(stack);
 
         if (owner != null) {
-            CompoundTag ownerTag = new CompoundTag();
-            NbtUtils.writeGameProfile(ownerTag, owner);
-            tag.put("Owner", ownerTag);
+            net.minecraft.world.item.component.ResolvableProfile.CODEC
+                    .encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, new net.minecraft.world.item.component.ResolvableProfile(owner))
+                    .result()
+                    .ifPresent(ownerTag -> tag.put("Owner", ownerTag));
 
             if (owner.getName() != null && !owner.getName().isBlank()) {
                 tag.putString("SkullOwner", owner.getName()); // for item display name
             } else if (owner.getId() != null) {
-                tag.put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), owner));
+                net.minecraft.world.item.component.ResolvableProfile.CODEC
+                        .encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, new net.minecraft.world.item.component.ResolvableProfile(owner))
+                        .result()
+                        .ifPresent(t -> tag.put("SkullOwner", t));
             }
         } else {
             tag.putString("SkullOwner", "MHF_Alex");

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item.blockitem;
 
+import dev.hexnowloading.dungeonnowloading.util.ProfileNbt;
 import com.mojang.authlib.GameProfile;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.nbt.CompoundTag;
@@ -52,11 +53,11 @@ public class PlayerStatueBlockItem extends BlockItem {
             return tag.getString("SkullOwner");
         }
         if (tag.contains("Owner", 10)) { // compound
-            GameProfile gp = NbtUtils.readGameProfile(tag.getCompound("Owner"));
+            GameProfile gp = ProfileNbt.read(tag.getCompound("Owner"));
             if (gp != null && gp.getName() != null) return gp.getName();
         }
         if (tag.contains("SkullOwner", 10)) { // compound
-            GameProfile gp = NbtUtils.readGameProfile(tag.getCompound("SkullOwner"));
+            GameProfile gp = ProfileNbt.read(tag.getCompound("SkullOwner"));
             if (gp != null && gp.getName() != null) return gp.getName();
         }
         return null;

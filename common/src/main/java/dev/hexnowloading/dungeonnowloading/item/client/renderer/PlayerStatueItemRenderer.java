@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item.client.renderer;
 
+import dev.hexnowloading.dungeonnowloading.util.ProfileNbt;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.hexnowloading.dungeonnowloading.block.PlayerStatueBlock;
@@ -49,7 +50,7 @@ public class PlayerStatueItemRenderer extends BlockEntityWithoutLevelRenderer {
 
         GameProfile gp = null;
         if (tag != null) {
-            if (tag.contains("Owner", 10)) gp = NbtUtils.readGameProfile(tag.getCompound("Owner"));
+            if (tag.contains("Owner", 10)) gp = ProfileNbt.read(tag.getCompound("Owner"));
             else if (tag.contains("SkullOwner", 8)) gp = new GameProfile(null, tag.getString("SkullOwner"));
             if (tag.contains("DNL_Pose", 3))  be.setPoseVariant(tag.getInt("DNL_Pose"));
             if (tag.contains("DNL_Notch", 8)) be.setNotchTier(

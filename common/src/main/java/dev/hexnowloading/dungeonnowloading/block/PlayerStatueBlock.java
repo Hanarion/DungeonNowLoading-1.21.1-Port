@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import dev.hexnowloading.dungeonnowloading.util.ProfileNbt;
 import com.mojang.authlib.GameProfile;
 import dev.hexnowloading.dungeonnowloading.block.entity.PlayerStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CPedestalOpenEditorPacket;
@@ -136,17 +137,17 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
         CompoundTag tag = StackNbt.getTag(stack);
 
         if (tag != null) {
-            if (tag.contains("Owner", 10)) gp = NbtUtils.readGameProfile(tag.getCompound("Owner"));
-            else if (tag.contains("SkullOwner", 10)) gp = NbtUtils.readGameProfile(tag.getCompound("SkullOwner"));
+            if (tag.contains("Owner", 10)) gp = ProfileNbt.read(tag.getCompound("Owner"));
+            else if (tag.contains("SkullOwner", 10)) gp = ProfileNbt.read(tag.getCompound("SkullOwner"));
             else if (tag.contains("SkullOwner", 8))  gp = new GameProfile(null, tag.getString("SkullOwner"));
         }
 
         // Owner / SkullOwner
         /*if (tag != null) {
             if (tag.contains("Owner", 10)) {
-                gp = NbtUtils.readGameProfile(tag.getCompound("Owner"));
+                gp = ProfileNbt.read(tag.getCompound("Owner"));
             } else if (tag.contains("SkullOwner", 10)) {
-                gp = NbtUtils.readGameProfile(tag.getCompound("SkullOwner"));
+                gp = ProfileNbt.read(tag.getCompound("SkullOwner"));
             } else if (tag.contains("SkullOwner", 8)) {
                 gp = new GameProfile(null, tag.getString("SkullOwner"));
             }
@@ -356,7 +357,7 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
                 StackNbt.update(stack, t -> t.putString("SkullOwner", gp.getName()));
             } else if (gp != null) {
                 // fallback to compound if name unknown
-                StackNbt.update(stack, t -> t.put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gp)));
+                StackNbt.update(stack, t -> t.put("SkullOwner", ProfileNbt.write(gp)));
             }
             StackNbt.update(stack, t -> t.putInt("DNL_Pose", statue.getPoseVariant()));
             StackNbt.update(stack, t -> t.putString("DNL_Notch", statue.getNotchTier().name()));

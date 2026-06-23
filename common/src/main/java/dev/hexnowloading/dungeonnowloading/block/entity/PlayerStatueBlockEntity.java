@@ -207,7 +207,7 @@ public class PlayerStatueBlockEntity extends BlockEntity {
 
         // Back-compat: if a legacy "Offering" tag exists, derive the tier once.
         if (this.notchTier == NotchTier.NONE && tag.contains("Offering", 10)) {
-            ItemStack legacy = ItemStack.of(tag.getCompound("Offering"));
+            ItemStack legacy = ItemStack.parseOptional(registries, tag.getCompound("Offering"));
             NotchTier legacyTier = tierFromItem(legacy);
             if (legacyTier != NotchTier.NONE) this.notchTier = legacyTier;
         }
