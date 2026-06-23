@@ -267,7 +267,7 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected float getGravity() {
+    protected double getDefaultGravity() {
         return GRAVITY;
     }
 
@@ -581,10 +581,10 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
             return false;
         }
 
-        CompoundTag tag = furnace.saveWithoutMetadata();
+        CompoundTag tag = furnace.saveWithoutMetadata(server.registryAccess());
         int burnTime = Math.min(Short.MAX_VALUE, tag.getShort("BurnTime") + FURNACE_BLOCK_FUEL_TICKS);
         tag.putShort("BurnTime", (short) burnTime);
-        furnace.load(tag);
+        furnace.loadWithComponents(tag, server.registryAccess());
         furnace.setChanged();
 
         BlockState state = server.getBlockState(blockPos);
@@ -712,15 +712,15 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
             return false;
         }
 
-        SimpleContainer container = new SimpleContainer(input);
+        net.minecraft.world.item.crafting.SingleRecipeInput recipeInput = new net.minecraft.world.item.crafting.SingleRecipeInput(input);
         return server.getRecipeManager()
-                .getRecipeFor(RecipeType.SMELTING, container, server)
-                .map(recipe -> this.applyBlockSmeltingTransform(server, blockPos, container, recipe))
+                .getRecipeFor(RecipeType.SMELTING, recipeInput, server)
+                .map(recipe -> this.applyBlockSmeltingTransform(server, blockPos, recipeInput, recipe.value()))
                 .orElse(false);
     }
 
-    protected boolean applyBlockSmeltingTransform(ServerLevel server, BlockPos blockPos, SimpleContainer container, SmeltingRecipe recipe) {
-        ItemStack result = recipe.assemble(container, server.registryAccess());
+    protected boolean applyBlockSmeltingTransform(ServerLevel server, BlockPos blockPos, net.minecraft.world.item.crafting.SingleRecipeInput recipeInput, SmeltingRecipe recipe) {
+        ItemStack result = recipe.assemble(recipeInput, server.registryAccess());
         if (result.isEmpty()) {
             return false;
         }
@@ -778,11 +778,11 @@ public class WispProjectileEntity extends ThrowableItemProjectile {
 
         ItemStack singleInput = input.copy();
         singleInput.setCount(1);
-        SimpleContainer container = new SimpleContainer(singleInput);
+        net.minecraft.world.item.crafting.SingleRecipeInput recipeInput = new net.minecraft.world.item.crafting.SingleRecipeInput(singleInput);
         return server.getRecipeManager()
-                .getRecipeFor(RecipeType.SMELTING, container, server)
+                .getRecipeFor(RecipeType.SMELTING, recipeInput, server)
                 .map(recipe -> {
-                    ItemStack result = recipe.assemble(container, server.registryAccess());
+                    ItemStack result = recipe.value().assemble(recipeInput, server.registryAccess());
                     if (result.isEmpty()) {
                         return ItemStack.EMPTY;
                     }

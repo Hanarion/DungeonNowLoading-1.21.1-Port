@@ -93,7 +93,7 @@ public class WebSpitProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected float getGravity() {
+    protected double getDefaultGravity() {
         return GRAVITY;
     }
 

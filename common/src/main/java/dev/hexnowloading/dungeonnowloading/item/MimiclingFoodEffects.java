@@ -285,10 +285,10 @@ public final class MimiclingFoodEffects {
             return false;
         }
 
-        SimpleContainer container = new SimpleContainer(input);
+        net.minecraft.world.item.crafting.SingleRecipeInput recipeInput = new net.minecraft.world.item.crafting.SingleRecipeInput(input);
         boolean transformed = level.getRecipeManager()
-                .getRecipeFor(RecipeType.SMELTING, container, level)
-                .map(recipe -> applyBlockSmeltingTransform(level, pos, tool, container, recipe))
+                .getRecipeFor(RecipeType.SMELTING, recipeInput, level)
+                .map(recipe -> applyBlockSmeltingTransform(level, pos, tool, recipeInput, recipe.value()))
                 .orElse(false);
         if (transformed) {
             consumeAutoSmeltUsage(tool, true);
@@ -381,10 +381,10 @@ public final class MimiclingFoodEffects {
             return false;
         }
 
-        SimpleContainer container = new SimpleContainer(stack.copyWithCount(1));
+        net.minecraft.world.item.crafting.SingleRecipeInput recipeInput = new net.minecraft.world.item.crafting.SingleRecipeInput(stack.copyWithCount(1));
         return level.getRecipeManager()
-                .getRecipeFor(RecipeType.SMELTING, container, level)
-                .map(recipe -> !recipe.getResultItem(level.registryAccess()).isEmpty())
+                .getRecipeFor(RecipeType.SMELTING, recipeInput, level)
+                .map(recipe -> !recipe.value().getResultItem(level.registryAccess()).isEmpty())
                 .orElse(false);
     }
 
@@ -1598,8 +1598,8 @@ public final class MimiclingFoodEffects {
         return state.is(BlockTags.GOLD_ORES);
     }
 
-    private static boolean applyBlockSmeltingTransform(ServerLevel level, BlockPos pos, ItemStack tool, SimpleContainer container, SmeltingRecipe recipe) {
-        ItemStack result = recipe.assemble(container, level.registryAccess());
+    private static boolean applyBlockSmeltingTransform(ServerLevel level, BlockPos pos, ItemStack tool, net.minecraft.world.item.crafting.SingleRecipeInput recipeInput, SmeltingRecipe recipe) {
+        ItemStack result = recipe.assemble(recipeInput, level.registryAccess());
         if (result.isEmpty() || !(result.getItem() instanceof BlockItem blockItem)) {
             return false;
         }
@@ -1633,11 +1633,12 @@ public final class MimiclingFoodEffects {
             return originalDrops;
         }
 
-        SimpleContainer container = new SimpleContainer(new ItemStack(state.getBlock()));
-        AbstractCookingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, level).orElse(null);
-        if (recipe == null) {
+        net.minecraft.world.item.crafting.SingleRecipeInput recipeInput = new net.minecraft.world.item.crafting.SingleRecipeInput(new ItemStack(state.getBlock()));
+        var recipeHolder = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, recipeInput, level).orElse(null);
+        if (recipeHolder == null) {
             return originalDrops;
         }
+        AbstractCookingRecipe recipe = recipeHolder.value();
 
         ItemStack result = recipe.getResultItem(level.registryAccess()).copy();
         if (result.isEmpty() || !(result.getItem() instanceof BlockItem)) {
