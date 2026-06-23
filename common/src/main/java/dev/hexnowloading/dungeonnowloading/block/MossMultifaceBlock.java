@@ -59,7 +59,7 @@ public class MossMultifaceBlock extends MultifaceBlock implements BonemealableBl
     }
 
     @Override
-    public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState, boolean b) {
+    public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
         return Direction.stream().anyMatch((p_153316_) -> {
             return this.spreader.canSpreadInAnyDirection(blockState, levelReader, blockPos, p_153316_.getOpposite());
         });

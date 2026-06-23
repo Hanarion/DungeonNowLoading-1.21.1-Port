@@ -126,7 +126,7 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
                 Math.max(a.getZ(), b.getZ()) + 1
         );
 
-        return new AABB(min, max).inflate(inflate);
+        return new AABB(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ()).inflate(inflate);
     }
 
     private void tickSpawnTasks(ServerLevel server) {

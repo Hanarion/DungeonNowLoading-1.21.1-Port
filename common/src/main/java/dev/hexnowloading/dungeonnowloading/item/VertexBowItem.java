@@ -60,7 +60,7 @@ public class VertexBowItem extends BowItem {
                         if (useVertexArrow) {
                             arrow = new VertexArrowProjectileEntity(level, player);
                         } else {
-                            arrow = arrowItem.createArrow(level, projectile, player);
+                            arrow = arrowItem.createArrow(level, projectile, player, itemStack);
                         }
 
                         arrow.setBaseDamage(arrow.getBaseDamage() * 0.75);
@@ -75,10 +75,8 @@ public class VertexBowItem extends BowItem {
                             arrow.setBaseDamage(arrow.getBaseDamage() + (double)powerLevel * 0.5 + 0.5);
                         }
 
-                        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.PUNCH), itemStack);
-                        if (punchLevel > 0) {
-                            arrow.setKnockback(punchLevel);
-                        }
+                        // 1.21 removed AbstractArrow.setKnockback(int); Punch knockback now
+                        // applies automatically from the firing weapon (passed to createArrow).
 
                         if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.FLAME), itemStack) > 0) {
                             arrow.igniteForSeconds(100);
