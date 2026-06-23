@@ -1,6 +1,6 @@
 {
   "config": {
-    "entity_type": "minecraft:hollow"
+    "entity_type": "dungeonnowloading:hollow"
   },
   "type": "dungeonnowloading:generic_mob"
 }

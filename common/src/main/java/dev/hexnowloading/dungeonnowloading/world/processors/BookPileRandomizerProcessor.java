@@ -24,7 +24,20 @@ public class BookPileRandomizerProcessor extends StructureProcessor {
             RecordCodecBuilder.mapCodec(inst -> inst.group(
                     ResourceLocation.CODEC.listOf().fieldOf("loot_tables").forGetter(p -> p.lootTables),
                     Codec.BOOL.optionalFieldOf("write_seed", true).forGetter(p -> p.writeSeed),
-                    Codec.unboundedMap(Codec.INT, Codec.INT)
+                    // 1.21: unboundedMap(Codec.INT, ...) no longer accepts JSON object string keys
+                    // ("Not a number: \"4\""). Parse string-keyed object and convert to Integer keys.
+                    Codec.unboundedMap(Codec.STRING, Codec.INT)
+                            .xmap(
+                                    m -> {
+                                        java.util.Map<Integer, Integer> out = new java.util.HashMap<>();
+                                        m.forEach((k, v) -> out.put(Integer.parseInt(k), v));
+                                        return out;
+                                    },
+                                    m -> {
+                                        java.util.Map<String, Integer> out = new java.util.HashMap<>();
+                                        m.forEach((k, v) -> out.put(String.valueOf(k), v));
+                                        return out;
+                                    })
                             .optionalFieldOf("pile_weights", java.util.Map.of(1,1,2,1,3,1,4,1))
                             .forGetter(p -> p.pileWeights)
             ).apply(inst, BookPileRandomizerProcessor::new));
