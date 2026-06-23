@@ -99,8 +99,8 @@ public class WispwardChestBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (player.getItemInHand(hand).is(DNLItems.ZONE_WAND.get())) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (player.getMainHandItem().is(DNLItems.ZONE_WAND.get()) || player.getOffhandItem().is(DNLItems.ZONE_WAND.get())) {
             return InteractionResult.PASS;
         }
 

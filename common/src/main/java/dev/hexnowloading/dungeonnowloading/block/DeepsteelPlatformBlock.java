@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import net.minecraft.world.item.ItemStack;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
@@ -76,9 +77,11 @@ public class DeepsteelPlatformBlock extends HorizontalDirectionalBlock implement
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         InteractionResult mountedRail = DeepsteelRailMounts.tryMountRail(state, level, pos, player, hand);
-        return mountedRail.consumesAction() ? mountedRail : super.use(state, level, pos, player, hand, hit);
+        return mountedRail.consumesAction()
+                ? net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide)
+                : net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override

@@ -222,10 +222,9 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
         }
     }
 
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        ItemStack held = player.getItemInHand(hand);
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack held, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!held.is(Items.FLINT_AND_STEEL) && !held.is(Items.FIRE_CHARGE)) {
-            return super.use(state, level, pos, player, hand, hit);
+            return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         } else {
             this.onImmediateTrigger(level, pos, player, TriggerCause.GENTLY_LIT_ON_FIRE);
             if (!player.isCreative()) {
@@ -235,7 +234,7 @@ public abstract class GenericExplosiveBarrelBlock extends FallingBlock implement
                     held.shrink(1);
                 }
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
     }
 

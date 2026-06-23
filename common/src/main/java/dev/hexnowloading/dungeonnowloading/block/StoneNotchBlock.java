@@ -37,8 +37,7 @@ public class StoneNotchBlock extends Block {
     }
 
     @Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
-        ItemStack itemInHand = player.getItemInHand(hand);
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack itemInHand, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
         if (itemInHand.is(DNLTags.STONE_NOTCH_MATERIAL)) {
             if (blockState.is(DNLBlocks.STONE_NOTCH.get())) {
                 playSound(level, blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM);
@@ -47,18 +46,18 @@ public class StoneNotchBlock extends Block {
                 if (!player.getAbilities().instabuild) {
                     itemInHand.shrink(1);
                 }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
             } else {
-                return popOutMaterial(level, blockState, blockPos) ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
+                return popOutMaterial(level, blockState, blockPos) ? net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide) : net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
         }
         if (itemInHand.isEmpty()) {
             if (blockState.is(DNLBlocks.STONE_NOTCH.get())) {
-                return InteractionResult.PASS;
+                return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
-            return popOutMaterial(level, blockState, blockPos) ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
+            return popOutMaterial(level, blockState, blockPos) ? net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide) : net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        return InteractionResult.PASS;
+        return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     private void setNotchBlock(Item item, Level level, BlockPos blockPos) {

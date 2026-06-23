@@ -97,20 +97,14 @@ public class WebCarpetBlock extends MultifaceBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state,
-                                 Level level,
-                                 BlockPos pos,
-                                 Player player,
-                                 InteractionHand hand,
-                                 BlockHitResult hit) {
-        ItemStack stack = player.getItemInHand(hand);
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 
         boolean isIgniter =
                 stack.is(Items.FLINT_AND_STEEL) ||
                         stack.is(Items.FIRE_CHARGE);
 
         if (!isIgniter) {
-            return super.use(state, level, pos, player, hand, hit);
+            return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
@@ -125,7 +119,7 @@ public class WebCarpetBlock extends MultifaceBlock {
             }
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
     // --- Slowing ---
