@@ -82,7 +82,10 @@ public class GenericJigsawStructure extends Structure {
                         blockPos,
                         false,
                         this.projectStartToHeightmap,
-                        this.maxDistanceFromCenter);
+                        this.maxDistanceFromCenter,
+                        net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup.EMPTY,
+                        net.minecraft.world.level.levelgen.structure.pools.DimensionPadding.ZERO,
+                        net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings.APPLY_WATERLOGGING);
         return structurePiecesGenerator.map(generationStub -> this.addExtraSurfacePieces(context, generationStub));
     }
 
@@ -110,7 +113,10 @@ public class GenericJigsawStructure extends Structure {
                 new BlockPos(centerX, surfaceY, centerZ),
                 false,
                 Optional.empty(),
-                this.extraSurfaceMaxDistanceFromCenter
+                this.extraSurfaceMaxDistanceFromCenter,
+                net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup.EMPTY,
+                net.minecraft.world.level.levelgen.structure.pools.DimensionPadding.ZERO,
+                net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings.APPLY_WATERLOGGING
         ).ifPresent(surfaceStub -> surfaceStub.getPiecesBuilder().build().pieces().forEach(piecesBuilder::addPiece));
         return new GenerationStub(generationStub.position(), Either.right(piecesBuilder));
     }
