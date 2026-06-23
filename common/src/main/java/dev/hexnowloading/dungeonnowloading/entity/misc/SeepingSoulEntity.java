@@ -458,14 +458,14 @@ public class SeepingSoulEntity extends Entity {
         if (recallItemStack != null && !recallItemStack.isEmpty()) {
 
             // Check Nullification first (it overrides everything)
-            int nullifyLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(this.level(), DNLEnchantments.NULLIFICATION), recallItemStack);
+            int nullifyLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(dev.hexnowloading.dungeonnowloading.DungeonNowLoading.registryAccess(), DNLEnchantments.NULLIFICATION), recallItemStack);
 
             if (nullifyLevel > 0) {
                 modifiedDefeatedCount = 0;
             } else {
 
                 // Apply Amplification bonus
-                int ampLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(this.level(), DNLEnchantments.AMPLIFICATION), recallItemStack);
+                int ampLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(dev.hexnowloading.dungeonnowloading.DungeonNowLoading.registryAccess(), DNLEnchantments.AMPLIFICATION), recallItemStack);
 
                 if (ampLevel > 0) {
                     modifiedDefeatedCount = defeatedCount + ampLevel;

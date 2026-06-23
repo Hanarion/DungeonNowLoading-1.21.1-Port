@@ -734,7 +734,7 @@ public class FairkeeperSerpentCallerEntity extends Entity {
         if (greatBottleItem == null) return;
 
         // Split into max stack sizes
-        int max = greatBottleItem.getMaxStackSize(); // typically 64
+        int max = greatBottleItem.getDefaultMaxStackSize(); // typically 64
         while (total > 0) {
             int n = Math.min(total, max);
             ItemStack stack = new ItemStack(greatBottleItem, n);
