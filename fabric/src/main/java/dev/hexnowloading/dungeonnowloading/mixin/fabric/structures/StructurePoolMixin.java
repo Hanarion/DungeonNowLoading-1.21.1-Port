@@ -15,8 +15,10 @@ public class StructurePoolMixin {
      * @return - The higher weight that is a more reasonable limit.
      */
     @ModifyConstant(
-            // 1.21 Mojmap: the weight-limit logic lives in StructureTemplatePool's static codec lambda.
-            method = "lambda$static$1",
+            // Fabric loom dev + production use intermediary names at runtime; the 150 weight-limit
+            // lives in StructureTemplatePool.method_28886 (the codec-builder method). require=0 as a
+            // safety net if the name shifts.
+            method = "method_28886",
             constant = @Constant(intValue = 150),
             remap = false,
             require = 0
