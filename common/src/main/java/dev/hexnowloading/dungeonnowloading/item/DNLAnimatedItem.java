@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

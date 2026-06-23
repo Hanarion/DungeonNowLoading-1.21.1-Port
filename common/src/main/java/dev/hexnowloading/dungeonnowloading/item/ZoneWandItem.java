@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

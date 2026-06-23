@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item.client;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.item.DNLAnimatedItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;

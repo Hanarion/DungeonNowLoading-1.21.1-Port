@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.boss;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import net.minecraft.core.Holder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;

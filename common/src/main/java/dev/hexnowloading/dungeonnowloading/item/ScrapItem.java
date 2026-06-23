@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.util.ItemNbt;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.registries.BuiltInRegistries;

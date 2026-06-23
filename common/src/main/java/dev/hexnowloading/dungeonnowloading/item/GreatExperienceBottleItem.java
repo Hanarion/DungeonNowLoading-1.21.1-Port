@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.entity.misc.GreatExperienceBottleEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;

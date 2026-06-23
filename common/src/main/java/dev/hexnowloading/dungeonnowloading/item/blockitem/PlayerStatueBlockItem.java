@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item.blockitem;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.util.ProfileNbt;
 import com.mojang.authlib.GameProfile;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;

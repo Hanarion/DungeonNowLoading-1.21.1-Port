@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.monster;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.entity.ai.spawner_carrier.SpawnerCarrierApproachAndSmashGoal;
 import dev.hexnowloading.dungeonnowloading.entity.ai.spawner_carrier.SpawnerCarrierHurtByTargetGoal;

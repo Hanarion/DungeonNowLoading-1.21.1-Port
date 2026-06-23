@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item.client.renderer;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.util.ProfileNbt;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.entity.misc;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;

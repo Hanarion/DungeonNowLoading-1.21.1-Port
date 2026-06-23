@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import net.minecraft.world.item.Item;
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.config.PvpConfig;

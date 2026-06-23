@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import dev.hexnowloading.dungeonnowloading.entity.passive.SealedChaosEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
