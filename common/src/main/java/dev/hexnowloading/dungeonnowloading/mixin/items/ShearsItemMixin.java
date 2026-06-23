@@ -35,19 +35,7 @@ public abstract class ShearsItemMixin {
         cir.setReturnValue(true);
     }
 
-    @Inject(method = "isCorrectToolForDrops", at = @At("HEAD"), cancellable = true)
-    private void dnl$isCorrectToolForWebCarpet(BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if (state.is(DNLBlocks.WEB_CARPET.get())) {
-            cir.setReturnValue(true);
-        }
-    }
-    
-    @Inject(method = "getDestroySpeed", at = @At("HEAD"), cancellable = true)
-    private void dnl$destroySpeedForWebCarpet(ItemStack stack,
-                                              BlockState state,
-                                              CallbackInfoReturnable<Float> cir) {
-        if (state.is(DNLBlocks.WEB_CARPET.get())) {
-            cir.setReturnValue(15.0F);
-        }
-    }
+    // 1.21: isCorrectToolForDrops / getDestroySpeed moved to Item (with an ItemStack param) and
+    // ShearsItem no longer overrides them; the web-carpet correct-tool/speed handling for shears
+    // now lives in SwordItemMixin's Item-level injects, extended to ShearsItem below.
 }
