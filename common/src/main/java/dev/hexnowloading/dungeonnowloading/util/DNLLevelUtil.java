@@ -75,7 +75,7 @@ public class DNLLevelUtil {
     }
 
     public static void spawnDestroyParticles(Level level, BlockPos blockPos, BlockState blockState) {
-        if (blockState.isAir() || !blockState.shouldSpawnParticlesOnBreak()) {
+        if (blockState.isAir()) { // 1.21.1 has no per-state shouldSpawnParticlesOnBreak()
             return;
         }
         VoxelShape shape = blockState.getShape(level, blockPos);

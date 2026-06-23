@@ -67,7 +67,10 @@ public final class DNLCustomExplosion {
                 center.z,
                 settings.radius,
                 settings.causesFire,
-                blockInteraction
+                blockInteraction,
+                net.minecraft.core.particles.ParticleTypes.EXPLOSION,
+                net.minecraft.core.particles.ParticleTypes.EXPLOSION_EMITTER,
+                settings.sound
         );
 
         ObjectArrayList<BlockPos> toBlow = calculateBlocks(level, explosion, damageCalculator, center, settings.radius, blockInteraction);
@@ -171,7 +174,7 @@ public final class DNLCustomExplosion {
         AABB bounds = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
 
         for (Entity entity : level.getEntities(settings.source, bounds)) {
-            if (entity.ignoreExplosion()) {
+            if (entity.ignoreExplosion(explosion)) {
                 continue;
             }
 
@@ -209,7 +212,7 @@ public final class DNLCustomExplosion {
 
     private static void finalizeExplosion(ServerLevel level, Explosion explosion, ObjectArrayList<BlockPos> toBlow, Vec3 center, Settings settings, Explosion.BlockInteraction blockInteraction) {
         if (settings.sound != null) {
-            level.playSound(null, center.x, center.y, center.z, settings.sound, settings.soundSource, settings.soundVolume, settings.soundPitch);
+            level.playSound(null, center.x, center.y, center.z, settings.sound.value(), settings.soundSource, settings.soundVolume, settings.soundPitch);
         }
 
         if (settings.particle != null && settings.particleCount > 0) {
@@ -331,7 +334,7 @@ public final class DNLCustomExplosion {
         private double particleOffsetZ;
         private double particleSpeed;
         @Nullable
-        private SoundEvent sound = SoundEvents.GENERIC_EXPLODE;
+        private net.minecraft.core.Holder<SoundEvent> sound = SoundEvents.GENERIC_EXPLODE;
         private SoundSource soundSource = SoundSource.BLOCKS;
         private float soundVolume = 4.0F;
         private float soundPitch = 0.7F;
@@ -393,12 +396,12 @@ public final class DNLCustomExplosion {
         }
 
         public Settings sound(@Nullable SoundEvent sound) {
-            this.sound = sound;
+            this.sound = sound == null ? null : net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound);
             return this;
         }
 
         public Settings sound(@Nullable SoundEvent sound, SoundSource soundSource, float volume, float pitch) {
-            this.sound = sound;
+            this.sound = sound == null ? null : net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound);
             this.soundSource = soundSource;
             this.soundVolume = volume;
             this.soundPitch = pitch;
