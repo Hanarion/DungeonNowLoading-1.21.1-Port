@@ -1,10 +1,12 @@
 package dev.hexnowloading.dungeonnowloading.capabilities.fabric;
 
 import dev.hexnowloading.dungeonnowloading.item.client.DNLArmPose;
-import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 
-public class DNLArmPoseCapabilityHandler implements DNLArmPoseComponent, PlayerComponent<DNLArmPoseCapabilityHandler> {
+// 1.21 / CCA 6.1.3: PlayerComponent -> RespawnableComponent; NBT methods take HolderLookup.Provider.
+public class DNLArmPoseCapabilityHandler implements DNLArmPoseComponent, RespawnableComponent<DNLArmPoseCapabilityHandler> {
 
     private DNLArmPose armPose = DNLArmPose.EMPTY; // Default Pose
 
@@ -19,14 +21,19 @@ public class DNLArmPoseCapabilityHandler implements DNLArmPoseComponent, PlayerC
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag) {
+    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registries) {
         if (tag.contains("DNLArmPose", CompoundTag.TAG_STRING)) {
             this.armPose = DNLArmPose.fromId(tag.getString("DNLArmPose"));
         }
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag) {
+    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putString("DNLArmPose", armPose.getId());
+    }
+
+    @Override
+    public void copyFrom(DNLArmPoseCapabilityHandler original, HolderLookup.Provider registries) {
+        this.armPose = original.armPose;
     }
 }

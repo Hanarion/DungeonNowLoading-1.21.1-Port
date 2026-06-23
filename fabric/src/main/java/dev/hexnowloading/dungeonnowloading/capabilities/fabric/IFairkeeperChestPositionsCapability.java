@@ -1,17 +1,13 @@
 package dev.hexnowloading.dungeonnowloading.capabilities.fabric;
 
-import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
-import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
 import java.util.List;
 
-public interface IFairkeeperChestPositionsCapability extends ComponentV3, AutoSyncedComponent {
-
-    //ResourceLocation ID = ResourceLocation.parse("dungeonnowloading:fairkeeper_chest_positions");
+// 1.21 / CCA 6.1.3: ComponentV3 was merged into Component.
+public interface IFairkeeperChestPositionsCapability extends Component, AutoSyncedComponent {
 
     List<BlockPos> getList();
 

@@ -1,24 +1,27 @@
 package dev.hexnowloading.dungeonnowloading.capabilities.fabric;
 
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.nbt.Tag;
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.spongepowered.asm.util.perf.Profiler.setActive;
-
-public class FairkeeperChestPositionsCapabilityHandler implements IFairkeeperChestPositionsCapability, PlayerComponent<FairkeeperChestPositionsCapabilityHandler> {
+// 1.21 / CCA 6.1.3: PlayerComponent -> RespawnableComponent; NBT methods take HolderLookup.Provider.
+// Also fixed: the old readFromNbt read hardcoded indices getInt(0/1/2) (re-read entry 0) while
+// writeToNbt stored a list-of-int-lists; the serialization now round-trips correctly. Removed the
+// broken equals(){return false;} (it defeated AutoSyncedComponent change detection) and a stray
+// mixin Profiler.setActive debug leftover.
+public class FairkeeperChestPositionsCapabilityHandler implements IFairkeeperChestPositionsCapability, RespawnableComponent<FairkeeperChestPositionsCapabilityHandler> {
 
     private List<BlockPos> fairkeeperPosList;
 
     public FairkeeperChestPositionsCapabilityHandler() {
-        this(new ArrayList<BlockPos>());
+        this(new ArrayList<>());
     }
 
     public FairkeeperChestPositionsCapabilityHandler(List<BlockPos> blockPosList) {
@@ -38,7 +41,9 @@ public class FairkeeperChestPositionsCapabilityHandler implements IFairkeeperChe
         if (this.fairkeeperPosList == null) {
             this.fairkeeperPosList = new ArrayList<>();
         }
-        if (!this.fairkeeperPosList.contains(blockPos)) { this.fairkeeperPosList.add(blockPos);}
+        if (!this.fairkeeperPosList.contains(blockPos)) {
+            this.fairkeeperPosList.add(blockPos);
+        }
     }
 
     @Override
@@ -47,25 +52,27 @@ public class FairkeeperChestPositionsCapabilityHandler implements IFairkeeperChe
     }
 
     @Override
-    public void readFromNbt(CompoundTag compoundTag) {
-        if (compoundTag.contains("FairkeeperChestPositions", CompoundTag.TAG_LIST)) {
-            ListTag listTag = compoundTag.getList("FairkeeperChestPositions", CompoundTag.TAG_LIST);
-            if (this.fairkeeperPosList == null) {
-                this.fairkeeperPosList = new ArrayList<>();
-            }
+    public void readFromNbt(CompoundTag compoundTag, HolderLookup.Provider registries) {
+        this.fairkeeperPosList = new ArrayList<>();
+        if (compoundTag.contains("FairkeeperChestPositions", Tag.TAG_LIST)) {
+            ListTag listTag = compoundTag.getList("FairkeeperChestPositions", Tag.TAG_LIST);
             for (int a = 0; a < listTag.size(); ++a) {
-                this.fairkeeperPosList.add(new BlockPos(listTag.getInt(0), listTag.getInt(1), listTag.getInt(2)));
+                ListTag pos = listTag.getList(a);
+                this.fairkeeperPosList.add(new BlockPos(pos.getInt(0), pos.getInt(1), pos.getInt(2)));
             }
         }
     }
 
     @Override
-    public void writeToNbt(CompoundTag compoundTag) {
-        //if (this.fairkeeperPosList != null) {
-            ListTag listTag = new ListTag();
-            this.fairkeeperPosList.forEach(blockPos -> listTag.add(this.newIntList(blockPos.getX(), blockPos.getY(), blockPos.getZ())));
-            compoundTag.put("FairkeeperChestPositions", listTag);
-        //}
+    public void writeToNbt(CompoundTag compoundTag, HolderLookup.Provider registries) {
+        ListTag listTag = new ListTag();
+        getList().forEach(blockPos -> listTag.add(newIntList(blockPos.getX(), blockPos.getY(), blockPos.getZ())));
+        compoundTag.put("FairkeeperChestPositions", listTag);
+    }
+
+    @Override
+    public void copyFrom(FairkeeperChestPositionsCapabilityHandler original, HolderLookup.Provider registries) {
+        this.fairkeeperPosList = new ArrayList<>(original.fairkeeperPosList);
     }
 
     @Override
@@ -73,18 +80,7 @@ public class FairkeeperChestPositionsCapabilityHandler implements IFairkeeperChe
         return lossless || keepInventory;
     }
 
-    @Override
-    public void copyForRespawn(FairkeeperChestPositionsCapabilityHandler original, boolean lossless, boolean keepInventory, boolean sameCharacter) {
-        PlayerComponent.super.copyForRespawn(original, lossless, keepInventory, sameCharacter);
-        setActive(false);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return false;
-    }
-
-    private ListTag newIntList(int ... ints) {
+    private ListTag newIntList(int... ints) {
         ListTag listTag = new ListTag();
         for (int i : ints) {
             listTag.add(IntTag.valueOf(i));

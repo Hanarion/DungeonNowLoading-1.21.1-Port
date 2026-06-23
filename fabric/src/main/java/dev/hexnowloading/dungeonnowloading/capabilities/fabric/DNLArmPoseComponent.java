@@ -1,10 +1,11 @@
 package dev.hexnowloading.dungeonnowloading.capabilities.fabric;
 
 import dev.hexnowloading.dungeonnowloading.item.client.DNLArmPose;
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
-public interface DNLArmPoseComponent extends ComponentV3, AutoSyncedComponent {
+// 1.21 / CCA 6.1.3: ComponentV3 was merged into Component.
+public interface DNLArmPoseComponent extends Component, AutoSyncedComponent {
 
     void setArmPose(DNLArmPose pose);
 
