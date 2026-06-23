@@ -346,7 +346,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         BlockState originalState = level.getBlockState(pos);
 
         // snapshot BEFORE we touch the block
-        CompoundTag tag = this.saveWithFullMetadata(); // or saveWithoutMetadata(registries)
+        CompoundTag tag = this.saveWithFullMetadata(level.registryAccess());
 
         // mirror your working mending placement behavior
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);

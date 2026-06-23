@@ -87,7 +87,7 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
     protected void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
         super.saveAdditional(nbt, registries);
         if (!this.trySaveLootTable(nbt)) {
-            ContainerHelper.saveAllItems(nbt, this.items);
+            ContainerHelper.saveAllItems(nbt, this.items, registries);
         } else {
             if (this.combatLootTable != null) {
                 nbt.putString("CombatLootTable", this.combatLootTable.toString());
@@ -131,7 +131,7 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
         super.loadAdditional(nbt, registries);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         if (!this.tryLoadLootTable(nbt)) {
-            ContainerHelper.loadAllItems(nbt,this.items);
+            ContainerHelper.loadAllItems(nbt, this.items, registries);
         } else {
             if (nbt.contains("CombatLootTable", CompoundTag.OBJECT_HEADER)) {
                 this.combatLootTable = ResourceLocation.parse(nbt.getString("CombatLootTable"));
@@ -171,7 +171,7 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
     }
 
     public CompoundTag setCombatLootTable(FairkeeperChestBlockEntity blockEntity) {
-        CompoundTag nbt = blockEntity.saveWithFullMetadata().copy();
+        CompoundTag nbt = blockEntity.saveWithFullMetadata(blockEntity.level.registryAccess()).copy();
         if (nbt.contains("CombatLootTable", CompoundTag.OBJECT_HEADER)) {
             nbt.putString("LootTable", blockEntity.combatLootTable.toString());
             nbt.putLong("LootTableSeed", blockEntity.combatLootTableSeed);
@@ -415,7 +415,7 @@ public class FairkeeperChestBlockEntity extends RandomizableContainerBlockEntity
         CompoundTag compoundTag = blockEntity.setCombatLootTable(blockEntity);
         FairkeeperChestBlock.setFairkeeperAlert(level, fairkeeperChestPos, Boolean.TRUE);
         BlockEntity newBlockEntity = level.getBlockEntity(fairkeeperChestPos);
-        newBlockEntity.load(compoundTag);
+        newBlockEntity.loadWithComponents(compoundTag, level.registryAccess());
         AABB aabb = new AABB(blockEntity.actualRegion1X, blockEntity.actualRegion1Y, blockEntity.actualRegion1Z, blockEntity.actualRegion2X, blockEntity.actualRegion2Y, blockEntity.actualRegion2Z);
         List<Player> nearbyPlayers = level.getEntitiesOfClass(Player.class, aabb);
         blockEntity.playerCount = nearbyPlayers.size();

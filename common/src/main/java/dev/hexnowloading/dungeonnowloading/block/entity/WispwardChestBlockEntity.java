@@ -650,7 +650,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
     protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (!this.trySaveLootTable(tag)) {
-            ContainerHelper.saveAllItems(tag, this.items);
+            ContainerHelper.saveAllItems(tag, this.items, registries);
         }
 
         this.saveZone(tag);
@@ -661,7 +661,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
         super.loadAdditional(tag, registries);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         if (!this.tryLoadLootTable(tag)) {
-            ContainerHelper.loadAllItems(tag, this.items);
+            ContainerHelper.loadAllItems(tag, this.items, registries);
         }
 
         this.loadZone(tag);

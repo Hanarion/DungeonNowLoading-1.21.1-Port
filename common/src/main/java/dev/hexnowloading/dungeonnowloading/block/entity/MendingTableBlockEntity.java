@@ -40,16 +40,16 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
 
     // Persistence
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
+    protected void saveAdditional(@NotNull CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        ContainerHelper.saveAllItems(tag, items);
+        ContainerHelper.saveAllItems(tag, items, registries);
     }
 
     @Override
-    public void load(@NotNull CompoundTag tag) {
+    protected void loadAdditional(@NotNull CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, items);
+        ContainerHelper.loadAllItems(tag, items, registries);
     }
 
     @Override

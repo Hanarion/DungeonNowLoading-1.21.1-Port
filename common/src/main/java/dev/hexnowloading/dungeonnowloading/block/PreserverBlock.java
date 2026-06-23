@@ -72,7 +72,7 @@ public class PreserverBlock extends BaseEntityBlock {
             BlockEntity blockEntityOld = level.getBlockEntity(blockPos);
 
             if (blockEntityOld instanceof PreserverBlockEntity preserverBlockEntity) {
-                transferData = preserverBlockEntity.saveWithFullMetadata();
+                transferData = preserverBlockEntity.saveWithFullMetadata(level.registryAccess());
             }
         }
         super.playerWillDestroy(level, blockPos, blockState, player);
@@ -88,7 +88,7 @@ public class PreserverBlock extends BaseEntityBlock {
             BlockEntity blockEntityNew = level.getBlockEntity(blockPos);
 
             if (blockEntityNew instanceof PreserverBlockEntity preserverBlockEntity) {
-                preserverBlockEntity.load(transferData);
+                preserverBlockEntity.loadWithComponents(transferData, level.registryAccess());
             }
 
             level.scheduleTick(blockPos, this, 20);
@@ -107,7 +107,7 @@ public class PreserverBlock extends BaseEntityBlock {
         BlockEntity blockEntityOld = level.getBlockEntity(blockPos);
 
         if (blockEntityOld instanceof PreserverBlockEntity preserverBlockEntity) {
-            transferData = preserverBlockEntity.saveWithFullMetadata();
+            transferData = preserverBlockEntity.saveWithFullMetadata(level.registryAccess());
         }
 
     }

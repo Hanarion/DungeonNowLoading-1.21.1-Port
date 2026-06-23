@@ -237,7 +237,7 @@ public interface PreserverBlockDestructionSystem {
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
-                    compoundTag = originalBlockEntity.saveWithFullMetadata();
+                    compoundTag = originalBlockEntity.saveWithFullMetadata(serverLevel.registryAccess());
                 }
 
                 //BlockDestructionManager.cancel();
@@ -300,7 +300,7 @@ public interface PreserverBlockDestructionSystem {
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
-                    compoundTag = originalBlockEntity.saveWithFullMetadata();
+                    compoundTag = originalBlockEntity.saveWithFullMetadata(serverLevel.registryAccess());
                 }
 
                 ContainerDropManager.cancel(eventBlockPos);
@@ -356,7 +356,7 @@ public interface PreserverBlockDestructionSystem {
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
-                    compoundTag = originalBlockEntity.saveWithFullMetadata();
+                    compoundTag = originalBlockEntity.saveWithFullMetadata(serverLevel.registryAccess());
                 }
 
                 ContainerDropManager.cancel(eventBlockPos);
@@ -397,7 +397,7 @@ public interface PreserverBlockDestructionSystem {
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
-                    compoundTag = originalBlockEntity.saveWithFullMetadata();
+                    compoundTag = originalBlockEntity.saveWithFullMetadata(serverLevel.registryAccess());
                 }
 
                 BlockBurnManager.cancel();
@@ -436,7 +436,7 @@ public interface PreserverBlockDestructionSystem {
                 BlockEntity originalBlockEntity = serverLevel.getBlockEntity(eventBlockPos);
                 CompoundTag compoundTag = new CompoundTag();
                 if (originalBlockEntity != null) {
-                    compoundTag = originalBlockEntity.saveWithFullMetadata();
+                    compoundTag = originalBlockEntity.saveWithFullMetadata(serverLevel.registryAccess());
                 }
 
                 PistonPushManager.cancel();

@@ -42,7 +42,7 @@ public class DisabledFairkeeperChestBlockEntity extends RandomizableContainerBlo
     protected void saveAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
         super.saveAdditional(compoundTag, registries);
         if (!this.trySaveLootTable(compoundTag)) {
-            ContainerHelper.saveAllItems(compoundTag, this.items);
+            ContainerHelper.saveAllItems(compoundTag, this.items, registries);
         }
     }
 
@@ -51,7 +51,7 @@ public class DisabledFairkeeperChestBlockEntity extends RandomizableContainerBlo
         super.loadAdditional(compoundTag, registries);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         if (!this.tryLoadLootTable(compoundTag)) {
-            ContainerHelper.loadAllItems(compoundTag, this.items);
+            ContainerHelper.loadAllItems(compoundTag, this.items, registries);
         }
     }
 
