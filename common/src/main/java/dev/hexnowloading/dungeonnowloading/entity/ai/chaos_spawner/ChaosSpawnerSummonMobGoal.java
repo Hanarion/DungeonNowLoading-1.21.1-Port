@@ -232,7 +232,7 @@ public class ChaosSpawnerSummonMobGoal extends Goal {
             if (m instanceof Skeleton s) {
                 s.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.DIAMOND_HELMET));
                 s.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-                s.getItemBySlot(EquipmentSlot.MAINHAND).enchant(DNLEnchantments.holder(s.level(), Enchantments.POWER_ARROWS), 2);
+                s.getItemBySlot(EquipmentSlot.MAINHAND).enchant(DNLEnchantments.holder(s.level(), Enchantments.POWER), 2);
                 noDropChance(s);
             }
         }), 6);

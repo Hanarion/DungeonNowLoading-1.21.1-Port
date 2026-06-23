@@ -30,10 +30,10 @@ public class SkeletonWithStrongFlameBowFeature extends Feature<NoneFeatureConfig
         skeleton.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         EntityScale.scaleMobAttributes(skeleton);
         skeleton.setItemSlot(EquipmentSlot.MAINHAND, strongFlameBow(context.level().registryAccess()));
-        skeleton.setItemSlot(EquipmentSlot.HEAD, trimArmor(Items.DIAMOND_HELMET));
-        skeleton.setItemSlot(EquipmentSlot.CHEST, trimArmor(Items.DIAMOND_CHESTPLATE));
-        skeleton.setItemSlot(EquipmentSlot.LEGS, trimArmor(Items.DIAMOND_LEGGINGS));
-        skeleton.setItemSlot(EquipmentSlot.FEET, trimArmor(Items.DIAMOND_BOOTS));
+        skeleton.setItemSlot(EquipmentSlot.HEAD, trimArmor(context.level().registryAccess(), Items.DIAMOND_HELMET));
+        skeleton.setItemSlot(EquipmentSlot.CHEST, trimArmor(context.level().registryAccess(), Items.DIAMOND_CHESTPLATE));
+        skeleton.setItemSlot(EquipmentSlot.LEGS, trimArmor(context.level().registryAccess(), Items.DIAMOND_LEGGINGS));
+        skeleton.setItemSlot(EquipmentSlot.FEET, trimArmor(context.level().registryAccess(), Items.DIAMOND_BOOTS));
         skeleton.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
         skeleton.setDropChance(EquipmentSlot.OFFHAND, 0.0F);
         skeleton.setDropChance(EquipmentSlot.HEAD, 0.0F);
@@ -49,17 +49,14 @@ public class SkeletonWithStrongFlameBowFeature extends Feature<NoneFeatureConfig
 
     private static ItemStack strongFlameBow(net.minecraft.core.HolderLookup.Provider registries) {
         ItemStack itemStack = new ItemStack(Items.BOW);
-        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.POWER_ARROWS), 5);
-        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.FLAMING_ARROWS), 2);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.POWER), 5);
+        itemStack.enchant(DNLEnchantments.holder(registries, Enchantments.FLAME), 2);
         return itemStack;
     }
 
-    private static ItemStack trimArmor(Item item) {
+    private static ItemStack trimArmor(net.minecraft.core.HolderLookup.Provider registries, Item item) {
         ItemStack itemStack = new ItemStack(item);
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putString("material", "minecraft:gold");
-        compoundTag.putString("pattern", "minecraft:wild");
-        StackNbt.update(itemStack, t -> t.put("Trim", compoundTag));
+        dev.hexnowloading.dungeonnowloading.util.ArmorTrimUtil.applyTrim(registries, itemStack, "gold", "wild");
         return itemStack;
     }
 }

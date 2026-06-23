@@ -40,7 +40,7 @@ public class VertexBowItem extends BowItem {
     @Override
     public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int remainingUseDuration) {
         if (livingEntity instanceof Player player) {
-                boolean b = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.INFINITY_ARROWS), itemStack) > 0;
+                boolean b = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.INFINITY), itemStack) > 0;
             ItemStack projectile = player.getProjectile(itemStack);
             if (!projectile.isEmpty() || b) {
                 if (projectile.isEmpty()) {
@@ -70,17 +70,17 @@ public class VertexBowItem extends BowItem {
                             arrow.setCritArrow(true);
                         }
 
-                        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.POWER_ARROWS), itemStack);
+                        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.POWER), itemStack);
                         if (powerLevel > 0) {
                             arrow.setBaseDamage(arrow.getBaseDamage() + (double)powerLevel * 0.5 + 0.5);
                         }
 
-                        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.PUNCH_ARROWS), itemStack);
+                        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.PUNCH), itemStack);
                         if (punchLevel > 0) {
                             arrow.setKnockback(punchLevel);
                         }
 
-                        if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.FLAMING_ARROWS), itemStack) > 0) {
+                        if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.FLAME), itemStack) > 0) {
                             arrow.igniteForSeconds(100);
                         }
 

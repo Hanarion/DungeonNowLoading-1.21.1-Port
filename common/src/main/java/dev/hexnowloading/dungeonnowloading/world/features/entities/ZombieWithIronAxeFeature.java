@@ -30,10 +30,10 @@ public class ZombieWithIronAxeFeature extends Feature<NoneFeatureConfiguration> 
         zombie.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         EntityScale.scaleMobAttributes(zombie);
         zombie.setItemSlot(EquipmentSlot.MAINHAND, ironAxe(context.level().registryAccess()));
-        zombie.setItemSlot(EquipmentSlot.HEAD, trimArmor(Items.IRON_HELMET));
-        zombie.setItemSlot(EquipmentSlot.CHEST, trimArmor(Items.IRON_CHESTPLATE));
-        zombie.setItemSlot(EquipmentSlot.LEGS, trimArmor(Items.IRON_LEGGINGS));
-        zombie.setItemSlot(EquipmentSlot.FEET, trimArmor(Items.IRON_BOOTS));
+        zombie.setItemSlot(EquipmentSlot.HEAD, trimArmor(context.level().registryAccess(), Items.IRON_HELMET));
+        zombie.setItemSlot(EquipmentSlot.CHEST, trimArmor(context.level().registryAccess(), Items.IRON_CHESTPLATE));
+        zombie.setItemSlot(EquipmentSlot.LEGS, trimArmor(context.level().registryAccess(), Items.IRON_LEGGINGS));
+        zombie.setItemSlot(EquipmentSlot.FEET, trimArmor(context.level().registryAccess(), Items.IRON_BOOTS));
         zombie.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
         zombie.setDropChance(EquipmentSlot.OFFHAND, 0.0F);
         zombie.setDropChance(EquipmentSlot.HEAD, 0.0F);
@@ -54,12 +54,9 @@ public class ZombieWithIronAxeFeature extends Feature<NoneFeatureConfiguration> 
         return itemStack;
     }
 
-    private static ItemStack trimArmor(Item item) {
+    private static ItemStack trimArmor(net.minecraft.core.HolderLookup.Provider registries, Item item) {
         ItemStack itemStack = new ItemStack(item);
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putString("material", "minecraft:netherite");
-        compoundTag.putString("pattern", "minecraft:wild");
-        StackNbt.update(itemStack, t -> t.put("Trim", compoundTag));
+        dev.hexnowloading.dungeonnowloading.util.ArmorTrimUtil.applyTrim(registries, itemStack, "netherite", "wild");
         return itemStack;
     }
 }

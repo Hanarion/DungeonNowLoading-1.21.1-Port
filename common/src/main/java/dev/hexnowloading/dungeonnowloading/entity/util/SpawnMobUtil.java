@@ -56,16 +56,13 @@ public class SpawnMobUtil {
     }
 
     public static void equipArmor(Mob mob, EquipmentSlot equipmentSlot, Item item, ArmorTrimMaterial trimMaterial, ArmorTrimPattern trimPattern, float dropChance) {
-        mob.setItemSlot(equipmentSlot, trimArmor(item, trimMaterial, trimPattern));
+        mob.setItemSlot(equipmentSlot, trimArmor(mob.level().registryAccess(), item, trimMaterial, trimPattern));
         mob.setDropChance(equipmentSlot, dropChance);
     }
 
-    private static ItemStack trimArmor(Item item, ArmorTrimMaterial trimMaterial, ArmorTrimPattern trimPattern) {
+    private static ItemStack trimArmor(net.minecraft.core.HolderLookup.Provider registries, Item item, ArmorTrimMaterial trimMaterial, ArmorTrimPattern trimPattern) {
         ItemStack itemStack = new ItemStack(item);
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putString("material", "minecraft:" + trimMaterial.material);
-        compoundTag.putString("pattern", "minecraft:" + trimPattern.pattern);
-        StackNbt.update(itemStack, t -> t.put("Trim", compoundTag));
+        dev.hexnowloading.dungeonnowloading.util.ArmorTrimUtil.applyTrim(registries, itemStack, trimMaterial.material, trimPattern.pattern);
         return itemStack;
     }
 
