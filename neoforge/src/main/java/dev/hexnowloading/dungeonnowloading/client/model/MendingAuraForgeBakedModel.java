@@ -21,17 +21,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.ChunkRenderTypeSet;
-import net.minecraftforge.client.extensions.IForgeBakedModel;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.client.ChunkRenderTypeSet;
+import net.neoforged.neoforge.client.model.IDynamicBakedModel;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class MendingAuraForgeBakedModel implements BakedModel, IForgeBakedModel {
+public class MendingAuraForgeBakedModel implements IDynamicBakedModel {
     public static final ModelProperty<BlockState> STORED_STATE = new ModelProperty<>();
     public static final ModelProperty<Set<Direction>> CULLED_DIRECTIONS = new ModelProperty<>();
 
