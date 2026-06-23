@@ -16,8 +16,7 @@
   ],
   "client": [
     "MixinMinecraft",
-    "client.MimiclingReachGameRendererMixin",
-    "client.MimiclingReachClientGameModeMixin"
+    "client.MimiclingReachGameRendererMixin"
   ],
   "server": [
   ],
