@@ -31,7 +31,6 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
@@ -52,8 +51,8 @@ import java.util.Map;
 public class DNLFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        DNLPackets.registerServerbound();
-        DNLPackets.registerClientbound();
+        // Packets are registered by common's DungeonNowLoading.init() (via FabricNetworkHelper);
+        // do NOT re-register here — doing so double-registers the payload codec/receiver.
 
         DNLClient.registerItemModels();
         DNLClient.registerMenuScreens();
@@ -66,13 +65,6 @@ public class DNLFabricClient implements ClientModInitializer {
         registerParticleFactories();
         MendstonePickaxeParticleHandlerFabric.register();
         ClientTickEvents.END_CLIENT_TICK.register(SignalRailInputHandler::handleClientTick);
-
-        final var ID = ResourceLocation.fromNamespaceAndPath("dungeonnowloading", "serverbound_pedestal_update");
-        ServerPlayNetworking.registerGlobalReceiver(ID, (server, player, handler, buf, responseSender) -> {
-            System.out.println("[Server] registered receiver hit for " + ID);
-            var pkt = dev.hexnowloading.dungeonnowloading.network.packets.C2SPedestalUpdatePacket.decode(buf);
-            server.execute(() -> pkt.handle(player));  // hop to main thread, then call your handle()
-        });
 
         ItemTooltipCallback.EVENT.register((stack, context, lines) -> addDnlEnchantmentDescriptions(stack, lines));
     }
