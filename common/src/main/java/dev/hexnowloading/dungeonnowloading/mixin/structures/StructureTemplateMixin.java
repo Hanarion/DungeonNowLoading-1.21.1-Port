@@ -26,7 +26,7 @@ public class StructureTemplateMixin {
     )
     private void dungeonnowloading_fixWaterlogging(ServerLevelAccessor serverLevelAccessor, BlockPos blockPos1, BlockPos blockPos2, StructurePlaceSettings structurePlaceSettings, RandomSource random, int flag, CallbackInfoReturnable<Boolean> cir) {
         if (structurePlaceSettings.getProcessors().stream().anyMatch(processor -> ((StructureProcessorAccessor)processor).callGetType() == DNLProcessors.WATERLOGGING_FIX_PROCESSOR.get())) {
-            structurePlaceSettings.setKeepLiquids(false);
+            structurePlaceSettings.setLiquidSettings(net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings.IGNORE_WATERLOGGING);
         }
     }
 }

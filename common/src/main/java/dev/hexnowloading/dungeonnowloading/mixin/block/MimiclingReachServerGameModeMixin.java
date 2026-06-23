@@ -17,10 +17,10 @@ public class MimiclingReachServerGameModeMixin {
             method = "handleBlockBreakAction",
             at = @At(
                     value = "FIELD",
-                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;MAX_INTERACTION_DISTANCE:D"
+                    target = "Lnet/minecraft/server/network/36.0D:D"
             )
     )
     private double dnl$extendMimiclingBlockBreakDistance() {
-        return MimiclingFoodEffects.hasExtendedReach(this.player) ? MimiclingFoodEffects.getMimiclingReachValidationDistanceSqr(this.player) : ServerGamePacketListenerImpl.MAX_INTERACTION_DISTANCE;
+        return MimiclingFoodEffects.hasExtendedReach(this.player) ? MimiclingFoodEffects.getMimiclingReachValidationDistanceSqr(this.player) : 36.0D;
     }
 }

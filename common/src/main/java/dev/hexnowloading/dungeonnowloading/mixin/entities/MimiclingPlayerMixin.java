@@ -14,7 +14,7 @@ public class MimiclingPlayerMixin {
     private void dnl$removeMimiclingUnderwaterMiningPenalty(BlockState state, CallbackInfoReturnable<Float> cir) {
         Player player = (Player)(Object)this;
         float multiplier = MimiclingFoodEffects.getUnderwaterMiningSpeedMultiplier(player);
-        if (player.isEyeInFluid(net.minecraft.tags.FluidTags.WATER) && !net.minecraft.world.item.enchantment.EnchantmentHelper.hasAquaAffinity(player) && multiplier > 1.0F) {
+        if (player.isEyeInFluid(net.minecraft.tags.FluidTags.WATER) && player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SUBMERGED_MINING_SPEED) < 1.0D && multiplier > 1.0F) {
             cir.setReturnValue(cir.getReturnValue() * multiplier);
         }
     }

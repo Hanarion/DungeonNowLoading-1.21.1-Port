@@ -40,7 +40,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     protected abstract List<Component> getTooltipFromContainerItem(ItemStack stack);
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
         Slot hovered = getHoveredSlot(mouseX, mouseY);
         if (hovered != null) {
             ItemStack stack = hovered.getItem();
@@ -58,7 +58,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
             }
         }
 
-        return this.getChildAt(mouseX, mouseY).filter(child -> child.mouseScrolled(mouseX, mouseY, amount)).isPresent();
+        return this.getChildAt(mouseX, mouseY).filter(child -> child.mouseScrolled(mouseX, mouseY, scrollX, amount)).isPresent();
     }
 
     @Inject(method = "render", at = @At("HEAD"))

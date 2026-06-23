@@ -21,7 +21,7 @@ public interface ClientTooltipComponentMixin {
             return new ClientMimiclingTooltip(mimiclingTooltip);
         }
         if (tooltipComponent instanceof BundleTooltip bundleTooltip) {
-            return new ClientBundleTooltip(bundleTooltip);
+            return new ClientBundleTooltip(bundleTooltip.contents());
         }
 
         throw new IllegalArgumentException("Unknown TooltipComponent");
