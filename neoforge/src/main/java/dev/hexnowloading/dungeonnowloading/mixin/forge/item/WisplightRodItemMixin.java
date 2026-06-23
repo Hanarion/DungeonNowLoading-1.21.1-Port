@@ -4,7 +4,7 @@ import dev.hexnowloading.dungeonnowloading.item.WisplightRodItem;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.WisplightRodRenderer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.function.Consumer;

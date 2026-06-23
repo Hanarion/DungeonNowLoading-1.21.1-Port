@@ -4,7 +4,7 @@ import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.ScorcherRenderer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.function.Consumer;
