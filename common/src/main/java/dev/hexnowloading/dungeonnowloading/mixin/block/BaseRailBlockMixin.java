@@ -101,10 +101,9 @@ public abstract class BaseRailBlockMixin {
         }
     }
 
-    @Redirect(
-            method = "neighborChanged",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/BaseRailBlock;shouldBeRemoved(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/properties/RailShape;)Z")
-    )
+    // DNL 1.21: @Redirect of BaseRailBlock.shouldBeRemoved in neighborChanged doesn't bind at
+    // runtime; custom Deepsteel-platform rail retention disabled pending a proper retarget.
+    @SuppressWarnings("unused")
     private boolean dungeonnowloading$keepRailsOnDeepsteelPlatforms(BlockPos pos, Level level, RailShape shape) {
         if (isRailSupportingDeepsteelPlatform(level.getBlockState(pos.below()))) {
             return false;

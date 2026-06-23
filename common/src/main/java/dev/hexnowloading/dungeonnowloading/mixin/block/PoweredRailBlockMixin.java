@@ -30,11 +30,9 @@ public abstract class PoweredRailBlockMixin {
         }
     }
 
-    @Redirect(
-            method = "isSameRailWithPower",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"),
-            require = 0
-    )
+    // DNL 1.21: @Redirect of BlockState.is(Block) in isSameRailWithPower doesn't bind at runtime;
+    // custom Deepsteel powered-rail chaining disabled pending a proper retarget. Kept as unused.
+    @SuppressWarnings("unused")
     private boolean dungeonnowloading$connectDeepsteelMountedPoweredRails(BlockState state, Block block) {
         Block self = (Block) (Object) this;
         if (isPoweredRailPowerChainBlock(self) && isPoweredRailPowerChainBlock(state.getBlock())) {

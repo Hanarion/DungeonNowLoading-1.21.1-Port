@@ -53,26 +53,16 @@ public class RailStateMixin {
         ci.cancel();
     }
 
-    @Redirect(
-            method = "getRail",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
-                    ordinal = 1
-            )
-    )
+    // DNL 1.21: these @Redirects targeted RailState methods/calls whose shape changed in 1.21
+    // and don't bind at runtime; the custom Deepsteel-rail integration is disabled pending a
+    // proper retarget. Kept as unused private methods so the logic survives for re-wiring.
+    @SuppressWarnings("unused")
     private BlockState dungeonnowloading$ignoreOverheadMountedRails(Level level, BlockPos candidatePos) {
         BlockState candidateState = level.getBlockState(candidatePos);
         return isMountedDeepsteelRail(candidateState) ? Blocks.AIR.defaultBlockState() : candidateState;
     }
 
-    @Redirect(
-            method = {"place", "connectTo"},
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/BaseRailBlock;isRail(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Z"
-            )
-    )
+    @SuppressWarnings("unused")
     private boolean dungeonnowloading$doNotSlopeTowardMountedRails(Level level, BlockPos candidatePos) {
         BlockState candidateState = level.getBlockState(candidatePos);
         return BaseRailBlock.isRail(candidateState)
