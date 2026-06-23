@@ -97,7 +97,7 @@ public class DeepsteelMountedRailBlock extends RailBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(net.minecraft.world.level.LevelReader level, BlockPos pos, BlockState state) {
         return new ItemStack(railDrop);
     }
 
@@ -147,7 +147,7 @@ public class DeepsteelMountedRailBlock extends RailBlock {
         return rotated.optimize();
     }
 
-    public static Properties properties() {
+    public static Properties railProperties() {
         return Properties.of().noOcclusion().strength(0.7F).sound(net.minecraft.world.level.block.SoundType.METAL);
     }
 

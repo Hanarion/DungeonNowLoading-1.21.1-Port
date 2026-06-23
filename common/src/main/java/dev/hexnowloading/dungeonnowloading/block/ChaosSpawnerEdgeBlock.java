@@ -139,7 +139,7 @@ public class ChaosSpawnerEdgeBlock extends Block implements SimpleWaterloggedBlo
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, @Nullable BlockGetter blockGetter, List<Component> componentList, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack itemStack, net.minecraft.world.item.Item.TooltipContext blockGetter, List<Component> componentList, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, blockGetter, componentList, tooltipFlag);
         componentList.add(Component.translatable("block.dungeonnowloading.chaos_spawner_edge.tooltip").withStyle(ChatFormatting.GRAY));
     }

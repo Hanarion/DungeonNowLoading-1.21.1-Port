@@ -356,7 +356,7 @@ public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, S
     // ---- pick-block: preserve owner & pose on the item ----
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(net.minecraft.world.level.LevelReader world, BlockPos pos, BlockState state) {
         ItemStack stack = super.getCloneItemStack(world, pos, state);
         BlockEntity be = world.getBlockEntity(pos);
         if (be instanceof PlayerStatueBlockEntity statue) {

@@ -147,7 +147,7 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter $$0, BlockPos $$1, BlockState $$2) {
+    public ItemStack getCloneItemStack(net.minecraft.world.level.LevelReader $$0, BlockPos $$1, BlockState $$2) {
         return new ItemStack(DNLItems.BALLISTA_GOLEM_STATUE.get());
     }
 }
