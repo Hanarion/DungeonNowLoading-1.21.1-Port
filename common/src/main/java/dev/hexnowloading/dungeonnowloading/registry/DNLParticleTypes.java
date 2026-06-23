@@ -29,10 +29,15 @@ public class DNLParticleTypes {
     public static final Supplier<MendingFadeParticleType> WISPWARD_FLAME_TRAVEL_PARTICLE = register("wispward_flame_travel", () -> new MendingFadeParticleType(false));
     public static final Supplier<SimpleParticleType> BURNACLE_GAS_PARTICLE = register("burnacle_gas", () -> new SimpleParticleTypeOverride(false));
     public static final Supplier<ParticleType<SnifferTrailParticleType.Data>> SNIFFER_TRAIL_PARTICLE = register("sniffer_trail", () -> new SnifferTrailParticleType(false));
-    public static final Supplier<ParticleType<BlockParticleOption>> MIMICLING_IMPACT_BLOCK_PARTICLE = register("mimicling_impact_block", () -> new ParticleType<BlockParticleOption>(false, BlockParticleOption.DESERIALIZER) {
+    public static final Supplier<ParticleType<BlockParticleOption>> MIMICLING_IMPACT_BLOCK_PARTICLE = register("mimicling_impact_block", () -> new ParticleType<BlockParticleOption>(false) {
         @Override
-        public com.mojang.serialization.Codec<BlockParticleOption> codec() {
+        public com.mojang.serialization.MapCodec<BlockParticleOption> codec() {
             return BlockParticleOption.codec(this);
+        }
+
+        @Override
+        public net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, BlockParticleOption> streamCodec() {
+            return BlockParticleOption.streamCodec(this);
         }
     });
 

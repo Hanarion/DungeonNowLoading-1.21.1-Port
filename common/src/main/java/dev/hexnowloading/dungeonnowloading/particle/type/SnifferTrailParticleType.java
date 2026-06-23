@@ -1,58 +1,50 @@
 package dev.hexnowloading.dungeonnowloading.particle.type;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.Locale;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public class SnifferTrailParticleType extends ParticleType<SnifferTrailParticleType.Data> {
-    public static final Codec<Data> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("particle_type").forGetter(data -> BuiltInRegistries.PARTICLE_TYPE.getKey(data.particleType).toString()),
+
+    private final MapCodec<Data> codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.FLOAT.fieldOf("target_x").forGetter(data -> data.targetX),
             Codec.FLOAT.fieldOf("target_y").forGetter(data -> data.targetY),
             Codec.FLOAT.fieldOf("target_z").forGetter(data -> data.targetZ),
             Codec.INT.fieldOf("travel_lifetime").forGetter(data -> data.travelLifetime),
             Codec.INT.fieldOf("delay").forGetter(data -> data.delay)
-    ).apply(instance, (type, targetX, targetY, targetZ, travelLifetime, delay) -> new Data((ParticleType<Data>)BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)), targetX, targetY, targetZ, travelLifetime, delay)));
+    ).apply(instance, (targetX, targetY, targetZ, travelLifetime, delay) ->
+            new Data(this, targetX, targetY, targetZ, travelLifetime, delay)));
+
+    private final StreamCodec<RegistryFriendlyByteBuf, Data> streamCodec = StreamCodec.composite(
+            ByteBufCodecs.FLOAT, data -> data.targetX,
+            ByteBufCodecs.FLOAT, data -> data.targetY,
+            ByteBufCodecs.FLOAT, data -> data.targetZ,
+            ByteBufCodecs.VAR_INT, data -> data.travelLifetime,
+            ByteBufCodecs.VAR_INT, data -> data.delay,
+            (targetX, targetY, targetZ, travelLifetime, delay) ->
+                    new Data(this, targetX, targetY, targetZ, travelLifetime, delay)
+    );
 
     public SnifferTrailParticleType(boolean alwaysShow) {
-        super(alwaysShow, Data.DESERIALIZER);
+        super(alwaysShow);
     }
 
     @Override
-    public Codec<Data> codec() {
-        return CODEC;
+    public MapCodec<Data> codec() {
+        return codec;
+    }
+
+    @Override
+    public StreamCodec<? super RegistryFriendlyByteBuf, Data> streamCodec() {
+        return streamCodec;
     }
 
     public static class Data implements ParticleOptions {
-        public static final Deserializer<Data> DESERIALIZER = new Deserializer<>() {
-            @Override
-            public Data fromCommand(ParticleType<Data> type, StringReader reader) throws CommandSyntaxException {
-                reader.expect(' ');
-                float targetX = reader.readFloat();
-                reader.expect(' ');
-                float targetY = reader.readFloat();
-                reader.expect(' ');
-                float targetZ = reader.readFloat();
-                reader.expect(' ');
-                int travelLifetime = reader.readInt();
-                reader.expect(' ');
-                int delay = reader.readInt();
-                return new Data(type, targetX, targetY, targetZ, travelLifetime, delay);
-            }
-
-            @Override
-            public Data fromNetwork(ParticleType<Data> type, FriendlyByteBuf buffer) {
-                return new Data(type, buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readVarInt(), buffer.readVarInt());
-            }
-        };
 
         private final ParticleType<Data> particleType;
         private final float targetX;
@@ -73,20 +65,6 @@ public class SnifferTrailParticleType extends ParticleType<SnifferTrailParticleT
         @Override
         public ParticleType<?> getType() {
             return this.particleType;
-        }
-
-        @Override
-        public void writeToNetwork(FriendlyByteBuf buffer) {
-            buffer.writeFloat(this.targetX);
-            buffer.writeFloat(this.targetY);
-            buffer.writeFloat(this.targetZ);
-            buffer.writeVarInt(this.travelLifetime);
-            buffer.writeVarInt(this.delay);
-        }
-
-        @Override
-        public String writeToString() {
-            return String.format(Locale.ROOT, "%s %.3f %.3f %.3f %d %d", BuiltInRegistries.PARTICLE_TYPE.getKey(this.getType()), this.targetX, this.targetY, this.targetZ, this.travelLifetime, this.delay);
         }
 
         public float getTargetX() {

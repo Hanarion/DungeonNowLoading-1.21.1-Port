@@ -1,50 +1,40 @@
 package dev.hexnowloading.dungeonnowloading.particle.type;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.renderer.block.model.Variant;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.Locale;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public class ScalableParticleType extends ParticleType<ScalableParticleType.ScalableParticleData> {
 
-    public static final Codec<ScalableParticleData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("particle_type").forGetter(data -> BuiltInRegistries.PARTICLE_TYPE.getKey(data.particleType).toString()),
+    private final MapCodec<ScalableParticleData> codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.FLOAT.fieldOf("scale").forGetter(data -> data.scale)
-    ).apply(instance, (type, scale) -> new ScalableParticleData((ParticleType<ScalableParticleData>)BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(type)), scale)));
+    ).apply(instance, scale -> new ScalableParticleData(this, scale)));
+
+    private final StreamCodec<RegistryFriendlyByteBuf, ScalableParticleData> streamCodec = StreamCodec.composite(
+            ByteBufCodecs.FLOAT, data -> data.scale,
+            scale -> new ScalableParticleData(this, scale)
+    );
 
     public ScalableParticleType(boolean alwaysShow) {
-        super(alwaysShow, ScalableParticleData.DESERIALIZER);
+        super(alwaysShow);
     }
 
     @Override
-    public Codec<ScalableParticleData> codec() {
-        return CODEC;
+    public MapCodec<ScalableParticleData> codec() {
+        return codec;
+    }
+
+    @Override
+    public StreamCodec<? super RegistryFriendlyByteBuf, ScalableParticleData> streamCodec() {
+        return streamCodec;
     }
 
     public static class ScalableParticleData implements ParticleOptions {
-
-        public static final Deserializer<ScalableParticleData> DESERIALIZER = new Deserializer<>() {
-
-            public ScalableParticleData fromCommand(ParticleType<ScalableParticleData> particleType, StringReader reader) throws CommandSyntaxException {
-                reader.expect(' ');
-                float scale = reader.readFloat();
-
-                return new ScalableParticleData(particleType, scale);
-            }
-
-            public ScalableParticleData fromNetwork(ParticleType<ScalableParticleData> particleType, FriendlyByteBuf buffer) {
-                return new ScalableParticleData(particleType, buffer.readFloat());
-            }
-        };
 
         private final ParticleType<ScalableParticleData> particleType;
         private final float scale;
@@ -52,16 +42,6 @@ public class ScalableParticleType extends ParticleType<ScalableParticleType.Scal
         public ScalableParticleData(ParticleType<ScalableParticleData> particleType, float scale) {
             this.particleType = particleType;
             this.scale = scale;
-        }
-
-        @Override
-        public String writeToString() {
-            return String.format(Locale.ROOT, "%s", BuiltInRegistries.PARTICLE_TYPE.getKey(getType()));
-        }
-
-        @Override
-        public void writeToNetwork(FriendlyByteBuf buffer) {
-            buffer.writeFloat(scale);
         }
 
         @Override
