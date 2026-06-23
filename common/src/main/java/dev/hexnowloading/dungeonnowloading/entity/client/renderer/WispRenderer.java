@@ -32,7 +32,7 @@ public class WispRenderer<T extends WispEntity> extends MobRenderer<T, WispModel
     }
 
     @Override
-    protected void setupRotations(T entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
+    protected void setupRotations(T entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
         float entityYaw = Mth.rotLerp(partialTicks, entity.yRotO, entity.getYRot());
         float entityPitch = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot());
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entityYaw));

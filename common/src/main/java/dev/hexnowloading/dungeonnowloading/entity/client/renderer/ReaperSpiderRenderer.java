@@ -53,7 +53,7 @@ public class ReaperSpiderRenderer<T extends ReaperSpiderEntity> extends MobRende
         float limbSwingAmount = entity.walkAnimation.speed(partialTicks);
         float limbSwing = entity.walkAnimation.position(partialTicks);
 
-        this.setupRotations(entity, poseStack, ageInTicks, bodyYaw, partialTicks);
+        this.setupRotations(entity, poseStack, ageInTicks, bodyYaw, partialTicks, 1.0F);
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         this.scale(entity, poseStack, partialTicks);
         poseStack.translate(0.0F, -1.501F, 0.0F);

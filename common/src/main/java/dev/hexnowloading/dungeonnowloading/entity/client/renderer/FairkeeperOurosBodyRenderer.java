@@ -32,8 +32,8 @@ public class FairkeeperOurosBodyRenderer<T extends FairkeeperOurosPartEntity> ex
 
 
     @Override
-    protected void setupRotations(T entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
-        super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks);
+    protected void setupRotations(T entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
+        super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
 
         poseStack.translate(0.0F, entity.getBbHeight(), 0.0F);
         poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
