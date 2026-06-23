@@ -31,7 +31,7 @@ public class S2CPedestalOpenEditorPacket implements DNLPacket {
         this.pos = buf.readBlockPos();
         int n = buf.readVarInt();
         List<Component> tmp = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) tmp.add(buf.readComponent());
+        for (int i = 0; i < n; i++) tmp.add(net.minecraft.network.chat.ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC.decode(buf));
         this.lines = tmp;
         this.colorId = buf.readVarInt();
         this.glowing = buf.readBoolean();
@@ -40,7 +40,7 @@ public class S2CPedestalOpenEditorPacket implements DNLPacket {
     @Override public void encode(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
         buf.writeVarInt(lines.size());
-        for (Component c : lines) buf.writeComponent(c);
+        for (Component c : lines) net.minecraft.network.chat.ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC.encode(buf, c);
         buf.writeVarInt(colorId);
         buf.writeBoolean(glowing);
     }

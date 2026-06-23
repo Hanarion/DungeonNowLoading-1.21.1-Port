@@ -38,7 +38,7 @@ public class C2SPedestalUpdatePacket implements DNLPacket {
         List<Component> tmp = new ArrayList<>(MAX_LINES);
         for (int i = 0; i < n; i++) {
             // FriendlyByteBuf has readComponent/writeComponent in modern versions
-            tmp.add(buf.readComponent());
+            tmp.add(net.minecraft.network.chat.ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC.decode(buf));
         }
         this.lines = sanitize(tmp);
 
@@ -54,7 +54,7 @@ public class C2SPedestalUpdatePacket implements DNLPacket {
         buf.writeBlockPos(pos);
         buf.writeVarInt(lines.size());
         for (Component c : lines) {
-            buf.writeComponent(c);
+            net.minecraft.network.chat.ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC.encode(buf, c);
         }
         buf.writeVarInt(color.getId());
         buf.writeBoolean(glowing);
