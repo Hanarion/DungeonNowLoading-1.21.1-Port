@@ -74,7 +74,7 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
     }
 
     @Override
-    public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         if (!world.isClientSide) {
             this.playerDestroyedPart = !player.getAbilities().instabuild;
             if (this.playerDestroyedPart) {
@@ -82,7 +82,7 @@ public class BallistaGolemStatuePartBlock extends Block implements SimpleWaterlo
                 this.playerDestroyedPart = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(world, Enchantments.SILK_TOUCH), heldItem) < 1;
             }
         }
-        super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
 
     public static BlockPos findCorePosition(BlockPos partPos, BallistaGolemStatueStates partState, Direction partFacing) {

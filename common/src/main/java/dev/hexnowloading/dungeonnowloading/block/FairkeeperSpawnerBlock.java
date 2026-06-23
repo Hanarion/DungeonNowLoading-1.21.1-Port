@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.FairkeeperChestBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.FairkeeperSpawnerBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
@@ -23,6 +25,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class FairkeeperSpawnerBlock extends BaseEntityBlock implements EntityBlock {
+
+    public static final MapCodec<FairkeeperSpawnerBlock> CODEC = simpleCodec(FairkeeperSpawnerBlock::new);
+
+    @Override
+    public MapCodec<FairkeeperSpawnerBlock> codec() {
+        return CODEC;
+    }
 
     public static final BooleanProperty FAIRKEEPER_ALERT = DNLProperties.FAIRKEEPER_ALERT;
 

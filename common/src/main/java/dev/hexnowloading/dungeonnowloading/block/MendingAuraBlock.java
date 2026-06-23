@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingAuraBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLParticleTypes;
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
@@ -37,6 +39,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MendingAuraBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
+
+    public static final MapCodec<MendingAuraBlock> CODEC = simpleCodec(MendingAuraBlock::new);
+
+    @Override
+    public MapCodec<MendingAuraBlock> codec() {
+        return CODEC;
+    }
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty FENCE_LIKE = BooleanProperty.create("fence_like");

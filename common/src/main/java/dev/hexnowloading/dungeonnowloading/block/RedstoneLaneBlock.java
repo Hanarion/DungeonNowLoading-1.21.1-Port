@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.property.RedstoneLaneMode;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
@@ -28,6 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RedstoneLaneBlock extends DirectionalBlock {
+
+    public static final MapCodec<RedstoneLaneBlock> CODEC = simpleCodec(RedstoneLaneBlock::new);
+
+    @Override
+    public MapCodec<RedstoneLaneBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final EnumProperty<RedstoneLaneMode> REDSTONE_LANE_MODE = DNLProperties.REDSTONE_LANE_MODE;

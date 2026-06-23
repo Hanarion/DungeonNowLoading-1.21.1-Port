@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.FairkeeperChestBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.FairkeeperSpawnerBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.ChestStates;
@@ -50,6 +52,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class FairkeeperChestBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, EntityBlock {
+
+    public static final MapCodec<FairkeeperChestBlock> CODEC = simpleCodec(FairkeeperChestBlock::new);
+
+    @Override
+    public MapCodec<FairkeeperChestBlock> codec() {
+        return CODEC;
+    }
     public static final EnumProperty<ChestStates> CHEST_STATES = DNLProperties.CHEST_STATES;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty FAIRKEEPER_ALERT = DNLProperties.FAIRKEEPER_ALERT;
@@ -119,9 +128,9 @@ public class FairkeeperChestBlock extends BaseEntityBlock implements SimpleWater
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
 
-        super.playerWillDestroy(level, blockPos, blockState, player);
+        return super.playerWillDestroy(level, blockPos, blockState, player);
     }
 
     protected Stat<ResourceLocation> getOpenChestStat() { return Stats.CUSTOM.get(Stats.OPEN_CHEST); }

@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.block.entity.ScuttleStatueBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -24,6 +26,13 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
+
+    public static final MapCodec<ScuttleStatueBlock> CODEC = simpleCodec(ScuttleStatueBlock::new);
+
+    @Override
+    public MapCodec<ScuttleStatueBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
@@ -104,7 +113,7 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
         if (!level.isClientSide) {
             this.playerDestroyed = !player.getAbilities().instabuild;
             if (playerDestroyed) {
@@ -112,7 +121,7 @@ public class ScuttleStatueBlock extends BaseEntityBlock implements EntityBlock {
                 this.playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(level, Enchantments.SILK_TOUCH), heldItem) < 1;
             }
         }
-        super.playerWillDestroy(level, blockPos, blockState, player);
+        return super.playerWillDestroy(level, blockPos, blockState, player);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.VertexPillarBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
@@ -35,6 +37,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class VertexPillarBlock extends BaseEntityBlock implements EntityBlock, SimpleWaterloggedBlock {
+
+    public static final MapCodec<VertexPillarBlock> CODEC = simpleCodec(VertexPillarBlock::new);
+
+    @Override
+    public MapCodec<VertexPillarBlock> codec() {
+        return CODEC;
+    }
 
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;

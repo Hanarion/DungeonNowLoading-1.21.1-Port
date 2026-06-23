@@ -76,7 +76,7 @@ public class PreserverBlock extends BaseEntityBlock {
         }
     }
     @Override
-    public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
         if (!this.canPlayerDestroy() && !level.isClientSide && !player.getAbilities().instabuild) {
             BlockEntity blockEntityOld = level.getBlockEntity(blockPos);
 
@@ -84,7 +84,7 @@ public class PreserverBlock extends BaseEntityBlock {
                 transferData = preserverBlockEntity.saveWithFullMetadata(level.registryAccess());
             }
         }
-        super.playerWillDestroy(level, blockPos, blockState, player);
+        return super.playerWillDestroy(level, blockPos, blockState, player);
     }
 
     @Override

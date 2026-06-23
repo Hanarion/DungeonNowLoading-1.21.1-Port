@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -31,6 +33,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.List;
 
 public class WebCarpetBlock extends MultifaceBlock {
+
+    public static final MapCodec<WebCarpetBlock> CODEC = simpleCodec(WebCarpetBlock::new);
+
+    @Override
+    public MapCodec<WebCarpetBlock> codec() {
+        return CODEC;
+    }
 
     private final MultifaceSpreader spreader = new MultifaceSpreader(this);
     private static final Vec3 ENTITY_SLOWDOWN = new Vec3(0.9999D, 0.9999D, 0.9999D);

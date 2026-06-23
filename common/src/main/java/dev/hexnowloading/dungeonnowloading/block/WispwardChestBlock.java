@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.WispwardChestBlockEntity;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CWispwardChestOpenConfigPacket;
 import dev.hexnowloading.dungeonnowloading.platform.Services;
@@ -40,6 +42,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class WispwardChestBlock extends BaseEntityBlock {
+
+    public static final MapCodec<WispwardChestBlock> CODEC = simpleCodec(WispwardChestBlock::new);
+
+    @Override
+    public MapCodec<WispwardChestBlock> codec() {
+        return CODEC;
+    }
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     private static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
 

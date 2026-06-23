@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -11,6 +13,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class WispwardLanternBlockEntity extends BlockEntity {
+
+    public static final MapCodec<WispwardLanternBlock> CODEC = simpleCodec(WispwardLanternBlock::new);
+
+    @Override
+    public MapCodec<WispwardLanternBlock> codec() {
+        return CODEC;
+    }
     public static final int MIN_TIMER_SECONDS = 1;
     public static final int MAX_TIMER_SECONDS = 15;
 

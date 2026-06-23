@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import dev.hexnowloading.dungeonnowloading.block.entity.BallistaGolemStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.BallistaGolemStatueStates;
@@ -25,6 +27,13 @@ import java.util.Map;
 import static dev.hexnowloading.dungeonnowloading.block.BallistaGolemStatuePartBlock.STATES;
 
 public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityBlock {
+
+    public static final MapCodec<BallistaGolemStatueBlock> CODEC = simpleCodec(BallistaGolemStatueBlock::new);
+
+    @Override
+    public MapCodec<BallistaGolemStatueBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
@@ -192,7 +201,7 @@ public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityB
     }
 
     @Override
-    public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         if (!world.isClientSide) {
             this.playerDestroyed = !player.getAbilities().instabuild;
             if (this.playerDestroyed) {
@@ -200,7 +209,7 @@ public class BallistaGolemStatueBlock extends BaseEntityBlock implements EntityB
                 this.playerDestroyed = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(world, Enchantments.SILK_TOUCH), heldItem) < 1;
             }
         }
-        super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
 
     @Override

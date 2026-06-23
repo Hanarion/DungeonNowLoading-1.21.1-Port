@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import dev.hexnowloading.dungeonnowloading.util.ItemNbt;
 import dev.hexnowloading.dungeonnowloading.util.ProfileNbt;
@@ -48,6 +50,13 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 
 public class PlayerStatueBlock extends BaseEntityBlock implements EntityBlock, SimpleWaterloggedBlock {
+
+    public static final MapCodec<PlayerStatueBlock> CODEC = simpleCodec(PlayerStatueBlock::new);
+
+    @Override
+    public MapCodec<PlayerStatueBlock> codec() {
+        return CODEC;
+    }
 
     //public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;

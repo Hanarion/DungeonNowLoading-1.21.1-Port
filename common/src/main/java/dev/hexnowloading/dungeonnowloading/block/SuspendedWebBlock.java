@@ -86,7 +86,7 @@ public class SuspendedWebBlock extends Block {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide) {
             Structure structure = findStructure(level, pos, state.getValue(FACING));
             if (structure != null) {
@@ -101,7 +101,7 @@ public class SuspendedWebBlock extends Block {
                 removeOtherParts(level, pos, structure);
             }
         }
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override

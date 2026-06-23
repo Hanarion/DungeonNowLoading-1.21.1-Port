@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block.entity;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.MendingAuraBlock;
 import dev.hexnowloading.dungeonnowloading.block.ZoneReceiverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.particle.type.ScalableParticleType;
@@ -22,6 +24,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
 public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceiverBlockEntity {
+
+    public static final MapCodec<DuriteQuellerBlock> CODEC = simpleCodec(DuriteQuellerBlock::new);
+
+    @Override
+    public MapCodec<DuriteQuellerBlock> codec() {
+        return CODEC;
+    }
 
     private static final float RETURN_PARTICLE_SPEED = 0.18f; // blocks per tick
     private static final double MAX_SPAWN_DISTANCE = 32.0;

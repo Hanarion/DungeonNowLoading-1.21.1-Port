@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -16,6 +18,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class SilverfishBarrelBlock extends GenericExplosiveBarrelBlock {
+
+    public static final MapCodec<SilverfishBarrelBlock> CODEC = simpleCodec(SilverfishBarrelBlock::new);
+
+    @Override
+    public MapCodec<SilverfishBarrelBlock> codec() {
+        return CODEC;
+    }
 
     public SilverfishBarrelBlock(Properties props) {
         super(props);
