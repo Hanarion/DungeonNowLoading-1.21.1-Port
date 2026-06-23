@@ -96,8 +96,11 @@ public class BookPileBlock extends PileBlock implements EntityBlock {
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof BookPileBlockEntity pileBe)) return;
 
-        // Read from item BlockEntityTag (same pattern as chests/shulkers)
-        CompoundTag bet = stack.getTagElement("BlockEntityTag");
+        // Read from the item's block-entity data component (1.21 replaced the
+        // legacy "BlockEntityTag" item NBT with DataComponents.BLOCK_ENTITY_DATA).
+        net.minecraft.world.item.component.CustomData customData =
+                stack.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA);
+        CompoundTag bet = customData != null ? customData.copyTag() : null;
         if (bet != null && bet.contains("LootTable", Tag.TAG_STRING)) {
             ResourceLocation id = ResourceLocation.parse(bet.getString("LootTable"));
             long seed = bet.contains("LootTableSeed", Tag.TAG_LONG) ? bet.getLong("LootTableSeed") : level.getRandom().nextLong();

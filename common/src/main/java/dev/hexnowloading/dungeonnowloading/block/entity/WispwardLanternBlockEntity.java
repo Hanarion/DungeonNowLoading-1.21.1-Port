@@ -91,7 +91,7 @@ public class WispwardLanternBlockEntity extends BlockEntity {
 
     @Override
     public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag();
+        CompoundTag tag = super.getUpdateTag(registries);
         tag.putInt("TimerSeconds", this.timerSeconds);
         tag.putLong("LitUntilGameTime", this.litUntilGameTime);
         tag.putBoolean("LockedLit", this.lockedLit);
