@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "i": {
+      "item": "dungeonnowloading:redstone_circuit"
+    },
+    "r": {
+      "item": "minecraft:lightning_rod"
+    },
+    "s": {
+      "item": "minecraft:stone_button"
+    }
+  },
+  "pattern": [
+    " r ",
+    "csc",
+    "cic"
+  ],
+  "result": {
+    "count": 1,
+    "id": "dungeonnowloading:copper_detonator"
+  }
+}

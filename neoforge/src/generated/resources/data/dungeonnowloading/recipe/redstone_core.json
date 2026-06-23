@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "r": {
+      "item": "minecraft:redstone_block"
+    },
+    "s": {
+      "item": "dungeonnowloading:redstone_suppressor"
+    }
+  },
+  "pattern": [
+    "srs",
+    "rrr",
+    "srs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "dungeonnowloading:redstone_core"
+  }
+}

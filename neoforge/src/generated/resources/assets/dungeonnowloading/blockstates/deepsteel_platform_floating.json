@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "waterlogged=false": {
+      "model": "dungeonnowloading:block/deepsteel_hanging_platform"
+    },
+    "waterlogged=true": {
+      "model": "dungeonnowloading:block/deepsteel_hanging_platform"
+    }
+  }
+}

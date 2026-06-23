@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeonnowloading:crimson_wooden_board"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "dungeonnowloading:blocks/crimson_wooden_board"
+}

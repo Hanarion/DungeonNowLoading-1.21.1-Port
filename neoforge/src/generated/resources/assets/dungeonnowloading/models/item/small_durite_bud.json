@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "dungeonnowloading:block/small_durite_bud"
+  }
+}

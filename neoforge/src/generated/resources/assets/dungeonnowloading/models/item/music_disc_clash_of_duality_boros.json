@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "dungeonnowloading:item/music_disc_clash_of_duality_boros"
+  }
+}

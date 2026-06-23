@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,waterlogged=false": {
+      "model": "dungeonnowloading:block/deepsteel_braced_rail_east",
+      "y": 90
+    },
+    "facing=east,waterlogged=true": {
+      "model": "dungeonnowloading:block/deepsteel_braced_rail_east",
+      "y": 90
+    },
+    "facing=north,waterlogged=false": {
+      "model": "dungeonnowloading:block/deepsteel_braced_rail_north"
+    },
+    "facing=north,waterlogged=true": {
+      "model": "dungeonnowloading:block/deepsteel_braced_rail_north"
+    },
+    "facing=south,waterlogged=false": {
+      "model": "dungeonnowloading:block/deepsteel_braced_rail_south",
+      "y": 180
+    },
+    "facing=south,waterlogged=true": {
+      "model": "dungeonnowloading:block/deepsteel_braced_rail_south",
+      "y": 180
+    },
+    "facing=west,waterlogged=false": {
+      "model": "dungeonnowloading:block/deepsteel_braced_rail_west",
+      "y": 270
+    },
+    "facing=west,waterlogged=true": {
+      "model": "dungeonnowloading:block/deepsteel_braced_rail_west",
+      "y": 270
+    }
+  }
+}

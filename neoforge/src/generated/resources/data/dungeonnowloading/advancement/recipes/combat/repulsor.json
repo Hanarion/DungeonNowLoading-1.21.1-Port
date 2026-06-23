@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_redstone_circuit_or_core": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#dungeonnowloading:redstone_circuit_or_core"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "dungeonnowloading:repulsor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_redstone_circuit_or_core"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "dungeonnowloading:repulsor"
+    ]
+  }
+}

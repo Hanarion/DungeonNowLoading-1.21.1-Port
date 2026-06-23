@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeonnowloading:hazard_sign_up"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "dungeonnowloading:blocks/hazard_sign_up"
+}

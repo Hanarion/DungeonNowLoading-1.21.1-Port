@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "b": {
+      "item": "minecraft:blaze_powder"
+    },
+    "c": {
+      "item": "dungeonnowloading:redstone_core"
+    },
+    "r": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "pattern": [
+    "rbr",
+    "bcb",
+    "rbr"
+  ],
+  "result": {
+    "count": 1,
+    "id": "dungeonnowloading:overcharged_redstone_block"
+  }
+}

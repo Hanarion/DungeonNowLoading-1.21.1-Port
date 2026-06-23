@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "dungeonnowloading:dungeon_banner_spawner_recolor_to_black"
+    },
+    {
+      "item": "minecraft:black_dye"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "dungeonnowloading:dungeon_banner_spawner_black"
+  }
+}

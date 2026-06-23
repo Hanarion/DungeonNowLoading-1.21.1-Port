@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "d": {
+      "item": "dungeonnowloading:durite"
+    },
+    "l": {
+      "item": "minecraft:lapis_lazuli"
+    }
+  },
+  "pattern": [
+    "dl",
+    "ld"
+  ],
+  "result": {
+    "count": 1,
+    "id": "dungeonnowloading:mendstone"
+  }
+}

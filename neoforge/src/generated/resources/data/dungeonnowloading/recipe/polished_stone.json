@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "s": {
+      "item": "minecraft:stone"
+    }
+  },
+  "pattern": [
+    "sss",
+    "sss",
+    "sss"
+  ],
+  "result": {
+    "count": 9,
+    "id": "dungeonnowloading:polished_stone"
+  }
+}

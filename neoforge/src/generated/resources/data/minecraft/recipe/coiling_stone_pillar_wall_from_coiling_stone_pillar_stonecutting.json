@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "dungeonnowloading:coiling_stone_pillar"
+  },
+  "result": {
+    "count": 1,
+    "id": "dungeonnowloading:coiling_stone_pillar_wall"
+  }
+}

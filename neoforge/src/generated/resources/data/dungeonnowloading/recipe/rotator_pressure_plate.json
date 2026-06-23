@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "c": {
+      "item": "dungeonnowloading:redstone_chip"
+    },
+    "p": {
+      "item": "minecraft:stone_pressure_plate"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "   ",
+    " p ",
+    "rcr"
+  ],
+  "result": {
+    "count": 1,
+    "id": "dungeonnowloading:rotator_pressure_plate"
+  }
+}

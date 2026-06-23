@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": {
+      "item": "dungeonnowloading:redstone_circuit"
+    },
+    "b": {
+      "item": "dungeonnowloading:redstone_core"
+    },
+    "r": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "pattern": [
+    "rar",
+    "brb",
+    "rar"
+  ],
+  "result": {
+    "count": 1,
+    "id": "dungeonnowloading:redstone_idol"
+  }
+}

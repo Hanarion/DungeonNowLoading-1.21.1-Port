@@ -1,0 +1,124 @@
+{
+  "variants": {
+    "facing=east,variant=left,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_right",
+      "y": 90
+    },
+    "facing=east,variant=left,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_right",
+      "y": 90
+    },
+    "facing=east,variant=middle,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_middle",
+      "y": 90
+    },
+    "facing=east,variant=middle,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_middle",
+      "y": 90
+    },
+    "facing=east,variant=right,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_left",
+      "y": 90
+    },
+    "facing=east,variant=right,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_left",
+      "y": 90
+    },
+    "facing=east,variant=single,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_single",
+      "y": 90
+    },
+    "facing=east,variant=single,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_single",
+      "y": 90
+    },
+    "facing=north,variant=left,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_right"
+    },
+    "facing=north,variant=left,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_right"
+    },
+    "facing=north,variant=middle,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_middle"
+    },
+    "facing=north,variant=middle,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_middle"
+    },
+    "facing=north,variant=right,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_left"
+    },
+    "facing=north,variant=right,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_left"
+    },
+    "facing=north,variant=single,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_single"
+    },
+    "facing=north,variant=single,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_single"
+    },
+    "facing=south,variant=left,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_right",
+      "y": 180
+    },
+    "facing=south,variant=left,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_right",
+      "y": 180
+    },
+    "facing=south,variant=middle,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_middle",
+      "y": 180
+    },
+    "facing=south,variant=middle,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_middle",
+      "y": 180
+    },
+    "facing=south,variant=right,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_left",
+      "y": 180
+    },
+    "facing=south,variant=right,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_left",
+      "y": 180
+    },
+    "facing=south,variant=single,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_single",
+      "y": 180
+    },
+    "facing=south,variant=single,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_single",
+      "y": 180
+    },
+    "facing=west,variant=left,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_right",
+      "y": 270
+    },
+    "facing=west,variant=left,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_right",
+      "y": 270
+    },
+    "facing=west,variant=middle,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_middle",
+      "y": 270
+    },
+    "facing=west,variant=middle,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_middle",
+      "y": 270
+    },
+    "facing=west,variant=right,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_left",
+      "y": 270
+    },
+    "facing=west,variant=right,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_left",
+      "y": 270
+    },
+    "facing=west,variant=single,waterlogged=false": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_single",
+      "y": 270
+    },
+    "facing=west,variant=single,waterlogged=true": {
+      "model": "dungeonnowloading:block/acacia_wooden_board_single",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "dungeonnowloading:block/wooden_board_left",
+  "textures": {
+    "3": "dungeonnowloading:block/dark_oak_wooden_board",
+    "particle": "dungeonnowloading:block/dark_oak_wooden_board"
+  }
+}

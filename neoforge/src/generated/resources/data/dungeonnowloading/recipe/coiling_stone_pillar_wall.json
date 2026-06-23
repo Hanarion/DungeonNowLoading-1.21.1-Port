@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "p": {
+      "item": "dungeonnowloading:coiling_stone_pillar"
+    }
+  },
+  "pattern": [
+    "ppp",
+    "ppp"
+  ],
+  "result": {
+    "count": 6,
+    "id": "dungeonnowloading:coiling_stone_pillar_wall"
+  }
+}

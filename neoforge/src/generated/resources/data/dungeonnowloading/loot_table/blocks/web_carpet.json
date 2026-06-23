@@ -1,0 +1,340 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "condition": "minecraft:match_tool",
+              "predicate": {
+                "items": "minecraft:shears"
+              }
+            }
+          ],
+          "functions": [
+            {
+              "add": true,
+              "conditions": [
+                {
+                  "block": "dungeonnowloading:web_carpet",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "down": "true"
+                  }
+                }
+              ],
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "add": true,
+              "conditions": [
+                {
+                  "block": "dungeonnowloading:web_carpet",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "up": "true"
+                  }
+                }
+              ],
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "add": true,
+              "conditions": [
+                {
+                  "block": "dungeonnowloading:web_carpet",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "north": "true"
+                  }
+                }
+              ],
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "add": true,
+              "conditions": [
+                {
+                  "block": "dungeonnowloading:web_carpet",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "south": "true"
+                  }
+                }
+              ],
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "add": true,
+              "conditions": [
+                {
+                  "block": "dungeonnowloading:web_carpet",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "west": "true"
+                  }
+                }
+              ],
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "add": true,
+              "conditions": [
+                {
+                  "block": "dungeonnowloading:web_carpet",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "east": "true"
+                  }
+                }
+              ],
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "add": true,
+              "count": -1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "function": "minecraft:explosion_decay"
+            }
+          ],
+          "name": "dungeonnowloading:web_carpet"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "minecraft:shears"
+            }
+          }
+        },
+        {
+          "block": "dungeonnowloading:web_carpet",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "down": "true"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "chance": 0.16666667,
+              "condition": "minecraft:random_chance"
+            },
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "name": "minecraft:string"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "minecraft:shears"
+            }
+          }
+        },
+        {
+          "block": "dungeonnowloading:web_carpet",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "up": "true"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "chance": 0.16666667,
+              "condition": "minecraft:random_chance"
+            },
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "name": "minecraft:string"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "minecraft:shears"
+            }
+          }
+        },
+        {
+          "block": "dungeonnowloading:web_carpet",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "north": "true"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "chance": 0.16666667,
+              "condition": "minecraft:random_chance"
+            },
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "name": "minecraft:string"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "minecraft:shears"
+            }
+          }
+        },
+        {
+          "block": "dungeonnowloading:web_carpet",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "south": "true"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "chance": 0.16666667,
+              "condition": "minecraft:random_chance"
+            },
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "name": "minecraft:string"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "minecraft:shears"
+            }
+          }
+        },
+        {
+          "block": "dungeonnowloading:web_carpet",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "west": "true"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "chance": 0.16666667,
+              "condition": "minecraft:random_chance"
+            },
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "name": "minecraft:string"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "minecraft:shears"
+            }
+          }
+        },
+        {
+          "block": "dungeonnowloading:web_carpet",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "east": "true"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "chance": 0.16666667,
+              "condition": "minecraft:random_chance"
+            },
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "name": "minecraft:string"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "dungeonnowloading:blocks/web_carpet"
+}
