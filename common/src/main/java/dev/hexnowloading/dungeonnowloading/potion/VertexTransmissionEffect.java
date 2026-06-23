@@ -40,7 +40,7 @@ public class VertexTransmissionEffect extends MobEffect {
 
 
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         UUID uuid = entity.getUUID();
         entityVertexNodeMap.computeIfAbsent(uuid, id -> new VertexNode(entity));
         damageTickCountMap.putIfAbsent(uuid, 5);
@@ -87,10 +87,21 @@ public class VertexTransmissionEffect extends MobEffect {
         }
 
         vertexNode.tick(entity);
+        return true;
     }
 
+    /**
+     * 1.21 split the old removeAttributeModifiers(LivingEntity, AttributeMap, int) into
+     * removeAttributeModifiers(AttributeMap) (auto attribute cleanup) and the per-mob
+     * lifecycle hook onMobRemoved(...). Our per-entity bookkeeping cleanup lives here.
+     */
     @Override
-    public void removeAttributeModifiers(LivingEntity entity, AttributeMap attributeMap, int amplifier) {
+    public void onMobRemoved(LivingEntity entity, int amplifier, net.minecraft.world.entity.Entity.RemovalReason reason) {
+        cleanup(entity);
+        super.onMobRemoved(entity, amplifier, reason);
+    }
+
+    private void cleanup(LivingEntity entity) {
         UUID uuid = entity.getUUID();
 
         VertexNode vertexNode = entityVertexNodeMap.get(uuid);
@@ -101,12 +112,10 @@ public class VertexTransmissionEffect extends MobEffect {
         entityVertexNodeMap.remove(uuid);
         damageTickCountMap.remove(uuid);
         isReconnectionCaseMap.remove(uuid);
-
-        super.removeAttributeModifiers(entity, attributeMap, amplifier);
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration > 0;
     }
 }
