@@ -21,9 +21,10 @@ public class EnchantmentTooltipHandlerForge {
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
-        for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(stack).entrySet()) {
-            Enchantment ench = entry.getKey();
-            var id = BuiltInRegistries.ENCHANTMENT.getKey(ench);
+        // 1.21: getEnchantments returns ItemEnchantments keyed by Holder<Enchantment>;
+        // enchantments are a dynamic registry, so resolve the id from the holder key.
+        for (var holder : stack.getEnchantments().keySet()) {
+            var id = holder.unwrapKey().map(net.minecraft.resources.ResourceKey::location).orElse(null);
             if (id != null && DungeonNowLoading.MOD_ID.equals(id.getNamespace())) {
                 String key = "enchantment." + id.getNamespace() + "." + id.getPath() + ".desc";
                 event.getToolTip().add(Component.translatable(key).withStyle(ChatFormatting.DARK_GRAY));

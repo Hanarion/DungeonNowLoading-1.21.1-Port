@@ -46,6 +46,7 @@ public class DNLForge {
 
     private void addModClientListeners(IEventBus bus) {
         DNLClient.registerItemModels();
+        bus.addListener(dev.hexnowloading.dungeonnowloading.platform.ForgeClientHelper::onRegisterMenuScreens);
         bus.addListener(DNLForgeClientEvents::onRegisterAdditionalModels);
         bus.addListener(DNLForgeClientEvents::onModifyBakingResult);
         bus.addListener(DNLForgeClientEvents::onRegisterRenderer);
