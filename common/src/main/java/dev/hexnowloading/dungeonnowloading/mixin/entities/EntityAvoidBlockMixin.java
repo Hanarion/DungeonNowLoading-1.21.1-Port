@@ -18,7 +18,8 @@ import javax.annotation.Nullable;
 @Mixin(WalkNodeEvaluator.class)
 public class EntityAvoidBlockMixin {
 
-    @Inject(method = "Lnet/minecraft/world/level/pathfinder/WalkNodeEvaluator;getBlockPathTypeRaw(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/pathfinder/PathType;", at = @At("HEAD"), cancellable = true)
+    // 1.21: WalkNodeEvaluator.getBlockPathTypeRaw was renamed getPathTypeFromState(BlockGetter, BlockPos).
+    @Inject(method = "Lnet/minecraft/world/level/pathfinder/WalkNodeEvaluator;getPathTypeFromState(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/pathfinder/PathType;", at = @At("HEAD"), cancellable = true)
     private static void dungeonnowloading_hasValidPathType(BlockGetter blockGetter, BlockPos blockPos, CallbackInfoReturnable<PathType> cir) {
         if (DNLBlocks.blocksRegistered) {
             BlockState blockState = blockGetter.getBlockState(blockPos);
