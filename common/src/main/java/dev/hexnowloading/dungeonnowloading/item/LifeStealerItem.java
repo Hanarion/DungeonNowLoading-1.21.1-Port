@@ -26,7 +26,7 @@ import java.util.List;
 public class LifeStealerItem extends SwordItem {
 
     public LifeStealerItem(Tier $$0, int $$1, float $$2, Properties $$3) {
-        super($$0, $$1, $$2, $$3);
+        super($$0, $$3.attributes(net.minecraft.world.item.SwordItem.createAttributes($$0, $$1, $$2)));
     }
 
     /*@Override

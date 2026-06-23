@@ -23,7 +23,7 @@ public class MimiclingShovelItem extends ShovelItem implements MimiclingFormItem
     }
 
     public MimiclingShovelItem(Tier tier, Properties properties) {
-        super(tier, 1.5F, -3.0F, properties);
+        super(tier, properties.attributes(net.minecraft.world.item.DiggerItem.createAttributes(tier, 1.5F, -3.0F)));
     }
 
     @Override

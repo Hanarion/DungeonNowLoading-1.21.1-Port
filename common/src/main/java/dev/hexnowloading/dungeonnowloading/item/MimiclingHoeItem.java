@@ -23,7 +23,7 @@ public class MimiclingHoeItem extends HoeItem implements MimiclingFormItem {
     }
 
     public MimiclingHoeItem(Tier tier, Properties properties) {
-        super(tier, getAttackDamageBonus(tier), getAttackSpeed(tier), properties);
+        super(tier, properties.attributes(net.minecraft.world.item.DiggerItem.createAttributes(tier, getAttackDamageBonus(tier), getAttackSpeed(tier))));
     }
 
     private static int getAttackDamageBonus(Tier tier) {

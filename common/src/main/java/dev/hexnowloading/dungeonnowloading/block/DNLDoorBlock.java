@@ -6,6 +6,6 @@ import net.minecraft.world.level.block.state.properties.BlockSetType;
 
 public class DNLDoorBlock extends DoorBlock {
     public DNLDoorBlock(BlockBehaviour.Properties props, BlockSetType setType) {
-        super(props, setType);
+        super(setType, props);
     }
 }

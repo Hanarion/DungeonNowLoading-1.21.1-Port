@@ -12,7 +12,7 @@ import java.util.List;
 public class MendstonePickaxeItem extends PickaxeItem {
 
     public MendstonePickaxeItem(Properties properties) {
-        super(Tiers.IRON, 1, -2.8F, properties);
+        super(Tiers.IRON, properties.attributes(net.minecraft.world.item.DiggerItem.createAttributes(Tiers.IRON, 1, -2.8F)));
     }
 
     @Override
@@ -23,10 +23,7 @@ public class MendstonePickaxeItem extends PickaxeItem {
         components.add(Component.translatable("item.dungeonnowloading.mendstone_pickaxe.tooltip.disclaimer").withStyle(ChatFormatting.DARK_GRAY));
     }
 
-    @Override
-    public Rarity getRarity(ItemStack stack) {
-        return Rarity.RARE;
-    }
+    // 1.21 removed Item.getRarity(ItemStack); rarity is set via Properties.rarity(...) at registration.
 
     @Override
     public boolean isValidRepairItem(ItemStack itemStack, ItemStack repairItem) {

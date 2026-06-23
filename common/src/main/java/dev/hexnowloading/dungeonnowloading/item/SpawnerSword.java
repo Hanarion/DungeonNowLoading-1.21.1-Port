@@ -21,7 +21,7 @@ import java.util.List;
 public class SpawnerSword extends SwordItem {
 
     public SpawnerSword(Tier $$0, int $$1, float $$2, Properties $$3) {
-        super($$0, $$1, $$2, $$3);
+        super($$0, $$3.attributes(net.minecraft.world.item.SwordItem.createAttributes($$0, $$1, $$2)));
     }
 
     @Override

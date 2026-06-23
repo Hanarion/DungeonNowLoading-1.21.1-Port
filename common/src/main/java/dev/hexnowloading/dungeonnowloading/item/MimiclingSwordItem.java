@@ -23,7 +23,7 @@ public class MimiclingSwordItem extends SwordItem implements MimiclingFormItem {
     }
 
     public MimiclingSwordItem(Tier tier, Properties properties) {
-        super(tier, 3, -2.4F, properties);
+        super(tier, properties.attributes(SwordItem.createAttributes(tier, 3, -2.4F)));
     }
 
     @Override

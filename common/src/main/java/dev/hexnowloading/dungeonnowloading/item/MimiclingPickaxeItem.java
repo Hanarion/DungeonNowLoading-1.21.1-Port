@@ -23,7 +23,7 @@ public class MimiclingPickaxeItem extends PickaxeItem implements MimiclingFormIt
     }
 
     public MimiclingPickaxeItem(Tier tier, Properties properties) {
-        super(tier, 1, -2.8F, properties);
+        super(tier, properties.attributes(net.minecraft.world.item.DiggerItem.createAttributes(tier, 1, -2.8F)));
     }
 
     @Override
