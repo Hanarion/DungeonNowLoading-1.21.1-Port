@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -26,6 +28,13 @@ import java.util.Map;
 import java.util.Set;
 
 public class ChainedRailBlock extends BaseRailBlock {
+
+    public static final MapCodec<ChainedRailBlock> CODEC = simpleCodec(ChainedRailBlock::new);
+
+    @Override
+    public MapCodec<ChainedRailBlock> codec() {
+        return CODEC;
+    }
     public static final EnumProperty<RailShape> SHAPE = BlockStateProperties.RAIL_SHAPE_STRAIGHT;
     public static final IntegerProperty POWER = IntegerProperty.create("power", 0, 15);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;

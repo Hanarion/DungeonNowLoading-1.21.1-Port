@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.DisabledFairkeeperChestBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.FairkeeperChestBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.property.ChestStates;
@@ -39,6 +41,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class DisabledFairkeeperChestBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, EntityBlock {
+
+    public static final MapCodec<DisabledFairkeeperChestBlock> CODEC = simpleCodec(DisabledFairkeeperChestBlock::new);
+
+    @Override
+    public MapCodec<DisabledFairkeeperChestBlock> codec() {
+        return CODEC;
+    }
 
     public static final EnumProperty<ChestStates> CHEST_STATES = DNLProperties.CHEST_STATES;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;

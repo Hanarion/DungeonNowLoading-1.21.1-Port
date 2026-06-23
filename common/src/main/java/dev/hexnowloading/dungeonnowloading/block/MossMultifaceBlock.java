@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,6 +22,13 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 public class MossMultifaceBlock extends MultifaceBlock implements BonemealableBlock, SimpleWaterloggedBlock {
+
+    public static final MapCodec<MossMultifaceBlock> CODEC = simpleCodec(MossMultifaceBlock::new);
+
+    @Override
+    public MapCodec<MossMultifaceBlock> codec() {
+        return CODEC;
+    }
 
     private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private final MultifaceSpreader spreader = new MultifaceSpreader(this);

@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -14,6 +16,13 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
 public class TrophyBlock extends HorizontalDirectionalBlock implements SimpleWaterloggedBlock {
+
+    public static final MapCodec<TrophyBlock> CODEC = simpleCodec(TrophyBlock::new);
+
+    @Override
+    public MapCodec<TrophyBlock> codec() {
+        return CODEC;
+    }
 
     private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 

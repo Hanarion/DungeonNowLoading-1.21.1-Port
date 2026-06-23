@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
@@ -26,6 +28,13 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 public class SignalRailBlock extends BaseRailBlock {
+
+    public static final MapCodec<SignalRailBlock> CODEC = simpleCodec(SignalRailBlock::new);
+
+    @Override
+    public MapCodec<SignalRailBlock> codec() {
+        return CODEC;
+    }
     public static final EnumProperty<RailShape> SHAPE = BlockStateProperties.RAIL_SHAPE_STRAIGHT;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final IntegerProperty SIGNAL = IntegerProperty.create("signal", 0, 2);

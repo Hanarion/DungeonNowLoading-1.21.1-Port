@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.MendingTableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,6 +33,13 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 //add implements menuprovider
 public class MendingTableBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
+
+    public static final MapCodec<MendingTableBlock> CODEC = simpleCodec(MendingTableBlock::new);
+
+    @Override
+    public MapCodec<MendingTableBlock> codec() {
+        return CODEC;
+    }
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     // Tight hitbox matching the model: base slab (0-6), central pillar (3-13 from y 4-10), and top slab (10-16)

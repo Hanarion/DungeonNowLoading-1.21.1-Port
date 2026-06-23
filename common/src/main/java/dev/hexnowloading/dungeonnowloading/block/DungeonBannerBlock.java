@@ -25,6 +25,17 @@ import java.util.Map;
 
 public class DungeonBannerBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
+    public static final com.mojang.serialization.MapCodec<DungeonBannerBlock> CODEC =
+            com.mojang.serialization.codecs.RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    StringRepresentable.fromEnum(DungeonBannerVariant::values).fieldOf("variant").forGetter(b -> b.defaultVariant),
+                    propertiesCodec()
+            ).apply(instance, DungeonBannerBlock::new));
+
+    @Override
+    public com.mojang.serialization.MapCodec<DungeonBannerBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<DungeonBannerVariant> VARIANT = EnumProperty.create("variant", DungeonBannerVariant.class);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 

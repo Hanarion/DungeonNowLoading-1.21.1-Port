@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.config.GeneralConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -37,6 +39,13 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ExplosiveBarrelBlock extends GenericExplosiveBarrelBlock {
+
+    public static final MapCodec<ExplosiveBarrelBlock> CODEC = simpleCodec(ExplosiveBarrelBlock::new);
+
+    @Override
+    public MapCodec<ExplosiveBarrelBlock> codec() {
+        return CODEC;
+    }
     public ExplosiveBarrelBlock(Properties properties) {
         super(properties);
     }

@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.PreserverBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
@@ -23,6 +25,13 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class PreserverBlock extends BaseEntityBlock {
+
+    public static final MapCodec<PreserverBlock> CODEC = simpleCodec(PreserverBlock::new);
+
+    @Override
+    public MapCodec<PreserverBlock> codec() {
+        return CODEC;
+    }
 
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;

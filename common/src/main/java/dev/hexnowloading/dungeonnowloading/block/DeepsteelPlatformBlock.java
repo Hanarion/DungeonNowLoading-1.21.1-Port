@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -28,6 +30,13 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class DeepsteelPlatformBlock extends HorizontalDirectionalBlock implements SimpleWaterloggedBlock {
+
+    public static final MapCodec<DeepsteelPlatformBlock> CODEC = simpleCodec(DeepsteelPlatformBlock::new);
+
+    @Override
+    public MapCodec<DeepsteelPlatformBlock> codec() {
+        return CODEC;
+    }
     public enum ShapeRotation {
         AXIS,
         FULL

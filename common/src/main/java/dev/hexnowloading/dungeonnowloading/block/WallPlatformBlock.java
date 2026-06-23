@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,6 +28,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class WallPlatformBlock extends HorizontalDirectionalBlock implements SimpleWaterloggedBlock {
+
+    public static final MapCodec<WallPlatformBlock> CODEC = simpleCodec(WallPlatformBlock::new);
+
+    @Override
+    public MapCodec<WallPlatformBlock> codec() {
+        return CODEC;
+    }
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(0.0, 14.0, 0.0, 16.0, 16.0, 16.0);
