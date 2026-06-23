@@ -38,11 +38,16 @@ public class BorusArrowEntity extends AbstractArrow {
     }
 
     public BorusArrowEntity(LivingEntity owner, Level level) {
-        super(DNLEntityTypes.BORUS_ARROW.get(), owner, level);
+        super(DNLEntityTypes.BORUS_ARROW.get(), owner, level, new ItemStack(net.minecraft.world.item.Items.ARROW), null);
         this.setOwner(owner);
         this.constantDeltaMovement = Vec3.ZERO;
         this.blockBreakCount = 0;
         this.arrowPhase = 0;
+    }
+
+    @Override
+    protected ItemStack getDefaultPickupItem() {
+        return new ItemStack(net.minecraft.world.item.Items.ARROW);
     }
 
     @Override
@@ -134,12 +139,11 @@ public class BorusArrowEntity extends AbstractArrow {
                 }
 
                 if (livingEntity instanceof Player player && player.isBlocking()) {
-                    player.disableShield(true);
+                    player.disableShield();
                 }
 
-                if (!this.level().isClientSide && owner instanceof LivingEntity) {
-                    EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
-                    EnchantmentHelper.doPostDamageEffects((LivingEntity)owner, livingEntity);
+                if (this.level() instanceof net.minecraft.server.level.ServerLevel serverLevel && owner instanceof LivingEntity) {
+                    EnchantmentHelper.doPostAttackEffects(serverLevel, livingEntity, damageSource);
                 }
 
             }

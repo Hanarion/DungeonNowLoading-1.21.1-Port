@@ -162,8 +162,8 @@ public class ChaosSpawnerProjectileEntity extends Entity {
                         damageAmount = (int) (((ChaosSpawnerEntity) owner).getAttackDamage() * 0.5F);
                     }
                     boolean entityHurted = target.hurt(this.damageSources().mobProjectile(this, (LivingEntity) owner), (float) damageAmount);
-                    if (target instanceof Player player) {
-                        player.disableShield(player.isBlocking());
+                    if (target instanceof Player player && player.isBlocking()) {
+                        player.disableShield();
                     }
                     if (entityHurted && target.isAlive()) {
                         this.doEnchantDamageEffects((LivingEntity) owner, target);

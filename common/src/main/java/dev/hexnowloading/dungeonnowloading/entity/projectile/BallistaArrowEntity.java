@@ -27,7 +27,12 @@ public class BallistaArrowEntity extends AbstractArrow {
     }
 
     public BallistaArrowEntity(LivingEntity owner, Level level) {
-        super(DNLEntityTypes.BALLISTA_ARROW.get(), owner, level);
+        super(DNLEntityTypes.BALLISTA_ARROW.get(), owner, level, new ItemStack(net.minecraft.world.item.Items.ARROW), null);
+    }
+
+    @Override
+    protected ItemStack getDefaultPickupItem() {
+        return new ItemStack(net.minecraft.world.item.Items.ARROW);
     }
 
     @Override
@@ -68,12 +73,11 @@ public class BallistaArrowEntity extends AbstractArrow {
                 }
 
                 if (livingEntity instanceof Player player && player.isBlocking()) {
-                    player.disableShield(true);
+                    player.disableShield();
                 }
 
-                if (!this.level().isClientSide && owner instanceof LivingEntity) {
-                    EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
-                    EnchantmentHelper.doPostDamageEffects((LivingEntity)owner, livingEntity);
+                if (this.level() instanceof net.minecraft.server.level.ServerLevel serverLevel && owner instanceof LivingEntity) {
+                    EnchantmentHelper.doPostAttackEffects(serverLevel, livingEntity, damageSource);
                 }
 
             }

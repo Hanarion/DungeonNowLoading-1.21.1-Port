@@ -114,7 +114,7 @@ public class BallistaGolemMeleeAttackGoal extends Goal {
             this.mob.swing(InteractionHand.MAIN_HAND);
             this.mob.doHurtTarget(target);
             if (target instanceof Player player && player.isBlocking()) {
-                player.disableShield(true);
+                player.disableShield();
             }
         }
     }

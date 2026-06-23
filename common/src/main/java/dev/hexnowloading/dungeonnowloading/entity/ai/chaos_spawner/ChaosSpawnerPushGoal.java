@@ -74,7 +74,7 @@ public class ChaosSpawnerPushGoal extends Goal {
         double knockbackStrength = 12.0D;
         int damageAmount;
         if (player.isBlocking()) {
-            player.disableShield(true);
+            player.disableShield();
             damageAmount = (int) (chaosSpawnerEntity.getAttackDamage() * 0.45F);
         } else {
             damageAmount = (int) (chaosSpawnerEntity.getAttackDamage() * 0.9F);

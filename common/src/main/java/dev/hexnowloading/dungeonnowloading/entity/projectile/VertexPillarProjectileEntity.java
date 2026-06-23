@@ -141,7 +141,7 @@ public class VertexPillarProjectileEntity extends ModelledProjectileEntity {
             actualDamage = (float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE) * damagePercentage;
         }
         if (mob instanceof Player player && player.isBlocking()) {
-            player.disableShield(true);
+            player.disableShield();
             actualDamage *= 1.0F - SHILED_DAMAGE_REDUCTION;
         }
         double x = mob.getX() - this.getX();

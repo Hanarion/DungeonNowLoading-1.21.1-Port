@@ -38,7 +38,12 @@ public class VertexArrowProjectileEntity extends AbstractArrow {
     }
 
     public VertexArrowProjectileEntity(Level level, LivingEntity shooter) {
-        super(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), shooter, level);
+        super(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), shooter, level, new ItemStack(net.minecraft.world.item.Items.ARROW), null);
+    }
+
+    @Override
+    protected ItemStack getDefaultPickupItem() {
+        return new ItemStack(net.minecraft.world.item.Items.ARROW);
     }
 
     public int getPowerLevel() { return this.entityData.get(POWER_LEVEL); }
