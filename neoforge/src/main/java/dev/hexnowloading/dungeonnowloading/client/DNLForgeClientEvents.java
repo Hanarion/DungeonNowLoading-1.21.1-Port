@@ -35,9 +35,11 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class DNLForgeClientEvents {
     public static void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
-        // 1.21: RegisterAdditional.register takes a ModelResourceLocation (inventory variant).
+        // 1.21 NeoForge: side-loaded models registered via RegisterAdditional must use the
+        // 'standalone' variant (inventory throws "Side-loaded models must use the 'standalone'
+        // variant"). The WisplightRod renderer looks them up by the same standalone key.
         ForgeClientHelper.ITEM_MODELS.forEach(rl ->
-                event.register(net.minecraft.client.resources.model.ModelResourceLocation.inventory(rl)));
+                event.register(net.minecraft.client.resources.model.ModelResourceLocation.standalone(rl)));
     }
 
     public static void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {

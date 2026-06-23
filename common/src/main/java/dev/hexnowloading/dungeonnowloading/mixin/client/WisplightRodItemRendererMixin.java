@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -36,8 +37,11 @@ public class WisplightRodItemRendererMixin {
 
         ModelManager modelManager = Minecraft.getInstance().getModelManager();
         ResourceLocation modelLocation = isGuiLike(displayContext) ? WISPLIGHT_ROD_GUI_MODEL : WISPLIGHT_ROD_HANDHELD_MODEL;
-        return ((ModelManagerAccessor) modelManager).getBakedRegistry()
-                .getOrDefault(modelLocation, modelManager.getMissingModel());
+        // 1.21: side-loaded models live under the 'standalone' variant (see DNLForgeClientEvents).
+        // Build the MRL via the vanilla ctor with the literal variant string (the standalone()
+        // factory and STANDALONE_VARIANT constant are NeoForge-only, not visible in :common).
+        // getModel returns the missing model if absent.
+        return modelManager.getModel(new ModelResourceLocation(modelLocation, "standalone"));
     }
 
     private static boolean isGuiLike(ItemDisplayContext displayContext) {
