@@ -3,7 +3,7 @@ package dev.hexnowloading.dungeonnowloading.item;
 import dev.hexnowloading.dungeonnowloading.entity.monster.WispwardLanternCartEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEntityTypes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockSource;
+import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;

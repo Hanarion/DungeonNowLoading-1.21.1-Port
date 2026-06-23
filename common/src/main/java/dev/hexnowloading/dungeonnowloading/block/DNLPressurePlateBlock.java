@@ -5,7 +5,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 
 public class DNLPressurePlateBlock extends PressurePlateBlock{
-    public DNLPressurePlateBlock(PressurePlateBlock.Sensitivity sensitivity, BlockBehaviour.Properties properties, BlockSetType blockSetType) {
-        super(sensitivity, properties, blockSetType);
+    // 1.21 dropped the Sensitivity parameter; sensitivity now derives from the BlockSetType.
+    public DNLPressurePlateBlock(BlockBehaviour.Properties properties, BlockSetType blockSetType) {
+        super(blockSetType, properties);
     }
 }
