@@ -41,6 +41,12 @@ public class ForgeCommonRegistryHelper implements RegistryHelper {
     }
 
     @Override
+    public void registerEntityDataSerializer(String name, net.minecraft.network.syncher.EntityDataSerializer<?> serializer) {
+        // Defer onto the mod bus against NeoForge's serializer registry to keep client/server IDs in sync.
+        registryMap.register(net.neoforged.neoforge.registries.NeoForgeRegistries.ENTITY_DATA_SERIALIZERS, name, () -> serializer);
+    }
+
+    @Override
     public void register(ResourceLocation id, SimpleJsonResourceReloadListener loader) {
         dataLoaders.add(loader);
     }

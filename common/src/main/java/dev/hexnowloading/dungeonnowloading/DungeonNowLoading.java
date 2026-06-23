@@ -41,6 +41,9 @@ public class DungeonNowLoading {
     private static void initRegistries()
     {
         DNLEntityTypes.init();
+        // 1.21: register modded EntityDataSerializers via the platform registry (deferred on the
+        // mod bus) before any entity class-init references them.
+        dev.hexnowloading.dungeonnowloading.entity.util.EntityStates.init();
         DNLBlocks.init();
         DNLBlockEntityTypes.init();
         DNLProperties.init();

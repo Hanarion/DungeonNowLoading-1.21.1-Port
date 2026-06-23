@@ -8,10 +8,10 @@ import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
+import dev.hexnowloading.dungeonnowloading.platform.Services;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.util.ByIdMap;
 
 public class EntityStates {
@@ -90,34 +90,48 @@ public class EntityStates {
         WHIMPER_ANIMATION_STATE = simpleEnum(WhimperEntity.WhimperAnimationState.class);
         WHIMPER_SKIN = simpleEnum(WhimperEntity.Skin.class);
 
-        EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
-        EntityDataSerializers.registerSerializer(SPAWNER_CARRIER_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_STATE);
-        EntityDataSerializers.registerSerializer(FAIRKEEPER_BOROS_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_STATE);
-        EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_PART_STATE);
-        EntityDataSerializers.registerSerializer(FAIRKEEPER_OUROS_PART_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(SCUTTLE_STATE);
-        EntityDataSerializers.registerSerializer(BALLISTA_GOLEM_STATE);
-        EntityDataSerializers.registerSerializer(COPPER_CREEP_STATE);
-        EntityDataSerializers.registerSerializer(COPPER_CREEP_SKIN);
-        EntityDataSerializers.registerSerializer(COPPER_CREEP_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(VERTEX_DOMAIN_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(COMMAND_PYLON_STATE);
-        EntityDataSerializers.registerSerializer(REPULSOR_SKIN);
-        EntityDataSerializers.registerSerializer(MIMICART_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(SILK_SPIDER_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(REAPER_SPIDER_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(WISP_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(SEEPING_SOUL_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(GARHOLD_STATE);
-        EntityDataSerializers.registerSerializer(GARHOLD_ANIMATION_STATE);
-        //EntityDataSerializers.registerSerializer(GARHOLD_GATE_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(GARHOLD_SIDE_GATE_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(BROKEN_GARHOLD_STATE);
-        EntityDataSerializers.registerSerializer(WHIMPER_ANIMATION_STATE);
-        EntityDataSerializers.registerSerializer(WHIMPER_SKIN);
+    }
+
+    private static boolean registered = false;
+
+    /**
+     * 1.21 NeoForge forbids vanilla {@code EntityDataSerializers.registerSerializer} for modded
+     * serializers; route them through the platform registry (deferred onto the mod bus). Called
+     * from mod init so registration runs while the registry is still open.
+     */
+    public static void init() {
+        if (registered) {
+            return;
+        }
+        registered = true;
+
+        Services.REGISTRY.registerEntityDataSerializer("chaos_spawner_state", CHAOS_SPAWNER_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("spawner_carrier_animation_state", SPAWNER_CARRIER_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("fairkeeper_serpent_caller_animation_state", FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("fairkeeper_boros_state", FAIRKEEPER_BOROS_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("fairkeeper_boros_animation_state", FAIRKEEPER_BOROS_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("fairkeeper_ouros_state", FAIRKEEPER_OUROS_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("fairkeeper_ouros_animation_state", FAIRKEEPER_OUROS_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("fairkeeper_ouros_part_state", FAIRKEEPER_OUROS_PART_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("fairkeeper_ouros_part_animation_state", FAIRKEEPER_OUROS_PART_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("scuttle_state", SCUTTLE_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("ballista_golem_state", BALLISTA_GOLEM_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("copper_creep_state", COPPER_CREEP_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("copper_creep_skin", COPPER_CREEP_SKIN);
+        Services.REGISTRY.registerEntityDataSerializer("copper_creep_animation_state", COPPER_CREEP_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("vertex_domain_animation_state", VERTEX_DOMAIN_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("command_pylon_state", COMMAND_PYLON_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("repulsor_skin", REPULSOR_SKIN);
+        Services.REGISTRY.registerEntityDataSerializer("mimicart_animation_state", MIMICART_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("silk_spider_animation_state", SILK_SPIDER_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("reaper_spider_animation_state", REAPER_SPIDER_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("wisp_animation_state", WISP_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("seeping_soul_animation_state", SEEPING_SOUL_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("garhold_state", GARHOLD_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("garhold_animation_state", GARHOLD_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("garhold_side_gate_animation_state", GARHOLD_SIDE_GATE_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("broken_garhold_state", BROKEN_GARHOLD_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("whimper_animation_state", WHIMPER_ANIMATION_STATE);
+        Services.REGISTRY.registerEntityDataSerializer("whimper_skin", WHIMPER_SKIN);
     }
 }
