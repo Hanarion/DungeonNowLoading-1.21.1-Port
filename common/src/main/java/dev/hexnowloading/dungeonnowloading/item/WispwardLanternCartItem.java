@@ -28,14 +28,14 @@ public class WispwardLanternCartItem extends Item {
 
         @Override
         public ItemStack execute(BlockSource source, ItemStack stack) {
-            Direction facing = source.getBlockState().getValue(DispenserBlock.FACING);
-            ServerLevel level = source.getLevel();
+            Direction facing = source.state().getValue(DispenserBlock.FACING);
+            ServerLevel level = source.level();
 
-            double x = source.x() + (double) facing.getStepX() * 1.125D;
-            double y = Math.floor(source.y()) + (double) facing.getStepY();
-            double z = source.z() + (double) facing.getStepZ() * 1.125D;
+            double x = source.center().x + (double) facing.getStepX() * 1.125D;
+            double y = Math.floor(source.center().y) + (double) facing.getStepY();
+            double z = source.center().z + (double) facing.getStepZ() * 1.125D;
 
-            BlockPos railPos = source.getPos().relative(facing);
+            BlockPos railPos = source.pos().relative(facing);
             BlockState railState = level.getBlockState(railPos);
 
             double yOffset;
@@ -68,7 +68,7 @@ public class WispwardLanternCartItem extends Item {
             cart.setPos(x, y + yOffset, z);
             cart.setTimed(WispwardLanternCartItem.this.timed);
 
-            if (stack.hasCustomHoverName()) {
+            if (stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
                 cart.setCustomName(stack.getHoverName());
             }
 
@@ -79,7 +79,7 @@ public class WispwardLanternCartItem extends Item {
 
         @Override
         protected void playSound(BlockSource source) {
-            source.getLevel().levelEvent(1000, source.getPos(), 0);
+            source.level().levelEvent(1000, source.pos(), 0);
         }
     };
 
@@ -115,7 +115,7 @@ public class WispwardLanternCartItem extends Item {
                 cart.setPos(pos.getX() + 0.5D, pos.getY() + 0.0625D + extraY, pos.getZ() + 0.5D);
                 cart.setTimed(this.timed);
 
-                if (stack.hasCustomHoverName()) {
+                if (stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
                     cart.setCustomName(stack.getHoverName());
                 }
 
