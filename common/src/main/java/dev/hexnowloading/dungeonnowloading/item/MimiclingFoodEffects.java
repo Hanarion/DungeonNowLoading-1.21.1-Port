@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -207,7 +208,7 @@ public final class MimiclingFoodEffects {
         if (entity instanceof Player player
                 && player.getMainHandItem() == stack
                 && player.isEyeInFluid(FluidTags.WATER)
-                && !EnchantmentHelper.hasAquaAffinity(player)) {
+                && player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SUBMERGED_MINING_SPEED) < 1.0D) {
             if (MimiclingFoods.consumeUsage(stack, effect.ownerId(), 1)) {
                 MimiclingFoods.markUsageHandled(stack, effect.ownerId());
             }
@@ -1277,7 +1278,7 @@ public final class MimiclingFoodEffects {
             }
 
             JsonObject effectData = element.getAsJsonObject();
-            MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(effectData.get("effect").getAsString()));
+            net.minecraft.core.Holder<MobEffect> effect = BuiltInRegistries.MOB_EFFECT.wrapAsHolder(BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(effectData.get("effect").getAsString())));
             int duration = effectData.has("duration") ? effectData.get("duration").getAsInt() : 200;
             int amplifier = effectData.has("amplifier") ? effectData.get("amplifier").getAsInt() : 0;
             target.addEffect(new MobEffectInstance(effect, duration, amplifier));
@@ -1286,12 +1287,12 @@ public final class MimiclingFoodEffects {
 
     private static void convertActiveStatusEffects(ItemStack stack, LivingEntity target) {
         for (MobEffectInstance activeEffect : new ArrayList<>(target.getActiveEffects())) {
-            JsonObject conversion = findStatusEffectConversion(stack, BuiltInRegistries.MOB_EFFECT.getKey(activeEffect.getEffect()).toString());
+            JsonObject conversion = findStatusEffectConversion(stack, BuiltInRegistries.MOB_EFFECT.getKey(activeEffect.getEffect().value()).toString());
             if (conversion == null) {
                 continue;
             }
 
-            MobEffect convertedEffect = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(conversion.get("to").getAsString()));
+            net.minecraft.core.Holder<MobEffect> convertedEffect = BuiltInRegistries.MOB_EFFECT.wrapAsHolder(BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(conversion.get("to").getAsString())));
             int duration = activeEffect.getDuration();
             if (conversion.has("copy_duration") && !conversion.get("copy_duration").getAsBoolean()) {
                 duration = conversion.has("duration") ? conversion.get("duration").getAsInt() : 1;
@@ -1667,8 +1668,11 @@ public final class MimiclingFoodEffects {
         boolean changed = false;
 
         for (ItemStack drop : originalDrops) {
-            SimpleContainer container = new SimpleContainer(drop.copyWithCount(1));
-            AbstractCookingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, level).orElse(null);
+            net.minecraft.world.item.crafting.SingleRecipeInput input =
+                    new net.minecraft.world.item.crafting.SingleRecipeInput(drop.copyWithCount(1));
+            AbstractCookingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, input, level)
+                    .map(net.minecraft.world.item.crafting.RecipeHolder::value)
+                    .orElse(null);
             if (recipe == null) {
                 transformed.add(drop.copy());
                 continue;

@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.item;
 
+import dev.hexnowloading.dungeonnowloading.util.StackNbt;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -469,7 +470,7 @@ public final class MimiclingFoods {
     }
 
     public static boolean isUsageHandled(ItemStack mimicling, String foodId) {
-        return StackNbt.hasTag(mimicling) && StackNbt.getTag(getHandledUsageFoods(mimicling)).contains(foodId);
+        return StackNbt.hasTag(mimicling) && getHandledUsageFoods(StackNbt.getTag(mimicling)).contains(foodId);
     }
 
     private static Set<String> getHandledUsageFoods(CompoundTag tag) {
