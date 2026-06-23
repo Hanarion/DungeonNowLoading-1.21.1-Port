@@ -4,8 +4,8 @@ import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = DungeonNowLoading.MOD_ID, bus= Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonEventsForge {

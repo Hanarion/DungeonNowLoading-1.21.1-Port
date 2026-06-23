@@ -28,10 +28,10 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class DNLForgeClientEvents {
     public static void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {

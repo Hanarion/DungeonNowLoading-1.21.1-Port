@@ -2,7 +2,7 @@ package dev.hexnowloading.dungeonnowloading.client;
 
 import dev.hexnowloading.dungeonnowloading.DNLClient;
 import dev.hexnowloading.dungeonnowloading.registry.DNLPackets;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class DNLForgeClient {
     public static void init(FMLClientSetupEvent event) {

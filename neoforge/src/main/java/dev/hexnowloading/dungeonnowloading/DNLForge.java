@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading;
 
+import dev.hexnowloading.dungeonnowloading.capability.forge.DNLAttachments;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClient;
 import dev.hexnowloading.dungeonnowloading.client.DNLForgeClientEvents;
 import dev.hexnowloading.dungeonnowloading.platform.ForgeCommonRegistryHelper;
@@ -8,44 +9,34 @@ import dev.hexnowloading.dungeonnowloading.server.DNLForgeEntityEvents;
 import dev.hexnowloading.dungeonnowloading.supporter.PatronRegistry;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 @Mod(DungeonNowLoading.MOD_ID)
 public class DNLForge {
 
-    public DNLForge() {
-
-        // This method is invoked by the Forge mod loader when it is ready
-        // to load your mod. You can access Forge and Common code in this
-        // project.
-
-        // Use Forge to bootstrap the Common mod.
+    // 1.21 NeoForge: the @Mod constructor receives the mod event bus directly.
+    public DNLForge(IEventBus bus) {
         DungeonNowLoading.init();
 
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        //MinecraftForge.EVENT_BUS.register(this);
+        DNLAttachments.ATTACHMENT_TYPES.register(bus);
         addModListeners(bus);
         if (FMLEnvironment.dist.isClient()) {
-            // register client-only listeners
             addModClientListeners(bus);
-            // run init when registries are ready
             bus.addListener(DNLForgeClient::init);
         }
 
         addForgeListeners();
 
-        DungeonNowLoading.LOGGER.info("Hello Forge world!");
+        DungeonNowLoading.LOGGER.info("Hello NeoForge world!");
     }
 
     private void addModListeners(IEventBus bus) {
-        ForgeCommonRegistryHelper.TAB_REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ForgeCommonRegistryHelper.TAB_REGISTRY.register(bus);
         bus.addListener(DNLForgeEntityEvents::onEntityAttributeCreation);
         bus.addListener(DNLForgeEntityEvents::registerSpawnPlacements);
     }
@@ -61,29 +52,24 @@ public class DNLForge {
     }
 
     private void addForgeListeners() {
-        MinecraftForge.EVENT_BUS.addListener(DNLForgeEntityEvents::onLivingDamageEvent);
-        MinecraftForge.EVENT_BUS.addListener(DNLForgeEntityEvents::onLivingHurtEvent);
+        NeoForge.EVENT_BUS.addListener(DNLForgeEntityEvents::onLivingDamageEvent);
+        NeoForge.EVENT_BUS.addListener(DNLForgeEntityEvents::onLivingHurtEvent);
 
-        MinecraftForge.EVENT_BUS.addListener((ServerStartingEvent e) -> {
-            // Synchronous:
-            // PatronRegistry.initOrReload(e.getServer());
-
-            // Optional: do it in background to avoid blocking the server thread
+        NeoForge.EVENT_BUS.addListener((ServerStartingEvent e) -> {
+            // Wire the cached registry access used by ItemNbt (common) for NBT (de)serialization.
+            DungeonNowLoading.setRegistryAccess(e.getServer().registryAccess());
             java.util.concurrent.CompletableFuture.runAsync(
                     () -> PatronRegistry.initOrReload(e.getServer()),
                     net.minecraft.Util.backgroundExecutor()
             );
-            // Data registry reload removed — not present in this build
         });
 
-        // Optional: /dnlpatrons reload for admins
-        MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> {
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> {
             DNLCommands.register(e.getDispatcher());
             e.getDispatcher().register(
                     Commands.literal("dnlpatrons")
-                            .requires(src -> src.hasPermission(2)) // OP-only
+                            .requires(src -> src.hasPermission(2))
                             .then(Commands.literal("reload").executes(ctx -> {
-                                // You can keep this synchronous; it’s quick, and you already cache to disk.
                                 PatronRegistry.initOrReload(ctx.getSource().getServer());
                                 ctx.getSource().sendSuccess(() -> Component.literal("[DNL] Patrons reloaded."), true);
                                 return 1;
