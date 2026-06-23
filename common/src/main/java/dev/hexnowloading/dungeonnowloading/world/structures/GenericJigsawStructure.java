@@ -21,7 +21,7 @@ import java.util.Optional;
 
 public class GenericJigsawStructure extends Structure {
 
-    public static final Codec<GenericJigsawStructure> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final com.mojang.serialization.MapCodec<GenericJigsawStructure> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             GenericJigsawStructure.settingsCodec(instance),
             StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(structure -> structure.startPool),
             ResourceLocation.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(structure -> structure.startJigsawName),

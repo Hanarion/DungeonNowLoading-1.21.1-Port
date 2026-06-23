@@ -78,7 +78,7 @@ public class RepulsorItem extends Item {
 
         if (level instanceof ServerLevel server) {
             Consumer<RepulsorEntity> consumer = EntityType.createDefaultStackConfig(server, stack, ctx.getPlayer());
-            RepulsorEntity rep = (RepulsorEntity)DNLEntityTypes.REPULSOR.get().create(server, StackNbt.getTag(stack), consumer, placePos, MobSpawnType.SPAWN_EGG, true, true);
+            RepulsorEntity rep = (RepulsorEntity)DNLEntityTypes.REPULSOR.get().create(server, consumer, placePos, MobSpawnType.SPAWN_EGG, true, true);
             if (rep == null) return InteractionResult.FAIL;
 
             // Force exact placement + orientation
@@ -87,7 +87,7 @@ public class RepulsorItem extends Item {
             rep.setYHeadRot(0.0F);
 
             // init health from item durability
-            rep.setShieldHealth(this.getMaxDamage() - stack.getDamageValue());
+            rep.setShieldHealth(stack.getMaxDamage() - stack.getDamageValue());
 
             // Attach full source stack so enchants/NBT can be preserved when used up
             rep.setSourceStack(stack);
