@@ -3,11 +3,13 @@ package dev.hexnowloading.dungeonnowloading.capability.forge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.core.HolderLookup;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FairkeeperChestPositionsCapability {
+public class FairkeeperChestPositionsCapability implements INBTSerializable<CompoundTag> {
 
     private List<BlockPos> fairkeeperPosList;
 
@@ -59,5 +61,17 @@ public class FairkeeperChestPositionsCapability {
             listTag.add(IntTag.valueOf(i));
         }
         return listTag;
+    }
+
+    @Override
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag tag = new CompoundTag();
+        saveNBTData(tag);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        loadNBTData(tag);
     }
 }

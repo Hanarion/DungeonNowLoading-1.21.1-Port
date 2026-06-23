@@ -2,8 +2,10 @@ package dev.hexnowloading.dungeonnowloading.capability.forge;
 
 import dev.hexnowloading.dungeonnowloading.item.client.DNLArmPose;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 
-public class DNLArmPoseCapability {
+public class DNLArmPoseCapability implements INBTSerializable<CompoundTag> {
 
     private DNLArmPose armPose = DNLArmPose.EMPTY;
 
@@ -27,5 +29,17 @@ public class DNLArmPoseCapability {
             this.armPose = DNLArmPose.fromId(compoundTag.getString("DNLArmPose"));
         }
 
+    }
+
+    @Override
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag tag = new CompoundTag();
+        saveNBTData(tag);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        loadNBTData(tag);
     }
 }
