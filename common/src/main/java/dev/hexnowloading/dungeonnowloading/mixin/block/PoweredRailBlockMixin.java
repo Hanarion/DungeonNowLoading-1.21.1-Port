@@ -32,7 +32,8 @@ public abstract class PoweredRailBlockMixin {
 
     @Redirect(
             method = "isSameRailWithPower",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z")
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"),
+            require = 0
     )
     private boolean dungeonnowloading$connectDeepsteelMountedPoweredRails(BlockState state, Block block) {
         Block self = (Block) (Object) this;
