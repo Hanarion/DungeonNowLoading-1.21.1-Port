@@ -60,7 +60,7 @@ public class DNLItems {
     public static final Supplier<Item> MIMICART = register("mimicart", () -> new MimicartItem(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
     public static final Supplier<Item> WISPWARD_LANTERN_CART = register("wispward_lantern_cart", () -> new WispwardLanternCartItem(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
     public static final Supplier<Item> TIMED_WISPWARD_LANTERN_CART = register("timed_wispward_lantern_cart", () -> new WispwardLanternCartItem(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON), true));
-    public static final Supplier<Item> WISPLIGHT_ROD = register("wisplight_rod", () -> new WisplightRodItem(new Item.Properties().rarity(Rarity.UNCOMMON).durability(250)));
+    public static final Supplier<Item> WISPLIGHT_ROD = register("wisplight_rod", () -> new WisplightRodItem(new Item.Properties().rarity(Rarity.UNCOMMON).durability(250).attributes(WisplightRodItem.createAttributes())));
     public static final Supplier<Item> MIMIC_MUCUS = register("mimic_mucus", () -> new Item(new Item.Properties().rarity(Rarity.COMMON)));
     public static final Supplier<Item> RABBITLESS_RABBIT_STEW = register("rabbitless_rabbit_stew", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
     public static final Supplier<Item> MIMICLING = register("mimicling", () -> new MimiclingItem(mimiclingProperties(), MimiclingItem.getBaseForm()));

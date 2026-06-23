@@ -62,19 +62,23 @@ public class WisplightRodItem extends Item {
     private static final float PROJECTILE_SPEED = 1.1F;
     private static final float LARGE_PROJECTILE_SPEED = PROJECTILE_SPEED * 0.75F;
 
-    private final Multimap<Attribute, AttributeModifier> defaultModifiers;
-
     public WisplightRodItem(Properties properties) {
         super(properties);
-        ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", ATTACK_DAMAGE_MODIFIER, AttributeModifier.Operation.ADD_VALUE));
-        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", ATTACK_SPEED_MODIFIER, AttributeModifier.Operation.ADD_VALUE));
-        this.defaultModifiers = builder.build();
     }
 
-    @Override
-    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
-        return slot == EquipmentSlot.MAINHAND ? this.defaultModifiers : super.getDefaultAttributeModifiers(slot);
+    /**
+     * 1.21 moved item attribute modifiers to the ITEM_ATTRIBUTE_MODIFIERS data component
+     * (set on Item.Properties via .attributes(...)). Build the mainhand weapon modifiers here.
+     */
+    public static net.minecraft.world.item.component.ItemAttributeModifiers createAttributes() {
+        return net.minecraft.world.item.component.ItemAttributeModifiers.builder()
+                .add(Attributes.ATTACK_DAMAGE,
+                        new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, ATTACK_DAMAGE_MODIFIER, AttributeModifier.Operation.ADD_VALUE),
+                        net.minecraft.world.entity.EquipmentSlotGroup.MAINHAND)
+                .add(Attributes.ATTACK_SPEED,
+                        new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, ATTACK_SPEED_MODIFIER, AttributeModifier.Operation.ADD_VALUE),
+                        net.minecraft.world.entity.EquipmentSlotGroup.MAINHAND)
+                .build();
     }
 
     @Override
