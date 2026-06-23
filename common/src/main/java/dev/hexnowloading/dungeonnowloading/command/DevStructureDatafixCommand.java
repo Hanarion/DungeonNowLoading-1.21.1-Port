@@ -50,20 +50,20 @@ public class DevStructureDatafixCommand {
         StructureTemplateManager mgr = level.getStructureManager();
         var src = ctx.getSource();
         int checked = 0, empty = 0, zeroSize = 0;
+        var log = com.mojang.logging.LogUtils.getLogger();
+        log.info("[DNL-STRUCT] report start");
         for (ResourceLocation rl : dnlTemplates(mgr)) {
             checked++;
             StructureTemplate t = mgr.get(rl).orElse(null);
-            if (t == null) { empty++; continue; }
+            if (t == null) { empty++; log.info("[DNL-STRUCT] MISSING {}", rl); continue; }
             var size = t.getSize();
             boolean parsed = size.getX() > 0 || size.getY() > 0 || size.getZ() > 0;
             if (!parsed) zeroSize++;
-            ResourceLocation rl1 = rl; var sz = size; boolean ok = parsed;
-            if (checked <= 60) {
-                src.sendSuccess(() -> Component.literal(rl1 + " size=" + sz.getX() + "x" + sz.getY() + "x" + sz.getZ() + " parsed=" + ok), false);
-            }
+            log.info("[DNL-STRUCT] {} size={}x{}x{} parsed={}", rl, size.getX(), size.getY(), size.getZ(), parsed);
         }
         final int c = checked, e = empty, z = zeroSize;
-        src.sendSuccess(() -> Component.literal("Checked " + c + " templates; missing=" + e + " unparsed=" + z), true);
+        log.info("[DNL-STRUCT] summary: checked={} missing={} unparsed={}", c, e, z);
+        src.sendSuccess(() -> Component.literal("Checked " + c + " templates; missing=" + e + " unparsed=" + z + " (see log)"), true);
         return c;
     }
 
