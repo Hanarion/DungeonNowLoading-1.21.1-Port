@@ -866,10 +866,10 @@ public class GarholdEntity extends Monster {
         EntityDimensions self = this.getDimensions(this.getPose());
         EntityDimensions t    = target.getDimensions(target.getPose());
 
-        float maxW = self.width  + CAPTURE_MAX_WIDTH_ADD;
-        float maxH = self.height + CAPTURE_MAX_HEIGHT_ADD;
+        float maxW = self.width()  + CAPTURE_MAX_WIDTH_ADD;
+        float maxH = self.height() + CAPTURE_MAX_HEIGHT_ADD;
 
-        return t.width <= maxW && t.height <= maxH;
+        return t.width() <= maxW && t.height() <= maxH;
     }
 
     private static boolean isRidingAnyGarhold(@Nullable LivingEntity target) {

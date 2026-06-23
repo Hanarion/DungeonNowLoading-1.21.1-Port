@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.NodeEvaluator;
+import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 
 public class ReaperSpiderMoveControl extends MoveControl {
     private final ReaperSpiderEntity reaperSpider;
@@ -122,7 +123,7 @@ public class ReaperSpiderMoveControl extends MoveControl {
         NodeEvaluator eval = nav != null ? nav.getNodeEvaluator() : null;
 
         if (eval != null) {
-            PathType feetType = eval.getBlockPathType(this.mob.level(), x, y, z);
+            PathType feetType = WalkNodeEvaluator.getPathTypeStatic(this.mob, new BlockPos(x, y, z));
             if (this.isDangerous(feetType)) {
                 return false;
             }
@@ -136,7 +137,7 @@ public class ReaperSpiderMoveControl extends MoveControl {
             }
 
             for (int depth = 1; depth <= 3; depth++) {
-                PathType typeBelow = eval.getBlockPathType(this.mob.level(), x, y - depth, z);
+                PathType typeBelow = WalkNodeEvaluator.getPathTypeStatic(this.mob, new BlockPos(x, y - depth, z));
                 if (this.isDangerous(typeBelow)) {
                     return false;
                 }
