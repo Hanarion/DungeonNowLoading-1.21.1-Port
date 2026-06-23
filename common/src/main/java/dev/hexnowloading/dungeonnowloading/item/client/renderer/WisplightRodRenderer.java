@@ -41,7 +41,7 @@ public class WisplightRodRenderer extends BlockEntityWithoutLevelRenderer {
 
         if (isFirstPerson(itemDisplayContext) && itemStack.getItem() instanceof WisplightRodItem) {
             Player player = ClientUtil.getClientPlayer();
-            if (player != null && player.isUsingItem() && ItemStack.isSameItemSameTags(player.getUseItem(), itemStack)) {
+            if (player != null && player.isUsingItem() && ItemStack.isSameItemSameComponents(player.getUseItem(), itemStack)) {
                 applyBowPullStretch(poseStack, player, getPartialTick());
             }
         }
@@ -95,7 +95,7 @@ public class WisplightRodRenderer extends BlockEntityWithoutLevelRenderer {
     }
 
     private float getPartialTick() {
-        return (ClientUtil.getClientLevel() != null) ? ClientUtil.getClient().getFrameTime() : 0;
+        return (ClientUtil.getClientLevel() != null) ? ClientUtil.getClient().getTimer().getGameTimeDeltaPartialTick(false) : 0;
     }
 
     public static WisplightRodRenderer getInstance() {

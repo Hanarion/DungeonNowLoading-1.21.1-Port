@@ -122,6 +122,7 @@ public class WisplightRodModel extends AnimatedItemModel {
     }
 
     public void renderSolidToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        int color = net.minecraft.util.FastColor.ARGB32.colorFromFloat(alpha, red, green, blue);
         poseStack.pushPose();
         this.All.translateAndRotate(poseStack);
         this.Wand.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
@@ -130,6 +131,7 @@ public class WisplightRodModel extends AnimatedItemModel {
     }
 
     public void renderTranslucentToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        int color = net.minecraft.util.FastColor.ARGB32.colorFromFloat(alpha, red, green, blue);
         poseStack.pushPose();
         this.All.translateAndRotate(poseStack);
         this.FireBall.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
