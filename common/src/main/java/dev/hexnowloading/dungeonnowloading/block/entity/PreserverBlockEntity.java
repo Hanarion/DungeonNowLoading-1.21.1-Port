@@ -40,8 +40,8 @@ public class PreserverBlockEntity extends BlockEntity implements GameEventListen
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
-        super.saveAdditional(compoundTag);
+    protected void saveAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(compoundTag, registries);
 
         PreserverBlockDestructionSystem.User.CODEC.encodeStart(NbtOps.INSTANCE, this.user)
                 .resultOrPartial(LOGGER::error)
@@ -50,7 +50,7 @@ public class PreserverBlockEntity extends BlockEntity implements GameEventListen
     }
 
     @Override
-    public void load(CompoundTag compoundTag) {
+    protected void loadAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
         if (compoundTag.contains("listener", 10)) { // 10 means it's a CompoundTag
             PreserverBlockDestructionSystem.User.CODEC.parse(NbtOps.INSTANCE, compoundTag.getCompound("listener"))
                     .resultOrPartial(LOGGER::error)

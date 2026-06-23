@@ -647,8 +647,8 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         if (!this.trySaveLootTable(tag)) {
             ContainerHelper.saveAllItems(tag, this.items);
         }
@@ -657,8 +657,8 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         if (!this.tryLoadLootTable(tag)) {
             ContainerHelper.loadAllItems(tag, this.items);
@@ -668,7 +668,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag();
         this.saveZone(tag);
         return tag;

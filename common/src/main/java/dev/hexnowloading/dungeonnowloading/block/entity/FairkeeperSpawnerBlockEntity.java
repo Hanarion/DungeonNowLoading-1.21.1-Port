@@ -77,7 +77,7 @@ public class FairkeeperSpawnerBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
+    protected void saveAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
         compoundTag.putInt("RemainingStoredMobs", this.remainingStoredMobs);
         compoundTag.putInt("StartUpTick", this.startUpTick);
         compoundTag.putInt("SpawnDelay", this.spawnDelay);
@@ -89,11 +89,11 @@ public class FairkeeperSpawnerBlockEntity extends BlockEntity {
         }
 
         compoundTag.put("SpawnPotentials", (Tag)SpawnData.LIST_CODEC.encodeStart(NbtOps.INSTANCE, this.spawnPotentials).result().orElseThrow());
-        super.saveAdditional(compoundTag);
+        super.saveAdditional(compoundTag, registries);
     }
 
     @Override
-    public void load(CompoundTag compoundTag) {
+    protected void loadAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
         this.remainingStoredMobs = compoundTag.getInt("RemainingStoredMobs");
         this.startUpTick = compoundTag.getInt("StartUpTick");
         this.spawnDelay = compoundTag.getInt("SpawnDelay");
@@ -116,7 +116,7 @@ public class FairkeeperSpawnerBlockEntity extends BlockEntity {
         }
 
         this.displayEntity = null;
-        super.load(compoundTag);
+        super.loadAdditional(compoundTag, registries);
     }
 
     protected void setNextSpawnData(Level level, BlockPos blockPos, SpawnData spawnData) {

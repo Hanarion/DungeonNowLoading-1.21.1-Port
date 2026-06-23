@@ -41,13 +41,13 @@ public class MendingTableBlockEntity extends BlockEntity implements MenuProvider
     // Persistence
     @Override
     protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
+        super.saveAdditional(tag, registries);
         ContainerHelper.saveAllItems(tag, items);
     }
 
     @Override
     public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
+        super.loadAdditional(tag, registries);
         items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, items);
     }

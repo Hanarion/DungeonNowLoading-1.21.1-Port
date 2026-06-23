@@ -59,8 +59,8 @@ public class MendingAuraBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
-        super.saveAdditional(compoundTag);
+    protected void saveAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(compoundTag, registries);
 
         if (storedBlockState != null) {
             compoundTag.put("StoredBlockState", BlockState.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, storedBlockState).result().orElseThrow());
@@ -74,8 +74,8 @@ public class MendingAuraBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag compoundTag) {
-        super.load(compoundTag);
+    protected void loadAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(compoundTag, registries);
 
         if (compoundTag.contains("StoredBlockState")) {
             storedBlockState = BlockState.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, compoundTag.getCompound("StoredBlockState")).result().orElse(null);
@@ -95,7 +95,7 @@ public class MendingAuraBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
         CompoundTag compoundTag = new CompoundTag();
         if (storedBlockState != null) {
             compoundTag.put("StoredBlockState", BlockState.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, storedBlockState).result().orElseThrow());

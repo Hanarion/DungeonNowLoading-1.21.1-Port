@@ -71,23 +71,23 @@ public class WispwardLanternBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("TimerSeconds", this.timerSeconds);
         tag.putLong("LitUntilGameTime", this.litUntilGameTime);
         tag.putBoolean("LockedLit", this.lockedLit);
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         this.timerSeconds = Math.max(MIN_TIMER_SECONDS, Math.min(MAX_TIMER_SECONDS, tag.getInt("TimerSeconds")));
         this.litUntilGameTime = tag.getLong("LitUntilGameTime");
         this.lockedLit = tag.getBoolean("LockedLit");
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag();
         tag.putInt("TimerSeconds", this.timerSeconds);
         tag.putLong("LitUntilGameTime", this.litUntilGameTime);

@@ -19,14 +19,14 @@ public class SpawnNodeBlockEntity extends BlockEntity {
     public void setSpawnPool(String id) { this.spawnPool = id; setChanged(); }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putString("SpawnPool", spawnPool);
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         this.spawnPool = tag.getString("SpawnPool");
     }
 }

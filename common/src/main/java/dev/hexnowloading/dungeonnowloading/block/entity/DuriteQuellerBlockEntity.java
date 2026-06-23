@@ -346,7 +346,7 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         BlockState originalState = level.getBlockState(pos);
 
         // snapshot BEFORE we touch the block
-        CompoundTag tag = this.saveWithFullMetadata(); // or saveWithoutMetadata()
+        CompoundTag tag = this.saveWithFullMetadata(); // or saveWithoutMetadata(registries)
 
         // mirror your working mending placement behavior
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
@@ -539,8 +539,8 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
 
     // === Save/load ===
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("cornerAx", cornerA.getX());
         tag.putInt("cornerAy", cornerA.getY());
         tag.putInt("cornerAz", cornerA.getZ());
@@ -568,8 +568,8 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         cornerA = new BlockPos(tag.getInt("cornerAx"), tag.getInt("cornerAy"), tag.getInt("cornerAz"));
         cornerB = new BlockPos(tag.getInt("cornerBx"), tag.getInt("cornerBy"), tag.getInt("cornerBz"));
         nbtFacing = Direction.byName(tag.getString("nbtFacing"));

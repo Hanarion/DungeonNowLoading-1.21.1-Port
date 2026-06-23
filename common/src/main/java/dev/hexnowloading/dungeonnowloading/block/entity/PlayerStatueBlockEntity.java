@@ -140,14 +140,15 @@ public class PlayerStatueBlockEntity extends BlockEntity {
     // ===== saving / syncing ==================================================
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
 
         // owner
         if (owner != null) {
-            CompoundTag o = new CompoundTag();
-            NbtUtils.writeGameProfile(o, owner);
-            tag.put("Owner", o);
+            net.minecraft.world.item.component.ResolvableProfile.CODEC
+                    .encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, new net.minecraft.world.item.component.ResolvableProfile(owner))
+                    .result()
+                    .ifPresent(t -> tag.put("Owner", t));
         }
 
         // pose
@@ -155,7 +156,7 @@ public class PlayerStatueBlockEntity extends BlockEntity {
 
         // text
         for (int i = 0; i < LINES; i++) {
-            tag.putString("Text" + (i + 1), Component.Serializer.toJson(text[i]));
+            tag.putString("Text" + (i + 1), Component.Serializer.toJson(text[i], registries));
         }
         tag.putString("TextColor", textColor.getName());
         tag.putBoolean("TextGlowing", glowingText);
@@ -169,12 +170,16 @@ public class PlayerStatueBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
         // owner
         if (tag.contains("Owner", 10)) {
-            owner = NbtUtils.readGameProfile(tag.getCompound("Owner"));
+            owner = net.minecraft.world.item.component.ResolvableProfile.CODEC
+                    .parse(net.minecraft.nbt.NbtOps.INSTANCE, tag.getCompound("Owner"))
+                    .result()
+                    .map(net.minecraft.world.item.component.ResolvableProfile::gameProfile)
+                    .orElse(null);
         } else {
             owner = null;
         }
@@ -185,7 +190,7 @@ public class PlayerStatueBlockEntity extends BlockEntity {
         // text
         for (int i = 0; i < LINES; i++) {
             String key = "Text" + (i + 1);
-            text[i] = tag.contains(key, 8) ? Component.Serializer.fromJson(tag.getString(key)) : Component.empty();
+            text[i] = tag.contains(key, 8) ? Component.Serializer.fromJson(tag.getString(key), registries) : Component.empty();
         }
         if (tag.contains("TextColor", 8)) {
             try { textColor = DyeColor.byName(tag.getString("TextColor"), DyeColor.BLACK); } catch (Exception ignored) {}
@@ -210,7 +215,7 @@ public class PlayerStatueBlockEntity extends BlockEntity {
 
     // client sync
     @Override public ClientboundBlockEntityDataPacket getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
-    @Override public CompoundTag getUpdateTag() { return saveWithoutMetadata(); }
+    @Override public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) { return saveWithoutMetadata(registries); }
 
     /** Sends a block update to clients (server only). */
     public void sync() {

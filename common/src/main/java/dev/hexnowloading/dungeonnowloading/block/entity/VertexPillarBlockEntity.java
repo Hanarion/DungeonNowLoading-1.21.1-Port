@@ -49,8 +49,8 @@ public class VertexPillarBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
-        super.saveAdditional(compoundTag);
+    protected void saveAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(compoundTag, registries);
         ListTag posList = new ListTag();
 
         for (BlockPos pos : linkedPositions) {
@@ -66,8 +66,8 @@ public class VertexPillarBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag compoundTag) {
-        super.load(compoundTag);
+    protected void loadAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(compoundTag, registries);
         this.linkedPositions.clear();
 
         ListTag posList = compoundTag.getList("LinkedPositions", CompoundTag.TAG_COMPOUND);

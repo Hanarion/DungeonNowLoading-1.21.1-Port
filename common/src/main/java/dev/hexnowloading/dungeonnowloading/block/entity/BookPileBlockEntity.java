@@ -32,8 +32,8 @@ public class BookPileBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
 
         if (lootTable != null) {
             tag.putString("LootTable", lootTable.toString());
@@ -42,8 +42,8 @@ public class BookPileBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
         if (tag.contains("LootTable", Tag.TAG_STRING)) {
             this.lootTable = ResourceLocation.parse(tag.getString("LootTable"));

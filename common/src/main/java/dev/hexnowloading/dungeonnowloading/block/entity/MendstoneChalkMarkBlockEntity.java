@@ -17,15 +17,15 @@ public class MendstoneChalkMarkBlockEntity extends PreserverBlockEntity{
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
-        super.saveAdditional(compoundTag);
+    protected void saveAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(compoundTag, registries);
 
         compoundTag.putInt("Damage", this.damage);
     }
 
     @Override
-    public void load(CompoundTag compoundTag) {
-        super.load(compoundTag);
+    protected void loadAdditional(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(compoundTag, registries);
 
         this.damage = compoundTag.getInt("Damage");
     }

@@ -403,8 +403,8 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
     // NBT Save/Load
     // =========================
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
 
         tag.putFloat("TriggerRangeMultiplier", triggerRangeMultiplier);
         tag.put("CornerA", writePos(cornerAOffset));
@@ -438,8 +438,8 @@ public class DungeonDirectorBlockEntity extends BlockEntity implements ZoneRecei
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
         this.triggerRangeMultiplier = tag.contains("TriggerRangeMultiplier")
                 ? tag.getFloat("TriggerRangeMultiplier")

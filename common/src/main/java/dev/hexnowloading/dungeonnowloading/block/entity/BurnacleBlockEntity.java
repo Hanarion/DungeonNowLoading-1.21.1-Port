@@ -220,8 +220,8 @@ public class BurnacleBlockEntity extends BlockEntity {
      * ---------------------------------------------------------------------- */
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
 
         tag.putInt("CycleTime", this.cycleTime);
         tag.putInt("CycleOffset", this.cycleOffset);
@@ -237,8 +237,8 @@ public class BurnacleBlockEntity extends BlockEntity {
 
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
         if (tag.contains("CycleTime")) {
             this.cycleTime = tag.getInt("CycleTime");
