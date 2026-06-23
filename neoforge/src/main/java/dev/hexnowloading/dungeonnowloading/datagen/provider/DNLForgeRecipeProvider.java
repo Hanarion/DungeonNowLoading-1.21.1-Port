@@ -11,14 +11,15 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.core.HolderLookup;
 
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 public class DNLForgeRecipeProvider extends RecipeProvider {
 
-    public DNLForgeRecipeProvider(PackOutput packOutput) {
-        super(packOutput);
+    public DNLForgeRecipeProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(packOutput, lookupProvider);
     }
 
     public static final TagKey<Item> SPAWNER_BANNERS_TAG = TagKey.create(
@@ -51,13 +52,13 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
     }
 
     @Override
-    protected void buildRecipes(Consumer<FinishedRecipe> consumer) {
+    protected void buildRecipes(RecipeOutput consumer) {
         buildShapedRecipes(consumer);
         buildStoneCutterRecipes(consumer);
         buildSmeltingRecipes(consumer);
     }
 
-    private void buildShapedRecipes(Consumer<FinishedRecipe> consumer) {
+    private void buildShapedRecipes(RecipeOutput consumer) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, DNLItems.REDSTONE_CIRCUIT.get(), 1)
                 .pattern("rpi")
                 .pattern("pss")
@@ -349,7 +350,7 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildStoneCutterRecipes(Consumer<FinishedRecipe> consumer) {
+    private void buildStoneCutterRecipes(RecipeOutput consumer) {
         stonecutterResultFromBase(consumer, RecipeCategory.BUILDING_BLOCKS, DNLItems.COILING_STONE_PILLAR.get(), Items.STONE_BRICKS, 1);
         stonecutterResultFromBase(consumer, RecipeCategory.BUILDING_BLOCKS, DNLItems.CHISELED_COILING_STONE_PILLAR.get(), DNLItems.COILING_STONE_PILLAR.get(), 1);
         stonecutterResultFromBase(consumer, RecipeCategory.BUILDING_BLOCKS, DNLItems.COILING_STONE_PILLAR_CAPITAL.get(), DNLItems.COILING_STONE_PILLAR.get(), 1);
@@ -369,7 +370,7 @@ public class DNLForgeRecipeProvider extends RecipeProvider {
 
     }
 
-    private void buildSmeltingRecipes(Consumer<FinishedRecipe> consumer) {
+    private void buildSmeltingRecipes(RecipeOutput consumer) {
         smeltingResultFromBase(consumer, DNLItems.CRACKED_STONE_TILES.get(), DNLItems.STONE_TILES.get());
     }
 

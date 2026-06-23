@@ -7,12 +7,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class DNLForgeItemModelProvider extends ItemModelProvider {
 
@@ -62,23 +62,20 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
     }
 
     private void simpleItem(Item item) {
-        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        String name = BuiltInRegistries.ITEM.getKey(item).getPath();
         withExistingParent(ITEM_FOLDER + "/" + name, mcLoc(ITEM_FOLDER + "/generated")).texture("layer0", ITEM_FOLDER + "/" + name);
     }
 
-    private void spawnEggItem(Item item) {
-        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
-        withExistingParent(ITEM_FOLDER + "/" + name, mcLoc(ITEM_FOLDER + "/template_spawn_egg"));
-    }
+    // 1.21: ItemModelProvider now provides spawnEggItem(Item) itself — use the inherited one.
 
     private void generatedItem(Item item) {
-        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        String name = BuiltInRegistries.ITEM.getKey(item).getPath();
         singleTexture(name, mcLoc("item/generated"), "layer0", modLoc("item/" + name));
 
     }
 
     private void booleanPropertyItem(Item item, String propertyName, String baseTexture, String overrideTexture) {
-        String itemName = ForgeRegistries.ITEMS.getKey(item.asItem()).getPath();
+        String itemName = BuiltInRegistries.ITEM.getKey(item.asItem()).getPath();
 
         getBuilder(overrideTexture)
                 .parent(ITEM_GENERATED)
@@ -94,7 +91,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
 
 
     private void fourStageBowItem(Item item, float pulling1, float pulling2, float pulling3) {
-        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        String name = BuiltInRegistries.ITEM.getKey(item).getPath();
 
         registerBowPullingModel(name, 0);
         registerBowPullingModel(name, 1);
@@ -146,7 +143,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
     }
 
     private void simpleBowItem(Item item) {
-        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        String name = BuiltInRegistries.ITEM.getKey(item).getPath();
 
         registerBowPullingModel(name, 0);
         registerBowPullingModel(name, 1);
@@ -202,19 +199,9 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
                 ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "item/" + item.getId().getPath()));
     }*/
 
-    public void evenSimplerBlockItem(RegistryObject<Block> block) {
-        this.withExistingParent(DungeonNowLoading.MOD_ID + ":" + ForgeRegistries.BLOCKS.getKey(block.get()).getPath(),
-                modLoc("block/" + ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
-    }
-
-    private ItemModelBuilder simpleBlockItem(RegistryObject<Block> item) {
-        return withExistingParent(item.getId().getPath(),
-                ResourceLocation.parse("item/generated")).texture("layer0",
-                ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID,"item/" + item.getId().getPath()));
-    }
 
     private void builtinEntityItem(Item item) {
-        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        String name = BuiltInRegistries.ITEM.getKey(item).getPath();
 
         ItemModelBuilder b = getBuilder(ITEM_FOLDER + "/" + name)
                 // builtin/entity is virtual → UncheckedModelFile
@@ -255,7 +242,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
     }
 
     private void PlayerStatueItemWithDisplay(Item item) {
-        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        String name = BuiltInRegistries.ITEM.getKey(item).getPath();
 
         ItemModelBuilder b = getBuilder(ITEM_FOLDER + "/" + name)
                 // builtin/entity is virtual → UncheckedModelFile
@@ -298,7 +285,7 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
     }
 
     private void itemFromExistingModel(Item item, String existingModelPath) {
-        String name = ForgeRegistries.ITEMS.getKey(item).getPath();
+        String name = BuiltInRegistries.ITEM.getKey(item).getPath();
 
         getBuilder(ITEM_FOLDER + "/" + name)
                 .parent(getExistingFile(modLoc(existingModelPath)));

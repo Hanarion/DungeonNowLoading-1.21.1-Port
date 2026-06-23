@@ -26,20 +26,34 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
-import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
+import net.minecraft.world.level.storage.loot.functions.CopyCustomDataFunction;
 import net.minecraft.world.level.storage.loot.functions.EnchantRandomlyFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.*;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.Set;
 
 public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
-    public DNLForgeBlockLootTableProvider() {
-        super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+    // 1.21: Enchantments.FORTUNE is a ResourceKey; bonusLevelFlatChance wants a Holder<Enchantment>.
+    private final net.minecraft.core.HolderLookup.Provider registries;
+    private net.minecraft.core.Holder<net.minecraft.world.item.enchantment.Enchantment> fortune;
+
+    // 1.21: BlockLootSubProvider ctor gained the HolderLookup.Provider (SubProviderEntry supplies it).
+    public DNLForgeBlockLootTableProvider(net.minecraft.core.HolderLookup.Provider provider) {
+        super(Set.of(), FeatureFlags.REGISTRY.allFlags(), provider);
+        this.registries = provider;
+    }
+
+    private net.minecraft.core.Holder<net.minecraft.world.item.enchantment.Enchantment> fortune() {
+        if (fortune == null) {
+            fortune = registries.lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                    .getOrThrow(Enchantments.FORTUNE);
+        }
+        return fortune;
     }
 
     @Override
@@ -184,15 +198,15 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                 .withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
                         .add(LootItem.lootTableItem(item)
                                 .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0F))))
-                        .when(HAS_NO_SILK_TOUCH)))
+                        .when(doesNotHaveSilkTouch())))
                 .withPool(this.applyExplosionCondition(item, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
                         .add(LootItem.lootTableItem(DNLItems.STONE_NOTCH.get())
                                 .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0F))))
-                        .when(HAS_NO_SILK_TOUCH)))
+                        .when(doesNotHaveSilkTouch())))
                 .withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
                         .add(LootItem.lootTableItem(block)
                                 .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0F))))
-                        .when(HAS_SILK_TOUCH)));
+                        .when(hasSilkTouch())));
     }
 
     private LootTable.Builder bookPile() {
@@ -252,24 +266,24 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                 // Silk Touch → drop the cluster block
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
-                        .when(HAS_SILK_TOUCH)
+                        .when(hasSilkTouch())
                         .add(LootItem.lootTableItem(clusterBlock)))
 
                 // First Durite (guaranteed 1 on no-silk)
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
-                        .when(HAS_NO_SILK_TOUCH)
+                        .when(doesNotHaveSilkTouch())
                         .add(LootItem.lootTableItem(duriteItem)
-                                .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, first))
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(fortune(), first))
                                 .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
                                 .apply(ApplyExplosionDecay.explosionDecay())))
 
                 // Second Durite (overflow chance by Fortune level)
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
-                        .when(HAS_NO_SILK_TOUCH)
+                        .when(doesNotHaveSilkTouch())
                         .add(LootItem.lootTableItem(duriteItem)
-                                .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, extra))
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(fortune(), extra))
                                 .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
                                 .apply(ApplyExplosionDecay.explosionDecay())));
     }
@@ -293,24 +307,24 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                 // Silk Touch → drop bud block
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
-                        .when(HAS_SILK_TOUCH)
+                        .when(hasSilkTouch())
                         .add(LootItem.lootTableItem(budBlock)))
 
                 // First Durite (capped at 100%)
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
-                        .when(HAS_NO_SILK_TOUCH)
+                        .when(doesNotHaveSilkTouch())
                         .add(LootItem.lootTableItem(duriteItem)
-                                .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, first))
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(fortune(), first))
                                 .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
                                 .apply(ApplyExplosionDecay.explosionDecay())))
 
                 // Overflow → second Durite (chance = max(0, chance-1))
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
-                        .when(HAS_NO_SILK_TOUCH)
+                        .when(doesNotHaveSilkTouch())
                         .add(LootItem.lootTableItem(duriteItem)
-                                .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, extra))
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(fortune(), extra))
                                 .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
                                 .apply(ApplyExplosionDecay.explosionDecay())));
     }
@@ -325,7 +339,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
     protected Iterable<Block> getKnownBlocks() {
         return ForgeCommonRegistryHelper.getRegistryMap().getDeferred(BuiltInRegistries.BLOCK).getEntries()
                 .stream()
-                .flatMap(RegistryObject::stream)
+                .<Block>map(DeferredHolder::get)
                 ::iterator;
     }
 
@@ -335,7 +349,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
                         .setRolls(ConstantValue.exactly(1))
                         .when(ExplosionCondition.survivesExplosion())
                         .add(LootItem.lootTableItem(DNLBlocks.PLAYER_STATUE.get())
-                                .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
+                                .apply(CopyCustomDataFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
                                         .copy("Owner", "Owner")
                                         .copy("Owner.Name", "SkullOwner")
                                         .copy("PoseVariant", "DNL_Pose")

@@ -15,9 +15,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.*;
-import net.minecraftforge.client.model.generators.*;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.client.model.generators.*;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -56,7 +56,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.NETHERITE_STONE_NOTCH.get());
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
         simpleBlockWithItem(DNLBlocks.SPAWN_NODE.get());
-        anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(ForgeRegistries.BLOCKS.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
+        anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(BuiltInRegistries.BLOCK.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
         simpleBlockWithItem(DNLBlocks.BRITTLESTONE.get());
         simpleBlockWithItem(DNLBlocks.DEEPSTEEL_BLOCK.get());
         axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), "deepsteel_shaft");
@@ -162,14 +162,14 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         fenceBlock(block, blockTexture(parent));
 
         itemModels().withExistingParent(
-                        ForgeRegistries.BLOCKS.getKey(block).getPath(),
+                        BuiltInRegistries.BLOCK.getKey(block).getPath(),
                         mcLoc("block/fence_inventory"))
                 .texture("texture", blockTexture(parent));
     }
 
     private void simpleBlockWithItem(Block block) {
         simpleBlock(block);
-        simpleBlockItem(block, models().getExistingFile(modLoc("block/" + ForgeRegistries.BLOCKS.getKey(block).getPath())));
+        simpleBlockItem(block, models().getExistingFile(modLoc("block/" + BuiltInRegistries.BLOCK.getKey(block).getPath())));
     }
 
     private void anyModelBlockWithItem(Block block, ModelFile model) {
@@ -178,14 +178,14 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     }
 
     private void simpleItem(Block block) {
-        String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
+        String name = BuiltInRegistries.BLOCK.getKey(block).getPath();
         itemModels()
                 .withExistingParent(ModelProvider.ITEM_FOLDER + "/" + name, mcLoc(ModelProvider.ITEM_FOLDER + "/generated"))
                 .texture("layer0", ModelProvider.BLOCK_FOLDER + "/" + name);
     }
 
     private void simpleRandomBlockWithItem(Block block, int numVariants) {
-        String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
+        String name = BuiltInRegistries.BLOCK.getKey(block).getPath();
         ConfiguredModel[] models = new ConfiguredModel[numVariants];
         for (int i = 0; i < numVariants; i++) {
             models[i] = new ConfiguredModel(models().getExistingFile(modLoc("block/" + name + "_" + i)));
@@ -460,7 +460,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
         });
 
-        itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/fence_inventory"))
+        itemModels().withExistingParent(BuiltInRegistries.BLOCK.getKey(block).getPath(), mcLoc("block/fence_inventory"))
                 .texture("texture", degree_0);
     }
 
@@ -493,7 +493,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
             this.wallSidePart(builder, side_tall_0, e, WallSide.TALL);
         });
 
-        itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/wall_inventory"))
+        itemModels().withExistingParent(BuiltInRegistries.BLOCK.getKey(block).getPath(), mcLoc("block/wall_inventory"))
                 .texture("wall", degree_0);
     }
 
@@ -570,7 +570,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
             }
 
         });
-        /*itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("item/generated"))
+        /*itemModels().withExistingParent(BuiltInRegistries.BLOCK.getKey(block).getPath(), mcLoc("item/generated"))
                 .texture("layer_0", degree_0);*/
         itemModels().withExistingParent(this.key(block).getPath(), mcLoc("item/generated"))
                 .texture("layer0", modLoc("block/" + this.key(parent).getPath() + "_0"));
@@ -890,16 +890,16 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
 
     private void wallBlockWithItem(WallBlock block , Block parent) {
         wallBlock(block, blockTexture(parent));
-        itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/wall_inventory"))
-                .texture("wall",  ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(parent).getPath()));
+        itemModels().withExistingParent(BuiltInRegistries.BLOCK.getKey(block).getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall",  ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "block/" + BuiltInRegistries.BLOCK.getKey(parent).getPath()));
     }
 
     private void wallBlockWithItem(WallBlock block) {
         wallBlock(block, blockTexture(block));
         //itemModels().getBuilder(name(block)).texture(name(block), blockTexture(block));
         //simpleBlockItem(block, models().getExistingFile(blockTexture(block)));
-        itemModels().withExistingParent(ForgeRegistries.BLOCKS.getKey(block).getPath(), mcLoc("block/wall_inventory"))
-                .texture("wall",  ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(block).getPath()));
+        itemModels().withExistingParent(BuiltInRegistries.BLOCK.getKey(block).getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall",  ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "block/" + BuiltInRegistries.BLOCK.getKey(block).getPath()));
     }
 
     // --- Helpers: rotations for 6-way FACING
@@ -987,7 +987,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
      */
     private void generateMendstoneChalkMarkModels(MendstoneChalkMarkBlock block, Item item, IntegerProperty OUTLINE) {
         final String baseName = name(block); // e.g., "mendstone_chalk_mark"
-        final String itemName = ForgeRegistries.ITEMS.getKey(item).getPath();
+        final String itemName = BuiltInRegistries.ITEM.getKey(item).getPath();
 
         var vb = getVariantBuilder(block);
 
@@ -1594,8 +1594,8 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     }
 
     private void particleOnlyModel(Block block) {
-        String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
-        String ns   = ForgeRegistries.BLOCKS.getKey(block).getNamespace();
+        String name = BuiltInRegistries.BLOCK.getKey(block).getPath();
+        String ns   = BuiltInRegistries.BLOCK.getKey(block).getNamespace();
 
         // models/block/<name>_particle.json → parent builtin/entity + particle tex
         ModelFile model = models().getBuilder(name + "_particle")
@@ -1607,7 +1607,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
     }
 
     private ResourceLocation key(Block block) {
-        return ForgeRegistries.BLOCKS.getKey(block);
+        return BuiltInRegistries.BLOCK.getKey(block);
     }
 
     public String name(Block block) {

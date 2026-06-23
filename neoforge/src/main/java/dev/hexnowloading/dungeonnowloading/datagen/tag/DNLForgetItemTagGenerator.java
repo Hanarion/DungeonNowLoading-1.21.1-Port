@@ -6,12 +6,13 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -26,20 +27,14 @@ public class DNLForgetItemTagGenerator extends ItemTagsProvider {
             DyeColor.GREEN,   DNLItems.DUNGEON_BANNER_SPAWNER_GREEN.get()
     );
 
-    public DNLForgetItemTagGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper, CompletableFuture<TagLookup<Block>> blockTags) {
+    public DNLForgetItemTagGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper, CompletableFuture<TagsProvider.TagLookup<Block>> blockTags) {
         super(output, lookupProvider, blockTags, DungeonNowLoading.MOD_ID, existingFileHelper);
     }
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        this.tag(ItemTags.MUSIC_DISCS).add(
-                DNLItems.MUSIC_DISC_AOTSUGI.get(),
-                DNLItems.MUSIC_DISC_BROKEN_AOTSUGI.get(),
-                DNLItems.MUSIC_DISC_HELLSPAWN.get(),
-                DNLItems.MUSIC_DISC_BOROS.get(),
-                DNLItems.MUSIC_DISC_OUROS.get(),
-                DNLItems.MUSIC_DISC_PYTHONIC_OVERDRIVE.get()
-        );
+        // 1.21 removed ItemTags.MUSIC_DISCS; custom discs are jukebox-playable via their
+        // jukeboxPlayable(JukeboxSong) component (registered in DNLItems), so no item tag needed.
 
         for (var toEntry : SPAWNER_BANNERS.entrySet()) {
 

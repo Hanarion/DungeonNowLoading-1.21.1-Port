@@ -3,9 +3,9 @@ package dev.hexnowloading.dungeonnowloading.datagen.provider.blockitemstategener
 import dev.hexnowloading.dungeonnowloading.block.DungeonBannerBlock;
 import dev.hexnowloading.dungeonnowloading.datagen.provider.DNLForgeBlockStateProvider;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
 public class BannerBlockItemGen {
     private final DNLForgeBlockStateProvider p;
 
-    public static final Map<DungeonBannerBlock.DungeonBannerVariant, RegistryObject<Block>> DUNGEON_BANNERS = new EnumMap<>(DungeonBannerBlock.DungeonBannerVariant.class);
+    public static final Map<DungeonBannerBlock.DungeonBannerVariant, DeferredHolder<Block, Block>> DUNGEON_BANNERS = new EnumMap<>(DungeonBannerBlock.DungeonBannerVariant.class);
 
 
     public BannerBlockItemGen(DNLForgeBlockStateProvider p) {
