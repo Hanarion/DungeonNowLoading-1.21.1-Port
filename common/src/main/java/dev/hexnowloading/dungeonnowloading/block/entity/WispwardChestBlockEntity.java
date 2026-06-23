@@ -174,7 +174,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
     public void applyCreativeConfig(ServerLevel level, ResourceLocation lootTable, int requiredLitLanterns) {
         this.configuredLootTable = lootTable == null ? DEFAULT_LOOT_TABLE : lootTable;
         this.requiredLitLanterns = Math.max(1, requiredLitLanterns);
-        this.setLootTable(this.configuredLootTable, level.random.nextLong());
+        this.setLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, this.configuredLootTable), level.random.nextLong());
         this.refreshLanternCache(level);
         this.setChanged();
         this.syncToClients();
@@ -188,7 +188,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
         for (int i = 0; i < this.items.size(); i++) {
             this.items.set(i, ItemStack.EMPTY);
         }
-        this.setLootTable(this.configuredLootTable, level.random.nextLong());
+        this.setLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, this.configuredLootTable), level.random.nextLong());
         this.refreshLanternCache(level);
         this.setChanged();
         this.syncToClients();
@@ -196,7 +196,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
 
     public void initializeLootTable(ServerLevel level) {
         this.configuredLootTable = DEFAULT_LOOT_TABLE;
-        this.setLootTable(this.configuredLootTable, level.random.nextLong());
+        this.setLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, this.configuredLootTable), level.random.nextLong());
         this.setChanged();
         this.syncToClients();
     }
@@ -669,7 +669,7 @@ public class WispwardChestBlockEntity extends RandomizableContainerBlockEntity i
 
     @Override
     public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag();
+        CompoundTag tag = super.getUpdateTag(registries);
         this.saveZone(tag);
         return tag;
     }
