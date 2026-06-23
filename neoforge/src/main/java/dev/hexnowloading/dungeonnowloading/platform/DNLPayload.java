@@ -8,9 +8,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
  * existing {@link DNLPacket} so the common packet classes don't need rewriting; each
  * registered packet name gets its own {@link Type} (see {@link ForgeNetworkHelper}).
  */
-public record DNLPayload(DNLPacket packet, CustomPacketPayload.Type<DNLPayload> type) implements CustomPacketPayload {
+public record DNLPayload(DNLPacket packet, Type<DNLPayload> payloadType) implements CustomPacketPayload {
     @Override
     public Type<? extends CustomPacketPayload> type() {
-        return type;
+        return payloadType;
     }
 }

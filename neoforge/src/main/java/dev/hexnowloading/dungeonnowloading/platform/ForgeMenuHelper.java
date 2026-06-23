@@ -5,7 +5,7 @@ import dev.hexnowloading.dungeonnowloading.platform.services.MenuHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 
 import java.util.function.Supplier;
 
@@ -15,7 +15,7 @@ public class ForgeMenuHelper implements MenuHelper {
         return Services.REGISTRY.register(
                 BuiltInRegistries.MENU,
                 name,
-                () -> IForgeMenuType.create((containerId, inventory, buffer) -> factory.create(containerId, inventory))
+                () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> factory.create(containerId, inventory))
         );
     }
 }
