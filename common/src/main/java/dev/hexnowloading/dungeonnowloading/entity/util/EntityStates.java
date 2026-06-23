@@ -8,10 +8,27 @@ import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
 import dev.hexnowloading.dungeonnowloading.entity.projectile.VertexDomainProjectileEntity;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.util.ByIdMap;
 
 public class EntityStates {
+
+    /**
+     * 1.21 removed simpleEnum(Class); rebuild the equivalent
+     * ordinal-based serializer from a StreamCodec.
+     */
+    private static <T extends Enum<T>> EntityDataSerializer<T> simpleEnum(Class<T> enumClass) {
+        T[] values = enumClass.getEnumConstants();
+        StreamCodec<io.netty.buffer.ByteBuf, T> codec = ByteBufCodecs.idMapper(
+                ByIdMap.continuous(Enum::ordinal, values, ByIdMap.OutOfBoundsStrategy.ZERO),
+                Enum::ordinal
+        );
+        return EntityDataSerializer.forValueType(codec.cast());
+    }
+
     public static final EntityDataSerializer<ChaosSpawnerEntity.State> CHAOS_SPAWNER_STATE;
     public static final EntityDataSerializer<SpawnerCarrierEntity.SpawnerCarrierAnimationState> SPAWNER_CARRIER_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState> FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE;
@@ -43,35 +60,35 @@ public class EntityStates {
     public static final EntityDataSerializer<WispEntity.WispAnimationState> WISP_ANIMATION_STATE;
 
     static {
-        CHAOS_SPAWNER_STATE = EntityDataSerializer.simpleEnum(ChaosSpawnerEntity.State.class);
-        SPAWNER_CARRIER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SpawnerCarrierEntity.SpawnerCarrierAnimationState.class);
-        FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState.class);
-        FAIRKEEPER_BOROS_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosState.class);
-        FAIRKEEPER_BOROS_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperBorosEntity.FairkeeperBorosAnimationState.class);
-        FAIRKEEPER_OUROS_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosEntity.FairkeeperOurosState.class);
-        FAIRKEEPER_OUROS_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosEntity.FairkeeperOurosAnimationState.class);
-        FAIRKEEPER_OUROS_PART_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosPartEntity.FairkeeperOurosPartState.class);
-        FAIRKEEPER_OUROS_PART_ANIMATION_STATE = EntityDataSerializer.simpleEnum(FairkeeperOurosPartEntity.FairkeeperOurosPartAnimationState.class);
-        SCUTTLE_STATE = EntityDataSerializer.simpleEnum(ScuttleEntity.ScuttleState.class);
-        BALLISTA_GOLEM_STATE = EntityDataSerializer.simpleEnum(BallistaGolemEntity.BallistaGolemState.class);
-        COPPER_CREEP_STATE = EntityDataSerializer.simpleEnum(CopperCreepEntity.State.class);
-        COPPER_CREEP_SKIN = EntityDataSerializer.simpleEnum(CopperCreepEntity.Skin.class);
-        COPPER_CREEP_ANIMATION_STATE = EntityDataSerializer.simpleEnum(CopperCreepEntity.CopperCreepAnimationState.class);
-        VERTEX_DOMAIN_ANIMATION_STATE = EntityDataSerializer.simpleEnum(VertexDomainProjectileEntity.VertexDomainAnimationState.class);
-        COMMAND_PYLON_STATE = EntityDataSerializer.simpleEnum(RepulsorEntity.State.class);
-        REPULSOR_SKIN = EntityDataSerializer.simpleEnum(RepulsorEntity.Skin.class);
-        MIMICART_ANIMATION_STATE = EntityDataSerializer.simpleEnum(MimicartEntity.MimicartAnimationState.class);
-        SILK_SPIDER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SilkSpiderEntity.SilkSpiderAnimationState.class);
-        REAPER_SPIDER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(ReaperSpiderEntity.ReaperSpiderAnimationState.class);
-        WISP_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WispEntity.WispAnimationState.class);
-        SEEPING_SOUL_ANIMATION_STATE = EntityDataSerializer.simpleEnum(SeepingSoulEntity.SeepingSoulAnimationState.class);
-        GARHOLD_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdState.class);
-        GARHOLD_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdAnimationState.class);
-        //GARHOLD_GATE_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdBottomGateAnimationState.class);
-        GARHOLD_SIDE_GATE_ANIMATION_STATE = EntityDataSerializer.simpleEnum(GarholdEntity.GarholdSideGateAnimationState.class);
-        BROKEN_GARHOLD_STATE = EntityDataSerializer.simpleEnum(BrokenGarholdEntity.BrokenGarholdState.class);
-        WHIMPER_ANIMATION_STATE = EntityDataSerializer.simpleEnum(WhimperEntity.WhimperAnimationState.class);
-        WHIMPER_SKIN = EntityDataSerializer.simpleEnum(WhimperEntity.Skin.class);
+        CHAOS_SPAWNER_STATE = simpleEnum(ChaosSpawnerEntity.State.class);
+        SPAWNER_CARRIER_ANIMATION_STATE = simpleEnum(SpawnerCarrierEntity.SpawnerCarrierAnimationState.class);
+        FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE = simpleEnum(FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState.class);
+        FAIRKEEPER_BOROS_STATE = simpleEnum(FairkeeperBorosEntity.FairkeeperBorosState.class);
+        FAIRKEEPER_BOROS_ANIMATION_STATE = simpleEnum(FairkeeperBorosEntity.FairkeeperBorosAnimationState.class);
+        FAIRKEEPER_OUROS_STATE = simpleEnum(FairkeeperOurosEntity.FairkeeperOurosState.class);
+        FAIRKEEPER_OUROS_ANIMATION_STATE = simpleEnum(FairkeeperOurosEntity.FairkeeperOurosAnimationState.class);
+        FAIRKEEPER_OUROS_PART_STATE = simpleEnum(FairkeeperOurosPartEntity.FairkeeperOurosPartState.class);
+        FAIRKEEPER_OUROS_PART_ANIMATION_STATE = simpleEnum(FairkeeperOurosPartEntity.FairkeeperOurosPartAnimationState.class);
+        SCUTTLE_STATE = simpleEnum(ScuttleEntity.ScuttleState.class);
+        BALLISTA_GOLEM_STATE = simpleEnum(BallistaGolemEntity.BallistaGolemState.class);
+        COPPER_CREEP_STATE = simpleEnum(CopperCreepEntity.State.class);
+        COPPER_CREEP_SKIN = simpleEnum(CopperCreepEntity.Skin.class);
+        COPPER_CREEP_ANIMATION_STATE = simpleEnum(CopperCreepEntity.CopperCreepAnimationState.class);
+        VERTEX_DOMAIN_ANIMATION_STATE = simpleEnum(VertexDomainProjectileEntity.VertexDomainAnimationState.class);
+        COMMAND_PYLON_STATE = simpleEnum(RepulsorEntity.State.class);
+        REPULSOR_SKIN = simpleEnum(RepulsorEntity.Skin.class);
+        MIMICART_ANIMATION_STATE = simpleEnum(MimicartEntity.MimicartAnimationState.class);
+        SILK_SPIDER_ANIMATION_STATE = simpleEnum(SilkSpiderEntity.SilkSpiderAnimationState.class);
+        REAPER_SPIDER_ANIMATION_STATE = simpleEnum(ReaperSpiderEntity.ReaperSpiderAnimationState.class);
+        WISP_ANIMATION_STATE = simpleEnum(WispEntity.WispAnimationState.class);
+        SEEPING_SOUL_ANIMATION_STATE = simpleEnum(SeepingSoulEntity.SeepingSoulAnimationState.class);
+        GARHOLD_STATE = simpleEnum(GarholdEntity.GarholdState.class);
+        GARHOLD_ANIMATION_STATE = simpleEnum(GarholdEntity.GarholdAnimationState.class);
+        //GARHOLD_GATE_ANIMATION_STATE = simpleEnum(GarholdEntity.GarholdBottomGateAnimationState.class);
+        GARHOLD_SIDE_GATE_ANIMATION_STATE = simpleEnum(GarholdEntity.GarholdSideGateAnimationState.class);
+        BROKEN_GARHOLD_STATE = simpleEnum(BrokenGarholdEntity.BrokenGarholdState.class);
+        WHIMPER_ANIMATION_STATE = simpleEnum(WhimperEntity.WhimperAnimationState.class);
+        WHIMPER_SKIN = simpleEnum(WhimperEntity.Skin.class);
 
         EntityDataSerializers.registerSerializer(CHAOS_SPAWNER_STATE);
         EntityDataSerializers.registerSerializer(SPAWNER_CARRIER_ANIMATION_STATE);
