@@ -29,6 +29,8 @@ tasks.named('compileJava', JavaCompile) {
 processResources {
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
+    // Loader resources win over duplicates pulled from common (e.g. mixin refmap, configs).
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 tasks.named('javadoc', Javadoc).configure {
