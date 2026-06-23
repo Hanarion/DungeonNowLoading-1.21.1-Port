@@ -35,11 +35,14 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class DNLForgeClientEvents {
     public static void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
-        ForgeClientHelper.ITEM_MODELS.forEach(event::register);
+        // 1.21: RegisterAdditional.register takes a ModelResourceLocation (inventory variant).
+        ForgeClientHelper.ITEM_MODELS.forEach(rl ->
+                event.register(net.minecraft.client.resources.model.ModelResourceLocation.inventory(rl)));
     }
 
     public static void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {
-        event.getModels().replaceAll((id, model) -> DungeonNowLoading.MOD_ID.equals(id.getNamespace()) && isMendingAuraModel(id.getPath())
+        // 1.21: the baking-result map is keyed by ModelResourceLocation (id() -> ResourceLocation).
+        event.getModels().replaceAll((id, model) -> DungeonNowLoading.MOD_ID.equals(id.id().getNamespace()) && isMendingAuraModel(id.id().getPath())
                 ? new MendingAuraForgeBakedModel(model)
                 : model);
     }
@@ -177,7 +180,7 @@ public class DNLForgeClientEvents {
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), ResourceLocation.parse("pull"), (stack, level, entity, idk) -> {
             if (entity == null) return 0.0F;
             else
-                return entity.getUseItem() != stack ? 0.0F : (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 30.0F;
+                return entity.getUseItem() != stack ? 0.0F : (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 30.0F;
         });
 
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), ResourceLocation.parse("pulling"), (stack, level, entity, idk) ->
@@ -186,7 +189,7 @@ public class DNLForgeClientEvents {
         ItemProperties.register(DNLItems.COPPER_DETONATOR.get(), ResourceLocation.parse("mode_switch"), (stack, BlockableEventLoop, entity, idk) -> {
             if (entity == null || entity.getUseItem() != stack) return 0.0F;
 
-            int useTime = stack.getUseDuration() - entity.getUseItemRemainingTicks();
+            int useTime = stack.getUseDuration(entity) - entity.getUseItemRemainingTicks();
             return useTime > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
         });
 
