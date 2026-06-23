@@ -530,7 +530,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 if (this.level() instanceof ServerLevel serverLevel) {
                     serverLevel.sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);
                 }
-                this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 1.0F, 1.0F);
+                this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.0F, 1.0F);
                 return hurtAndTrackAttackers(damageSource, 0);
             } else {
                 //this.level().playSound(null, this.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.HOSTILE, 1.0F, 1.0F);
@@ -581,7 +581,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
             if (partIndex <= 13) {
                 FairkeeperBorosPartEntity part = this.getPart(13 - this.partIndex);
                 if (part != null) {
-                    this.level().playSound(null, part.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+                    this.level().playSound(null, part.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
                     ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, part.getX(), part.getY(), part.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
                     part.remove(RemovalReason.KILLED);
                 }
@@ -590,7 +590,7 @@ public class FairkeeperBorosEntity extends Monster implements Boss, Enemy, Slumb
                 if (caller != null) {
                     caller.defeatedBoros();
                 }
-                this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+                this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
                 ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
                 this.level().broadcastEntityEvent(this, (byte)60);
                 this.remove(Entity.RemovalReason.KILLED);

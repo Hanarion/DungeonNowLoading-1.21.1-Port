@@ -98,7 +98,7 @@ public class FairkeeperOurosBodyShootVertexOrbGoal extends StoppableGoal{
         } else if (this.progress == PHASE_AIM) {
             this.part.aimCannonAtPlayer(this.part.getShootingTarget());
             if (this.part.isCancelShooting()) {
-                this.ouros.level().playSound(null, this.part.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.ouros.level().random.nextFloat() - this.ouros.level().random.nextFloat()) * 0.2f) * 0.7f);
+                this.ouros.level().playSound(null, this.part.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.ouros.level().random.nextFloat() - this.ouros.level().random.nextFloat()) * 0.2f) * 0.7f);
                 ((ServerLevel) (this.ouros.level())).sendParticles(ParticleTypes.EXPLOSION, this.part.getX(), this.part.getY(), this.part.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
                 this.part.playCannonCancelAnimation(this::stopGoal);
                 this.progress = PHASE_FINISH;

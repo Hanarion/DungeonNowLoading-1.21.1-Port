@@ -169,7 +169,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
         if ((this.onGround() || this.horizontalCollision) || this.getDeltaMovement().lengthSqr() < 1.0E-7 && this.life <= 0) {
             this.life = DURATION_ON_GROUND;
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 3.0F, 1.0F);
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE.value(), this.getSoundSource(), 3.0F, 1.0F);
             spawnInitialRedstoneParticles();
             this.expansionTick = 40;
             if (!this.level().isClientSide) {
@@ -210,7 +210,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
 
         //DNLLevelUtil.beginMultiDestroySoundPending();
 
-        this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+        this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
 
         BlockPos pos = this.blockPosition();
         int r = this.getRadius();
@@ -469,7 +469,7 @@ public class VertexOrbProjectileEntity extends ModelledProjectileEntity {
                     DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
                     1.0F
             );
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 1.0F, 2.0F);
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE.value(), this.getSoundSource(), 1.0F, 2.0F);
             ((ServerLevel)this.level()).sendParticles(particleData, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0.0f);
         }
         return true;

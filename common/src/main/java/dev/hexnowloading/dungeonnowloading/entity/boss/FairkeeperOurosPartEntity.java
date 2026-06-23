@@ -254,7 +254,7 @@ public class FairkeeperOurosPartEntity extends Monster implements Boss, Enemy, S
         }
 
         if (!this.isState(FairkeeperOurosPartState.SHOOT_ORB) && this.isCancelShooting()) {
-            this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
+            this.level().playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f);
             ((ServerLevel) (this.level())).sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 0.0D, 0.0D, 0.0D, 1.0D);
             this.playCannonCancelAnimation(null);
             this.setCancelShooting(false);

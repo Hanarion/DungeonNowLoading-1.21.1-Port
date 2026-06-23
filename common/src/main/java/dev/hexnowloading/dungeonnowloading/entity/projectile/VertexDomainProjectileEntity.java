@@ -586,7 +586,7 @@ public class VertexDomainProjectileEntity extends ModelledProjectileEntity {
                     DNLParticleTypes.REDSTONE_SHOCKWAVE_PARTICLE.get(),
                     3.0F
             );
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 1.0F, 2.0F);
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE.value(), this.getSoundSource(), 1.0F, 2.0F);
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), DNLSounds.OVERCHARGED_REDSTONE_BLOCK_TNT_EXPLOSION.get(), this.getSoundSource(), 1.0F, 2.0F);
             ((ServerLevel)this.level()).sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 5, 2, 2, 2, 0.0f);
             ((ServerLevel)this.level()).sendParticles(particleData, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0.0f);
