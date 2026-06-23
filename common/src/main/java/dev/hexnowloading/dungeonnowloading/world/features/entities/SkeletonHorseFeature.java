@@ -20,7 +20,7 @@ public class SkeletonHorseFeature extends Feature<NoneFeatureConfiguration> {
         skeletonHorse.moveTo((double)context.origin().getX() + 0.5D, context.origin().getY(), (double)context.origin().getZ() + 0.5D, 0.0F, 0.0F);
         skeletonHorse.finalizeSpawn(context.level(), context.level().getCurrentDifficultyAt(context.origin()), MobSpawnType.STRUCTURE, null);
         skeletonHorse.setTamed(true);
-        skeletonHorse.equipSaddle(SoundSource.NEUTRAL);
+        skeletonHorse.equipSaddle(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE), SoundSource.NEUTRAL);
 
         context.level().addFreshEntity(skeletonHorse);
         return true;

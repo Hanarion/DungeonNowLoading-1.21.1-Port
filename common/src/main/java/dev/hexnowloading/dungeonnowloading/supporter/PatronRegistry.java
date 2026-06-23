@@ -132,7 +132,7 @@ public final class PatronRegistry {
 
     private static File getCacheFile(MinecraftServer server) {
         // config/dnl/patrons.json
-        return server.getFile("config/dnl/patrons.json");
+        return server.getFile("config/dnl/patrons.json").toFile();
     }
 
     private static void enrichNamesFromProfileCache(MinecraftServer server, Map<String, Campaign> data) {

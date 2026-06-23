@@ -42,7 +42,7 @@ public class BallistaGolemStatueBlockEntity extends BlockEntity {
         summonBallistaGolemEntity(level, blockPos, BallistaGolemStatueBlock.getDirection(ballistaGolemStatueBlockEntity.getBlockState()));
         BallistaGolemStatueBlock.destroyAllBlocks(level, blockPos);
         BallistaGolemStatueBlock.destroyBlocksAbove(level, blockPos);
-        SoundEvent soundType = ballistaGolemStatueBlock.getSoundType(level.getBlockState(blockPos)).getBreakSound();
+        SoundEvent soundType = level.getBlockState(blockPos).getSoundType().getBreakSound();
         RandomSource random = this.getLevel().random;
         this.level.playSound(null, blockPos, soundType, SoundSource.BLOCKS, 1.0f, 1.0F + (random.nextFloat() - random.nextFloat()) * 0.2F);
     }

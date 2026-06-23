@@ -51,7 +51,7 @@ public class WispwardChestModel extends Model{
         float blue = 0.08F + 0.92F * clamped;
         poseStack.pushPose();
         this.wispward_chest.translateAndRotate(poseStack);
-        this.fire.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, 1.0F);
+        this.fire.render(poseStack, vertexConsumer, packedLight, packedOverlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(1.0F, red, green, blue));
         poseStack.popPose();
     }
 }

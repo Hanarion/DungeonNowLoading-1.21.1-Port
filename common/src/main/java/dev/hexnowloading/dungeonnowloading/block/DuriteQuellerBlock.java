@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.DuriteQuellerBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlockEntityTypes;
 import net.minecraft.core.BlockPos;
@@ -18,6 +20,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 
 public class DuriteQuellerBlock extends BaseEntityBlock {
+
+    public static final MapCodec<DuriteQuellerBlock> CODEC = simpleCodec(DuriteQuellerBlock::new);
+
+    @Override
+    public MapCodec<DuriteQuellerBlock> codec() {
+        return CODEC;
+    }
     public DuriteQuellerBlock(Properties props) {
         super(props);
         this.registerDefaultState(this.stateDefinition.any()

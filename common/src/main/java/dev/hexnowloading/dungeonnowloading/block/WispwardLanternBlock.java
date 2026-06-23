@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.block.entity.WispwardChestBlockEntity;
 import dev.hexnowloading.dungeonnowloading.block.entity.WispwardLanternBlockEntity;
 import dev.hexnowloading.dungeonnowloading.network.packets.S2CWispwardLanternOpenConfigPacket;
@@ -35,6 +37,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class WispwardLanternBlock extends BaseEntityBlock {
+
+    public static final MapCodec<WispwardLanternBlock> CODEC = simpleCodec(WispwardLanternBlock::new);
+
+    @Override
+    public MapCodec<WispwardLanternBlock> codec() {
+        return CODEC;
+    }
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     private static final int TIMED_UNLIGHT_DELAY_TICKS = 20;
     private static final VoxelShape SHAPE = Block.box(3.0D, 3.0D, 3.0D, 13.0D, 13.0D, 13.0D);
