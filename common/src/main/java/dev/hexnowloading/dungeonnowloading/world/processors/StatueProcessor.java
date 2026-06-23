@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.world.processors;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.hexnowloading.dungeonnowloading.block.entity.PlayerStatueBlockEntity;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 public class StatueProcessor extends StructureProcessor {
 
-    public static final Codec<StatueProcessor> CODEC = RecordCodecBuilder.create(i ->
+    public static final MapCodec<StatueProcessor> CODEC = RecordCodecBuilder.mapCodec(i ->
             i.group(
                     Codec.STRING.fieldOf("campaign").forGetter(p -> p.campaign),
                     Codec.FLOAT.optionalFieldOf("chance", 1.0F).forGetter(p -> p.chance),

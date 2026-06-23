@@ -1,6 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.world.processors;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.hexnowloading.dungeonnowloading.block.PileBlock;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
@@ -19,8 +20,8 @@ import java.util.List;
 
 public class BookPileRandomizerProcessor extends StructureProcessor {
 
-    public static final Codec<BookPileRandomizerProcessor> CODEC =
-            RecordCodecBuilder.create(inst -> inst.group(
+    public static final MapCodec<BookPileRandomizerProcessor> CODEC =
+            RecordCodecBuilder.mapCodec(inst -> inst.group(
                     ResourceLocation.CODEC.listOf().fieldOf("loot_tables").forGetter(p -> p.lootTables),
                     Codec.BOOL.optionalFieldOf("write_seed", true).forGetter(p -> p.writeSeed),
                     Codec.unboundedMap(Codec.INT, Codec.INT)

@@ -2,6 +2,7 @@ package dev.hexnowloading.dungeonnowloading.world.processors;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.hexnowloading.dungeonnowloading.registry.DNLProcessors;
 import net.minecraft.core.BlockPos;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class WeightedListProcessor extends StructureProcessor {
 
-    public static final Codec<WeightedListProcessor> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
+    public static final MapCodec<WeightedListProcessor> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             BuiltInRegistries.BLOCK.byNameCodec().fieldOf("input_block").forGetter(config -> config.input_block),
             Codec.mapPair(BlockState.CODEC.fieldOf("blockstate"), Codec.intRange(1, Integer.MAX_VALUE).fieldOf("weight"))
                     .codec().listOf().fieldOf("weighted_list_of_replacement_blocks")
