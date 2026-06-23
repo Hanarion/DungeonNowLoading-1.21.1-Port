@@ -43,4 +43,7 @@ tasks.named('sourcesJar', Jar) {
     from(configurations.commonJava)
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
+    // Generated assets (neoforge/src/generated) can overlap with hand-authored common resources
+    // (a model that's both authored and datagen-output); include both, mirroring processResources.
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
