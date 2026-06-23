@@ -33,11 +33,9 @@ public abstract class PlayerMixin {
         }
     }
 
-    // 1.21 removed Entity.wantsToStopRiding(); dismount-on-sneak is no longer a gateable Entity
-    // method (handled in player input/aiStep now). The "block dismount from Garhold/Mimicart"
-    // behavior needs a different hook — disabled here to avoid the apply-time "target not found"
-    // crash. TODO: re-implement via a LocalPlayer input mixin if the feature is needed.
-    /*
+    // Block the auto-dismount-on-sneak while riding the custom vehicles (Garhold / Mimicart),
+    // so players can't accidentally dismount them mid-combat/motion. Player.wantsToStopRiding()
+    // still exists in 1.21 (it's on Player, not Entity) — gate it on the vehicle type.
     @Inject(method = "wantsToStopRiding", at = @At("HEAD"), cancellable = true)
     private void dnl$blockDismountOnMimicart(CallbackInfoReturnable<Boolean> cir) {
         Player self = (Player)(Object) this;
@@ -47,5 +45,4 @@ public abstract class PlayerMixin {
             cir.setReturnValue(false);
         }
     }
-    */
 }
