@@ -129,7 +129,7 @@ public class WoodenBoardBlock extends Block implements SimpleWaterloggedBlock {
     // ----- Misc -----
 
     @Override
-    public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, net.minecraft.world.level.pathfinder.PathComputationType type) {
+    protected boolean isPathfindable(BlockState state, net.minecraft.world.level.pathfinder.PathComputationType type) {
         return false;
     }
 

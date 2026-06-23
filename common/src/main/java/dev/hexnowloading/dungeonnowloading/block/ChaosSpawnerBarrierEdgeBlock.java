@@ -103,7 +103,7 @@ public class ChaosSpawnerBarrierEdgeBlock extends Block implements SimpleWaterlo
     }
 
     @Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult hitResult) {
         if (player.isCreative()) {
             if (blockState.getValue(BARRIER_EDGE) == BarrierEdges.TOP || blockState.getValue(BARRIER_EDGE) == BarrierEdges.BOTTOM) {
                 switch (blockState.getValue(FACING)) {

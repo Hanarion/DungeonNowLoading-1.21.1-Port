@@ -55,10 +55,10 @@ public class WallPlatformBlock extends HorizontalDirectionalBlock implements Sim
     }
 
     @Override
-    public boolean isPathfindable(BlockState $$0, BlockGetter $$1, BlockPos $$2, PathComputationType pathComputationType) {
+    protected boolean isPathfindable(BlockState $$0, PathComputationType pathComputationType) {
         switch(pathComputationType) {
             case WATER:
-                return $$1.getFluidState($$2).is(FluidTags.WATER);
+                return $$0.getFluidState().is(FluidTags.WATER);
             default:
                 return false;
         }

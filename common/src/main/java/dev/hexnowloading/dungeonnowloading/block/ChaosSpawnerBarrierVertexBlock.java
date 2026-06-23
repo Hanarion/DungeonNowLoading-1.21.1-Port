@@ -103,7 +103,7 @@ public class ChaosSpawnerBarrierVertexBlock extends Block implements SimpleWater
     }
 
     @Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult hitResult) {
         if (player.isCreative()) {
             if (blockState.getValue(BARRIER_VERTEX) == BarrierVertexs.TOP || blockState.getValue(BARRIER_VERTEX) == BarrierVertexs.BOTTOM) {
                 switch (blockState.getValue(FACING)) {

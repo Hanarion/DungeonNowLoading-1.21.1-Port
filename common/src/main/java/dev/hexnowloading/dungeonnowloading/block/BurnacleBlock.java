@@ -304,9 +304,7 @@ public class BurnacleBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public boolean isPathfindable(BlockState state,
-                                  BlockGetter level,
-                                  BlockPos pos,
+    protected boolean isPathfindable(BlockState state,
                                   PathComputationType type) {
         return false;
     }
@@ -361,24 +359,23 @@ public class BurnacleBlock extends Block implements EntityBlock {
      * ---------------------------------------------------------------------- */
 
     @Override
-    public InteractionResult use(BlockState state,
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack,
+                                 BlockState state,
                                  Level level,
                                  BlockPos pos,
                                  Player player,
                                  InteractionHand hand,
                                  BlockHitResult hit) {
-        ItemStack stack = player.getItemInHand(hand);
-
         // Only handle bone meal
         if (!stack.is(Items.BONE_MEAL)) {
-            return super.use(state, level, pos, player, hand, hit);
+            return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         Stage stage = state.getValue(STAGE);
 
         // Already max size → let other interactions handle it
         if (stage == Stage.ELDER) {
-            return super.use(state, level, pos, player, hand, hit);
+            return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         // We will grow it: consume item + change state
@@ -401,7 +398,7 @@ public class BurnacleBlock extends Block implements EntityBlock {
             level.levelEvent(1505, pos, 0);
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override

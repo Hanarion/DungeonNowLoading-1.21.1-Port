@@ -119,7 +119,7 @@ public class DisabledFairkeeperChestBlock extends BaseEntityBlock implements Sim
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.sidedSuccess(level.isClientSide());
         }

@@ -37,7 +37,7 @@ public class RotatorPressurePlate extends PressurePlateBlock {
     private final BlockSetType type;
 
     public RotatorPressurePlate(Properties properties, BlockSetType blockSetType) {
-        super(Sensitivity.EVERYTHING, properties, blockSetType);
+        super(blockSetType, properties);
         this.type = blockSetType;
     }
 
@@ -47,7 +47,7 @@ public class RotatorPressurePlate extends PressurePlateBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
         if (blockState.getValue(POWERED)) {
             return InteractionResult.CONSUME;
         } else {

@@ -1,5 +1,7 @@
 package dev.hexnowloading.dungeonnowloading.block;
 
+import com.mojang.serialization.MapCodec;
+
 import dev.hexnowloading.dungeonnowloading.registry.DNLSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,6 +28,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class SignalGateBlock extends DirectionalBlock {
+
+    public static final MapCodec<SignalGateBlock> CODEC = simpleCodec(SignalGateBlock::new);
+
+    @Override
+    public MapCodec<SignalGateBlock> codec() {
+        return CODEC;
+    }
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -56,7 +65,7 @@ public class SignalGateBlock extends DirectionalBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
         int power = blockState.getValue(POWER) + 1;
         if (power > 15) {
             power = 0;

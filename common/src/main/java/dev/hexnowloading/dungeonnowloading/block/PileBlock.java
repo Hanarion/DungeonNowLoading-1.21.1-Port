@@ -73,7 +73,7 @@ public class PileBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     @Override
-    public boolean isPathfindable(BlockState p_154341_, BlockGetter p_154342_, BlockPos p_154343_, PathComputationType p_154344_) {
+    protected boolean isPathfindable(BlockState p_154341_, PathComputationType p_154344_) {
         return false;
     }
 }
