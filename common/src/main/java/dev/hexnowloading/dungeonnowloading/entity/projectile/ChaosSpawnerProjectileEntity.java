@@ -166,7 +166,7 @@ public class ChaosSpawnerProjectileEntity extends Entity {
                         player.disableShield();
                     }
                     if (entityHurted && target.isAlive()) {
-                        this.doEnchantDamageEffects((LivingEntity) owner, target);
+                        applyPostAttackEffects(owner, target);
                     }
                 }
             }
@@ -176,7 +176,7 @@ public class ChaosSpawnerProjectileEntity extends Entity {
                         int damageAmount = (int) (((SealedChaosEntity) owner).getAttributeValue(Attributes.ATTACK_DAMAGE));
                         boolean entityHurted = target.hurt(this.damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), (float) damageAmount);
                         if (entityHurted && target.isAlive()) {
-                            this.doEnchantDamageEffects((LivingEntity) owner, target);
+                            applyPostAttackEffects(owner, target);
                         }
                     }
                 } else if (target instanceof LivingEntity) {
@@ -184,17 +184,28 @@ public class ChaosSpawnerProjectileEntity extends Entity {
                         int damageAmount = (int) (((SealedChaosEntity) owner).getAttributeValue(Attributes.ATTACK_DAMAGE));
                         boolean entityHurted = target.hurt(this.damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), (float) damageAmount);
                         if (entityHurted && target.isAlive()) {
-                            this.doEnchantDamageEffects((LivingEntity) owner, target);
+                            applyPostAttackEffects(owner, target);
                         }
                     }
                 } else {
                     int damageAmount = (int) (((SealedChaosEntity) owner).getAttributeValue(Attributes.ATTACK_DAMAGE));
                     boolean entityHurted = target.hurt(this.damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), (float) damageAmount);
                     if (entityHurted && target.isAlive()) {
-                        this.doEnchantDamageEffects((LivingEntity) owner, target);
+                        applyPostAttackEffects(owner, target);
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 1.21 removed Entity.doEnchantDamageEffects; post-attack enchantment effects now go
+     * through EnchantmentHelper.doPostAttackEffects(ServerLevel, target, damageSource).
+     */
+    private void applyPostAttackEffects(Entity owner, Entity target) {
+        if (this.level() instanceof net.minecraft.server.level.ServerLevel serverLevel && owner instanceof LivingEntity livingOwner) {
+            net.minecraft.world.item.enchantment.EnchantmentHelper.doPostAttackEffects(
+                    serverLevel, target, this.damageSources().mobProjectile(this, livingOwner));
         }
     }
 
@@ -218,7 +229,7 @@ public class ChaosSpawnerProjectileEntity extends Entity {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket(net.minecraft.server.level.ServerEntity serverEntity) {
         Entity entity = this.getOwner();
         int i = entity == null ? 0 : entity.getId();
         return new ClientboundAddEntityPacket(this.getId(), this.getUUID(), this.getX(), this.getY(), this.getZ(), this.getXRot(), this.getYRot(), this.getType(), i, new Vec3(this.getDeltaMovement().scale(this.INERTIA).toVector3f()), 0.0D);

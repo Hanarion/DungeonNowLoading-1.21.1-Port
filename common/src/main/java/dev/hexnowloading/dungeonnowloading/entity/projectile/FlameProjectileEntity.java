@@ -109,11 +109,11 @@ public class FlameProjectileEntity extends ThrowableItemProjectile {
                 return;
             }
             if (this.getDamage() > 0 && target.hurt(this.damageSources().mobProjectile(this, livingEntity), this.getDamage()) && target.isAlive()) {
-                this.doEnchantDamageEffects(livingEntity, target);
+                if (this.level() instanceof net.minecraft.server.level.ServerLevel sl) { net.minecraft.world.item.enchantment.EnchantmentHelper.doPostAttackEffects(sl, target, this.damageSources().mobProjectile(this, livingEntity)); }
                 return;
             }
             if (target.hurt(this.damageSources().mobProjectile(this, livingEntity), (float) damageAmount) && target.isAlive()) {
-                this.doEnchantDamageEffects(livingEntity, target);
+                if (this.level() instanceof net.minecraft.server.level.ServerLevel sl) { net.minecraft.world.item.enchantment.EnchantmentHelper.doPostAttackEffects(sl, target, this.damageSources().mobProjectile(this, livingEntity)); }
             }
         }
     }
