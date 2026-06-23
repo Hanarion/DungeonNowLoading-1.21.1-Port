@@ -104,8 +104,11 @@ public class VertexDomainProjectileModel<T extends VertexDomainProjectileEntity>
     }
 
     public void renderToBufferWithEntity(VertexDomainProjectileEntity entity, PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        wave.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, entity.getDyingTick() > 0 || (entity.getLife() > 0 && entity.getLife() < 20) ? alpha : waveAlpha);
-        whoosh.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, entity.getDyingTick() > 0 || (entity.getImpactAnimationTimeOut() > 0 && entity.getImpactAnimationTimeOut() < VertexDomainProjectileEntity.IMPACT_ANIMATION_DURATION) ? waveAlpha : alpha);
+        // 1.21 ModelPart.render takes a packed ARGB int instead of r/g/b/a floats.
+        float waveA = entity.getDyingTick() > 0 || (entity.getLife() > 0 && entity.getLife() < 20) ? alpha : waveAlpha;
+        float whooshA = entity.getDyingTick() > 0 || (entity.getImpactAnimationTimeOut() > 0 && entity.getImpactAnimationTimeOut() < VertexDomainProjectileEntity.IMPACT_ANIMATION_DURATION) ? waveAlpha : alpha;
+        orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
+        wave.render(poseStack, vertexConsumer, packedLight, packedOverlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(waveA, red, green, blue));
+        whoosh.render(poseStack, vertexConsumer, packedLight, packedOverlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(whooshA, red, green, blue));
     }
 }

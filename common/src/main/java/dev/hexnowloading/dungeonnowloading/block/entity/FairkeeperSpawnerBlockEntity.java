@@ -147,7 +147,7 @@ public class FairkeeperSpawnerBlockEntity extends BlockEntity {
         if (this.nextSpawnData != null) {
             return this.nextSpawnData;
         } else {
-            this.setNextSpawnData(level, blockPos, this.spawnPotentials.getRandom(randomSource).map(WeightedEntry.Wrapper::getData).orElseGet(SpawnData::new));
+            this.setNextSpawnData(level, blockPos, this.spawnPotentials.getRandom(randomSource).map(WeightedEntry.Wrapper::data).orElseGet(SpawnData::new));
             return this.nextSpawnData;
         }
     }
@@ -248,7 +248,7 @@ public class FairkeeperSpawnerBlockEntity extends BlockEntity {
             });
             if (mob == null) break;
             mob.moveTo(x, y, z, level.random.nextFloat() * 360.0f, 0.0f);
-            if (mob instanceof Mob mob1 && level.noCollision(mob1, entityType.get().getAABB(mob1.getX(), mob1.getY(), mob1.getZ())) && mob1.checkSpawnObstruction(level)) {
+            if (mob instanceof Mob mob1 && level.noCollision(mob1, entityType.get().getSpawnAABB(mob1.getX(), mob1.getY(), mob1.getZ())) && mob1.checkSpawnObstruction(level)) {
                 EntityScale.scaleMobAttributes(mob1);
                 mob1.setPersistenceRequired();
                 if (spawnData.getEntityToSpawn().size() == 1 && spawnData.getEntityToSpawn().contains("id", CompoundTag.OBJECT_HEADER)) { // adding this part ignores equipment attachment from the finalized spawn, which is good, but don't know why it happens...
@@ -267,7 +267,7 @@ public class FairkeeperSpawnerBlockEntity extends BlockEntity {
             level.gameEvent(mob1, GameEvent.ENTITY_PLACE, blockPos);
             mob1.spawnAnim();
             this.spawnPotentials.getRandom(randomSource).ifPresent((b) -> {
-                this.setNextSpawnData(level, blockPos, b.getData());
+                this.setNextSpawnData(level, blockPos, b.data());
             });
             break;
         }
