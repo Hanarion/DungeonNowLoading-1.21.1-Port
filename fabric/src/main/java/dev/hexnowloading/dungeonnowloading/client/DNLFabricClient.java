@@ -25,6 +25,7 @@ import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
@@ -66,7 +67,7 @@ public class DNLFabricClient implements ClientModInitializer {
         MendstonePickaxeParticleHandlerFabric.register();
         ClientTickEvents.END_CLIENT_TICK.register(SignalRailInputHandler::handleClientTick);
 
-        ItemTooltipCallback.EVENT.register((stack, context, lines) -> addDnlEnchantmentDescriptions(stack, lines));
+        ItemTooltipCallback.EVENT.register((stack, tooltipContext, tooltipFlag, lines) -> addDnlEnchantmentDescriptions(stack, lines));
     }
 
     private void registerItemModelLayers() {
@@ -179,10 +180,10 @@ public class DNLFabricClient implements ClientModInitializer {
     }
 
     private void registerModelModifiers() {
-        ModelLoadingPlugin.register(context -> context.modifyModelAfterBake().register((model, modifierContext) -> {
-            ResourceLocation id = modifierContext.id();
+        ModelLoadingPlugin.register(context -> context.modifyModelAfterBake().register((net.minecraft.client.resources.model.BakedModel model, ModelModifier.AfterBake.Context modifierContext) -> {
+            ResourceLocation id = modifierContext.resourceId();
             if (model != null && DungeonNowLoading.MOD_ID.equals(id.getNamespace()) && isMendingAuraModel(id.getPath())) {
-                return new MendingAuraFabricBakedModel(model);
+                return (net.minecraft.client.resources.model.BakedModel) new MendingAuraFabricBakedModel(model);
             }
             return model;
         }));
@@ -257,7 +258,7 @@ public class DNLFabricClient implements ClientModInitializer {
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), ResourceLocation.parse("pull"), (stack, level, entity, idk) -> {
             if (entity == null) return 0.0F;
             else
-                return entity.getUseItem() != stack ? 0.0F : (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 30.0F;
+                return entity.getUseItem() != stack ? 0.0F : (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 30.0F;
         });
 
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), ResourceLocation.parse("pulling"), (stack, level, entity, idk) ->
@@ -266,7 +267,7 @@ public class DNLFabricClient implements ClientModInitializer {
         ItemProperties.register(DNLItems.COPPER_DETONATOR.get(), ResourceLocation.parse("mode_switch"), (stack, level, entity, idk) -> {
             if (entity == null || entity.getUseItem() != stack) return 0.0F;
 
-            int useTime = stack.getUseDuration() - entity.getUseItemRemainingTicks();
+            int useTime = stack.getUseDuration(entity) - entity.getUseItemRemainingTicks();
             return useTime > CopperDetonatorItem.MODE_SWITCH_TIMING ? 1.0F : 0.0F;
         });
 
@@ -394,12 +395,12 @@ public class DNLFabricClient implements ClientModInitializer {
     }
 
     private static void addDnlEnchantmentDescriptions(ItemStack stack, List<Component> lines) {
-        for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(stack).entrySet()) {
-            Enchantment ench = entry.getKey();
-            var id = BuiltInRegistries.ENCHANTMENT.getKey(ench);
-            if (id != null && DungeonNowLoading.MOD_ID.equals(id.getNamespace())) {
-                String key = "enchantment." + id.getNamespace() + "." + id.getPath() + ".desc";
-                lines.add(Component.translatable(key).withStyle(ChatFormatting.DARK_GRAY));
+        // 1.21: enchantments are holder-based via the ENCHANTMENTS component (not EnchantmentHelper.getEnchantments).
+        for (var holder : stack.getEnchantments().keySet()) {
+            var key = holder.unwrapKey().orElse(null);
+            if (key != null && DungeonNowLoading.MOD_ID.equals(key.location().getNamespace())) {
+                String descKey = "enchantment." + key.location().getNamespace() + "." + key.location().getPath() + ".desc";
+                lines.add(Component.translatable(descKey).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
     }

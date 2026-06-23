@@ -15,6 +15,8 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
 
 import java.util.function.Supplier;
 
@@ -24,6 +26,13 @@ public class FabricRegistryHelper implements RegistryHelper {
         T value = entry.get();
         Registry.register(registry, DungeonNowLoading.id(name), value);
         return () -> value;
+    }
+
+    @Override
+    public void registerEntityDataSerializer(String name, EntityDataSerializer<?> serializer) {
+        // 1.21: Fabric (unlike NeoForge) has no separate modded-serializer registry gate — vanilla
+        // EntityDataSerializers.registerSerializer is callable directly (no "already frozen" guard).
+        EntityDataSerializers.registerSerializer(serializer);
     }
 
     @Override
