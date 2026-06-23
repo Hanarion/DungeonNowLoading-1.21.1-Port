@@ -5,7 +5,6 @@ import dev.hexnowloading.dungeonnowloading.platform.Services;
 
 public class DNLPackets {
     public static void registerServerbound() {
-        System.out.println("[DNLPackets] registerServerbound()");
         Services.NETWORK.register("serverbound_stop_ticking_sound", C2SStopTickingSoundPacket.class, C2SStopTickingSoundPacket::decode);
         Services.NETWORK.register("serverbound_pedestal_edit", C2SPedestalEditPacket.class, C2SPedestalEditPacket::decode);
         Services.NETWORK.register("serverbound_pedestal_update", C2SPedestalUpdatePacket.class, C2SPedestalUpdatePacket::decode);
