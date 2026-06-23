@@ -665,7 +665,7 @@ public class MimicartEntity extends AbstractMinecart {
     @Override
     protected void addPassenger(Entity passenger) {
         if (passenger instanceof LivingEntity living) {
-            double seatY = this.getY() + this.getPassengersRidingOffset() + passenger.getMyRidingOffset();
+            double seatY = this.getPassengerRidingPosition(passenger).y();
 
             // initial full offset at the moment they get grabbed
             Vec3 offset = living.position().subtract(this.getX(), seatY, this.getZ());
@@ -688,7 +688,7 @@ public class MimicartEntity extends AbstractMinecart {
             return;
         }
 
-        double baseY = this.getY() + this.getPassengersRidingOffset() + passenger.getMyRidingOffset();
+        double baseY = this.getPassengerRidingPosition(passenger).y();
         double x = this.getX();
         double y = baseY;
         double z = this.getZ();
@@ -932,7 +932,7 @@ public class MimicartEntity extends AbstractMinecart {
     }
 
     @Override
-    public Item getDropItem() {
+    protected Item getDropItem() {
         return DNLItems.MIMICART.get();
     }
 
@@ -947,12 +947,7 @@ public class MimicartEntity extends AbstractMinecart {
     }
     @Override
     public boolean fireImmune() {
-        return true; // full vanilla fire immunity
-    }
-
-    @Override
-    public void igniteForSeconds(float seconds) {
-        // block being lit on fire
+        return true; // full vanilla fire immunity (also prevents igniteForSeconds, which is final in 1.21)
     }
 
     @Override
