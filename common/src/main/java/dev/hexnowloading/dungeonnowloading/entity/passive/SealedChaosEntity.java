@@ -232,10 +232,11 @@ public class SealedChaosEntity extends PathfinderMob implements OwnableEntity {
     }
 
     @Override
-    public double getMyRidingOffset() {
-        // Keep riding offset proportional to size
-        double base = super.getMyRidingOffset();
-        return this.isGigantic() ? base * 2.0D : base;
+    protected Vec3 getPassengerAttachmentPoint(net.minecraft.world.entity.Entity entity, net.minecraft.world.entity.EntityDimensions dimensions, float partialTick) {
+        // 1.21 replaced getMyRidingOffset with an attachment-point Vec3; keep the
+        // riding offset proportional to size (doubled when gigantic).
+        Vec3 base = super.getPassengerAttachmentPoint(entity, dimensions, partialTick);
+        return this.isGigantic() ? base.multiply(1.0D, 2.0D, 1.0D) : base;
     }
 
     @Override

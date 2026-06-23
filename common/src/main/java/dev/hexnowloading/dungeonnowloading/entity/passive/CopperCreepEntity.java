@@ -978,13 +978,8 @@ public class CopperCreepEntity extends PathfinderMob implements OwnableEntity, P
         }
 
         @Override
-        protected void checkAndPerformAttack(LivingEntity $$0, double $$1) {
-//            double $$2 = this.getAttackReachSqr($$0);
-//            if ($$1 <= $$2 && this.ticksUntilNextAttack <= 0) {
-//                this.resetAttackCooldown();
-//                this.mob.swing(InteractionHand.MAIN_HAND);
-//                this.mob.doHurtTarget($$0);
-//            }
+        protected void checkAndPerformAttack(LivingEntity $$0) {
+            // intentionally suppresses the default melee attack
         }
     }
 

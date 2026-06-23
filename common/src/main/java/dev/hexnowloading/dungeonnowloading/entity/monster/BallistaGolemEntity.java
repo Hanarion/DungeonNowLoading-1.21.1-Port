@@ -161,11 +161,6 @@ public class BallistaGolemEntity extends Monster implements Enemy, SlumberingEnt
     }
 
     @Override
-    public double getMeleeAttackRangeSqr(LivingEntity livingEntity) {
-        return (double) (this.getBbWidth() * this.getBbWidth());
-    }
-
-    @Override
     protected EntityDimensions getDefaultDimensions(Pose pose) {
         return super.getDefaultDimensions(pose).withEyeHeight(2.0F);
     }
