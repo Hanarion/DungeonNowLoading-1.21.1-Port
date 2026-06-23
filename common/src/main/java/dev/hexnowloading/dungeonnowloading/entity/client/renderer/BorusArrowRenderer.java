@@ -59,13 +59,12 @@ public class BorusArrowRenderer<T extends BorusArrowEntity> extends EntityRender
     }
 
     public void vertex(Matrix4f $$0, Matrix3f $$1, VertexConsumer $$2, int $$3, int $$4, int $$5, float $$6, float $$7, int $$8, int $$9, int $$10, int $$11) {
-        $$2.vertex($$0, (float)$$3, (float)$$4, (float)$$5)
-                .color(255, 255, 255, 255)
-                .uv($$6, $$7)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2($$11)
-                .normal($$1, (float)$$8, (float)$$10, (float)$$9)
-                .endVertex();
+        $$2.addVertex($$0, (float)$$3, (float)$$4, (float)$$5)
+                .setColor(255, 255, 255, 255)
+                .setUv($$6, $$7)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight($$11)
+                .setNormal((float)$$8, (float)$$10, (float)$$9);
     }
 
     @Override
