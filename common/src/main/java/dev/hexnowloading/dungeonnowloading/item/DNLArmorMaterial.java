@@ -45,19 +45,22 @@ public final class DNLArmorMaterial {
             () -> Ingredient.of(DNLItems.SPAWNER_FRAME.get())
     );
 
-    @SuppressWarnings("unchecked")
     private static Holder<ArmorMaterial> register(String name, EnumMap<ArmorItem.Type, Integer> defense,
                                                   int enchantmentValue, float toughness, float knockbackResistance,
                                                   Supplier<Ingredient> repairIngredient) {
         ResourceLocation id = DungeonNowLoading.id(name);
         List<ArmorMaterial.Layer> layers = List.of(new ArmorMaterial.Layer(id, "", false));
-        Supplier<ArmorMaterial> deferred = Services.REGISTRY.register(
+        // Register the material; then resolve its Holder from the registry by id (works on both
+        // NeoForge, where register() returns a DeferredHolder, and Fabric, where register() returns
+        // a plain Supplier — so don't cast the supplier; look up the Holder directly).
+        Services.REGISTRY.register(
                 BuiltInRegistries.ARMOR_MATERIAL,
                 name,
                 () -> new ArmorMaterial(defense, enchantmentValue, SoundEvents.ARMOR_EQUIP_IRON, repairIngredient, layers, toughness, knockbackResistance)
         );
-        // The platform helper returns a DeferredHolder (a Holder<ArmorMaterial>) on NeoForge.
-        return (Holder<ArmorMaterial>) deferred;
+        return BuiltInRegistries.ARMOR_MATERIAL.getHolder(
+                net.minecraft.resources.ResourceKey.create(BuiltInRegistries.ARMOR_MATERIAL.key(), id))
+                .orElseThrow(() -> new IllegalStateException("DNL armor material not registered: " + id));
     }
 
     /** Forces class init so the static registration runs. */
