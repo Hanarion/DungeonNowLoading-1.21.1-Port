@@ -22,8 +22,10 @@ public abstract class CreativeModeInventoryScreenMixin extends EffectRenderingIn
         super(menu, inventory, title);
     }
 
+    // 1.21: mouseScrolled gained a 4th double (scrollX, scrollY); the scroll amount is now scrollY.
     @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
-    private void dungeonnowloading$scrollMimiclingSlot(double mouseX, double mouseY, double amount, CallbackInfoReturnable<Boolean> cir) {
+    private void dungeonnowloading$scrollMimiclingSlot(double mouseX, double mouseY, double scrollX, double scrollY, CallbackInfoReturnable<Boolean> cir) {
+        double amount = scrollY;
         if (hoveredSlot != null) {
             ItemStack stack = hoveredSlot.getItem();
             int delta = amount < 0.0D ? 1 : -1;
