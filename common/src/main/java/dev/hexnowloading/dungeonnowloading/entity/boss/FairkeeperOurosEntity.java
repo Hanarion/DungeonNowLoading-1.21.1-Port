@@ -418,7 +418,7 @@ public class FairkeeperOurosEntity extends Monster implements Boss, Enemy, Slumb
                 this.move(MoverType.SELF, this.getDeltaMovement());
                 //Vec3 adjustedMovement = this.handleRelativeFrictionAndCalculateMovement(movementInput, blockFriction);
                 Vec3 adjustedMovement = this.getDeltaMovement();
-                if ((this.horizontalCollision || this.jumping) && (this.onClimbable() || this.getFeetBlockState().is(Blocks.POWDER_SNOW) && PowderSnowBlock.canEntityWalkOnPowderSnow(this))) {
+                if ((this.horizontalCollision || this.jumping) && (this.onClimbable() || this.getBlockStateOn().is(Blocks.POWDER_SNOW) && PowderSnowBlock.canEntityWalkOnPowderSnow(this))) {
                     adjustedMovement = new Vec3(adjustedMovement.x, -0.2, adjustedMovement.z);
                 }
                 double adjustedYVelocity = adjustedMovement.y;

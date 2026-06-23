@@ -507,7 +507,7 @@ public class SpawnerCarrierEntity extends Monster {
         int toDrop = Math.max(0, afterSteps - beforeSteps);
         if (toDrop > 0) {
 
-            int fortune = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(this.level(), Enchantments.BLOCK_FORTUNE), held);
+            int fortune = EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(this.level(), Enchantments.FORTUNE), held);
             float height = this.getBbHeight();
 
             for (int i = 0; i < toDrop; i++) {

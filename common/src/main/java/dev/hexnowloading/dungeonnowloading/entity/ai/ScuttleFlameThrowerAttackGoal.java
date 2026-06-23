@@ -42,7 +42,7 @@ public class ScuttleFlameThrowerAttackGoal extends Goal {
             return false;
         } else {
             double DETECTION_RANGE = 5.0d;
-            boolean hasTargetInRange = scuttleEntity.getTarget() != null && scuttleEntity.getPerceivedTargetDistanceSquareForMeleeAttack(scuttleEntity.getTarget()) < DETECTION_RANGE * DETECTION_RANGE;
+            boolean hasTargetInRange = scuttleEntity.getTarget() != null && scuttleEntity.distanceToSqr(scuttleEntity.getTarget()) < DETECTION_RANGE * DETECTION_RANGE;
             this.nextScanTick = this.nextStartTick();
             return scuttleEntity.isState(ScuttleEntity.ScuttleState.CLOSED) && hasTargetInRange;
         }

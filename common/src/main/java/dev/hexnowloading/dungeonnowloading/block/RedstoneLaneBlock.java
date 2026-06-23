@@ -73,7 +73,7 @@ public class RedstoneLaneBlock extends DirectionalBlock {
     @Override
     public void stepOn(Level level, BlockPos blockPos, BlockState blockState, Entity entity) {
         if (level.getBlockState(blockPos).getValue(DNLProperties.REDSTONE_LANE_MODE) == RedstoneLaneMode.OVERPOWERED) {
-            if (entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) entity) && !(entity instanceof ScuttleEntity)) {
+            if (entity instanceof LivingEntity && net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantmentLevel(dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments.holder(level, net.minecraft.world.item.enchantment.Enchantments.FROST_WALKER), (LivingEntity) entity) <= 0 && !(entity instanceof ScuttleEntity)) {
                 entity.hurt(level.damageSources().hotFloor(), 6.0F);
                 if (!entity.fireImmune()) {
                     entity.igniteForSeconds(5);

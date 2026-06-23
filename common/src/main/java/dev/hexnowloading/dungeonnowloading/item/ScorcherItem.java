@@ -429,7 +429,7 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
 
     private static void ensureUUID(ItemStack stack) {
         if (!StackNbt.hasTag(stack)) {
-            stack.setTag(new CompoundTag()); // ✅ Create tag if missing
+            dev.hexnowloading.dungeonnowloading.util.StackNbt.setTag(stack, new CompoundTag()); // Create tag if missing
         }
         if (!StackNbt.getTag(stack).contains("ScorcherUUID")) {
             StackNbt.update(stack, t -> t.putUUID("ScorcherUUID", UUID.randomUUID())); // ✅ Assign unique UUID

@@ -63,7 +63,7 @@ public class SpecialItemEntity extends ItemEntity implements TraceableEntity {
         if (this.picker == null) {
             super.playerTouch(player);
         } else if (player.getUUID().equals(this.picker)) {
-            this.getItem().removeTagKey("PickerUUID");
+            dev.hexnowloading.dungeonnowloading.util.StackNbt.update(this.getItem(), t -> t.remove("PickerUUID"));
             super.playerTouch(player);
         }
     }

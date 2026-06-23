@@ -145,7 +145,7 @@ public class ScepterOfSealedChaosItem extends Item {
 
         player.awardStat(Stats.ITEM_USED.get(this));
         if (spawned && !player.getAbilities().instabuild) {
-            itemStack.hurt(1, level.random, null);
+            itemStack.hurtAndBreak(1, (net.minecraft.server.level.ServerLevel) level, player instanceof net.minecraft.server.level.ServerPlayer sp ? sp : null, item -> {});
         }
 
         return InteractionResult.SUCCESS;
