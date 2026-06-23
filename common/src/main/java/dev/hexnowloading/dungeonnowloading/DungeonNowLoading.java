@@ -44,6 +44,7 @@ public class DungeonNowLoading {
         DNLBlocks.init();
         DNLBlockEntityTypes.init();
         DNLProperties.init();
+        dev.hexnowloading.dungeonnowloading.item.DNLArmorMaterial.init();
         DNLItems.init();
         DNLMenuTypes.init();
         // Ensure custom enchantments are registered and available to commands and books

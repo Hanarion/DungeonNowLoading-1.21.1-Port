@@ -2,76 +2,57 @@ package dev.hexnowloading.dungeonnowloading.item;
 
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.Util;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 
-import java.util.function.Supplier;
+import java.util.EnumMap;
+import java.util.List;
 
-public enum DNLArmorMaterial implements ArmorMaterial {
-    SPAWNER("spawner", 26, new int[]{3, 8, 6, 3}, 10, SoundEvents.ARMOR_EQUIP_IRON, 2f, 0f, () -> Ingredient.of(DNLItems.SPAWNER_FRAME.get()));
+/**
+ * 1.21 made ArmorMaterial a data-driven record registered in {@code Registries.ARMOR_MATERIAL}.
+ * The durability multiplier moved onto the item ({@code Type.getDurability}); the material now
+ * only carries defense/enchantability/sound/repair/toughness/knockback + render layers.
+ */
+public final class DNLArmorMaterial {
+    private DNLArmorMaterial() {}
 
-    private String name;
-    private int durability;
-    private int[] damageReduction;
-    private int encantability;
-    private SoundEvent sound;
-    private float toughness;
-    private float knockbackResistance = 0.0F;
-    private final Supplier<Ingredient> repairIngredient;
+    /** Durability multiplier the old enum carried (BASE_DURABILITY * 26). */
+    public static final int SPAWNER_DURABILITY_MULTIPLIER = 26;
 
-    private static final int[] BASE_DURABILITY = new int[]{13, 15, 16, 11};
+    public static final Holder<ArmorMaterial> SPAWNER = register(
+            "spawner",
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 3);
+                map.put(ArmorItem.Type.CHESTPLATE, 8);
+                map.put(ArmorItem.Type.LEGGINGS, 6);
+                map.put(ArmorItem.Type.BOOTS, 3);
+                map.put(ArmorItem.Type.BODY, 8);
+            }),
+            10,                                   // enchantmentValue
+            2.0F,                                 // toughness
+            0.0F,                                 // knockbackResistance
+            () -> Ingredient.of(DNLItems.SPAWNER_FRAME.get())
+    );
 
-    DNLArmorMaterial(String name, int durability, int[] damageReduction, int enchantability, SoundEvent sound, float toughness, float knockbackResistance, Supplier<Ingredient> repairIngredient) {
-        this.name = name;
-        this.durability = durability;
-        this.damageReduction = damageReduction;
-        this.repairIngredient = repairIngredient;
-        this.encantability = encantability;
-        this.sound = sound;
-        this.toughness = toughness;
-        this.knockbackResistance = 0;
+    private static Holder<ArmorMaterial> register(String name, EnumMap<ArmorItem.Type, Integer> defense,
+                                                  int enchantmentValue, float toughness, float knockbackResistance,
+                                                  java.util.function.Supplier<Ingredient> repairIngredient) {
+        ResourceLocation id = DungeonNowLoading.id(name);
+        List<ArmorMaterial.Layer> layers = List.of(new ArmorMaterial.Layer(id, "", false));
+        return Registry.registerForHolder(
+                BuiltInRegistries.ARMOR_MATERIAL,
+                id,
+                new ArmorMaterial(defense, enchantmentValue, SoundEvents.ARMOR_EQUIP_IRON, repairIngredient, layers, toughness, knockbackResistance)
+        );
     }
 
-    @Override
-    public int getDurabilityForType(ArmorItem.Type type) {
-        return BASE_DURABILITY[type.ordinal()] * this.durability;
-    }
-
-    @Override
-    public int getDefenseForType(ArmorItem.Type type) {
-        return this.damageReduction[type.ordinal()];
-    }
-
-    @Override
-    public int getEnchantmentValue() {
-        return this.encantability;
-    }
-
-    @Override
-    public SoundEvent getEquipSound() {
-        return this.sound;
-    }
-
-    @Override
-    public Ingredient getRepairIngredient() {
-        return this.repairIngredient.get();
-    }
-
-    @Override
-    public String getName() {
-        return DungeonNowLoading.MOD_ID + ":" + this.name;
-    }
-
-    @Override
-    public float getToughness() {
-        return this.toughness;
-    }
-
-    @Override
-    public float getKnockbackResistance() {
-        return this.knockbackResistance;
-    }
+    /** Forces class init so the static registration runs. */
+    public static void init() {}
 }
