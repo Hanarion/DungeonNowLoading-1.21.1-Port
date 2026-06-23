@@ -46,6 +46,8 @@ public class DifferentProspectiveItemRenderer implements BuiltinItemRendererRegi
     }
 
     public static BakedModel getModel(ModelManager modelManager, ResourceLocation modelLocation) {
-        return ((ModelManagerAccessor) modelManager).getBakedRegistry().getOrDefault(modelLocation, modelManager.getMissingModel());
+        // 1.21: bakedRegistry is keyed by ModelResourceLocation (standalone variant for side-loaded models).
+        var key = new net.minecraft.client.resources.model.ModelResourceLocation(modelLocation, "standalone");
+        return ((ModelManagerAccessor) modelManager).getBakedRegistry().getOrDefault(key, modelManager.getMissingModel());
     }
 }

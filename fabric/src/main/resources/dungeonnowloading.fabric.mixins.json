@@ -69,7 +69,6 @@
     "client.WisplightRodItemRendererMixin",
     "client.MimiclingEnderEyeOutlineMixin",
     "client.MimiclingReachGameRendererMixin",
-    "client.MimiclingReachClientGameModeMixin",
     "MixinMinecraft",
     "MaxHealthAttributeMixin",
     "items.ItemInHandRendererMixin",

@@ -15,7 +15,8 @@ public class StructurePoolMixin {
      * @return - The higher weight that is a more reasonable limit.
      */
     @ModifyConstant(
-            method = "method_28886",
+            // 1.21 Mojmap: the weight-limit logic lives in StructureTemplatePool's static codec lambda.
+            method = "lambda$static$1",
             constant = @Constant(intValue = 150),
             remap = false,
             require = 0

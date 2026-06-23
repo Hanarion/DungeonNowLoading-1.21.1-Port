@@ -10,3 +10,4 @@ accessible field net/minecraft/client/sounds/SoundManager soundEngine Lnet/minec
 accessible field net/minecraft/client/sounds/SoundEngine instanceToChannel Ljava/util/Map;
 extendable method net/minecraft/world/entity/vehicle/VehicleEntity getDropItem ()Lnet/minecraft/world/item/Item;
 accessible method net/minecraft/world/entity/SpawnPlacements register (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacementType;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V
+accessible method net/minecraft/world/item/Item getPlayerPOVHitResult (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/ClipContext$Fluid;)Lnet/minecraft/world/phys/BlockHitResult;
