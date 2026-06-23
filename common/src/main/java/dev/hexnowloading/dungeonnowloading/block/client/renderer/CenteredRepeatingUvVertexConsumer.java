@@ -16,49 +16,34 @@ public class CenteredRepeatingUvVertexConsumer implements VertexConsumer {
     }
 
     @Override
-    public VertexConsumer vertex(double x, double y, double z) {
-        return this.delegate.vertex(x, y, z);
+    public VertexConsumer addVertex(float x, float y, float z) {
+        return this.delegate.addVertex(x, y, z);
     }
 
     @Override
-    public VertexConsumer color(int red, int green, int blue, int alpha) {
-        return this.delegate.color(red, green, blue, alpha);
+    public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+        return this.delegate.setColor(red, green, blue, alpha);
     }
 
     @Override
-    public VertexConsumer uv(float u, float v) {
+    public VertexConsumer setUv(float u, float v) {
         float centeredU = (u - UV_CENTER) * this.uScale + UV_CENTER;
         float centeredV = (v - UV_CENTER) * this.vScale + UV_CENTER;
-        return this.delegate.uv(centeredU, centeredV);
+        return this.delegate.setUv(centeredU, centeredV);
     }
 
     @Override
-    public VertexConsumer overlayCoords(int u, int v) {
-        return this.delegate.overlayCoords(u, v);
+    public VertexConsumer setUv1(int u, int v) {
+        return this.delegate.setUv1(u, v);
     }
 
     @Override
-    public VertexConsumer uv2(int u, int v) {
-        return this.delegate.uv2(u, v);
+    public VertexConsumer setUv2(int u, int v) {
+        return this.delegate.setUv2(u, v);
     }
 
     @Override
-    public VertexConsumer normal(float x, float y, float z) {
-        return this.delegate.normal(x, y, z);
-    }
-
-    @Override
-    public void endVertex() {
-        this.delegate.endVertex();
-    }
-
-    @Override
-    public void defaultColor(int red, int green, int blue, int alpha) {
-        this.delegate.defaultColor(red, green, blue, alpha);
-    }
-
-    @Override
-    public void unsetDefaultColor() {
-        this.delegate.unsetDefaultColor();
+    public VertexConsumer setNormal(float x, float y, float z) {
+        return this.delegate.setNormal(x, y, z);
     }
 }

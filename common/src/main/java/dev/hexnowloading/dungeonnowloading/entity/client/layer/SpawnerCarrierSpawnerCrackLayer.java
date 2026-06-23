@@ -58,7 +58,7 @@ public class SpawnerCarrierSpawnerCrackLayer<T extends SpawnerCarrierEntity, M e
                 tiled,
                 packedLight,
                 net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
-                1f, 0.2f, 0.2f, 1f
+                net.minecraft.util.FastColor.ARGB32.colorFromFloat(1f, 1f, 0.2f, 0.2f)
         );
 
         poseStack.popPose();
@@ -74,11 +74,11 @@ public class SpawnerCarrierSpawnerCrackLayer<T extends SpawnerCarrierEntity, M e
             this.vMul = vMul;
         }
 
-        @Override public VertexConsumer vertex(double x, double y, double z) { return delegate.vertex(x,y,z); }
-        @Override public VertexConsumer color(int r, int g, int b, int a) { return delegate.color(r,g,b,a); }
+        @Override public VertexConsumer addVertex(float x, float y, float z) { return delegate.addVertex(x, y, z); }
+        @Override public VertexConsumer setColor(int r, int g, int b, int a) { return delegate.setColor(r, g, b, a); }
 
         @Override
-        public VertexConsumer uv(float u, float v) {
+        public VertexConsumer setUv(float u, float v) {
             float tu = u * uMul;
             float tv = v * vMul;
 
@@ -91,14 +91,11 @@ public class SpawnerCarrierSpawnerCrackLayer<T extends SpawnerCarrierEntity, M e
             float uOff = uOffPx / 16.0f;
             float vOff = vOffPx / 16.0f;
 
-            return delegate.uv(tu + uOff, tv + vOff);
+            return delegate.setUv(tu + uOff, tv + vOff);
         }
 
-        @Override public VertexConsumer overlayCoords(int u, int v) { return delegate.overlayCoords(u,v); }
-        @Override public VertexConsumer uv2(int u, int v) { return delegate.uv2(u,v); }
-        @Override public VertexConsumer normal(float x, float y, float z) { return delegate.normal(x,y,z); }
-        @Override public void endVertex() { delegate.endVertex(); }
-        @Override public void defaultColor(int r, int g, int b, int a) { delegate.defaultColor(r,g,b,a); }
-        @Override public void unsetDefaultColor() { delegate.unsetDefaultColor(); }
+        @Override public VertexConsumer setUv1(int u, int v) { return delegate.setUv1(u, v); }
+        @Override public VertexConsumer setUv2(int u, int v) { return delegate.setUv2(u, v); }
+        @Override public VertexConsumer setNormal(float x, float y, float z) { return delegate.setNormal(x, y, z); }
     }
 }

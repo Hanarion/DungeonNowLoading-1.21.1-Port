@@ -54,53 +54,17 @@ public class MendingAuraBlockEntityOverlayBuffer implements MultiBufferSource {
             this.textureMask = textureMask;
         }
 
-        @Override
-        public VertexConsumer vertex(double x, double y, double z) {
-            this.current.x = (float) x;
-            this.current.y = (float) y;
-            this.current.z = (float) z;
-            return this;
-        }
+        // 1.21 removed endVertex(); each addVertex() starts a new vertex, so we
+        // finalize the previously-started vertex here before beginning the next.
+        private boolean vertexInProgress;
 
-        @Override
-        public VertexConsumer color(int red, int green, int blue, int alpha) {
-            this.current.alpha = Math.round(alpha * this.alpha);
-            return this;
-        }
-
-        @Override
-        public VertexConsumer uv(float u, float v) {
-            this.current.u = u;
-            this.current.v = v;
-            return this;
-        }
-
-        @Override
-        public VertexConsumer overlayCoords(int u, int v) {
-            this.current.overlayU = u;
-            this.current.overlayV = v;
-            return this;
-        }
-
-        @Override
-        public VertexConsumer uv2(int u, int v) {
-            this.current.lightU = u;
-            this.current.lightV = v;
-            return this;
-        }
-
-        @Override
-        public VertexConsumer normal(float x, float y, float z) {
-            this.current.normalX = x;
-            this.current.normalY = y;
-            this.current.normalZ = z;
-            return this;
-        }
-
-        @Override
-        public void endVertex() {
+        private void finishVertex() {
+            if (!this.vertexInProgress) {
+                return;
+            }
             this.quad[this.vertexCount++] = this.current;
             this.current = new VertexData();
+            this.vertexInProgress = false;
             if (this.vertexCount == 4) {
                 emitTiledQuad();
                 this.vertexCount = 0;
@@ -108,13 +72,46 @@ public class MendingAuraBlockEntityOverlayBuffer implements MultiBufferSource {
         }
 
         @Override
-        public void defaultColor(int red, int green, int blue, int alpha) {
-            this.delegate.defaultColor(255, 255, 255, Math.round(alpha * this.alpha));
+        public VertexConsumer addVertex(float x, float y, float z) {
+            finishVertex();
+            this.current.x = x;
+            this.current.y = y;
+            this.current.z = z;
+            this.vertexInProgress = true;
+            return this;
         }
 
         @Override
-        public void unsetDefaultColor() {
-            this.delegate.unsetDefaultColor();
+        public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+            this.current.alpha = Math.round(alpha * this.alpha);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv(float u, float v) {
+            this.current.u = u;
+            this.current.v = v;
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv1(int u, int v) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv2(int u, int v) {
+            this.current.lightU = u;
+            this.current.lightV = v;
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setNormal(float x, float y, float z) {
+            this.current.normalX = x;
+            this.current.normalY = y;
+            this.current.normalZ = z;
+            return this;
         }
 
         private void emitTiledQuad() {
@@ -241,17 +238,16 @@ public class MendingAuraBlockEntityOverlayBuffer implements MultiBufferSource {
         }
 
         private void emitVertex(VertexData vertex, float u, float v) {
-            this.delegate.vertex(
+            this.delegate.addVertex(
                             vertex.x + vertex.normalX * OVERLAY_OFFSET,
                             vertex.y + vertex.normalY * OVERLAY_OFFSET,
                             vertex.z + vertex.normalZ * OVERLAY_OFFSET
                     )
-                    .color(255, 255, 255, vertex.alpha)
-                    .uv(this.auraSprite.getU(u * 16.0F), this.auraSprite.getV(v * 16.0F))
-                    .overlayCoords(vertex.overlayU, vertex.overlayV)
-                    .uv2(LightTexture.FULL_BRIGHT)
-                    .normal(vertex.normalX, vertex.normalY, vertex.normalZ)
-                    .endVertex();
+                    .setColor(255, 255, 255, vertex.alpha)
+                    .setUv(this.auraSprite.getU(u * 16.0F), this.auraSprite.getV(v * 16.0F))
+                    .setUv1(vertex.overlayU, vertex.overlayV)
+                    .setLight(LightTexture.FULL_BRIGHT)
+                    .setNormal(vertex.normalX, vertex.normalY, vertex.normalZ);
         }
 
         private static float nextTileBoundary(float value, float max) {

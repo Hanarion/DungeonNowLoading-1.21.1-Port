@@ -154,11 +154,10 @@ public class MendingAuraOverlayRenderer {
 
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix = pose.pose();
-        Matrix3f normal = pose.normal();
         shape.forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> renderBox(
                 consumer,
                 matrix,
-                normal,
+                pose,
                 auraSprite,
                 inflateBox(minX, minY, minZ, maxX, maxY, maxZ)
         ));
@@ -175,7 +174,7 @@ public class MendingAuraOverlayRenderer {
         );
     }
 
-    private static void renderBox(VertexConsumer consumer, Matrix4f matrix, Matrix3f normal, TextureAtlasSprite auraSprite, AABB box) {
+    private static void renderBox(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose, TextureAtlasSprite auraSprite, AABB box) {
         float minX = (float) box.minX;
         float minY = (float) box.minY;
         float minZ = (float) box.minZ;
@@ -183,33 +182,32 @@ public class MendingAuraOverlayRenderer {
         float maxY = (float) box.maxY;
         float maxZ = (float) box.maxZ;
 
-        renderFace(consumer, matrix, normal, auraSprite, minX, minY, minZ, minX, maxY, minZ, minX, maxY, maxZ, minX, minY, maxZ, Direction.WEST, minZ, maxZ, minY, maxY);
-        renderFace(consumer, matrix, normal, auraSprite, maxX, minY, maxZ, maxX, maxY, maxZ, maxX, maxY, minZ, maxX, minY, minZ, Direction.EAST, minZ, maxZ, minY, maxY);
-        renderFace(consumer, matrix, normal, auraSprite, maxX, minY, minZ, maxX, maxY, minZ, minX, maxY, minZ, minX, minY, minZ, Direction.NORTH, minX, maxX, minY, maxY);
-        renderFace(consumer, matrix, normal, auraSprite, minX, minY, maxZ, minX, maxY, maxZ, maxX, maxY, maxZ, maxX, minY, maxZ, Direction.SOUTH, minX, maxX, minY, maxY);
-        renderFace(consumer, matrix, normal, auraSprite, minX, maxY, maxZ, minX, maxY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ, Direction.UP, minX, maxX, minZ, maxZ);
-        renderFace(consumer, matrix, normal, auraSprite, minX, minY, minZ, minX, minY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, Direction.DOWN, minX, maxX, minZ, maxZ);
+        renderFace(consumer, matrix, pose, auraSprite, minX, minY, minZ, minX, maxY, minZ, minX, maxY, maxZ, minX, minY, maxZ, Direction.WEST, minZ, maxZ, minY, maxY);
+        renderFace(consumer, matrix, pose, auraSprite, maxX, minY, maxZ, maxX, maxY, maxZ, maxX, maxY, minZ, maxX, minY, minZ, Direction.EAST, minZ, maxZ, minY, maxY);
+        renderFace(consumer, matrix, pose, auraSprite, maxX, minY, minZ, maxX, maxY, minZ, minX, maxY, minZ, minX, minY, minZ, Direction.NORTH, minX, maxX, minY, maxY);
+        renderFace(consumer, matrix, pose, auraSprite, minX, minY, maxZ, minX, maxY, maxZ, maxX, maxY, maxZ, maxX, minY, maxZ, Direction.SOUTH, minX, maxX, minY, maxY);
+        renderFace(consumer, matrix, pose, auraSprite, minX, maxY, maxZ, minX, maxY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ, Direction.UP, minX, maxX, minZ, maxZ);
+        renderFace(consumer, matrix, pose, auraSprite, minX, minY, minZ, minX, minY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, Direction.DOWN, minX, maxX, minZ, maxZ);
     }
 
-    private static void renderFace(VertexConsumer consumer, Matrix4f matrix, Matrix3f normal, TextureAtlasSprite auraSprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, Direction direction, float minUBlock, float maxUBlock, float minVBlock, float maxVBlock) {
+    private static void renderFace(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose, TextureAtlasSprite auraSprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, Direction direction, float minUBlock, float maxUBlock, float minVBlock, float maxVBlock) {
         float u0 = auraSprite.getU(minUBlock * 16.0F);
         float u1 = auraSprite.getU(maxUBlock * 16.0F);
         float v0 = auraSprite.getV(minVBlock * 16.0F);
         float v1 = auraSprite.getV(maxVBlock * 16.0F);
-        vertex(consumer, matrix, normal, direction, x1, y1, z1, u0, v1);
-        vertex(consumer, matrix, normal, direction, x2, y2, z2, u0, v0);
-        vertex(consumer, matrix, normal, direction, x3, y3, z3, u1, v0);
-        vertex(consumer, matrix, normal, direction, x4, y4, z4, u1, v1);
+        vertex(consumer, matrix, pose, direction, x1, y1, z1, u0, v1);
+        vertex(consumer, matrix, pose, direction, x2, y2, z2, u0, v0);
+        vertex(consumer, matrix, pose, direction, x3, y3, z3, u1, v0);
+        vertex(consumer, matrix, pose, direction, x4, y4, z4, u1, v1);
     }
 
-    private static void vertex(VertexConsumer consumer, Matrix4f matrix, Matrix3f normal, Direction direction, float x, float y, float z, float u, float v) {
-        consumer.vertex(matrix, x, y, z)
-                .color(255, 255, 255, 255)
-                .uv(u, v)
-                .overlayCoords(0)
-                .uv2(LightTexture.FULL_BRIGHT)
-                .normal(normal, direction.getStepX(), direction.getStepY(), direction.getStepZ())
-                .endVertex();
+    private static void vertex(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose, Direction direction, float x, float y, float z, float u, float v) {
+        consumer.addVertex(matrix, x, y, z)
+                .setColor(255, 255, 255, 255)
+                .setUv(u, v)
+                .setOverlay(0)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setNormal(pose, direction.getStepX(), direction.getStepY(), direction.getStepZ());
     }
 
     private static class AlphaVertexConsumer implements VertexConsumer {
@@ -222,48 +220,33 @@ public class MendingAuraOverlayRenderer {
         }
 
         @Override
-        public VertexConsumer vertex(double x, double y, double z) {
-            return this.delegate.vertex(x, y, z);
+        public VertexConsumer addVertex(float x, float y, float z) {
+            return this.delegate.addVertex(x, y, z);
         }
 
         @Override
-        public VertexConsumer color(int red, int green, int blue, int alpha) {
-            return this.delegate.color(red, green, blue, Math.round(alpha * this.alpha));
+        public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+            return this.delegate.setColor(red, green, blue, Math.round(alpha * this.alpha));
         }
 
         @Override
-        public VertexConsumer uv(float u, float v) {
-            return this.delegate.uv(u, v);
+        public VertexConsumer setUv(float u, float v) {
+            return this.delegate.setUv(u, v);
         }
 
         @Override
-        public VertexConsumer overlayCoords(int u, int v) {
-            return this.delegate.overlayCoords(u, v);
+        public VertexConsumer setUv1(int u, int v) {
+            return this.delegate.setUv1(u, v);
         }
 
         @Override
-        public VertexConsumer uv2(int u, int v) {
-            return this.delegate.uv2(u, v);
+        public VertexConsumer setUv2(int u, int v) {
+            return this.delegate.setUv2(u, v);
         }
 
         @Override
-        public VertexConsumer normal(float x, float y, float z) {
-            return this.delegate.normal(x, y, z);
-        }
-
-        @Override
-        public void endVertex() {
-            this.delegate.endVertex();
-        }
-
-        @Override
-        public void defaultColor(int red, int green, int blue, int alpha) {
-            this.delegate.defaultColor(red, green, blue, Math.round(alpha * this.alpha));
-        }
-
-        @Override
-        public void unsetDefaultColor() {
-            this.delegate.unsetDefaultColor();
+        public VertexConsumer setNormal(float x, float y, float z) {
+            return this.delegate.setNormal(x, y, z);
         }
     }
 }

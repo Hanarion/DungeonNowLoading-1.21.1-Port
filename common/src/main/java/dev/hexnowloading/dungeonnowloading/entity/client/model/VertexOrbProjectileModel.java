@@ -84,8 +84,9 @@ public class VertexOrbProjectileModel<T extends VertexOrbProjectileEntity> exten
     }*/
 
     public void renderToBufferWithEntity(VertexOrbProjectileEntity entity, PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-        wave.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, entity.getDyingTick() > 0 || (entity.getLife() > 0 && entity.getLife() < 20) ? alpha : waveAlpha);
+        orb.render(poseStack, vertexConsumer, packedLight, packedOverlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
+        float waveA = entity.getDyingTick() > 0 || (entity.getLife() > 0 && entity.getLife() < 20) ? alpha : waveAlpha;
+        wave.render(poseStack, vertexConsumer, packedLight, packedOverlay, net.minecraft.util.FastColor.ARGB32.colorFromFloat(waveA, red, green, blue));
     }
 
     @Override

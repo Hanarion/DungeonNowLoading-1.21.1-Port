@@ -104,7 +104,6 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
 
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix = pose.pose();
-        Matrix3f normal = pose.normal();
         Set<Direction> culledDirections = EnumSet.noneOf(Direction.class);
         for (Direction direction : Direction.values()) {
             if (!AuraTextureModel.shouldRenderAgainstNeighborAura(storedState, blockEntity.getLevel(), blockEntity.getBlockPos(), direction)) {
@@ -114,7 +113,7 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         shape.forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> renderBox(
                 consumer,
                 matrix,
-                normal,
+                pose,
                 auraSprite,
                 packedOverlay,
                 culledDirections,
@@ -133,7 +132,7 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         );
     }
 
-    private static void renderBox(VertexConsumer consumer, Matrix4f matrix, Matrix3f normal, TextureAtlasSprite auraSprite, int packedOverlay, Set<Direction> culledDirections, AABB box) {
+    private static void renderBox(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose, TextureAtlasSprite auraSprite, int packedOverlay, Set<Direction> culledDirections, AABB box) {
         float minX = (float) box.minX;
         float minY = (float) box.minY;
         float minZ = (float) box.minZ;
@@ -141,33 +140,32 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
         float maxY = (float) box.maxY;
         float maxZ = (float) box.maxZ;
 
-        if (minX > 0.0F || !culledDirections.contains(Direction.WEST)) renderFace(consumer, matrix, normal, auraSprite, packedOverlay, minX, minY, minZ, minX, maxY, minZ, minX, maxY, maxZ, minX, minY, maxZ, Direction.WEST, minZ, maxZ, minY, maxY);
-        if (maxX < 1.0F || !culledDirections.contains(Direction.EAST)) renderFace(consumer, matrix, normal, auraSprite, packedOverlay, maxX, minY, maxZ, maxX, maxY, maxZ, maxX, maxY, minZ, maxX, minY, minZ, Direction.EAST, minZ, maxZ, minY, maxY);
-        if (minZ > 0.0F || !culledDirections.contains(Direction.NORTH)) renderFace(consumer, matrix, normal, auraSprite, packedOverlay, maxX, minY, minZ, maxX, maxY, minZ, minX, maxY, minZ, minX, minY, minZ, Direction.NORTH, minX, maxX, minY, maxY);
-        if (maxZ < 1.0F || !culledDirections.contains(Direction.SOUTH)) renderFace(consumer, matrix, normal, auraSprite, packedOverlay, minX, minY, maxZ, minX, maxY, maxZ, maxX, maxY, maxZ, maxX, minY, maxZ, Direction.SOUTH, minX, maxX, minY, maxY);
-        if (maxY < 1.0F || !culledDirections.contains(Direction.UP)) renderFace(consumer, matrix, normal, auraSprite, packedOverlay, minX, maxY, maxZ, minX, maxY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ, Direction.UP, minX, maxX, minZ, maxZ);
-        if (minY > 0.0F || !culledDirections.contains(Direction.DOWN)) renderFace(consumer, matrix, normal, auraSprite, packedOverlay, minX, minY, minZ, minX, minY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, Direction.DOWN, minX, maxX, minZ, maxZ);
+        if (minX > 0.0F || !culledDirections.contains(Direction.WEST)) renderFace(consumer, matrix, pose, auraSprite, packedOverlay, minX, minY, minZ, minX, maxY, minZ, minX, maxY, maxZ, minX, minY, maxZ, Direction.WEST, minZ, maxZ, minY, maxY);
+        if (maxX < 1.0F || !culledDirections.contains(Direction.EAST)) renderFace(consumer, matrix, pose, auraSprite, packedOverlay, maxX, minY, maxZ, maxX, maxY, maxZ, maxX, maxY, minZ, maxX, minY, minZ, Direction.EAST, minZ, maxZ, minY, maxY);
+        if (minZ > 0.0F || !culledDirections.contains(Direction.NORTH)) renderFace(consumer, matrix, pose, auraSprite, packedOverlay, maxX, minY, minZ, maxX, maxY, minZ, minX, maxY, minZ, minX, minY, minZ, Direction.NORTH, minX, maxX, minY, maxY);
+        if (maxZ < 1.0F || !culledDirections.contains(Direction.SOUTH)) renderFace(consumer, matrix, pose, auraSprite, packedOverlay, minX, minY, maxZ, minX, maxY, maxZ, maxX, maxY, maxZ, maxX, minY, maxZ, Direction.SOUTH, minX, maxX, minY, maxY);
+        if (maxY < 1.0F || !culledDirections.contains(Direction.UP)) renderFace(consumer, matrix, pose, auraSprite, packedOverlay, minX, maxY, maxZ, minX, maxY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ, Direction.UP, minX, maxX, minZ, maxZ);
+        if (minY > 0.0F || !culledDirections.contains(Direction.DOWN)) renderFace(consumer, matrix, pose, auraSprite, packedOverlay, minX, minY, minZ, minX, minY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, Direction.DOWN, minX, maxX, minZ, maxZ);
     }
 
-    private static void renderFace(VertexConsumer consumer, Matrix4f matrix, Matrix3f normal, TextureAtlasSprite auraSprite, int packedOverlay, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, Direction direction, float minUBlock, float maxUBlock, float minVBlock, float maxVBlock) {
+    private static void renderFace(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose, TextureAtlasSprite auraSprite, int packedOverlay, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, Direction direction, float minUBlock, float maxUBlock, float minVBlock, float maxVBlock) {
         float u0 = auraSprite.getU(minUBlock * 16.0F);
         float u1 = auraSprite.getU(maxUBlock * 16.0F);
         float v0 = auraSprite.getV(minVBlock * 16.0F);
         float v1 = auraSprite.getV(maxVBlock * 16.0F);
-        vertex(consumer, matrix, normal, packedOverlay, direction, x1, y1, z1, u0, v1);
-        vertex(consumer, matrix, normal, packedOverlay, direction, x2, y2, z2, u0, v0);
-        vertex(consumer, matrix, normal, packedOverlay, direction, x3, y3, z3, u1, v0);
-        vertex(consumer, matrix, normal, packedOverlay, direction, x4, y4, z4, u1, v1);
+        vertex(consumer, matrix, pose, packedOverlay, direction, x1, y1, z1, u0, v1);
+        vertex(consumer, matrix, pose, packedOverlay, direction, x2, y2, z2, u0, v0);
+        vertex(consumer, matrix, pose, packedOverlay, direction, x3, y3, z3, u1, v0);
+        vertex(consumer, matrix, pose, packedOverlay, direction, x4, y4, z4, u1, v1);
     }
 
-    private static void vertex(VertexConsumer consumer, Matrix4f matrix, Matrix3f normal, int packedOverlay, Direction direction, float x, float y, float z, float u, float v) {
-        consumer.vertex(matrix, x, y, z)
-                .color(255, 255, 255, 255)
-                .uv(u, v)
-                .overlayCoords(packedOverlay)
-                .uv2(LightTexture.FULL_BRIGHT)
-                .normal(normal, direction.getStepX(), direction.getStepY(), direction.getStepZ())
-                .endVertex();
+    private static void vertex(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose, int packedOverlay, Direction direction, float x, float y, float z, float u, float v) {
+        consumer.addVertex(matrix, x, y, z)
+                .setColor(255, 255, 255, 255)
+                .setUv(u, v)
+                .setOverlay(packedOverlay)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setNormal(pose, direction.getStepX(), direction.getStepY(), direction.getStepZ());
     }
 
     private static List<BakedQuad> remapQuad(BakedQuad quad, TextureAtlasSprite auraSprite, float normalOffset) {
