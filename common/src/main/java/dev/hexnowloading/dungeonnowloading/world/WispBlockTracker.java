@@ -37,10 +37,12 @@ public class WispBlockTracker extends SavedData {
     private final Map<UUID, List<TrackedWisp>> wispsByOwner = new HashMap<>();
 
     public static WispBlockTracker get(ServerLevel level) {
-        return level.getServer().overworld().getDataStorage().computeIfAbsent(WispBlockTracker::load, WispBlockTracker::new, DATA_NAME);
+        return level.getServer().overworld().getDataStorage().computeIfAbsent(
+                new SavedData.Factory<>(WispBlockTracker::new, WispBlockTracker::load, null),
+                DATA_NAME);
     }
 
-    public static WispBlockTracker load(CompoundTag tag) {
+    public static WispBlockTracker load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         WispBlockTracker tracker = new WispBlockTracker();
         ListTag players = tag.getList(PLAYERS_TAG, Tag.TAG_COMPOUND);
         for (int i = 0; i < players.size(); i++) {
@@ -115,7 +117,7 @@ public class WispBlockTracker extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         ListTag players = new ListTag();
         for (Map.Entry<UUID, List<TrackedWisp>> entry : this.wispsByOwner.entrySet()) {
             if (entry.getValue().isEmpty()) {
