@@ -15,11 +15,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(FireBlock.class)
 public abstract class DNLFireBlockMixin {
 
-    @Redirect(method = "tryCatchFire",
+    @Redirect(method = "checkBurnOut",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/util/RandomSource;nextInt(I)I",
-                    ordinal = 1))
-    private int injectBlockBurnEvent(RandomSource randomSource, int bound, Level level, BlockPos blockPos, int i, RandomSource originalRandom, int j) {
+                    ordinal = 0))
+    private int injectBlockBurnEvent(RandomSource randomSource, int bound, Level level, BlockPos blockPos, int chance, RandomSource originalRandom, int age) {
         BlockBurnManager.reset();
 
         if (level instanceof ServerLevel serverLevel) {
@@ -34,7 +34,7 @@ public abstract class DNLFireBlockMixin {
     }
 
 
-    @Redirect(method = "tryCatchFire",
+    @Redirect(method = "checkBurnOut",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/Level;removeBlock(Lnet/minecraft/core/BlockPos;Z)Z"))
     private boolean preventFireBurning(Level level, BlockPos pos, boolean isMoving) {
