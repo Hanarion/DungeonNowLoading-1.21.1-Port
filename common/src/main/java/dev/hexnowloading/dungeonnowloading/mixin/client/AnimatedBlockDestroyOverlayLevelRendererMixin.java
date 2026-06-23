@@ -1,9 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.mixin.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.hexnowloading.dungeonnowloading.block.BurnacleBlock;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -32,8 +32,11 @@ public class AnimatedBlockDestroyOverlayLevelRendererMixin {
 
     private final List<RemovedDestroyProgress> dungeonnowloading$removedDestroyProgress = new ArrayList<>();
 
+    // 1.21: LevelRenderer.renderLevel(DeltaTracker, boolean, Camera, GameRenderer, LightTexture,
+    // Matrix4f frustumMatrix, Matrix4f projectionMatrix) — PoseStack/float/long replaced by
+    // DeltaTracker, plus a second Matrix4f.
     @Inject(method = "renderLevel", at = @At("HEAD"))
-    private void dungeonnowloading$removeAnimatedBlockDestroyOverlays(PoseStack poseStack, float partialTick, long finishTimeNano, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+    private void dungeonnowloading$removeAnimatedBlockDestroyOverlays(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f frustumMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         if (this.level == null || this.destructionProgress.isEmpty()) {
             return;
         }
@@ -56,7 +59,7 @@ public class AnimatedBlockDestroyOverlayLevelRendererMixin {
     }
 
     @Inject(method = "renderLevel", at = @At("RETURN"))
-    private void dungeonnowloading$restoreAnimatedBlockDestroyOverlays(PoseStack poseStack, float partialTick, long finishTimeNano, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+    private void dungeonnowloading$restoreAnimatedBlockDestroyOverlays(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f frustumMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         for (RemovedDestroyProgress removedProgress : this.dungeonnowloading$removedDestroyProgress) {
             this.destructionProgress.putIfAbsent(removedProgress.posAsLong(), removedProgress.progressSet());
         }
