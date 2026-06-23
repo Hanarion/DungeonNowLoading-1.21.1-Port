@@ -31,6 +31,7 @@ public class ForgeNetworkHelper implements NetworkHelper {
 
     private static final List<Entry<?>> ENTRIES = new ArrayList<>();
     private static final java.util.Map<Class<?>, CustomPacketPayload.Type<DNLPayload>> TYPES = new java.util.HashMap<>();
+    private static boolean flushed = false;
 
     @Override
     public <T extends DNLPacket> void register(String name, Class<T> clazz, Function<FriendlyByteBuf, T> constructor) {
@@ -40,8 +41,17 @@ public class ForgeNetworkHelper implements NetworkHelper {
         TYPES.put(clazz, type);
     }
 
-    /** Flush buffered registrations; call from RegisterPayloadHandlersEvent (mod bus). */
+    /**
+     * Flush buffered registrations; call from RegisterPayloadHandlersEvent (mod bus).
+     * NeoForge can fire this event again on a later NetworkRegistry.setup (resource reload) within
+     * the same JVM, and payloads are registered process-globally — flushing twice throws
+     * "already registered". Guard so we register exactly once.
+     */
     public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
+        if (flushed) {
+            return;
+        }
+        flushed = true;
         PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
         for (Entry<?> entry : ENTRIES) {
             registerEntry(registrar, entry);
