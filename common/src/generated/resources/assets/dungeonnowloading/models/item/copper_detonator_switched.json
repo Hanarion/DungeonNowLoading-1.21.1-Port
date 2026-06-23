@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "dungeonnowloading:item/copper_detonator_switched"
-  }
-}

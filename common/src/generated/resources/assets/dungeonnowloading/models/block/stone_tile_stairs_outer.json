@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "dungeonnowloading:block/stone_tiles",
-    "side": "dungeonnowloading:block/stone_tiles",
-    "top": "dungeonnowloading:block/stone_tiles"
-  }
-}

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "dungeonnowloading:block/signaling_stone_emblem"
-  }
-}

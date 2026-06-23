@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "dungeonnowloading:block/mendstone_chalk_mark_base_0",
-    "layer1": "dungeonnowloading:block/mendstone_chalk_mark_outline_0"
-  }
-}
