@@ -24,6 +24,7 @@ public class DNLForge {
         DungeonNowLoading.init();
 
         DNLAttachments.ATTACHMENT_TYPES.register(bus);
+        bus.addListener(dev.hexnowloading.dungeonnowloading.platform.ForgeNetworkHelper::onRegisterPayloads);
         addModListeners(bus);
         if (FMLEnvironment.dist.isClient()) {
             addModClientListeners(bus);

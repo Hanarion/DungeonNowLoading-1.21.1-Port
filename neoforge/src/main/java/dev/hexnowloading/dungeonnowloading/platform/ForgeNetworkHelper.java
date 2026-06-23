@@ -4,48 +4,76 @@ import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.network.DNLPacket;
 import dev.hexnowloading.dungeonnowloading.platform.services.NetworkHelper;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
+/**
+ * 1.21 NeoForge networking. Common registers packets via {@link #register} at mod init;
+ * those are buffered and flushed onto a {@link PayloadRegistrar} during
+ * RegisterPayloadHandlersEvent (mod bus). Each DNLPacket is wrapped in {@link DNLPayload}.
+ */
 public class ForgeNetworkHelper implements NetworkHelper {
-    private static final String PROTOCOL_VERSION = "1";
-    public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            DungeonNowLoading.id("main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
 
-    private int id = 0;
+    private static final String PROTOCOL_VERSION = "1";
+
+    private record Entry<T extends DNLPacket>(CustomPacketPayload.Type<DNLPayload> type,
+                                              Function<FriendlyByteBuf, T> constructor) {}
+
+    private static final List<Entry<?>> ENTRIES = new ArrayList<>();
+    private static final java.util.Map<Class<?>, CustomPacketPayload.Type<DNLPayload>> TYPES = new java.util.HashMap<>();
 
     @Override
     public <T extends DNLPacket> void register(String name, Class<T> clazz, Function<FriendlyByteBuf, T> constructor) {
-        INSTANCE.registerMessage(id++, clazz,
-                DNLPacket::encode,
-                constructor,
-                (packet, ctx) -> {
-                    ctx.get().enqueueWork(() -> packet.handle(ctx.get().getSender()));
-                    ctx.get().setPacketHandled(true);
-                });
+        CustomPacketPayload.Type<DNLPayload> type =
+                new CustomPacketPayload.Type<>(DungeonNowLoading.id(name));
+        ENTRIES.add(new Entry<>(type, constructor));
+        TYPES.put(clazz, type);
+    }
+
+    /** Flush buffered registrations; call from RegisterPayloadHandlersEvent (mod bus). */
+    public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
+        for (Entry<?> entry : ENTRIES) {
+            registerEntry(registrar, entry);
+        }
+    }
+
+    private static <T extends DNLPacket> void registerEntry(PayloadRegistrar registrar, Entry<T> entry) {
+        StreamCodec<RegistryFriendlyByteBuf, DNLPayload> codec = StreamCodec.of(
+                (buf, payload) -> payload.packet().encode(buf),
+                buf -> new DNLPayload(entry.constructor().apply(buf), entry.type())
+        );
+        registrar.playBidirectional(entry.type(), codec, (payload, context) ->
+                context.enqueueWork(() -> payload.packet().handle(
+                        context.player() instanceof ServerPlayer sp ? sp : null)));
+    }
+
+    private DNLPayload wrap(DNLPacket packet) {
+        return new DNLPayload(packet, TYPES.get(packet.getClass()));
     }
 
     @Override
     public void sendToPlayer(DNLPacket packet, ServerPlayer player) {
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
+        PacketDistributor.sendToPlayer(player, wrap(packet));
     }
 
     @Override
     public void sendToAllPlayers(DNLPacket packet, MinecraftServer server) {
-        INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
+        PacketDistributor.sendToAllPlayers(wrap(packet));
     }
 
     @Override
     public void sendToServer(DNLPacket packet) {
-        INSTANCE.sendToServer(packet);
+        PacketDistributor.sendToServer(wrap(packet));
     }
 }
