@@ -1,6 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.server;
 
-import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.DNLEntityEvents;
 import dev.hexnowloading.dungeonnowloading.entity.monster.HollowEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.ScuttleEntity;
@@ -17,10 +16,11 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 
-@EventBusSubscriber(modid = DungeonNowLoading.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+// These handlers are registered explicitly as method-reference listeners in DNLForge
+// (mod bus for attribute/spawn-placement, NeoForge.EVENT_BUS for damage), so this class must
+// NOT carry @EventBusSubscriber — auto-registration would scan for @SubscribeEvent methods,
+// find none, and throw "has no @SubscribeEvent methods, but register was called anyway".
 public class DNLForgeEntityEvents {
 
     public static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
