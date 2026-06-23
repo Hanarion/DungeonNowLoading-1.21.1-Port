@@ -11,7 +11,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
 
-    @Inject(method = "updatePose", at = @At("TAIL"))
+    // 1.21 removed LivingEntity.updatePose(); pose is now updated within aiStep(), so inject there
+    // at TAIL to force STANDING while riding a Garhold.
+    @Inject(method = "aiStep", at = @At("TAIL"))
     private void dnl_forceStandingWhenRidingGarhold(CallbackInfo ci) {
         LivingEntity self = (LivingEntity)(Object)this;
 
