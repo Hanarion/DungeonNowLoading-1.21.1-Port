@@ -20,12 +20,25 @@ import java.util.function.Consumer;
 @Mixin(ItemStack.class)
 public abstract class ItemStackBreakProtectionMixin {
 
-    // 1.21: target the hurtAndBreak(int, ServerLevel, ServerPlayer, Consumer) overload. This overload
-    // exists on BOTH vanilla (Fabric) and NeoForge, and contains the shrink(1) break call (NeoForge
-    // also has a LivingEntity overload, but vanilla does not — targeting that breaks Fabric).
+    // 1.21: the shrink(1) break call lives in different hurtAndBreak overloads per loader:
+    //   - NeoForge: hurtAndBreak(int, ServerLevel, LivingEntity, Consumer)  (the ServerPlayer overload just delegates)
+    //   - Fabric/vanilla: hurtAndBreak(int, ServerLevel, ServerPlayer, Consumer)  (no LivingEntity overload exists)
+    // A single @Inject can't match both (the method only exists on one loader each). Declare one
+    // inject per overload with require = 0; exactly one binds on each loader, the other is a no-op.
+
+    @Inject(method = "hurtAndBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"), cancellable = true, require = 0)
+    private void dnl$convertToScrapOnBreakLivingEntity(int amount, ServerLevel serverLevel, net.minecraft.world.entity.LivingEntity entity, Consumer<Item> onBroken, CallbackInfo ci) {
+        dnl$handleBreak(serverLevel, entity instanceof ServerPlayer sp ? sp : null, onBroken, ci);
+    }
+
     @Inject(method = "hurtAndBreak(ILnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Ljava/util/function/Consumer;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"), cancellable = true)
-    private void dnl$convertToScrapOnBreak(int amount, ServerLevel serverLevel, ServerPlayer player, Consumer<Item> onBroken, CallbackInfo ci) {
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"), cancellable = true, require = 0)
+    private void dnl$convertToScrapOnBreakServerPlayer(int amount, ServerLevel serverLevel, ServerPlayer player, Consumer<Item> onBroken, CallbackInfo ci) {
+        dnl$handleBreak(serverLevel, player, onBroken, ci);
+    }
+
+    private void dnl$handleBreak(ServerLevel serverLevel, ServerPlayer player, Consumer<Item> onBroken, CallbackInfo ci) {
         ItemStack self = (ItemStack)(Object)this;
         if (!self.isDamageableItem()) return;
         if (MimiclingItem.tryTransformBrokenToolFormToBase(self, player)) {
