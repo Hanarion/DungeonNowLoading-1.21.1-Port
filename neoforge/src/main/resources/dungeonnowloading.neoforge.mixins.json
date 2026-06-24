@@ -43,6 +43,7 @@
       "forge.block.FlintAndSteelMixin",
       "forge.block.DNLFireBlockMixin",
       "forge.structures.StructurePoolMixin",
+      "forge.item.ItemStackNeoForgeBreakProtectionMixin",
       "inventory.AbstractContainerMenuMixin",
       "inventory.AnvilMenuMixin"
     ],

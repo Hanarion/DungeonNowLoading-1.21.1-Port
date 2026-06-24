@@ -24,8 +24,15 @@ public class DNLFabric implements ModInitializer {
         registerPackets();
         DNLFabricEntities.registerSpawnPlacements();
 
-        ServerLifecycleEvents.SERVER_STARTING.register(PatronRegistry::initOrReload);
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+            // Wire the cached registry access used by common code (e.g. ItemNbt NBT
+            // (de)serialization, DNLEnchantments.holder) that has no Level at hand. Mirrors the
+            // NeoForge ServerStartingEvent listener in DNLForge.
+            DungeonNowLoading.setRegistryAccess(server.registryAccess());
+            PatronRegistry.initOrReload(server);
+        });
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, rm, success) -> {
+            DungeonNowLoading.setRegistryAccess(server.registryAccess());
             PatronRegistry.initOrReload(server);
         });
 
