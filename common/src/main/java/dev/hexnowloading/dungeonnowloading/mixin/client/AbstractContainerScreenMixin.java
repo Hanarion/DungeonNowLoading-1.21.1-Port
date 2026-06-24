@@ -106,7 +106,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
 
     private Slot getHoveredSlot(double mouseX, double mouseY) {
         for (Slot slot : menu.slots) {
-            if (slot.isActive() && isHovering(slot, mouseX, mouseY)) {
+            if (slot.isActive() && dungeonnowloading$isHovering(slot, mouseX, mouseY)) {
                 return slot;
             }
         }
@@ -114,7 +114,10 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         return null;
     }
 
-    private boolean isHovering(Slot slot, double mouseX, double mouseY) {
+    // Renamed (was isHovering) to avoid colliding with AbstractContainerScreen.isHovering, which is
+    // protected in 1.21. A same-name private method in the mixin is treated as an overwrite and
+    // rejected for reducing visibility ("cannot reduce visibility of PROTECTED target method").
+    private boolean dungeonnowloading$isHovering(Slot slot, double mouseX, double mouseY) {
         return mouseX >= leftPos + slot.x
                 && mouseX < leftPos + slot.x + 16
                 && mouseY >= topPos + slot.y
