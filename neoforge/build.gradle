@@ -29,7 +29,7 @@ neoForge {
             // Textures/models the providers reference live in :common's resources (the neoforge
             // sourceset has none), so add common's resource dir as an --existing source.
             programArguments.addAll '--mod', project.mod_id, '--all',
-                    '--output', file('src/generated/resources/').getAbsolutePath(),
+                    '--output', rootProject.file('common/src/generated/resources/').getAbsolutePath(),
                     '--existing', file('src/main/resources/').getAbsolutePath(),
                     '--existing', rootProject.file('common/src/main/resources/').getAbsolutePath()
         }
@@ -48,4 +48,5 @@ dependencies {
     implementation "fuzs.forgeconfigapiport:forgeconfigapiport-neoforge:${forgeconfigapiport_version}"
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+// Generated datagen assets live in :common/src/generated so both loaders inherit them via
+// commonResources (loader-agnostic JSON). runData writes there too (see run config below).

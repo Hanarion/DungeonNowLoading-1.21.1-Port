@@ -29,6 +29,9 @@ tasks.named('compileJava', JavaCompile) {
 processResources {
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
+    // Generated datagen assets (blockstates/models/recipes/loot/tags) live in :common/src/generated
+    // so both loaders inherit them. runData (run from :neoforge) writes into that dir.
+    from(rootProject.file('common/src/generated/resources'))
     // Loader resources win over duplicates pulled from common (e.g. mixin refmap, configs).
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
