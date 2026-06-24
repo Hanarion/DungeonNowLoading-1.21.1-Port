@@ -1,0 +1,101 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeonnowloading:redstone_suppressor"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/armor/easy_combat"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 3,
+          "value": "dungeonnowloading:chests/temple_of_duality/equipment/easy_combat"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/material/easy_combat"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/food/easy_combat"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/potion/easy_combat"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 2,
+          "value": "dungeonnowloading:chests/temple_of_duality/arrow/easy_combat"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/garbage/easy_combat"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/wood/common"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/book/easy_combat"
+        }
+      ]
+    }
+  ]
+}

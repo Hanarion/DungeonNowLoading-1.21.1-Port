@@ -1,0 +1,160 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:enchanted_book",
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "enchantments": {
+                "dungeonnowloading:overworked": {
+                  "min": 1,
+                  "max": 3
+                }
+              }
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "dungeonnowloading:book_pile",
+              "properties": {
+                "pile": "1"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:enchanted_book",
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "enchantments": {
+                "dungeonnowloading:overworked": {
+                  "min": 2,
+                  "max": 4
+                }
+              }
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "dungeonnowloading:book_pile",
+              "properties": {
+                "pile": "2"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:enchanted_book",
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "enchantments": {
+                "dungeonnowloading:overworked": {
+                  "min": 3,
+                  "max": 5
+                }
+              }
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "dungeonnowloading:book_pile",
+              "properties": {
+                "pile": "3"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:enchanted_book",
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "enchantments": {
+                "dungeonnowloading:overworked": {
+                  "min": 4,
+                  "max": 5
+                }
+              }
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "dungeonnowloading:book_pile",
+              "properties": {
+                "pile": "4"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "dungeonnowloading:book_pile",
+          "properties": {
+            "pile": "2"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "dungeonnowloading:chests/labyrinth/enchantments/random"
+        }
+      ]
+    },
+    {
+      "rolls": 2,
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "dungeonnowloading:book_pile",
+          "properties": {
+            "pile": "3"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "dungeonnowloading:chests/labyrinth/enchantments/random"
+        }
+      ]
+    },
+    {
+      "rolls": 3,
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "dungeonnowloading:book_pile",
+          "properties": {
+            "pile": "4"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "dungeonnowloading:chests/labyrinth/enchantments/random"
+        }
+      ]
+    }
+  ]
+}

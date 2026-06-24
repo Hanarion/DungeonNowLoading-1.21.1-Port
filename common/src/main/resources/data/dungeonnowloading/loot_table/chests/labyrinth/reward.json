@@ -1,0 +1,42 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "dungeonnowloading:chests/labyrinth/rewards/materials"
+        }
+      ]
+    },
+    {
+      "rolls": {
+        "min": 1,
+        "max": 2
+      },
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 3,
+          "value": "dungeonnowloading:chests/labyrinth/rewards/enchantment_books"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 3,
+          "value": "dungeonnowloading:chests/labyrinth/rewards/gears"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/labyrinth/rewards/music_discs"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 3,
+          "value": "dungeonnowloading:chests/labyrinth/rewards/potions"
+        }
+      ]
+    }
+  ]
+}

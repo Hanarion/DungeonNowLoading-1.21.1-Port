@@ -567,5 +567,12 @@
   "block.dungeonnowloading.hazard_sign_spikes": "Spikes Hazard Sign",
   "block.dungeonnowloading.hazard_sign_spiral": "Spiral Hazard Sign",
   "block.dungeonnowloading.hazard_sign_sword": "Sword Hazard Sign",
-  "block.dungeonnowloading.hazard_sign_up": "Up Hazard Sign"
+  "block.dungeonnowloading.hazard_sign_up": "Up Hazard Sign",
+
+  "jukebox_song.dungeonnowloading.hellspawn": "Callister Corvus - Hellspawn",
+  "jukebox_song.dungeonnowloading.aotsugi": "Callister Corvus - Aotsugi",
+  "jukebox_song.dungeonnowloading.broken_aotsugi": "Callister Corvus - Broken Aotsugi",
+  "jukebox_song.dungeonnowloading.clash_of_duality_boros": "Callister Corvus - Clash of Duality \"Boros\"",
+  "jukebox_song.dungeonnowloading.clash_of_duality_ouros": "Callister Corvus - Clash of Duality \"Ouros\"",
+  "jukebox_song.dungeonnowloading.clash_of_duality_pythonic_overdrive": "Callister Corvus - Clash of Duality \"Pythonic Overdrive\""
 }

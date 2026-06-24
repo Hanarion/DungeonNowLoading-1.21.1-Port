@@ -1,0 +1,110 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeonnowloading:redstone_suppressor",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/armor/normal_combat"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 3,
+          "value": "dungeonnowloading:chests/temple_of_duality/equipment/normal_combat"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/material/normal_combat"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/food/normal_combat"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/potion/normal_combat"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 2,
+          "value": "dungeonnowloading:chests/temple_of_duality/arrow/normal_combat"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/garbage/normal_combat"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/wood/common"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "weight": 1,
+          "value": "dungeonnowloading:chests/temple_of_duality/book/normal_combat"
+        }
+      ]
+    }
+  ]
+}
