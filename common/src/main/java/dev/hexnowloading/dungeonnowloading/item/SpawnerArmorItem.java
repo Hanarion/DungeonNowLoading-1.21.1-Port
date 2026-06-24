@@ -60,8 +60,8 @@ public class SpawnerArmorItem extends ArmorItem {
     private static final String MODE_LANTERN = "lantern";
     private static final String MODE_MIX = "mix";
 
-    public SpawnerArmorItem(net.minecraft.core.Holder<ArmorMaterial> armorMaterial, Type slot) {
-        super(armorMaterial, slot, new Properties().durability(slot.getDurability(DNLArmorMaterial.SPAWNER_DURABILITY_MULTIPLIER)));
+    public SpawnerArmorItem(java.util.function.Supplier<net.minecraft.core.Holder<ArmorMaterial>> armorMaterial, Type slot) {
+        super(armorMaterial.get(), slot, new Properties().durability(slot.getDurability(DNLArmorMaterial.SPAWNER_DURABILITY_MULTIPLIER)));
     }
 
     @Override

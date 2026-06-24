@@ -16,6 +16,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.google.common.base.Suppliers;
+
 /**
  * 1.21 made ArmorMaterial a data-driven record registered in {@code Registries.ARMOR_MATERIAL}.
  * The durability multiplier moved onto the item ({@code Type.getDurability}); the material now
@@ -27,10 +29,12 @@ public final class DNLArmorMaterial {
     /** Durability multiplier the old enum carried (BASE_DURABILITY * 26). */
     public static final int SPAWNER_DURABILITY_MULTIPLIER = 26;
 
-    // 1.21 NeoForge: BuiltInRegistries.ARMOR_MATERIAL is frozen by the time the mod constructs, so
-    // the old direct Registry.registerForHolder crashes ("Registry is already frozen"). Register
-    // through the platform DeferredRegister instead (the returned supplier is a Holder at runtime).
-    public static final Holder<ArmorMaterial> SPAWNER = register(
+    // 1.21: register the material via the platform helper (DeferredRegister on NeoForge — the
+    // BuiltInRegistries.ARMOR_MATERIAL is frozen by mod-construction time; eager Registry.register
+    // on Fabric). Expose a lazy Holder<ArmorMaterial> resolved from the registry on first access
+    // (consumers run at item-registry time, post-init on both loaders), so neither loader's
+    // registration-timing model (deferred vs eager) breaks it.
+    public static final Supplier<Holder<ArmorMaterial>> SPAWNER = register(
             "spawner",
             Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
                 map.put(ArmorItem.Type.HELMET, 3);
@@ -45,22 +49,21 @@ public final class DNLArmorMaterial {
             () -> Ingredient.of(DNLItems.SPAWNER_FRAME.get())
     );
 
-    private static Holder<ArmorMaterial> register(String name, EnumMap<ArmorItem.Type, Integer> defense,
-                                                  int enchantmentValue, float toughness, float knockbackResistance,
-                                                  Supplier<Ingredient> repairIngredient) {
+    private static Supplier<Holder<ArmorMaterial>> register(String name, EnumMap<ArmorItem.Type, Integer> defense,
+                                                            int enchantmentValue, float toughness, float knockbackResistance,
+                                                            Supplier<Ingredient> repairIngredient) {
         ResourceLocation id = DungeonNowLoading.id(name);
         List<ArmorMaterial.Layer> layers = List.of(new ArmorMaterial.Layer(id, "", false));
-        // Register the material; then resolve its Holder from the registry by id (works on both
-        // NeoForge, where register() returns a DeferredHolder, and Fabric, where register() returns
-        // a plain Supplier — so don't cast the supplier; look up the Holder directly).
+        net.minecraft.resources.ResourceKey<ArmorMaterial> key =
+                net.minecraft.resources.ResourceKey.create(BuiltInRegistries.ARMOR_MATERIAL.key(), id);
         Services.REGISTRY.register(
                 BuiltInRegistries.ARMOR_MATERIAL,
                 name,
                 () -> new ArmorMaterial(defense, enchantmentValue, SoundEvents.ARMOR_EQUIP_IRON, repairIngredient, layers, toughness, knockbackResistance)
         );
-        return BuiltInRegistries.ARMOR_MATERIAL.getHolder(
-                net.minecraft.resources.ResourceKey.create(BuiltInRegistries.ARMOR_MATERIAL.key(), id))
-                .orElseThrow(() -> new IllegalStateException("DNL armor material not registered: " + id));
+        // Resolve lazily: by the time anything reads SPAWNER, the material is registered on both loaders.
+        return Suppliers.memoize(() -> BuiltInRegistries.ARMOR_MATERIAL.getHolder(key)
+                .orElseThrow(() -> new IllegalStateException("DNL armor material not registered: " + id)));
     }
 
     /** Forces class init so the static registration runs. */
