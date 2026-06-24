@@ -76,7 +76,10 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final EntityDataAccessor<Boolean> DATA_FLAGS_ID = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<State> DATA_STATE;
+    // DATA_STATE is assigned lazily in defineSynchedData to avoid a circular class-load:
+    // EntityStates' static init references ChaosSpawnerEntity.State.class -> triggers ChaosSpawnerEntity
+    // class-load -> the old static block tried to read EntityStates.CHAOS_SPAWNER_STATE (still null).
+    private static EntityDataAccessor<State> DATA_STATE;
     private static final EntityDataAccessor<BlockPos> SPAWN_POINT = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Integer> PHASE = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> AWAKENING_TICKS = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.INT);
@@ -171,6 +174,9 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
+        if (DATA_STATE == null) {
+            DATA_STATE = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityStates.CHAOS_SPAWNER_STATE);
+        }
         builder.define(SPAWN_POINT, BlockPos.ZERO);
         builder.define(DATA_STATE, State.IDLE);
         builder.define(PHASE, 0);
@@ -1074,10 +1080,6 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
         actualCooldown = Math.max(actualCooldown, 20);
 
         this.setAttackTick(actualCooldown);
-    }
-
-    static {
-        DATA_STATE = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityStates.CHAOS_SPAWNER_STATE);
     }
 
     private boolean hurtAndTrackAttackers(DamageSource source, float amount) {
