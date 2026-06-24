@@ -42,8 +42,15 @@ public class ForgeCommonRegistryHelper implements RegistryHelper {
 
     @Override
     public void registerEntityDataSerializer(String name, net.minecraft.network.syncher.EntityDataSerializer<?> serializer) {
-        // Defer onto the mod bus against NeoForge's serializer registry to keep client/server IDs in sync.
-        registryMap.register(net.neoforged.neoforge.registries.NeoForgeRegistries.ENTITY_DATA_SERIALIZERS, name, () -> serializer);
+        // Register EAGERLY into NeoForge's serializer registry (not deferred). Entity entities call
+        // SynchedEntityData.defineId(..., serializer) at class-load time, which needs the serializer's
+        // ID assigned immediately — a DeferredRegister registers too late, leaving defineId with a bad
+        // ID and silently breaking entity creation (the Chaos Spawner wouldn't spawn). Mod-init runs
+        // before this registry freezes, so Registry.register works.
+        net.minecraft.core.Registry.register(
+                net.neoforged.neoforge.registries.NeoForgeRegistries.ENTITY_DATA_SERIALIZERS,
+                dev.hexnowloading.dungeonnowloading.DungeonNowLoading.id(name),
+                serializer);
     }
 
     @Override

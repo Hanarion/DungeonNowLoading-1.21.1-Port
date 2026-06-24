@@ -40,10 +40,12 @@ public class DungeonNowLoading {
 
     private static void initRegistries()
     {
-        DNLEntityTypes.init();
-        // 1.21: register modded EntityDataSerializers via the platform registry (deferred on the
-        // mod bus) before any entity class-init references them.
+        // 1.21: register modded EntityDataSerializers FIRST. Entity classes (loaded by
+        // DNLEntityTypes.init below) call SynchedEntityData.defineId at class-load time, which needs
+        // the serializer registered before it runs — otherwise the synched-data ID is wrong and
+        // entity creation throws "has not defined synched data value N".
         dev.hexnowloading.dungeonnowloading.entity.util.EntityStates.init();
+        DNLEntityTypes.init();
         DNLBlocks.init();
         DNLBlockEntityTypes.init();
         DNLProperties.init();
