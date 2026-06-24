@@ -1,9 +1,9 @@
 package dev.hexnowloading.dungeonnowloading.entity.util;
 
+import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.monster.*;
 import dev.hexnowloading.dungeonnowloading.entity.passive.CopperCreepEntity;
 import dev.hexnowloading.dungeonnowloading.entity.passive.WhimperEntity;
@@ -20,7 +20,7 @@ public class EntityStates {
      * 1.21 removed simpleEnum(Class); rebuild the equivalent
      * ordinal-based serializer from a StreamCodec.
      */
-    private static <T extends Enum<T>> EntityDataSerializer<T> simpleEnum(Class<T> enumClass) {
+    public static <T extends Enum<T>> EntityDataSerializer<T> simpleEnum(Class<T> enumClass) {
         T[] values = enumClass.getEnumConstants();
         StreamCodec<io.netty.buffer.ByteBuf, T> codec = ByteBufCodecs.idMapper(
                 ByIdMap.continuous(Enum::ordinal, values, ByIdMap.OutOfBoundsStrategy.ZERO),
@@ -29,7 +29,14 @@ public class EntityStates {
         return EntityDataSerializer.forValueType(codec.cast());
     }
 
-    public static final EntityDataSerializer<ChaosSpawnerEntity.State> CHAOS_SPAWNER_STATE;
+    /**
+     * ChaosSpawnerEntity.State is the FIRST enum referenced in this class's static block.
+     * Referencing ChaosSpawnerEntity.State.class there triggers ChaosSpawnerEntity's static
+     * init, which calls defineId(..., EntityStates.CHAOS_SPAWNER_STATE) while this static
+     * block is still paused — so CHAOS_SPAWNER_STATE would still be null. To break the cycle,
+     * ChaosSpawnerEntity builds and publishes this serializer itself (see ChaosSpawnerEntity).
+     */
+    public static EntityDataSerializer<ChaosSpawnerEntity.State> CHAOS_SPAWNER_STATE;
     public static final EntityDataSerializer<SpawnerCarrierEntity.SpawnerCarrierAnimationState> SPAWNER_CARRIER_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState> FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE;
     public static final EntityDataSerializer<FairkeeperBorosEntity.FairkeeperBorosState> FAIRKEEPER_BOROS_STATE;
@@ -60,7 +67,8 @@ public class EntityStates {
     public static final EntityDataSerializer<WispEntity.WispAnimationState> WISP_ANIMATION_STATE;
 
     static {
-        CHAOS_SPAWNER_STATE = simpleEnum(ChaosSpawnerEntity.State.class);
+        // CHAOS_SPAWNER_STATE is intentionally NOT built here — see the field comment above.
+        // It is published by ChaosSpawnerEntity's static init to avoid a class-load cycle.
         SPAWNER_CARRIER_ANIMATION_STATE = simpleEnum(SpawnerCarrierEntity.SpawnerCarrierAnimationState.class);
         FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE = simpleEnum(FairkeeperSerpentCallerEntity.FairkeeperSerpentCallerAnimationState.class);
         FAIRKEEPER_BOROS_STATE = simpleEnum(FairkeeperBorosEntity.FairkeeperBorosState.class);
@@ -104,7 +112,22 @@ public class EntityStates {
             return;
         }
         registered = true;
+        DungeonNowLoading.LOGGER.info("[DNL-SER] EntityStates.init() ENTERED");
 
+        try {
+        // Force ChaosSpawnerEntity to class-load so it publishes CHAOS_SPAWNER_STATE (built in
+        // its own static block to avoid the load cycle — see field comment). Touching the class
+        // runs its static init, which assigns EntityStates.CHAOS_SPAWNER_STATE if still null.
+        if (CHAOS_SPAWNER_STATE == null) {
+            try {
+                Class.forName("dev.hexnowloading.dungeonnowloading.entity.boss.ChaosSpawnerEntity");
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (CHAOS_SPAWNER_STATE == null) {
+            throw new IllegalStateException("CHAOS_SPAWNER_STATE serializer was not published by ChaosSpawnerEntity");
+        }
         Services.REGISTRY.registerEntityDataSerializer("chaos_spawner_state", CHAOS_SPAWNER_STATE);
         Services.REGISTRY.registerEntityDataSerializer("spawner_carrier_animation_state", SPAWNER_CARRIER_ANIMATION_STATE);
         Services.REGISTRY.registerEntityDataSerializer("fairkeeper_serpent_caller_animation_state", FAIRKEEPER_SERPENT_CALLER_ANIMATION_STATE);
@@ -133,5 +156,16 @@ public class EntityStates {
         Services.REGISTRY.registerEntityDataSerializer("broken_garhold_state", BROKEN_GARHOLD_STATE);
         Services.REGISTRY.registerEntityDataSerializer("whimper_animation_state", WHIMPER_ANIMATION_STATE);
         Services.REGISTRY.registerEntityDataSerializer("whimper_skin", WHIMPER_SKIN);
+        } catch (Throwable t) {
+            DungeonNowLoading.LOGGER.error("[DNL-SER] registration threw", t);
+        }
+
+        // DIAGNOSTIC: verify the serializer is registered + what ID it got
+        try {
+            int id = net.minecraft.network.syncher.EntityDataSerializers.getSerializedId(CHAOS_SPAWNER_STATE);
+            DungeonNowLoading.LOGGER.info("[DNL-SER] CHAOS_SPAWNER_STATE getSerializedId={}", id);
+        } catch (Throwable t) {
+            DungeonNowLoading.LOGGER.error("[DNL-SER] diagnostic threw", t);
+        }
     }
 }

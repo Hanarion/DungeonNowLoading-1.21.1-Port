@@ -75,11 +75,20 @@ import java.util.*;
 public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAnimationEntity, WeightedTargetProvider {
 
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    // Publish our custom serializer BEFORE any defineId(...) below reads it. ChaosSpawnerEntity
+    // is the first entity referenced from EntityStates' static block, so that block would be
+    // paused (CHAOS_SPAWNER_STATE still null) when our static init runs here. Building it from
+    // our own State enum (no cross-class load) and assigning it back to EntityStates breaks the
+    // cycle. See EntityStates.CHAOS_SPAWNER_STATE field comment.
+    static {
+        if (EntityStates.CHAOS_SPAWNER_STATE == null) {
+            EntityStates.CHAOS_SPAWNER_STATE = EntityStates.simpleEnum(State.class);
+        }
+    }
+
     private static final EntityDataAccessor<Boolean> DATA_FLAGS_ID = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.BOOLEAN);
-    // DATA_STATE is assigned lazily in defineSynchedData to avoid a circular class-load:
-    // EntityStates' static init references ChaosSpawnerEntity.State.class -> triggers ChaosSpawnerEntity
-    // class-load -> the old static block tried to read EntityStates.CHAOS_SPAWNER_STATE (still null).
-    private static EntityDataAccessor<State> DATA_STATE;
+    private static final EntityDataAccessor<State> DATA_STATE = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityStates.CHAOS_SPAWNER_STATE);
     private static final EntityDataAccessor<BlockPos> SPAWN_POINT = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Integer> PHASE = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> AWAKENING_TICKS = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityDataSerializers.INT);
@@ -106,6 +115,7 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     private static final UUID RECALL_ATTACK_MOD_UUID = UUID.fromString("1f3d0f6b-2c9e-4d4f-9c2d-2a91c8f2b8d7");
     private static final UUID RECALL_HEALTH_MOD_UUID = UUID.fromString("e41f6c2a-77b1-4c52-9f89-0a3e8c6d21f9");
     private static final int RECALL_POSITION_OFFSET_Y = 1;
+    private static final int MAX_BOSS_RANGE = 30;
 
     private int musicTick;
     protected int attackTickCount;
@@ -174,16 +184,15 @@ public class ChaosSpawnerEntity extends Monster implements Enemy, UniqueDeathAni
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        if (DATA_STATE == null) {
-            DATA_STATE = SynchedEntityData.defineId(ChaosSpawnerEntity.class, EntityStates.CHAOS_SPAWNER_STATE);
-        }
         builder.define(SPAWN_POINT, BlockPos.ZERO);
         builder.define(DATA_STATE, State.IDLE);
+        builder.define(ACTIVE_RANGE, MAX_BOSS_RANGE);
         builder.define(PHASE, 0);
         builder.define(DATA_FLAGS_ID, false);
         builder.define(AWAKENING_TICKS, 0);
         builder.define(ATTACK_TICK, 0);
         builder.define(PLAYER_COUNT, 0);
+        builder.define(PLAYER_UUID, java.util.Optional.empty());
         builder.define(BARRIER_NORTH_TICK, -1);
         builder.define(BARRIER_EAST_TICK, -1);
         builder.define(BARRIER_SOUTH_TICK, -1);
