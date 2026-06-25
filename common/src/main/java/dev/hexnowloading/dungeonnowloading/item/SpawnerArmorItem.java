@@ -14,7 +14,6 @@ import dev.hexnowloading.dungeonnowloading.util.OverworkedPenaltyUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -359,11 +358,12 @@ public class SpawnerArmorItem extends ArmorItem {
     }
 
     private static int getSummonTick(ItemStack stack) {
-        CompoundTag tag = StackNbt.getOrCreateTag(stack);
-        if (!tag.contains(TAG_SUMMON_TICK)) {
-            tag.putInt(TAG_SUMMON_TICK, DEFAULT_SUMMON_TICK);
+        // Read-only: StackNbt.getOrCreateTag returns a COPY, so don't mutate it here to seed a
+        // default (the write wouldn't persist anyway). setSummonTick handles persistence.
+        if (!StackNbt.hasTag(stack) || !StackNbt.getTag(stack).contains(TAG_SUMMON_TICK)) {
+            return DEFAULT_SUMMON_TICK;
         }
-        return tag.getInt(TAG_SUMMON_TICK);
+        return StackNbt.getTag(stack).getInt(TAG_SUMMON_TICK);
     }
 
     private static void setSummonTick(ItemStack stack, int value) {
