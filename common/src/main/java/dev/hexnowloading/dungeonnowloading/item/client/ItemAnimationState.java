@@ -12,19 +12,19 @@ public class ItemAnimationState {
     public static void start(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
         ensureUUID(stack);
 
-        if (resetAnimations) stopAll(stack);
+        // Single write-back: StackNbt.getOrCreateTag returns a COPY in 1.21, so all mutations
+        // (reset + the new entry) must happen inside one update() or they are lost.
+        StackNbt.update(stack, tag -> {
+            CompoundTag animationsTag = resetAnimations ? new CompoundTag() : tag.getCompound(ANIMATIONS_TAG);
 
-        CompoundTag tag = StackNbt.getOrCreateTag(stack);
-        CompoundTag animationsTag = tag.getCompound(ANIMATIONS_TAG);
+            CompoundTag animTag = new CompoundTag();
+            animTag.putLong("StartTime", gameTime);
+            animTag.putLong("Duration", duration);
+            animTag.putBoolean("Looping", loop);
 
-        CompoundTag animTag = new CompoundTag();
-        animTag.putLong("StartTime", gameTime);
-        animTag.putLong("Duration", duration);
-        animTag.putBoolean("Looping", loop);
-
-        animationsTag.put(animationName, animTag);
-        tag.put(ANIMATIONS_TAG, animationsTag);
-        StackNbt.setTag(stack, tag);
+            animationsTag.put(animationName, animTag);
+            tag.put(ANIMATIONS_TAG, animationsTag);
+        });
     }
 
     public static void startIfStopped(ItemStack stack, String animationName, long gameTime, long duration, boolean loop, boolean resetAnimations) {
@@ -114,10 +114,11 @@ public class ItemAnimationState {
     public static void stopAll(ItemStack itemStack) {
         if (!StackNbt.hasTag(itemStack)) return;
 
-        CompoundTag tag = StackNbt.getTag(itemStack);
-        if (tag.contains(ANIMATIONS_TAG)) {
-            tag.remove(ANIMATIONS_TAG);
-        }
+        // StackNbt.getTag returns a COPY in 1.21 (unlike 1.20.1's live tag), so the removal must be
+        // written back or it is silently lost. Without this, start(resetAnimations=true) never clears
+        // prior clips and every animation ever started accumulates, freezing finished clips at their
+        // final keyframe (mouth stuck open, parts in wrong pose).
+        StackNbt.update(itemStack, tag -> tag.remove(ANIMATIONS_TAG));
     }
 
     private static void ensureUUID(ItemStack itemStack) {
