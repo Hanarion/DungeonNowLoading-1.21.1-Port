@@ -14,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.UUID;
-
 @Mixin(ItemInHandRenderer.class)
 public class ItemInHandRendererMixin {
 
@@ -51,25 +49,14 @@ public class ItemInHandRendererMixin {
             return stack1.is(stack2.getItem());
         }
 
-        if (stack1.getItem() instanceof DNLAnimatedItem<?> animatedItem1 && stack2.getItem() instanceof DNLAnimatedItem<?> animatedItem2) {
-            // Ensure UUID exists before comparison
-            UUID uuid1 = animatedItem1.getItemUUID(stack1);
-            UUID uuid2 = animatedItem2.getItemUUID(stack2);
-
-            // If either stack is missing a UUID, generate one
-            if (uuid1 == null) {
-                animatedItem1.ensureItemUUID(stack1);
-                uuid1 = animatedItem1.getItemUUID(stack1);
-            }
-            if (uuid2 == null) {
-                animatedItem2.ensureItemUUID(stack2);
-                uuid2 = animatedItem2.getItemUUID(stack2);
-            }
-
-            // Check if both items have the same UUID
-            if (uuid1 != null && uuid2 != null && uuid1.equals(uuid2)) {
-                return true;
-            }
+        // DNLAnimatedItems (e.g. the Scorcher) rewrite their CUSTOM_DATA every tick (animation
+        // StartTime, heat, fuel). Vanilla ItemInHandRenderer.tick() decides the first-person re-equip
+        // ("lowering") animation from a full ItemStack comparison, so that per-tick NBT churn would
+        // re-trigger the bob every tick and the model jumps/drops. Treat the same animated item type
+        // as "unchanged" so only an actual item swap re-equips. (This renderer only tracks the
+        // main/off-hand stacks, so item-type matching is safe — it can't conflate hotbar slots.)
+        if (stack1.getItem() instanceof DNLAnimatedItem<?> && stack1.is(stack2.getItem())) {
+            return true;
         }
         return false;
     }
