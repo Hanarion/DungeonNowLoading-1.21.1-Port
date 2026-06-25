@@ -6,13 +6,18 @@
     " S "
   ],
   "key": {
-    "D": { "item": "dungeonnowloading:durite" },
-    "M": { "item": "dungeonnowloading:mendstone" },
-    "S": { "item": "minecraft:stick" }
+    "D": {
+      "item": "dungeonnowloading:durite"
+    },
+    "M": {
+      "item": "dungeonnowloading:mendstone"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
   },
   "result": {
-    "item": "dungeonnowloading:mendstone_pickaxe",
+    "id": "dungeonnowloading:mendstone_pickaxe",
     "count": 1
   }
 }
-
