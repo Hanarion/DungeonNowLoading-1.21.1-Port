@@ -437,11 +437,10 @@ public class ScorcherItem extends Item implements DNLAnimatedItem<ScorcherItem.S
     }
 
     private void setFuelNBT(ItemStack weaponItemStack, Item fuelItem) {
-        CompoundTag tag = StackNbt.getOrCreateTag(weaponItemStack);
         ResourceLocation fuelId = BuiltInRegistries.ITEM.getKey(fuelItem);
 
         if (fuelId != null) {
-            tag.putString("FuelType", fuelId.toString());
+            StackNbt.update(weaponItemStack, tag -> tag.putString("FuelType", fuelId.toString()));
         }
     }
 

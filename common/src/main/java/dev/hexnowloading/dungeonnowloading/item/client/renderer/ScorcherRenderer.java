@@ -59,11 +59,19 @@ public class ScorcherRenderer extends BlockEntityWithoutLevelRenderer {
 
         if (itemStack.getItem() instanceof ScorcherItem scorcherItem) {
             Player player = ClientUtil.getClientPlayer();
-            if (player == null) return;
+            if (player == null) {
+                poseStack.popPose();
+                return;
+            }
             animateOutsideInventory(player, itemStack, itemDisplayContext);
             this.model.setUpAnim(scorcherItem, player, itemStack, getPartialTick());
-            flameAlpha = getFlameAlpha(player, itemStack);
-            heatAlpha = getHeat(player, itemStack);
+            // 1.21 no longer clips the BEWLR's emissive (entityTranslucent) passes to the GUI/hotbar
+            // slot, so a "hanging" flame/heat alpha would bleed out of inventory slots. 1.20.1 only
+            // ever showed the fire in-hand (GUI clipped it), so gate the emissive passes to hands.
+            if (onlyRenderInHands(itemDisplayContext)) {
+                flameAlpha = getFlameAlpha(player, itemStack);
+                heatAlpha = getHeat(player, itemStack);
+            }
         }
 
         this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
