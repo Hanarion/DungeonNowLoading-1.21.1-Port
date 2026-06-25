@@ -1,7 +1,5 @@
-package dev.hexnowloading.dungeonnowloading.mixin.items;
+package dev.hexnowloading.dungeonnowloading.item;
 
-import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
-import dev.hexnowloading.dungeonnowloading.item.ScrapItem;
 import dev.hexnowloading.dungeonnowloading.registry.DNLEnchantments;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,8 +14,10 @@ import java.util.function.Consumer;
 
 /**
  * Shared break-protection logic, kept OUT of the {@code @Mixin} class because Mixin forbids
- * non-private static methods inside a mixin. Called by both the Fabric/vanilla inject
- * ({@link ItemStackBreakProtectionMixin}) and the NeoForge-only inject
+ * non-private static methods inside a mixin, AND it must live OUTSIDE any mixin package
+ * ({@code dev.hexnowloading.dungeonnowloading.mixin.*}) or Mixin throws IllegalClassLoadError
+ * ("cannot be referenced directly") at runtime when a mixin inject references it. Called by both
+ * the Fabric/vanilla inject ({@code ItemStackBreakProtectionMixin}) and the NeoForge-only inject
  * ({@code ItemStackNeoForgeBreakProtectionMixin}).
  */
 public final class ItemStackBreakProtectionHandler {

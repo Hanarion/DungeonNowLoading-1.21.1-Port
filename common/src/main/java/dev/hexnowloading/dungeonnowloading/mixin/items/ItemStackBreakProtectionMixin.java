@@ -1,5 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.items;
 
+import dev.hexnowloading.dungeonnowloading.item.ItemStackBreakProtectionHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;

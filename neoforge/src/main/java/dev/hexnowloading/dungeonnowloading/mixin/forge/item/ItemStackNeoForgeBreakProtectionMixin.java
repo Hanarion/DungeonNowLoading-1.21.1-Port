@@ -1,6 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.forge.item;
 
-import dev.hexnowloading.dungeonnowloading.mixin.items.ItemStackBreakProtectionHandler;
+import dev.hexnowloading.dungeonnowloading.item.ItemStackBreakProtectionHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
