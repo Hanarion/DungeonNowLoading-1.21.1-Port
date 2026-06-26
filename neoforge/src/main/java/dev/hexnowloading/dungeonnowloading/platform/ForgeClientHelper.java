@@ -15,8 +15,11 @@ import java.util.List;
 public class ForgeClientHelper implements ClientHelper {
     public static final List<ResourceLocation> ITEM_MODELS = new ArrayList<>();
 
-    // 1.21 NeoForge: MenuScreens.register is private; screens must be registered during
-    // RegisterMenuScreensEvent. Buffer the registrations and flush them there.
+    // 1.21 NeoForge: MenuScreens.register is private; screens MUST be registered directly inside
+    // RegisterMenuScreensEvent. Previously this was buffered in onClientSetup/enqueueWork and flushed
+    // in onRegisterMenuScreens — but RegisterMenuScreensEvent fires BEFORE onClientSetup, so the
+    // buffer was empty at flush time and the screen never registered (menu opened server-side but no
+    // client screen appeared). Register directly in the event instead.
     private record ScreenEntry<M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>>(
             MenuType<? extends M> menuType, MenuScreens.ScreenConstructor<M, U> constructor) {}
 
@@ -30,8 +33,14 @@ public class ForgeClientHelper implements ClientHelper {
         SCREENS.add(new ScreenEntry<>(menuType, factory::create));
     }
 
-    /** Flush buffered menu-screen registrations; call from RegisterMenuScreensEvent (mod bus, client). */
+    /**
+     * Register menu screens. Called from RegisterMenuScreensEvent (mod bus, client).
+     * Populate the buffer INSIDE this event (before flushing) — RegisterMenuScreensEvent fires
+     * earlier in the client lifecycle than onClientSetup/enqueueWork, so buffering from the latter
+     * left the buffer empty here and screens never registered.
+     */
     public static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
+        dev.hexnowloading.dungeonnowloading.DNLClient.registerMenuScreens();
         for (ScreenEntry<?, ?> entry : SCREENS) {
             registerEntry(event, entry);
         }
