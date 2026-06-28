@@ -149,10 +149,10 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
     }
 
     private static void renderFace(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose, TextureAtlasSprite auraSprite, int packedOverlay, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, Direction direction, float minUBlock, float maxUBlock, float minVBlock, float maxVBlock) {
-        float u0 = auraSprite.getU(minUBlock * 16.0F);
-        float u1 = auraSprite.getU(maxUBlock * 16.0F);
-        float v0 = auraSprite.getV(minVBlock * 16.0F);
-        float v1 = auraSprite.getV(maxVBlock * 16.0F);
+        float u0 = spriteU(auraSprite, minUBlock * 16.0F);
+        float u1 = spriteU(auraSprite, maxUBlock * 16.0F);
+        float v0 = spriteV(auraSprite, minVBlock * 16.0F);
+        float v1 = spriteV(auraSprite, maxVBlock * 16.0F);
         vertex(consumer, matrix, pose, packedOverlay, direction, x1, y1, z1, u0, v1);
         vertex(consumer, matrix, pose, packedOverlay, direction, x2, y2, z2, u0, v0);
         vertex(consumer, matrix, pose, packedOverlay, direction, x3, y3, z3, u1, v0);
@@ -213,8 +213,8 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
             );
             Vec2f auraUv = auraUvMapper.map(position);
 
-            vertices[uIndex] = Float.floatToRawIntBits(auraSprite.getU(auraUv.u));
-            vertices[vIndex] = Float.floatToRawIntBits(auraSprite.getV(auraUv.v));
+            vertices[uIndex] = Float.floatToRawIntBits(spriteU(auraSprite, auraUv.u));
+            vertices[vIndex] = Float.floatToRawIntBits(spriteV(auraSprite, auraUv.v));
         }
         offsetVertices(vertices, quad.getDirection(), normalOffset);
 
@@ -229,8 +229,8 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
 
         for (int vertex = 0; vertex < VERTEX_COUNT; vertex++) {
             int vertexOffset = vertex * VERTEX_STRIDE;
-            float sourceU = originalSprite.getUOffset(Float.intBitsToFloat(sourceVertices[vertexOffset + U_OFFSET]));
-            float sourceV = originalSprite.getVOffset(Float.intBitsToFloat(sourceVertices[vertexOffset + V_OFFSET]));
+            float sourceU = spriteLocalU(originalSprite, Float.intBitsToFloat(sourceVertices[vertexOffset + U_OFFSET]));
+            float sourceV = spriteLocalV(originalSprite, Float.intBitsToFloat(sourceVertices[vertexOffset + V_OFFSET]));
             float targetU = closerToMax(sourceU, uvBounds.minU, uvBounds.maxU) ? maxU : minU;
             float targetV = closerToMax(sourceV, uvBounds.minV, uvBounds.maxV) ? maxV : minV;
             float s = (targetU - uvBounds.minU) / (uvBounds.maxU - uvBounds.minU);
@@ -242,8 +242,8 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
             vertices[vertexOffset + 2] = Float.floatToRawIntBits(position.z);
             offsetVertex(vertices, vertexOffset, direction, normalOffset);
             Vec2f auraUv = auraUvMapper.map(position);
-            vertices[vertexOffset + U_OFFSET] = Float.floatToRawIntBits(auraSprite.getU(auraUv.u));
-            vertices[vertexOffset + V_OFFSET] = Float.floatToRawIntBits(auraSprite.getV(auraUv.v));
+            vertices[vertexOffset + U_OFFSET] = Float.floatToRawIntBits(spriteU(auraSprite, auraUv.u));
+            vertices[vertexOffset + V_OFFSET] = Float.floatToRawIntBits(spriteV(auraSprite, auraUv.v));
         }
 
         return new BakedQuad(vertices, -1, quad.getDirection(), auraSprite, quad.isShade());
@@ -363,8 +363,8 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
 
         for (int vertex = 0; vertex < VERTEX_COUNT; vertex++) {
             int vertexOffset = vertex * VERTEX_STRIDE;
-            float localU = sprite.getUOffset(Float.intBitsToFloat(vertices[vertexOffset + U_OFFSET]));
-            float localV = sprite.getVOffset(Float.intBitsToFloat(vertices[vertexOffset + V_OFFSET]));
+            float localU = spriteLocalU(sprite, Float.intBitsToFloat(vertices[vertexOffset + U_OFFSET]));
+            float localV = spriteLocalV(sprite, Float.intBitsToFloat(vertices[vertexOffset + V_OFFSET]));
             float distance = Math.abs(localU - targetU) + Math.abs(localV - targetV);
             if (distance < closestDistance) {
                 closestDistance = distance;
@@ -498,8 +498,8 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
 
             for (int vertex = 0; vertex < VERTEX_COUNT; vertex++) {
                 int vertexOffset = vertex * VERTEX_STRIDE;
-                float localU = sprite.getUOffset(Float.intBitsToFloat(vertices[vertexOffset + U_OFFSET]));
-                float localV = sprite.getVOffset(Float.intBitsToFloat(vertices[vertexOffset + V_OFFSET]));
+                float localU = spriteLocalU(sprite, Float.intBitsToFloat(vertices[vertexOffset + U_OFFSET]));
+                float localV = spriteLocalV(sprite, Float.intBitsToFloat(vertices[vertexOffset + V_OFFSET]));
                 minU = Math.min(minU, localU);
                 maxU = Math.max(maxU, localU);
                 minV = Math.min(minV, localV);
@@ -548,6 +548,26 @@ public class MendingAuraBlockEntityRenderer implements BlockEntityRenderer<Mendi
 
     private static float clampSpriteCoordinate(float value) {
         return Math.max(0.0F, Math.min(16.0F, value));
+    }
+
+    // 1.21 changed TextureAtlasSprite.getU/getV (and getUOffset/getVOffset) from a 0..16 "sixteenths"
+    // convention to a normalized 0..1 fraction across the sprite. The remapping math here is written
+    // throughout in 0..16 units, so these helpers translate at the API boundary: spriteU/spriteV take
+    // 0..16 -> atlas coord, spriteLocalU/spriteLocalV give back 0..16 sprite-local from an atlas coord.
+    private static float spriteU(TextureAtlasSprite sprite, float u16) {
+        return sprite.getU(u16 / 16.0F);
+    }
+
+    private static float spriteV(TextureAtlasSprite sprite, float v16) {
+        return sprite.getV(v16 / 16.0F);
+    }
+
+    private static float spriteLocalU(TextureAtlasSprite sprite, float atlasU) {
+        return sprite.getUOffset(atlasU) * 16.0F;
+    }
+
+    private static float spriteLocalV(TextureAtlasSprite sprite, float atlasV) {
+        return sprite.getVOffset(atlasV) * 16.0F;
     }
 
     private record Vec2f(float u, float v) {

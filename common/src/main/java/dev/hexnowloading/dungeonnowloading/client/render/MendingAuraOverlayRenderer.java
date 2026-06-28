@@ -191,10 +191,12 @@ public class MendingAuraOverlayRenderer {
     }
 
     private static void renderFace(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose, TextureAtlasSprite auraSprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, Direction direction, float minUBlock, float maxUBlock, float minVBlock, float maxVBlock) {
-        float u0 = auraSprite.getU(minUBlock * 16.0F);
-        float u1 = auraSprite.getU(maxUBlock * 16.0F);
-        float v0 = auraSprite.getV(minVBlock * 16.0F);
-        float v1 = auraSprite.getV(maxVBlock * 16.0F);
+        // 1.21: getU/getV take a normalized 0..1 fraction (1.20.1 took 0..16). minUBlock..maxVBlock
+        // are already 0..1 block-face extents.
+        float u0 = auraSprite.getU(minUBlock);
+        float u1 = auraSprite.getU(maxUBlock);
+        float v0 = auraSprite.getV(minVBlock);
+        float v1 = auraSprite.getV(maxVBlock);
         vertex(consumer, matrix, pose, direction, x1, y1, z1, u0, v1);
         vertex(consumer, matrix, pose, direction, x2, y2, z2, u0, v0);
         vertex(consumer, matrix, pose, direction, x3, y3, z3, u1, v0);

@@ -244,7 +244,8 @@ public class MendingAuraBlockEntityOverlayBuffer implements MultiBufferSource {
                             vertex.z + vertex.normalZ * OVERLAY_OFFSET
                     )
                     .setColor(255, 255, 255, vertex.alpha)
-                    .setUv(this.auraSprite.getU(u * 16.0F), this.auraSprite.getV(v * 16.0F))
+                    // 1.21: getU/getV take a normalized 0..1 fraction (1.20.1 took 0..16); u,v are already 0..1.
+                    .setUv(this.auraSprite.getU(u), this.auraSprite.getV(v))
                     .setUv1(vertex.overlayU, vertex.overlayV)
                     .setLight(LightTexture.FULL_BRIGHT)
                     .setNormal(vertex.normalX, vertex.normalY, vertex.normalZ);
