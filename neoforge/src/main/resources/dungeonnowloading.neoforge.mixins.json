@@ -12,6 +12,7 @@
       "block.PlayerBlockDestroyCancelMixin",
       "block.EnchantmentHelperMixin",
       "block.ExplosionMixin",
+      "block.BlockBehaviourExplosionMixin",
       "block.ContainerMixin",
       "block.LecternBlockMixin",
       "block.PistonBlockMixin",

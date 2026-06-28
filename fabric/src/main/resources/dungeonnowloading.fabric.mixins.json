@@ -12,6 +12,7 @@
     "block.MimiclingReachServerGameModeMixin",
     "block.PlayerBlockDestroyCancelMixin",
     "block.ExplosionMixin",
+    "block.BlockBehaviourExplosionMixin",
     "block.ContainerMixin",
     "block.DNLFireBlockMixin",
     "block.EnchantmentHelperMixin",
