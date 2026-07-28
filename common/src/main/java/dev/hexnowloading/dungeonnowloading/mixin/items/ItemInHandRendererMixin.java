@@ -1,7 +1,6 @@
 package dev.hexnowloading.dungeonnowloading.mixin.items;
 
 import dev.hexnowloading.dungeonnowloading.item.DNLAnimatedItem;
-import dev.hexnowloading.dungeonnowloading.item.WisplightRodItem;
 import dev.hexnowloading.dungeonnowloading.item.MimiclingFormItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -41,9 +40,6 @@ public class ItemInHandRendererMixin {
     }
 
     private boolean itemMatches(ItemStack stack1, ItemStack stack2) {
-        if (stack1.getItem() instanceof WisplightRodItem && stack2.getItem() instanceof WisplightRodItem && ItemStack.isSameItem(stack1, stack2)) {
-            return true;
-        }
 
         if (stack1.getItem() instanceof MimiclingFormItem && stack2.getItem() instanceof MimiclingFormItem) {
             return stack1.is(stack2.getItem());

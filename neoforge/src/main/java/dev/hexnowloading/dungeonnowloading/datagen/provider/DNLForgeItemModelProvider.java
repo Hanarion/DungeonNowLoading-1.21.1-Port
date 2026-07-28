@@ -44,16 +44,11 @@ public class DNLForgeItemModelProvider extends ItemModelProvider {
         simpleItem(DNLItems.MENDSTONE_CHALK.get());
         simpleItem(DNLItems.ZONE_WAND.get());
         simpleItem(DNLItems.ZONE_WAND.get());
-        simpleItem(DNLItems.MIMICART.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_SPAWNEGG.get());
         //spawnEggItem(DNLItems.FAIRKEEPER_OUROS_SPAWNEGG.get());
         spawnEggItem(DNLItems.SCUTTLE_SPAWNEGG.get());
         spawnEggItem(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
         spawnEggItem(DNLItems.GARHOLD_SPAWNEGG.get());
-        spawnEggItem(DNLItems.WISP_SPAWNEGG.get());
-        spawnEggItem(DNLItems.WISP_LANTERN_SPAWNEGG.get());
-        spawnEggItem(DNLItems.SILK_SPIDER_SPAWNEGG.get());
-        spawnEggItem(DNLItems.REAPER_SPIDER_SPAWNEGG.get());
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.65f, 0.9f, 1.5f);
         fourStageBowItem(DNLItems.VERTEX_BOW.get(), 0.43f, 0.6f, 1.0f);
         booleanPropertyItem(DNLItems.COPPER_DETONATOR.get(), "mode_switch", "copper_detonator", "copper_detonator_switched");

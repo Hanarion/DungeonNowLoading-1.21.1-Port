@@ -2,11 +2,9 @@ package dev.hexnowloading.dungeonnowloading.mixin.entities;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.MimicartEntity;
 import dev.hexnowloading.dungeonnowloading.item.DNLAnimatedItem;
 import dev.hexnowloading.dungeonnowloading.item.ScorcherItem;
 import dev.hexnowloading.dungeonnowloading.item.client.ItemAnimationState;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -33,15 +31,15 @@ public abstract class PlayerMixin {
         }
     }
 
-    // Block the auto-dismount-on-sneak while riding the custom vehicles (Garhold / Mimicart),
-    // so players can't accidentally dismount them mid-combat/motion. Player.wantsToStopRiding()
-    // still exists in 1.21 (it's on Player, not Entity) — gate it on the vehicle type.
+    // Block the auto-dismount-on-sneak while riding the Garhold, so players can't accidentally
+    // dismount it mid-combat/motion. Player.wantsToStopRiding() still exists in 1.21 (it's on
+    // Player, not Entity) — gate it on the vehicle type.
     @Inject(method = "wantsToStopRiding", at = @At("HEAD"), cancellable = true)
-    private void dnl$blockDismountOnMimicart(CallbackInfoReturnable<Boolean> cir) {
+    private void dnl$blockDismountOnGarhold(CallbackInfoReturnable<Boolean> cir) {
         Player self = (Player)(Object) this;
         Entity vehicle = self.getVehicle();
 
-        if ((vehicle instanceof GarholdEntity || vehicle instanceof BrokenGarholdEntity || vehicle instanceof MimicartEntity) && !self.getAbilities().instabuild) {
+        if ((vehicle instanceof GarholdEntity || vehicle instanceof BrokenGarholdEntity) && !self.getAbilities().instabuild) {
             cir.setReturnValue(false);
         }
     }

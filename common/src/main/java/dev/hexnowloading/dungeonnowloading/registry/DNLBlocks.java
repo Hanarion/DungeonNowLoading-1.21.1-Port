@@ -154,15 +154,6 @@ public class DNLBlocks {
     public static Supplier<Block> DEEPSTEEL_MOUNTED_POWERED_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_DETECTOR_RAIL;
     public static Supplier<Block> DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL;
-    public static Supplier<Block> WISPWARD_LANTERN;
-    public static Supplier<Block> TIMED_WISPWARD_LANTERN;
-    public static Supplier<Block> WEB_CARPET;
-    public static Supplier<Block> WEBBING_BLOCK;
-    public static Supplier<Block> WEBBING_NEST_BLOCK;
-    public static Supplier<Block> SUSPENDED_WEB;
-    public static Supplier<Block> BURNACLE;
-    public static Supplier<Block> WISP_BLOCK;
-    public static Supplier<Block> WISPWARD_CHEST;
     public static Supplier<Block> HAZARD_SIGN_BOTTLE;
     public static Supplier<Block> HAZARD_SIGN_BUBBLE;
     public static Supplier<Block> HAZARD_SIGN_CALTROP;
@@ -338,15 +329,6 @@ public class DNLBlocks {
         CHAINED_RAIL = registerBlock("chained_rail", () -> new ChainedRailBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.POWERED_RAIL)));
         DEEPSTEEL_MOUNTED_CHAINED_RAIL = registerBlock("deepsteel_mounted_chained_rail", () -> new DeepsteelMountedChainedRailBlock(DeepsteelMountedRailBlock.railProperties()));
         DEEPSTEEL_MOUNTED_SIGNAL_RAIL = registerBlock("deepsteel_mounted_signal_rail", () -> new DeepsteelMountedSignalRailBlock(DeepsteelMountedRailBlock.railProperties()));
-        WISPWARD_LANTERN = registerBlock("wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission)));
-        TIMED_WISPWARD_LANTERN = registerBlock("timed_wispward_lantern", () -> new WispwardLanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.LANTERN).noCollission().noOcclusion().lightLevel(WispwardLanternBlock::lightEmission), true));
-        WEB_CARPET = registerBlock("web_carpet", () -> new WebCarpetBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).forceSolidOn().noCollission().requiresCorrectToolForDrops().strength(4.0F).pushReaction(PushReaction.DESTROY)));
-        WEBBING_BLOCK = registerBlock("webbing_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).strength(4.0F).sound(SoundType.WOOL).pushReaction(PushReaction.DESTROY)));
-        WEBBING_NEST_BLOCK = registerBlock("webbing_nest_block", () -> new WebbingNestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).strength(4.0F).sound(SoundType.WOOL).pushReaction(PushReaction.DESTROY)));
-        SUSPENDED_WEB = registerBlock("suspended_web", () -> new SuspendedWebBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).noCollission().noOcclusion().strength(4.0F).pushReaction(PushReaction.DESTROY)));
-        BURNACLE = registerBlock("burnacle", () -> new BurnacleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).pushReaction(PushReaction.DESTROY).noOcclusion()));
-        WISP_BLOCK = registerBlock("wisp_block", () -> new WispBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).instabreak().noCollission().noOcclusion().noLootTable().sound(SoundType.EMPTY).lightLevel(state -> 14).pushReaction(PushReaction.DESTROY)));
-        WISPWARD_CHEST = registerBlock("wispward_chest", () -> new WispwardChestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).sound(SoundType.METAL).noOcclusion()));
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
         TEMPLE_OF_DUALITY_TROPHY = registerBlock("temple_of_duality_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));

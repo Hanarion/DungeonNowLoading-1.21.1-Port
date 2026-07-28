@@ -3,7 +3,6 @@ package dev.hexnowloading.dungeonnowloading.mixin.client;
 
 import dev.hexnowloading.dungeonnowloading.entity.monster.BrokenGarholdEntity;
 import dev.hexnowloading.dungeonnowloading.entity.monster.GarholdEntity;
-import dev.hexnowloading.dungeonnowloading.entity.monster.MimicartEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
@@ -16,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public abstract class ClientPacketListenerMixin {
 
     /**
-     * Replace the overlay message "Press Left Shift to Dismount" with
-     * "Derail the Mimicart to Dismount" when the player mounts a Mimicart.
+     * Replace the overlay message "Press Left Shift to Dismount" with the
+     * Garhold-specific hint when the player mounts a Garhold.
      */
     // 1.21: ClientPacketListener no longer holds a `minecraft` field (it's on the parent), so use
     // Minecraft.getInstance() instead of a @Shadow.
@@ -35,8 +34,6 @@ public abstract class ClientPacketListenerMixin {
             Entity vehicle = mc.player.getVehicle();
             if (vehicle instanceof GarholdEntity || vehicle instanceof BrokenGarholdEntity) {
                 return Component.translatable("entity.dungeonnowloading.garhold.dismount_hint");
-            } else if (vehicle instanceof MimicartEntity) {
-                return Component.translatable("entity.dungeonnowloading.mimicart.dismount_hint");
             }
         }
         return original;

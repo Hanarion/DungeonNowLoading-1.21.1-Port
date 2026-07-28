@@ -61,10 +61,6 @@ public class EntityStates {
     public static final EntityDataSerializer<BrokenGarholdEntity.BrokenGarholdState> BROKEN_GARHOLD_STATE;
     public static final EntityDataSerializer<WhimperEntity.WhimperAnimationState> WHIMPER_ANIMATION_STATE;
     public static final EntityDataSerializer<WhimperEntity.Skin> WHIMPER_SKIN;
-    public static final EntityDataSerializer<MimicartEntity.MimicartAnimationState> MIMICART_ANIMATION_STATE;
-    public static final EntityDataSerializer<SilkSpiderEntity.SilkSpiderAnimationState> SILK_SPIDER_ANIMATION_STATE;
-    public static final EntityDataSerializer<ReaperSpiderEntity.ReaperSpiderAnimationState> REAPER_SPIDER_ANIMATION_STATE;
-    public static final EntityDataSerializer<WispEntity.WispAnimationState> WISP_ANIMATION_STATE;
 
     static {
         // CHAOS_SPAWNER_STATE is intentionally NOT built here — see the field comment above.
@@ -85,10 +81,6 @@ public class EntityStates {
         VERTEX_DOMAIN_ANIMATION_STATE = simpleEnum(VertexDomainProjectileEntity.VertexDomainAnimationState.class);
         COMMAND_PYLON_STATE = simpleEnum(RepulsorEntity.State.class);
         REPULSOR_SKIN = simpleEnum(RepulsorEntity.Skin.class);
-        MIMICART_ANIMATION_STATE = simpleEnum(MimicartEntity.MimicartAnimationState.class);
-        SILK_SPIDER_ANIMATION_STATE = simpleEnum(SilkSpiderEntity.SilkSpiderAnimationState.class);
-        REAPER_SPIDER_ANIMATION_STATE = simpleEnum(ReaperSpiderEntity.ReaperSpiderAnimationState.class);
-        WISP_ANIMATION_STATE = simpleEnum(WispEntity.WispAnimationState.class);
         SEEPING_SOUL_ANIMATION_STATE = simpleEnum(SeepingSoulEntity.SeepingSoulAnimationState.class);
         GARHOLD_STATE = simpleEnum(GarholdEntity.GarholdState.class);
         GARHOLD_ANIMATION_STATE = simpleEnum(GarholdEntity.GarholdAnimationState.class);
@@ -145,10 +137,6 @@ public class EntityStates {
         Services.REGISTRY.registerEntityDataSerializer("vertex_domain_animation_state", VERTEX_DOMAIN_ANIMATION_STATE);
         Services.REGISTRY.registerEntityDataSerializer("command_pylon_state", COMMAND_PYLON_STATE);
         Services.REGISTRY.registerEntityDataSerializer("repulsor_skin", REPULSOR_SKIN);
-        Services.REGISTRY.registerEntityDataSerializer("mimicart_animation_state", MIMICART_ANIMATION_STATE);
-        Services.REGISTRY.registerEntityDataSerializer("silk_spider_animation_state", SILK_SPIDER_ANIMATION_STATE);
-        Services.REGISTRY.registerEntityDataSerializer("reaper_spider_animation_state", REAPER_SPIDER_ANIMATION_STATE);
-        Services.REGISTRY.registerEntityDataSerializer("wisp_animation_state", WISP_ANIMATION_STATE);
         Services.REGISTRY.registerEntityDataSerializer("seeping_soul_animation_state", SEEPING_SOUL_ANIMATION_STATE);
         Services.REGISTRY.registerEntityDataSerializer("garhold_state", GARHOLD_STATE);
         Services.REGISTRY.registerEntityDataSerializer("garhold_animation_state", GARHOLD_ANIMATION_STATE);

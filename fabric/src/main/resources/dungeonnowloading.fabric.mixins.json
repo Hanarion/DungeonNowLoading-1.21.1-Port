@@ -10,7 +10,6 @@
     "block.MimiclingBlockSmeltTransformMixin",
     "block.MimiclingBlockDropsMixin",
     "block.MimiclingReachServerGameModeMixin",
-    "block.PlayerBlockDestroyCancelMixin",
     "block.ExplosionMixin",
     "block.BlockBehaviourExplosionMixin",
     "block.ContainerMixin",
@@ -27,8 +26,6 @@
     "block.IronBarsMixin",
 
     "items.ItemStackBreakProtectionMixin",
-    "items.ShearsItemMixin",
-    "items.SwordItemMixin",
     "entities.EntityAvoidBlockMixin",
     "entities.MimiclingLivingEntityMixin",
     "entities.MimiclingPlayerMixin",
@@ -52,7 +49,6 @@
   ],
   "client": [
     "client.ClientPacketListenerMixin",
-    "client.AnimatedBlockDestroyOverlayLevelRendererMixin",
     "client.HumanoidModelMixin",
     "client.AbstractContainerScreenMixin",
     "client.CreativeModeInventoryScreenMixin",
@@ -67,7 +63,6 @@
     "client.MusicManagerMixin",
     "client.LivingEntityRendererMixin",
     "client.ModelManagerAccessor",
-    "client.WisplightRodItemRendererMixin",
     "client.MimiclingEnderEyeOutlineMixin",
     "client.MimiclingReachGameRendererMixin",
     "MixinMinecraft",

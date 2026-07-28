@@ -16,10 +16,8 @@ import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
 import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
-import dev.hexnowloading.dungeonnowloading.item.client.model.WisplightRodModel;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.PlayerStatueItemRenderer;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.ScorcherRenderer;
-import dev.hexnowloading.dungeonnowloading.item.client.renderer.WisplightRodRenderer;
 import dev.hexnowloading.dungeonnowloading.particle.*;
 import dev.hexnowloading.dungeonnowloading.registry.*;
 import net.fabricmc.api.ClientModInitializer;
@@ -72,7 +70,6 @@ public class DNLFabricClient implements ClientModInitializer {
 
     private void registerItemModelLayers() {
         EntityModelLayerRegistry.registerModelLayer(ScorcherModel.LAYER_LOCATION, ScorcherModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(WisplightRodModel.LAYER_LOCATION, WisplightRodModel::createBodyLayer);
     }
 
     private void registerItemRenderers() {
@@ -96,7 +93,6 @@ public class DNLFabricClient implements ClientModInitializer {
         // Item
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
         BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SOUL_SCORCHER.get(), ScorcherRenderer.getInstance()::renderByItem);
-        BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.WISPLIGHT_ROD.get(), WisplightRodRenderer.getInstance()::renderByItem);
         //BuiltinItemRendererRegistry.INSTANCE.register(DNLItems.SCORCHER.get(), new DifferentProspectiveItemRenderer(DNLClientRegistry.SCORCHER_3D_MODEL, DNLClientRegistry.SCORCHER_3D_MODEL));
 
     }
@@ -139,9 +135,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDSTONE_CHALK_MARK.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WISP_BLOCK.get(), RenderType.translucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WISPWARD_LANTERN.get(), RenderType.translucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.TIMED_WISPWARD_LANTERN.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.ACACIA_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BAMBOO_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BIRCH_WOODEN_BOARD.get(), RenderType.cutout());
@@ -173,10 +166,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAINED_RAIL.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_CHAINED_RAIL.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_SIGNAL_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WEB_CARPET.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WEBBING_BLOCK.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WEBBING_NEST_BLOCK.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SUSPENDED_WEB.get(), RenderType.cutout());
     }
 
     private void registerModelModifiers() {
@@ -209,11 +198,6 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.BALLISTA_GOLEM.get(), BallistaGolemRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.GARHOLD.get(), GarholdRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BROKEN_GARHOLD.get(), BrokenGarholdRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.WISP.get(), WispRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.LARGE_WISP.get(), LargeWispRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.WISP_LANTERN.get(), WispLanternRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.SILK_SPIDER.get(), SilkSpiderRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.REAPER_SPIDER.get(), ReaperSpiderRenderer::new);
 
         // Passive
         EntityRendererRegistry.register(DNLEntityTypes.SEALED_CHAOS.get(), SealedChaosRenderer::new);
@@ -224,25 +208,19 @@ public class DNLFabricClient implements ClientModInitializer {
         // Projectiles
         EntityRendererRegistry.register(DNLEntityTypes.CHAOS_SPAWNER_PROJECTILE.get(), ChaosSpawnerProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.FLAME_PROJECTILE.get(), ThrownItemRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.WISP_PROJECTILE.get(), WispProjectileRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.LARGE_WISP_PROJECTILE.get(), LargeWispProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_ARROW_PROJECTILE.get(), VertexArrowProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_PILLAR_PROJECTILE.get(), VertexPillarProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BALLISTA_ARROW.get(), BallistaArrowRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_ORB_PROJECTILE.get(), VertexOrbProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.VERTEX_DOMAIN_PROJECTILE.get(), VertexDomainProjectileRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.BORUS_ARROW.get(), BorusArrowRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.WEB_SPIT_PROJECTILE.get(), WebSpitProjectileRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.GAS_CLOUD.get(), GasCloudRenderer::new);
 
         // Misc
         EntityRendererRegistry.register(DNLEntityTypes.SPECIAL_ITEM_ENTITY.get(), SpecialItemEntityRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.GREAT_EXPERIENCE_BOTTLE.get(), (context) -> new ThrownItemRenderer<>(context, 1.25F, false));
         EntityRendererRegistry.register(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.MIMICART.get(), MimicartRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.MIMICLING_FALLING_BLOCK.get(), MimiclingFallingBlockRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.WISPWARD_LANTERN_CART.get(), WispwardLanternCartRenderer::new);
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
@@ -250,9 +228,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockEntityRenderers.register(DNLBlockEntityTypes.DUNGEON_DIRECTOR.get(), DungeonDirectorRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DUNGEON_BANNER.get(), DungeonBannerBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.MENDING_AURA.get(), MendingAuraBlockEntityRenderer::new);
-        BlockEntityRenderers.register(DNLBlockEntityTypes.WISP_BLOCK.get(), WispBlockRenderer::new);
-        BlockEntityRenderers.register(DNLBlockEntityTypes.WISPWARD_CHEST.get(), WispwardChestBlockRenderer::new);
-        BlockEntityRenderers.register(DNLBlockEntityTypes.BURNACLE.get(), BurnacleBlockRenderer::new);
 
         // Item Properties
         ItemProperties.register(DNLItems.VERTEX_BOW.get(), ResourceLocation.parse("pull"), (stack, level, entity, idk) -> {
@@ -327,11 +302,6 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(BallistaGolemModel.LAYER_LOCATION, BallistaGolemModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(GarholdModel.LAYER_LOCATION, GarholdModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BrokenGarholdModel.LAYER_LOCATION, BrokenGarholdModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(WispModel.LAYER_LOCATION, WispModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(LargeWispModel.LAYER_LOCATION, LargeWispModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(WispLanternModel.LAYER_LOCATION, WispLanternModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(SilkSpiderModel.LAYER_LOCATION, SilkSpiderModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(ReaperSpiderModel.LAYER_LOCATION, ReaperSpiderModel::createBodyLayer);
 
         // Passive
         EntityModelLayerRegistry.registerModelLayer(SealedChaosModel.LAYER_LOCATION, SealedChaosModel::createBodyLayer);
@@ -339,31 +309,21 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(CopperCreepModel.LAYER_LOCATION, CopperCreepModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(CopperCreepButlerModel.LAYER_LOCATION, CopperCreepButlerModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(RepulsorModel.LAYER_LOCATION, RepulsorModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(MimicartModel.LAYER_LOCATION, MimicartModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(WispwardLanternModel.LAYER_LOCATION, WispwardLanternModel::createBodyLayer);
 
         //Projectiles
         EntityModelLayerRegistry.registerModelLayer(ChaosSpawnerProjectileModel.LAYER_LOCATION, ChaosSpawnerProjectileModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(WispProjectileModel.LAYER_LOCATION, WispProjectileModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(LargeWispProjectileModel.LAYER_LOCATION, LargeWispProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(VertexArrowProjectileModel.LAYER_LOCATION, VertexArrowProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(VertexPillarProjectileModel.LAYER_LOCATION, VertexPillarProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BallistaArrowModel.LAYER_LOCATION, BallistaArrowModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(VertexOrbProjectileModel.LAYER_LOCATION, VertexOrbProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(VertexDomainProjectileModel.LAYER_LOCATION, VertexDomainProjectileModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(BorusArrowModel.LAYER_LOCATION, BorusArrowModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(WebSpitModel.LAYER_LOCATION, WebSpitModel::createBodyLayer);
         // Block Entities
         EntityModelLayerRegistry.registerModelLayer(FairkeeperChestModel.LAYER_LOCATION, FairkeeperChestModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(DisabledFairkeeperChestModel.LAYER_LOCATION, DisabledFairkeeperChestModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(PlayerStatueModel.LAYER_LOCATION, PlayerStatueModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(PlayerStatuePedestalModel.LAYER_LOCATION, PlayerStatuePedestalModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(DungeonBannerBlockModel.LAYER_LOCATION, DungeonBannerBlockModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(WispwardChestModel.LAYER_LOCATION, WispwardChestModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(BurnacleBudModel.LAYER_LOCATION, BurnacleBudModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(BurnacleJuvenileModel.LAYER_LOCATION, BurnacleJuvenileModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(BurnacleMatureModel.LAYER_LOCATION, BurnacleMatureModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(BurnacleElderModel.LAYER_LOCATION, BurnacleElderModel::createBodyLayer);
 
         // Misc
         EntityModelLayerRegistry.registerModelLayer(SeepingSoulChaosSpawnerModel.LAYER_LOCATION, SeepingSoulChaosSpawnerModel::createBodyLayer);
@@ -387,9 +347,7 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.MENDING_RUNE_PARTICLE.get(), MendingRuneParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_RUNE_SHORT_PARTICLE.get(), MendingRuneShortParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
-        registry.register(DNLParticleTypes.WISPWARD_FLAME_TRAVEL_PARTICLE.get(), WispwardFlameTravelParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
-        registry.register(DNLParticleTypes.BURNACLE_GAS_PARTICLE.get(), BurnacleGasParticle.Factory::new);
         registry.register(DNLParticleTypes.SNIFFER_TRAIL_PARTICLE.get(), SnifferTrailParticle.Factory::new);
         registry.register(DNLParticleTypes.MIMICLING_IMPACT_BLOCK_PARTICLE.get(), new MimiclingImpactBlockParticle.Factory());
     }

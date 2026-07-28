@@ -15,8 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
-    private static final TagKey<Block> MINEABLE_WITH_SHEARS = BlockTags.create(ResourceLocation.fromNamespaceAndPath("minecraft", "mineable/shears"));
-    private static final TagKey<Block> MINEABLE_WITH_SWORD = BlockTags.create(ResourceLocation.fromNamespaceAndPath("minecraft", "mineable/sword"));
+
 
     public DNLForgeBlockTagGenerator(DataGenerator generator, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
         super(generator.getPackOutput(), lookupProvider, DungeonNowLoading.MOD_ID, existingFileHelper);
@@ -89,7 +88,6 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.DURITE_QUELLER.get(),
                 DNLBlocks.BRITTLESTONE.get(),
                 DNLBlocks.DEEPSTEEL_BLOCK.get(),
-                DNLBlocks.BURNACLE.get(),
                 DNLBlocks.DEEPSTEEL_BLOCK.get(),
                 DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(),
                 DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(),
@@ -135,18 +133,7 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.FAIRKEEEPER_SPAWNER.get()
         );
 
-        this.tag(MINEABLE_WITH_SHEARS).add(
-                DNLBlocks.SUSPENDED_WEB.get()
-        );
 
-        this.tag(MINEABLE_WITH_SWORD).add(
-                DNLBlocks.SUSPENDED_WEB.get()
-        );
-
-        this.tag(BlockTags.FALL_DAMAGE_RESETTING).add(
-                DNLBlocks.WEB_CARPET.get(),
-                DNLBlocks.SUSPENDED_WEB.get()
-        );
 
         this.tag(BlockTags.WALLS).add(
                 DNLBlocks.COILING_STONE_PILLAR_WALL.get(),

@@ -1,5 +1,5 @@
 {
-  "music_clash_of_duality_base" : {
+  "music_clash_of_duality_base": {
     "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_base",
     "sounds": [
       {
@@ -8,7 +8,7 @@
       }
     ]
   },
-  "music_clash_of_duality_boros" : {
+  "music_clash_of_duality_boros": {
     "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_boros",
     "sounds": [
       {
@@ -17,7 +17,7 @@
       }
     ]
   },
-  "music_clash_of_duality_ouros" : {
+  "music_clash_of_duality_ouros": {
     "subtitle": "sounds.dungeonnowloading.music_clash_of_duality_ouros",
     "sounds": [
       {
@@ -26,7 +26,7 @@
       }
     ]
   },
-  "music_temple_of_duality" : {
+  "music_temple_of_duality": {
     "subtitle": "sounds.dungeonnowloading.music_temple_of_duality",
     "sounds": [
       {
@@ -39,7 +39,7 @@
       }
     ]
   },
-  "music_hellspawn_base" : {
+  "music_hellspawn_base": {
     "subtitle": "sounds.dungeonnowloading.music_hellspawn_base",
     "sounds": [
       {
@@ -48,7 +48,7 @@
       }
     ]
   },
-  "music_hellspawn_overlay" : {
+  "music_hellspawn_overlay": {
     "subtitle": "sounds.dungeonnowloading.music_hellspawn_overlay",
     "sounds": [
       {
@@ -57,7 +57,7 @@
       }
     ]
   },
-  "disc_aotsugi" : {
+  "disc_aotsugi": {
     "subtitle": "sounds.dungeonnowloading.disc_aotsugi",
     "sounds": [
       {
@@ -66,7 +66,7 @@
       }
     ]
   },
-  "disc_broken_aotsugi" : {
+  "disc_broken_aotsugi": {
     "subtitle": "sounds.dungeonnowloading.disc_broken_aotsugi",
     "sounds": [
       {
@@ -75,7 +75,7 @@
       }
     ]
   },
-  "disc_hellspawn" : {
+  "disc_hellspawn": {
     "subtitle": "sounds.dungeonnowloading.disc_hellspawn",
     "sounds": [
       {
@@ -84,7 +84,7 @@
       }
     ]
   },
-  "disc_clash_of_duality_boros" : {
+  "disc_clash_of_duality_boros": {
     "subtitle": "sounds.dungeonnowloading.disc_clash_of_duality_boros",
     "sounds": [
       {
@@ -93,7 +93,7 @@
       }
     ]
   },
-  "disc_clash_of_duality_ouros" : {
+  "disc_clash_of_duality_ouros": {
     "subtitle": "sounds.dungeonnowloading.disc_clash_of_duality_ouros",
     "sounds": [
       {
@@ -102,7 +102,7 @@
       }
     ]
   },
-  "disc_clash_of_duality_pythonic_overdrive" : {
+  "disc_clash_of_duality_pythonic_overdrive": {
     "subtitle": "sounds.dungeonnowloading.disc_clash_of_duality_pythonic_overdrive",
     "sounds": [
       {
@@ -189,7 +189,7 @@
       "dungeonnowloading:item/soul_scorcher/soul_scorcher_start_2"
     ]
   },
-  "mending_table_mend" : {
+  "mending_table_mend": {
     "subtitle": "sounds.dungeonnowloading.mending_table_mend",
     "sounds": [
       "dungeonnowloading:block/mending_table/mending_table_mend_0",
@@ -550,13 +550,13 @@
   "whimper_hurt": {
     "subtitle": "sounds.dungeonnowloading.whimper_hurt",
     "sounds": [
-        "dungeonnowloading:mob/whimper/whimper_hurt"
+      "dungeonnowloading:mob/whimper/whimper_hurt"
     ]
   },
   "whimper_death": {
     "subtitle": "sounds.dungeonnowloading.whimper_death",
     "sounds": [
-        "dungeonnowloading:mob/whimper/whimper_death"
+      "dungeonnowloading:mob/whimper/whimper_death"
     ]
   },
   "scuttle_waking": {
@@ -621,8 +621,8 @@
   "scuttle_deflect": {
     "subtitle": "sounds.dungeonnowloading.scuttle_deflect",
     "sounds": [
-        "dungeonnowloading:mob/scuttle/scuttle_deflect_0",
-        "dungeonnowloading:mob/scuttle/scuttle_deflect_1"
+      "dungeonnowloading:mob/scuttle/scuttle_deflect_0",
+      "dungeonnowloading:mob/scuttle/scuttle_deflect_1"
     ]
   },
   "scuttle_hurt": {
@@ -636,54 +636,7 @@
   "scuttle_death": {
     "subtitle": "sounds.dungeonnowloading.scuttle_death",
     "sounds": [
-        "dungeonnowloading:mob/scuttle/scuttle_death"
-    ]
-  },
-  "silk_spider_ambient": {
-    "subtitle": "sounds.dungeonnowloading.silk_spider_ambient",
-    "sounds": [
-      "dungeonnowloading:mob/silk_spider/silk_spider_ambient_0",
-      "dungeonnowloading:mob/silk_spider/silk_spider_ambient_1",
-      "dungeonnowloading:mob/silk_spider/silk_spider_ambient_2"
-    ]
-  },
-  "silk_spider_death": {
-    "subtitle": "sounds.dungeonnowloading.silk_spider_death",
-    "sounds": [
-      "dungeonnowloading:mob/silk_spider/silk_spider_death_0",
-      "dungeonnowloading:mob/silk_spider/silk_spider_death_1"
-    ]
-  },
-  "silk_spider_hurt": {
-    "subtitle": "sounds.dungeonnowloading.silk_spider_hurt",
-    "sounds": [
-      "dungeonnowloading:mob/silk_spider/silk_spider_hurt_0",
-      "dungeonnowloading:mob/silk_spider/silk_spider_hurt_1",
-      "dungeonnowloading:mob/silk_spider/silk_spider_hurt_2"
-    ]
-  },
-  "silk_spider_shoot": {
-    "subtitle": "sounds.dungeonnowloading.silk_spider_shoot",
-    "sounds": [
-      "dungeonnowloading:mob/silk_spider/silk_spider_shoot_0",
-      "dungeonnowloading:mob/silk_spider/silk_spider_shoot_1",
-      "dungeonnowloading:mob/silk_spider/silk_spider_shoot_2"
-    ]
-  },
-  "silk_spider_web_spit_land": {
-    "subtitle": "sounds.dungeonnowloading.silk_spider_web_spit_land",
-    "sounds": [
-      "dungeonnowloading:mob/silk_spider/web_spit_land_0",
-      "dungeonnowloading:mob/silk_spider/web_spit_land_1"
-    ]
-  },
-  "silk_spider_step": {
-    "subtitle": "sounds.dungeonnowloading.silk_spider_step",
-    "sounds": [
-      "dungeonnowloading:mob/silk_spider/silk_spider_step_0",
-      "dungeonnowloading:mob/silk_spider/silk_spider_step_1",
-      "dungeonnowloading:mob/silk_spider/silk_spider_step_2",
-      "dungeonnowloading:mob/silk_spider/silk_spider_step_3"
+      "dungeonnowloading:mob/scuttle/scuttle_death"
     ]
   },
   "sealed_chaos_bullet_hit": {
@@ -1145,30 +1098,6 @@
     "sounds": [
       "dungeonnowloading:mob/garhold/garhold_teleport_0",
       "dungeonnowloading:mob/garhold/garhold_teleport_1"
-    ]
-  },
-  "wisp_death": {
-    "subtitle": "sounds.dungeonnowloading.wisp_death",
-    "sounds": [
-      "dungeonnowloading:mob/wisp/wisp_death_0",
-      "dungeonnowloading:mob/wisp/wisp_death_1",
-      "dungeonnowloading:mob/wisp/wisp_death_2"
-    ]
-  },
-  "wisp_flare_up": {
-    "subtitle": "sounds.dungeonnowloading.wisp_flare_up",
-    "sounds": [
-      "dungeonnowloading:mob/wisp/wisp_flare_up_0",
-      "dungeonnowloading:mob/wisp/wisp_flare_up_1",
-      "dungeonnowloading:mob/wisp/wisp_flare_up_2"
-    ]
-  },
-  "wisp_tackle": {
-    "subtitle": "sounds.dungeonnowloading.wisp_tackle",
-    "sounds": [
-      "dungeonnowloading:mob/wisp/wisp_tackle_0",
-      "dungeonnowloading:mob/wisp/wisp_tackle_1",
-      "dungeonnowloading:mob/wisp/wisp_tackle_2"
     ]
   }
 }

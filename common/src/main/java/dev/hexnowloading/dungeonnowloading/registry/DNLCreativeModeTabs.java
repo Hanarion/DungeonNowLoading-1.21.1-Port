@@ -24,10 +24,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.BALLISTA_GOLEM_SPAWNEGG.get());
                 output.accept(DNLItems.SEALED_CHAOS_SPAWNEGG.get());
                 output.accept(DNLItems.WHIMPER_SPAWNEGG.get());
-                output.accept(DNLItems.WISP_SPAWNEGG.get());
-                output.accept(DNLItems.WISP_LANTERN_SPAWNEGG.get());
-                output.accept(DNLItems.SILK_SPIDER_SPAWNEGG.get());
-                output.accept(DNLItems.REAPER_SPIDER_SPAWNEGG.get());
                 // Items - Ingredients
                 output.accept(DNLItems.SPAWNER_FRAGMENT.get());
                 output.accept(DNLItems.SPAWNER_FRAME.get());
@@ -53,10 +49,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SOUL_SCORCHER.get());
                 output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.REPULSOR.get());
-                output.accept(DNLItems.MIMICART.get());
-                output.accept(DNLItems.WISPWARD_LANTERN_CART.get());
-                output.accept(DNLItems.TIMED_WISPWARD_LANTERN_CART.get());
-                output.accept(DNLItems.WISPLIGHT_ROD.get());
                 output.accept(DNLItems.MIMIC_MUCUS.get());
                 output.accept(DNLItems.RABBITLESS_RABBIT_STEW.get());
                 output.accept(DNLItems.MIMICLING.get());
@@ -231,14 +223,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get());
                 output.accept(DNLItems.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
                 output.accept(DNLItems.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
-                output.accept(DNLItems.WEB_CARPET.get());
-                output.accept(DNLItems.WEBBING_BLOCK.get());
-                output.accept(DNLItems.WEBBING_NEST_BLOCK.get());
-                output.accept(DNLItems.SUSPENDED_WEB.get());
-                output.accept(DNLItems.BURNACLE.get());
-                output.accept(DNLItems.WISPWARD_CHEST.get());
-                output.accept(DNLItems.WISPWARD_LANTERN.get());
-                output.accept(DNLItems.TIMED_WISPWARD_LANTERN.get());
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());

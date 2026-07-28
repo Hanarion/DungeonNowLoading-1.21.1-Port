@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/glow_lichen",
-  "textures": {
-    "glow_lichen": "dungeonnowloading:block/web_carpet_burning",
-    "particle": "dungeonnowloading:block/web_carpet_burning"
-  }
-}

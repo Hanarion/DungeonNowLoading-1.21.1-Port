@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cross",
-  "render_type": "minecraft:cutout",
-  "textures": {
-    "cross": "dungeonnowloading:block/suspended_web_c",
-    "particle": "dungeonnowloading:block/suspended_web_c"
-  }
-}

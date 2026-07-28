@@ -184,11 +184,6 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
         this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
-        this.add(DNLBlocks.WEB_CARPET.get(), this::addWebCarpetDrop);
-        this.dropSelf(DNLBlocks.WEBBING_BLOCK.get());
-        this.dropSelf(DNLBlocks.WEBBING_NEST_BLOCK.get());
-        this.add(DNLBlocks.SUSPENDED_WEB.get(), this::addSuspendedWebDrop);
-        this.dropSelf(DNLBlocks.BURNACLE.get());
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {
@@ -375,53 +370,7 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.add(block, table);
     }
 
-    private LootTable.Builder addWebCarpetDrop(Block block) {
-        LootTable.Builder table = this.createMultifaceBlockDrops(block, HAS_SHEARS);
 
-        // Only give string when *not* using shears
-        LootItemCondition.Builder noShears =
-                net.minecraft.world.level.storage.loot.predicates.InvertedLootItemCondition.invert(HAS_SHEARS);
-
-        for (Direction dir : Direction.values()) {
-            BooleanProperty faceProp = MultifaceBlock.getFaceProperty(dir);
-            if (faceProp == null) continue;
-
-            // Only roll this pool if this face is present (faceProp = true)
-            LootItemCondition.Builder hasFace =
-                    LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
-                            .setProperties(StatePropertiesPredicate.Builder.properties()
-                                    .hasProperty(faceProp, true));
-
-            table.withPool(
-                    LootPool.lootPool()
-                            .setRolls(ConstantValue.exactly(1.0F))
-                            .when(noShears)       // don't give string when shearing
-                            .when(hasFace)        // only if this face exists
-                            .add(LootItem.lootTableItem(Items.STRING)
-                                    .when(LootItemRandomChanceCondition.randomChance(1.0F / 6.0F))
-                                    .when(ExplosionCondition.survivesExplosion())
-                            )
-            );
-        }
-
-        return table;
-    }
-
-    private LootTable.Builder addSuspendedWebDrop(Block block) {
-        LootItemCondition.Builder noShears = InvertedLootItemCondition.invert(HAS_SHEARS);
-
-        return LootTable.lootTable()
-                .withPool(LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1.0F))
-                        .when(HAS_SHEARS)
-                        .when(ExplosionCondition.survivesExplosion())
-                        .add(LootItem.lootTableItem(DNLItems.SUSPENDED_WEB.get())))
-                .withPool(LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1.0F))
-                        .when(noShears)
-                        .when(ExplosionCondition.survivesExplosion())
-                        .add(LootItem.lootTableItem(Items.STRING)));
-    }
 
     private static LootItemCondition.Builder destroyedByPlayer() {
         return LootItemEntityPropertyCondition.hasProperties(

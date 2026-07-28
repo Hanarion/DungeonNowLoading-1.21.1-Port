@@ -84,9 +84,6 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> WHIMPER_AMBIENT = registerSoundEvent("whimper_ambient");
     public static final Supplier<SoundEvent> WHIMPER_HURT = registerSoundEvent("whimper_hurt");
     public static final Supplier<SoundEvent> WHIMPER_DEATH = registerSoundEvent("whimper_death");
-    public static final Supplier<SoundEvent> WISP_DEATH = registerSoundEvent("wisp_death");
-    public static final Supplier<SoundEvent> WISP_FLARE_UP = registerSoundEvent("wisp_flare_up");
-    public static final Supplier<SoundEvent> WISP_TACKLE = registerSoundEvent("wisp_tackle");
     public static final Supplier<SoundEvent> SCUTTLE_WAKING = registerSoundEvent("scuttle_waking");
     public static final Supplier<SoundEvent> SCUTTLE_STEP = registerSoundEvent("scuttle_step");
     public static final Supplier<SoundEvent> SCUTTLE_AMBIENT = registerSoundEvent("scuttle_idle");
@@ -99,12 +96,6 @@ public class DNLSounds {
     public static final Supplier<SoundEvent> SCUTTLE_DEFLECT = registerSoundEvent("scuttle_deflect");
     public static final Supplier<SoundEvent> SCUTTLE_HURT = registerSoundEvent("scuttle_hurt");
     public static final Supplier<SoundEvent> SCUTTLE_DEATH = registerSoundEvent("scuttle_death");
-    public static final Supplier<SoundEvent> SILK_SPIDER_AMBIENT = registerSoundEvent("silk_spider_ambient");
-    public static final Supplier<SoundEvent> SILK_SPIDER_DEATH = registerSoundEvent("silk_spider_death");
-    public static final Supplier<SoundEvent> SILK_SPIDER_HURT = registerSoundEvent("silk_spider_hurt");
-    public static final Supplier<SoundEvent> SILK_SPIDER_SHOOT = registerSoundEvent("silk_spider_shoot");
-    public static final Supplier<SoundEvent> SILK_SPIDER_WEB_SPIT_LAND = registerSoundEvent("silk_spider_web_spit_land");
-    public static final Supplier<SoundEvent> SILK_SPIDER_STEP = registerSoundEvent("silk_spider_step");
     public static final Supplier<SoundEvent> SEALED_CHAOS_BULLET_HIT = registerSoundEvent("sealed_chaos_bullet_hit");
     public static final Supplier<SoundEvent> SEALED_CHAOS_BULLET_SHOOT = registerSoundEvent("sealed_chaos_bullet_shoot");
     public static final Supplier<SoundEvent> SEALED_CHAOS_PLACE = registerSoundEvent("sealed_chaos_place");

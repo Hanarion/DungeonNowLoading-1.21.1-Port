@@ -3,7 +3,6 @@ package dev.hexnowloading.dungeonnowloading.datagen.provider;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.block.*;
 import dev.hexnowloading.dungeonnowloading.block.property.RedstoneLaneMode;
-import dev.hexnowloading.dungeonnowloading.block.property.SuspendedWebPart;
 import dev.hexnowloading.dungeonnowloading.datagen.provider.blockitemstategenerators.BannerBlockItemGen;
 import dev.hexnowloading.dungeonnowloading.registry.DNLBlocks;
 import dev.hexnowloading.dungeonnowloading.registry.DNLItems;
@@ -122,11 +121,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_WHIMPER_LANTERN.get());
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_GARHOLD_UPSIDEDOWN.get());
         gen.dungeonBanner(DNLBlocks.DUNGEON_BANNER_SKULL_OF_CHAOS.get());
-        multifaceWebCarpet(DNLBlocks.WEB_CARPET.get());
-        webbingBlock(DNLBlocks.WEBBING_BLOCK.get());
-        webbingNestBlock(DNLBlocks.WEBBING_NEST_BLOCK.get());
-        suspendedWeb(DNLBlocks.SUSPENDED_WEB.get());
-        burnacleSixWayWithStages(DNLBlocks.BURNACLE.get());
     }
 
     private void fenceGateBlockWithItem(FenceGateBlock block, Block parent) {
@@ -1081,90 +1075,7 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, model);
     }
 
-    private void multifaceWebCarpet(Block block) {
-        String name = key(block).getPath();
 
-        // === Model files for normal & burning ===
-        ModelFile normal = models()
-                .withExistingParent(name, mcLoc("block/glow_lichen"))
-                .texture("glow_lichen", modLoc("block/web_carpet"))
-                .texture("particle", modLoc("block/web_carpet"));
-
-        ModelFile burning = models()
-                .withExistingParent(name + "_burning", mcLoc("block/glow_lichen"))
-                .texture("glow_lichen", modLoc("block/web_carpet_burning"))
-                .texture("particle", modLoc("block/web_carpet_burning"));
-
-        // === Multipart blockstate builder ===
-        MultiPartBlockStateBuilder builder = getMultipartBuilder(block);
-
-        for (Direction dir : Direction.values()) {
-            BooleanProperty faceProp = MultifaceBlock.getFaceProperty(dir);
-
-            if (faceProp == null) continue; // Safety
-
-            int xRot = switch (dir) {
-                case UP -> 270;
-                case DOWN -> 90;
-                default -> 0;
-            };
-            int yRot = switch (dir) {
-                case NORTH -> 0;
-                case EAST -> 90;
-                case SOUTH -> 180;
-                case WEST -> 270;
-                default -> 0;
-            };
-
-            // Normal face
-            builder.part()
-                    .modelFile(normal)
-                    .rotationX(xRot)
-                    .rotationY(yRot)
-                    .uvLock(true)
-                    .addModel()
-                    .condition(faceProp, true)
-                    .condition(WebCarpetBlock.BURNING, false);
-
-            // Burning face
-            builder.part()
-                    .modelFile(burning)
-                    .rotationX(xRot)
-                    .rotationY(yRot)
-                    .uvLock(true)
-                    .addModel()
-                    .condition(faceProp, true)
-                    .condition(WebCarpetBlock.BURNING, true);
-        }
-
-        // === Item model generation ===
-        simpleItem(block);
-    }
-
-    private void suspendedWeb(Block block) {
-        String blockName = key(block).getPath();
-        Map<SuspendedWebPart, ModelFile> modelsByPart = Map.of(
-                SuspendedWebPart.ONE, suspendedWebModel("1"),
-                SuspendedWebPart.TWO, suspendedWebModel("2"),
-                SuspendedWebPart.THREE, suspendedWebModel("3"),
-                SuspendedWebPart.FOUR, suspendedWebModel("4"),
-                SuspendedWebPart.FIVE, suspendedWebModel("5"),
-                SuspendedWebPart.SIX, suspendedWebModel("6"),
-                SuspendedWebPart.A, suspendedWebModel("a"),
-                SuspendedWebPart.B, suspendedWebModel("b"),
-                SuspendedWebPart.C, suspendedWebModel("c")
-        );
-
-        getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
-                .modelFile(modelsByPart.get(state.getValue(SuspendedWebBlock.PART)))
-                .rotationX(suspendedWebXRotation(state.getValue(SuspendedWebBlock.FACING)))
-                .rotationY(suspendedWebYRotation(state.getValue(SuspendedWebBlock.FACING)))
-                .build());
-
-        itemModels()
-                .withExistingParent(ModelProvider.ITEM_FOLDER + "/" + blockName, mcLoc(ModelProvider.ITEM_FOLDER + "/generated"))
-                .texture("layer0", modLoc("block/suspended_web_1"));
-    }
 
     private void webbingBlock(Block block) {
         ResourceLocation side = modLoc("block/webbing_block");
@@ -1177,91 +1088,11 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, model);
     }
 
-    private void webbingNestBlock(Block block) {
-        ResourceLocation side = modLoc("block/webbing_block");
-        ResourceLocation top = modLoc("block/webbing_block_top");
-        ResourceLocation nest = modLoc("block/webbing_block_nest");
-        Map<Direction, ModelFile> modelsByFacing = Map.of(
-                Direction.DOWN, webbingNestModel(name(block) + "_down", top, top, nest, side, side, side),
-                Direction.UP, webbingNestModel(name(block) + "_up", top, top, nest, side, side, side),
-                Direction.NORTH, webbingNestModel(name(block) + "_north", top, top, nest, side, side, side),
-                Direction.SOUTH, webbingNestModel(name(block) + "_south", top, top, side, nest, side, side),
-                Direction.EAST, webbingNestModel(name(block) + "_east", top, top, side, side, nest, side),
-                Direction.WEST, webbingNestModel(name(block) + "_west", top, top, side, side, side, nest)
-        );
 
-        getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
-                .modelFile(modelsByFacing.get(state.getValue(WebbingNestBlock.FACING)))
-                .build());
 
-        simpleBlockItem(block, modelsByFacing.get(Direction.NORTH));
-    }
 
-    private ModelFile webbingNestModel(String modelName, ResourceLocation bottom, ResourceLocation top, ResourceLocation north, ResourceLocation south, ResourceLocation east, ResourceLocation west) {
-        return models()
-                .cube(modelName, bottom, top, north, south, east, west)
-                .texture("particle", north)
-                .renderType("cutout");
-    }
 
-    private ModelFile suspendedWebModel(String suffix) {
-        return models()
-                .withExistingParent("suspended_web_" + suffix, mcLoc("block/cross"))
-                .texture("cross", modLoc("block/suspended_web_" + suffix))
-                .texture("particle", modLoc("block/suspended_web_" + suffix))
-                .renderType("cutout");
-    }
 
-    private int suspendedWebXRotation(Direction facing) {
-        return switch (facing) {
-            case SOUTH, WEST -> 90;
-            default -> 0;
-        };
-    }
-
-    private int suspendedWebYRotation(Direction facing) {
-        return switch (facing) {
-            case WEST -> 90;
-            default -> 0;
-        };
-    }
-
-    private void burnacleSixWayWithStages(Block block) {
-        getVariantBuilder(block).forAllStates(state -> {
-            Direction f = state.getValue(BlockStateProperties.FACING);
-            BurnacleBlock.Stage stage = state.getValue(BurnacleBlock.STAGE);
-
-            String modelName = switch (stage) {
-                case BUD      -> "burnacle_bud";
-                case JUVENILE -> "burnacle_juvenile";
-                case MATURE   -> "burnacle_mature";
-                case ELDER    -> "burnacle_elder";
-            };
-
-            ModelFile model = models().getExistingFile(modLoc("block/" + modelName));
-
-            int x = 0, y = 0;
-            switch (f) {
-                case UP    -> { x = 0;   y = 0;   }
-                case DOWN  -> { x = 180; y = 0;   }
-                case NORTH -> { x = 90;  y = 0;   }
-                case SOUTH -> { x = 90;  y = 180; }
-                case WEST  -> { x = 90;  y = 270; }
-                case EAST  -> { x = 90;  y = 90;  }
-            }
-
-            return ConfiguredModel.builder()
-                    .modelFile(model)
-                    .rotationX(x)
-                    .rotationY(y)
-                    .build();
-        });
-
-        // Item model: use the dedicated flat item texture.
-        itemModels()
-                .withExistingParent(ModelProvider.ITEM_FOLDER + "/" + name(block), mcLoc(ModelProvider.ITEM_FOLDER + "/generated"))
-                .texture("layer0", ModelProvider.ITEM_FOLDER + "/" + name(block));
-    }
 
 
 

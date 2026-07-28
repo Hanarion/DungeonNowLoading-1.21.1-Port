@@ -2,8 +2,7 @@ package dev.hexnowloading.dungeonnowloading.item.client;
 
 public enum DNLArmPose {
     EMPTY(false, "empty"),
-    SCORCHER(true, "scorcher"),
-    WISPLIGHT_ROD(false, "wisplight_rod");
+    SCORCHER(true, "scorcher");
 
     private final boolean twoHanded;
     private final String id;
