@@ -6,6 +6,7 @@
     "mixins": [
       "ServerLevelMixin",
       "block.BlockDestroyCancelMixin",
+      "block.PlayerBlockDestroyCancelMixin",
       "block.EnchantmentHelperMixin",
       "block.ExplosionMixin",
       "block.BlockBehaviourExplosionMixin",
