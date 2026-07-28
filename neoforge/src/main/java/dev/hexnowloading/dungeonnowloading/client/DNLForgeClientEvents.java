@@ -205,24 +205,8 @@ public class DNLForgeClientEvents {
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_SPIRAL.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_SWORD.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.HAZARD_SIGN_UP.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.SIGNAL_RAIL.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(DNLBlocks.CHAINED_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_CHAINED_RAIL.get(), RenderType.cutout());
-            ItemBlockRenderTypes.setRenderLayer(DNLBlocks.DEEPSTEEL_MOUNTED_SIGNAL_RAIL.get(), RenderType.cutout());
         });
     }
 

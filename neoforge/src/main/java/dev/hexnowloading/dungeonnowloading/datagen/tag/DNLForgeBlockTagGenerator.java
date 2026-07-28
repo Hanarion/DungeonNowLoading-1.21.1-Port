@@ -86,45 +86,15 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.MEDIUM_DURITE_BUD.get(),
                 DNLBlocks.LARGE_DURITE_BUD.get(),
                 DNLBlocks.DURITE_QUELLER.get(),
-                DNLBlocks.BRITTLESTONE.get(),
-                DNLBlocks.DEEPSTEEL_BLOCK.get(),
-                DNLBlocks.DEEPSTEEL_BLOCK.get(),
-                DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(),
-                DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(),
-                DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(),
-                DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(),
-                DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(),
-                DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get()
+                DNLBlocks.BRITTLESTONE.get()
         );
 
         this.tag(BlockTags.RAILS).add(
-                DNLBlocks.DEEPSTEEL_MOUNTED_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get(),
                 DNLBlocks.SIGNAL_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_MOUNTED_SIGNAL_RAIL.get(),
-                DNLBlocks.CHAINED_RAIL.get(),
-                DNLBlocks.DEEPSTEEL_MOUNTED_CHAINED_RAIL.get()
+                DNLBlocks.CHAINED_RAIL.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(
-                DNLBlocks.ACACIA_WOODEN_BOARD.get(),
-                DNLBlocks.BAMBOO_WOODEN_BOARD.get(),
-                DNLBlocks.BIRCH_WOODEN_BOARD.get(),
-                DNLBlocks.CHERRY_WOODEN_BOARD.get(),
-                DNLBlocks.CRIMSON_WOODEN_BOARD.get(),
-                DNLBlocks.DARK_OAK_WOODEN_BOARD.get(),
-                DNLBlocks.JUNGLE_WOODEN_BOARD.get(),
-                DNLBlocks.MANGROVE_WOODEN_BOARD.get(),
-                DNLBlocks.OAK_WOODEN_BOARD.get(),
-                DNLBlocks.PALE_OAK_WOODEN_BOARD.get(),
-                DNLBlocks.SPRUCE_WOODEN_BOARD.get(),
-                DNLBlocks.WARPED_WOODEN_BOARD.get(),
                 DNLBlocks.WOODEN_WALL_RACK.get(),
                 DNLBlocks.WOODEN_WALL_PLATFORM.get(),
                 DNLBlocks.FAIRKEEPER_CHEST.get(),

@@ -95,18 +95,6 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(DNLBlocks.REDSTONE_LANE_L.get());
         this.dropSelf(DNLBlocks.REDSTONE_LANE_T.get());
         this.dropSelf(DNLBlocks.ROTATOR_PRESSURE_PLATE.get());
-        this.dropSelf(DNLBlocks.ACACIA_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.BAMBOO_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.BIRCH_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.CHERRY_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.CRIMSON_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.DARK_OAK_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.JUNGLE_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.MANGROVE_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.OAK_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.PALE_OAK_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.SPRUCE_WOODEN_BOARD.get());
-        this.dropSelf(DNLBlocks.WARPED_WOODEN_BOARD.get());
         this.add(DNLBlocks.COAL_STONE_NOTCH.get(), block -> notchBlock(block, Items.COAL));
         this.add(DNLBlocks.COPPER_STONE_NOTCH.get(), block -> notchBlock(block, Items.COPPER_INGOT));
         this.add(DNLBlocks.IRON_STONE_NOTCH.get(), block -> notchBlock(block, Items.IRON_INGOT));
@@ -173,17 +161,6 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         add(bannerBlock, table);
 
         this.dropWhenSilkTouch(DNLBlocks.BRITTLESTONE.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_BLOCK.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
-        this.dropSelf(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {

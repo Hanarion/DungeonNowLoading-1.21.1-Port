@@ -21,7 +21,5 @@ public abstract class AbstractMinecartMixin {
     }
 
     // 1.21: moveAlongTrack detects powered rails via `instanceof PoweredRailBlock` rather than a
-    // BlockState.is(Block) call, and DeepsteelMountedPoweredRailBlock extends PoweredRailBlock, so
-    // the deepsteel mounted powered rail already gets the vanilla speed boost. The old @Redirect
     // (BlockState.is(Block)) no longer has a target and is unnecessary — removed.
 }

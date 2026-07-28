@@ -134,37 +134,9 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDSTONE_CHALK_MARK.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.ACACIA_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BAMBOO_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BIRCH_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHERRY_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CRIMSON_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DARK_OAK_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.JUNGLE_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MANGROVE_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.OAK_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.PALE_OAK_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPRUCE_WOODEN_BOARD.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WARPED_WOODEN_BOARD.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BRITTLESTONE.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_POWERED_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_DETECTOR_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SIGNAL_RAIL.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAINED_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_CHAINED_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DEEPSTEEL_MOUNTED_SIGNAL_RAIL.get(), RenderType.cutout());
     }
 
     private void registerModelModifiers() {

@@ -90,18 +90,6 @@ public class DNLItems {
     public static final Supplier<Item> PUZZLING_STONE_EMBLEM = register("puzzling_stone_emblem", () -> new BlockItem(DNLBlocks.PUZZLING_STONE_EMBLEM.get(), new Item.Properties()));
     public static final Supplier<Item> POLISHED_STONE = register("polished_stone", () -> new BlockItem(DNLBlocks.POLISHED_STONE.get(), new Item.Properties()));
     public static final Supplier<Item> BORDERED_STONE = register("bordered_stone", () -> new BlockItem(DNLBlocks.BORDERED_STONE.get(), new Item.Properties()));
-    public static final Supplier<Item> ACACIA_WOODEN_BOARD      = register("acacia_wooden_board",      () -> new BlockItem(DNLBlocks.ACACIA_WOODEN_BOARD.get(),      new Item.Properties()));
-    public static final Supplier<Item> BAMBOO_WOODEN_BOARD      = register("bamboo_wooden_board",      () -> new BlockItem(DNLBlocks.BAMBOO_WOODEN_BOARD.get(),      new Item.Properties()));
-    public static final Supplier<Item> BIRCH_WOODEN_BOARD       = register("birch_wooden_board",       () -> new BlockItem(DNLBlocks.BIRCH_WOODEN_BOARD.get(),       new Item.Properties()));
-    public static final Supplier<Item> CHERRY_WOODEN_BOARD      = register("cherry_wooden_board",      () -> new BlockItem(DNLBlocks.CHERRY_WOODEN_BOARD.get(),      new Item.Properties()));
-    public static final Supplier<Item> CRIMSON_WOODEN_BOARD     = register("crimson_wooden_board",     () -> new BlockItem(DNLBlocks.CRIMSON_WOODEN_BOARD.get(),     new Item.Properties()));
-    public static final Supplier<Item> DARK_OAK_WOODEN_BOARD    = register("dark_oak_wooden_board",    () -> new BlockItem(DNLBlocks.DARK_OAK_WOODEN_BOARD.get(),    new Item.Properties()));
-    public static final Supplier<Item> JUNGLE_WOODEN_BOARD      = register("jungle_wooden_board",      () -> new BlockItem(DNLBlocks.JUNGLE_WOODEN_BOARD.get(),      new Item.Properties()));
-    public static final Supplier<Item> MANGROVE_WOODEN_BOARD    = register("mangrove_wooden_board",    () -> new BlockItem(DNLBlocks.MANGROVE_WOODEN_BOARD.get(),    new Item.Properties()));
-    public static final Supplier<Item> OAK_WOODEN_BOARD         = register("oak_wooden_board",         () -> new BlockItem(DNLBlocks.OAK_WOODEN_BOARD.get(),         new Item.Properties()));
-    public static final Supplier<Item> PALE_OAK_WOODEN_BOARD    = register("pale_oak_wooden_board",    () -> new BlockItem(DNLBlocks.PALE_OAK_WOODEN_BOARD.get(),    new Item.Properties()));
-    public static final Supplier<Item> SPRUCE_WOODEN_BOARD      = register("spruce_wooden_board",      () -> new BlockItem(DNLBlocks.SPRUCE_WOODEN_BOARD.get(),      new Item.Properties()));
-    public static final Supplier<Item> WARPED_WOODEN_BOARD      = register("warped_wooden_board",      () -> new BlockItem(DNLBlocks.WARPED_WOODEN_BOARD.get(),      new Item.Properties()));
 
     // MECHANICAL BLOCKS
     public static final Supplier<Item> DUNGEON_WALL_TORCH = register("dungeon_wall_torch", () -> new BlockItem(DNLBlocks.DUNGEON_WALL_TORCH.get(), new Item.Properties()));
@@ -200,17 +188,6 @@ public class DNLItems {
     public static final Supplier<Item> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> new BlockItem(DNLBlocks.MENDSTONE_CHALK_MARK.get(), new Item.Properties()));
 
     public static final Supplier<Item> BRITTLESTONE = register("brittlestone", () -> new BlockItem(DNLBlocks.BRITTLESTONE.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_BLOCK = register("deepsteel_block", () -> new BlockItem(DNLBlocks.DEEPSTEEL_BLOCK.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FRAME = register("deepsteel_platform_frame", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FLOATING = register("deepsteel_platform_floating", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FLOATING_RAIL = register("deepsteel_platform_floating_rail", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FRAME_TOP = register("deepsteel_platform_frame_top", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL = register("deepsteel_platform_frame_top_rail", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_PLATFORM_SUSPENDED = register("deepsteel_platform_suspended", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_PLATFORM_SUSPENDED_RAIL = register("deepsteel_platform_suspended_rail", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_SLOPED_PLATFORM_FLOATING = register("deepsteel_sloped_platform_floating", () -> new BlockItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL = register("deepsteel_sloped_platform_floating_rail", () -> new BlockItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), new Item.Properties()));
-    public static final Supplier<Item> DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS = register("deepsteel_platform_enclosed_stairs", () -> new BlockItem(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get(), new Item.Properties()));
 
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));

@@ -42,18 +42,6 @@ public class DNLBlocks {
     public static Supplier<Block> PUZZLING_STONE_EMBLEM;
     public static Supplier<Block> POLISHED_STONE;
     public static Supplier<Block> BORDERED_STONE;
-    public static Supplier<Block> ACACIA_WOODEN_BOARD;
-    public static Supplier<Block> BAMBOO_WOODEN_BOARD;
-    public static Supplier<Block> BIRCH_WOODEN_BOARD;
-    public static Supplier<Block> CHERRY_WOODEN_BOARD;
-    public static Supplier<Block> CRIMSON_WOODEN_BOARD;
-    public static Supplier<Block> DARK_OAK_WOODEN_BOARD;
-    public static Supplier<Block> JUNGLE_WOODEN_BOARD;
-    public static Supplier<Block> MANGROVE_WOODEN_BOARD;
-    public static Supplier<Block> OAK_WOODEN_BOARD;
-    public static Supplier<Block> PALE_OAK_WOODEN_BOARD;
-    public static Supplier<Block> SPRUCE_WOODEN_BOARD;
-    public static Supplier<Block> WARPED_WOODEN_BOARD;
 
     public static Supplier<Block> MOSS;
 
@@ -135,25 +123,8 @@ public class DNLBlocks {
     public static Supplier<Block> DUNGEON_DIRECTOR;
     public static Supplier<Block> SPAWN_NODE;
     public static Supplier<Block> BRITTLESTONE;
-    public static Supplier<Block> DEEPSTEEL_BLOCK;
-    public static Supplier<Block> DEEPSTEEL_PLATFORM_FRAME;
-    public static Supplier<Block> DEEPSTEEL_PLATFORM_FLOATING;
-    public static Supplier<Block> DEEPSTEEL_PLATFORM_FLOATING_RAIL;
-    public static Supplier<Block> DEEPSTEEL_PLATFORM_FRAME_TOP;
-    public static Supplier<Block> DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL;
-    public static Supplier<Block> DEEPSTEEL_PLATFORM_SUSPENDED;
-    public static Supplier<Block> DEEPSTEEL_PLATFORM_SUSPENDED_RAIL;
-    public static Supplier<Block> DEEPSTEEL_SLOPED_PLATFORM_FLOATING;
-    public static Supplier<Block> DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL;
-    public static Supplier<Block> DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS;
-    public static Supplier<Block> DEEPSTEEL_MOUNTED_RAIL;
     public static Supplier<Block> SIGNAL_RAIL;
     public static Supplier<Block> CHAINED_RAIL;
-    public static Supplier<Block> DEEPSTEEL_MOUNTED_CHAINED_RAIL;
-    public static Supplier<Block> DEEPSTEEL_MOUNTED_SIGNAL_RAIL;
-    public static Supplier<Block> DEEPSTEEL_MOUNTED_POWERED_RAIL;
-    public static Supplier<Block> DEEPSTEEL_MOUNTED_DETECTOR_RAIL;
-    public static Supplier<Block> DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL;
     public static Supplier<Block> HAZARD_SIGN_BOTTLE;
     public static Supplier<Block> HAZARD_SIGN_BUBBLE;
     public static Supplier<Block> HAZARD_SIGN_CALTROP;
@@ -198,18 +169,6 @@ public class DNLBlocks {
         PUZZLING_STONE_EMBLEM = registerBlock("puzzling_stone_emblem", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         POLISHED_STONE = registerBlock("polished_stone", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
         BORDERED_STONE = registerBlock("bordered_stone", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
-        ACACIA_WOODEN_BOARD = registerBlock("acacia_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        BAMBOO_WOODEN_BOARD = registerBlock("bamboo_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        BIRCH_WOODEN_BOARD = registerBlock("birch_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        CHERRY_WOODEN_BOARD = registerBlock("cherry_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        CRIMSON_WOODEN_BOARD = registerBlock("crimson_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        DARK_OAK_WOODEN_BOARD = registerBlock("dark_oak_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        JUNGLE_WOODEN_BOARD = registerBlock("jungle_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        MANGROVE_WOODEN_BOARD = registerBlock("mangrove_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        OAK_WOODEN_BOARD = registerBlock("oak_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        PALE_OAK_WOODEN_BOARD = registerBlock("pale_oak_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        SPRUCE_WOODEN_BOARD = registerBlock("spruce_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
-        WARPED_WOODEN_BOARD = registerBlock("warped_wooden_board", () -> new WoodenBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0F).ignitedByLava().noOcclusion()));
 
 
         // MECHANICAL BLOCKS
@@ -310,25 +269,8 @@ public class DNLBlocks {
         DUNGEON_DIRECTOR = registerBlock("dungeon_director", () -> new DungeonDirectorBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
 
         BRITTLESTONE = registerBlock("brittlestone", () -> new BrittlestoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0f, 6.0f).noOcclusion()));
-        DEEPSTEEL_BLOCK = registerBlock("deepsteel_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F)));
-        DEEPSTEEL_PLATFORM_FRAME = registerBlock("deepsteel_platform_frame", () -> axisDeepsteelPlatformBlock(deepsteelFrameShape()));
-        DEEPSTEEL_PLATFORM_FLOATING = registerBlock("deepsteel_platform_floating", () -> deepsteelPlatformBlock(deepsteelFloatingShape()));
-        DEEPSTEEL_PLATFORM_FLOATING_RAIL = registerBlock("deepsteel_platform_floating_rail", () -> axisDeepsteelPlatformBlock(deepsteelFloatingRailShape()));
-        DEEPSTEEL_PLATFORM_FRAME_TOP = registerBlock("deepsteel_platform_frame_top", () -> axisDeepsteelPlatformBlock(deepsteelFrameTopShape()));
-        DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL = registerBlock("deepsteel_platform_frame_top_rail", () -> axisDeepsteelPlatformBlock(deepsteelFrameShape()));
-        DEEPSTEEL_PLATFORM_SUSPENDED = registerBlock("deepsteel_platform_suspended", () -> suspendedDeepsteelPlatformBlock(deepsteelFloatingShape()));
-        DEEPSTEEL_PLATFORM_SUSPENDED_RAIL = registerBlock("deepsteel_platform_suspended_rail", () -> suspendedDeepsteelPlatformBlock(deepsteelFloatingRailShape()));
-        DEEPSTEEL_SLOPED_PLATFORM_FLOATING = registerBlock("deepsteel_sloped_platform_floating", () -> directionalDeepsteelPlatformBlock(deepsteelStairsShape()));
-        DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL = registerBlock("deepsteel_sloped_platform_floating_rail", () -> directionalDeepsteelPlatformBlock(deepsteelStairsRailShape()));
-        DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS = registerBlock("deepsteel_platform_enclosed_stairs", () -> directionalDeepsteelPlatformBlock(deepsteelEnclosedStairsShape()));
-        DEEPSTEEL_MOUNTED_RAIL = registerBlock("deepsteel_mounted_rail", () -> new DeepsteelMountedRailBlock(DeepsteelMountedRailBlock.railProperties(), Items.RAIL));
-        DEEPSTEEL_MOUNTED_POWERED_RAIL = registerBlock("deepsteel_mounted_powered_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.railProperties(), Items.POWERED_RAIL));
-        DEEPSTEEL_MOUNTED_DETECTOR_RAIL = registerBlock("deepsteel_mounted_detector_rail", () -> new DeepsteelMountedDetectorRailBlock(DeepsteelMountedRailBlock.railProperties(), Items.DETECTOR_RAIL));
-        DEEPSTEEL_MOUNTED_ACTIVATOR_RAIL = registerBlock("deepsteel_mounted_activator_rail", () -> new DeepsteelMountedPoweredRailBlock(DeepsteelMountedRailBlock.railProperties(), Items.ACTIVATOR_RAIL));
         SIGNAL_RAIL = registerBlock("signal_rail", () -> new SignalRailBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.RAIL)));
         CHAINED_RAIL = registerBlock("chained_rail", () -> new ChainedRailBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.POWERED_RAIL)));
-        DEEPSTEEL_MOUNTED_CHAINED_RAIL = registerBlock("deepsteel_mounted_chained_rail", () -> new DeepsteelMountedChainedRailBlock(DeepsteelMountedRailBlock.railProperties()));
-        DEEPSTEEL_MOUNTED_SIGNAL_RAIL = registerBlock("deepsteel_mounted_signal_rail", () -> new DeepsteelMountedSignalRailBlock(DeepsteelMountedRailBlock.railProperties()));
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
         TEMPLE_OF_DUALITY_TROPHY = registerBlock("temple_of_duality_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
@@ -347,75 +289,6 @@ public class DNLBlocks {
         return registerBlock(name, () -> new WarningSignBlock(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.METAL).strength(1.0F).sound(SoundType.METAL)
                 .requiresCorrectToolForDrops().noOcclusion().pushReaction(PushReaction.DESTROY)));
-    }
-
-    private static Block deepsteelPlatformBlock(VoxelShape shape) {
-        return new DeepsteelStaticPlatformBlock(deepsteelPlatformProperties(), shape);
-    }
-
-    private static Block directionalDeepsteelPlatformBlock(VoxelShape shape) {
-        return new DeepsteelPlatformBlock(deepsteelPlatformProperties(), shape, DeepsteelPlatformBlock.ShapeRotation.FULL);
-    }
-
-    private static Block axisDeepsteelPlatformBlock(VoxelShape shape) {
-        return new DeepsteelPlatformBlock(deepsteelPlatformProperties(), shape, DeepsteelPlatformBlock.ShapeRotation.AXIS);
-    }
-
-    private static Block suspendedDeepsteelPlatformBlock(VoxelShape shape) {
-        return new DeepsteelSuspendedPlatformBlock(deepsteelPlatformProperties(), shape);
-    }
-
-    private static BlockBehaviour.Properties deepsteelPlatformProperties() {
-        return BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.5F, 1200.0F).noOcclusion();
-    }
-
-    private static VoxelShape deepsteelFrameShape() {
-        return Shapes.or(
-                Block.box(0, 0, 0, 2, 16, 16),
-                Block.box(14, 0, 0, 16, 16, 16)
-        );
-    }
-
-    private static VoxelShape deepsteelFloatingShape() {
-        return Block.box(0, 13, 0, 16, 16, 16);
-    }
-
-    private static VoxelShape deepsteelFloatingRailShape() {
-        return Shapes.or(
-                Block.box(0, 13, 0, 2, 16, 16),
-                Block.box(14, 13, 0, 16, 16, 16)
-        );
-    }
-
-    private static VoxelShape deepsteelFrameTopShape() {
-        return Shapes.or(
-                Block.box(0, 0, 0, 2, 13, 16),
-                Block.box(14, 0, 0, 16, 13, 16),
-                Block.box(0, 13, 0, 16, 16, 16)
-        );
-    }
-
-    private static VoxelShape deepsteelStairsShape() {
-        return Shapes.or(
-                Block.box(0, 0, 0, 16, 8, 8),
-                Block.box(0, 8, 8, 16, 16, 16)
-        );
-    }
-
-    private static VoxelShape deepsteelEnclosedStairsShape() {
-        return Shapes.or(
-                deepsteelStairsShape(),
-                deepsteelFrameShape()
-        );
-    }
-
-    private static VoxelShape deepsteelStairsRailShape() {
-        return Shapes.or(
-                Block.box(0, 0, 0, 2, 8, 8),
-                Block.box(14, 0, 0, 16, 8, 8),
-                Block.box(0, 8, 8, 2, 16, 16),
-                Block.box(14, 8, 8, 16, 16, 16)
-        );
     }
 
     private static int laneLight(BlockState blockState) {

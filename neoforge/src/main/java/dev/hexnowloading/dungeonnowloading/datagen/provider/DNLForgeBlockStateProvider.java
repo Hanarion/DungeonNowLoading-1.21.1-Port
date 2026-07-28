@@ -57,17 +57,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.SPAWN_NODE.get());
         anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(BuiltInRegistries.BLOCK.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
         simpleBlockWithItem(DNLBlocks.BRITTLESTONE.get());
-        simpleBlockWithItem(DNLBlocks.DEEPSTEEL_BLOCK.get());
-        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME.get(), "deepsteel_shaft");
-        waterloggedExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING.get(), "deepsteel_hanging_platform");
-        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get(), "deepsteel_hanging_rail");
-        deepsteelShaftPlatform(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP.get());
-        axisHorizontalExistingModelWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get(), "deepsteel_shaft_rail");
-        axisHorizontalDirectionalExistingModelsWithItem(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED.get(), "deepsteel_braced_platform");
-        deepsteelBracedRail(DNLBlocks.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get());
-        horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get(), "deepsteel_stairs");
-        horizontalExistingModelRotated180WithItem(DNLBlocks.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get(), "deepsteel_slope");
-        deepsteelPlatformEnclosedStairs(DNLBlocks.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
 
         dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());
@@ -90,18 +79,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         facingSixWayWithExistingModel(DNLBlocks.LARGE_DURITE_BUD.get(), "large_durite_bud");
         facingSixWayWithExistingModel(DNLBlocks.MEDIUM_DURITE_BUD.get(), "medium_durite_bud");
         facingSixWayWithExistingModel(DNLBlocks.SMALL_DURITE_BUD.get(), "small_durite_bud");
-        woodenBoard(DNLBlocks.ACACIA_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.BAMBOO_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.BIRCH_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.CHERRY_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.CRIMSON_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.DARK_OAK_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.JUNGLE_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.MANGROVE_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.OAK_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.PALE_OAK_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.SPRUCE_WOODEN_BOARD.get());
-        woodenBoard(DNLBlocks.WARPED_WOODEN_BOARD.get());
         generateMendstoneChalkMarkModels((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK_MARK.get(), MendstoneChalkMarkBlock.OUTLINE);
         //faceBlockWithItem((MendstoneChalkMarkBlock) DNLBlocks.MENDSTONE_CHALK_MARK.get(), DNLItems.MENDSTONE_CHALK.get());
 
@@ -1196,66 +1173,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, mf);
     }
 
-    private void deepsteelPlatformEnclosedStairs(Block block) {
-        ModelFile model = models().getExistingFile(modLoc("block/deepsteel_platform_enclosed_stairs"));
-
-        getVariantBuilder(block).forAllStates(state -> {
-            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
-            int rotationY = ((int) direction.toYRot() + 180) % 360;
-            return ConfiguredModel.builder()
-                    .modelFile(model)
-                    .rotationY(rotationY)
-                    .build();
-        });
-        simpleBlockItem(block, model);
-    }
-
-    private void deepsteelBracedRail(Block block) {
-        ModelFile north = models().getExistingFile(modLoc("block/deepsteel_braced_rail_north"));
-        ModelFile east = models().getExistingFile(modLoc("block/deepsteel_braced_rail_east"));
-        ModelFile south = models().getExistingFile(modLoc("block/deepsteel_braced_rail_south"));
-        ModelFile west = models().getExistingFile(modLoc("block/deepsteel_braced_rail_west"));
-
-        getVariantBuilder(block).forAllStates(state -> {
-            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
-            ModelFile model = switch (direction) {
-                case NORTH -> north;
-                case EAST -> east;
-                case WEST -> west;
-                default -> south;
-            };
-            int rotationY = ((int) direction.toYRot() + 180) % 360;
-            return ConfiguredModel.builder()
-                    .modelFile(model)
-                    .rotationY(rotationY)
-                    .build();
-        });
-        simpleBlockItem(block, south);
-    }
-
-    private void deepsteelShaftPlatform(Block block) {
-        ModelFile north = models().getExistingFile(modLoc("block/deepsteel_shaft_platform_north"));
-        ModelFile east = models().getExistingFile(modLoc("block/deepsteel_shaft_platform_east"));
-        ModelFile south = models().getExistingFile(modLoc("block/deepsteel_shaft_platform_south"));
-        ModelFile west = models().getExistingFile(modLoc("block/deepsteel_shaft_platform_west"));
-
-        getVariantBuilder(block).forAllStates(state -> {
-            Direction direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
-            ModelFile model = switch (direction) {
-                case NORTH -> north;
-                case EAST -> east;
-                case WEST -> west;
-                default -> south;
-            };
-            int rotationY = ((int) direction.toYRot() + 180) % 360;
-            return ConfiguredModel.builder()
-                    .modelFile(model)
-                    .rotationY(rotationY)
-                    .build();
-        });
-        simpleBlockItem(block, south);
-    }
-
     private void axisHorizontalModelFromParent(Block block, String parentModelName, String textureKey, ResourceLocation blockTexture) {
         String n = name(block);
 
@@ -1296,31 +1213,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
             // Fallback to the block model
             simpleBlockItem(block, mf);
         }
-    }
-
-    private void woodenBoard(Block block) {
-        String blockName = name(block);
-        ResourceLocation texture = modLoc("block/" + blockName);
-        Map<WoodenBoardBlock.Variant, ModelFile> variantModels = Map.of(
-                WoodenBoardBlock.Variant.SINGLE, woodenBoardModel(blockName, "single", "3", texture),
-                WoodenBoardBlock.Variant.LEFT, woodenBoardModel(blockName, "right", "2", texture),
-                WoodenBoardBlock.Variant.MIDDLE, woodenBoardModel(blockName, "middle", "2", texture),
-                WoodenBoardBlock.Variant.RIGHT, woodenBoardModel(blockName, "left", "3", texture)
-        );
-
-        getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
-                .modelFile(variantModels.get(state.getValue(WoodenBoardBlock.VARIANT)))
-                .rotationY(((int) state.getValue(WoodenBoardBlock.FACING).toYRot() + 180) % 360)
-                .build());
-
-        itemModels().withExistingParent(blockName, mcLoc("item/generated"))
-                .texture("layer0", modLoc("item/" + blockName));
-    }
-
-    private ModelFile woodenBoardModel(String blockName, String variant, String textureKey, ResourceLocation texture) {
-        return models().withExistingParent(blockName + "_" + variant, modLoc("block/wooden_board_" + variant))
-                .texture(textureKey, texture)
-                .texture("particle", texture);
     }
     private void dungeonDirectorBlock(Block block) {
         ModelFile normal = models()

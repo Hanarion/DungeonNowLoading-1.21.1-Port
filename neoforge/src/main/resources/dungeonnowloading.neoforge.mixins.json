@@ -13,8 +13,6 @@
       "block.LecternBlockMixin",
       "block.PistonBlockMixin",
       "block.BaseRailBlockMixin",
-      "block.PoweredRailBlockMixin",
-      "block.RailStateMixin",
       "block.StairsMixin",
       "block.FenceMixin",
       "block.WallMixin",

@@ -104,18 +104,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.POLISHED_STONE.get());
                 output.accept(DNLItems.BORDERED_STONE.get());
                 output.accept(DNLItems.MOSS.get());
-                output.accept(DNLItems.ACACIA_WOODEN_BOARD.get());
-                output.accept(DNLItems.BAMBOO_WOODEN_BOARD.get());
-                output.accept(DNLItems.BIRCH_WOODEN_BOARD.get());
-                output.accept(DNLItems.CHERRY_WOODEN_BOARD.get());
-                output.accept(DNLItems.CRIMSON_WOODEN_BOARD.get());
-                output.accept(DNLItems.DARK_OAK_WOODEN_BOARD.get());
-                output.accept(DNLItems.JUNGLE_WOODEN_BOARD.get());
-                output.accept(DNLItems.MANGROVE_WOODEN_BOARD.get());
-                output.accept(DNLItems.OAK_WOODEN_BOARD.get());
-                output.accept(DNLItems.PALE_OAK_WOODEN_BOARD.get());
-                output.accept(DNLItems.SPRUCE_WOODEN_BOARD.get());
-                output.accept(DNLItems.WARPED_WOODEN_BOARD.get());
                 output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_MAGENTA.get());
                 output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_BLACK.get());
                 output.accept(DNLItems.DUNGEON_BANNER_SPAWNER_BLUE.get());
@@ -211,17 +199,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.ZONE_WAND.get());
 
                 output.accept(DNLItems.BRITTLESTONE.get());
-                output.accept(DNLItems.DEEPSTEEL_BLOCK.get());
-                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FRAME.get());
-                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FLOATING.get());
-                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FLOATING_RAIL.get());
-                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FRAME_TOP.get());
-                output.accept(DNLItems.DEEPSTEEL_PLATFORM_FRAME_TOP_RAIL.get());
-                output.accept(DNLItems.DEEPSTEEL_PLATFORM_SUSPENDED.get());
-                output.accept(DNLItems.DEEPSTEEL_PLATFORM_SUSPENDED_RAIL.get());
-                output.accept(DNLItems.DEEPSTEEL_SLOPED_PLATFORM_FLOATING.get());
-                output.accept(DNLItems.DEEPSTEEL_SLOPED_PLATFORM_FLOATING_RAIL.get());
-                output.accept(DNLItems.DEEPSTEEL_PLATFORM_ENCLOSED_STAIRS.get());
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());
