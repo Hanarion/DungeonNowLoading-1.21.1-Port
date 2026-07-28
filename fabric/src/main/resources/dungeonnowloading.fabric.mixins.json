@@ -7,9 +7,6 @@
   "mixins": [
     "ServerLevelMixin",
     "block.BlockDestroyCancelMixin",
-    "block.MimiclingBlockSmeltTransformMixin",
-    "block.MimiclingBlockDropsMixin",
-    "block.MimiclingReachServerGameModeMixin",
     "block.ExplosionMixin",
     "block.BlockBehaviourExplosionMixin",
     "block.ContainerMixin",
@@ -27,9 +24,6 @@
 
     "items.ItemStackBreakProtectionMixin",
     "entities.EntityAvoidBlockMixin",
-    "entities.MimiclingLivingEntityMixin",
-    "entities.MimiclingPlayerMixin",
-    "entities.MimiclingReachServerPacketMixin",
     "entities.ServerPlayerMixin",
     "entities.SummonCommandMixin",
     "entities.AbstractMinecartMixin",
@@ -44,14 +38,11 @@
     "structures.StructureProcessorAccessor",
     "structures.StructureTemplateMixin",
     "structures.NoGeodesInStructuresMixin",
-    "inventory.AbstractContainerMenuMixin",
     "inventory.AnvilMenuMixin"
   ],
   "client": [
     "client.ClientPacketListenerMixin",
     "client.HumanoidModelMixin",
-    "client.AbstractContainerScreenMixin",
-    "client.CreativeModeInventoryScreenMixin",
     "client.ClientTooltipComponentMixin",
     "client.ClientPacketListenerMixin",
     "client.InstantRepairOverlayLevelRendererMixin",
@@ -63,8 +54,6 @@
     "client.MusicManagerMixin",
     "client.LivingEntityRendererMixin",
     "client.ModelManagerAccessor",
-    "client.MimiclingEnderEyeOutlineMixin",
-    "client.MimiclingReachGameRendererMixin",
     "MixinMinecraft",
     "MaxHealthAttributeMixin",
     "items.ItemInHandRendererMixin",

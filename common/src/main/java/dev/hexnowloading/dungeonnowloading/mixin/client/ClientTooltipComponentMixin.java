@@ -1,7 +1,5 @@
 package dev.hexnowloading.dungeonnowloading.mixin.client;
 
-import dev.hexnowloading.dungeonnowloading.client.tooltip.ClientMimiclingTooltip;
-import dev.hexnowloading.dungeonnowloading.item.MimiclingTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientActivePlayersTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientBundleTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -14,7 +12,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 public interface ClientTooltipComponentMixin {
     /**
      * @author HexNowLoading
-     * Add the mimicling tooltip component to vanilla's tooltip component factory.
+     * Route unknown tooltip components through the platform tooltip-component manager.
      *
      * This mirrors vanilla's create(TooltipComponent) instead of replacing it wholesale: unknown
      * components are delegated to the platform's tooltip-component manager (NeoForge:
@@ -24,9 +22,6 @@ public interface ClientTooltipComponentMixin {
      */
     @Overwrite
     static ClientTooltipComponent create(TooltipComponent tooltipComponent) {
-        if (tooltipComponent instanceof MimiclingTooltip mimiclingTooltip) {
-            return new ClientMimiclingTooltip(mimiclingTooltip);
-        }
         if (tooltipComponent instanceof BundleTooltip bundleTooltip) {
             return new ClientBundleTooltip(bundleTooltip.contents());
         }

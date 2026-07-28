@@ -3,7 +3,6 @@ package dev.hexnowloading.dungeonnowloading.registry;
 import dev.hexnowloading.dungeonnowloading.DungeonNowLoading;
 import dev.hexnowloading.dungeonnowloading.entity.boss.*;
 import dev.hexnowloading.dungeonnowloading.entity.misc.GreatExperienceBottleEntity;
-import dev.hexnowloading.dungeonnowloading.entity.misc.MimiclingFallingBlockEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.RepulsorEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SeepingSoulEntity;
 import dev.hexnowloading.dungeonnowloading.entity.misc.SpecialItemEntity;
@@ -63,7 +62,6 @@ public class DNLEntityTypes {
     public static final Supplier<EntityType<GreatExperienceBottleEntity>> GREAT_EXPERIENCE_BOTTLE = register("great_experience_bottle", () -> EntityType.Builder.<GreatExperienceBottleEntity>of(GreatExperienceBottleEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).build(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "great_experience_bottle").toString()));
     public static final Supplier<EntityType<RepulsorEntity>> REPULSOR = register("repulsor", () -> EntityType.Builder.<RepulsorEntity>of(RepulsorEntity::new, MobCategory.MISC).sized(0.99F, 0.3F).build(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "command_pylon").toString()));
     public static final Supplier<EntityType<SeepingSoulEntity>> SEEPING_SOUL = register("seeping_soul", () -> EntityType.Builder.<SeepingSoulEntity>of(SeepingSoulEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).build(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "seeping_soul").toString()));
-    public static final Supplier<EntityType<MimiclingFallingBlockEntity>> MIMICLING_FALLING_BLOCK = register("mimicling_falling_block", () -> EntityType.Builder.<MimiclingFallingBlockEntity>of(MimiclingFallingBlockEntity::new, MobCategory.MISC).sized(0.98F, 0.98F).clientTrackingRange(10).updateInterval(20).build(ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_falling_block").toString()));
 
     private static <T extends EntityType<?>> Supplier<T> register(String name, Supplier<T> entityTypeSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ENTITY_TYPE, name, entityTypeSupplier);

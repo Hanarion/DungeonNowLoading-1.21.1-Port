@@ -6,9 +6,6 @@
     "mixins": [
       "ServerLevelMixin",
       "block.BlockDestroyCancelMixin",
-      "block.MimiclingBlockSmeltTransformMixin",
-      "block.MimiclingBlockDropsMixin",
-      "block.MimiclingReachServerGameModeMixin",
       "block.EnchantmentHelperMixin",
       "block.ExplosionMixin",
       "block.BlockBehaviourExplosionMixin",
@@ -24,9 +21,6 @@
       "block.IronBarsMixin",
       "items.ItemInHandRendererMixin",
       "entities.EntityAvoidBlockMixin",
-      "entities.MimiclingLivingEntityMixin",
-      "entities.MimiclingPlayerMixin",
-      "entities.MimiclingReachServerPacketMixin",
       "entities.ServerPlayerMixin",
       "entities.PlayerMixin",
       "entities.MobMixin",
@@ -42,7 +36,6 @@
       "forge.block.DNLFireBlockMixin",
       "forge.structures.StructurePoolMixin",
       "forge.item.ItemStackNeoForgeBreakProtectionMixin",
-      "inventory.AbstractContainerMenuMixin",
       "inventory.AnvilMenuMixin"
     ],
     "client": [
@@ -53,8 +46,6 @@
       "forge.blockentities.PlayerStatueBlockItemMixin",
       "forge.item.ScorcherItemMixin",
       "client.HumanoidModelMixin",
-      "client.AbstractContainerScreenMixin",
-      "client.CreativeModeInventoryScreenMixin",
       "client.ClientTooltipComponentMixin",
       "client.PlayerRendererMixin",
       "client.ClientPacketListenerMixin",
@@ -66,8 +57,6 @@
       "client.MusicManagerMixin",
       "client.ModelManagerAccessor",
       "client.LivingEntityRendererMixin",
-      "client.MimiclingEnderEyeOutlineMixin",
-      "client.MimiclingReachGameRendererMixin",
       "MixinMinecraft",
       "MixinTitleScreen",
       "MaxHealthAttributeMixin"

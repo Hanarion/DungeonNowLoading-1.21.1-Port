@@ -26,10 +26,6 @@ public final class ItemStackBreakProtectionHandler {
 
     public static void handleBreak(ItemStack self, ServerLevel serverLevel, ServerPlayer player, Consumer<Item> onBroken, CallbackInfo ci) {
         if (!self.isDamageableItem()) return;
-        if (MimiclingItem.tryTransformBrokenToolFormToBase(self, player)) {
-            ci.cancel();
-            return;
-        }
 
         // Only intercept if the item has our Break Protection enchantment
         if (EnchantmentHelper.getItemEnchantmentLevel(DNLEnchantments.holder(serverLevel, DNLEnchantments.BREAK_PROTECTION), self) <= 0) return;

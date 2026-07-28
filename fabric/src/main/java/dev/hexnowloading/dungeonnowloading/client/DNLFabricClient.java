@@ -13,7 +13,6 @@ import dev.hexnowloading.dungeonnowloading.entity.client.model.seeping_soul.Seep
 import dev.hexnowloading.dungeonnowloading.entity.client.model.seeping_soul.SeepingSoulSerpentCallerModel;
 import dev.hexnowloading.dungeonnowloading.entity.client.renderer.*;
 import dev.hexnowloading.dungeonnowloading.item.CopperDetonatorItem;
-import dev.hexnowloading.dungeonnowloading.item.MimiclingItem;
 import dev.hexnowloading.dungeonnowloading.item.RepulsorItem;
 import dev.hexnowloading.dungeonnowloading.item.client.model.ScorcherModel;
 import dev.hexnowloading.dungeonnowloading.item.client.renderer.PlayerStatueItemRenderer;
@@ -220,7 +219,6 @@ public class DNLFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(DNLEntityTypes.GREAT_EXPERIENCE_BOTTLE.get(), (context) -> new ThrownItemRenderer<>(context, 1.25F, false));
         EntityRendererRegistry.register(DNLEntityTypes.REPULSOR.get(), RepulsorRenderer::new);
         EntityRendererRegistry.register(DNLEntityTypes.SEEPING_SOUL.get(), SeepingSoulRenderer::new);
-        EntityRendererRegistry.register(DNLEntityTypes.MIMICLING_FALLING_BLOCK.get(), MimiclingFallingBlockRenderer::new);
         // Block Entities
         BlockEntityRenderers.register(DNLBlockEntityTypes.FAIRKEEPER_CHEST.get(), FairkeeperChestBlockRenderer::new);
         BlockEntityRenderers.register(DNLBlockEntityTypes.DISABLED_FAIRKEEPER_CHEST.get(), DisabledFairkeeperChestBlockRenderer::new);
@@ -248,42 +246,6 @@ public class DNLFabricClient implements ClientModInitializer {
 
         ItemProperties.register(DNLItems.REPULSOR.get(), ResourceLocation.parse("golden_mode"),
                 (stack, level, entity, seed) -> RepulsorItem.isGoldenMode(stack) ? 1.0F : 0.0F);
-
-        for (Item mimiclingItem : getMimiclingItems()) {
-            for (int frame = 0; frame < 15; frame++) {
-                int currentFrame = frame;
-                ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_chewing_frame_" + currentFrame),
-                        (stack, level, entity, seed) -> MimiclingItem.isChewingFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
-            }
-
-            for (int frame = 0; frame < 3; frame++) {
-                int currentFrame = frame;
-                ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_open_frame_" + currentFrame),
-                        (stack, level, entity, seed) -> MimiclingFeedHintHandler.isOpenFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, currentFrame) ? 1.0F : 0.0F);
-            }
-
-            String[] mimiclingForms = {"base", "pickaxe", "axe", "shovel", "hoe", "sword"};
-            int[] mimiclingFrameCounts = {10, 9, 9, 8, 8, 8};
-            for (int formIndex = 0; formIndex < mimiclingForms.length; formIndex++) {
-                String form = mimiclingForms[formIndex];
-                int frameCount = mimiclingFrameCounts[formIndex];
-                ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_form_" + form),
-                        (stack, level, entity, seed) -> MimiclingItem.isForm(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, form) ? 1.0F : 0.0F);
-
-                for (int frame = 0; frame < frameCount; frame++) {
-                    int currentFrame = frame;
-                    ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mimicling_" + form + "_frame_" + currentFrame),
-                            (stack, level, entity, seed) -> MimiclingItem.isTransitionFrame(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L, form, currentFrame, frameCount) ? 1.0F : 0.0F);
-                }
-            }
-
-            ItemProperties.register(mimiclingItem, ResourceLocation.fromNamespaceAndPath(DungeonNowLoading.MOD_ID, "mucus"),
-                    (stack, level, entity, seed) -> MimiclingItem.isMucus(stack, level != null ? level.getGameTime() : entity != null ? entity.level().getGameTime() : Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L) ? 1.0F : 0.0F);
-        }
-    }
-
-    private static Item[] getMimiclingItems() {
-        return DNLItems.getMimiclingItems();
     }
 
     private void registerModelLayers() {
@@ -349,7 +311,6 @@ public class DNLFabricClient implements ClientModInitializer {
         registry.register(DNLParticleTypes.MENDING_FADE_PARTICLE.get(), MendingFadeParticle.Factory::new);
         registry.register(DNLParticleTypes.MENDING_POP_PARTICLE.get(), MendingPopParticle.Factory::new);
         registry.register(DNLParticleTypes.SNIFFER_TRAIL_PARTICLE.get(), SnifferTrailParticle.Factory::new);
-        registry.register(DNLParticleTypes.MIMICLING_IMPACT_BLOCK_PARTICLE.get(), new MimiclingImpactBlockParticle.Factory());
     }
 
     private static void addDnlEnchantmentDescriptions(ItemStack stack, List<Component> lines) {
