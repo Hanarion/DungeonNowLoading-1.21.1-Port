@@ -62,7 +62,6 @@ public class DNLFabricClient implements ClientModInitializer {
         registerRenderers();
         registerParticleFactories();
         MendstonePickaxeParticleHandlerFabric.register();
-        ClientTickEvents.END_CLIENT_TICK.register(SignalRailInputHandler::handleClientTick);
 
         ItemTooltipCallback.EVENT.register((stack, tooltipContext, tooltipFlag, lines) -> addDnlEnchantmentDescriptions(stack, lines));
     }
@@ -107,15 +106,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_EDGE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAOS_SPAWNER_BROKEN_EDGE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPIKES.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(),
-                DNLBlocks.HAZARD_SIGN_BOTTLE.get(), DNLBlocks.HAZARD_SIGN_BUBBLE.get(),
-                DNLBlocks.HAZARD_SIGN_CALTROP.get(), DNLBlocks.HAZARD_SIGN_DOWN.get(),
-                DNLBlocks.HAZARD_SIGN_EXCLAMATION.get(), DNLBlocks.HAZARD_SIGN_FIRE.get(),
-                DNLBlocks.HAZARD_SIGN_ICE.get(), DNLBlocks.HAZARD_SIGN_LEFT.get(),
-                DNLBlocks.HAZARD_SIGN_MONSTER.get(), DNLBlocks.HAZARD_SIGN_PICKAXE.get(),
-                DNLBlocks.HAZARD_SIGN_RIGHT.get(), DNLBlocks.HAZARD_SIGN_SOUND.get(),
-                DNLBlocks.HAZARD_SIGN_SPIKES.get(), DNLBlocks.HAZARD_SIGN_SPIRAL.get(),
-                DNLBlocks.HAZARD_SIGN_SWORD.get(), DNLBlocks.HAZARD_SIGN_UP.get());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MOSS.get(), RenderType.translucent());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.FAIRKEEPER_CHEST.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.WISE_FAIRKEEPER_CHEST.get(), RenderType.cutout());
@@ -134,8 +124,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDSTONE_CHALK_MARK.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SIGNAL_RAIL.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAINED_RAIL.get(), RenderType.cutout());
     }
 
     private void registerModelModifiers() {

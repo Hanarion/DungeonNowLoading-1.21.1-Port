@@ -121,24 +121,6 @@ public class DNLBlocks {
     public static Supplier<Block> DURITE_QUELLER;
     public static Supplier<Block> DUNGEON_DIRECTOR;
     public static Supplier<Block> SPAWN_NODE;
-    public static Supplier<Block> SIGNAL_RAIL;
-    public static Supplier<Block> CHAINED_RAIL;
-    public static Supplier<Block> HAZARD_SIGN_BOTTLE;
-    public static Supplier<Block> HAZARD_SIGN_BUBBLE;
-    public static Supplier<Block> HAZARD_SIGN_CALTROP;
-    public static Supplier<Block> HAZARD_SIGN_DOWN;
-    public static Supplier<Block> HAZARD_SIGN_EXCLAMATION;
-    public static Supplier<Block> HAZARD_SIGN_FIRE;
-    public static Supplier<Block> HAZARD_SIGN_ICE;
-    public static Supplier<Block> HAZARD_SIGN_LEFT;
-    public static Supplier<Block> HAZARD_SIGN_MONSTER;
-    public static Supplier<Block> HAZARD_SIGN_PICKAXE;
-    public static Supplier<Block> HAZARD_SIGN_RIGHT;
-    public static Supplier<Block> HAZARD_SIGN_SOUND;
-    public static Supplier<Block> HAZARD_SIGN_SPIKES;
-    public static Supplier<Block> HAZARD_SIGN_SPIRAL;
-    public static Supplier<Block> HAZARD_SIGN_SWORD;
-    public static Supplier<Block> HAZARD_SIGN_UP;
 
     // Trophies
     public static Supplier<Block> LABYRINTH_TROPHY;// = registerBlock("labyrinth_trophy", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).pushReaction(PushReaction.DESTROY)));
@@ -182,22 +164,6 @@ public class DNLBlocks {
         WOODEN_WALL_RACK = registerBlock("wooden_wall_rack", () -> new WallRackBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(3.0F).noOcclusion().ignitedByLava()));
         WOODEN_WALL_PLATFORM = registerBlock("wooden_wall_platform", () -> new WallPlatformBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(3.0F).noOcclusion().ignitedByLava()));
         SPIKES = registerBlock("spikes", () -> new SpikesBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL).pushReaction(PushReaction.DESTROY).noLootTable()));
-        HAZARD_SIGN_BOTTLE = warningSign("hazard_sign_bottle");
-        HAZARD_SIGN_BUBBLE = warningSign("hazard_sign_bubble");
-        HAZARD_SIGN_CALTROP = warningSign("hazard_sign_caltrop");
-        HAZARD_SIGN_DOWN = warningSign("hazard_sign_down");
-        HAZARD_SIGN_EXCLAMATION = warningSign("hazard_sign_exclamation");
-        HAZARD_SIGN_FIRE = warningSign("hazard_sign_fire");
-        HAZARD_SIGN_ICE = warningSign("hazard_sign_ice");
-        HAZARD_SIGN_LEFT = warningSign("hazard_sign_left");
-        HAZARD_SIGN_MONSTER = warningSign("hazard_sign_monster");
-        HAZARD_SIGN_PICKAXE = warningSign("hazard_sign_pickaxe");
-        HAZARD_SIGN_RIGHT = warningSign("hazard_sign_right");
-        HAZARD_SIGN_SOUND = warningSign("hazard_sign_sound");
-        HAZARD_SIGN_SPIKES = warningSign("hazard_sign_spikes");
-        HAZARD_SIGN_SPIRAL = warningSign("hazard_sign_spiral");
-        HAZARD_SIGN_SWORD = warningSign("hazard_sign_sword");
-        HAZARD_SIGN_UP = warningSign("hazard_sign_up");
         DUNGEON_WALL_TORCH = registerBlock("dungeon_wall_torch", () -> new DungeonWallTorch(BlockBehaviour.Properties.of().noCollission().instabreak().lightLevel(DungeonWallTorch.LIGHT_EMISSION).sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY)));
         DUNGEON_BANNER_SPAWNER_MAGENTA = registerBlock("dungeon_banner_spawner_magenta", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SPAWNER_MAGENTA, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
         DUNGEON_BANNER_SPAWNER_BLACK = registerBlock("dungeon_banner_spawner_black", () -> new DungeonBannerBlock(DungeonBannerBlock.DungeonBannerVariant.SPAWNER_BLACK, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0f).sound(SoundType.WOOD).ignitedByLava()));
@@ -265,8 +231,6 @@ public class DNLBlocks {
         SPAWN_NODE = registerBlock("spawn_node", () -> new SpawnNodeBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
         DUNGEON_DIRECTOR = registerBlock("dungeon_director", () -> new DungeonDirectorBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
 
-        SIGNAL_RAIL = registerBlock("signal_rail", () -> new SignalRailBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.RAIL)));
-        CHAINED_RAIL = registerBlock("chained_rail", () -> new ChainedRailBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.POWERED_RAIL)));
         // Trophies
         LABYRINTH_TROPHY = registerBlock("labyrinth_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
         TEMPLE_OF_DUALITY_TROPHY = registerBlock("temple_of_duality_trophy", () -> new TrophyBlock(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.CUSTOM_HEAD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY)));
@@ -279,12 +243,6 @@ public class DNLBlocks {
 
     public static <T extends Block> Supplier<T> registerBlock(String name, Supplier<T> blockSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.BLOCK, name, blockSupplier);
-    }
-
-    private static Supplier<Block> warningSign(String name) {
-        return registerBlock(name, () -> new WarningSignBlock(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.METAL).strength(1.0F).sound(SoundType.METAL)
-                .requiresCorrectToolForDrops().noOcclusion().pushReaction(PushReaction.DESTROY)));
     }
 
     private static int laneLight(BlockState blockState) {

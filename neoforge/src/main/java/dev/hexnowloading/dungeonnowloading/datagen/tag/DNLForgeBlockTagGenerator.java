@@ -71,8 +71,6 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.DIAMOND_STONE_NOTCH.get(),
                 DNLBlocks.NETHERITE_STONE_NOTCH.get(),
                 DNLBlocks.SIGNAL_GATE.get(),
-                DNLBlocks.SIGNAL_RAIL.get(),
-                DNLBlocks.CHAINED_RAIL.get(),
                 DNLBlocks.SCUTTLE_STATUE.get(),
                 DNLBlocks.BALLISTA_GOLEM_STATUE.get(),
                 DNLBlocks.BALLISTA_GOLEM_STATUE_PART.get(),
@@ -86,11 +84,6 @@ public class DNLForgeBlockTagGenerator extends BlockTagsProvider {
                 DNLBlocks.MEDIUM_DURITE_BUD.get(),
                 DNLBlocks.LARGE_DURITE_BUD.get(),
                 DNLBlocks.DURITE_QUELLER.get()
-        );
-
-        this.tag(BlockTags.RAILS).add(
-                DNLBlocks.SIGNAL_RAIL.get(),
-                DNLBlocks.CHAINED_RAIL.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_AXE).add(

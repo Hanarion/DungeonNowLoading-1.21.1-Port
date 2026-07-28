@@ -101,22 +101,6 @@ public class DNLItems {
     public static final Supplier<Item> WOODEN_WALL_PLATFORM = register("wooden_wall_platform", () -> new BlockItem(DNLBlocks.WOODEN_WALL_PLATFORM.get(), new Item.Properties()));
 
     public static final Supplier<Item> SPIKES = register("spikes", () -> new BlockItem(DNLBlocks.SPIKES.get(), new Item.Properties()));
-    public static final Supplier<Item> HAZARD_SIGN_BOTTLE = warningSign("hazard_sign_bottle", DNLBlocks.HAZARD_SIGN_BOTTLE);
-    public static final Supplier<Item> HAZARD_SIGN_BUBBLE = warningSign("hazard_sign_bubble", DNLBlocks.HAZARD_SIGN_BUBBLE);
-    public static final Supplier<Item> HAZARD_SIGN_CALTROP = warningSign("hazard_sign_caltrop", DNLBlocks.HAZARD_SIGN_CALTROP);
-    public static final Supplier<Item> HAZARD_SIGN_DOWN = warningSign("hazard_sign_down", DNLBlocks.HAZARD_SIGN_DOWN);
-    public static final Supplier<Item> HAZARD_SIGN_EXCLAMATION = warningSign("hazard_sign_exclamation", DNLBlocks.HAZARD_SIGN_EXCLAMATION);
-    public static final Supplier<Item> HAZARD_SIGN_FIRE = warningSign("hazard_sign_fire", DNLBlocks.HAZARD_SIGN_FIRE);
-    public static final Supplier<Item> HAZARD_SIGN_ICE = warningSign("hazard_sign_ice", DNLBlocks.HAZARD_SIGN_ICE);
-    public static final Supplier<Item> HAZARD_SIGN_LEFT = warningSign("hazard_sign_left", DNLBlocks.HAZARD_SIGN_LEFT);
-    public static final Supplier<Item> HAZARD_SIGN_MONSTER = warningSign("hazard_sign_monster", DNLBlocks.HAZARD_SIGN_MONSTER);
-    public static final Supplier<Item> HAZARD_SIGN_PICKAXE = warningSign("hazard_sign_pickaxe", DNLBlocks.HAZARD_SIGN_PICKAXE);
-    public static final Supplier<Item> HAZARD_SIGN_RIGHT = warningSign("hazard_sign_right", DNLBlocks.HAZARD_SIGN_RIGHT);
-    public static final Supplier<Item> HAZARD_SIGN_SOUND = warningSign("hazard_sign_sound", DNLBlocks.HAZARD_SIGN_SOUND);
-    public static final Supplier<Item> HAZARD_SIGN_SPIKES = warningSign("hazard_sign_spikes", DNLBlocks.HAZARD_SIGN_SPIKES);
-    public static final Supplier<Item> HAZARD_SIGN_SPIRAL = warningSign("hazard_sign_spiral", DNLBlocks.HAZARD_SIGN_SPIRAL);
-    public static final Supplier<Item> HAZARD_SIGN_SWORD = warningSign("hazard_sign_sword", DNLBlocks.HAZARD_SIGN_SWORD);
-    public static final Supplier<Item> HAZARD_SIGN_UP = warningSign("hazard_sign_up", DNLBlocks.HAZARD_SIGN_UP);
 
     public static final Supplier<Item> CHAOS_SPAWNER_EDGE = register("chaos_spawner_edge", () -> new BlockItem(DNLBlocks.CHAOS_SPAWNER_EDGE.get(), new Item.Properties()));
     public static final Supplier<Item> CHAOS_SPAWNER_DIAMOND_EDGE = register("chaos_spawner_diamond_edge", () -> new BlockItem(DNLBlocks.CHAOS_SPAWNER_DIAMOND_EDGE.get(), new Item.Properties()));
@@ -153,8 +137,6 @@ public class DNLItems {
     public static final Supplier<Item> DIAMOND_STONE_NOTCH = register("diamond_stone_notch", () -> new BlockItem(DNLBlocks.DIAMOND_STONE_NOTCH.get(), new Item.Properties()));
     public static final Supplier<Item> NETHERITE_STONE_NOTCH = register("netherite_stone_notch", () -> new BlockItem(DNLBlocks.NETHERITE_STONE_NOTCH.get(), new Item.Properties()));
     public static final Supplier<Item> SIGNAL_GATE = register("signal_gate", () -> new BlockItem(DNLBlocks.SIGNAL_GATE.get(), new Item.Properties()));
-    public static final Supplier<Item> SIGNAL_RAIL = register("signal_rail", () -> new BlockItem(DNLBlocks.SIGNAL_RAIL.get(), new Item.Properties()));
-    public static final Supplier<Item> CHAINED_RAIL = register("chained_rail", () -> new BlockItem(DNLBlocks.CHAINED_RAIL.get(), new Item.Properties()));
     public static final Supplier<Item> SCUTTLE_STATUE = register("scuttle_statue", () -> new BlockItem(DNLBlocks.SCUTTLE_STATUE.get(), new Item.Properties()));
     public static final Supplier<Item> BALLISTA_GOLEM_STATUE = register("ballista_golem_statue", () -> new BlockItem(DNLBlocks.BALLISTA_GOLEM_STATUE.get(), new Item.Properties()));
     public static final Supplier<Item> OVERCHARGED_REDSTONE_BLOCK = register("overcharged_redstone_block", () -> new BlockItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get(), new Item.Properties()));
@@ -209,10 +191,6 @@ public class DNLItems {
 
     private static <T extends Item> Supplier<T> register(String name, Supplier<T> itemSupplier) {
         return Services.REGISTRY.register(BuiltInRegistries.ITEM, name, itemSupplier);
-    }
-
-    private static Supplier<Item> warningSign(String name, Supplier<Block> block) {
-        return register(name, () -> new WarningSignBlockItem(block.get(), new Item.Properties()));
     }
 
     public static Map<ResourceKey<CreativeModeTab>, ArrayList<ResourceLocation>> getItemTabs() {
