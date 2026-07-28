@@ -48,7 +48,6 @@ public class DNLBlocks {
     // MECHANICAL BLOCKS
     public static Supplier<Block> BOOK_PILE;// = registerBlock("book_pile", () -> new BookPileBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOL)));
     public static Supplier<Block> EXPLOSIVE_BARREL;// = registerBlock("explosive_barrel", () -> new ExplosiveBarrelBlock(BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.GRASS)));
-    public static Supplier<Block> SILVERFISH_BARREL;
     public static Supplier<Block> COBBLESTONE_PEBBLES;// = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> MOSSY_COBBLESTONE_PEBBLES;// = registerBlock("mossy_cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
     public static Supplier<Block> IRON_INGOT_PILE;// = registerBlock("iron_ingot_pile", () -> new PileBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL)));
@@ -122,7 +121,6 @@ public class DNLBlocks {
     public static Supplier<Block> DURITE_QUELLER;
     public static Supplier<Block> DUNGEON_DIRECTOR;
     public static Supplier<Block> SPAWN_NODE;
-    public static Supplier<Block> BRITTLESTONE;
     public static Supplier<Block> SIGNAL_RAIL;
     public static Supplier<Block> CHAINED_RAIL;
     public static Supplier<Block> HAZARD_SIGN_BOTTLE;
@@ -177,7 +175,6 @@ public class DNLBlocks {
                 .lightLevel(state -> state.hasProperty(FUSE) && state.getValue(FUSE) > 0 ? 12 : 0)
                 .emissiveRendering((state, getter, pos) -> state.hasProperty(FUSE) && state.getValue(FUSE) > 0)
         ));
-        SILVERFISH_BARREL = registerBlock("silverfish_barrel", () -> new SilverfishBarrelBlock(BlockBehaviour.Properties.of().noOcclusion().sound(SoundType.GRASS).noLootTable()));
         COBBLESTONE_PEBBLES = registerBlock("cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
         MOSSY_COBBLESTONE_PEBBLES = registerBlock("mossy_cobblestone_pebbles", () -> new PebbleBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.STONE)));
         IRON_INGOT_PILE = registerBlock("iron_ingot_pile", () -> new PileBlock(BlockBehaviour.Properties.of().strength(3.0F, 6.0F).noOcclusion().sound(SoundType.METAL)));
@@ -268,7 +265,6 @@ public class DNLBlocks {
         SPAWN_NODE = registerBlock("spawn_node", () -> new SpawnNodeBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
         DUNGEON_DIRECTOR = registerBlock("dungeon_director", () -> new DungeonDirectorBlock(BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noCollission().noLootTable()));
 
-        BRITTLESTONE = registerBlock("brittlestone", () -> new BrittlestoneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0f, 6.0f).noOcclusion()));
         SIGNAL_RAIL = registerBlock("signal_rail", () -> new SignalRailBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.RAIL)));
         CHAINED_RAIL = registerBlock("chained_rail", () -> new ChainedRailBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.POWERED_RAIL)));
         // Trophies

@@ -134,7 +134,6 @@ public class DNLFabricClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.DUNGEON_DIRECTOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SPAWN_NODE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.MENDSTONE_CHALK_MARK.get(), RenderType.cutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.BRITTLESTONE.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.SIGNAL_RAIL.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(DNLBlocks.CHAINED_RAIL.get(), RenderType.cutout());
     }

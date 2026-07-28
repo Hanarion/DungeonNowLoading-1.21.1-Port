@@ -160,7 +160,6 @@ public class DNLForgeBlockLootTableProvider extends BlockLootSubProvider {
         table.withPool(pool);
         add(bannerBlock, table);
 
-        this.dropWhenSilkTouch(DNLBlocks.BRITTLESTONE.get());
     }
 
     private LootTable.Builder fairkeeperChestBlock(Block block) {

@@ -56,7 +56,6 @@ public class DNLForgeBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(DNLBlocks.OVERCHARGED_REDSTONE_BLOCK.get());
         simpleBlockWithItem(DNLBlocks.SPAWN_NODE.get());
         anyModelBlockWithItem(DNLBlocks.DURITE_QUELLER.get(), models().cubeBottomTop(BuiltInRegistries.BLOCK.getKey(DNLBlocks.DURITE_QUELLER.get()).getPath(), modLoc("block/durite_queller_side"), modLoc("block/durite_queller_bottom"), modLoc("block/durite_queller_top")));
-        simpleBlockWithItem(DNLBlocks.BRITTLESTONE.get());
 
         dungeonDirectorBlock(DNLBlocks.DUNGEON_DIRECTOR.get());
         fullyRotatedVarientBlock(DNLBlocks.MENDING_AURA.get());

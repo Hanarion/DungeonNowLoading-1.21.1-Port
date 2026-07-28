@@ -56,8 +56,6 @@ public class DNLItems {
     public static final Supplier<Item> REPULSOR = register("repulsor", () -> new RepulsorItem(new Item.Properties().rarity(Rarity.COMMON).durability(100)));
     public static final Supplier<Item> MENDSTONE_CHALK = register("mendstone_chalk", () -> new MendstoneChalkItem(new Item.Properties().rarity(Rarity.COMMON).durability(15), DNLBlocks.MENDSTONE_CHALK_MARK.get()));
     public static final Supplier<Item> ZONE_WAND = register("zone_wand", () -> new ZoneWandItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
-    public static final Supplier<Item> MIMIC_MUCUS = register("mimic_mucus", () -> new Item(new Item.Properties().rarity(Rarity.COMMON)));
-    public static final Supplier<Item> RABBITLESS_RABBIT_STEW = register("rabbitless_rabbit_stew", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
 
     // ITEMS - MUSIC DISC
     public static final Supplier<Item> MUSIC_DISC_HELLSPAWN = register("music_disc_hellspawn", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE).jukeboxPlayable(DNLJukeboxSongs.HELLSPAWN)));
@@ -95,7 +93,6 @@ public class DNLItems {
     public static final Supplier<Item> DUNGEON_WALL_TORCH = register("dungeon_wall_torch", () -> new BlockItem(DNLBlocks.DUNGEON_WALL_TORCH.get(), new Item.Properties()));
     public static final Supplier<Item> BOOK_PILE = register("book_pile", () -> new BlockItem(DNLBlocks.BOOK_PILE.get(), new Item.Properties()));
     public static final Supplier<Item> EXPLOSIVE_BARREL = register("explosive_barrel", () -> new BlockItem(DNLBlocks.EXPLOSIVE_BARREL.get(), new Item.Properties()));
-    public static final Supplier<Item> SILVERFISH_BARREL = register("silverfish_barrel", () -> new BlockItem(DNLBlocks.SILVERFISH_BARREL.get(), new Item.Properties()));
     public static final Supplier<Item> COBBLESTONE_PEBBLE = register("cobblestone_pebble", () -> new BlockItem(DNLBlocks.COBBLESTONE_PEBBLES.get(), new Item.Properties()));
     public static final Supplier<Item> MOSSY_COBBLESTONE_PEBBLE = register("mossy_cobblestone_pebble", () -> new BlockItem(DNLBlocks.MOSSY_COBBLESTONE_PEBBLES.get(), new Item.Properties()));
     public static final Supplier<Item> IRON_INGOT_PILE = register("iron_ingot_pile", () -> new BlockItem(DNLBlocks.IRON_INGOT_PILE.get(), new Item.Properties()));
@@ -187,7 +184,6 @@ public class DNLItems {
     public static final Supplier<Item> MENDING_TABLE = register("mending_table", () -> new BlockItem(DNLBlocks.MENDING_TABLE.get(), new Item.Properties()));
     public static final Supplier<Item> MENDSTONE_CHALK_MARK = register("mendstone_chalk_mark", () -> new BlockItem(DNLBlocks.MENDSTONE_CHALK_MARK.get(), new Item.Properties()));
 
-    public static final Supplier<Item> BRITTLESTONE = register("brittlestone", () -> new BlockItem(DNLBlocks.BRITTLESTONE.get(), new Item.Properties()));
 
 
     public static final Supplier<Item> DNL_LOGO = register("dnl_logo", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));

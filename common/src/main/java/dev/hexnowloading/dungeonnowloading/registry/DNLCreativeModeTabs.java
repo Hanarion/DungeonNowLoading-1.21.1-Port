@@ -49,8 +49,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SOUL_SCORCHER.get());
                 output.accept(DNLItems.COPPER_DETONATOR.get());
                 output.accept(DNLItems.REPULSOR.get());
-                output.accept(DNLItems.MIMIC_MUCUS.get());
-                output.accept(DNLItems.RABBITLESS_RABBIT_STEW.get());
                 // Items - Tools
                 output.accept(DNLItems.MENDSTONE_CHALK.get());
                 output.accept(DNLItems.MENDSTONE_PICKAXE.get());
@@ -121,7 +119,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.DUNGEON_WALL_TORCH.get());
                 output.accept(DNLItems.BOOK_PILE.get());
                 output.accept(DNLItems.EXPLOSIVE_BARREL.get());
-                output.accept(DNLItems.SILVERFISH_BARREL.get());
 
                 output.accept(DNLItems.COBBLESTONE_PEBBLE.get());
                 output.accept(DNLItems.MOSSY_COBBLESTONE_PEBBLE.get());
@@ -198,7 +195,6 @@ public class DNLCreativeModeTabs {
                 output.accept(DNLItems.SPAWN_NODE.get());
                 output.accept(DNLItems.ZONE_WAND.get());
 
-                output.accept(DNLItems.BRITTLESTONE.get());
                 // Blocks - Trophies
                 output.accept(DNLItems.DNL_LOGO.get());
                 output.accept(DNLItems.LABYRINTH_TROPHY.get());
