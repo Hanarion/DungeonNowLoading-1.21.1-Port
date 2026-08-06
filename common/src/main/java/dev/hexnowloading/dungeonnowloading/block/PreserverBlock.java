@@ -141,8 +141,20 @@ public class PreserverBlock extends BaseEntityBlock {
     }
 
     public void setLitPreserverBlock(ServerLevel serverLevel, BlockPos blockPos) {
+        // Captured at call time; the write is deferred to the next server tick. setLitPreserverBlock
+        // runs inside GameEventListener.handleGameEvent, which can fire from the middle of another
+        // mod's tick (e.g. Sable's physics step). Performing Level.setBlock synchronously there
+        // forces that mod to recompute colliders mid-tick and can deadlock its native pipeline.
+        // Flipping the LIT property is cosmetic and has no neighbour dependency, so we push it off
+        // the event-dispatch stack. Block.UPDATE_CLIENTS (no UPDATE_NEIGHBORS) avoids re-firing
+        // block-change events that would re-enter this listener.
         Direction direction = serverLevel.getBlockState(blockPos).getValue(FACING);
-        serverLevel.setBlock(blockPos, this.blockType.defaultBlockState().setValue(LIT, true).setValue(FACING, direction), Block.UPDATE_ALL);
+        BlockState litState = this.blockType.defaultBlockState().setValue(LIT, true).setValue(FACING, direction);
+        serverLevel.getServer().execute(() -> {
+            if (serverLevel.getBlockState(blockPos).getBlock() == this) {
+                serverLevel.setBlock(blockPos, litState, Block.UPDATE_CLIENTS);
+            }
+        });
         serverLevel.scheduleTick(blockPos, this, 20);
     }
 }
