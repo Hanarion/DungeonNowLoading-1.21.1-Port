@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "minecraft:mossy_cobblestone"
+      "id": "minecraft:mossy_cobblestone"
     },
     "title": {
       "translate": "advancements.dungeonnowloading.find_jungle_pyramid.title"

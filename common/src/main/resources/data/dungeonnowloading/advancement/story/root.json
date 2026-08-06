@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "dungeonnowloading:dnl_logo"
+      "id": "dungeonnowloading:dnl_logo"
     },
     "title": {
       "translate": "advancements.dungeonnowloading.root.title"

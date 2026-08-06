@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "dungeonnowloading:combustion_cell"
+      "id": "dungeonnowloading:combustion_cell"
     },
     "title": {
       "translate": "advancements.dungeonnowloading.obtain_combustion_cell.title"

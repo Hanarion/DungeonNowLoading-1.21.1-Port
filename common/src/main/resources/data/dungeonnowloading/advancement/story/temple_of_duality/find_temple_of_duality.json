@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "dungeonnowloading:temple_of_duality_trophy"
+      "id": "dungeonnowloading:temple_of_duality_trophy"
     },
     "title": {
       "translate": "advancements.dungeonnowloading.find_temple_of_duality.title"

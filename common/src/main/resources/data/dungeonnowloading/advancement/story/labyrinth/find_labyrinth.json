@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "dungeonnowloading:labyrinth_trophy"
+      "id": "dungeonnowloading:labyrinth_trophy"
     },
     "title": {
       "translate": "advancements.dungeonnowloading.find_labyrinth.title"

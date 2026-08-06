@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "dungeonnowloading:chaotic_hexahedron"
+      "id": "dungeonnowloading:chaotic_hexahedron"
     },
     "title": {
       "translate": "advancements.dungeonnowloading.obtain_chaotic_hexahedron.title"

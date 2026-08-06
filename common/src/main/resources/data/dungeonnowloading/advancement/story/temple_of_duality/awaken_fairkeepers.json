@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "dungeonnowloading:redstone_idol"
+      "id": "dungeonnowloading:redstone_idol"
     },
     "title": {
       "translate": "advancements.dungeonnowloading.awaken_fairkeepers.title"

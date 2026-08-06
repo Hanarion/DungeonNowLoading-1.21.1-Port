@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "dungeonnowloading:catalyzed_redstone"
+      "id": "dungeonnowloading:catalyzed_redstone"
     },
     "title": {
       "translate": "advancements.dungeonnowloading.obtain_catalyzed_redstone.title"
