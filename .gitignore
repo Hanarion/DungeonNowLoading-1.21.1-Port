@@ -22,3 +22,5 @@ build
 eclipse
 run
 runs/
+.claude/.curse_api_key
+.claude/
