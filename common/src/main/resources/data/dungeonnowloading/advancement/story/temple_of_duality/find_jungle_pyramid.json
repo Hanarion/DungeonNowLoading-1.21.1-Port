@@ -25,7 +25,7 @@
             "entity": "this",
             "predicate": {
               "location": {
-                "structure": "minecraft:jungle_pyramid"
+                "structures": "minecraft:jungle_pyramid"
               }
             }
           }
