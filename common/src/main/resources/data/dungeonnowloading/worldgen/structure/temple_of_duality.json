@@ -16,5 +16,6 @@
   },
   "start_jigsaw_name": "dungeonnowloading:start",
   "max_distance_from_center": 117,
-  "use_expansion_hack": false
+  "use_expansion_hack": false,
+  "sample_biome_at_surface": true
 }

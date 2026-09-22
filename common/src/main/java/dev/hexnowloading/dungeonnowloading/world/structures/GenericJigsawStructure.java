@@ -35,7 +35,8 @@ public class GenericJigsawStructure extends Structure {
             Codec.intRange(0, 100).optionalFieldOf("extra_surface_size", 0).forGetter(structure -> structure.extraSurfaceSize),
             Codec.intRange(1, 128).optionalFieldOf("extra_surface_max_distance_from_center", 80).forGetter(structure -> structure.extraSurfaceMaxDistanceFromCenter),
             Heightmap.Types.CODEC.optionalFieldOf("extra_surface_heightmap", Heightmap.Types.WORLD_SURFACE_WG).forGetter(structure -> structure.extraSurfaceHeightmap),
-            Codec.INT.optionalFieldOf("extra_surface_y_offset", 0).forGetter(structure -> structure.extraSurfaceYOffset)
+            Codec.INT.optionalFieldOf("extra_surface_y_offset", 0).forGetter(structure -> structure.extraSurfaceYOffset),
+            Codec.BOOL.optionalFieldOf("sample_biome_at_surface", false).forGetter(structure -> structure.sampleBiomeAtSurface)
     ).apply(instance, GenericJigsawStructure::new));
     private final Holder<StructureTemplatePool> startPool;
     private final Optional<ResourceLocation> startJigsawName;
@@ -50,8 +51,9 @@ public class GenericJigsawStructure extends Structure {
     private final int extraSurfaceMaxDistanceFromCenter;
     private final Heightmap.Types extraSurfaceHeightmap;
     private final int extraSurfaceYOffset;
+    private final boolean sampleBiomeAtSurface;
 
-    public GenericJigsawStructure(StructureSettings config, Holder<StructureTemplatePool> startPool, Optional<ResourceLocation> startJigsawName, int size, HeightProvider startHeight, boolean useExpansionHack, Optional<Heightmap.Types> projectStartToHeightmap, int maxDistanceFromCenter, Optional<Holder<StructureTemplatePool>> extraSurfacePool, Optional<ResourceLocation> extraSurfaceStartJigsawName, int extraSurfaceSize, int extraSurfaceMaxDistanceFromCenter, Heightmap.Types extraSurfaceHeightmap, int extraSurfaceYOffset) {
+    public GenericJigsawStructure(StructureSettings config, Holder<StructureTemplatePool> startPool, Optional<ResourceLocation> startJigsawName, int size, HeightProvider startHeight, boolean useExpansionHack, Optional<Heightmap.Types> projectStartToHeightmap, int maxDistanceFromCenter, Optional<Holder<StructureTemplatePool>> extraSurfacePool, Optional<ResourceLocation> extraSurfaceStartJigsawName, int extraSurfaceSize, int extraSurfaceMaxDistanceFromCenter, Heightmap.Types extraSurfaceHeightmap, int extraSurfaceYOffset, boolean sampleBiomeAtSurface) {
         super(config);
         this.startPool = startPool;
         this.startJigsawName = startJigsawName;
@@ -66,6 +68,7 @@ public class GenericJigsawStructure extends Structure {
         this.extraSurfaceMaxDistanceFromCenter = extraSurfaceMaxDistanceFromCenter;
         this.extraSurfaceHeightmap = extraSurfaceHeightmap;
         this.extraSurfaceYOffset = extraSurfaceYOffset;
+        this.sampleBiomeAtSurface = sampleBiomeAtSurface;
     }
 
     @Override
@@ -86,7 +89,29 @@ public class GenericJigsawStructure extends Structure {
                         net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup.EMPTY,
                         net.minecraft.world.level.levelgen.structure.pools.DimensionPadding.ZERO,
                         net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings.APPLY_WATERLOGGING);
-        return structurePiecesGenerator.map(generationStub -> this.addExtraSurfacePieces(context, generationStub));
+        return structurePiecesGenerator.map(generationStub -> {
+            GenerationStub stub = this.addExtraSurfacePieces(context, generationStub);
+            return this.sampleBiomeAtSurface ? this.withSurfaceBiomeSample(context, stub) : stub;
+        });
+    }
+
+    /**
+     * Rewraps the stub so vanilla's biome check (Structure.isValidBiome) samples the surface
+     * climate instead of the underground start height. Overhaul mods like No Man's Land replace
+     * the underground column under their biomes with a generic cave biome, which hides the
+     * surface climate from structures that generate at a fixed depth. The pieces themselves are
+     * untouched: only the position used for the biome predicate moves to the surface.
+     */
+    private GenerationStub withSurfaceBiomeSample(GenerationContext context, GenerationStub generationStub) {
+        ChunkPos chunkPos = context.chunkPos();
+        int surfaceY = context.chunkGenerator().getFirstOccupiedHeight(
+                chunkPos.getMiddleBlockX(),
+                chunkPos.getMiddleBlockZ(),
+                Heightmap.Types.WORLD_SURFACE_WG,
+                context.heightAccessor(),
+                context.randomState());
+        BlockPos surfacePos = new BlockPos(chunkPos.getMiddleBlockX(), surfaceY, chunkPos.getMiddleBlockZ());
+        return new GenerationStub(surfacePos, Either.right(generationStub.getPiecesBuilder()));
     }
 
     private GenerationStub addExtraSurfacePieces(GenerationContext context, GenerationStub generationStub) {
