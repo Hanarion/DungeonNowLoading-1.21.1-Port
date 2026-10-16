@@ -580,7 +580,14 @@ public class DuriteQuellerBlockEntity extends BlockEntity implements ZoneReceive
         delayTicks = tag.getInt("delayTicks");
         pending = tag.getBoolean("pending");
         wasPowered = tag.getBoolean("wasPowered");
-        this.phase = Phase.valueOf(tag.getString("phase"));
+        // Tolerate a missing/unknown value: loadAdditional also runs on tags that
+        // carry no "phase" key (e.g. the default empty update tag on chunk re-sync),
+        // and Phase.valueOf("") would disconnect the player from the world (#14).
+        this.phase = switch (tag.getString("phase")) {
+            case "SPAWNING" -> Phase.SPAWNING;
+            case "WAITING" -> Phase.WAITING;
+            default -> Phase.NONE;
+        };
         this.spawnTicksLeft = tag.getInt("spawnTicksLeft");
         this.waitTicksLeft = tag.getInt("waitTicksLeft");
 
