@@ -7,15 +7,6 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "dungeonnowloading:temple_of_duality/chamber/normal/pillar_parkour",
-        "processors": "dungeonnowloading:temple_of_duality/generic_degradation"
-      }
-    },
-    {
-      "weight": 1,
-      "element": {
-        "element_type": "minecraft:single_pool_element",
-        "projection": "rigid",
         "location": "dungeonnowloading:temple_of_duality/chamber/normal/pressure_plate",
         "processors": "dungeonnowloading:temple_of_duality/generic_degradation"
       }

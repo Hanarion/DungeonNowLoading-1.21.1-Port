@@ -25,15 +25,6 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "dungeonnowloading:temple_of_duality/chamber/easy/arrow_lane",
-        "processors": "dungeonnowloading:temple_of_duality/generic_degradation"
-      }
-    },
-    {
-      "weight": 1,
-      "element": {
-        "element_type": "minecraft:single_pool_element",
-        "projection": "rigid",
         "location": "dungeonnowloading:temple_of_duality/chamber/easy/lava",
         "processors": "dungeonnowloading:temple_of_duality/generic_degradation"
       }
